@@ -30,8 +30,6 @@ en la nueva estructura.
 4. "todos los archivos de producto estaban al pedo, resumí todo lo que
    puedas y que sea esencial" — recorte del contenido migrado a
    `docs/product/`
-5. "crea una bitácora de prompts en algún lugar de los docs, ya que luego
-   vamos a tener que enviárselo al profesor y la cátedra"
 
 **Resultado:** `CLAUDE.md`, `docs/architecture/` (5 archivos),
 `docs/decisions/` (6 ADRs) y `docs/product/` (8 archivos resumidos)
