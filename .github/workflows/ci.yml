@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # No hay código en el repo todavía (ver docs/product/estado.md). Este job
+  # evita que el CI quede en rojo permanente por scripts que no existen aún:
+  # detecta si ya hay un package.json en la raíz y condiciona el resto.
+  check-project:
+    runs-on: ubuntu-latest
+    outputs:
+      has-package-json: ${{ steps.check.outputs.exists }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        run: |
+          if [ -f package.json ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  no-code-yet:
+    needs: check-project
+    if: needs.check-project.outputs.has-package-json == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "No hay package.json en la raíz todavía — CI queda en" \
+               "verde a propósito hasta que exista código (ver" \
+               "docs/product/estado.md). Actualizar este workflow no hace" \
+               "falta: los jobs de abajo se activan solos."
+
+  lint:
+    needs: check-project
+    if: needs.check-project.outputs.has-package-json == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint --if-present
+
+  typecheck:
+    needs: check-project
+    if: needs.check-project.outputs.has-package-json == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck --if-present
+
+  test:
+    needs: check-project
+    if: needs.check-project.outputs.has-package-json == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run test --if-present
+
+  # Compilación TypeScript (p.ej. el motor de reglas de
+  # docs/decisions/001-motor-de-reglas-paquete-separado.md), NO el build de
+  # Expo/EAS: eso consume el cupo gratuito de EAS Build y se dispara a mano,
+  # no en cada push (ver docs/architecture/04-infrastructure.md).
+  build:
+    needs: check-project
+    if: needs.check-project.outputs.has-package-json == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build --if-present
