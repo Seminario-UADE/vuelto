@@ -27,3 +27,9 @@
       (mattpocock) que ya está en el ciclo — mismo tipo de ambigüedad que se
       resolvió en `docs/decisions/007-speckit-sobre-to-spec.md`, todavía sin
       decidir cuál de las dos usar.
+- [ ] Verificar si las páginas de bancos/billeteras que se van a scrapear
+      para supermercado listan también restaurantes y/o combustible en la
+      misma página/estructura (comentario de Joaconz en PR #13). Si se
+      confirma, sumar esos rubros al alcance sale casi gratis en esfuerzo de
+      ingesta; si no, se evalúa aparte. Depende del relevamiento de fuentes
+      de más arriba.

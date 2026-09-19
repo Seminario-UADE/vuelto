@@ -47,8 +47,8 @@ agéntica (link compartido por el equipo), definir el detalle concreto del
 alcance del MVP, armar el CI base y subir todo a una branch nueva.
 
 **Prompts principales:**
-1. Análisis del proyecto + del link del runbook, filtrando qué aplica solo
-   a Vuelto vs. a Biyu.
+1. Análisis del proyecto + del link del runbook, filtrando qué aplica a
+   Vuelto.
 2. "Revisemos juntos el alcance del MVP" — definición conjunta de rubro (solo
    supermercado), 6 billeteras/bancos y cadenas de supermercado (CABA/AMBA).
 3. "Configurar CI/CD" — workflow base de GitHub Actions (lint, typecheck,
@@ -61,10 +61,6 @@ alcance del MVP, armar el CI base y subir todo a una branch nueva.
 5. "subí la carpeta a una branch nueva" — push a `config/ci-y-speckit`
    (partiendo de `main`, no de `config/skills-y-agentes` para no pisar
    trabajo en paralelo).
-6. Detectada y resuelta una ambigüedad del propio runbook: `to-spec` y
-   spec-kit hacen lo mismo — se decidió usar solo spec-kit (ver
-   `docs/decisions/007-speckit-sobre-to-spec.md`); se borró la branch vieja
-   `config/skills-y-agentes` por decisión del equipo.
 
 **Resultado:** `docs/product/alcance-mvp.md` y `docs/product/pendientes.md`
 actualizados; `.github/workflows/ci.yml` nuevo; skill `implement` instalada;
