@@ -16,11 +16,6 @@ queda como `<a confirmar>`.
 - Aprueba, corrige o rechaza en la cola de revisión de la ingesta (ADR-005).
   Si no puede hacerlo, delega por escrito en otra persona del equipo.
 
-### Scrum Master — sin rol
-
-El equipo decidió no tener Scrum Master. Sus responsabilidades no
-desaparecen: se reparten como indica la sección siguiente.
-
 ### Development Team — Front y Back
 
 Autoorganizado, dos frentes. Que cada persona tenga un frente no impide
@@ -32,28 +27,10 @@ tomar tareas del otro.
 | Back | Supabase: modelo de datos, RLS, Edge Function del ticket, ingesta / extractor | Agustín Herrero, Santiago Pazos |
 
 El **motor de reglas** (paquete TypeScript sin dependencias, con su suite
-Vitest) corre en el dispositivo pero no es ni app ni Supabase: queda sin
-asignar a un frente, `<a definir>`.
+Vitest, ADR-001) es la pieza técnica más compleja del proyecto y está a cargo
+de Agustín Herrero, dentro de Back.
 
-Joaquín es PO y además desarrolla en Front, así que no debería ser el único
-que revise su propio código: las revisiones de Front las hace Jesús.
-
-## Responsabilidades sin Scrum Master
-
-Sin ese rol, estas tareas necesitan dueño explícito. Propuesta inicial, a
-confirmar con el equipo:
-
-| Responsabilidad | Quién |
-|---|---|
-| Facilitar planning, review y retro | Rota por sprint entre los 4 `<a confirmar>` |
-| Mantener el tablero (GitHub Projects) al día | Cada persona con sus tarjetas; el PO ordena el backlog |
-| Bitácora de prompts (`../bitacora-prompts.md`) | Quien haga el trabajo con IA |
-| Consultas a la cátedra: tamaño del equipo (4 vs. 6-8) y cronograma real | Joaquín (PO) `<a confirmar>` |
-| Asistencia mínima del 75% que exige la materia | Cada integrante; se revisa en la retro |
-
-**A confirmar con la cátedra:** que la materia no exija un Scrum Master
-formal (`restricciones-catedra.md` pide "metodología ágil" sin detallar
-roles).
+Las revisiones de código las hacemos todos.
 
 ## Ceremonias
 
