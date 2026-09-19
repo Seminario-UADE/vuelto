@@ -11,7 +11,7 @@ datos reales de usuarios de prueba, no un entorno de producción comercial.
 | Medios de pago declarados (billeteras, bancos, tarjetas) | Perfil (RF-01) | Sí |
 | Comercios habituales | Perfil (RF-02) | Sí, opcional |
 | Imagen del ticket | Cámara del usuario | **No** |
-| Texto extraído del ticket (monto, comercio, medio de pago, descuento) | Extractor (ADR-006) | Sí, junto al registro de compra |
+| Texto extraído del ticket: monto, comercio, medio de pago, promoción aplicada, descuento obtenido, reintegro esperado, fecha estimada de acreditación, origen del registro (`ticket` / `excepción` / `manual`) | Extractor (ADR-006), `01-data-models.md` §Compra | Sí, junto al registro de compra |
 | Registro de compra confirmado | Confirmación del usuario (RF-09) | Sí |
 
 ## Imágenes de ticket: retención durante el procesamiento
@@ -66,4 +66,5 @@ se actualiza si esa funcionalidad avanza más allá del nivel 0.
 ---
 
 Fuentes: ADR-006, `CLAUDE.md`, `requisitos.md` (RNF-06, RNF-07),
-`architecture/04-infrastructure.md`.
+`architecture/04-infrastructure.md`, `architecture/01-data-models.md`
+(§Compra, §Perfil de usuario).
