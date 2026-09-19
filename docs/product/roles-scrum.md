@@ -1,11 +1,11 @@
 # Roles de Scrum
 
-Equipo de 4 integrantes. Los nombres se completan donde dice `<a definir>`;
-lo que depende del cronograma real de la cátedra queda como `<a confirmar>`.
+Equipo de 4 integrantes. Lo que depende del cronograma real de la cátedra
+queda como `<a confirmar>`.
 
 ## Roles
 
-### Product Owner — `<a definir>`
+### Product Owner — Joaquín Nuñez
 
 - Custodia la regla de oro: si una funcionalidad se puede describir como
   "mostrar promociones", no entra al backlog (`problema.md`).
@@ -16,30 +16,44 @@ lo que depende del cronograma real de la cátedra queda como `<a confirmar>`.
 - Aprueba, corrige o rechaza en la cola de revisión de la ingesta (ADR-005).
   Si no puede hacerlo, delega por escrito en otra persona del equipo.
 
-### Scrum Master — `<a definir>`
+### Scrum Master — sin rol
 
-- Facilita las ceremonias y cuida que se cumplan los acuerdos de este documento.
-- Destraba los impedimentos externos: confirmar con la cátedra el tamaño del
-  equipo (4 vs. 6-8) y el cronograma real del cuatrimestre.
-- Mantiene actualizado el tablero y la bitácora de prompts
-  (`../bitacora-prompts.md`).
-- Vigila la asistencia mínima del 75% que exige la materia.
+El equipo decidió no tener Scrum Master. Sus responsabilidades no
+desaparecen: se reparten como indica la sección siguiente.
 
-### Development Team — `<a definir>` (integrantes restantes)
+### Development Team — Front y Back
 
-Autoorganizado. Las áreas técnicas del proyecto, para que cada una tenga una
-persona de referencia (no implica exclusividad):
+Autoorganizado, dos frentes. Que cada persona tenga un frente no impide
+tomar tareas del otro.
 
-| Área | Alcance | Referente |
+| Frente | Alcance | Integrantes |
 |---|---|---|
-| Motor de reglas | Paquete TypeScript sin dependencias + suite Vitest | `<a definir>` |
-| Ingesta / extractor | Playwright, Gemini con esquema, chequeo de salud | `<a definir>` |
-| App Expo | Perfil, recomendación, registro por ticket | `<a definir>` |
-| Supabase | Modelo de datos, RLS, Edge Function del ticket | `<a definir>` |
+| Front | App Expo: perfil, recomendación, registro por ticket | Joaquín Nuñez, Jesús Quijada |
+| Back | Supabase: modelo de datos, RLS, Edge Function del ticket, ingesta / extractor | Agustín Herrero, Santiago Pazos |
 
-Con 4 personas, una misma persona puede ser Scrum Master y parte del
-Development Team; el Product Owner no debería ser el único referente de un
-área, para no revisar su propio trabajo.
+El **motor de reglas** (paquete TypeScript sin dependencias, con su suite
+Vitest) corre en el dispositivo pero no es ni app ni Supabase: queda sin
+asignar a un frente, `<a definir>`.
+
+Joaquín es PO y además desarrolla en Front, así que no debería ser el único
+que revise su propio código: las revisiones de Front las hace Jesús.
+
+## Responsabilidades sin Scrum Master
+
+Sin ese rol, estas tareas necesitan dueño explícito. Propuesta inicial, a
+confirmar con el equipo:
+
+| Responsabilidad | Quién |
+|---|---|
+| Facilitar planning, review y retro | Rota por sprint entre los 4 `<a confirmar>` |
+| Mantener el tablero (GitHub Projects) al día | Cada persona con sus tarjetas; el PO ordena el backlog |
+| Bitácora de prompts (`../bitacora-prompts.md`) | Quien haga el trabajo con IA |
+| Consultas a la cátedra: tamaño del equipo (4 vs. 6-8) y cronograma real | Joaquín (PO) `<a confirmar>` |
+| Asistencia mínima del 75% que exige la materia | Cada integrante; se revisa en la retro |
+
+**A confirmar con la cátedra:** que la materia no exija un Scrum Master
+formal (`restricciones-catedra.md` pide "metodología ágil" sin detallar
+roles).
 
 ## Ceremonias
 

@@ -107,7 +107,7 @@ prioridad del MVP.
 | RNF-09 | **Extractor medido.** | Existe un informe de precisión por campo sobre 15-20 tickets reales y sobre el corpus de promos. | ADR-005, ADR-006 |
 | RNF-10 | **Costo $0** durante el cuatrimestre. | Todos los servicios dentro del tier gratuito (`04-infrastructure.md` §Servicios). | `CLAUDE.md`, `04-infrastructure.md` |
 | RNF-11 | **Demostrable.** | La app corre por Expo Go (QR); hay build de EAS de respaldo. | `04-infrastructure.md` §Distribución, `restricciones-catedra.md` |
-| RNF-12 | **Alcance geográfico.** | Solo CABA/AMBA; el corpus no incluye promos fuera de esa zona. | `alcance-mvp.md` |
+| RNF-12 | **Alcance acotado.** | Solo CABA/AMBA; corpus de supermercado, combustible y restaurantes de las 6 billeteras/bancos definidos; supermercado es el único flujo de compra optimizado. | `alcance-mvp.md` |
 | RNF-13 | **Scraping respetuoso.** | Se respeta `robots.txt`, frecuencia limitada y agente identificado. | `riesgos.md` |
 | RNF-14 | **Cumplimiento de la materia.** | Sprints con tablero, dos entregas parciales, documentación final, research con datos reales. | `restricciones-catedra.md` |
 
@@ -118,7 +118,7 @@ No se dan por chequeados hasta resolver el pendiente que los frena
 
 | Requisito | Qué falta | Issue |
 |---|---|---|
-| RF-01, RF-02, RF-18, RNF-12 | Rubros, billeteras y cadenas concretas del alcance | #8 |
+| RF-18 | Tamaño del corpus sembrado a mano: el alcance ya está definido (`alcance-mvp.md`) pero falta verificar sucursales reales de las cadenas | #8 |
 | RF-13, RNF-13 | Relevar fuentes: HTML vs. SPA/JSON, términos de uso, `robots.txt`; y dónde corre el cron | #12 |
 | RNF-06 | Política de retención de imágenes de ticket durante el procesamiento | #11 |
 | RF-08, RNF-09 | Proveedor/modelo del extractor y precisión sobre tickets reales | #10 |
@@ -129,14 +129,11 @@ No se dan por chequeados hasta resolver el pendiente que los frena
 
 ## Chequeo de coherencia (issue #3)
 
-Revisión hecha contra `alcance-mvp.md`, `restricciones-catedra.md` y
-`../architecture/`:
+Revisión hecha contra `alcance-mvp.md` (ya con rubros y billeteras
+concretos), `restricciones-catedra.md` y `../architecture/`:
 
 - Todo RF/RNF traza a una fuente; ninguno inventa alcance.
 - Nada del listado cae en "Fuera" del alcance (integración bancaria, lectura de
   resúmenes, publicación sin revisión, cobertura nacional, app nativa).
-- Tensión detectada: `alcance-mvp.md` dice "4-5 billeteras/bancos" y "1-3
-  rubros" pero no los nombra; sin eso RF-18 no tiene tamaño verificable
-  (#8).
 - Tensión detectada: RF-05 es deseable pero depende del disparo del momento
   de uso, que además es un riesgo (`riesgos.md`: solo 16% acepta permisos).
