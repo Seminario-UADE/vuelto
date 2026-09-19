@@ -38,6 +38,44 @@ migrar todo su contenido relevante a la nueva estructura.
 
 ---
 
+## 2026-09-19 — Runbook de configuración agéntica, alcance del MVP y CI
+
+**Herramienta:** Claude Code (Sonnet 5).
+
+**Objetivo:** ejecutar la parte de Vuelto del runbook de configuración
+agéntica (link compartido por el equipo), definir el detalle concreto del
+alcance del MVP, armar el CI base y subir todo a una branch nueva.
+
+**Prompts principales:**
+1. Análisis del proyecto + del link del runbook, filtrando qué aplica solo
+   a Vuelto vs. a Biyu.
+2. "Revisemos juntos el alcance del MVP" — definición conjunta de rubro (solo
+   supermercado), 6 billeteras/bancos y cadenas de supermercado (CABA/AMBA).
+3. "Configurar CI/CD" — workflow base de GitHub Actions (lint, typecheck,
+   test, build), condicionado a que exista `package.json` para no fallar por
+   código que todavía no existe.
+4. Ejecución en orden de los pasos del runbook que aplican a Vuelto:
+   auditoría de `.claude/`, instalación de la skill `implement` faltante,
+   instalación de spec-kit y comparación de su formato de spec contra el de
+   la cátedra (bloqueado: el PDF de la cátedra no está en el repo).
+5. "subí la carpeta a una branch nueva" — push a `config/ci-y-speckit`
+   (partiendo de `main`, no de `config/skills-y-agentes` para no pisar
+   trabajo en paralelo).
+6. Detectada y resuelta una ambigüedad del propio runbook: `to-spec` y
+   spec-kit hacen lo mismo — se decidió usar solo spec-kit (ver
+   `docs/decisions/007-speckit-sobre-to-spec.md`); se borró la branch vieja
+   `config/skills-y-agentes` por decisión del equipo.
+
+**Resultado:** `docs/product/alcance-mvp.md` y `docs/product/pendientes.md`
+actualizados; `.github/workflows/ci.yml` nuevo; skill `implement` instalada;
+spec-kit inicializado (`.specify/`) con una feature de prueba
+(`specs/001-perfil-billeteras/`); `docs/decisions/007-speckit-sobre-to-spec.md`
+nuevo; branch `config/ci-y-speckit` pusheada a
+`Seminario-UADE/vuelto` con 6 commits, PR sin abrir todavía; branch
+`config/skills-y-agentes` eliminada del remoto.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

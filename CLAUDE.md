@@ -75,3 +75,10 @@ Issues viven en GitHub Issues (`Seminario-UADE/vuelto`), vía la CLI `gh`. Ver
 Layout single-context. Los docs de dominio viven en `docs/product/`,
 `docs/architecture/` y `docs/decisions/` (en vez de `CONTEXT.md`/`docs/adr/`,
 que es el default de las skills). Ver `docs/agents/domain.md`.
+
+### Specs
+
+Las specs de feature se generan con spec-kit (`/speckit-specify →
+spec-critic → /speckit-plan → /speckit-tasks → /implement → /code-review →
+test-runner`), no con la skill `to-spec`. Ver
+`docs/decisions/007-speckit-sobre-to-spec.md`.
