@@ -98,6 +98,28 @@ todo quedó en el Project "Seminario UADE - Vuelto".
 
 ---
 
+## 2026-09-19 — Política de privacidad y retención de datos (issue #11)
+
+**Herramienta:** Claude Code (Sonnet 5), con `gh` CLI.
+
+**Objetivo:** resolver el issue #11 ("Añadir política de privacidad /
+retención de datos"), que desbloqueaba RNF-06 en `requisitos.md`.
+
+**Prompts principales:**
+1. "Arranquemos con el issue 11 de privacidad, imagino que será una
+   documentación."
+2. Revisión conjunta del flujo existente (ADR-006, RNF-06, la Edge Function
+   de tickets en `04-infrastructure.md`) antes de escribir la política, para
+   no inventar reglas nuevas por fuera de lo ya decidido.
+
+**Resultado:** `docs/product/privacidad.md` nuevo (qué datos se recopilan,
+retención de imágenes de ticket durante el procesamiento, qué se persiste y
+por cuánto tiempo, terceros involucrados, derechos del usuario);
+`docs/product/pendientes.md` y `docs/product/requisitos.md` actualizados
+para reflejar el pendiente resuelto.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
