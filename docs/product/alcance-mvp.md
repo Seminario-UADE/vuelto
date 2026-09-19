@@ -1,18 +1,39 @@
 # Alcance del MVP
 
-**Dentro:** CABA/AMBA, 1 rubro (supermercado, ver detalle abajo), un solo
-flujo optimizado (compra de supermercado), 6 billeteras/bancos, cadenas de
-supermercado con sucursales en CABA/AMBA, ingesta asistida con revisión
-humana, perfil declarado por el usuario, registro por ticket, gasto en grupo
-nivel 0 (ver abajo).
+**Dentro:** CABA/AMBA, 3 rubros de corpus (supermercado, combustible y
+restaurantes/gastronomía, ver detalle abajo), un solo flujo optimizado
+(compra de supermercado), 6 billeteras/bancos, cadenas de supermercado con
+sucursales en CABA/AMBA, ingesta asistida con revisión humana, perfil
+declarado por el usuario, registro por ticket, gasto en grupo nivel 0 (ver
+abajo).
 
 **Fuera:** integración bancaria, lectura de resúmenes, publicación sin
 revisión humana, cobertura nacional, app nativa (se usa Expo).
 
 ## Rubro, billeteras y cadenas concretas
 
-- **Rubro:** solo supermercado. Es el único flujo optimizado del MVP — no se
-  suman combustible, farmacia ni gastronomía/delivery.
+- **Rubro:** supermercado, combustible y restaurantes/gastronomía entran al
+  corpus de promociones. **Supermercado sigue siendo el único flujo
+  optimizado** de compra del MVP — combustible y restaurantes se ingestan y
+  quedan disponibles para el control de tope, pero no tienen un flujo de
+  compra dedicado todavía.
+  - Se verificó (research web, no scraping real todavía) que los 6
+    proveedores del alcance publican supermercado, combustible y
+    restaurantes/gastronomía como categorías de la misma página o portal de
+    beneficios: el buscador de promociones de Galicia filtra por categoría
+    incluyendo combustible junto a supermercados; los paquetes Black+ de
+    BBVA comparten un mismo tope de reintegro entre supermercado,
+    combustible y gastronomía; Santander lista "indumentaria, supermercados,
+    farmacias, combustible" en una sola página de beneficios; MODO y Mercado
+    Pago publican los tres rubros en el mismo resumen mensual de
+    promociones. El costo de ingesta extra de sumar estos dos rubros es
+    marginal sobre el de supermercado, no una fuente nueva por rubro.
+  - Farmacia queda afuera: no apareció junto a los otros tres con la misma
+    consistencia en la búsqueda, y no se investigó a fondo — se puede
+    reconsiderar más adelante con el mismo criterio.
+  - Sigue pendiente relevar las fuentes reales (HTML vs. SPA/JSON, robots.txt)
+    antes de scrapear — esto solo confirma que los rubros están juntos, no
+    reemplaza el relevamiento técnico (`pendientes.md`).
 - **Billeteras y bancos** (6): Mercado Pago, MODO, Cuenta DNI (Banco
   Provincia), Santander, Galicia, BBVA. MODO agrega el pago interbancario,
   pero el tope de reintegro se controla por banco (ver
