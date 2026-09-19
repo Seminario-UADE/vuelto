@@ -56,9 +56,11 @@ roadmap inicial" (#6) del repositorio.
 
 **Resultado:** `docs/product/requisitos.md` (RF/RNF con criterios de
 aceptación y requisitos bloqueados por pendientes) y
-`docs/product/roles-scrum.md` (roles, ceremonias, DoR/DoD). #6 quedó sin
-resolver: el token de `gh` no tiene el scope `project`, necesario para leer
-y escribir en el GitHub Project.
+`docs/product/roles-scrum.md` (roles, ceremonias, DoR/DoD). #6 se resolvió
+en GitHub, no en `docs/`: tras ampliar el scope `project` del token de `gh`,
+se crearon 8 épicas (#15-#22) como issues con etiqueta `epic`, se enlazaron
+los issues existentes como sub-issues, se crearon 3 milestones sin fecha y
+todo quedó en el Project "Seminario UADE - Vuelto".
 
 ---
 
