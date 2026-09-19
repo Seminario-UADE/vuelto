@@ -38,6 +38,30 @@ migrar todo su contenido relevante a la nueva estructura.
 
 ---
 
+## 2026-09-19 — Requisitos y roles de Scrum (issues #3 y #2)
+
+**Herramienta:** Claude Code (Opus 5 / Sonnet 5), con `gh` CLI.
+
+**Objetivo:** resolver las stories "Chequear requerimientos (funcionales y no
+funcionales)" (#3), "Definir roles de Scrum" (#2) y "Crear épicas y asentar
+roadmap inicial" (#6) del repositorio.
+
+**Prompts principales:**
+1. "si tenes github cli, realiza esta stories: Chequear requerimientos,
+   Definir roles de Scrum #2, Crear épicas y asentar roadmap inicial #6"
+2. Decisiones tomadas en la sesión: entregables en `docs/` + comentario en el
+   issue; nombres del equipo como placeholders; el roadmap vive solo en el
+   GitHub Project existente (nada de roadmap en `docs/`); cerrar los issues
+   al terminar.
+
+**Resultado:** `docs/product/requisitos.md` (RF/RNF con criterios de
+aceptación y requisitos bloqueados por pendientes) y
+`docs/product/roles-scrum.md` (roles, ceremonias, DoR/DoD). #6 quedó sin
+resolver: el token de `gh` no tiene el scope `project`, necesario para leer
+y escribir en el GitHub Project.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
