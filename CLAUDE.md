@@ -62,3 +62,16 @@ reales de dev/build/test.
 Integración bancaria directa, lectura automática de resúmenes/movimientos,
 publicación de promos sin revisión humana, cobertura nacional, app nativa nuda
 (se usa Expo).
+
+## Agent skills
+
+### Issue tracker
+
+Issues viven en GitHub Issues (`Seminario-UADE/vuelto`), vía la CLI `gh`. Ver
+`docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Layout single-context. Los docs de dominio viven en `docs/product/`,
+`docs/architecture/` y `docs/decisions/` (en vez de `CONTEXT.md`/`docs/adr/`,
+que es el default de las skills). Ver `docs/agents/domain.md`.
