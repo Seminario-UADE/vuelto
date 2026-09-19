@@ -20,6 +20,16 @@ Costo total durante el cuatrimestre: **$0**.
   escribir en `capturas_crudas`, saltea row-level security por completo —
   tratarla como llave maestra.
 
+## CI
+
+`.github/workflows/ci.yml` corre lint, typecheck, test y build (compilación
+TS, no build de Expo/EAS) en cada push/PR a `main`, con los mismos comandos
+que usa el subagente `test-runner` (`npm run lint|typecheck|test|build`). No
+tiene relación con el cron de ingesta de abajo — comparten runner
+(GitHub Actions) pero no credenciales ni objetivo. Mientras no exista
+`package.json` en la raíz (ver `../product/estado.md`), el workflow lo
+detecta y no falla: queda en verde con un aviso hasta que haya código.
+
 ## Pipeline de ingesta
 
 | Paso | Dónde corre | Qué hace |
