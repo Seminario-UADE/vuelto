@@ -18,6 +18,7 @@ Contexto completo del producto: `docs/product/`.
 Arquitectura técnica: `docs/architecture/`.
 Decisiones y su razonamiento: `docs/decisions/`.
 Registro de sesiones de trabajo con IA (para la cátedra): `docs/bitacora-prompts.md`.
+Declaración end-to-end de dónde se usa IA en el proyecto: `docs/uso-de-ia.md`.
 
 ## Estado
 
