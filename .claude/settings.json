@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "status=$(git status --porcelain 2>/dev/null); if [ -z \"$status\" ]; then exit 0; fi; if echo \"$status\" | grep -q \"docs/bitacora-prompts.md\"; then exit 0; fi; echo \"{\\\"systemMessage\\\": \\\"📝 Esta sesión modificó archivos pero docs/bitacora-prompts.md no fue actualizado. Registrá la sesión (requisito de la cátedra, ver CLAUDE.md).\\\"}\""
+          }
+        ]
+      }
+    ]
+  }
+}
