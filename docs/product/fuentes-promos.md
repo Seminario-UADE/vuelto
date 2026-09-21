@@ -14,7 +14,7 @@ abierto en `pendientes.md`.
 | Fuente | robots.txt | Términos de uso | Estructura | Automatizable |
 |---|---|---|---|---|
 | **Mercado Pago** | Permite `/promociones` | **Prohíbe explícitamente** robots/scraping (verificado, cita textual abajo) | No determinada (403 al fetch; no se probó Playwright por la prohibición) | **No** |
-| **MODO** | Permite, incluso nombra bots de IA como permitidos | Sin cláusula de scraping (verificado, fetch directo) | **SPA confirmada** con Playwright | **Sí** |
+| **MODO** | Permite, incluso nombra bots de IA como permitidos | Sin cláusula de scraping (verificado, fetch directo) | **SPA con API REST pública detectada** (`/promos/api/rewards/*`, sin autenticación) — no hace falta Playwright para ingestar | **Sí** |
 | **Cuenta DNI (Banco Provincia)** | Totalmente abierto | Sin cláusula de scraping en el PDF de términos | **HTML tradicional confirmado** | **Sí** |
 | **Santander** | No verificable (timeout) | Sin cláusula explícita; aviso legal genérico restrictivo | No determinable — **bloqueado incluso con Playwright** (navegador real, timeout total) | **No** |
 | **Galicia** | Permite; tiene `sitemap-beneficios.xml` dedicado | Sin prohibición de scraping (verificado, PDF leído completo); sí prohíbe copiar/redistribuir/comercializar contenido sin consentimiento escrito — zona gris | **SPA confirmada** (`#spa-root` en el HTML) | **Sí** |
@@ -37,7 +37,12 @@ abierto en `pendientes.md`.
 - `robots.txt` (`modo.com.ar/robots.txt`) permite todo (`Allow: /`), y nombra explícitamente bots de IA como permitidos (`GPTBot`, `ClaudeBot`, `PerplexityBot`, `Google-Extended`, `Gemini-User`). Bloquea solo `/api/`, `/data/` y rutas de flujo interno (`/pagar/`, `/scan-qr/`, `/validar-identidad/`).
 - Términos de uso (`modo.com.ar/terminos-y-condiciones`), leídos con fetch directo: sin cláusula de scraping. Solo una genérica de no usar mecanismos para impedir el funcionamiento del sitio.
 - Estructura confirmada con Playwright real: el HTML crudo (sin JS) trae solo 47 caracteres de texto visible (el `<title>`); el contenido renderizado tiene 3251 caracteres de texto visible con las promos. **SPA confirmada.**
-- **Automatizable** con Playwright, esperando el render.
+- **Hallazgo posterior, más importante que lo anterior**: inspeccionando las requests de red que dispara la página se encontró que MODO expone una **API REST pública y sin autenticación** (`www.modo.com.ar/promos/api/rewards/...`) que responde con `curl` común, sin necesidad de navegador:
+  - `GET /promos/api/rewards/categories?subcategories=true` — las 13 categorías de comercio (Gastronomía, Farmacias, Mercados, Estaciones de Servicio, etc.), cada una con `id` numérico y `slug`.
+  - `GET /promos/api/rewards/banks?source=app_modo` — el listado completo de bancos asociados (~28), cada uno con su propio `promotion_url` (la página de beneficios de ese banco).
+  - `GET /promos/api/rewards/slots?slots=web-modo-hub-mas-promos&categories=<id>&banks=<id>&search_text=<texto>&page=<n>&limit=<n>` — el listado paginado de promos, filtrable por categoría, banco o texto libre.
+  - **Ojo con un detalle real**: filtrar por `categories=<slug>` (texto) devuelve 0 resultados; hay que usar el **id numérico** de la categoría. Este error llevó a una conclusión incorrecta en la primera pasada de este research (ver `alcance-mvp.md`). También se encontró que `search_text` no es confiable para términos cortos/comunes (ej. "Día" trae 369 resultados que no tienen nada que ver).
+- **Automatizable de forma más simple de lo esperado**: no hace falta Playwright para ingestar MODO — se puede pegar directo a esta API con requests HTTP simples, igual que Cuenta DNI. La necesidad de "esperar el render" queda relegada a cuando haga falta reproducir exactamente lo que ve el usuario en el sitio, no para extraer los datos.
 
 ### Cuenta DNI (Banco Provincia)
 
@@ -74,9 +79,9 @@ abierto en `pendientes.md`.
 
 ## Consecuencias para el pipeline de ingesta
 
-- **Automatizables con Playwright (3 de 6):** MODO y Galicia (SPA, esperar render), Cuenta DNI (HTML directo, el caso más simple).
+- **Automatizables (3 de 6):** MODO (API REST pública, `curl`/`fetch` alcanza — no hace falta Playwright), Cuenta DNI (HTML directo), Galicia (SPA, sí necesita Playwright esperando el render — no se le encontró una API equivalente a la de MODO).
 - **Captura manual (3 de 6):** Mercado Pago (prohibición contractual confirmada), Santander y BBVA (bloqueo técnico — WAF — que no cede ni con navegador real).
-- La mitad del corpus depende de que alguien del equipo copie/pegue o capture la promo a mano; esa captura entra igual al pipeline de extracción con Gemini (ADR-005) — el extractor no distingue si el texto crudo vino de un scraper o de un copy-paste humano.
+- Como el MVP se acota a una sola fuente de ingesta (MODO, ver `alcance-mvp.md`), en la práctica el ingestor del MVP ni siquiera necesita Playwright: alcanza con requests HTTP simples contra la API de MODO. Playwright queda relevante recién si se reincorporan Galicia u otras fuentes SPA en el futuro.
 
 ## Metodología y limitaciones
 
@@ -85,3 +90,4 @@ abierto en `pendientes.md`.
 - No se usó ninguna técnica de evasión de bloqueos (proxies, stealth, rotación de IP) contra Santander ni BBVA — el bloqueo se documenta tal cual se encontró, no se intentó sortear.
 - Cláusulas de términos de uso verificadas con lectura completa del documento primario: Mercado Pago (desarrolladores), Galicia, MODO. Para Cuenta DNI y Santander, la ausencia de cláusula surge de research vía búsqueda, no de una lectura exhaustiva línea por línea — no se puede descartar por completo que exista algo no encontrado.
 - BBVA quedó con una clasificación inicial incorrecta (se le atribuyó una prohibición de scraping que en realidad aplica a otro servicio) que se corrigió en esta versión del documento tras pedido de verificación más profunda.
+- MODO tuvo un error similar en la primera pasada: se concluyó que no tenía gastronomía por buscar esa palabra en el HTML renderizado con Playwright, sin saber todavía que existía una API con categorías propias. Corregido en `alcance-mvp.md` al encontrar la API y consultarla con el id numérico correcto de categoría (646 promos de gastronomía, no cero).

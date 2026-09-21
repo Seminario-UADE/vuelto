@@ -107,7 +107,7 @@ prioridad del MVP.
 | RNF-09 | **Extractor medido.** | Existe un informe de precisión por campo sobre 15-20 tickets reales y sobre el corpus de promos. | ADR-005, ADR-006 |
 | RNF-10 | **Costo $0** durante el cuatrimestre. | Todos los servicios dentro del tier gratuito (`04-infrastructure.md` §Servicios). | `CLAUDE.md`, `04-infrastructure.md` |
 | RNF-11 | **Demostrable.** | La app corre por Expo Go (QR); hay build de EAS de respaldo. | `04-infrastructure.md` §Distribución, `restricciones-catedra.md` |
-| RNF-12 | **Alcance acotado.** | Solo CABA/AMBA; corpus de supermercado, combustible y restaurantes de las 6 billeteras/bancos definidos; supermercado es el único flujo de compra optimizado. | `alcance-mvp.md` |
+| RNF-12 | **Alcance acotado.** | Solo CABA/AMBA; corpus de las 13 categorías que publica MODO (única fuente de ingesta); el flujo de compra optimizado cubre las 13, no solo supermercado. | `alcance-mvp.md`, `fuentes-promos.md` |
 | RNF-13 | **Scraping respetuoso.** | Se respeta `robots.txt`, frecuencia limitada y agente identificado. | `riesgos.md`, `fuentes-promos.md` |
 | RNF-14 | **Cumplimiento de la materia.** | Sprints con tablero, dos entregas parciales, documentación final, research con datos reales. | `restricciones-catedra.md` |
 

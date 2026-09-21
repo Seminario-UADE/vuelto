@@ -150,6 +150,54 @@ justificación legal/técnica; `docs/product/pendientes.md` y
 
 ---
 
+## 2026-09-21 — Reducción del alcance de billeteras a MODO
+
+**Herramienta:** Claude Code (Sonnet 5), con Playwright.
+
+**Objetivo:** decidir el alcance de billeteras/bancos del MVP a partir de
+las limitaciones de scraping encontradas en `fuentes-promos.md`, y validar
+qué rubros de comercio publica efectivamente la fuente elegida.
+
+**Prompts principales:**
+1. Decisión de producto: dado que varios bancos exigen permiso explícito
+   (o bloquean técnicamente) el scraping de sus promociones, se acota el
+   alcance del MVP a una sola billetera, MODO. Coordinar el permiso con el
+   resto de los bancos/billeteras queda fuera de alcance del MVP, para una
+   etapa futura.
+2. Pedido de revisar qué rubros de comercio muestra MODO en sus
+   promociones, para validar si el corpus de rubros definido (supermercado,
+   combustible, restaurantes) se sostiene con la fuente ya acotada.
+3. Pedido de verificar más a fondo gastronomía (con ejemplos concretos,
+   como el restaurante Kansas) ante una primera conclusión dudosa, y de
+   sumar Farmacias al alcance del MVP.
+4. A partir de revisar el filtro de categorías del propio sitio, decisión de
+   ampliar el corpus a las 13 categorías completas que publica MODO, en vez
+   de curar un subconjunto de rubros a mano.
+5. Decisión de que el flujo de compra optimizado cubra las 13 categorías,
+   no solo supermercado — la recomendación ya era genérica por compra, y
+   limitarla a un rubro era el recorte de alcance original, no una
+   necesidad técnica.
+
+**Resultado:** `docs/product/alcance-mvp.md` actualizado (billeteras de 6 a
+1; rubro ampliado de un subconjunto curado a las 13 categorías completas de
+MODO; el flujo de compra optimizado deja de estar acotado a supermercado).
+El rubro se revisó dos veces: la primera pasada, con Playwright sobre el
+HTML renderizado, concluyó erróneamente que gastronomía no existía en MODO;
+inspeccionar las requests de red de la propia página reveló que MODO expone
+una **API REST pública sin autenticación** (`categories`, `banks`, `slots`
+con filtros y paginación) — consultada con el id numérico correcto de
+categoría, se relevó el conteo de promos activas de las 13 categorías (de
+646 en Gastronomía a 10 en Ferretería, ~1864 en total). Cadenas de
+supermercado quedan con reconciliación pendiente: un intento de validarlas
+por `search_text` dio resultados no confiables (contradijo una observación
+directa anterior), falta paginar la categoría completa.
+`docs/product/requisitos.md` (RNF-12), `docs/product/pendientes.md` y
+`docs/architecture/04-infrastructure.md` actualizados — este último porque
+la API de MODO simplifica la ingesta: no hace falta Playwright para esta
+fuente.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

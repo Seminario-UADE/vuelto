@@ -32,4 +32,21 @@
       para supermercado listan también restaurantes y/o combustible en la
       misma página/estructura (comentario de Joaconz en PR #13) — confirmado
       por research web para los 6 proveedores del alcance, ver
-      `alcance-mvp.md`. Farmacia no se investigó, queda afuera por ahora.
+      `alcance-mvp.md`.
+      **Revisado de nuevo con el alcance ya acotado a MODO**: se había
+      concluido mal en el camino (ver ítem siguiente) que restaurantes no
+      existía en MODO; corregido — sí existe, y con más promos que ningún
+      otro rubro. Farmacias también se sumó al alcance, con evidencia real.
+- [x] Confirmar si MODO publica promociones de restaurantes/gastronomía —
+      **sí, confirmado**: 646 promos activas bajo la categoría "Gastronomía"
+      de la API de MODO (incluye Kansas), ver `alcance-mvp.md` y
+      `fuentes-promos.md`. La primera pasada de este research había
+      concluido lo contrario por un error al consultar la API (se probó con
+      el slug de texto en vez del id numérico de categoría).
+- [ ] Reconciliar la lista de cadenas de supermercado del alcance contra las
+      que efectivamente tienen promoción vigente en MODO (`alcance-mvp.md`)
+      — la lista anterior salía de presencia genérica en CABA/AMBA, no de
+      las promos reales de la única fuente que va a ingestar el MVP. Un
+      primer intento vía `search_text` por cadena dio resultados poco
+      confiables (ver `alcance-mvp.md`); falta paginar la categoría
+      "Mercados" completa y revisar los comercios uno por uno.
