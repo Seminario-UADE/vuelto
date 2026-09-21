@@ -120,6 +120,36 @@ para reflejar el pendiente resuelto.
 
 ---
 
+## 2026-09-21 — Relevamiento de fuentes de promos (issue #12)
+
+**Herramienta:** Claude Code (Sonnet 5), con WebFetch, WebSearch y Playwright
+(instalado ad-hoc para la investigación, fuera del repo).
+
+**Objetivo:** determinar, para las 6 billeteras/bancos del alcance del MVP,
+si sus páginas de promociones son HTML tradicional o SPA/JSON, y si sus
+términos de uso o `robots.txt` restringen el scraping — para resolver el
+issue #12 y desbloquear RF-13/RNF-13.
+
+**Prompts principales:**
+1. Delegación del research inicial (robots.txt, términos de uso, estructura
+   HTML/SPA de las 6 fuentes) a un subagente, para mantener el contenido
+   crudo fuera de la conversación principal.
+2. Definición del criterio de decisión ante un conflicto entre `robots.txt` y
+   términos de uso (caso Mercado Pago), y del límite ético de probar
+   Playwright solo contra fuentes sin prohibición contractual explícita.
+3. Exigencia de verificar con fetch directo cada cláusula legal citada, en
+   vez de aceptar resúmenes de búsqueda sin confirmar — esto llevó a
+   corregir una atribución incorrecta sobre BBVA (la cláusula de
+   "robots/arañas" pertenecía a otro documento, sobre geolocalización, no al
+   sitio en general).
+
+**Resultado:** `docs/product/fuentes-promos.md` nuevo, con la clasificación
+de las 6 fuentes (3 automatizables con Playwright, 3 de captura manual) y su
+justificación legal/técnica; `docs/product/pendientes.md` y
+`docs/product/requisitos.md` actualizados.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

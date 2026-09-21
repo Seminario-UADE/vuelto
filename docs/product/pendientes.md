@@ -7,7 +7,8 @@
       `alcance-mvp.md`
 - [ ] Cómo se dispara el momento de uso (notificación / geolocalización)
 - [ ] Auto-registro de una semana (cifra en pesos ahorrada)
-- [ ] Relevar fuentes: HTML vs. SPA/JSON, términos de uso, robots.txt
+- [x] Relevar fuentes: HTML vs. SPA/JSON, términos de uso, robots.txt — ver
+      `fuentes-promos.md`
 - [ ] Umbral de revisión de la ingesta asistida
 - [ ] Experimento de precisión del extractor (entregable de research)
 - [ ] Proveedor/modelo del extractor, con salida estructurada
