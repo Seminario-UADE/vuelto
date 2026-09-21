@@ -15,7 +15,7 @@
 - [ ] Expo vs. Flutter formalmente (nivel real del equipo en TS/Dart)
 - [ ] Estrategia de sincronización del corpus al dispositivo
 - [ ] Probar el extractor contra 15-20 tickets reales
-- [ ] Política de retención de imágenes de ticket
+- [x] Política de retención de imágenes de ticket — ver `privacidad.md`
 - [ ] Gasto en grupo: promoción de débito, redondeo de la división
 - [ ] Formato exacto de requisitos de la cátedra (numeración, si distingue
       funcionales de no funcionales, formato de historia de usuario) — hace

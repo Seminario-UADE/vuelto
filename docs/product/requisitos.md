@@ -101,7 +101,7 @@ prioridad del MVP.
 | RNF-03 | **Testeabilidad.** El motor tiene su propia suite. | `vitest run` pasa sin red ni servicios externos; cubre las dimensiones de RF-04. | ADR-001, ADR-004 |
 | RNF-04 | **Secretos.** La API key de Gemini nunca está en la app. | Búsqueda de la key en el bundle de la app: 0 resultados. Letra chica sale del script de ingesta; ticket, de una Edge Function. | `04-infrastructure.md`, `CLAUDE.md` |
 | RNF-05 | **Llave maestra.** La service role key solo la usa el proceso de ingesta. | No aparece en el cliente ni en el repo. | `04-infrastructure.md` |
-| RNF-06 | **Privacidad de tickets.** La imagen no se persiste. | Tras procesar un ticket, no queda imagen en Storage ni en la base; sí el texto extraído junto al registro. | ADR-006, `CLAUDE.md` |
+| RNF-06 | **Privacidad de tickets.** La imagen no se persiste. | Tras procesar un ticket, no queda imagen en Storage ni en la base; sí el texto extraído junto al registro. | ADR-006, `CLAUDE.md`, `privacidad.md` |
 | RNF-07 | **RLS desde el día uno.** | Cada migración que crea una tabla incluye sus policies en el mismo cambio. | `CLAUDE.md` |
 | RNF-08 | **Trazabilidad.** | Cada promoción publicada conserva el crudo, la extracción y quién la aprobó. | `01-data-models.md` §capturas_crudas |
 | RNF-09 | **Extractor medido.** | Existe un informe de precisión por campo sobre 15-20 tickets reales y sobre el corpus de promos. | ADR-005, ADR-006 |
@@ -120,7 +120,6 @@ No se dan por chequeados hasta resolver el pendiente que los frena
 |---|---|---|
 | RF-18 | Tamaño del corpus sembrado a mano: el alcance ya está definido (`alcance-mvp.md`) pero falta verificar sucursales reales de las cadenas | #8 |
 | RF-13, RNF-13 | Relevar fuentes: HTML vs. SPA/JSON, términos de uso, `robots.txt`; y dónde corre el cron | #12 |
-| RNF-06 | Política de retención de imágenes de ticket durante el procesamiento | #11 |
 | RF-08, RNF-09 | Proveedor/modelo del extractor y precisión sobre tickets reales | #10 |
 | RF-16 | Umbral de revisión de la ingesta asistida | `pendientes.md` |
 | RF-05 | Cómo se dispara el momento de uso (notificación / geolocalización) | `pendientes.md` |

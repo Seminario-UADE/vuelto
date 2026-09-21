@@ -49,7 +49,10 @@ reales de dev/build/test.
 - **La API key de Gemini nunca va en la app del celular.** Letra chica → script
   de ingesta. Ticket → Edge Function de Supabase.
 - **Las imágenes de ticket no se persisten** (se mandan a Gemini y se
-  descartan). Sí se persiste el texto extraído junto al registro de compra.
+  descartan; no se escriben a disco ni a Supabase Storage en ningún paso del
+  camino). Sí se persiste el texto extraído junto al registro de compra.
+  Detalle completo de qué se guarda y por cuánto tiempo:
+  `docs/product/privacidad.md`.
 - **Ningún dato de promoción se publica sin revisión humana.** El extractor
   llena un borrador en cola; una persona aprueba, corrige o rechaza.
 - **Topes de reintegro siempre se muestran como estimados, con su base**

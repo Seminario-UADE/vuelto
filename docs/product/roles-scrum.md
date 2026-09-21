@@ -68,6 +68,8 @@ Una historia está terminada si cumple los criterios de aceptación y además:
 - Nada de promoción se publica sin revisión humana.
 - Los topes se muestran como estimados, con su base.
 - Ningún secreto (Gemini, service role key) está en el cliente ni en el repo.
+- Si el cambio toca datos de usuario (perfil, tickets, compras), es
+  consistente con `../product/privacidad.md`.
 - Se puede demostrar en Expo Go.
 - Si hubo trabajo con IA relevante, tiene su entrada en `../bitacora-prompts.md`.
 
