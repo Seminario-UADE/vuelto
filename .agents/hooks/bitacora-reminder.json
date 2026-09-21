@@ -1,0 +1,9 @@
+{
+  "name": "bitacora-reminder",
+  "description": "Reminds you to log the AI session in docs/bitacora-prompts.md (cátedra requirement per CLAUDE.md) if the working tree changed but that file wasn't touched.",
+  "trigger": "on agent session stop / end of turn",
+  "condition": "git status --porcelain is non-empty AND docs/bitacora-prompts.md is not among the changed paths",
+  "action": "non-blocking notice to the user; does not stop or fail the session",
+  "command": "status=$(git status --porcelain 2>/dev/null); if [ -z \"$status\" ]; then exit 0; fi; if echo \"$status\" | grep -q \"docs/bitacora-prompts.md\"; then exit 0; fi; echo \"Recordá actualizar docs/bitacora-prompts.md con esta sesión (requisito de la cátedra, ver CLAUDE.md).\"",
+  "_note": "This is a portable description of the hook logic. Claude Code's actual wiring for this hook lives in .claude/settings.json under hooks.Stop (Claude Code hooks are engine-specific and can't be symlinked from a single JSON key). Other tools with an equivalent lifecycle hook can reuse the `command` above verbatim."
+}
