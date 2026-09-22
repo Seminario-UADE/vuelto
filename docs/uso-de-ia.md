@@ -14,7 +14,7 @@ usuario.
 
 | Dónde | Qué hace | Corre en | Revisión humana |
 |---|---|---|---|
-| Ingesta de letra chica de promociones | Convierte la prosa legal de cada banco/billetera en los atributos del modelo de datos, contra un esquema forzado (`null` explícito si un campo no está) | Servidor, offline, en lote | Obligatoria antes de publicar — bandeja de aprobar/corregir/rechazar (ver `decisions/005-ingesta-asistida-con-revision-humana.md`) |
+| Ingesta de letra chica de promociones | Convierte la prosa legal de cada banco/billetera en los atributos del modelo de datos, contra un esquema forzado (`null` explícito si un campo no está) | Servidor, offline, en lote | Ninguna — publicación automática si el borrador completa el esquema (campos obligatorios no `null`); si no, se descarta solo (ver `decisions/005-ingesta-automatica-sin-revision-humana.md`) |
 | Registro de compras por ticket | Extrae monto, comercio, medio de pago y descuento de la foto del comprobante | Edge Function de Supabase (servidor) | El propio usuario confirma antes de que el registro sea válido (ver `decisions/006-registro-de-compras-por-ticket.md`) |
 
 **Frontera que no se cruza:** el motor de reglas — la pieza que efectivamente
@@ -64,6 +64,6 @@ sesión de trabajo con IA queda registrada en `docs/bitacora-prompts.md`.
 - **Qué se hizo en cada sesión**: `docs/bitacora-prompts.md`.
 - **Por qué se decidió cada cosa**: `docs/decisions/` (motor de reglas
   separado, Expo sobre Flutter, Supabase sobre Firebase, LLM solo en la
-  ingesta, ingesta asistida con revisión humana, registro por ticket,
+  ingesta, ingesta automática sin revisión humana, registro por ticket,
   spec-kit sobre `to-spec`).
 - **Qué falta o está en duda**: `docs/product/pendientes.md`.

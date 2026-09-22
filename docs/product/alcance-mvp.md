@@ -4,12 +4,12 @@
 para supermercado), corpus de promociones de las 13 categorías que publica
 MODO (ver detalle abajo), flujo de compra optimizado para esas 13 categorías
 (no solo supermercado), una sola billetera como fuente de ingesta (MODO),
-cadenas de supermercado, ingesta asistida con revisión humana, perfil
-declarado por el usuario, registro por ticket, gasto en grupo nivel 0 (ver
-abajo).
+cadenas de supermercado, ingesta 100% automática (sin revisión humana,
+validada contra esquema), perfil declarado por el usuario, registro por
+ticket, gasto en grupo nivel 0 (ver abajo).
 
-**Fuera:** integración bancaria, lectura de resúmenes, publicación sin
-revisión humana, cobertura nacional, app nativa (se usa Expo).
+**Fuera:** integración bancaria, lectura de resúmenes, cobertura nacional,
+app nativa (se usa Expo).
 
 ## Rubro, billeteras y cadenas concretas
 

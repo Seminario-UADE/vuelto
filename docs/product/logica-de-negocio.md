@@ -1,10 +1,20 @@
 # Lógica de negocio
 
-Usuario final: gratis. Costo principal: mantenimiento del corpus de
-promociones (revisión humana permanente), no infraestructura.
+Usuario final: gratis. La ingesta del corpus de promociones es 100%
+automática (sin revisión humana, ver ADR-005), así que el costo principal no
+es mantenimiento de una cola de revisión — es infraestructura y, a medida
+que crece la cobertura, negociar los acuerdos con cada banco/billetera
+(`Cómo crece`, abajo).
 
-Ingresos potenciales: afiliación con billeteras/comercios, destaque de
-comercios adheridos, reportes agregados y anonimizados de consumo.
+Ingresos potenciales:
+
+- **Afiliación con billeteras/comercios:** el acuerdo formal que reemplaza el
+  scraping sin permiso a medida que se suman bancos (ver `Cómo crece` abajo).
+- **Destaque de comercios adheridos:** dentro de una recomendación, un
+  comercio adherido puede pagar por aparecer resaltado cuando ya es una
+  opción válida para el usuario — nunca se recomienda un medio de pago peor
+  para forzar un destaque, eso rompería la regla de oro (`problema.md`).
+- **Reportes agregados y anonimizados** de consumo, para bancos y comercios.
 
 ## Por qué el MVP arranca con una sola fuente (MODO)
 

@@ -257,7 +257,7 @@ aplicar la paleta e imagen de marca oficial del equipo a todo el deck.
    ADRs y la arquitectura), se fusionó "IA en el producto" al bloque de
    Arquitectura (presentado por Agustín), se recortaron 2 tarjetas
    duplicadas de "Automatización y límites", y se eliminó "Research y datos:
-   lo que sigue" (Kevin) migrando sus 2 pendientes únicos a "Líneas
+   lo que sigue" migrando sus 2 pendientes únicos a "Líneas
    futuras". El deck bajó de 23 a 20 slides.
 5. "instala esta skill [...] mostrando el flow de tecnologías" — instalación
    de `archify` y generación de un diagrama de arquitectura validado

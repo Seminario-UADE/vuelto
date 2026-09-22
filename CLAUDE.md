@@ -54,8 +54,10 @@ reales de dev/build/test.
   camino). Sí se persiste el texto extraído junto al registro de compra.
   Detalle completo de qué se guarda y por cuánto tiempo:
   `docs/product/privacidad.md`.
-- **Ningún dato de promoción se publica sin revisión humana.** El extractor
-  llena un borrador en cola; una persona aprueba, corrige o rechaza.
+- **La ingesta de promociones es 100% automática, sin revisión humana.** El
+  extractor publica el borrador directo si completa el esquema (todos los
+  campos obligatorios no `null`); si no lo completa, se descarta solo, sin
+  cola de aprobación.
 - **Topes de reintegro siempre se muestran como estimados, con su base**
   (ej. "≈$18.000, según 4 compras registradas"). Nunca una cifra falsamente
   precisa.
@@ -64,8 +66,7 @@ reales de dev/build/test.
 ## Fuera de alcance (MVP), explícito
 
 Integración bancaria directa, lectura automática de resúmenes/movimientos,
-publicación de promos sin revisión humana, cobertura nacional, app nativa nuda
-(se usa Expo).
+cobertura nacional, app nativa nuda (se usa Expo).
 
 ## Agent skills
 

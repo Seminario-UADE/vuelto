@@ -64,20 +64,20 @@ prioridad del MVP.
 - RF-10: campo ausente en el ticket queda `null` y dispara la pregunta al usuario.
 - RF-12: cada compra guarda su origen (`ticket` \| `excepción` \| `manual`).
 
-### Ingesta asistida del corpus de promociones
+### Ingesta automática del corpus de promociones
 
 | ID | Requisito | Prior. | Fuente |
 |---|---|---|---|
 | RF-13 | El sistema captura el contenido de las fuentes de promociones y lo guarda crudo. | S | `04-infrastructure.md` §Pipeline |
 | RF-14 | El extractor convierte la letra chica en los atributos de una promoción, con salida estructurada contra un esquema. | S | ADR-005, `CLAUDE.md` |
 | RF-15 | Cada campo extraído trae el fragmento textual de la fuente. | S | ADR-005 |
-| RF-16 | Ninguna promoción llega al motor sin haber sido aprobada por una persona (aprobar, corregir, rechazar, marcar vencida). | M | ADR-005, `CLAUDE.md` |
+| RF-16 | Ninguna promoción llega al motor sin haber completado el esquema (validación automática de campos obligatorios; sin persona en el circuito). | M | ADR-005, `CLAUDE.md` |
 | RF-17 | Un chequeo de salud marca y avisa cuando una fuente devuelve cero resultados o contenido irreconocible. | S | `04-infrastructure.md` paso 5, `riesgos.md` |
 | RF-18 | Hay un corpus sembrado a mano suficiente para correr el motor sin depender de la ingesta. | M | ADR-005 §Consecuencias |
 
 **Criterios de aceptación**
 - RF-14: campo ausente en la fuente se guarda `null` explícito; el esquema es `{"type": ["string", "null"]}`, sin campos opcionales.
-- RF-16: no hay ruta de código que escriba en la base validada sin pasar por un estado aprobado.
+- RF-16: no hay ruta de código que escriba en la base validada sin pasar por la validación automática de esquema.
 - RF-17: simular una fuente vacía genera un aviso.
 - RF-18: la demo del pitch corre con el corpus sembrado, con la ingesta apagada.
 
@@ -103,7 +103,7 @@ prioridad del MVP.
 | RNF-05 | **Llave maestra.** La service role key solo la usa el proceso de ingesta. | No aparece en el cliente ni en el repo. | `04-infrastructure.md` |
 | RNF-06 | **Privacidad de tickets.** La imagen no se persiste. | Tras procesar un ticket, no queda imagen en Storage ni en la base; sí el texto extraído junto al registro. | ADR-006, `CLAUDE.md`, `privacidad.md` |
 | RNF-07 | **RLS desde el día uno.** | Cada migración que crea una tabla incluye sus policies en el mismo cambio. | `CLAUDE.md` |
-| RNF-08 | **Trazabilidad.** | Cada promoción publicada conserva el crudo, la extracción y quién la aprobó. | `01-data-models.md` §capturas_crudas |
+| RNF-08 | **Trazabilidad.** | Cada promoción publicada conserva el crudo y la extracción, con el fragmento fuente de cada campo, para poder auditar una extracción que salió mal. | `01-data-models.md` §capturas_crudas |
 | RNF-09 | **Extractor medido.** | Existe un informe de precisión por campo sobre 15-20 tickets reales y sobre el corpus de promos. | ADR-005, ADR-006 |
 | RNF-10 | **Costo $0** durante el cuatrimestre. | Todos los servicios dentro del tier gratuito (`04-infrastructure.md` §Servicios). | `CLAUDE.md`, `04-infrastructure.md` |
 | RNF-11 | **Demostrable.** | La app corre por Expo Go (QR); hay build de EAS de respaldo. | `04-infrastructure.md` §Distribución, `restricciones-catedra.md` |
@@ -121,7 +121,7 @@ No se dan por chequeados hasta resolver el pendiente que los frena
 | RF-18 | Tamaño del corpus sembrado a mano: el alcance ya está definido (`alcance-mvp.md`) pero falta verificar sucursales reales de las cadenas | #8 |
 | RF-13, RNF-13 | Dónde corre el cron de ingesta (relevamiento de fuentes ya resuelto, ver `fuentes-promos.md`) | `pendientes.md` |
 | RF-08, RNF-09 | Proveedor/modelo del extractor y precisión sobre tickets reales | #10 |
-| RF-16 | Umbral de revisión de la ingesta asistida | `pendientes.md` |
+| RF-16 | Umbral de validación automática de la ingesta (campos obligatorios) | `pendientes.md` |
 | RF-05 | Cómo se dispara el momento de uso (notificación / geolocalización) | `pendientes.md` |
 | RF-19, RF-20 | Promoción de débito y redondeo de la división | `pendientes.md` |
 | RNF-14 | Cronograma real del cuatrimestre y tamaño del equipo | `restricciones-catedra.md`, `estado.md` |
