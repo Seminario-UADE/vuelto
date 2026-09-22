@@ -9,8 +9,7 @@ colores desactualizados, no usarlo salvo como referencia de diseño.
 
 | Persona | Slides | Cantidad |
 |---|---|---|
-| Joaquín | 1, 2, 3, 15, 16, 17, 18, 19, 20 | 9 (varias son livianas: portada, marca, cierre) |
-| Kevin | 4 | 1 |
+| Joaquín | 1, 2, 3, 4, 15, 16, 17, 18, 19, 20 | 10 (varias son livianas: portada, marca, cierre) |
 | Santiago | 5, 6, 7, 8 | 4 |
 | Jesús | 9, 10 | 2 |
 | Agustín | 11, 12, 13, 14 | 4 |
@@ -22,7 +21,7 @@ colores desactualizados, no usarlo salvo como referencia de diseño.
 | 1 | Portada | Joaquín | 0:15 |
 | 2 | Problema y propuesta | Joaquín | 1:15 |
 | 3 | Alcance del MVP | Joaquín | 0:55 |
-| 4 | Relevamiento de fuentes: por qué MODO | Kevin | 1:10 |
+| 4 | Relevamiento de fuentes: por qué MODO | Joaquín | 1:10 |
 | 5 | Stakeholders y clientes objetivo | Santiago | 0:50 |
 | 6 | Encuesta · hallazgo 1 | Santiago | 1:10 |
 | 7 | Encuesta · hallazgo 2 | Santiago | 0:55 |
@@ -49,7 +48,7 @@ resumida) y slide 16 (automatización, es un repaso).
 
 ---
 
-## Joaquín — Apertura y alcance (slides 1-3, ~2 min 25 s)
+## Joaquín — Apertura, alcance y research de fuentes (slides 1-4, ~3 min 35 s)
 
 **Slide 1 · Portada**
 - Somos el equipo de Vuelto, del Seminario de Integración Profesional de UADE.
@@ -78,11 +77,7 @@ resumida) y slide 16 (automatización, es un repaso).
 - Honestidad: las otras 5 billeteras quedan para más adelante, y las cadenas
   de supermercado dentro de MODO todavía no están reconciliadas.
 - Pase: “La decisión de acotar a MODO salió de un research bien concreto.
-  Kevin cuenta cómo.”
-
----
-
-## Kevin — Research y datos (slide 4, ~1 min 10 s)
+  Cuento cómo.”
 
 **Slide 4 · Relevamiento de fuentes: por qué MODO**
 - Evaluamos las 6 billeteras/bancos originales. Tres quedaron **bloqueadas**:
@@ -164,8 +159,8 @@ resumida) y slide 16 (automatización, es un repaso).
 - Equipo de desarrollo con tres frentes:
   - **Front** (app Expo): Joaquín Nuñez y Jesús Quijada (1195298).
   - **Back** (Supabase, Edge Function, ingesta): Agustín Herrero (1174588,
-    además a cargo del motor de reglas) y Santiago Pazos (1172896).
-  - **Research y datos:** Kevin Calcagni (1172825).
+    además a cargo del motor de reglas) y Santiago Pazos (1172896, además a
+    cargo de Research y datos).
 - Equipo autoorganizado. Las revisiones de código las hacemos todos.
 
 **Slide 10 · Tablero Kanban y Scrum** (mostrar el tablero en vivo si hay
@@ -280,7 +275,7 @@ Abrir el repo en GitHub (no en el editor), con zoom del navegador al 125-150%.
   documentado, modelo de negocio, y bitácora y declaración de IA.
 - **Sigue:** lo mismo de la slide de líneas futuras, resumido en una línea.
 - A resolver con la cátedra: el cronograma real de sprints y el tamaño del
-  equipo (somos 5 y la materia pide de 6 a 8).
+  equipo (somos 4 y la materia pide de 6 a 8).
 - Frase final: “Problema validado, alcance concreto, equipo organizado e IA
   con límites claros. Gracias, ¿preguntas?”
 
@@ -320,5 +315,5 @@ Abrir el repo en GitHub (no en el editor), con zoom del navegador al 125-150%.
   se descartan. Solo se persiste el texto extraído, y el usuario confirma.
 - **¿Por qué Expo y no Flutter?** Expo Go permite probar en el celular con un
   QR, y usa el mismo TypeScript que el motor de reglas.
-- **¿Son 5 y la materia pide 6 a 8?** Está pendiente con la cátedra. El
-  alcance del MVP está pensado para ser defendible con 5.
+- **¿Son 4 y la materia pide 6 a 8?** Está pendiente con la cátedra. El
+  alcance del MVP está pensado para ser defendible con 4.
