@@ -198,6 +198,89 @@ fuente.
 
 ---
 
+## 2026-09-21 — Organización y slides de la presentación del equipo
+
+**Herramienta:** Claude Code (Sonnet 5), con `gh` CLI y la skill
+`presentaciones-visuales`.
+
+**Objetivo:** organizar la presentación de avance del equipo (encuestas,
+repo con documentación, roles, Scrum con Kanban, bitácora y declaración de
+uso de IA), repartir los bloques entre los 4 integrantes y generar las
+slides.
+
+**Prompts principales:**
+1. "hacé una organización de cómo hacer la presentación, dividiendo el
+   trabajo por 4 integrantes" — los nombres se tomaron de
+   `docs/product/roles-scrum.md`.
+2. Ajustes de reparto pedidos por el equipo (quién abre, quién cierra, quién
+   toma el repo y la bitácora) y decisión de armar un deck corto combinado
+   con demo en vivo del repo y del tablero.
+3. "pulleá de main, que Santiago ya subió su parte. Hagamos las slides, con
+   gráficos de los resultados de la encuesta y una línea de tiempo del uso
+   de IA end to end."
+
+**Resultado:** `docs/presentacion/vuelto-avance.html` (16 slides HTML
+autocontenidas, navegables con teclado). Los datos de los gráficos salen
+literalmente de `docs/product/encuesta-resultados.md` (51 respuestas); el
+estado del tablero se leyó con `gh project item-list`. Quedó marcado para
+verificar con la fuente (Google Forms) que la suma de las opciones de
+"mayor frustración" da más de 100%, por lo que ese dato se usó solo como
+"la más citada".
+
+---
+
+## 2026-09-21 — Cierre de la presentación: chequeo contra la pauta, diagrama de arquitectura y marca
+
+**Herramienta:** Claude Code (Sonnet 5), con la skill de terceros `archify`
+(`npx skills add tt-a1i/archify -g`) para el diagrama de arquitectura.
+
+**Objetivo:** chequear la presentación y el repo contra la pauta del examen
+del 22/09 (stakeholders, modelo de negocio, estudio de plataformas, líneas
+futuras, marca, legajos), corregir duplicaciones entre slides, reemplazar el
+diagrama de arquitectura por uno generado con una herramienta dedicada, y
+aplicar la paleta e imagen de marca oficial del equipo a todo el deck.
+
+**Prompts principales:**
+1. "chequea nuevamente si cumple con estos requisitos" — auditoría línea por
+   línea de la pauta contra el repo y el deck; se identificaron como
+   faltantes stakeholders, modelo de negocio, estudio de plataformas, líneas
+   futuras, marca/logo y legajos.
+2. Ampliación de `logica-de-negocio.md` con el research legal de Agustín
+   (MODO sin restricción de scraping ni redistribución, a diferencia de
+   Mercado Pago/Galicia/BBVA) y la estrategia de crecimiento (pedir permiso a
+   los bancos más populares).
+3. Legajos de los 5 integrantes, agregados a `roles-scrum.md` y a la slide de
+   roles.
+4. "Diapositiva 14 y 15 de más [...] la 18 tiene que estar en arquitectura
+   [...] ver si la 19 está duplicada [...] sacar la 5" — se eliminaron las
+   slides de Estudio de plataformas y Stack (contenido ya cubierto por los
+   ADRs y la arquitectura), se fusionó "IA en el producto" al bloque de
+   Arquitectura (presentado por Agustín), se recortaron 2 tarjetas
+   duplicadas de "Automatización y límites", y se eliminó "Research y datos:
+   lo que sigue" (Kevin) migrando sus 2 pendientes únicos a "Líneas
+   futuras". El deck bajó de 23 a 20 slides.
+5. "instala esta skill [...] mostrando el flow de tecnologías" — instalación
+   de `archify` y generación de un diagrama de arquitectura validado
+   (`archify validate/deliver`, 9/9 checks, 0 errores) a partir de
+   `arquitectura.architecture.json`. El embed inicial vía `<iframe>` al
+   archivo entregado no cargó en el entorno de preview (restricción de
+   `file://` entre documentos) — se optó por extraer el `<svg>` generado y
+   sus reglas de color, e inlinearlo directo en el deck para no depender de
+   un archivo externo en la presentación en vivo.
+6. Nuevos logos (`vuelto-logo-light.svg`, `vuelto-logo-dark.svg`) y paleta
+   oficial de marca (Verde Bosque, Verde Salvia, Blanco Hueso, Dorado
+   Champán, Gris Neutro) — re-tematizado de punta a punta: variables CSS del
+   deck, el diagrama de arquitectura y `docs/product/marca.md`.
+
+**Resultado:** `vuelto-avance.html` con 20 slides, sin desbordes verificados
+por medición geométrica en las 20; `docs/presentacion/arquitectura.architecture.json`
+nuevo (spec fuente del diagrama); `docs/presentacion/assets/logo-light.svg`
+y `logo-dark.svg` nuevos; `docs/product/marca.md`, `docs/product/roles-scrum.md`
+y `docs/product/logica-de-negocio.md` actualizados; `guion.md` reescrito
+para la estructura final.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

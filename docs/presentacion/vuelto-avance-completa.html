@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vuelto — Avance del equipo (versión completa)</title>
+<style>
+  :root {
+    --paper: #F5F1E8;
+    --paper-2: #EDE8DB;
+    --card: #FFFFFF;
+    --ink: #14201B;
+    --ink-2: #26352E;
+    --muted: #5B665F;
+    --line: #D8D2C2;
+    --green: #0E7A5A;
+    --green-deep: #0A5A43;
+    --green-soft: #D6EBE2;
+    --amber: #C47F00;
+    --amber-soft: #F6E4B8;
+    --red: #B24632;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--paper); overflow: hidden; font-family: var(--sans); color: var(--ink); transition: background .45s ease; }
+  body.is-dark { background: var(--ink); }
+
+  /* ---------- Escenario 16:9 escalado ---------- */
+  .stage {
+    position: absolute; left: 50%; top: 50%;
+    width: 1280px; height: 720px;
+    transform-origin: center center;
+    background: var(--paper);
+    overflow: hidden;
+  }
+  .slide {
+    position: absolute; inset: 0;
+    padding: 72px 84px 64px;
+    opacity: 0; visibility: hidden;
+    transition: opacity .45s ease, visibility 0s linear .45s;
+    display: flex; flex-direction: column;
+  }
+  .slide.active { opacity: 1; visibility: visible; transition: opacity .45s ease; }
+  .slide.dark { background: var(--ink); color: var(--paper); }
+
+  /* Animación de entrada por elemento */
+  .rise { opacity: 0; transform: translateY(14px); }
+  .slide.active .rise { animation: rise .65s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--d, 0s); }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+
+  /* Etiqueta de quién presenta */
+  .who {
+    position: absolute; top: 28px; left: 84px;
+    font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); display: flex; align-items: center; gap: 10px;
+  }
+  .who::before { content: ""; width: 26px; height: 2px; background: var(--green); }
+  .dark .who { color: #A9B7AF; }
+  .dark .who::before { background: #4FC3A0; }
+
+  .kicker { font-size: 16px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--green); margin-bottom: 14px; }
+  .dark .kicker { color: #4FC3A0; }
+  h1, h2 { font-family: var(--serif); font-weight: 700; letter-spacing: -.015em; line-height: 1.08; color: var(--ink); }
+  .dark h1, .dark h2 { color: var(--paper); }
+  h2 { font-size: 46px; max-width: 1040px; }
+  h1 { font-size: 92px; }
+  .lead { font-size: 25px; line-height: 1.4; color: var(--ink-2); max-width: 900px; }
+  .dark .lead { color: #D3DDD7; }
+  .muted { color: var(--muted); }
+  .foot { margin-top: auto; font-size: 15px; color: var(--muted); line-height: 1.45; }
+  .dark .foot { color: #93A39A; }
+  .body { display: flex; flex-direction: column; gap: 26px; margin-top: 30px; flex: 1; min-height: 0; }
+  em.g { font-style: normal; color: var(--green); }
+  em.a { font-style: normal; color: var(--amber); }
+
+  /* ---------- Cards ---------- */
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 24px 26px; }
+  .card h3 { font-size: 22px; margin-bottom: 8px; }
+  .card p, .card li { font-size: 19px; line-height: 1.42; color: var(--ink-2); }
+  .grid { display: grid; gap: 20px; }
+  .g2 { grid-template-columns: 1fr 1fr; }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  .tag {
+    display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 999px; background: var(--green-soft); color: var(--green-deep);
+  }
+  .tag.a { background: var(--amber-soft); color: #7A4F00; }
+  .tag.k { background: var(--ink); color: var(--paper); }
+  .tag.g { background: var(--paper-2); color: var(--muted); }
+
+  /* ---------- Números grandes ---------- */
+  .big { font-family: var(--serif); font-size: 120px; line-height: 1; font-weight: 700; letter-spacing: -.03em; }
+  .big.sm { font-size: 76px; }
+  .big.g { color: var(--green); } .big.a { color: var(--amber); } .big.r { color: var(--red); }
+  .dark .big.g { color: #4FC3A0; } .dark .big.a { color: #F0B43C; }
+
+  /* ---------- Gráficos de barras ---------- */
+  .chart-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .chart-sub { font-size: 15px; color: var(--muted); margin-bottom: 18px; }
+  .brow { margin-bottom: 15px; }
+  .brow .l { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; font-size: 18px; line-height: 1.25; margin-bottom: 6px; color: var(--ink-2); }
+  .brow .l b { font-family: var(--serif); font-size: 26px; color: var(--ink); white-space: nowrap; }
+  .track { height: 16px; border-radius: 8px; background: var(--paper-2); overflow: hidden; }
+  .track i { display: block; height: 100%; width: 0; border-radius: 8px; background: #9AA59E; transition: width 1s cubic-bezier(.2,.8,.2,1) .35s; }
+  .slide.active .track i { width: var(--w); }
+  .brow.hl .track i { background: var(--amber); }
+  .brow.ok .track i { background: var(--green); }
+  .brow.hl .l b { color: var(--amber); } .brow.ok .l b { color: var(--green); }
+
+  .stack { display: flex; height: 44px; border-radius: 10px; overflow: hidden; background: var(--paper-2); }
+  .stack span { display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 17px; color: #fff; width: 0; transition: width 1s cubic-bezier(.2,.8,.2,1) .35s; overflow: hidden; white-space: nowrap; }
+  .slide.active .stack span { width: var(--w); }
+  .stack .s1 { background: var(--amber); } .stack .s2 { background: #8A5A00; } .stack .s3 { background: #9AA59E; }
+  .legend { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 10px; font-size: 15px; color: var(--muted); }
+  .legend i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 7px; vertical-align: -1px; }
+
+  /* ---------- Personas ---------- */
+  .person { display: flex; gap: 16px; align-items: center; }
+  .avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--green); color: #fff; font-family: var(--serif); font-size: 24px; font-weight: 700; display: grid; place-items: center; flex: none; }
+  .avatar.b { background: var(--ink); }
+  .person b { font-size: 21px; display: block; }
+  .person span { font-size: 16px; color: var(--muted); }
+
+  /* ---------- Ceremonias ---------- */
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; position: relative; margin-top: 8px; }
+  .steps::before { content: ""; position: absolute; left: 6%; right: 6%; top: 26px; height: 3px; background: var(--line); }
+  .step { text-align: center; padding: 0 10px; position: relative; }
+  .step .n { width: 54px; height: 54px; border-radius: 50%; background: var(--green); color: #fff; font-family: var(--serif); font-size: 24px; font-weight: 700; display: grid; place-items: center; margin: 0 auto 14px; border: 5px solid var(--paper); }
+  .step b { font-size: 20px; display: block; margin-bottom: 4px; }
+  .step span { font-size: 16px; color: var(--muted); line-height: 1.35; display: block; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip { font-size: 16px; padding: 8px 14px; border-radius: 10px; background: var(--card); border: 1px solid var(--line); color: var(--ink-2); }
+
+  /* ---------- Kanban ---------- */
+  .board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; flex: 1; min-height: 0; }
+  .col { background: var(--paper-2); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow: hidden; }
+  .col header { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); }
+  .col header span { background: var(--ink); color: var(--paper); border-radius: 999px; font-size: 14px; min-width: 26px; text-align: center; padding: 2px 8px; }
+  .kc { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 15px; line-height: 1.3; color: var(--ink-2); }
+  .kc small { display: block; font-size: 12px; color: var(--muted); font-family: var(--mono); margin-bottom: 3px; }
+  .kc.epic { border-left: 4px solid #7A4FD0; }
+  .kc.pr small { color: var(--green); }
+  .more { font-size: 14px; color: var(--muted); text-align: center; padding-top: 2px; }
+  .empty { font-size: 14px; color: var(--muted); text-align: center; margin-top: 18px; font-style: italic; }
+
+  /* ---------- Repo ---------- */
+  .tree { font-family: var(--mono); font-size: 21px; line-height: 1.5; }
+  .tree .row { display: flex; align-items: baseline; gap: 14px; padding: 11px 18px; border-radius: 10px; }
+  .tree .row:nth-child(odd) { background: rgba(255,255,255,.55); }
+  .tree .p { color: var(--green-deep); font-weight: 700; min-width: 330px; }
+  .tree .d { font-family: var(--sans); color: var(--ink-2); font-size: 20px; }
+  .tree .c { margin-left: auto; font-family: var(--sans); font-size: 15px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+
+  .chain { display: flex; align-items: stretch; gap: 0; }
+  .link { flex: 1; background: var(--card); border: 1px solid var(--line); padding: 20px 16px; text-align: center; position: relative; margin-right: 14px; border-radius: 12px; }
+  .link:not(:last-child)::after { content: "→"; position: absolute; right: -22px; top: 50%; transform: translateY(-50%); color: var(--green); font-size: 24px; font-weight: 700; z-index: 2; }
+  .link b { display: block; font-family: var(--serif); font-size: 38px; color: var(--green); line-height: 1; margin-bottom: 8px; }
+  .link span { font-size: 16px; color: var(--ink-2); line-height: 1.3; display: block; }
+  .link small { display: block; font-size: 13px; color: var(--muted); margin-top: 6px; font-family: var(--mono); }
+
+  /* ---------- Línea de tiempo IA ---------- */
+  .tl { position: relative; padding-left: 4px; }
+  .tl::before { content: ""; position: absolute; left: 111px; top: 8px; bottom: 8px; width: 3px; background: var(--line); }
+  .ev { display: grid; grid-template-columns: 96px 30px 1fr; gap: 0 12px; align-items: start; margin-bottom: 14px; position: relative; }
+  .ev .dt { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--green-deep); text-align: right; padding-top: 3px; }
+  .ev .dot { width: 16px; height: 16px; border-radius: 50%; background: var(--green); border: 4px solid var(--paper); box-shadow: 0 0 0 2px var(--green); margin: 5px 0 0 6px; z-index: 2; }
+  .ev .tx b { font-size: 20px; display: block; margin-bottom: 2px; }
+  .ev .tx span { font-size: 16px; color: var(--muted); line-height: 1.35; display: block; }
+  .pipe { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .pipe .pc { font-family: var(--mono); font-size: 15px; background: var(--ink); color: var(--paper); border-radius: 8px; padding: 7px 12px; }
+  .pipe .ar { color: var(--green); font-weight: 700; }
+
+  /* ---------- Diagrama IA en producto ---------- */
+  .lane { display: grid; grid-template-columns: 172px repeat(5, 1fr); gap: 0; align-items: stretch; }
+  .lane + .lane { margin-top: 18px; }
+  .lane .ln { display: flex; flex-direction: column; justify-content: center; padding-right: 14px; }
+  .lane .ln b { font-size: 20px; } .lane .ln span { font-size: 15px; color: #93A39A; line-height: 1.3; }
+  .node { border-radius: 12px; padding: 14px 12px; font-size: 17px; line-height: 1.3; text-align: center; display: flex; flex-direction: column; justify-content: center; margin-right: 22px; position: relative; min-height: 104px; border: 1.5px solid #3A4A42; background: #1E2C26; color: #E4ECE7; }
+  .node:last-child { margin-right: 0; }
+  .node:not(:last-child)::after { content: "›"; position: absolute; right: -19px; top: 50%; transform: translateY(-52%); color: #7C8F85; font-size: 28px; font-weight: 700; }
+  .node small { display: block; font-size: 13px; margin-top: 4px; opacity: .8; font-family: var(--mono); }
+  .node.ai { background: #4A3410; border-color: #F0B43C; color: #FBE7B5; }
+  .node.human { background: #0E4D39; border-color: #4FC3A0; color: #D2F3E6; }
+  .engine { margin-top: 12px; border: 2px solid #4FC3A0; border-radius: 16px; padding: 16px 24px; display: flex; align-items: center; gap: 22px; background: linear-gradient(90deg, #0E4D39, #14201B); }
+  .engine b { font-size: 26px; display: block; color: #fff; }
+  .engine span { font-size: 17px; color: #C7D6CE; line-height: 1.35; }
+  .engine .out { margin-left: auto; text-align: right; flex: none; }
+  .engine .out strong { font-family: var(--serif); font-size: 26px; color: #4FC3A0; display: block; }
+  .lg { display: flex; gap: 22px; font-size: 15px; color: #A9B7AF; margin-bottom: 16px; }
+  .feeds { text-align: center; font-size: 15px; color: #7C8F85; margin-top: 12px; letter-spacing: .04em; }
+  .lg i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 7px; vertical-align: -1px; border: 1.5px solid; }
+
+  /* ---------- Navegación ---------- */
+  .progress { position: fixed; left: 0; top: 0; height: 4px; background: var(--green); width: 0; transition: width .4s ease; z-index: 20; }
+  .nav { position: fixed; right: 18px; bottom: 14px; display: flex; align-items: center; gap: 8px; z-index: 20; font-family: var(--sans); }
+  .nav { transition: opacity .3s ease; }
+  .nav button { background: rgba(20,32,27,.08); color: var(--ink); border: 1px solid rgba(20,32,27,.18); width: 38px; height: 38px; border-radius: 10px; font-size: 18px; cursor: pointer; }
+  .nav button:hover { background: rgba(20,32,27,.16); }
+  .nav .ct { color: var(--muted); font-size: 14px; min-width: 56px; text-align: center; font-variant-numeric: tabular-nums; }
+  .hint { position: fixed; left: 18px; bottom: 20px; color: var(--muted); font-size: 13px; z-index: 20; transition: opacity .3s ease; }
+  body.is-dark .nav button { background: rgba(255,255,255,.12); color: #fff; border-color: rgba(255,255,255,.22); }
+  body.is-dark .nav button:hover { background: rgba(255,255,255,.24); }
+  body.is-dark .nav .ct { color: #cfd9d3; }
+  body.is-dark .hint { color: #7f9088; }
+  /* Pantalla completa: controles se ocultan si no hay movimiento */
+  body.fs .hint { display: none; }
+  body.fs.idle .nav { opacity: 0; pointer-events: none; }
+  body.fs.idle { cursor: none; }
+  .present { position: absolute; right: 84px; bottom: 118px; z-index: 5; font: 700 18px var(--sans); color: var(--ink); background: #4FC3A0; border: 0; border-radius: 14px; padding: 16px 26px; cursor: pointer; letter-spacing: .01em; box-shadow: 0 8px 24px rgba(79,195,160,.25); }
+  .present:hover { background: #63D2B0; }
+  body.fs .present { display: none; }
+  .timer { position: fixed; left: 18px; top: 14px; z-index: 20; font: 600 15px var(--mono); color: var(--muted); background: rgba(20,32,27,.06); border-radius: 8px; padding: 6px 10px; display: none; font-variant-numeric: tabular-nums; }
+  body.is-dark .timer { color: #cfd9d3; background: rgba(255,255,255,.1); }
+  body.show-timer .timer { display: block; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide, .slide.active { transition: none; }
+    .slide.active .rise { animation: none; opacity: 1; transform: none; }
+    .track i, .stack span { transition: none; }
+  }
+
+  /* Impresión / PDF: una slide por página */
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    html, body { overflow: visible; height: auto; background: #fff; }
+    .stage { position: static; transform: none !important; width: 1280px; height: auto; box-shadow: none; overflow: visible; }
+    .slide { position: relative; width: 1280px; height: 720px; opacity: 1; visibility: visible; page-break-after: always; break-after: page; }
+    .rise { opacity: 1; transform: none; }
+    .track i, .stack span { width: var(--w); transition: none; }
+    .nav, .hint, .progress, .timer, .present { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="hint">← → navegar · F pantalla completa · T cronómetro</div>
+<div class="timer" id="timer">00:00</div>
+<div class="nav">
+  <button id="prev" aria-label="Anterior">‹</button>
+  <div class="ct" id="counter">1 / 17</div>
+  <button id="next" aria-label="Siguiente">›</button>
+</div>
+
+<main class="stage" id="stage">
+
+  <!-- 1 · PORTADA -->
+  <section class="slide dark" style="justify-content:center">
+    <div class="who">Seminario de Integración Profesional · UADE</div>
+    <div class="kicker rise" style="--d:.05s">Avance del equipo</div>
+    <h1 class="rise" style="--d:.15s">Vuelto</h1>
+    <p class="lead rise" style="--d:.3s; margin-top:22px; max-width:820px">Un asistente que le dice al usuario <em class="g" style="color:#4FC3A0">con qué medio de pago pagar</em> en una compra concreta, y cuánto tope de reintegro le queda.</p>
+    <button class="present rise" id="present" style="--d:.6s" type="button">▶ Presentar en pantalla completa</button>
+    <div class="rise" style="--d:.5s; margin-top:auto; display:flex; gap:34px; font-size:18px; color:#C7D6CE; flex-wrap:wrap">
+      <span>Joaquín Nuñez</span><span>Jesús Quijada</span><span>Agustín Herrero</span><span>Santiago Pazos</span><span>Kevin Calcagni</span>
+    </div>
+  </section>
+
+  <!-- 2 · PROBLEMA -->
+  <section class="slide">
+    <div class="who">Joaquín · Apertura</div>
+    <div class="kicker rise">El problema</div>
+    <h2 class="rise" style="--d:.08s">El usuario paga con el primer medio disponible y <em class="a">pierde plata sin darse cuenta</em></h2>
+    <div class="body">
+      <div class="grid g3">
+        <div class="card rise" style="--d:.2s"><span class="tag a">Varía</span><h3 style="margin-top:12px">Por todo</h3><p>Día, billetera, banco y tarjeta. Cada combinación tiene su promo.</p></div>
+        <div class="card rise" style="--d:.3s"><span class="tag a">Se comparte</span><h3 style="margin-top:12px">Un tope mensual</h3><p>El reintegro tiene un tope común entre promos, y hoy es invisible.</p></div>
+        <div class="card rise" style="--d:.4s"><span class="tag a">Se esconde</span><h3 style="margin-top:12px">Letra chica</h3><p>Las condiciones son largas, cambian y son difíciles de seguir.</p></div>
+      </div>
+      <p class="lead rise" style="--d:.55s; font-size:27px">El problema no es la falta de información. <b>Es la decisión.</b></p>
+    </div>
+  </section>
+
+  <!-- 3 · QUÉ ES VUELTO -->
+  <section class="slide">
+    <div class="who">Joaquín · Apertura</div>
+    <div class="kicker rise">La propuesta</div>
+    <h2 class="rise" style="--d:.08s">No listamos promociones. <em class="g">Recomendamos qué pagar.</em></h2>
+    <div class="body">
+      <div class="grid g3">
+        <div class="card rise" style="--d:.2s; border:2px solid var(--green)"><span class="tag">Recomienda</span><h3 style="margin-top:12px">Con qué pagar</h3><p>En una compra concreta, con el medio que más conviene hoy.</p></div>
+        <div class="card rise" style="--d:.3s; border:2px solid var(--green)"><span class="tag">Controla</span><h3 style="margin-top:12px">Cuánto tope queda</h3><p>El tope mensual compartido deja de ser invisible.</p></div>
+        <div class="card rise" style="--d:.4s; border:2px solid var(--green)"><span class="tag">Es honesto</span><h3 style="margin-top:12px">Estimado, con su base</h3><p>Nunca una cifra falsamente precisa: siempre muestra en qué se apoya.</p></div>
+      </div>
+      <div class="rise" style="--d:.55s; background:var(--ink); color:var(--paper); border-radius:16px; padding:26px 32px; display:flex; align-items:center; gap:26px">
+        <span class="tag" style="background:#4FC3A0;color:var(--ink);flex:none">Regla de oro</span>
+        <span style="font-size:25px; line-height:1.35">Si una funcionalidad se puede describir como <b>“mostrar promociones”</b>, no es este producto.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · ALCANCE DEL MVP -->
+  <section class="slide">
+    <div class="who">Kevin · Alcance del MVP</div>
+    <div class="kicker rise">Alcance del MVP</div>
+    <h2 class="rise" style="--d:.08s">Un MVP acotado: <em class="g">un flujo bien hecho</em> antes que cobertura</h2>
+    <div class="body">
+      <div class="grid g2" style="align-items:stretch">
+        <div class="card rise" style="--d:.2s; border:2px solid var(--green)">
+          <span class="tag">Dentro</span>
+          <ul style="margin-top:14px; padding-left:22px; display:grid; gap:9px; font-size:19px">
+            <li><b>CABA/AMBA</b>, con supermercado como único flujo optimizado</li>
+            <li>Combustible y restaurantes: entran al corpus y al control de tope</li>
+            <li><b>6 billeteras/bancos:</b> Mercado Pago, MODO, Cuenta DNI, Santander, Galicia, BBVA</li>
+            <li>Perfil declarado, registro por ticket e ingesta con revisión humana</li>
+            <li>Gasto en grupo nivel 0 (última prioridad)</li>
+          </ul>
+        </div>
+        <div class="card rise" style="--d:.3s">
+          <span class="tag g">Fuera</span>
+          <ul style="margin-top:14px; padding-left:22px; display:grid; gap:9px; font-size:19px">
+            <li>Integración bancaria directa</li>
+            <li>Lectura automática de resúmenes y movimientos</li>
+            <li>Publicar promos sin revisión humana</li>
+            <li>Cobertura nacional</li>
+            <li>App nativa nuda (usamos Expo)</li>
+          </ul>
+        </div>
+      </div>
+      <p class="foot rise" style="--d:.45s">Farmacia quedó afuera. Se puede reconsiderar más adelante con el mismo criterio. Detalle en <span style="font-family:var(--mono)">docs/product/alcance-mvp.md</span>.</p>
+    </div>
+  </section>
+
+  <!-- 4 · ENCUESTA: FICHA -->
+  <section class="slide">
+    <div class="who">Santiago · Encuestas</div>
+    <div class="kicker rise">Research · Encuesta</div>
+    <h2 class="rise" style="--d:.08s">Le preguntamos a 51 personas cómo pagan y cómo usan las promos</h2>
+    <div class="body">
+      <div class="grid g3" style="align-items:stretch">
+        <div class="card rise" style="--d:.2s; text-align:center"><div class="big g">51</div><p style="margin-top:8px">respuestas</p></div>
+        <div class="card rise" style="--d:.3s; text-align:center"><div class="big g">12</div><p style="margin-top:8px">días de relevamiento<br><span class="muted" style="font-size:16px">8 al 20 de septiembre</span></p></div>
+        <div class="card rise" style="--d:.4s; text-align:center"><div class="big a">62,7%</div><p style="margin-top:8px">tiene entre 18 y 25 años<br><span class="muted" style="font-size:16px">sesgo de muestra</span></p></div>
+      </div>
+      <div class="card rise" style="--d:.55s; background:var(--amber-soft); border-color:#E5C875">
+        <p><b>Cómo leerla:</b> circuló por la red de contactos del equipo, así que describe a esa población. Sirve para <b>validar que el problema existe</b>, no para dimensionar el mercado.</p>
+      </div>
+      <p class="foot rise" style="--d:.65s">Fuente: Google Forms “Encuesta sobre el uso de promociones y billeteras virtuales” · análisis completo en <span style="font-family:var(--mono)">docs/product/encuesta-resultados.md</span></p>
+    </div>
+  </section>
+
+  <!-- 5 · ENCUESTA: EL PROBLEMA EXISTE -->
+  <section class="slide">
+    <div class="who">Santiago · Encuestas</div>
+    <div class="kicker rise">Hallazgo 1</div>
+    <h2 class="rise" style="--d:.08s">El problema es real: <em class="a">98%</em> pagó y se enteró tarde de una promo mejor</h2>
+    <div class="body">
+      <div class="grid g2" style="gap:44px; align-items:start">
+        <div class="rise" style="--d:.2s">
+          <div class="chart-title">¿Pagaste y después supiste de una promo mejor?</div>
+          <div class="chart-sub">% de respuestas · n = 51</div>
+          <div class="stack">
+            <span class="s1" style="--w:68.6%">68,6%</span>
+            <span class="s2" style="--w:29.4%">29,4%</span>
+            <span class="s3" style="--w:2%"></span>
+          </div>
+          <div class="legend">
+            <span><i style="background:var(--amber)"></i>Alguna vez</span>
+            <span><i style="background:#8A5A00"></i>Seguido</span>
+            <span><i style="background:#9AA59E"></i>Nunca (2%)</span>
+          </div>
+          <div class="card" style="margin-top:26px; padding:18px 22px">
+            <p style="font-size:18px">Mayor frustración, la más citada (54,9%): <b>llegar a la caja y descubrir que la promo era con otra app, no aplicaba hoy o tenía letra chica.</b></p>
+          </div>
+        </div>
+        <div class="rise" style="--d:.32s">
+          <div class="chart-title">¿Cómo controlás el tope consumido?</div>
+          <div class="chart-sub">% de respuestas · n = 51</div>
+          <div class="brow hl"><div class="l"><span>No lleva ningún control</span><b>47,1%</b></div><div class="track"><i style="--w:47.1%"></i></div></div>
+          <div class="brow"><div class="l"><span>Cálculo mental</span><b>25,5%</b></div><div class="track"><i style="--w:25.5%"></i></div></div>
+          <div class="brow"><div class="l"><span>Revisa el historial de cada app a mano</span><b>19,6%</b></div><div class="track"><i style="--w:19.6%"></i></div></div>
+          <div class="brow ok"><div class="l"><span>Lleva un registro exacto</span><b>7,8%</b></div><div class="track"><i style="--w:7.8%"></i></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · ENCUESTA: SE SIENTEN SEGUROS, DECIDEN A CIEGAS -->
+  <section class="slide">
+    <div class="who">Santiago · Encuestas</div>
+    <div class="kicker rise">Hallazgo 2</div>
+    <h2 class="rise" style="--d:.08s">Se sienten seguros, pero <em class="a">deciden a ciegas</em></h2>
+    <div class="body">
+      <div class="grid g2" style="gap:44px; align-items:start">
+        <div class="rise" style="--d:.2s">
+          <div class="chart-title">La contradicción</div>
+          <div class="chart-sub">Lo que dicen vs. lo que hacen · n = 51</div>
+          <div style="display:flex; gap:26px; align-items:flex-end">
+            <div><div class="big sm g">51%</div><p style="font-size:18px; margin-top:6px; max-width:220px">dice estar <b>seguro</b> de qué tarjeta conviene usar</p></div>
+            <div style="font-size:34px; color:var(--muted); padding-bottom:44px">vs.</div>
+            <div><div class="big sm a">7,8%</div><p style="font-size:18px; margin-top:6px; max-width:220px">lleva un <b>registro exacto</b> de su tope</p></div>
+          </div>
+          <div class="card" style="margin-top:26px; padding:18px 22px; background:var(--green-soft); border-color:#9DCDB9">
+            <p style="font-size:18px">La seguridad percibida no coincide con el control real. <b>Ese es el hueco que ataca Vuelto.</b></p>
+          </div>
+        </div>
+        <div class="rise" style="--d:.32s">
+          <div class="chart-title">Entre dos tarjetas con promo, ¿cómo eligen?</div>
+          <div class="chart-sub">% de respuestas · n = 51</div>
+          <div class="brow hl"><div class="l"><span>El mayor % de descuento nominal</span><b>68,6%</b></div><div class="track"><i style="--w:68.6%"></i></div></div>
+          <div class="brow"><div class="l"><span>Si les queda tope disponible</span><b>13,7%</b></div><div class="track"><i style="--w:13.7%"></i></div></div>
+          <div class="brow"><div class="l"><span>El tope nominal restante</span><b>13,7%</b></div><div class="track"><i style="--w:13.7%"></i></div></div>
+          <p class="foot" style="margin-top:14px">Un solo factor, sin mirar el tope consumido: justo el error que corrige el motor de reglas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · ENCUESTA: QUÉ PIDEN -->
+  <section class="slide">
+    <div class="who">Santiago · Encuestas</div>
+    <div class="kicker rise">Hallazgo 3</div>
+    <h2 class="rise" style="--d:.08s">Piden que les digan <em class="g">con qué pagar</em>, no un buscador de promos</h2>
+    <div class="body">
+      <div class="grid" style="grid-template-columns: 1.5fr 1fr; gap:44px; align-items:start">
+        <div class="rise" style="--d:.2s">
+          <div class="chart-title">¿Qué te daría tranquilidad?</div>
+          <div class="chart-sub">Respuesta múltiple · % de personas · n = 51</div>
+          <div class="brow ok"><div class="l"><span>Que la app diga “Pagá con la billetera X” en el momento</span><b>41,2%</b></div><div class="track"><i style="--w:41.2%"></i></div></div>
+          <div class="brow ok"><div class="l"><span>Que avise qué días comprar en mis locales</span><b>39,2%</b></div><div class="track"><i style="--w:39.2%"></i></div></div>
+          <div class="brow"><div class="l"><span>Saber, antes de pagar, si me queda tope</span><b>15,7%</b></div><div class="track"><i style="--w:15.7%"></i></div></div>
+          <div class="brow"><div class="l"><span>Un buscador unificado de promociones <span class="tag g" style="margin-left:6px">= “mostrar promos”</span></span><b>15,7%</b></div><div class="track"><i style="--w:15.7%"></i></div></div>
+        </div>
+        <div style="display:grid; gap:16px">
+          <div class="card rise" style="--d:.34s; padding:20px 22px"><span class="tag">Intención</span><div class="big sm g" style="margin-top:10px">96,1%</div><p style="font-size:17px; margin-top:4px">usaría una app así. Es intención declarada: pesa menos que los datos de comportamiento.</p></div>
+          <div class="card rise" style="--d:.44s; padding:20px 22px; background:var(--amber-soft); border-color:#E5C875"><span class="tag a">Riesgo</span><p style="font-size:17px; margin-top:10px">Piden avisos proactivos, pero solo ~16% acepta permisos de notificaciones push. Pendiente de definir.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · ROLES -->
+  <section class="slide">
+    <div class="who">Jesús · Roles y Scrum</div>
+    <div class="kicker rise">Roles</div>
+    <h2 class="rise" style="--d:.08s">Un Product Owner y tres frentes de trabajo</h2>
+    <div class="body" style="gap:18px">
+      <div class="grid g3" style="align-items:stretch">
+        <div class="card rise" style="--d:.2s; border:2px solid var(--green)">
+          <span class="tag">Product Owner</span>
+          <div class="person" style="margin-top:16px"><div class="avatar">JN</div><div><b>Joaquín Nuñez</b><span>También en Front</span></div></div>
+          <ul style="margin-top:16px; padding-left:20px; display:grid; gap:6px">
+            <li>Custodia la regla de oro</li>
+            <li>Prioriza el backlog</li>
+            <li>Acepta o rechaza cada historia</li>
+            <li>Decide en la cola de revisión de la ingesta</li>
+          </ul>
+        </div>
+        <div class="card rise" style="--d:.3s">
+          <span class="tag k">Front</span>
+          <p class="muted" style="font-size:16px; margin:10px 0 14px">App Expo: perfil, recomendación, registro por ticket</p>
+          <div style="display:grid; gap:16px">
+            <div class="person"><div class="avatar">JN</div><div><b>Joaquín Nuñez</b></div></div>
+            <div class="person"><div class="avatar">JQ</div><div><b>Jesús Quijada</b></div></div>
+          </div>
+        </div>
+        <div class="card rise" style="--d:.4s">
+          <span class="tag k">Back</span>
+          <p class="muted" style="font-size:16px; margin:10px 0 14px">Supabase: datos, RLS, Edge Function, ingesta/extractor</p>
+          <div style="display:grid; gap:16px">
+            <div class="person"><div class="avatar b">AH</div><div><b>Agustín Herrero</b><span>+ motor de reglas</span></div></div>
+            <div class="person"><div class="avatar b">SP</div><div><b>Santiago Pazos</b></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card rise" style="--d:.48s; display:flex; align-items:center; gap:22px; padding:16px 26px">
+        <span class="tag k" style="flex:none">Research y datos</span>
+        <div class="person" style="flex:none"><div class="avatar b">KC</div><div><b>Kevin Calcagni</b></div></div>
+        <span style="font-size:17px; color:var(--muted); line-height:1.35">Relevamiento de fuentes de promos, corpus de tickets y research pendiente</span>
+      </div>
+      <p class="foot rise" style="--d:.55s">Equipo autoorganizado: un frente por persona no impide tomar tareas de otro. Las revisiones de código las hacemos todos.</p>
+    </div>
+  </section>
+
+  <!-- 9 · SCRUM -->
+  <section class="slide">
+    <div class="who">Jesús · Roles y Scrum</div>
+    <div class="kicker rise">Scrum</div>
+    <h2 class="rise" style="--d:.08s">Sprints de 2 semanas con cinco ceremonias</h2>
+    <div class="body" style="gap:30px">
+      <div class="steps rise" style="--d:.2s">
+        <div class="step"><div class="n">1</div><b>Planning</b><span>Día 1 · 1 h<br>Objetivo del sprint</span></div>
+        <div class="step"><div class="n">2</div><b>Daily</b><span>15 min · 3 veces<br>por semana o async</span></div>
+        <div class="step"><div class="n">3</div><b>Refinamiento</b><span>Mitad del sprint<br>30 min</span></div>
+        <div class="step"><div class="n">4</div><b>Review</b><span>Último día<br>Demo en Expo Go</span></div>
+        <div class="step"><div class="n">5</div><b>Retro</b><span>45 min<br>Una acción concreta</span></div>
+      </div>
+      <div class="grid g2 rise" style="--d:.35s; gap:22px">
+        <div class="card">
+          <span class="tag">Definition of Ready</span>
+          <ul style="margin-top:12px; padding-left:20px; display:grid; gap:6px">
+            <li>Ligada a requisitos (RF/RNF)</li>
+            <li>Criterios de aceptación verificables</li>
+            <li>No bloqueada por un pendiente abierto</li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="tag">Definition of Done</span>
+          <ul style="margin-top:12px; padding-left:20px; display:grid; gap:6px">
+            <li>Tests Vitest del motor pasan; sin LLM en el motor</li>
+            <li>RLS en toda tabla nueva; ningún secreto en el cliente</li>
+            <li>Se puede demostrar en Expo Go; sesión de IA en la bitácora</li>
+          </ul>
+        </div>
+      </div>
+      <p class="foot rise" style="--d:.5s">Honestidad: los acuerdos de ceremonias son propuestos y las fechas del sprint están <b>a confirmar</b> con el cronograma real de la cátedra.</p>
+    </div>
+  </section>
+
+  <!-- 10 · KANBAN -->
+  <section class="slide">
+    <div class="who">Jesús · Roles y Scrum</div>
+    <div class="kicker rise">Tablero Kanban · GitHub Projects</div>
+    <h2 class="rise" style="--d:.08s; font-size:40px">24 ítems: <em class="g">12 terminados</em>, 3 en curso, 9 en backlog</h2>
+    <div class="body" style="margin-top:22px; gap:14px">
+      <div class="board rise" style="--d:.2s">
+        <div class="col"><header>Backlog <span>9</span></header>
+          <div class="kc epic"><small>8 épicas · #15–#22</small>Research, Alcance, Gestión ágil, Plataforma, Motor de reglas, App Expo, Ticket y topes, Privacidad</div>
+          <div class="kc"><small>#10</small>Testear precisión del lector de tickets</div>
+        </div>
+        <div class="col"><header>Ready <span>0</span></header><div class="empty">Sin ítems por ahora</div></div>
+        <div class="col"><header>In progress <span>2</span></header>
+          <div class="kc"><small>#12</small>Relevar fuentes reales de promos (HTML vs SPA/JSON, robots.txt)</div>
+          <div class="kc"><small>#9</small>Crear cuenta de Supabase y manejo de secrets</div>
+        </div>
+        <div class="col"><header>In review <span>1</span></header>
+          <div class="kc"><small>#5</small>Configurar CI/CD</div>
+        </div>
+        <div class="col"><header>Done <span>12</span></header>
+          <div class="kc"><small>#4</small>Respuestas y análisis de la encuesta</div>
+          <div class="kc"><small>#11</small>Política de privacidad y retención</div>
+          <div class="kc"><small>#3</small>Requerimientos funcionales y no funcionales</div>
+          <div class="kc"><small>#2</small>Roles de Scrum</div>
+          <div class="more">+ 8 más (issues y PRs)</div>
+        </div>
+      </div>
+      <p class="foot rise" style="--d:.4s; margin-top:0">Captura del tablero al 21/09/2026. 8 épicas vinculadas como sub-issues y 3 milestones. Si hay conexión, mostramos el tablero en vivo.</p>
+    </div>
+  </section>
+
+  <!-- 11 · REPO: MAPA -->
+  <section class="slide">
+    <div class="who">Agustín · Repo con documentación</div>
+    <div class="kicker rise">El repositorio</div>
+    <h2 class="rise" style="--d:.08s">Todo el proyecto está documentado <em class="g">dentro del repo</em></h2>
+    <div class="body" style="gap:14px">
+      <div class="tree rise" style="--d:.2s">
+        <div class="row"><span class="p">CLAUDE.md</span><span class="d">Reglas del proyecto para cualquier IA</span></div>
+        <div class="row"><span class="p">docs/product/</span><span class="d">Problema, alcance, requisitos, roles, privacidad, encuesta</span><span class="c">12 docs</span></div>
+        <div class="row"><span class="p">docs/architecture/</span><span class="d">Datos, API, frontend, infraestructura</span><span class="c">5 docs</span></div>
+        <div class="row"><span class="p">docs/decisions/</span><span class="d">ADRs: qué se decidió y por qué</span><span class="c">7 ADRs</span></div>
+        <div class="row"><span class="p">specs/</span><span class="d">Specs de feature con spec-kit</span></div>
+        <div class="row"><span class="p">.github/workflows/</span><span class="d">CI: lint, typecheck, test, build</span></div>
+        <div class="row"><span class="p">.claude/ · .agents/</span><span class="d">Agentes, skills y hook de bitácora</span></div>
+      </div>
+      <p class="foot rise" style="--d:.4s; margin-top:2px">Etapa de definición: todavía no hay código. Es a propósito: primero problema, alcance y reglas.</p>
+    </div>
+  </section>
+
+  <!-- 12 · REPO: TRAZABILIDAD -->
+  <section class="slide">
+    <div class="who">Agustín · Repo con documentación</div>
+    <div class="kicker rise">Trazabilidad</div>
+    <h2 class="rise" style="--d:.08s">Cada decisión deja su <em class="g">porqué</em> por escrito</h2>
+    <div class="body">
+      <div class="chain rise" style="--d:.2s">
+        <div class="link"><b>34</b><span>requisitos</span><small>20 RF · 14 RNF</small></div>
+        <div class="link"><b>7</b><span>ADRs</span><small>docs/decisions</small></div>
+        <div class="link"><b>1</b><span>spec</span><small>specs/001</small></div>
+        <div class="link"><b>20</b><span>issues</span><small>8 épicas</small></div>
+        <div class="link"><b>6</b><span>PRs mergeados</span><small>revisión de todos</small></div>
+      </div>
+      <div class="grid g2 rise" style="--d:.35s">
+        <div class="card">
+          <span class="tag">Ejemplo · ADR-004</span>
+          <h3 style="margin-top:12px">El LLM vive solo en la ingesta</h3>
+          <p>El motor de reglas es código determinístico. Así hay tests, resultados reproducibles y un argumento técnico defendible.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Ejemplo · ADR-007</span>
+          <h3 style="margin-top:12px">spec-kit, no dos herramientas</h3>
+          <p>Un solo punto de entrada para especificar una feature. Nadie duda cuál correr al arrancar.</p>
+        </div>
+      </div>
+      <p class="foot rise" style="--d:.5s">También quedan registrados los pendientes abiertos (<span style="font-family:var(--mono)">pendientes.md</span>) y los riesgos (<span style="font-family:var(--mono)">riesgos.md</span>).</p>
+    </div>
+  </section>
+
+  <!-- 13 · IA: LÍNEA DE TIEMPO -->
+  <section class="slide">
+    <div class="who">Joaquín · Uso de IA</div>
+    <div class="kicker rise">IA para construir · línea de tiempo</div>
+    <h2 class="rise" style="--d:.08s; font-size:40px">Trabajamos con Claude Code de punta a punta, <em class="g">con una persona decidiendo</em></h2>
+    <div class="body" style="margin-top:26px; gap:18px">
+      <div class="tl rise" style="--d:.2s">
+        <div class="ev"><div class="dt">01/09</div><div class="dot"></div><div class="tx"><b>Retro-documentación del repo</b><span>Skill ai-project-setup: CLAUDE.md, arquitectura, ADRs y docs de producto</span></div></div>
+        <div class="ev"><div class="dt">19/09</div><div class="dot"></div><div class="tx"><b>Alcance del MVP, CI y spec-kit</b><span>La IA propone; el equipo confirma cada decisión de alcance</span></div></div>
+        <div class="ev"><div class="dt">19/09</div><div class="dot"></div><div class="tx"><b>Requisitos, roles y épicas</b><span>20 RF + 14 RNF, roles de Scrum y 8 épicas cargadas vía gh CLI</span></div></div>
+        <div class="ev"><div class="dt">19/09</div><div class="dot"></div><div class="tx"><b>Privacidad y declaración de uso de IA</b><span>Política de retención de datos y este mapa end-to-end</span></div></div>
+        <div class="ev"><div class="dt">21/09</div><div class="dot"></div><div class="tx"><b>Automatizaciones</b><span>4 agentes, skills de diseño y hook que exige actualizar la bitácora</span></div></div>
+      </div>
+      <div class="rise" style="--d:.4s">
+        <div style="font-size:14px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:8px">Ciclo de desarrollo definido</div>
+        <div class="pipe"><span class="pc">specify</span><span class="ar">→</span><span class="pc">spec-critic</span><span class="ar">→</span><span class="pc">plan</span><span class="ar">→</span><span class="pc">tasks</span><span class="ar">→</span><span class="pc">implement</span><span class="ar">→</span><span class="pc">code-review</span><span class="ar">→</span><span class="pc">test-runner</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14 · IA EN EL PRODUCTO -->
+  <section class="slide dark">
+    <div class="who">Joaquín · Uso de IA</div>
+    <div class="kicker rise">IA en el producto · end-to-end</div>
+    <h2 class="rise" style="--d:.08s; font-size:40px">El LLM extrae datos. <em class="g" style="color:#4FC3A0">Nunca decide.</em></h2>
+    <div class="body" style="margin-top:18px; gap:0">
+      <div class="lg rise" style="--d:.15s">
+        <span><i style="background:#4A3410;border-color:#F0B43C"></i>Paso con IA (Gemini, en servidor)</span>
+        <span><i style="background:#0E4D39;border-color:#4FC3A0"></i>Persona decide</span>
+        <span><i style="background:#1E2C26;border-color:#3A4A42"></i>Código determinístico</span>
+      </div>
+      <div class="lane rise" style="--d:.25s">
+        <div class="ln"><b>Ingesta de promos</b><span>Offline, en lote</span></div>
+        <div class="node">Letra chica del banco o billetera</div>
+        <div class="node ai">Gemini extrae contra un esquema<small>campo ausente = null</small></div>
+        <div class="node">Borrador en cola</div>
+        <div class="node human">Revisión humana<small>aprueba · corrige · rechaza</small></div>
+        <div class="node">Promo publicada</div>
+      </div>
+      <div class="lane rise" style="--d:.35s">
+        <div class="ln"><b>Registro por ticket</b><span>Edge Function de Supabase</span></div>
+        <div class="node">Foto del ticket</div>
+        <div class="node ai">Gemini lee el ticket<small>la imagen se descarta</small></div>
+        <div class="node">Texto extraído<small>se persiste</small></div>
+        <div class="node human">El usuario confirma</div>
+        <div class="node">Compra registrada</div>
+      </div>
+      <div class="feeds rise" style="--d:.45s">▼ solo datos aprobados o confirmados por una persona llegan al motor ▼</div>
+      <div class="engine rise" style="--d:.5s">
+        <div><b>Motor de reglas</b><span>TypeScript sin dependencias · corre en el dispositivo · sin LLM en el camino</span></div>
+        <div class="out"><strong>Con qué pagar</strong><span>+ tope estimado, con su base</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15 · GARANTÍAS + BITÁCORA -->
+  <section class="slide">
+    <div class="who">Joaquín · Uso de IA</div>
+    <div class="kicker rise">Límites y trazabilidad</div>
+    <h2 class="rise" style="--d:.08s">Cuatro garantías, y <em class="g">cada sesión queda registrada</em></h2>
+    <div class="body">
+      <div class="grid g4">
+        <div class="card rise" style="--d:.15s"><b style="font-size:36px; font-family:var(--serif); color:var(--green)">1</b><h3 style="margin-top:8px">Sin LLM en el motor</h3><p>La recomendación sale de código con tests.</p></div>
+        <div class="card rise" style="--d:.22s"><b style="font-size:36px; font-family:var(--serif); color:var(--green)">2</b><h3 style="margin-top:8px">Revisión humana</h3><p>Ninguna promo se publica sin que una persona la apruebe.</p></div>
+        <div class="card rise" style="--d:.29s"><b style="font-size:36px; font-family:var(--serif); color:var(--green)">3</b><h3 style="margin-top:8px">Key en el servidor</h3><p>La API key de Gemini nunca viaja al celular.</p></div>
+        <div class="card rise" style="--d:.36s"><b style="font-size:36px; font-family:var(--serif); color:var(--green)">4</b><h3 style="margin-top:8px">Tickets sin imagen</h3><p>Se descartan tras el envío; solo queda el texto.</p></div>
+      </div>
+      <div class="card rise" style="--d:.5s; display:grid; grid-template-columns: 1fr 1fr; gap:34px; align-items:center">
+        <div>
+          <span class="tag">Bitácora de prompts</span>
+          <h3 style="margin-top:12px">Evidencia para la cátedra</h3>
+          <p>Cada entrada: fecha, herramienta, objetivo, prompts principales y resultado. Hoy hay 5 sesiones registradas.</p>
+        </div>
+        <div>
+          <p><b>Un hook nos avisa</b> si una sesión cambió archivos y la bitácora quedó sin actualizar. Además, cada decisión de arquitectura queda en un ADR con su razonamiento.</p>
+          <p style="margin-top:10px; font-family:var(--mono); font-size:15px; color:var(--muted)">docs/bitacora-prompts.md · docs/uso-de-ia.md</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 16 · CIERRE -->
+  <section class="slide dark">
+    <div class="who">Joaquín · Cierre</div>
+    <div class="kicker rise">Lo que sigue</div>
+    <h2 class="rise" style="--d:.08s">Problema validado, equipo organizado, IA con límites claros</h2>
+    <div class="body" style="gap:22px">
+      <div class="grid g2" style="gap:22px">
+        <div class="rise" style="--d:.2s; background:#1E2C26; border-radius:16px; padding:24px 28px">
+          <span class="tag" style="background:#0E4D39;color:#D2F3E6">Hecho</span>
+          <ul style="margin-top:14px; padding-left:22px; display:grid; gap:9px; font-size:20px; color:#E4ECE7; line-height:1.35">
+            <li>Encuesta de 51 respuestas y su análisis</li>
+            <li>Requisitos, roles, épicas y tablero</li>
+            <li>Repo documentado, con ADRs y spec-kit</li>
+            <li>Bitácora y declaración de uso de IA</li>
+          </ul>
+        </div>
+        <div class="rise" style="--d:.3s; background:#1E2C26; border-radius:16px; padding:24px 28px">
+          <span class="tag a">Sigue</span>
+          <ul style="margin-top:14px; padding-left:22px; display:grid; gap:9px; font-size:20px; color:#E4ECE7; line-height:1.35">
+            <li>Relevar fuentes reales de promos (#12)</li>
+            <li>Supabase y manejo de secrets (#9)</li>
+            <li>CI/CD en revisión (#5)</li>
+            <li>Testear la precisión del lector de tickets (#10)</li>
+          </ul>
+        </div>
+      </div>
+      <p class="foot rise" style="--d:.45s; margin-top:0">A resolver con la cátedra: cronograma real de sprints y equipo de 5 integrantes (la materia pide 6 a 8).</p>
+      <p class="rise" style="--d:.55s; font-family:var(--serif); font-size:34px; color:var(--paper); margin-top:auto">Gracias. <span style="color:#4FC3A0">¿Preguntas?</span></p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var stage = document.getElementById('stage');
+  var counter = document.getElementById('counter');
+  var progress = document.getElementById('progress');
+  var cur = 0;
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+
+  function go(n) {
+    cur = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (el, i) { el.classList.toggle('active', i === cur); });
+    counter.textContent = (cur + 1) + ' / ' + slides.length;
+    progress.style.width = ((cur + 1) / slides.length * 100) + '%';
+    document.body.classList.toggle('is-dark', slides[cur].classList.contains('dark'));
+    try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+  }
+
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+
+  document.getElementById('next').addEventListener('click', next);
+  document.getElementById('prev').addEventListener('click', prev);
+  window.addEventListener('resize', fit);
+
+  document.addEventListener('keydown', function (e) {
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); next(); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); prev(); }
+    else if (k === 'Home') go(0);
+    else if (k === 'End') go(slides.length - 1);
+    else if (k === 'f' || k === 'F') toggleFs();
+    else if (k === 't' || k === 'T') toggleTimer();
+  });
+
+  /* Pantalla completa */
+  function toggleFs() {
+    var el = document.documentElement;
+    if (!document.fullscreenElement) {
+      if (el.requestFullscreen) el.requestFullscreen().catch(function () {});
+    } else if (document.exitFullscreen) document.exitFullscreen();
+  }
+  document.addEventListener('fullscreenchange', function () {
+    document.body.classList.toggle('fs', !!document.fullscreenElement);
+    document.body.classList.remove('idle');
+    fit();
+  });
+  var presentBtn = document.getElementById('present');
+  if (presentBtn) presentBtn.addEventListener('click', function () { toggleFs(); });
+
+  /* Ocultar controles tras 2,5 s sin mover el mouse (solo en pantalla completa) */
+  var idleT;
+  function wake() {
+    document.body.classList.remove('idle');
+    clearTimeout(idleT);
+    idleT = setTimeout(function () { document.body.classList.add('idle'); }, 2500);
+  }
+  document.addEventListener('mousemove', wake);
+  document.addEventListener('mousedown', wake);
+
+  /* Cronómetro opcional (tecla T) */
+  var timerEl = document.getElementById('timer'), t0 = null, tick = null;
+  function fmt(n) { return (n < 10 ? '0' : '') + n; }
+  function toggleTimer() {
+    var on = document.body.classList.toggle('show-timer');
+    if (on) {
+      t0 = t0 || Date.now();
+      tick = setInterval(function () {
+        var sec = Math.floor((Date.now() - t0) / 1000);
+        timerEl.textContent = fmt(Math.floor(sec / 60)) + ':' + fmt(sec % 60);
+      }, 500);
+    } else { clearInterval(tick); t0 = null; timerEl.textContent = '00:00'; }
+  }
+
+  var sx = null;
+  document.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (sx === null) return;
+    var dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+    sx = null;
+  }, { passive: true });
+
+  fit();
+  var start = parseInt((location.hash || '').replace('#', ''), 10);
+  go(isNaN(start) ? 0 : start - 1);
+})();
+</script>
+</body>
+</html>

@@ -1,11 +1,21 @@
 # Roles de Scrum
 
-Equipo de 4 integrantes. Lo que depende del cronograma real de la cátedra
+Equipo de 5 integrantes. Lo que depende del cronograma real de la cátedra
 queda como `<a confirmar>`.
+
+## Integrantes
+
+| Integrante | Legajo | Rol |
+|---|---|---|
+| Joaquín Nuñez | 1224134 | Product Owner, Front |
+| Jesús Quijada | 1195298 | Development Team — Front |
+| Agustín Herrero | 1174588 | Development Team — Back, motor de reglas |
+| Santiago Pazos | 1172896 | Development Team — Back |
+| Kevin Calcagni | 1172825 | Development Team — Research y datos |
 
 ## Roles
 
-### Product Owner — Joaquín Nuñez
+### Product Owner — Joaquín Nuñez (legajo 1224134)
 
 - Custodia la regla de oro: si una funcionalidad se puede describir como
   "mostrar promociones", no entra al backlog (`problema.md`).
@@ -16,15 +26,16 @@ queda como `<a confirmar>`.
 - Aprueba, corrige o rechaza en la cola de revisión de la ingesta (ADR-005).
   Si no puede hacerlo, delega por escrito en otra persona del equipo.
 
-### Development Team — Front y Back
+### Development Team — Front, Back y Research
 
-Autoorganizado, dos frentes. Que cada persona tenga un frente no impide
-tomar tareas del otro.
+Autoorganizado, tres frentes. Que cada persona tenga un frente no impide
+tomar tareas de otro.
 
 | Frente | Alcance | Integrantes |
 |---|---|---|
 | Front | App Expo: perfil, recomendación, registro por ticket | Joaquín Nuñez, Jesús Quijada |
 | Back | Supabase: modelo de datos, RLS, Edge Function del ticket, ingesta / extractor | Agustín Herrero, Santiago Pazos |
+| Research y datos | Relevamiento de fuentes de promos, corpus de tickets para medir el lector, research pendiente (auto-registro, observación en punto de venta, 2ª ronda de encuesta) | Kevin Calcagni |
 
 El **motor de reglas** (paquete TypeScript sin dependencias, con su suite
 Vitest, ADR-001) es la pieza técnica más compleja del proyecto y está a cargo
@@ -75,6 +86,6 @@ Una historia está terminada si cumple los criterios de aceptación y además:
 
 ## Riesgo de proceso abierto
 
-El equipo tiene 4 integrantes y la materia pide 6-8 (`estado.md`). Hasta
-resolverlo con la cátedra, el alcance del MVP debe ser defendible con 4
+El equipo tiene 5 integrantes y la materia pide 6-8 (`estado.md`). Hasta
+resolverlo con la cátedra, el alcance del MVP debe ser defendible con 5
 personas — por eso el gasto en grupo es la última prioridad.
