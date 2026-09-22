@@ -120,6 +120,37 @@ para reflejar el pendiente resuelto.
 
 ---
 
+## 2026-09-21 — Organización y slides de la presentación del equipo
+
+**Herramienta:** Claude Code (Sonnet 5), con `gh` CLI y la skill
+`presentaciones-visuales`.
+
+**Objetivo:** organizar la presentación de avance del equipo (encuestas,
+repo con documentación, roles, Scrum con Kanban, bitácora y declaración de
+uso de IA), repartir los bloques entre los 4 integrantes y generar las
+slides.
+
+**Prompts principales:**
+1. "hacé una organización de cómo hacer la presentación, dividiendo el
+   trabajo por 4 integrantes" — los nombres se tomaron de
+   `docs/product/roles-scrum.md`.
+2. Ajustes de reparto pedidos por el equipo (quién abre, quién cierra, quién
+   toma el repo y la bitácora) y decisión de armar un deck corto combinado
+   con demo en vivo del repo y del tablero.
+3. "pulleá de main, que Santiago ya subió su parte. Hagamos las slides, con
+   gráficos de los resultados de la encuesta y una línea de tiempo del uso
+   de IA end to end."
+
+**Resultado:** `docs/presentacion/vuelto-avance.html` (16 slides HTML
+autocontenidas, navegables con teclado). Los datos de los gráficos salen
+literalmente de `docs/product/encuesta-resultados.md` (51 respuestas); el
+estado del tablero se leyó con `gh project item-list`. Quedó marcado para
+verificar con la fuente (Google Forms) que la suma de las opciones de
+"mayor frustración" da más de 100%, por lo que ese dato se usó solo como
+"la más citada".
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

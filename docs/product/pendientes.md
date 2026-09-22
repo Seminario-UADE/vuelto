@@ -1,7 +1,7 @@
 # Pendientes
 
 - [ ] Confirmar con la cátedra que el problema no cae en exclusiones
-- [ ] Resolver tamaño del equipo (4 vs. 6-8 requeridos)
+- [ ] Resolver tamaño del equipo (5 vs. 6-8 requeridos)
 - [ ] Nombre final + dominio + marca
 - [x] Rubros y billeteras/cadenas concretas del alcance — ver
       `alcance-mvp.md`
