@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Vuelto — arquitectura del MVP",
+    "output": "arquitectura.html",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    { "id": "modo", "type": "external", "label": "API de MODO", "sublabel": "REST pública, sin autenticación", "pos": [40, 300], "size": [160, 68] },
+    { "id": "supabase", "type": "database", "label": "Supabase", "sublabel": "Postgres + Auth + Edge Function", "tag": "RLS en cada tabla", "pos": [320, 300], "size": [170, 74] },
+    { "id": "gemini", "type": "external", "label": "Gemini", "sublabel": "Extractor, solo en servidor", "pos": [320, 100], "size": [160, 68] },
+    { "id": "app", "type": "frontend", "label": "App Expo", "sublabel": "Motor de reglas, en el dispositivo", "tag": "sin red", "pos": [620, 300], "size": [170, 74] }
+  ],
+  "connections": [
+    { "id": "modo-to-supabase", "from": "modo", "to": "supabase", "label": "promos (ingesta)", "variant": "emphasis" },
+    { "id": "supabase-to-gemini", "from": "supabase", "to": "gemini", "label": "extrae contra un esquema", "fromSide": "top", "toSide": "bottom" },
+    { "id": "supabase-to-app", "from": "supabase", "to": "app", "label": "datos validados", "variant": "emphasis" },
+    { "id": "app-to-supabase", "from": "app", "to": "supabase", "label": "perfil, ticket, compras", "fromSide": "bottom", "toSide": "bottom", "labelDy": 40 }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "Dispositivo", "items": ["App Expo: perfil, recomendación y motor de reglas — sin red"] },
+    { "dot": "cyan", "title": "Servidor", "items": ["Supabase: Postgres + Auth + Edge Function del ticket, con RLS", "Gemini: extractor de texto no estructurado, nunca en el cliente"] },
+    { "dot": "amber", "title": "Fuente de datos", "items": ["API de MODO: REST pública, sin autenticación, única fuente de ingesta del MVP"] }
+  ]
+}

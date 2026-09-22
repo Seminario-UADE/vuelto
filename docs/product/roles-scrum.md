@@ -3,9 +3,19 @@
 Equipo de 5 integrantes. Lo que depende del cronograma real de la cátedra
 queda como `<a confirmar>`.
 
+## Integrantes
+
+| Integrante | Legajo | Rol |
+|---|---|---|
+| Joaquín Nuñez | 1224134 | Product Owner, Front |
+| Jesús Quijada | 1195298 | Development Team — Front |
+| Agustín Herrero | 1174588 | Development Team — Back, motor de reglas |
+| Santiago Pazos | 1172896 | Development Team — Back |
+| Kevin Calcagni | 1172825 | Development Team — Research y datos |
+
 ## Roles
 
-### Product Owner — Joaquín Nuñez
+### Product Owner — Joaquín Nuñez (legajo 1224134)
 
 - Custodia la regla de oro: si una funcionalidad se puede describir como
   "mostrar promociones", no entra al backlog (`problema.md`).

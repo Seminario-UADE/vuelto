@@ -6,19 +6,37 @@
 <title>Vuelto — Avance del equipo</title>
 <style>
   :root {
-    --paper: #F5F1E8;
-    --paper-2: #EDE8DB;
-    --card: #FFFFFF;
-    --ink: #14201B;
-    --ink-2: #26352E;
-    --muted: #5B665F;
-    --line: #D8D2C2;
-    --green: #0E7A5A;
-    --green-deep: #0A5A43;
-    --green-soft: #D6EBE2;
-    --amber: #C47F00;
-    --amber-soft: #F6E4B8;
-    --red: #B24632;
+    /* Paleta oficial de marca — orden de prioridad: Verde Salvia, Blanco
+       Hueso, Gris Neutro, Dorado Champán. Verde Bosque queda como el ink /
+       fondo oscuro (no es uno de los 4 colores principales). */
+    --forest: #14281D; /* Verde Bosque / Cazador — ink y fondo oscuro */
+    --sage:   #4A6B53; /* 1º — Verde Salvia / Laurel */
+    --linen:  #F7F4EB; /* 2º — Blanco Hueso / Lino */
+    --sand:   #E8E4D8; /* 3º — Gris Neutro Cálido */
+    --gold:   #C5A059; /* 4º — Dorado Suave / Champán */
+
+    --paper: var(--linen);
+    --paper-2: var(--sand);
+    --card: var(--linen);
+    --ink: var(--forest);
+    --ink-2: #324D3B;
+    --muted: #636F65;
+    --line: var(--sand);
+    --green: var(--sage);
+    --green-deep: #2E4233;
+    --green-soft: #D8DBD0;
+    --green-soft-border: #A9B6A7;
+    --amber: var(--gold);
+    --amber-soft: #EDE3CE;
+    --amber-soft-border: #DECAA2;
+    --amber-text: #6C5831;
+    --red: var(--forest);
+    --neutral: #99A896;
+    --stack-2: #866D3D;
+    --dark-text-2: #C5C7BE;
+    --dark-muted: #989E94;
+    --dark-label: #AEB3A9;
+    --present-hover: #D2B57E;
     --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -57,20 +75,20 @@
     color: var(--muted); display: flex; align-items: center; gap: 10px;
   }
   .who::before { content: ""; width: 26px; height: 2px; background: var(--green); }
-  .dark .who { color: #A9B7AF; }
-  .dark .who::before { background: #4FC3A0; }
+  .dark .who { color: var(--dark-label); }
+  .dark .who::before { background: var(--gold); }
 
   .kicker { font-size: 16px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--green); margin-bottom: 14px; }
-  .dark .kicker { color: #4FC3A0; }
+  .dark .kicker { color: var(--gold); }
   h1, h2 { font-family: var(--serif); font-weight: 700; letter-spacing: -.015em; line-height: 1.08; color: var(--ink); }
   .dark h1, .dark h2 { color: var(--paper); }
   h2 { font-size: 46px; max-width: 1040px; }
   h1 { font-size: 92px; }
   .lead { font-size: 25px; line-height: 1.4; color: var(--ink-2); max-width: 900px; }
-  .dark .lead { color: #D3DDD7; }
+  .dark .lead { color: var(--dark-text-2); }
   .muted { color: var(--muted); }
   .foot { margin-top: auto; font-size: 15px; color: var(--muted); line-height: 1.45; }
-  .dark .foot { color: #93A39A; }
+  .dark .foot { color: var(--dark-muted); }
   .body { display: flex; flex-direction: column; gap: 26px; margin-top: 30px; flex: 1; min-height: 0; }
   em.g { font-style: normal; color: var(--green); }
   em.a { font-style: normal; color: var(--amber); }
@@ -87,7 +105,7 @@
     display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
     padding: 4px 10px; border-radius: 999px; background: var(--green-soft); color: var(--green-deep);
   }
-  .tag.a { background: var(--amber-soft); color: #7A4F00; }
+  .tag.a { background: var(--amber-soft); color: var(--amber-text); }
   .tag.k { background: var(--ink); color: var(--paper); }
   .tag.g { background: var(--paper-2); color: var(--muted); }
 
@@ -95,7 +113,7 @@
   .big { font-family: var(--serif); font-size: 120px; line-height: 1; font-weight: 700; letter-spacing: -.03em; }
   .big.sm { font-size: 76px; }
   .big.g { color: var(--green); } .big.a { color: var(--amber); } .big.r { color: var(--red); }
-  .dark .big.g { color: #4FC3A0; } .dark .big.a { color: #F0B43C; }
+  .dark .big.g { color: var(--gold); } .dark .big.a { color: var(--gold); }
 
   /* ---------- Gráficos de barras ---------- */
   .chart-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
@@ -104,22 +122,22 @@
   .brow .l { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; font-size: 18px; line-height: 1.25; margin-bottom: 6px; color: var(--ink-2); }
   .brow .l b { font-family: var(--serif); font-size: 26px; color: var(--ink); white-space: nowrap; }
   .track { height: 16px; border-radius: 8px; background: var(--paper-2); overflow: hidden; }
-  .track i { display: block; height: 100%; width: 0; border-radius: 8px; background: #9AA59E; transition: width 1s cubic-bezier(.2,.8,.2,1) .35s; }
+  .track i { display: block; height: 100%; width: 0; border-radius: 8px; background: var(--neutral); transition: width 1s cubic-bezier(.2,.8,.2,1) .35s; }
   .slide.active .track i { width: var(--w); }
   .brow.hl .track i { background: var(--amber); }
   .brow.ok .track i { background: var(--green); }
   .brow.hl .l b { color: var(--amber); } .brow.ok .l b { color: var(--green); }
 
   .stack { display: flex; height: 44px; border-radius: 10px; overflow: hidden; background: var(--paper-2); }
-  .stack span { display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 17px; color: #fff; width: 0; transition: width 1s cubic-bezier(.2,.8,.2,1) .35s; overflow: hidden; white-space: nowrap; }
+  .stack span { display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 17px; color: var(--linen); width: 0; transition: width 1s cubic-bezier(.2,.8,.2,1) .35s; overflow: hidden; white-space: nowrap; }
   .slide.active .stack span { width: var(--w); }
-  .stack .s1 { background: var(--amber); } .stack .s2 { background: #8A5A00; } .stack .s3 { background: #9AA59E; }
+  .stack .s1 { background: var(--amber); } .stack .s2 { background: var(--stack-2); } .stack .s3 { background: var(--neutral); }
   .legend { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 10px; font-size: 15px; color: var(--muted); }
   .legend i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 7px; vertical-align: -1px; }
 
   /* ---------- Personas ---------- */
   .person { display: flex; gap: 16px; align-items: center; }
-  .avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--green); color: #fff; font-family: var(--serif); font-size: 24px; font-weight: 700; display: grid; place-items: center; flex: none; }
+  .avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--green); color: var(--linen); font-family: var(--serif); font-size: 24px; font-weight: 700; display: grid; place-items: center; flex: none; }
   .avatar.b { background: var(--ink); }
   .person b { font-size: 21px; display: block; }
   .person span { font-size: 16px; color: var(--muted); }
@@ -128,7 +146,7 @@
   .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; position: relative; margin-top: 8px; }
   .steps::before { content: ""; position: absolute; left: 6%; right: 6%; top: 26px; height: 3px; background: var(--line); }
   .step { text-align: center; padding: 0 10px; position: relative; }
-  .step .n { width: 54px; height: 54px; border-radius: 50%; background: var(--green); color: #fff; font-family: var(--serif); font-size: 24px; font-weight: 700; display: grid; place-items: center; margin: 0 auto 14px; border: 5px solid var(--paper); }
+  .step .n { width: 54px; height: 54px; border-radius: 50%; background: var(--green); color: var(--linen); font-family: var(--serif); font-size: 24px; font-weight: 700; display: grid; place-items: center; margin: 0 auto 14px; border: 5px solid var(--paper); }
   .step b { font-size: 20px; display: block; margin-bottom: 4px; }
   .step span { font-size: 16px; color: var(--muted); line-height: 1.35; display: block; }
   .chips { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -141,7 +159,7 @@
   .col header span { background: var(--ink); color: var(--paper); border-radius: 999px; font-size: 14px; min-width: 26px; text-align: center; padding: 2px 8px; }
   .kc { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 15px; line-height: 1.3; color: var(--ink-2); }
   .kc small { display: block; font-size: 12px; color: var(--muted); font-family: var(--mono); margin-bottom: 3px; }
-  .kc.epic { border-left: 4px solid #7A4FD0; }
+  .kc.epic { border-left: 4px solid var(--gold); }
   .kc.pr small { color: var(--green); }
   .more { font-size: 14px; color: var(--muted); text-align: center; padding-top: 2px; }
   .empty { font-size: 14px; color: var(--muted); text-align: center; margin-top: 18px; font-style: italic; }
@@ -149,7 +167,7 @@
   /* ---------- Repo ---------- */
   .tree { font-family: var(--mono); font-size: 21px; line-height: 1.5; }
   .tree .row { display: flex; align-items: baseline; gap: 14px; padding: 11px 18px; border-radius: 10px; }
-  .tree .row:nth-child(odd) { background: rgba(255,255,255,.55); }
+  .tree .row:nth-child(odd) { background: rgba(255,255,255,.45); }
   .tree .p { color: var(--green-deep); font-weight: 700; min-width: 330px; }
   .tree .d { font-family: var(--sans); color: var(--ink-2); font-size: 20px; }
   .tree .c { margin-left: auto; font-family: var(--sans); font-size: 15px; font-weight: 700; color: var(--muted); white-space: nowrap; }
@@ -180,15 +198,15 @@
   .lane .ln b { font-size: 20px; color: var(--ink); } .lane .ln span { font-size: 15px; color: var(--muted); line-height: 1.3; }
   .node { border-radius: 12px; padding: 14px 12px; font-size: 17px; line-height: 1.3; text-align: center; display: flex; flex-direction: column; justify-content: center; margin-right: 22px; position: relative; min-height: 104px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink-2); }
   .node:last-child { margin-right: 0; }
-  .node:not(:last-child)::after { content: "›"; position: absolute; right: -19px; top: 50%; transform: translateY(-52%); color: #9AA59E; font-size: 28px; font-weight: 700; }
+  .node:not(:last-child)::after { content: "›"; position: absolute; right: -19px; top: 50%; transform: translateY(-52%); color: var(--neutral); font-size: 28px; font-weight: 700; }
   .node small { display: block; font-size: 13px; margin-top: 4px; opacity: .8; font-family: var(--mono); }
-  .node.ai { background: var(--amber-soft); border-color: var(--amber); color: #5A3B00; }
+  .node.ai { background: var(--amber-soft); border-color: var(--amber); color: var(--amber-text); }
   .node.human { background: var(--green-soft); border-color: var(--green); color: var(--green-deep); }
-  .engine { margin-top: 12px; border: 2px solid #4FC3A0; border-radius: 16px; padding: 16px 24px; display: flex; align-items: center; gap: 22px; background: var(--ink); }
-  .engine b { font-size: 26px; display: block; color: #fff; }
-  .engine span { font-size: 17px; color: #C7D6CE; line-height: 1.35; }
+  .engine { margin-top: 12px; border: 2px solid var(--gold); border-radius: 16px; padding: 16px 24px; display: flex; align-items: center; gap: 22px; background: var(--ink); }
+  .engine b { font-size: 26px; display: block; color: var(--linen); }
+  .engine span { font-size: 17px; color: var(--dark-text-2); line-height: 1.35; }
   .engine .out { margin-left: auto; text-align: right; flex: none; }
-  .engine .out strong { font-family: var(--serif); font-size: 26px; color: #4FC3A0; display: block; }
+  .engine .out strong { font-family: var(--serif); font-size: 26px; color: var(--gold); display: block; }
   .lg { display: flex; gap: 22px; font-size: 15px; color: var(--muted); margin-bottom: 16px; }
   .feeds { text-align: center; font-size: 15px; color: var(--muted); margin-top: 12px; letter-spacing: .04em; }
   .lg i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 7px; vertical-align: -1px; border: 1.5px solid; }
@@ -206,27 +224,53 @@
   .adr h3 { font-size: 21px; line-height: 1.2; margin: 8px 0 2px; }
   .adr p { font-size: 17px; line-height: 1.38; }
 
+  /* ---------- Diagrama de arquitectura (Archify, recoloreado a marca) ---------- */
+  .arch-diagram { display: flex; align-items: center; justify-content: center; height: 355px; }
+  .arch-diagram svg { height: 100%; width: auto; max-width: 100%; min-width: 0; display: block; }
+  .arch-diagram .c-frontend { fill: var(--frontend-fill); stroke: var(--frontend-stroke); }
+  .arch-diagram .c-database { fill: var(--database-fill); stroke: var(--database-stroke); }
+  .arch-diagram .c-external { fill: var(--external-fill); stroke: var(--external-stroke); }
+  .arch-diagram .c-grid { stroke: var(--grid); fill: none; }
+  .arch-diagram .c-mask { fill: var(--mask); stroke: none; }
+  .arch-diagram .a-default { stroke: var(--arrow); fill: none; }
+  .arch-diagram .a-emphasis { stroke: var(--arrow-emphasis); fill: none; }
+  .arch-diagram .m-default { fill: var(--arrow); }
+  .arch-diagram .m-emphasis { fill: var(--arrow-emphasis); }
+  .arch-diagram .m-security { fill: var(--security-stroke); }
+  .arch-diagram .m-dashed { fill: var(--database-stroke); }
+  .arch-diagram .t-primary { fill: var(--text); }
+  .arch-diagram .t-muted { fill: var(--text-muted); }
+  .arch-diagram .t-frontend { fill: var(--frontend-stroke); }
+  .arch-diagram .t-backend { fill: var(--backend-stroke); }
+  .arch-diagram .t-database { fill: var(--database-stroke); }
+  .arch-diagram svg .semantic-sigil { fill: none; stroke: currentColor; stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; opacity: .76; pointer-events: none; }
+  .arch-diagram svg .semantic-sigil > * { vector-effect: non-scaling-stroke; }
+  .arch-diagram svg .semantic-sigil .sigil-fill { fill: currentColor; stroke: none; }
+  .arch-diagram svg .s-frontend { color: var(--frontend-stroke); }
+  .arch-diagram svg .s-database { color: var(--database-stroke); }
+  .arch-diagram svg .s-external { color: var(--external-stroke); }
+
   /* ---------- Navegación ---------- */
   .progress { position: fixed; left: 0; top: 0; height: 4px; background: var(--green); width: 0; transition: width .4s ease; z-index: 20; }
   .nav { position: fixed; right: 18px; bottom: 14px; display: flex; align-items: center; gap: 8px; z-index: 20; font-family: var(--sans); }
   .nav { transition: opacity .3s ease; }
-  .nav button { background: rgba(20,32,27,.08); color: var(--ink); border: 1px solid rgba(20,32,27,.18); width: 38px; height: 38px; border-radius: 10px; font-size: 18px; cursor: pointer; }
-  .nav button:hover { background: rgba(20,32,27,.16); }
+  .nav button { background: rgba(20,40,29,.08); color: var(--ink); border: 1px solid rgba(20,40,29,.18); width: 38px; height: 38px; border-radius: 10px; font-size: 18px; cursor: pointer; }
+  .nav button:hover { background: rgba(20,40,29,.16); }
   .nav .ct { color: var(--muted); font-size: 14px; min-width: 56px; text-align: center; font-variant-numeric: tabular-nums; }
   .hint { position: fixed; left: 18px; bottom: 20px; color: var(--muted); font-size: 13px; z-index: 20; transition: opacity .3s ease; }
-  body.is-dark .nav button { background: rgba(255,255,255,.12); color: #fff; border-color: rgba(255,255,255,.22); }
-  body.is-dark .nav button:hover { background: rgba(255,255,255,.24); }
-  body.is-dark .nav .ct { color: #cfd9d3; }
-  body.is-dark .hint { color: #7f9088; }
+  body.is-dark .nav button { background: rgba(247,244,235,.12); color: var(--linen); border-color: rgba(247,244,235,.22); }
+  body.is-dark .nav button:hover { background: rgba(247,244,235,.24); }
+  body.is-dark .nav .ct { color: var(--dark-text-2); }
+  body.is-dark .hint { color: var(--dark-muted); }
   /* Pantalla completa: controles se ocultan si no hay movimiento */
   body.fs .hint { display: none; }
   body.fs.idle .nav { opacity: 0; pointer-events: none; }
   body.fs.idle { cursor: none; }
-  .present { position: absolute; right: 84px; bottom: 118px; z-index: 5; font: 700 18px var(--sans); color: var(--ink); background: #4FC3A0; border: 0; border-radius: 14px; padding: 16px 26px; cursor: pointer; letter-spacing: .01em; box-shadow: 0 8px 24px rgba(79,195,160,.25); }
-  .present:hover { background: #63D2B0; }
+  .present { position: absolute; right: 84px; bottom: 118px; z-index: 5; font: 700 18px var(--sans); color: var(--ink); background: var(--gold); border: 0; border-radius: 14px; padding: 16px 26px; cursor: pointer; letter-spacing: .01em; box-shadow: 0 8px 24px rgba(197,160,89,.3); }
+  .present:hover { background: var(--present-hover); }
   body.fs .present { display: none; }
-  .timer { position: fixed; left: 18px; top: 14px; z-index: 20; font: 600 15px var(--mono); color: var(--muted); background: rgba(20,32,27,.06); border-radius: 8px; padding: 6px 10px; display: none; font-variant-numeric: tabular-nums; }
-  body.is-dark .timer { color: #cfd9d3; background: rgba(255,255,255,.1); }
+  .timer { position: fixed; left: 18px; top: 14px; z-index: 20; font: 600 15px var(--mono); color: var(--muted); background: rgba(20,40,29,.06); border-radius: 8px; padding: 6px 10px; display: none; font-variant-numeric: tabular-nums; }
+  body.is-dark .timer { color: var(--dark-text-2); background: rgba(247,244,235,.1); }
   body.show-timer .timer { display: block; }
 
   @media (prefers-reduced-motion: reduce) {
@@ -238,7 +282,7 @@
   /* Impresión / PDF: una slide por página */
   @media print {
     @page { size: 1280px 720px; margin: 0; }
-    html, body { overflow: visible; height: auto; background: #fff; }
+    html, body { overflow: visible; height: auto; background: var(--linen); }
     .stage { position: static; transform: none !important; width: 1280px; height: auto; box-shadow: none; overflow: visible; }
     .slide { position: relative; width: 1280px; height: 720px; opacity: 1; visibility: visible; page-break-after: always; break-after: page; }
     .rise { opacity: 1; transform: none; }
@@ -264,10 +308,17 @@
   <section class="slide dark" style="justify-content:center">
     <div class="who">Seminario de Integración Profesional · UADE</div>
     <div class="kicker rise" style="--d:.05s">Avance del equipo</div>
+    <div class="rise" style="--d:.1s; width:64px; height:64px; border-radius:16px; overflow:hidden; margin-bottom:18px; box-shadow:0 10px 28px rgba(0,0,0,.35)">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" style="width:100%;height:100%;display:block">
+  <title>Vuelto app icon — light</title>
+  <rect width="1024" height="1024" rx="190" fill="#F7F4EB"/>
+  <path d="M 330 270 L 405 270 L 590 560 C 612 594 646 615 686 615 C 652 647 606 660 565 642 C 542 632 523 613 508 590 Z M 710 285 C 665 308 623 330 592 359 C 555 393 548 437 570 477 C 583 501 599 518 618 535 C 611 501 622 471 648 448 C 675 424 713 408 747 389 C 780 371 795 341 795 285 C 767 300 739 315 710 285 Z" fill="#14281D"/>
+</svg>
+    </div>
     <h1 class="rise" style="--d:.15s">Vuelto</h1>
-    <p class="lead rise" style="--d:.3s; margin-top:22px; max-width:820px">Un asistente que le dice al usuario <em class="g" style="color:#4FC3A0">con qué medio de pago pagar</em> en una compra concreta, y cuánto tope de reintegro le queda.</p>
+    <p class="lead rise" style="--d:.3s; margin-top:22px; max-width:820px">Un asistente que le dice al usuario <em class="g" style="color:var(--gold)">con qué medio de pago pagar</em> en una compra concreta, y cuánto tope de reintegro le queda.</p>
     <button class="present rise" id="present" style="--d:.6s" type="button">▶ Presentar en pantalla completa</button>
-    <div class="rise" style="--d:.5s; margin-top:auto; display:flex; gap:34px; font-size:18px; color:#C7D6CE; flex-wrap:wrap">
+    <div class="rise" style="--d:.5s; margin-top:auto; display:flex; gap:34px; font-size:18px; color:var(--dark-text-2); flex-wrap:wrap">
       <span>Joaquín Nuñez</span><span>Jesús Quijada</span><span>Agustín Herrero</span><span>Santiago Pazos</span><span>Kevin Calcagni</span>
     </div>
   </section>
@@ -297,7 +348,7 @@
         </div>
       </div>
       <div class="rise" style="--d:.45s; background:var(--ink); color:var(--paper); border-radius:16px; padding:22px 30px; display:flex; align-items:center; gap:24px">
-        <span class="tag" style="background:#4FC3A0;color:var(--ink);flex:none">Regla de oro</span>
+        <span class="tag" style="background:var(--gold);color:var(--ink);flex:none">Regla de oro</span>
         <span style="font-size:24px; line-height:1.35">Si una funcionalidad se puede describir como <b>“mostrar promociones”</b>, no es este producto.</span>
       </div>
       <p class="lead rise" style="--d:.55s; font-size:23px">No es falta de información. <b>Es la decisión.</b></p>
@@ -306,17 +357,18 @@
 
   <!-- 4 · ALCANCE DEL MVP -->
   <section class="slide">
-    <div class="who">Kevin · Alcance del MVP</div>
+    <div class="who">Joaquín · Alcance del MVP</div>
     <div class="kicker rise">Alcance del MVP</div>
-    <h2 class="rise" style="--d:.08s">Un MVP acotado: <em class="g">un flujo bien hecho</em> antes que cobertura</h2>
+    <h2 class="rise" style="--d:.08s">Una sola fuente, <em class="g">bien ingestada</em>, antes que cobertura a medias</h2>
     <div class="body">
       <div class="grid g2" style="align-items:stretch">
         <div class="card rise" style="--d:.2s; border:2px solid var(--green)">
           <span class="tag">Dentro</span>
           <ul style="margin-top:14px; padding-left:22px; display:grid; gap:9px; font-size:19px">
-            <li><b>CABA/AMBA</b>, con supermercado como único flujo optimizado</li>
-            <li>Combustible y restaurantes: entran al corpus y al control de tope</li>
-            <li><b>6 billeteras/bancos:</b> Mercado Pago, MODO, Cuenta DNI, Santander, Galicia, BBVA</li>
+            <li><b>CABA/AMBA</b>, para todo el producto</li>
+            <li><b>Una sola billetera</b> como fuente de ingesta: <b>MODO</b></li>
+            <li>Corpus de las <b>13 categorías</b> que publica MODO (no solo supermercado)</li>
+            <li>El flujo de compra optimizado cubre las <b>13 categorías</b></li>
             <li>Perfil declarado, registro por ticket e ingesta con revisión humana</li>
             <li>Gasto en grupo nivel 0 (última prioridad)</li>
           </ul>
@@ -332,61 +384,42 @@
           </ul>
         </div>
       </div>
-      <p class="foot rise" style="--d:.45s">Farmacia quedó afuera. Se puede reconsiderar más adelante con el mismo criterio. Detalle en <span style="font-family:var(--mono)">docs/product/alcance-mvp.md</span>.</p>
+      <p class="foot rise" style="--d:.45s">Las otras 5 billeteras/bancos quedan para más adelante, si se consigue permiso explícito de scraping. Cadenas de supermercado dentro de MODO: reconciliación pendiente. Detalle en <span style="font-family:var(--mono)">docs/product/alcance-mvp.md</span>.</p>
     </div>
   </section>
 
-  <!-- 4 · CORPUS -->
-  <section class="slide">
-    <div class="who">Kevin · Alcance del MVP</div>
-    <div class="kicker rise">Corpus de promociones</div>
-    <h2 class="rise" style="--d:.08s">Tres rubros, seis proveedores y <em class="g">cadenas de toda la zona</em></h2>
-    <div class="body" style="gap:20px">
-      <div class="grid g3" style="align-items:stretch">
-        <div class="card rise" style="--d:.2s">
-          <span class="tag">Rubros</span>
-          <ul style="margin-top:14px; padding-left:20px; display:grid; gap:8px">
-            <li><b>Supermercado:</b> el único flujo optimizado</li>
-            <li><b>Combustible:</b> corpus y control de tope</li>
-            <li><b>Restaurantes:</b> corpus y control de tope</li>
-          </ul>
-        </div>
-        <div class="card rise" style="--d:.3s">
-          <span class="tag">Billeteras y bancos</span>
-          <ul style="margin-top:14px; padding-left:20px; display:grid; gap:8px">
-            <li>Mercado Pago y MODO</li>
-            <li>Cuenta DNI (Banco Provincia)</li>
-            <li>Santander, Galicia y BBVA</li>
-          </ul>
-        </div>
-        <div class="card rise" style="--d:.4s">
-          <span class="tag">Cadenas en CABA/AMBA</span>
-          <ul style="margin-top:14px; padding-left:20px; display:grid; gap:8px">
-            <li>Coto, Carrefour, Jumbo</li>
-            <li>Disco, Vea</li>
-            <li>Día y Changomas</li>
-          </ul>
-        </div>
-      </div>
-      <div class="card rise" style="--d:.55s; background:var(--amber-soft); border-color:#E5C875; padding:18px 26px">
-        <p style="font-size:18px"><b>Por qué sumar rubros cuesta poco:</b> los 6 proveedores publican los tres rubros en la misma página o portal. <b>Riesgo:</b> Día y Changomas tienen sucursales chicas y dispersas, y “no todas participan”.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5 · RESEARCH Y DATOS -->
+  <!-- 4B · POR QUÉ MODO -->
   <section class="slide">
     <div class="who">Kevin · Research y datos</div>
-    <div class="kicker rise">Research y datos · lo que sigue</div>
-    <h2 class="rise" style="--d:.08s">Lo que falta relevar y medir <em class="g">antes de escribir código</em></h2>
-    <div class="body" style="gap:18px">
-      <div class="grid g2" style="align-items:stretch">
-        <div class="card rise" style="--d:.2s"><span class="tag">En curso · #12</span><h3 style="margin-top:12px">Relevar las fuentes reales</h3><p>HTML vs SPA/JSON, términos de uso y robots.txt de los 6 proveedores.</p></div>
-        <div class="card rise" style="--d:.3s"><span class="tag a">Pendiente · #10</span><h3 style="margin-top:12px">Probar el lector de tickets</h3><p>15-20 tickets reales con los valores anotados a mano, para medir la precisión por campo.</p></div>
-        <div class="card rise" style="--d:.4s"><span class="tag a">Pendiente</span><h3 style="margin-top:12px">Auto-registro de una semana</h3><p>Compras propias y cifra en pesos ahorrable: abre el pitch.</p></div>
-        <div class="card rise" style="--d:.5s"><span class="tag a">Pendiente</span><h3 style="margin-top:12px">Segunda ronda de encuesta</h3><p>Sumar qué billeteras usa cada persona (la primera no lo preguntó) y observar el momento de pago en la caja.</p></div>
+    <div class="kicker rise">Relevamiento de fuentes · issue #12</div>
+    <h2 class="rise" style="--d:.08s">De 6 billeteras a una: <em class="g">por qué MODO</em></h2>
+    <div class="body" style="gap:16px">
+      <div class="grid g3" style="align-items:stretch">
+        <div class="card rise" style="--d:.2s; border:2px solid var(--red)"><span class="tag" style="background:var(--ink);color:var(--paper)">Bloqueadas</span><h3 style="margin-top:12px">Mercado Pago, Santander, BBVA</h3><p>ToS prohíbe scraping (Mercado Pago) o un WAF bloquea el acceso automatizado, incluso con navegador real.</p></div>
+        <div class="card rise" style="--d:.3s"><span class="tag">Automatizables</span><h3 style="margin-top:12px">MODO, Cuenta DNI, Galicia</h3><p>Sin objeción legal ni técnica. Se elige una sola para no mezclar automatización parcial con captura manual.</p></div>
+        <div class="card rise" style="--d:.4s; border:2px solid var(--green)"><span class="tag">Elegida</span><h3 style="margin-top:12px">MODO</h3><p>Tiene una <b>API REST pública, sin autenticación</b>: no hace falta Playwright para esta fuente.</p></div>
       </div>
-      <p class="foot rise" style="--d:.6s">#12 y #10 ya están en el tablero; el resto se abre como issue cuando entre a un sprint.</p>
+      <div class="card rise" style="--d:.5s; padding:14px 26px">
+        <p style="font-size:18px">La API expone <b>13 categorías fijas</b>, con <b>~1864 promos activas</b> hoy: Gastronomía (646), Supermercados (226), Farmacias (170), Combustibles (22), entre otras. Se decidió ingestar las 13 completas, no un subconjunto curado a mano.</p>
+      </div>
+      <p class="foot rise" style="--d:.6s; margin-top:0">La primera pasada había concluido mal que gastronomía no existía (bug del slug vs. id numérico de categoría); corregido y confirmado con evidencia directa (Kansas, 6 promos activas).</p>
+    </div>
+  </section>
+
+  <!-- 5B · STAKEHOLDERS -->
+  <section class="slide">
+    <div class="who">Santiago · Encuestas</div>
+    <div class="kicker rise">Stakeholders y clientes objetivo</div>
+    <h2 class="rise" style="--d:.08s">A quién le apuntamos: <em class="g">grupos reducidos, no todo el mercado</em></h2>
+    <div class="body" style="gap:20px">
+      <div class="grid g3" style="align-items:stretch">
+        <div class="card rise" style="--d:.2s"><span class="tag">Perfil primario</span><h3 style="margin-top:12px">18 a 25 años, CABA/AMBA</h3><p>El mismo perfil que respondió la encuesta (62,7%): estudiantes y jóvenes profesionales.</p></div>
+        <div class="card rise" style="--d:.3s"><span class="tag">Multi-billetera</span><h3 style="margin-top:12px">3 o más medios de pago</h3><p>43,1% de la muestra usa 3+ tarjetas/billeteras por mes — el caso que el motor de reglas resuelve.</p></div>
+        <div class="card rise" style="--d:.4s"><span class="tag">Fuente del MVP</span><h3 style="margin-top:12px">Usuarios de MODO</h3><p>Compradores de supermercado que ya tienen o pueden usar MODO, la única fuente de ingesta del MVP.</p></div>
+      </div>
+      <div class="card rise" style="--d:.5s; background:var(--amber-soft); border-color:var(--amber-soft-border); padding:18px 26px">
+        <p style="font-size:18px"><b>Encuesta en vez de entrevistas 1:1:</b> con 51 respuestas priorizamos volumen dado lo transversal del problema (ver <span style="font-family:var(--mono)">research.md</span>), en vez de un puñado de entrevistas en profundidad.</p>
+      </div>
     </div>
   </section>
 
@@ -407,8 +440,8 @@
           </div>
           <div class="legend">
             <span><i style="background:var(--amber)"></i>Alguna vez</span>
-            <span><i style="background:#8A5A00"></i>Seguido</span>
-            <span><i style="background:#9AA59E"></i>Nunca (2%)</span>
+            <span><i style="background:var(--stack-2)"></i>Seguido</span>
+            <span><i style="background:var(--neutral)"></i>Nunca (2%)</span>
           </div>
           <div class="card" style="margin-top:26px; padding:18px 22px">
             <p style="font-size:18px">Mayor frustración, la más citada (54,9%): <b>llegar a la caja y descubrir que la promo era con otra app, no aplicaba hoy o tenía letra chica.</b></p>
@@ -442,7 +475,7 @@
             <div style="font-size:34px; color:var(--muted); padding-bottom:44px">vs.</div>
             <div><div class="big sm a">7,8%</div><p style="font-size:18px; margin-top:6px; max-width:220px">lleva un <b>registro exacto</b> de su tope</p></div>
           </div>
-          <div class="card" style="margin-top:26px; padding:18px 22px; background:var(--green-soft); border-color:#9DCDB9">
+          <div class="card" style="margin-top:26px; padding:18px 22px; background:var(--green-soft); border-color:var(--green-soft-border)">
             <p style="font-size:18px">La seguridad percibida no coincide con el control real. <b>Ese es el hueco que ataca Vuelto.</b></p>
           </div>
         </div>
@@ -475,7 +508,7 @@
         </div>
         <div style="display:grid; gap:16px">
           <div class="card rise" style="--d:.34s; padding:20px 22px"><span class="tag">Intención</span><div class="big sm g" style="margin-top:10px">96,1%</div><p style="font-size:17px; margin-top:4px">usaría una app así. Es intención declarada: pesa menos que los datos de comportamiento.</p></div>
-          <div class="card rise" style="--d:.44s; padding:20px 22px; background:var(--amber-soft); border-color:#E5C875"><span class="tag a">Riesgo</span><p style="font-size:17px; margin-top:10px">Piden avisos proactivos, pero solo ~16% acepta permisos de notificaciones push. Pendiente de definir.</p></div>
+          <div class="card rise" style="--d:.44s; padding:20px 22px; background:var(--amber-soft); border-color:var(--amber-soft-border)"><span class="tag a">Riesgo</span><p style="font-size:17px; margin-top:10px">Piden avisos proactivos, pero solo ~16% acepta permisos de notificaciones push. Pendiente de definir.</p></div>
         </div>
       </div>
     </div>
@@ -490,7 +523,7 @@
       <div class="grid g3" style="align-items:stretch">
         <div class="card rise" style="--d:.2s; border:2px solid var(--green)">
           <span class="tag">Product Owner</span>
-          <div class="person" style="margin-top:16px"><div class="avatar">JN</div><div><b>Joaquín Nuñez</b><span>También en Front</span></div></div>
+          <div class="person" style="margin-top:16px"><div class="avatar">JN</div><div><b>Joaquín Nuñez</b><span>Legajo 1224134 · También en Front</span></div></div>
           <ul style="margin-top:16px; padding-left:20px; display:grid; gap:6px">
             <li>Custodia la regla de oro</li>
             <li>Prioriza el backlog</li>
@@ -502,22 +535,22 @@
           <span class="tag k">Front</span>
           <p class="muted" style="font-size:16px; margin:10px 0 14px">App Expo: perfil, recomendación, registro por ticket</p>
           <div style="display:grid; gap:16px">
-            <div class="person"><div class="avatar">JN</div><div><b>Joaquín Nuñez</b></div></div>
-            <div class="person"><div class="avatar">JQ</div><div><b>Jesús Quijada</b></div></div>
+            <div class="person"><div class="avatar">JN</div><div><b>Joaquín Nuñez</b><span>Legajo 1224134</span></div></div>
+            <div class="person"><div class="avatar">JQ</div><div><b>Jesús Quijada</b><span>Legajo 1195298</span></div></div>
           </div>
         </div>
         <div class="card rise" style="--d:.4s">
           <span class="tag k">Back</span>
           <p class="muted" style="font-size:16px; margin:10px 0 14px">Supabase: datos, RLS, Edge Function, ingesta/extractor</p>
           <div style="display:grid; gap:16px">
-            <div class="person"><div class="avatar b">AH</div><div><b>Agustín Herrero</b><span>+ motor de reglas</span></div></div>
-            <div class="person"><div class="avatar b">SP</div><div><b>Santiago Pazos</b></div></div>
+            <div class="person"><div class="avatar b">AH</div><div><b>Agustín Herrero</b><span>Legajo 1174588 · + motor de reglas</span></div></div>
+            <div class="person"><div class="avatar b">SP</div><div><b>Santiago Pazos</b><span>Legajo 1172896</span></div></div>
           </div>
         </div>
       </div>
       <div class="card rise" style="--d:.48s; display:flex; align-items:center; gap:22px; padding:16px 26px">
         <span class="tag k" style="flex:none">Research y datos</span>
-        <div class="person" style="flex:none"><div class="avatar b">KC</div><div><b>Kevin Calcagni</b></div></div>
+        <div class="person" style="flex:none"><div class="avatar b">KC</div><div><b>Kevin Calcagni</b><span>Legajo 1172825</span></div></div>
         <span style="font-size:17px; color:var(--muted); line-height:1.35">Relevamiento de fuentes de promos, corpus de tickets y research pendiente</span>
       </div>
       <p class="foot rise" style="--d:.55s">Equipo autoorganizado: un frente por persona no impide tomar tareas de otro. Las revisiones de código las hacemos todos.</p>
@@ -528,7 +561,7 @@
   <section class="slide">
     <div class="who">Jesús · Roles y Scrum</div>
     <div class="kicker rise">Tablero Kanban · GitHub Projects</div>
-    <h2 class="rise" style="--d:.08s; font-size:40px">24 ítems: <em class="g">12 terminados</em>, 3 en curso, 9 en backlog</h2>
+    <h2 class="rise" style="--d:.08s; font-size:40px">25 ítems: <em class="g">14 terminados</em>, 1 en curso, 1 en revisión, 9 en backlog</h2>
     <div class="body" style="margin-top:22px; gap:14px">
       <div class="board rise" style="--d:.2s">
         <div class="col"><header>Backlog <span>9</span></header>
@@ -536,19 +569,18 @@
           <div class="kc"><small>#10</small>Testear precisión del lector de tickets</div>
         </div>
         <div class="col"><header>Ready <span>0</span></header><div class="empty">Sin ítems por ahora</div></div>
-        <div class="col"><header>In progress <span>2</span></header>
-          <div class="kc"><small>#12</small>Relevar fuentes reales de promos (HTML vs SPA/JSON, robots.txt)</div>
+        <div class="col"><header>In progress <span>1</span></header>
           <div class="kc"><small>#9</small>Crear cuenta de Supabase y manejo de secrets</div>
         </div>
         <div class="col"><header>In review <span>1</span></header>
           <div class="kc"><small>#5</small>Configurar CI/CD</div>
         </div>
-        <div class="col"><header>Done <span>12</span></header>
-          <div class="kc"><small>#4</small>Respuestas y análisis de la encuesta</div>
+        <div class="col"><header>Done <span>14</span></header>
+          <div class="kc"><small>#27</small>Relevar fuentes y acotar alcance a MODO</div>
+          <div class="kc"><small>#26</small>Respuestas y análisis de la encuesta</div>
           <div class="kc"><small>#11</small>Política de privacidad y retención</div>
-          <div class="kc"><small>#3</small>Requerimientos funcionales y no funcionales</div>
           <div class="kc"><small>#2</small>Roles de Scrum</div>
-          <div class="more">+ 8 más (issues y PRs)</div>
+          <div class="more">+ 10 más (issues y PRs)</div>
         </div>
       </div>
       <p class="foot rise" style="--d:.4s; margin-top:0">Sprints de 2 semanas (fechas a confirmar con la cátedra) con demo en Expo Go. <b>Definition of Done:</b> tests Vitest, RLS en cada tabla, sin secretos en el cliente y sesión de IA en la bitácora. Tablero al 21/09.</p>
@@ -588,27 +620,8 @@
         <div class="card adr"><span class="tag">ADR-005</span><h3>Ingesta con revisión humana</h3><p>Nada se publica sin que una persona lo apruebe.</p></div>
         <div class="card adr"><span class="tag">ADR-006</span><h3>Registro por ticket</h3><p>Sin esto no hay control de topes.</p></div>
         <div class="card adr"><span class="tag">ADR-007</span><h3>spec-kit sobre to-spec</h3><p>Un solo punto de entrada para las specs.</p></div>
-        <div class="card adr" style="background:var(--ink); border-color:var(--ink)"><span class="tag" style="background:#4FC3A0;color:var(--ink)">Formato</span><h3 style="color:var(--paper)">Contexto, decisión, razonamiento y consecuencias</h3><p style="color:#C7D6CE">Cada ADR responde las cuatro.</p></div>
+        <div class="card adr" style="background:var(--ink); border-color:var(--ink)"><span class="tag" style="background:var(--gold);color:var(--ink)">Formato</span><h3 style="color:var(--paper)">Contexto, decisión, razonamiento y consecuencias</h3><p style="color:var(--dark-text-2)">Cada ADR responde las cuatro.</p></div>
       </div>
-    </div>
-  </section>
-
-  <!-- 14 · STACK -->
-  <section class="slide">
-    <div class="who">Agustín · Repo con documentación</div>
-    <div class="kicker rise">docs/architecture · el stack</div>
-    <h2 class="rise" style="--d:.08s"><em class="g">TypeScript de punta a punta</em>, con costo $0</h2>
-    <div class="body" style="gap:18px">
-      <div class="tbl rise" style="--d:.2s">
-        <div class="trow h"><span>Pieza</span><span>Elección</span><span>Corre en</span></div>
-        <div class="trow"><b>Motor de reglas</b><span>TypeScript, paquete propio</span><span class="where">Dispositivo y backend</span></div>
-        <div class="trow"><b>Cliente mobile</b><span>Expo (React Native)</span><span class="where">Dispositivo</span></div>
-        <div class="trow"><b>Backend y DB</b><span>Supabase (Postgres + Auth)</span><span class="where">Servidor</span></div>
-        <div class="trow"><b>Extractor</b><span>Gemini API</span><span class="where">Servidor únicamente</span></div>
-        <div class="trow"><b>Ingesta</b><span>Playwright</span><span class="where">Servidor (lugar por definir)</span></div>
-        <div class="trow"><b>Testing</b><span>Vitest + Expo Go</span><span class="where">Motor y ejecución manual</span></div>
-      </div>
-      <p class="foot rise" style="--d:.4s; margin-top:0">El mismo paquete del motor corre en la app y en el backend. La API key de Gemini nunca va al celular.</p>
     </div>
   </section>
 
@@ -617,22 +630,177 @@
     <div class="who">Agustín · Repo con documentación</div>
     <div class="kicker rise">Arquitectura · cómo se conectan las piezas</div>
     <h2 class="rise" style="--d:.08s">Un dispositivo liviano, <em class="g">un servidor que hace el trabajo pesado</em></h2>
-    <div class="body" style="gap:22px">
-      <div class="grid g4 rise" style="--d:.2s; gap:16px">
-        <div class="card" style="padding:18px 18px; border:2px solid var(--green)"><span class="tag">Dispositivo</span><h3 style="margin-top:10px; font-size:20px">App Expo</h3><p style="font-size:16px">Perfil, recomendación y motor de reglas corriendo local</p></div>
-        <div class="card" style="padding:18px 18px"><span class="tag k">Servidor</span><h3 style="margin-top:10px; font-size:20px">Supabase</h3><p style="font-size:16px">Postgres + Auth + Edge Function del ticket, con RLS</p></div>
-        <div class="card" style="padding:18px 18px"><span class="tag k">Servidor</span><h3 style="margin-top:10px; font-size:20px">Gemini</h3><p style="font-size:16px">Extractor de texto no estructurado, nunca en el cliente</p></div>
-        <div class="card" style="padding:18px 18px"><span class="tag k">Servidor</span><h3 style="margin-top:10px; font-size:20px">Playwright</h3><p style="font-size:16px">Captura las fuentes de promos (lugar del cron: pendiente)</p></div>
+    <div class="body" style="gap:14px">
+      <div class="rise arch-diagram" style="--d:.2s; border:1px solid var(--line); border-radius:16px; background:var(--card); padding:14px;
+        --grid: var(--sand); --text: var(--ink); --text-muted: var(--muted); --mask: var(--card);
+        --arrow: var(--gold); --arrow-emphasis: var(--sage);
+        --frontend-fill: rgba(197,160,89,.16); --frontend-stroke: var(--gold);
+        --backend-stroke: var(--sage);
+        --database-fill: rgba(74,107,83,.14); --database-stroke: var(--sage);
+        --security-stroke: var(--ink);
+        --external-fill: rgba(20,40,29,.06); --external-stroke: var(--ink);">
+      <svg viewBox="0 0 830 442" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
+        <title id="archify-diagram-title">Vuelto — arquitectura del MVP</title>
+        <desc id="archify-diagram-description">An architecture diagram generated by Archify.</desc>
+        <!-- Definitions -->
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-default" />
+          </marker>
+          <marker id="arrowhead-emphasis" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-emphasis" />
+          </marker>
+          <marker id="arrowhead-security" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-security" />
+          </marker>
+          <marker id="arrowhead-dashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-dashed" />
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" class="c-grid" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <!-- Background Grid -->
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- Boundaries (behind everything) -->
+
+
+        <!-- Connection paths (before components for correct z-order) -->
+        <path data-edge-from="modo" data-edge-to="supabase" data-edge-label="promos (ingesta)" data-edge-key="0" data-edge-id="modo-to-supabase" data-composition-points="200,334;320,334" d="M 200 334 L 320 334" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="supabase" data-edge-to="gemini" data-edge-label="extrae contra un esquema" data-edge-key="1" data-edge-id="supabase-to-gemini" data-composition-points="405,300;405,276;421,276;421,192;400,192;400,168" d="M 405 300 L 405 284 Q 405 276 413 276 L 413 276 Q 421 276 421 268 L 421 200 Q 421 192 413 192 L 408 192 Q 400 192 400 184 L 400 168" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="supabase" data-edge-to="app" data-edge-label="datos validados" data-edge-key="2" data-edge-id="supabase-to-app" data-composition-points="490,337;620,337" d="M 490 337 L 620 337" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="app" data-edge-to="supabase" data-edge-label="perfil, ticket, compras" data-edge-key="3" data-edge-id="app-to-supabase" data-composition-points="705,374;705,398;405,398;405,374" d="M 705 374 L 705 390 Q 705 398 697 398 L 413 398 Q 405 398 405 390 L 405 374" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+        <!-- Components -->
+        <g id="node-modo" data-node-id="modo" data-node-label="API de MODO" tabindex="0" role="button" aria-label="Focus API de MODO, REST pública, sin autenticación, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="REST pública, sin autenticación" data-node-context="Architecture component">
+          <title>API de MODO · REST pública, sin autenticación · Architecture component</title>
+          <rect x="40" y="300" width="160" height="68" rx="6" class="c-mask"/>
+          <rect x="40" y="300" width="160" height="68" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(46 306) scale(0.6875)">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="120" y="332" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">API de MODO</text>
+        <text data-detail="context" x="120" y="348" class="t-muted" font-size="8.1" text-anchor="middle">REST pública, sin autenticación</text>
+        </g>
+
+        <g id="node-supabase" data-node-id="supabase" data-node-label="Supabase" tabindex="0" role="button" aria-label="Focus Supabase, Postgres + Auth + Edge Function, Architecture component" aria-pressed="false" data-node-kind="database" data-node-sublabel="Postgres + Auth + Edge Function" data-node-tag="RLS en cada tabla" data-node-context="Architecture component">
+          <title>Supabase · Postgres + Auth + Edge Function · Architecture component · RLS en cada tabla</title>
+          <rect x="320" y="300" width="170" height="74" rx="6" class="c-mask"/>
+          <rect x="320" y="300" width="170" height="74" rx="6" class="c-database" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(326 306) scale(0.6875)">
+            <ellipse cx="8" cy="4" rx="5" ry="2"/>
+            <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="405" y="335" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Supabase</text>
+        <text data-detail="context" x="405" y="351" class="t-muted" font-size="8.7" text-anchor="middle">Postgres + Auth + Edge Function</text>
+        <text data-detail="fine" x="405" y="366" class="t-database" font-size="7" text-anchor="middle">RLS en cada tabla</text>
+        </g>
+
+        <g id="node-gemini" data-node-id="gemini" data-node-label="Gemini" tabindex="0" role="button" aria-label="Focus Gemini, Extractor, solo en servidor, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="Extractor, solo en servidor" data-node-context="Architecture component">
+          <title>Gemini · Extractor, solo en servidor · Architecture component</title>
+          <rect x="320" y="100" width="160" height="68" rx="6" class="c-mask"/>
+          <rect x="320" y="100" width="160" height="68" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(326 106) scale(0.6875)">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="400" y="132" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Gemini</text>
+        <text data-detail="context" x="400" y="148" class="t-muted" font-size="9" text-anchor="middle">Extractor, solo en servidor</text>
+        </g>
+
+        <g id="node-app" data-node-id="app" data-node-label="App Expo" tabindex="0" role="button" aria-label="Focus App Expo, Motor de reglas, en el dispositivo, Architecture component" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="Motor de reglas, en el dispositivo" data-node-tag="sin red" data-node-context="Architecture component">
+          <title>App Expo · Motor de reglas, en el dispositivo · Architecture component · sin red</title>
+          <rect x="620" y="300" width="170" height="74" rx="6" class="c-mask"/>
+          <rect x="620" y="300" width="170" height="74" rx="6" class="c-frontend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(626 306) scale(0.6875)">
+            <rect x="2" y="3" width="12" height="10" rx="2"/>
+            <path d="M2 6.5h12"/>
+            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
+            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="705" y="335" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">App Expo</text>
+        <text data-detail="context" x="705" y="351" class="t-muted" font-size="7.9" text-anchor="middle">Motor de reglas, en el dispositivo</text>
+        <text data-detail="fine" x="705" y="366" class="t-frontend" font-size="7" text-anchor="middle">sin red</text>
+        </g>
+
+        <!-- Connection labels -->
+        <g data-detail="context" data-edge-from="modo" data-edge-to="supabase" data-edge-label="promos (ingesta)" data-edge-key="0" data-edge-id="modo-to-supabase">
+          <rect x="216.6" y="314" width="86.8" height="14" rx="3" class="c-mask"/>
+          <text x="260" y="324" class="t-backend" font-size="8" text-anchor="middle">promos (ingesta)</text>
+        </g>
+        <g data-detail="context" data-edge-from="supabase" data-edge-to="gemini" data-edge-label="extrae contra un esquema" data-edge-key="1" data-edge-id="supabase-to-gemini">
+          <rect x="350.4" y="256" width="125.19999999999999" height="14" rx="3" class="c-mask"/>
+          <text x="413" y="266" class="t-muted" font-size="8" text-anchor="middle">extrae contra un esquema</text>
+        </g>
+        <g data-detail="context" data-edge-from="supabase" data-edge-to="app" data-edge-label="datos validados" data-edge-key="2" data-edge-id="supabase-to-app">
+          <rect x="514" y="317" width="82" height="14" rx="3" class="c-mask"/>
+          <text x="555" y="327" class="t-backend" font-size="8" text-anchor="middle">datos validados</text>
+        </g>
+        <g data-detail="context" data-edge-from="app" data-edge-to="supabase" data-edge-label="perfil, ticket, compras" data-edge-key="3" data-edge-id="app-to-supabase">
+          <rect x="494.8" y="418" width="120.39999999999999" height="14" rx="3" class="c-mask"/>
+          <text x="555" y="428" class="t-muted" font-size="8" text-anchor="middle">perfil, ticket, compras</text>
+        </g>
+
+        <!-- Boundary labels (foreground masks keep routes out of titles) -->
+
+
+        <!-- Legend -->
+        <g data-legend="" data-legend-bridge="">
+          <text x="40" y="406" class="t-primary" font-size="12" font-weight="650">Legend</text>
+          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="Frontend" data-legend-x="40" data-legend-baseline="426" data-legend-width="83">
+            <rect x="40" y="417" width="16" height="10" rx="2.5" class="c-frontend" stroke-width="1"/>
+            <text x="62" y="426" class="t-muted" font-size="10" font-weight="500">Frontend</text>
+          </g>
+          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="Database" data-legend-x="145" data-legend-baseline="426" data-legend-width="83">
+            <rect x="145" y="417" width="16" height="10" rx="2.5" class="c-database" stroke-width="1"/>
+            <text x="167" y="426" class="t-muted" font-size="10" font-weight="500">Database</text>
+          </g>
+          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="External" data-legend-x="250" data-legend-baseline="426" data-legend-width="83">
+            <rect x="250" y="417" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
+            <text x="272" y="426" class="t-muted" font-size="10" font-weight="500">External</text>
+          </g>
+        </g>
+      </svg>
       </div>
-      <div class="rise" style="--d:.35s">
-        <div class="chart-title" style="margin-bottom:10px">Flujo de ingesta de promos</div>
-        <div class="pipe" style="font-size:13px"><span class="pc">Fuentes web</span><span class="ar">→</span><span class="pc">Playwright</span><span class="ar">→</span><span class="pc">Supabase crudo</span><span class="ar">→</span><span class="pc">Gemini extrae</span><span class="ar">→</span><span class="pc">revisión humana</span><span class="ar">→</span><span class="pc">motor de reglas</span></div>
+      <p class="foot rise" style="--d:.35s; margin-top:0">El motor de reglas es el único paso que corre en el dispositivo: recomendación instantánea, sin red. Todo lo demás vive en el servidor — el flujo completo, a continuación.</p>
+    </div>
+  </section>
+
+  <!-- 14 · IA EN EL PRODUCTO -->
+  <section class="slide">
+    <div class="who">Agustín · Arquitectura</div>
+    <div class="kicker rise">IA en el producto · end-to-end</div>
+    <h2 class="rise" style="--d:.08s; font-size:40px">El LLM extrae datos. <em class="g">Nunca decide.</em></h2>
+    <div class="body" style="margin-top:18px; gap:0">
+      <div class="lg rise" style="--d:.15s">
+        <span><i style="background:var(--amber-soft);border-color:var(--amber)"></i>Paso con IA (Gemini, en servidor)</span>
+        <span><i style="background:var(--green-soft);border-color:var(--green)"></i>Persona decide</span>
+        <span><i style="background:#fff;border-color:var(--line)"></i>Paso automático</span>
       </div>
-      <div class="rise" style="--d:.45s">
-        <div class="chart-title" style="margin-bottom:10px">Flujo de registro por ticket</div>
-        <div class="pipe" style="font-size:13px"><span class="pc">Foto del ticket</span><span class="ar">→</span><span class="pc">Edge Function</span><span class="ar">→</span><span class="pc">Gemini extrae</span><span class="ar">→</span><span class="pc">usuario confirma</span><span class="ar">→</span><span class="pc">Postgres (compra)</span><span class="ar">→</span><span class="pc">actualiza tope</span></div>
+      <div class="lane rise" style="--d:.25s">
+        <div class="ln"><b>Ingesta de promos</b><span>Offline, en lote</span></div>
+        <div class="node">Promo publicada por la API de MODO</div>
+        <div class="node ai">Gemini extrae contra un esquema<small>campo ausente = null</small></div>
+        <div class="node">Borrador en cola</div>
+        <div class="node human">Revisión humana<small>aprueba · corrige · rechaza</small></div>
+        <div class="node">Promo publicada</div>
       </div>
-      <p class="foot rise" style="--d:.55s; margin-top:0">El motor de reglas es el único paso que corre en el dispositivo: recomendación instantánea, sin red. Todo lo demás vive en el servidor.</p>
+      <div class="lane rise" style="--d:.35s">
+        <div class="ln"><b>Registro por ticket</b><span>Edge Function de Supabase</span></div>
+        <div class="node">Foto del ticket</div>
+        <div class="node ai">Gemini lee el ticket<small>la imagen se descarta</small></div>
+        <div class="node">Texto extraído<small>se persiste</small></div>
+        <div class="node human">El usuario confirma</div>
+        <div class="node">Compra registrada</div>
+      </div>
+      <div class="feeds rise" style="--d:.45s">▼ solo datos aprobados o confirmados por una persona llegan al motor ▼</div>
+      <div class="engine rise" style="--d:.5s">
+        <div><b>Motor de reglas</b><span>TypeScript sin dependencias · corre en el dispositivo · sin LLM en el camino</span></div>
+        <div class="out"><strong>Con qué pagar</strong><span>+ tope estimado, con su base</span></div>
+      </div>
     </div>
   </section>
 
@@ -656,62 +824,107 @@
     </div>
   </section>
 
-  <!-- 14 · IA EN EL PRODUCTO -->
-  <section class="slide">
-    <div class="who">Joaquín · Uso de IA</div>
-    <div class="kicker rise">IA en el producto · end-to-end</div>
-    <h2 class="rise" style="--d:.08s; font-size:40px">El LLM extrae datos. <em class="g">Nunca decide.</em></h2>
-    <div class="body" style="margin-top:18px; gap:0">
-      <div class="lg rise" style="--d:.15s">
-        <span><i style="background:var(--amber-soft);border-color:var(--amber)"></i>Paso con IA (Gemini, en servidor)</span>
-        <span><i style="background:var(--green-soft);border-color:var(--green)"></i>Persona decide</span>
-        <span><i style="background:#fff;border-color:var(--line)"></i>Paso automático</span>
-      </div>
-      <div class="lane rise" style="--d:.25s">
-        <div class="ln"><b>Ingesta de promos</b><span>Offline, en lote</span></div>
-        <div class="node">Letra chica del banco o billetera</div>
-        <div class="node ai">Gemini extrae contra un esquema<small>campo ausente = null</small></div>
-        <div class="node">Borrador en cola</div>
-        <div class="node human">Revisión humana<small>aprueba · corrige · rechaza</small></div>
-        <div class="node">Promo publicada</div>
-      </div>
-      <div class="lane rise" style="--d:.35s">
-        <div class="ln"><b>Registro por ticket</b><span>Edge Function de Supabase</span></div>
-        <div class="node">Foto del ticket</div>
-        <div class="node ai">Gemini lee el ticket<small>la imagen se descarta</small></div>
-        <div class="node">Texto extraído<small>se persiste</small></div>
-        <div class="node human">El usuario confirma</div>
-        <div class="node">Compra registrada</div>
-      </div>
-      <div class="feeds rise" style="--d:.45s">▼ solo datos aprobados o confirmados por una persona llegan al motor ▼</div>
-      <div class="engine rise" style="--d:.5s">
-        <div><b>Motor de reglas</b><span>TypeScript sin dependencias · corre en el dispositivo · sin LLM en el camino</span></div>
-        <div class="out"><strong>Con qué pagar</strong><span>+ tope estimado, con su base</span></div>
-      </div>
-    </div>
-  </section>
-
   <!-- 15 · AUTOMATIZACIÓN Y LÍMITES -->
   <section class="slide">
     <div class="who">Joaquín · Uso de IA</div>
     <div class="kicker rise">Automatización y límites</div>
-    <h2 class="rise" style="--d:.08s; font-size:42px">Automatizamos todo lo posible, <em class="g">con límites claros</em></h2>
+    <h2 class="rise" style="--d:.08s; font-size:42px">Cómo automatizamos <em class="g">nuestro propio trabajo</em></h2>
     <div class="body" style="gap:18px; margin-top:24px">
-      <div class="grid g3 rise" style="--d:.2s; gap:16px">
-        <div class="card" style="padding:18px 20px"><span class="tag">En el producto</span><h3 style="margin-top:10px">Ingesta de promos</h3><p style="font-size:17px">Playwright captura, Gemini extrae y queda un borrador en cola.</p></div>
-        <div class="card" style="padding:18px 20px"><span class="tag">En el producto</span><h3 style="margin-top:10px">Lectura de tickets</h3><p style="font-size:17px">De la foto a los datos con una Edge Function; el usuario solo confirma.</p></div>
-        <div class="card" style="padding:18px 20px"><span class="tag k">CI</span><h3 style="margin-top:10px">Chequeos en cada PR</h3><p style="font-size:17px">GitHub Actions corre lint, typecheck, test y build.</p></div>
-        <div class="card" style="padding:18px 20px"><span class="tag k">Agentes</span><h3 style="margin-top:10px">Revisión asistida</h3><p style="font-size:17px">test-runner, spec-critic, rules-guardian y debugger.</p></div>
-        <div class="card" style="padding:18px 20px"><span class="tag k">Proceso</span><h3 style="margin-top:10px">Specs y tareas</h3><p style="font-size:17px">spec-kit genera spec, plan y tasks, y después se implementa.</p></div>
-        <div class="card" style="padding:18px 20px"><span class="tag k">Bitácora</span><h3 style="margin-top:10px">Registro de sesiones</h3><p style="font-size:17px">5 sesiones registradas. Un hook avisa si falta actualizarla.</p></div>
+      <div class="grid g2 rise" style="--d:.2s; gap:18px">
+        <div class="card" style="padding:22px 26px"><span class="tag k">CI</span><h3 style="margin-top:10px">Chequeos en cada PR</h3><p style="font-size:18px">GitHub Actions corre lint, typecheck, test y build.</p></div>
+        <div class="card" style="padding:22px 26px"><span class="tag k">Agentes</span><h3 style="margin-top:10px">Revisión asistida</h3><p style="font-size:18px">test-runner, spec-critic, rules-guardian y debugger.</p></div>
+        <div class="card" style="padding:22px 26px"><span class="tag k">Proceso</span><h3 style="margin-top:10px">Specs y tareas</h3><p style="font-size:18px">spec-kit genera spec, plan y tasks, y después se implementa.</p></div>
+        <div class="card" style="padding:22px 26px"><span class="tag k">Bitácora</span><h3 style="margin-top:10px">Registro de sesiones</h3><p style="font-size:18px">5 sesiones registradas. Un hook avisa si falta actualizarla.</p></div>
       </div>
       <div class="rise" style="--d:.4s; display:flex; align-items:center; gap:18px; background:var(--ink); color:var(--paper); border-radius:14px; padding:16px 24px; flex-wrap:wrap">
-        <span class="tag" style="background:#4FC3A0;color:var(--ink);flex:none">Límites</span>
-        <span style="font-size:18px">Sin LLM en el motor de reglas</span><span style="color:#4FC3A0">·</span>
-        <span style="font-size:18px">La API key de Gemini nunca va al celular</span><span style="color:#4FC3A0">·</span>
+        <span class="tag" style="background:var(--gold);color:var(--ink);flex:none">Límites</span>
+        <span style="font-size:18px">Sin LLM en el motor de reglas</span><span style="color:var(--gold)">·</span>
+        <span style="font-size:18px">La API key de Gemini nunca va al celular</span><span style="color:var(--gold)">·</span>
         <span style="font-size:18px">Las imágenes de ticket no se guardan</span>
       </div>
     </div>
+  </section>
+
+  <!-- 15B · MODELO DE NEGOCIO -->
+  <section class="slide">
+    <div class="who">Joaquín · Modelo de negocio</div>
+    <div class="kicker rise">Modelo de negocio y crecimiento</div>
+    <h2 class="rise" style="--d:.08s">Gratis para el usuario, <em class="g">y crece con acuerdos, no con más scraping</em></h2>
+    <div class="body" style="gap:20px">
+      <div class="grid g2" style="align-items:stretch">
+        <div class="card rise" style="--d:.2s">
+          <span class="tag">Hoy</span>
+          <ul style="margin-top:12px; padding-left:20px; display:grid; gap:8px; font-size:18px">
+            <li><b>Usuario final: gratis.</b> El costo principal es mantener el corpus (revisión humana), no infraestructura</li>
+            <li>Se arranca por <b>MODO</b> porque es la única fuente sin restricción de scraping ni de redistribución de sus promos</li>
+            <li>Mercado Pago lo prohíbe explícito; Galicia y BBVA restringen redistribuir o comercializar su contenido</li>
+          </ul>
+        </div>
+        <div class="card rise" style="--d:.3s; border:2px solid var(--green)">
+          <span class="tag">Cómo crece</span>
+          <ul style="margin-top:12px; padding-left:20px; display:grid; gap:8px; font-size:18px">
+            <li>Pedir <b>permiso explícito</b> a los bancos más populares de Argentina para consumir y mostrar sus promos</li>
+            <li>Cada banco sumado así es más cobertura <b>y</b> una relación comercial formal, no una dependencia legal frágil</li>
+            <li><b>Ingresos potenciales:</b> afiliación, destaque de comercios adheridos, reportes agregados y anonimizados</li>
+          </ul>
+        </div>
+      </div>
+      <p class="foot rise" style="--d:.45s">Detalle en <span style="font-family:var(--mono)">docs/product/logica-de-negocio.md</span>.</p>
+    </div>
+  </section>
+
+  <!-- 15C · LÍNEAS FUTURAS -->
+  <section class="slide">
+    <div class="who">Joaquín · Líneas futuras</div>
+    <div class="kicker rise">Qué sigue, en dos horizontes</div>
+    <h2 class="rise" style="--d:.08s">De acá a fin de cuatrimestre, <em class="g">y después del MVP</em></h2>
+    <div class="body" style="gap:20px">
+      <div class="grid g2" style="align-items:stretch">
+        <div class="card rise" style="--d:.2s; border:2px solid var(--green)">
+          <span class="tag">Resto del cuatrimestre</span>
+          <ul style="margin-top:12px; padding-left:20px; display:grid; gap:8px; font-size:18px">
+            <li>Diseño y armado de la app en Expo (épica #20)</li>
+            <li>Supabase y manejo de secrets (#9)</li>
+            <li>Reconciliar cadenas de supermercado contra MODO</li>
+            <li>Testear la precisión del lector de tickets (#10)</li>
+            <li>Auto-registro de una semana de compras propias</li>
+            <li>Segunda ronda de encuesta: qué billeteras usa cada persona</li>
+          </ul>
+        </div>
+        <div class="card rise" style="--d:.3s">
+          <span class="tag k">Después del MVP</span>
+          <ul style="margin-top:12px; padding-left:20px; display:grid; gap:8px; font-size:18px">
+            <li>Sumar bancos/billeteras bloqueados, con permiso explícito</li>
+            <li>Cobertura fuera de CABA/AMBA</li>
+            <li>Gasto en grupo, más allá del nivel 0 (cuentas y topes reales del grupo)</li>
+            <li>Disparo proactivo: notificaciones o geolocalización en el momento de pagar</li>
+          </ul>
+        </div>
+      </div>
+      <p class="foot rise" style="--d:.45s">Los pendientes completos, con su estado, en <span style="font-family:var(--mono)">docs/product/pendientes.md</span>.</p>
+    </div>
+  </section>
+
+  <!-- 15D · MARCA -->
+  <section class="slide" style="justify-content:center; align-items:center; text-align:center">
+    <div class="who">Joaquín · Marca</div>
+    <div class="kicker rise" style="align-self:center">Marca · logo</div>
+    <div class="rise" style="--d:.15s; margin:0 auto; width:220px; height:220px; border-radius:20px; overflow:hidden; box-shadow:0 20px 50px rgba(20,40,29,.18)">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" style="width:100%;height:100%;display:block">
+  <title>Vuelto app icon — dark</title>
+  <rect width="1024" height="1024" rx="190" fill="#14281D"/>
+  <path d="M 330 270 L 405 270 L 590 560 C 612 594 646 615 686 615 C 652 647 606 660 565 642 C 542 632 523 613 508 590 Z M 710 285 C 665 308 623 330 592 359 C 555 393 548 437 570 477 C 583 501 599 518 618 535 C 611 501 622 471 648 448 C 675 424 713 408 747 389 C 780 371 795 341 795 285 C 767 300 739 315 710 285 Z" fill="#C5A059"/>
+</svg>
+    </div>
+    <div class="rise" style="--d:.25s; display:flex; gap:14px; justify-content:center; margin:22px auto 0; flex-wrap:wrap; max-width:680px">
+      <div style="text-align:center"><div style="width:64px;height:64px;border-radius:12px;background:#4A6B53;border:2px solid var(--sage)"></div><span style="font-size:12px;color:var(--muted);display:block;margin-top:4px">Verde Salvia<br><span style="font-family:var(--mono)">#4A6B53</span></span></div>
+      <div style="text-align:center"><div style="width:64px;height:64px;border-radius:12px;background:#F7F4EB;border:1px solid var(--line)"></div><span style="font-size:12px;color:var(--muted);display:block;margin-top:4px">Blanco Hueso<br><span style="font-family:var(--mono)">#F7F4EB</span></span></div>
+      <div style="text-align:center"><div style="width:64px;height:64px;border-radius:12px;background:#E8E4D8;border:1px solid var(--line)"></div><span style="font-size:12px;color:var(--muted);display:block;margin-top:4px">Gris Neutro<br><span style="font-family:var(--mono)">#E8E4D8</span></span></div>
+      <div style="text-align:center"><div style="width:64px;height:64px;border-radius:12px;background:#C5A059;border:1px solid var(--line)"></div><span style="font-size:12px;color:var(--muted);display:block;margin-top:4px">Dorado Champán<br><span style="font-family:var(--mono)">#C5A059</span></span></div>
+      <div style="text-align:center"><div style="width:64px;height:64px;border-radius:12px;background:#14281D;border:1px solid var(--line)"></div><span style="font-size:12px;color:var(--muted);display:block;margin-top:4px">Verde Bosque<br><span style="font-family:var(--mono)">#14281D</span></span></div>
+    </div>
+    <p class="foot rise" style="--d:.35s; margin-top:10px">Paleta oficial de marca, usada en toda esta presentación — detalle en <span style="font-family:var(--mono)">docs/product/marca.md</span>.</p>
+    <p class="lead rise" style="--d:.4s; margin:14px auto 0; max-width:640px">Nombre y logo <b>tentativos</b> — falta verificar dominio y marca (INPI) antes de darlo por definitivo.</p>
   </section>
 
   <!-- 16 · CIERRE -->
@@ -721,18 +934,18 @@
     <h2 class="rise" style="--d:.08s">Problema validado, equipo organizado, IA con límites claros</h2>
     <div class="body" style="gap:22px">
       <div class="grid g2" style="gap:22px">
-        <div class="rise" style="--d:.2s; background:#1E2C26; border-radius:16px; padding:24px 28px">
-          <span class="tag" style="background:#0E4D39;color:#D2F3E6">Hecho</span>
-          <ul style="margin-top:14px; padding-left:22px; display:grid; gap:9px; font-size:20px; color:#E4ECE7; line-height:1.35">
+        <div class="rise" style="--d:.2s; background:var(--sage); border-radius:16px; padding:24px 28px">
+          <span class="tag" style="background:var(--forest);color:var(--linen)">Hecho</span>
+          <ul style="margin-top:14px; padding-left:22px; display:grid; gap:9px; font-size:20px; color:var(--linen); line-height:1.35">
             <li>Encuesta de 51 respuestas y su análisis</li>
             <li>Requisitos, roles, épicas y tablero</li>
             <li>Repo documentado, con ADRs y spec-kit</li>
             <li>Bitácora y declaración de uso de IA</li>
           </ul>
         </div>
-        <div class="rise" style="--d:.3s; background:#1E2C26; border-radius:16px; padding:24px 28px">
+        <div class="rise" style="--d:.3s; background:var(--sage); border-radius:16px; padding:24px 28px">
           <span class="tag a">Sigue</span>
-          <ul style="margin-top:14px; padding-left:22px; display:grid; gap:9px; font-size:20px; color:#E4ECE7; line-height:1.35">
+          <ul style="margin-top:14px; padding-left:22px; display:grid; gap:9px; font-size:20px; color:var(--linen); line-height:1.35">
             <li>Diseño de la app en Expo (épica #20)</li>
             <li>Supabase y manejo de secrets (#9)</li>
             <li>Testear la precisión del lector de tickets (#10)</li>
@@ -740,7 +953,7 @@
         </div>
       </div>
       <p class="foot rise" style="--d:.45s; margin-top:0">A resolver con la cátedra: cronograma real de sprints y equipo de 5 integrantes (la materia pide 6 a 8).</p>
-      <p class="rise" style="--d:.55s; font-family:var(--serif); font-size:34px; color:var(--paper); margin-top:auto">Gracias. <span style="color:#4FC3A0">¿Preguntas?</span></p>
+      <p class="rise" style="--d:.55s; font-family:var(--serif); font-size:34px; color:var(--paper); margin-top:auto">Gracias. <span style="color:var(--gold)">¿Preguntas?</span></p>
     </div>
   </section>
 
