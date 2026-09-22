@@ -35,7 +35,7 @@ detecta y no falla: queda en verde con un aviso hasta que haya código.
 | Paso | Dónde corre | Qué hace |
 |---|---|---|
 | 1. Disparo | Cron — **pendiente dónde** | Arranca el proceso programado |
-| 2. Captura | Playwright | Abre cada página (SPA) en navegador headless, espera el render |
+| 2. Captura | Playwright, o `fetch`/`curl` directo cuando la fuente lo permite | Abre cada página (SPA) en navegador headless y espera el render — salvo MODO, la única fuente del MVP (`../product/alcance-mvp.md`), que expone una API REST pública (`modo.com.ar/promos/api/rewards/...`) y no necesita navegador |
 | 3. Guardado | Supabase `capturas_crudas` | Contenido crudo, con service role key |
 | 4. Extracción | Gemini | El crudo se manda con el esquema estructurado |
 | 5. Verificación | El propio script | Chequeo de salud: fuente en cero o contenido irreconocible se marca y avisa |

@@ -1,9 +1,10 @@
 # Alcance del MVP
 
-**Dentro:** CABA/AMBA, 3 rubros de corpus (supermercado, combustible y
-restaurantes/gastronomía, ver detalle abajo), un solo flujo optimizado
-(compra de supermercado), 6 billeteras/bancos, cadenas de supermercado con
-sucursales en CABA/AMBA, ingesta asistida con revisión humana, perfil
+**Dentro:** CABA/AMBA (restricción de zona para todo el producto, no solo
+para supermercado), corpus de promociones de las 13 categorías que publica
+MODO (ver detalle abajo), flujo de compra optimizado para esas 13 categorías
+(no solo supermercado), una sola billetera como fuente de ingesta (MODO),
+cadenas de supermercado, ingesta asistida con revisión humana, perfil
 declarado por el usuario, registro por ticket, gasto en grupo nivel 0 (ver
 abajo).
 
@@ -12,45 +13,114 @@ revisión humana, cobertura nacional, app nativa (se usa Expo).
 
 ## Rubro, billeteras y cadenas concretas
 
-- **Rubro:** supermercado, combustible y restaurantes/gastronomía entran al
-  corpus de promociones. **Supermercado sigue siendo el único flujo
-  optimizado** de compra del MVP — combustible y restaurantes se ingestan y
-  quedan disponibles para el control de tope, pero no tienen un flujo de
-  compra dedicado todavía.
-  - Se verificó (research web, no scraping real todavía) que los 6
-    proveedores del alcance publican supermercado, combustible y
-    restaurantes/gastronomía como categorías de la misma página o portal de
-    beneficios: el buscador de promociones de Galicia filtra por categoría
-    incluyendo combustible junto a supermercados; los paquetes Black+ de
-    BBVA comparten un mismo tope de reintegro entre supermercado,
-    combustible y gastronomía; Santander lista "indumentaria, supermercados,
-    farmacias, combustible" en una sola página de beneficios; MODO y Mercado
-    Pago publican los tres rubros en el mismo resumen mensual de
-    promociones. El costo de ingesta extra de sumar estos dos rubros es
-    marginal sobre el de supermercado, no una fuente nueva por rubro.
-  - Farmacia queda afuera: no apareció junto a los otros tres con la misma
-    consistencia en la búsqueda, y no se investigó a fondo — se puede
-    reconsiderar más adelante con el mismo criterio.
-  - Sigue pendiente relevar las fuentes reales (HTML vs. SPA/JSON, robots.txt)
-    antes de scrapear — esto solo confirma que los rubros están juntos, no
-    reemplaza el relevamiento técnico (`pendientes.md`).
-- **Billeteras y bancos** (6): Mercado Pago, MODO, Cuenta DNI (Banco
-  Provincia), Santander, Galicia, BBVA. MODO agrega el pago interbancario,
-  pero el tope de reintegro se controla por banco (ver
-  `../architecture/01-data-models.md`), así que Santander, Galicia y BBVA
-  entran como fuentes de promoción independientes aunque el pago pase por
-  MODO.
-- **Cadenas de supermercado:** todas las que tengan sucursales en CABA/AMBA.
-  La cobertura la define la zona, no una lista corta de cadenas elegidas a
-  mano.
-  - Presencia confirmada en CABA/AMBA: Coto, Carrefour (Market / Express /
-    Maxi), Jumbo, Disco, Vea, Día, Changomas.
-  - Día y Changomas tienen muchas sucursales chicas o dispersas — mayor
-    riesgo de que "no todas las sucursales participan" complique el motor
-    (ver `../architecture/01-data-models.md`).
-  - Pendiente de verificar en el relevamiento de fuentes (`pendientes.md`):
-    confirmar sucursales reales en CABA/AMBA antes de sumar cadenas
-    regionales como La Anónima al corpus.
+### Billetera: se reduce de 6 a 1 (MODO)
+
+El alcance original consideraba 6 billeteras/bancos como fuentes de
+ingesta. El relevamiento técnico y legal (`fuentes-promos.md`, issue #12)
+encontró que la mitad de esas fuentes no se pueden scrapear sin más:
+Mercado Pago prohíbe explícitamente el uso de robots/scraping en sus
+términos, y Santander y BBVA bloquean el acceso automatizado a nivel de red
+(WAF) incluso con un navegador real. De las 3 restantes, automatizables sin
+objeción legal ni técnica (MODO, Cuenta DNI, Galicia), **se decide acotar el
+MVP a una sola: MODO**.
+
+Se procede así en vez de sostener las 3 fuentes automatizables porque
+mezclar automatización parcial con captura manual de las fuentes bloqueadas
+agregaba complejidad de ingesta que no aporta al objetivo del MVP (demostrar
+el motor de reglas y el control de topes, no maximizar cobertura de
+fuentes). Queda **fuera de alcance del MVP, para más adelante**: coordinar
+con los bancos/billeteras bloqueados para conseguir permiso explícito de
+scraping (o un acuerdo de acceso a datos), y recién ahí reincorporarlos.
+
+### Rubro: se amplía a las 13 categorías que publica MODO
+
+La primera pasada de este research (con Playwright, sobre el HTML
+renderizado de `modo.com.ar/promos`) había concluido erróneamente que
+restaurantes/gastronomía no existía en MODO — esa conclusión estaba mal:
+solo faltaba mirar en el lugar correcto. La página de promos de MODO no es
+solo una SPA para renderizar con Playwright: **expone una API REST pública,
+sin autenticación**, que arma el listado (`04-infrastructure.md` tiene el
+detalle técnico), con 13 categorías fijas. En vez de curar un subconjunto de
+rubros a mano, **se decide ingestar las 13 categorías completas** — es la
+misma API y el mismo mecanismo de paginación para todas, así que filtrar
+rubros no ahorra complejidad de ingesta, solo reduce cobertura sin motivo.
+
+Conteo de promos activas por categoría, vía
+`GET /promos/api/rewards/slots?...&categories=<id>` (relevado el 2026-09-21,
+va a variar con el tiempo):
+
+| Categoría | id (API) | Promos activas |
+|---|---|---|
+| Gastronomía | 2 | 646 |
+| Indumentaria | 3 | 310 |
+| Supermercados (categoría "Mercados" en la API) | 1 | 226 |
+| Farmacias, Perfumerías y Peluquerías | 4 | 170 |
+| Entretenimiento (categoría "Turismo y Entretenimiento" en la API) | 14 | 124 |
+| Hogar | 7 | 115 |
+| Electro y Tecnología | 10 | 95 |
+| Jugueterías y Librerías | 13 | 54 |
+| Automóviles | 8 | 45 |
+| Mascotas | 12 | 29 |
+| Combustibles | 5 | 22 |
+| Deportes | 6 | 18 |
+| Ferretería y Pinturerías | 11 | 10 |
+
+Total: **~1864 promos activas** en MODO en este momento, repartidas en estas
+13 categorías. **El flujo de compra optimizado cubre las 13 categorías, no
+solo supermercado** — la recomendación (RF-03/RF-04) ya era genérica por
+compra, no específica de un rubro; restringir el "flujo optimizado" a
+supermercado no tenía un motivo técnico, era simplemente el recorte de
+alcance original. Con el corpus completo ya ingestado desde una sola fuente,
+no hay razón para seguir tratando a las otras 12 categorías como de segunda
+clase.
+
+Gastronomía en particular quedó confirmada con evidencia directa: incluye el
+caso puntual que se pidió verificar, Kansas (6 promos activas, hasta 30% de
+reintegro, encontrado con `search_text=Kansas`).
+
+Lección del error original: alcanzaba con probar la API con el **id
+numérico** de categoría — el intento inicial con el *slug* de texto
+(`categories=gastronomia`) devolvía 0 resultados por un detalle de la
+implementación de MODO, lo cual llevó a la conclusión incorrecta de que el
+rubro no existía. Queda como nota para cuando se diseñe el ingestor real: no
+asumir que un filtro "vacío" significa "sin datos" sin probar la variante
+numérica.
+
+### Cadenas de supermercado: la lista previa no está validada contra MODO
+
+La lista de "presencia confirmada en CABA/AMBA" (Coto, Carrefour, Jumbo,
+Disco, Vea, Día, Changomas) salió de research general de presencia en la
+zona, no de las promos reales de MODO. Se intentó reconciliarla contra la
+API real (`search_text=<cadena>` sobre el endpoint de promos) con resultado
+mixto:
+
+| Cadena | Promos encontradas (`search_text`) |
+|---|---|
+| Vea | 3 |
+| Coto | 2 |
+| Jumbo | 2 |
+| Changomas | 2 |
+| Disco | 1 |
+| Carrefour | 0 |
+| Día | no concluyente (ver abajo) |
+
+**Esto no es una reconciliación confiable todavía**: `search_text=Día`
+devolvió 369 resultados, pero ninguno de los títulos revisados menciona a la
+cadena Día — el parámetro de búsqueda no filtra bien términos cortos o
+comunes. Peor todavía: `search_text=La Anónima` dio 0 resultados, a pesar de
+que esa cadena **sí apareció** directamente en el HTML renderizado de la
+página en una corrida anterior de este mismo research ("20% de reintegro en
+La Anónima"). La búsqueda por texto de esta API no es confiable para esta
+tarea.
+
+**Pendiente, antes de fijar el corpus sembrado a mano (RF-18)**: reconciliar
+la lista de cadenas paginando por completo la categoría "Mercados" (id 1,
+226 promos totales) y revisando los nombres de comercio uno por uno, en vez
+de confiar en `search_text` por cadena. Importa qué cadena participa
+efectivamente en MODO, no su presencia genérica en CABA/AMBA — y eso puede
+afectar qué tan útil es el flujo de compra de supermercado si las cadenas
+grandes (Coto, Carrefour, Jumbo, Disco, Vea, Día) tienen poca o ninguna
+promoción vigente vía MODO.
 
 ## Gasto en grupo (nivel 0, última prioridad del MVP)
 
