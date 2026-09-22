@@ -10,11 +10,12 @@ el tope de reintegro mensual consumido. No es un listado de promociones.
    instantánea, sin red. Evalúa combinaciones válidas (medio de pago × compra
    × tope ya consumido × jurisdicción × acumulabilidad) y devuelve la óptima.
    Es código **determinístico** — el LLM nunca entra acá.
-2. **Ingesta asistida** — la letra chica de cada promoción viene en prosa
+2. **Ingesta automática** — la letra chica de cada promoción viene en prosa
    legal no estructurada. Un LLM (Gemini) la convierte en los atributos de
    `01-data-models.md`, contra un esquema forzado. Corre offline, en lote,
-   fuera del camino crítico. Todo borrador pasa por revisión humana antes de
-   entrar a la base que usa el motor.
+   fuera del camino crítico. Un borrador entra a la base que usa el motor
+   automáticamente si completa el esquema — sin revisión humana; si no lo
+   completa, se descarta solo.
 3. **Registro por ticket** — mismo extractor, otra fuente de texto sucio: el
    usuario fotografía el comprobante y el extractor obtiene monto, comercio,
    medio de pago y descuento. Es lo que alimenta el consumo de tope. El
@@ -38,7 +39,7 @@ Fuentes web (bancos/billeteras)
   → Playwright captura el render
   → Supabase.capturas_crudas (contenido crudo)
   → Gemini extrae contra esquema (offline, batch)
-  → cola de revisión humana
+  → validación automática de esquema (sin persona)
   → base validada (Postgres)
   → motor de reglas (dispositivo) ← perfil del usuario + tope consumido
   → recomendación al usuario

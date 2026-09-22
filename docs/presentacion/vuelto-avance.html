@@ -165,6 +165,12 @@
   .empty { font-size: 14px; color: var(--muted); text-align: center; margin-top: 18px; font-style: italic; }
 
   /* ---------- Repo ---------- */
+  .repo-window { background: var(--ink); border-radius: 16px; padding: 14px 0 6px; box-shadow: 0 18px 40px rgba(20,40,29,.16); }
+  .repo-bar { display: flex; align-items: center; gap: 8px; padding: 0 20px 12px; }
+  .repo-bar i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .repo-bar i.r { background: #EC6A5E; } .repo-bar i.y { background: #F5BF4F; } .repo-bar i.g { background: #61C554; }
+  .repo-bar span { margin-left: 10px; font-family: var(--mono); font-size: 14px; color: var(--dark-muted); }
+  .repo-window .tree { background: var(--paper); border-radius: 0 0 12px 12px; padding: 10px 14px; }
   .tree { font-family: var(--mono); font-size: 21px; line-height: 1.5; }
   .tree .row { display: flex; align-items: baseline; gap: 14px; padding: 11px 18px; border-radius: 10px; }
   .tree .row:nth-child(odd) { background: rgba(255,255,255,.45); }
@@ -341,15 +347,15 @@
         <div class="card rise" style="--d:.3s; border:2px solid var(--green)">
           <span class="tag">Vuelto</span>
           <ul style="margin-top:14px; padding-left:22px; display:grid; gap:9px">
-            <li><b>Recomienda</b> con qué pagar en una compra concreta</li>
+            <li><b>Recomienda</b> con qué pagar en una compra concreta, con el porqué</li>
             <li><b>Controla</b> cuánto tope de reintegro queda</li>
             <li>Lo muestra <b>estimado, con su base</b></li>
           </ul>
         </div>
       </div>
       <div class="rise" style="--d:.45s; background:var(--ink); color:var(--paper); border-radius:16px; padding:22px 30px; display:flex; align-items:center; gap:24px">
-        <span class="tag" style="background:var(--gold);color:var(--ink);flex:none">Regla de oro</span>
-        <span style="font-size:24px; line-height:1.35">Si una funcionalidad se puede describir como <b>“mostrar promociones”</b>, no es este producto.</span>
+        <span class="tag" style="background:var(--gold);color:var(--ink);flex:none">Qué es Vuelto</span>
+        <span style="font-size:24px; line-height:1.35">Un asistente de decisión: dice <b>con qué medio pagar ahora mismo</b>, específico para los medios que declaró el usuario — no un listado de promociones.</span>
       </div>
       <p class="lead rise" style="--d:.55s; font-size:23px">No es falta de información. <b>Es la decisión.</b></p>
     </div>
@@ -369,7 +375,7 @@
             <li><b>Una sola billetera</b> como fuente de ingesta: <b>MODO</b></li>
             <li>Corpus de las <b>13 categorías</b> que publica MODO (no solo supermercado)</li>
             <li>El flujo de compra optimizado cubre las <b>13 categorías</b></li>
-            <li>Perfil declarado, registro por ticket e ingesta con revisión humana</li>
+            <li>Perfil declarado, registro por ticket e ingesta 100% automática</li>
             <li>Gasto en grupo nivel 0 (última prioridad)</li>
           </ul>
         </div>
@@ -378,7 +384,6 @@
           <ul style="margin-top:14px; padding-left:22px; display:grid; gap:9px; font-size:19px">
             <li>Integración bancaria directa</li>
             <li>Lectura automática de resúmenes y movimientos</li>
-            <li>Publicar promos sin revisión humana</li>
             <li>Cobertura nacional</li>
             <li>App nativa nuda (usamos Expo)</li>
           </ul>
@@ -402,7 +407,7 @@
       <div class="card rise" style="--d:.5s; padding:14px 26px">
         <p style="font-size:18px">La API expone <b>13 categorías fijas</b>, con <b>~1864 promos activas</b> hoy: Gastronomía (646), Supermercados (226), Farmacias (170), Combustibles (22), entre otras. Se decidió ingestar las 13 completas, no un subconjunto curado a mano.</p>
       </div>
-      <p class="foot rise" style="--d:.6s; margin-top:0">La primera pasada había concluido mal que gastronomía no existía (bug del slug vs. id numérico de categoría); corregido y confirmado con evidencia directa (Kansas, 6 promos activas).</p>
+      <p class="foot rise" style="--d:.6s; margin-top:0">Con la fuente y el corpus definidos, falta algo más básico: confirmar que el problema es real y no supuesto — la encuesta de 51 respuestas que cuenta Santiago a continuación.</p>
     </div>
   </section>
 
@@ -528,7 +533,6 @@
             <li>Custodia la regla de oro</li>
             <li>Prioriza el backlog</li>
             <li>Acepta o rechaza cada historia</li>
-            <li>Decide en la cola de revisión de la ingesta</li>
           </ul>
         </div>
         <div class="card rise" style="--d:.3s">
@@ -587,20 +591,58 @@
     </div>
   </section>
 
+  <!-- 10B · ROADMAP DE ÉPICAS -->
+  <section class="slide">
+    <div class="who">Jesús · Roles y Scrum</div>
+    <div class="kicker rise">Roadmap · 8 épicas, 3 entregas</div>
+    <h2 class="rise" style="--d:.08s">Así caen las épicas en las <em class="g">tres entregas de la cátedra</em></h2>
+    <div class="body" style="gap:16px">
+      <div class="grid g3 rise" style="--d:.2s; align-items:stretch">
+        <div class="card" style="border:2px solid var(--green)">
+          <span class="tag">Entrega parcial 1</span>
+          <ul style="margin-top:14px; padding-left:20px; display:grid; gap:11px; font-size:16px">
+            <li><b>#15</b> Research y validación del problema <span class="tag a" style="margin-left:2px">En curso</span></li>
+            <li><b>#16</b> Alcance y corpus de promociones <span class="tag a" style="margin-left:2px">En curso</span></li>
+            <li><b>#17</b> Gestión ágil y documentación <span class="tag" style="margin-left:2px">Hecho</span></li>
+            <li><b>#18</b> Plataforma, secretos y CI/CD <span class="tag a" style="margin-left:2px">En curso</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="tag k">Entrega parcial 2</span>
+          <ul style="margin-top:14px; padding-left:20px; display:grid; gap:11px; font-size:16px">
+            <li><b>#19</b> Motor de reglas determinístico <span class="tag g" style="margin-left:2px">Backlog</span></li>
+            <li><b>#20</b> App Expo y experiencia de decisión <span class="tag g" style="margin-left:2px">Backlog</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="tag k">Pitch y documentación final</span>
+          <ul style="margin-top:14px; padding-left:20px; display:grid; gap:11px; font-size:16px">
+            <li><b>#21</b> Registro por ticket y control de topes <span class="tag g" style="margin-left:2px">Backlog</span></li>
+            <li><b>#22</b> Privacidad y cumplimiento <span class="tag" style="margin-left:2px">Hecho</span></li>
+          </ul>
+        </div>
+      </div>
+      <p class="foot rise" style="--d:.4s">Fechas de cada entrega: a confirmar con el cronograma real de la cátedra. El orden de las épicas sí está fijado — mismos milestones que el tablero de GitHub Projects.</p>
+    </div>
+  </section>
+
   <!-- 11 · REPO: MAPA -->
   <section class="slide">
     <div class="who">Agustín · Repo con documentación</div>
     <div class="kicker rise">El repositorio</div>
     <h2 class="rise" style="--d:.08s">Todo está documentado <em class="g">dentro del repo</em></h2>
     <div class="body" style="gap:14px">
-      <div class="tree rise" style="--d:.2s">
-        <div class="row"><span class="p">CLAUDE.md</span><span class="d">Reglas del proyecto para cualquier IA</span></div>
-        <div class="row"><span class="p">docs/product/</span><span class="d">Problema, alcance, requisitos, roles, privacidad, encuesta</span><span class="c">12 docs</span></div>
-        <div class="row"><span class="p">docs/architecture/</span><span class="d">Datos, API, frontend, infraestructura</span><span class="c">5 docs</span></div>
-        <div class="row"><span class="p">docs/decisions/</span><span class="d">ADRs: qué se decidió y por qué</span><span class="c">7 ADRs</span></div>
-        <div class="row"><span class="p">specs/</span><span class="d">Specs de feature con spec-kit</span></div>
-        <div class="row"><span class="p">.github/workflows/</span><span class="d">CI: lint, typecheck, test, build</span></div>
-        <div class="row"><span class="p">.claude/ · .agents/</span><span class="d">Agentes, skills y hook de bitácora</span></div>
+      <div class="repo-window rise" style="--d:.2s">
+        <div class="repo-bar"><i class="r"></i><i class="y"></i><i class="g"></i><span>vuelto/</span></div>
+        <div class="tree">
+          <div class="row"><span class="p">CLAUDE.md</span><span class="d">Reglas del proyecto para cualquier IA</span></div>
+          <div class="row"><span class="p">docs/product/</span><span class="d">Problema, alcance, requisitos, roles, privacidad, encuesta</span><span class="c">12 docs</span></div>
+          <div class="row"><span class="p">docs/architecture/</span><span class="d">Datos, API, frontend, infraestructura</span><span class="c">5 docs</span></div>
+          <div class="row"><span class="p">docs/decisions/</span><span class="d">ADRs: qué se decidió y por qué</span><span class="c">7 ADRs</span></div>
+          <div class="row"><span class="p">specs/</span><span class="d">Specs de feature con spec-kit</span></div>
+          <div class="row"><span class="p">.github/workflows/</span><span class="d">CI: lint, typecheck, test, build</span></div>
+          <div class="row"><span class="p">.claude/ · .agents/</span><span class="d">Agentes, skills y hook de bitácora</span></div>
+        </div>
       </div>
       <p class="foot rise" style="--d:.4s; margin-top:2px"><b>34 requisitos</b> (20 RF, 14 RNF) · <b>7 ADRs</b> · <b>20 issues</b> · <b>6 PRs</b> mergeados. Todavía no hay código: es etapa de definición, a propósito.</p>
     </div>
@@ -617,7 +659,7 @@
         <div class="card adr"><span class="tag">ADR-002</span><h3>Expo sobre Flutter</h3><p>Expo Go por QR y el mismo TypeScript que el motor.</p></div>
         <div class="card adr"><span class="tag">ADR-003</span><h3>Supabase sobre Firebase</h3><p>Postgres relacional y Auth sin pedir tarjeta.</p></div>
         <div class="card adr" style="border:2px solid var(--green)"><span class="tag">ADR-004</span><h3>El LLM solo en la ingesta</h3><p>Sin LLM en el motor: determinismo y tests.</p></div>
-        <div class="card adr"><span class="tag">ADR-005</span><h3>Ingesta con revisión humana</h3><p>Nada se publica sin que una persona lo apruebe.</p></div>
+        <div class="card adr"><span class="tag">ADR-005</span><h3>Ingesta automática, sin revisión humana</h3><p>El esquema decide: sin campos obligatorios completos, no se publica.</p></div>
         <div class="card adr"><span class="tag">ADR-006</span><h3>Registro por ticket</h3><p>Sin esto no hay control de topes.</p></div>
         <div class="card adr"><span class="tag">ADR-007</span><h3>spec-kit sobre to-spec</h3><p>Un solo punto de entrada para las specs.</p></div>
         <div class="card adr" style="background:var(--ink); border-color:var(--ink)"><span class="tag" style="background:var(--gold);color:var(--ink)">Formato</span><h3 style="color:var(--paper)">Contexto, decisión, razonamiento y consecuencias</h3><p style="color:var(--dark-text-2)">Cada ADR responde las cuatro.</p></div>
@@ -639,7 +681,7 @@
         --database-fill: rgba(74,107,83,.14); --database-stroke: var(--sage);
         --security-stroke: var(--ink);
         --external-fill: rgba(20,40,29,.06); --external-stroke: var(--ink);">
-      <svg viewBox="0 0 830 442" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
+      <svg viewBox="0 75 830 367" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
         <title id="archify-diagram-title">Vuelto — arquitectura del MVP</title>
         <desc id="archify-diagram-description">An architecture diagram generated by Archify.</desc>
         <!-- Definitions -->
@@ -784,9 +826,9 @@
         <div class="ln"><b>Ingesta de promos</b><span>Offline, en lote</span></div>
         <div class="node">Promo publicada por la API de MODO</div>
         <div class="node ai">Gemini extrae contra un esquema<small>campo ausente = null</small></div>
-        <div class="node">Borrador en cola</div>
-        <div class="node human">Revisión humana<small>aprueba · corrige · rechaza</small></div>
-        <div class="node">Promo publicada</div>
+        <div class="node">Borrador con cita de cada campo<small>para auditar después</small></div>
+        <div class="node">Valida el esquema<small>automático, sin persona</small></div>
+        <div class="node">Publica o descarta<small>según complete el esquema</small></div>
       </div>
       <div class="lane rise" style="--d:.35s">
         <div class="ln"><b>Registro por ticket</b><span>Edge Function de Supabase</span></div>
@@ -796,7 +838,7 @@
         <div class="node human">El usuario confirma</div>
         <div class="node">Compra registrada</div>
       </div>
-      <div class="feeds rise" style="--d:.45s">▼ solo datos aprobados o confirmados por una persona llegan al motor ▼</div>
+      <div class="feeds rise" style="--d:.45s">▼ solo datos validados por esquema o confirmados por el usuario llegan al motor ▼</div>
       <div class="engine rise" style="--d:.5s">
         <div><b>Motor de reglas</b><span>TypeScript sin dependencias · corre en el dispositivo · sin LLM en el camino</span></div>
         <div class="out"><strong>Con qué pagar</strong><span>+ tope estimado, con su base</span></div>
@@ -827,7 +869,7 @@
   <!-- 15 · AUTOMATIZACIÓN Y LÍMITES -->
   <section class="slide">
     <div class="who">Joaquín · Uso de IA</div>
-    <div class="kicker rise">Automatización y límites</div>
+    <div class="kicker rise">Automatización de nuestro propio trabajo</div>
     <h2 class="rise" style="--d:.08s; font-size:42px">Cómo automatizamos <em class="g">nuestro propio trabajo</em></h2>
     <div class="body" style="gap:18px; margin-top:24px">
       <div class="grid g2 rise" style="--d:.2s; gap:18px">
@@ -836,12 +878,7 @@
         <div class="card" style="padding:22px 26px"><span class="tag k">Proceso</span><h3 style="margin-top:10px">Specs y tareas</h3><p style="font-size:18px">spec-kit genera spec, plan y tasks, y después se implementa.</p></div>
         <div class="card" style="padding:22px 26px"><span class="tag k">Bitácora</span><h3 style="margin-top:10px">Registro de sesiones</h3><p style="font-size:18px">5 sesiones registradas. Un hook avisa si falta actualizarla.</p></div>
       </div>
-      <div class="rise" style="--d:.4s; display:flex; align-items:center; gap:18px; background:var(--ink); color:var(--paper); border-radius:14px; padding:16px 24px; flex-wrap:wrap">
-        <span class="tag" style="background:var(--gold);color:var(--ink);flex:none">Límites</span>
-        <span style="font-size:18px">Sin LLM en el motor de reglas</span><span style="color:var(--gold)">·</span>
-        <span style="font-size:18px">La API key de Gemini nunca va al celular</span><span style="color:var(--gold)">·</span>
-        <span style="font-size:18px">Las imágenes de ticket no se guardan</span>
-      </div>
+      <p class="foot rise" style="--d:.4s">Los límites técnicos del producto (sin LLM en el motor, ingesta automática sin revisión humana) ya los contó Agustín — acá el foco es el proceso propio del equipo.</p>
     </div>
   </section>
 
@@ -855,7 +892,7 @@
         <div class="card rise" style="--d:.2s">
           <span class="tag">Hoy</span>
           <ul style="margin-top:12px; padding-left:20px; display:grid; gap:8px; font-size:18px">
-            <li><b>Usuario final: gratis.</b> El costo principal es mantener el corpus (revisión humana), no infraestructura</li>
+            <li><b>Usuario final: gratis.</b> La ingesta es 100% automática (sin revisión humana), así que el costo principal es infraestructura, no una cola de revisión</li>
             <li>Se arranca por <b>MODO</b> porque es la única fuente sin restricción de scraping ni de redistribución de sus promos</li>
             <li>Mercado Pago lo prohíbe explícito; Galicia y BBVA restringen redistribuir o comercializar su contenido</li>
           </ul>
@@ -865,7 +902,7 @@
           <ul style="margin-top:12px; padding-left:20px; display:grid; gap:8px; font-size:18px">
             <li>Pedir <b>permiso explícito</b> a los bancos más populares de Argentina para consumir y mostrar sus promos</li>
             <li>Cada banco sumado así es más cobertura <b>y</b> una relación comercial formal, no una dependencia legal frágil</li>
-            <li><b>Ingresos potenciales:</b> afiliación, destaque de comercios adheridos, reportes agregados y anonimizados</li>
+            <li><b>Ingresos potenciales:</b> afiliación con billeteras/comercios, <b>destaque de comercios adheridos</b> (un comercio que ya es una recomendación válida puede pagar por aparecer resaltado, nunca se recomienda un medio peor para forzarlo) y reportes agregados anonimizados</li>
           </ul>
         </div>
       </div>
@@ -885,6 +922,7 @@
           <ul style="margin-top:12px; padding-left:20px; display:grid; gap:8px; font-size:18px">
             <li>Diseño y armado de la app en Expo (épica #20)</li>
             <li>Supabase y manejo de secrets (#9)</li>
+            <li>Implementar gasto en grupo nivel 0 (ya es parte del MVP)</li>
             <li>Reconciliar cadenas de supermercado contra MODO</li>
             <li>Testear la precisión del lector de tickets (#10)</li>
             <li>Auto-registro de una semana de compras propias</li>
@@ -952,7 +990,6 @@
           </ul>
         </div>
       </div>
-      <p class="foot rise" style="--d:.45s; margin-top:0">A resolver con la cátedra: cronograma real de sprints y equipo de 5 integrantes (la materia pide 6 a 8).</p>
       <p class="rise" style="--d:.55s; font-family:var(--serif); font-size:34px; color:var(--paper); margin-top:auto">Gracias. <span style="color:var(--gold)">¿Preguntas?</span></p>
     </div>
   </section>

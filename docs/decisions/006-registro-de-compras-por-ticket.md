@@ -14,9 +14,9 @@ funcionalidad.
 
 El usuario fotografía el comprobante de la compra. El mismo extractor de
 ADR-005 (Gemini, salida estructurada) obtiene monto, comercio, medio de pago
-y descuento aplicado. El circuito es extracción → revisión → confirmación,
-pero acá revisa el propio usuario: ve tres campos ya completos y confirma,
-no tipea.
+y descuento aplicado. Es el mismo patrón de extracción de ADR-005, pero el
+paso que en la ingesta de promos es validación automática de esquema, acá lo
+hace el propio usuario: ve tres campos ya completos y confirma, no tipea.
 
 ## Rationale
 

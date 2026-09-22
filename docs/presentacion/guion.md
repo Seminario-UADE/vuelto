@@ -1,6 +1,6 @@
-# Guion de la presentación — Vuelto (~16 min)
+# Guion de la presentación — Vuelto (~19 min)
 
-Deck: `vuelto-avance.html` (20 slides). Abrirlo en el navegador y apretar `F`
+Deck: `vuelto-avance.html` (21 slides). Abrirlo en el navegador y apretar `F`
 (o el botón de la portada) para pantalla completa. `T` prende un cronómetro.
 `vuelto-avance-completa.html` es un respaldo viejo — alcance, reparto y
 colores desactualizados, no usarlo salvo como referencia de diseño.
@@ -9,46 +9,48 @@ colores desactualizados, no usarlo salvo como referencia de diseño.
 
 | Persona | Slides | Cantidad |
 |---|---|---|
-| Joaquín | 1, 2, 3, 4, 15, 16, 17, 18, 19, 20 | 10 (varias son livianas: portada, marca, cierre) |
+| Joaquín | 1, 2, 3, 4, 16, 17, 18, 19, 20, 21 | 10 (varias son livianas: portada, marca, cierre) |
 | Santiago | 5, 6, 7, 8 | 4 |
-| Jesús | 9, 10 | 2 |
-| Agustín | 11, 12, 13, 14 | 4 |
+| Jesús | 9, 10, 11 | 3 |
+| Agustín | 12, 13, 14, 15 | 4 |
 
 ## Orden y tiempos
 
 | # | Slide | Quién | Tiempo |
 |---|---|---|---|
 | 1 | Portada | Joaquín | 0:15 |
-| 2 | Problema y propuesta | Joaquín | 1:15 |
+| 2 | Problema y propuesta | Joaquín | 1:10 |
 | 3 | Alcance del MVP | Joaquín | 0:55 |
-| 4 | Relevamiento de fuentes: por qué MODO | Joaquín | 1:10 |
+| 4 | Relevamiento de fuentes: por qué MODO | Joaquín | 1:05 |
 | 5 | Stakeholders y clientes objetivo | Santiago | 0:50 |
 | 6 | Encuesta · hallazgo 1 | Santiago | 1:10 |
 | 7 | Encuesta · hallazgo 2 | Santiago | 0:55 |
 | 8 | Encuesta · hallazgo 3 | Santiago | 0:55 |
 | 9 | Roles | Jesús | 0:55 |
-| 10 | Tablero Kanban y Scrum | Jesús | 1:20 |
-| 11 | Repo con documentación | Agustín | 0:55 |
-| 12 | Decisiones técnicas (ADRs) | Agustín | 0:55 |
-| 13 | Arquitectura: cómo se conectan las piezas | Agustín | 1:00 |
-| 14 | IA en el producto | Agustín | 1:10 |
-| 15 | IA para construir (línea de tiempo) | Joaquín | 1:00 |
-| 16 | Automatización y límites | Joaquín | 0:50 |
-| 17 | Modelo de negocio y crecimiento | Joaquín | 1:00 |
-| 18 | Líneas futuras | Joaquín | 0:55 |
-| 19 | Marca | Joaquín | 0:30 |
-| 20 | Cierre | Joaquín | 0:45 |
-| | **Total** | | **~16:20** |
+| 10 | Tablero Kanban y Scrum | Jesús | 1:15 |
+| 11 | Roadmap: cómo caen las épicas | Jesús | 0:50 |
+| 12 | Repo con documentación | Agustín | 0:55 |
+| 13 | Decisiones técnicas (ADRs) | Agustín | 0:55 |
+| 14 | Arquitectura: cómo se conectan las piezas | Agustín | 1:00 |
+| 15 | IA en el producto | Agustín | 1:10 |
+| 16 | IA para construir (línea de tiempo) | Joaquín | 1:15 |
+| 17 | Automatización de nuestro propio trabajo | Joaquín | 0:40 |
+| 18 | Modelo de negocio y crecimiento | Joaquín | 1:05 |
+| 19 | Líneas futuras | Joaquín | 0:55 |
+| 20 | Marca | Joaquín | 0:30 |
+| 21 | Cierre | Joaquín | 0:40 |
+| | **Total** | | **~19:20** |
 
 Reglas para todos: hablar con los números de la slide, no leerla entera, y
 pasar la palabra con una frase corta al final.
 
-Si nos pasamos de tiempo, lo más fácil de acortar: slide 12 (ADRs, ya
-resumida) y slide 16 (automatización, es un repaso).
+Si nos pasamos de tiempo, lo más fácil de acortar: slide 13 (ADRs, ya
+resumida), slide 11 (roadmap, es un repaso del tablero) y slide 17
+(automatización, ya trimeada).
 
 ---
 
-## Joaquín — Apertura, alcance y research de fuentes (slides 1-4, ~3 min 35 s)
+## Joaquín — Apertura, alcance y research de fuentes (slides 1-4, ~3 min 25 s)
 
 **Slide 1 · Portada**
 - Somos el equipo de Vuelto, del Seminario de Integración Profesional de UADE.
@@ -61,19 +63,21 @@ resumida) y slide 16 (automatización, es un repaso).
   invisible para el usuario.
 - Resultado: paga con el primer medio disponible y pierde plata sin darse
   cuenta. **No es falta de información, es la decisión.**
-- Vuelto **recomienda con qué pagar** en una compra concreta y **controla
-  cuánto tope queda**. Siempre lo muestra como estimado, con su base.
-- La regla de oro: si algo se puede describir como “mostrar promociones”, no
-  es este producto.
+- Vuelto es un asistente de decisión: en el momento de pagar, **recomienda
+  con qué medio pagar** una compra concreta, con el porqué, y en todo
+  momento **controla cuánto tope de reintegro le queda**, siempre como
+  estimado, con su base.
+- No es un buscador de promociones — es una decisión tomada por código
+  determinístico, específica para los medios de pago que el usuario declaró.
 
 **Slide 3 · Alcance del MVP**
 - **Dentro:** CABA/AMBA para todo el producto. Una sola billetera como fuente
   de ingesta: **MODO**. El corpus cubre las **13 categorías** que publica su
   API, no solo supermercado, y el flujo de compra optimizado también.
-- También entran el perfil declarado, el registro por ticket y la ingesta con
-  revisión humana.
-- **Fuera:** integración bancaria, lectura de resúmenes, publicar promos sin
-  revisión humana, cobertura nacional y app nativa (usamos Expo).
+- También entran el perfil declarado, el registro por ticket y la ingesta
+  **100% automática** (sin revisión humana, validada contra un esquema).
+- **Fuera:** integración bancaria, lectura de resúmenes, cobertura nacional y
+  app nativa (usamos Expo).
 - Honestidad: las otras 5 billeteras quedan para más adelante, y las cadenas
   de supermercado dentro de MODO todavía no están reconciliadas.
 - Pase: “La decisión de acotar a MODO salió de un research bien concreto.
@@ -91,15 +95,16 @@ resumida) y slide 16 (automatización, es un repaso).
 - La API expone **13 categorías fijas**, con **~1864 promos activas** hoy:
   Gastronomía (646), Supermercados (226), Farmacias (170), Combustibles (22),
   entre otras.
-- Anécdota corta: la primera pasada concluyó mal que gastronomía no existía,
-  por confundir el slug de texto con el id numérico de categoría. Se
-  corrigió y se confirmó con evidencia directa.
+- Con la fuente y el corpus definidos, falta confirmar algo más básico: que
+  el problema **es real y no supuesto**. Eso lo corroboramos con una
+  encuesta propia, no con intuición.
 - Pendiente para más adelante (no ocupa slide propia, pero puede salir en
   preguntas): reconciliar las cadenas de supermercado contra las promos
   reales de MODO, probar el lector de tickets, auto-registro de una semana y
   una segunda ronda de encuesta. Está todo en `docs/product/pendientes.md`.
-- Pase: “Con el alcance y la fuente definidos, Santiago cuenta a quién le
-  apuntamos y cómo validamos el problema.”
+- Pase: “Con el alcance y la fuente definidos, Santiago cuenta cómo
+  validamos con datos que el problema existe, empezando por a quién le
+  apuntamos.”
 
 ---
 
@@ -151,7 +156,7 @@ resumida) y slide 16 (automatización, es un repaso).
 
 ---
 
-## Jesús — Roles y Scrum (slides 9-10, ~2 min 15 s)
+## Jesús — Roles, Scrum y roadmap (slides 9-11, ~3 min 5 s)
 
 **Slide 9 · Roles** (con legajo de cada uno)
 - **Product Owner:** Joaquín Nuñez (legajo 1224134). Custodia la regla de
@@ -172,16 +177,35 @@ conexión, con la pestaña abierta de antemano)
 - Trabajamos en **sprints de 2 semanas** con demo en Expo Go al final. Las
   fechas están **a confirmar** con el cronograma real de la cátedra.
 - **Definition of Done:** tests Vitest del motor, RLS en cada tabla, ningún
-  secreto en el cliente y la sesión de IA registrada en la bitácora.
-- Pase: “Todo esto queda documentado en el repo; Agustín lo muestra.”
+  secreto en el cliente, ninguna promoción publicada sin pasar la validación
+  automática de esquema, y la sesión de IA registrada en la bitácora.
+- Pase: “Y así van cayendo las 8 épicas en el tiempo — el roadmap completo,
+  a continuación.”
+
+**Slide 11 · Roadmap: cómo caen las épicas**
+- Las 8 épicas se agrupan en las **3 entregas de la cátedra**: Entrega
+  parcial 1, Entrega parcial 2 y Pitch y documentación final — mismos hitos
+  que ya usa GitHub Projects como milestones.
+- **Entrega parcial 1:** Research y validación del problema, Alcance y
+  corpus de promociones, Gestión ágil y documentación (ya cerrada), y
+  Plataforma/secretos/CI-CD.
+- **Entrega parcial 2:** Motor de reglas determinístico y App Expo — todavía
+  en backlog, sin issues abiertos, se planifican después.
+- **Pitch y documentación final:** Registro por ticket y control de topes
+  (backlog) y Privacidad y cumplimiento — esta ya está resuelta, adelantada
+  desde la primera entrega.
+- Las fechas de cada entrega siguen **a confirmar** con la cátedra; el orden
+  de las épicas sí está fijado.
+- Pase: “Con roles, tablero y roadmap documentados, Agustín muestra cómo
+  está organizado el repo.”
 
 ---
 
-## Agustín — Repo, decisiones, arquitectura e IA en el producto (slides 11-14, ~4 min)
+## Agustín — Repo, decisiones, arquitectura e IA en el producto (slides 12-15, ~4 min)
 
 Abrir el repo en GitHub (no en el editor), con zoom del navegador al 125-150%.
 
-**Slide 11 · Repo con documentación**
+**Slide 12 · Repo con documentación**
 - Todo el proyecto vive en el repo: **`CLAUDE.md`** con las reglas para
   cualquier IA, y `docs/` dividido en producto, arquitectura y decisiones.
 - **`docs/product/`:** problema, alcance, requisitos, roles, privacidad y los
@@ -190,7 +214,7 @@ Abrir el repo en GitHub (no en el editor), con zoom del navegador al 125-150%.
 - En números: **34 requisitos** (20 funcionales y 14 no funcionales), 7 ADRs.
 - Todavía **no hay código**: es etapa de definición, a propósito.
 
-**Slide 12 · Decisiones técnicas (ADRs)**
+**Slide 13 · Decisiones técnicas (ADRs)**
 - Siete ADRs, cada uno con contexto, decisión, razonamiento y consecuencias.
 - Los más importantes:
   - **ADR-001:** el motor de reglas es un paquete propio que corre en el
@@ -200,82 +224,101 @@ Abrir el repo en GitHub (no en el editor), con zoom del navegador al 125-150%.
     Auth sin pedir tarjeta).
   - **ADR-004:** el LLM vive solo en la ingesta, para que el motor sea
     determinístico.
-  - **ADR-005:** ninguna promo se publica sin revisión humana.
+  - **ADR-005:** la ingesta de promos es **100% automática, sin revisión
+    humana** — se publica sola si completa el esquema; si no, se descarta
+    sola.
 
-**Slide 13 · Arquitectura: cómo se conectan las piezas**
+**Slide 14 · Arquitectura: cómo se conectan las piezas**
 - Diagrama de 4 piezas: **API de MODO** (la fuente), **Supabase** (Postgres +
   Auth + Edge Function del ticket, con RLS), **Gemini** (el extractor, nunca
   en el cliente) y **App Expo** (el dispositivo, con el motor de reglas
   adentro).
 - El camino principal (resaltado) es MODO → Supabase → App Expo: la promo
-  entra, se valida, y llega al motor. Gemini es la rama que hace la
-  extracción.
+  entra, se valida contra el esquema, y llega al motor. Gemini es la rama
+  que hace la extracción.
 - El motor de reglas es el único paso que corre en el dispositivo:
   recomendación instantánea, sin red.
 
-**Slide 14 · IA en el producto** (la más importante del bloque)
+**Slide 15 · IA en el producto** (la más importante del bloque)
 - El LLM **extrae datos, nunca decide**.
 - **Ingesta de promos:** Gemini convierte cada promo en un borrador
-  estructurado (campo ausente = `null`). Una persona revisa antes de
-  publicar.
+  estructurado (campo ausente = `null`). Se publica sola si completa el
+  esquema; si falta un campo obligatorio, se descarta sola — sin revisión
+  humana (ADR-005).
 - **Ticket:** Edge Function que lee el ticket. La imagen se descarta y el
-  usuario confirma.
+  usuario confirma — ese sí es un paso con una persona, pero es el propio
+  usuario revisando su propia compra, no una cola interna.
 - El **motor de reglas** es TypeScript determinístico, sin LLM en el camino.
 - Pase: “Y para construir todo esto usamos IA. Joaquín cuenta cómo.”
 
 ---
 
-## Joaquín — IA, modelo de negocio, marca y cierre (slides 15-20, ~5 min 15 s)
+## Joaquín — IA, modelo de negocio, marca y cierre (slides 16-21, ~5 min 20 s)
 
-**Slide 15 · IA para construir**
+**Slide 16 · IA para construir**
 - Usamos Claude Code de punta a punta, **con una persona decidiendo**.
 - Línea de tiempo: retro-documentación del repo (01/09), alcance del MVP y CI
   (19/09), requisitos y roles (19/09), privacidad y declaración de IA
   (19/09), relevamiento de fuentes y reducción del alcance a MODO (21/09).
-- Al pie está el ciclo de desarrollo definido: specify, spec-critic, plan,
-  tasks, implement, code-review y test-runner.
+- Al pie está el ciclo de desarrollo definido, en 7 pasos — vale explicar qué
+  hace cada uno:
+  - **specify:** convierte una feature en una spec formal, con criterios de
+    aceptación verificables.
+  - **spec-critic:** agente que ataca esa spec buscando ambigüedad y casos
+    borde antes de escribir una línea de código.
+  - **plan:** decide el diseño técnico y qué archivos toca.
+  - **tasks:** baja el plan a tareas concretas, ordenadas por dependencia.
+  - **implement:** ejecuta esas tareas y escribe el código.
+  - **code-review:** agente que revisa el diff contra los estándares del
+    repo y contra la spec original.
+  - **test-runner:** corre tests, typecheck y lint, y reporta solo lo que
+    falló.
 
-**Slide 16 · Automatización y límites**
+**Slide 17 · Automatización de nuestro propio trabajo**
 - Automatizamos todo lo posible en cómo trabajamos: CI en cada PR, cuatro
-  agentes de revisión, spec-kit para specs y tareas, y una bitácora con hook
-  que avisa si falta actualizarla.
-- Los límites: sin LLM en el motor de reglas, la API key de Gemini nunca va al
-  celular y las imágenes de ticket no se guardan.
+  agentes de revisión (test-runner, spec-critic, rules-guardian, debugger),
+  spec-kit para specs y tareas, y una bitácora con hook que avisa si falta
+  actualizarla.
+- Los límites técnicos del producto en sí ya los contó Agustín (ADR-004,
+  ADR-005): sin LLM en el motor, ingesta automática sin revisión humana. Acá
+  el foco es el proceso propio del equipo, no repetir eso.
 
-**Slide 17 · Modelo de negocio y crecimiento**
-- **Hoy:** usuario final gratis, el costo principal es mantener el corpus
-  (revisión humana), no infraestructura.
+**Slide 18 · Modelo de negocio y crecimiento**
+- **Hoy:** usuario final gratis. Como la ingesta es 100% automática (sin
+  cola de revisión humana), el costo principal no es mantenimiento de esa
+  cola — es infraestructura y, a medida que crece, negociar acuerdos.
 - Arrancamos por MODO porque es la única fuente sin restricción de scraping
   **ni de redistribución** de sus promos — Mercado Pago lo prohíbe explícito,
   y Galicia/BBVA restringen redistribuir o comercializar su contenido.
 - **Cómo crece:** pedir **permiso explícito** a los bancos más populares de
   Argentina para consumir y mostrar sus promos. Cada banco sumado es más
   cobertura y una relación comercial formal, no una dependencia legal frágil.
-- **Ingresos potenciales:** afiliación, destaque de comercios adheridos,
-  reportes agregados y anonimizados.
+- **Ingresos potenciales:** afiliación con billeteras/comercios; **destaque
+  de comercios adheridos** — un comercio que ya es una opción válida para el
+  usuario puede pagar por aparecer resaltado, nunca se recomienda un medio
+  peor para forzarlo; y reportes agregados y anonimizados de consumo.
 
-**Slide 18 · Líneas futuras**
+**Slide 19 · Líneas futuras**
 - **Resto del cuatrimestre:** diseño de la app en Expo, Supabase y secrets,
-  reconciliar cadenas de supermercado, testear el lector de tickets,
-  auto-registro de una semana y una segunda ronda de encuesta.
+  **implementar el gasto en grupo nivel 0** (ya es parte del MVP, no de más
+  adelante), reconciliar cadenas de supermercado, testear el lector de
+  tickets, auto-registro de una semana y una segunda ronda de encuesta.
 - **Después del MVP:** sumar bancos con permiso explícito, cobertura fuera de
-  CABA/AMBA, gasto en grupo más allá del nivel 0, disparo proactivo por
-  notificación o geolocalización.
+  CABA/AMBA, gasto en grupo más allá del nivel 0 (cuentas y topes reales del
+  grupo), disparo proactivo por notificación o geolocalización.
 
-**Slide 19 · Marca**
+**Slide 20 · Marca**
 - Nombre y logo **tentativos** — todavía falta verificar dominio y marca en
   el INPI.
 - La paleta oficial: Verde Bosque, Verde Salvia, Blanco Hueso, Dorado
   Champán y Gris Neutro — la misma que usamos en toda esta presentación.
 - No hace falta detenerse mucho: mostrar y seguir.
 
-**Slide 20 · Cierre**
+**Slide 21 · Cierre**
 - **Hecho:** alcance acotado a MODO con research real, stakeholders
-  definidos, encuesta con análisis, requisitos, roles y tablero, repo
-  documentado, modelo de negocio, y bitácora y declaración de IA.
+  definidos, encuesta con análisis, requisitos, roles, tablero y roadmap,
+  repo documentado, modelo de negocio, y bitácora y declaración de IA.
 - **Sigue:** lo mismo de la slide de líneas futuras, resumido en una línea.
-- A resolver con la cátedra: el cronograma real de sprints y el tamaño del
-  equipo (somos 4 y la materia pide de 6 a 8).
 - Frase final: “Problema validado, alcance concreto, equipo organizado e IA
   con límites claros. Gracias, ¿preguntas?”
 
@@ -306,11 +349,11 @@ Abrir el repo en GitHub (no en el editor), con zoom del navegador al 125-150%.
 - **¿Por qué el LLM no recomienda el medio de pago?** Rompería el
   determinismo y los tests. El LLM solo extrae datos, y la recomendación sale
   de código verificable.
-- **¿Por qué no publican las promos automáticamente?** Un error de
-  jurisdicción o de tope le arruina la compra al usuario, y el modelo falla en
-  silencio, con confianza. Por eso la extracción es automática pero una
-  persona aprueba en una bandeja: cada campo viene con su cita de la fuente,
-  así que revisar es rápido (ADR-005).
+- **¿No es arriesgado publicar promos sin que nadie las revise?** El riesgo
+  se acepta y se mitiga distinto: con el esquema forzado (un campo
+  obligatorio ausente bloquea la publicación de esa promo) y midiendo la
+  precisión del extractor por campo. Una cola de revisión humana permanente
+  no escala con 4 personas ni con el volumen del corpus (ADR-005).
 - **¿Qué pasa con las fotos de tickets?** No se guardan: se mandan a Gemini y
   se descartan. Solo se persiste el texto extraído, y el usuario confirma.
 - **¿Por qué Expo y no Flutter?** Expo Go permite probar en el celular con un

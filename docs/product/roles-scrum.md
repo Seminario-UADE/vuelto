@@ -21,9 +21,7 @@ queda como `<a confirmar>`.
 - Prioriza el backlog y decide el orden de las épicas.
 - Acepta o rechaza cada historia contra los criterios de `requisitos.md`.
 - Es quien decide el alcance ante los pendientes de `pendientes.md` (rubros,
-  billeteras, umbral de revisión).
-- Aprueba, corrige o rechaza en la cola de revisión de la ingesta (ADR-005).
-  Si no puede hacerlo, delega por escrito en otra persona del equipo.
+  billeteras, umbral de validación automática de la ingesta).
 
 ### Development Team — Front, Back y Research
 
@@ -75,7 +73,8 @@ Una historia está terminada si cumple los criterios de aceptación y además:
 - La lógica del motor de reglas tiene tests Vitest que pasan.
 - Ningún camino de código llama a un LLM desde el motor (ADR-004).
 - Toda tabla nueva incluye sus policies de row-level security.
-- Nada de promoción se publica sin revisión humana.
+- Ninguna promoción se publica si no pasó la validación automática de
+  esquema (sin cola de revisión humana).
 - Los topes se muestran como estimados, con su base.
 - Ningún secreto (Gemini, service role key) está en el cliente ni en el repo.
 - Si el cambio toca datos de usuario (perfil, tickets, compras), es

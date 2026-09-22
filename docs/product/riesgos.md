@@ -1,9 +1,12 @@
 # Riesgos
 
 - Obtención/mantenimiento del corpus (80% del esfuerzo) — mitigado por
-  ingesta asistida + revisión.
-- Extracción incorrecta de letra chica o ticket — mitigada por revisión
-  humana, no eliminada.
+  ingesta 100% automática (sin revisión humana), validada contra esquema.
+- Extracción incorrecta de letra chica de promo — sin revisión humana, se
+  mitiga con la validación de esquema (campos obligatorios) y midiendo la
+  precisión del extractor por campo (RNF-09), no se elimina.
+- Extracción incorrecta de ticket — mitigada por la confirmación del propio
+  usuario, no eliminada.
 - Fragilidad de fuentes: un rediseño de sitio rompe el scraper en
   silencio — necesita chequeo de salud.
 - Deriva hacia "preguntarle al modelo" en vez de usar el motor de reglas —

@@ -59,8 +59,8 @@ falta de información, es la decisión."
 - Se enteran de las promos por canales dispersos y no confiables: redes
   sociales de bancos/billeteras (41.2%), carteles en el local (31.4%),
   notificaciones push (27.5%) (Q5, multi-respuesta). Refuerza el problema
-  de letra chica difícil de seguir que motiva `logica-de-negocio.md` y el
-  circuito de ingesta con revisión humana (`decisions/005-*.md`).
+  de letra chica difícil de seguir que motiva `logica-de-negocio.md` y la
+  ingesta automática contra esquema (`decisions/005-*.md`).
 
 ### 3. Lo que piden valida la propuesta de valor, no un buscador de promos
 

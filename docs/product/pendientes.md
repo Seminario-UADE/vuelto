@@ -1,7 +1,7 @@
 # Pendientes
 
 - [ ] Confirmar con la cátedra que el problema no cae en exclusiones
-- [ ] Resolver tamaño del equipo (5 vs. 6-8 requeridos)
+- [ ] Resolver tamaño del equipo (4 vs. 6-8 requeridos)
 - [ ] Nombre final + dominio + marca
 - [x] Rubros y billeteras/cadenas concretas del alcance — ver
       `alcance-mvp.md`
@@ -9,7 +9,8 @@
 - [ ] Auto-registro de una semana (cifra en pesos ahorrada)
 - [x] Relevar fuentes: HTML vs. SPA/JSON, términos de uso, robots.txt — ver
       `fuentes-promos.md`
-- [ ] Umbral de revisión de la ingesta asistida
+- [ ] Umbral de validación automática de la ingesta (qué campos son
+      obligatorios para publicar sin persona)
 - [ ] Experimento de precisión del extractor (entregable de research)
 - [ ] Proveedor/modelo del extractor, con salida estructurada
 - [ ] Dónde corre el cron de ingesta
