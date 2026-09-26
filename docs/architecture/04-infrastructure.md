@@ -39,7 +39,7 @@ detecta y no falla: queda en verde con un aviso hasta que haya código.
 | 3. Guardado | Supabase `capturas_crudas` | Contenido crudo, con service role key |
 | 4. Extracción | Gemini | El crudo se manda con el esquema estructurado |
 | 5. Verificación | El propio script | Chequeo de salud: fuente en cero o contenido irreconocible se marca y avisa |
-| 6. Revisión | Panel de la app, una persona | El borrador espera en cola hasta aprobación |
+| 6. Publicación | El propio script | Si la promo completa los campos obligatorios del esquema se publica en la base validada; si no, se descarta sola (sin revisión humana, ADR-005) |
 
 El paso 5 no es opcional: sin chequeo de salud, un rediseño de página o un
 bloqueo de WAF degrada el corpus en silencio.
