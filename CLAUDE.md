@@ -84,6 +84,8 @@ que es el default de las skills). Ver `docs/agents/domain.md`.
 ### Specs
 
 Las specs de feature se generan con spec-kit (`/speckit-specify →
-spec-critic → /speckit-plan → /speckit-tasks → /implement → /code-review →
+spec-critic → /speckit-plan → /speckit-tasks → /speckit-implement → /code-review →
 test-runner`), no con la skill `to-spec`. Ver
-`docs/decisions/007-speckit-sobre-to-spec.md`.
+`docs/decisions/007-speckit-sobre-to-spec.md`. Issues XS/S se implementan
+sin spec-kit. Principios no negociables para el chequeo de `/speckit-plan`:
+`.specify/memory/constitution.md`.

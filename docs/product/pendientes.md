@@ -25,10 +25,10 @@
       `.specify/templates/overrides/` (ver Paso 5 del runbook de
       `docs/bitacora-prompts.md`). El PDF de la cátedra no está en el repo;
       falta el texto de esa sección o el archivo.
-- [ ] `/speckit-implement` (de spec-kit) se solapa con la skill `implement`
-      (mattpocock) que ya está en el ciclo — mismo tipo de ambigüedad que se
-      resolvió en `docs/decisions/007-speckit-sobre-to-spec.md`, todavía sin
-      decidir cuál de las dos usar.
+- [x] `/speckit-implement` (de spec-kit) se solapa con la skill `implement`
+      (mattpocock) — resuelto: se usa `/speckit-implement` (la skill
+      `implement` no está instalada en el proyecto). Ciclo completo en
+      `.specify/memory/constitution.md` §Flujo de trabajo.
 - [x] Verificar si las páginas de bancos/billeteras que se van a scrapear
       para supermercado listan también restaurantes y/o combustible en la
       misma página/estructura (comentario de Joaconz en PR #13) — confirmado

@@ -40,7 +40,8 @@ Sí se persiste el texto extraído, junto al registro.
 
 Contenido crudo de cada captura de Playwright, con la service role key.
 Es la materia prima que Gemini procesa en la etapa de extracción. Se
-persiste junto con la extracción y quién aprobó, para trazabilidad.
+persiste junto con la extracción y el fragmento fuente de cada campo, para
+trazabilidad (no hay aprobación humana, ADR-005).
 
 ## Perfil de usuario (contexto §4.1)
 

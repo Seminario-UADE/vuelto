@@ -281,6 +281,35 @@ para la estructura final.
 
 ---
 
+## 2026-09-26 — Backlog de implementación, sprints y constitución de spec-kit
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` y la skill `speckit-constitution`.
+
+**Objetivo:** pasar de research a implementación con la agenda de la cátedra
+(Sprint Review 1 el 13/10, 2da entrega el 27/10, documentación final el
+10/11) y tener una V1 funcionando en dos semanas.
+
+**Prompts principales:**
+1. Buscar los issues de GitHub y proponer cómo dividir y asignar el trabajo
+   entre los 4 integrantes.
+2. Cruzar el cronograma de la cátedra (captura) contra lo que ya está hecho
+   en el repo.
+3. Crear las historias de usuario como issues para implementar con IA (con
+   spec-kit donde haga falta), repartirlas en sprints para tener la V1 en
+   dos semanas y ordenarlas por épica y dificultad.
+
+**Resultado:** 26 issues nuevas (#31–#56) escritas como historias de usuario
+o habilitadores, cada una con criterios de aceptación, dependencias nativas
+de GitHub, sub-issue de su épica, label de MoSCoW y de área, milestone de
+sprint (`Sprint 1 · V1`, `Sprint 2 · Ticket e ingesta`, `Sprint 3 · Cierre`)
+y `Size` en el tablero. Las issues #5, #9 y #10 se integraron al plan.
+Constitución de spec-kit completada (`.specify/memory/constitution.md`), para
+que el chequeo de `/speckit-plan` haga cumplir las reglas de `CLAUDE.md`.
+Se corrigieron dos docs de arquitectura que todavía describían la revisión
+humana que ADR-005 había eliminado.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
