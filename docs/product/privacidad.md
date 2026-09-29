@@ -1,8 +1,10 @@
 # Privacidad y retención de datos
 
 Resuelve el pendiente de retención de imágenes de ticket dejado abierto en
-ADR-006 y desbloquea RNF-06 (`requisitos.md`). Cubre el MVP del Seminario:
-datos reales de usuarios de prueba, no un entorno de producción comercial.
+ADR-006 y desbloquea RNF-06 (`requisitos.md`), y fija la política de
+retención del registro de compras (`pendientes.md`). Cubre el MVP del
+Seminario: datos reales de usuarios de prueba, no un entorno de producción
+comercial.
 
 ## Qué datos se recopilan
 
@@ -11,8 +13,8 @@ datos reales de usuarios de prueba, no un entorno de producción comercial.
 | Medios de pago declarados (billeteras, bancos, tarjetas) | Perfil (RF-01) | Sí |
 | Comercios habituales | Perfil (RF-02) | Sí, opcional |
 | Imagen del ticket | Cámara del usuario | **No** |
-| Texto extraído del ticket: monto, comercio, medio de pago, promoción aplicada, descuento obtenido, reintegro esperado, fecha estimada de acreditación, origen del registro (`ticket` / `excepción` / `manual`) | Extractor (ADR-006), `01-data-models.md` §Compra | Sí, junto al registro de compra |
-| Registro de compra confirmado | Confirmación del usuario (RF-09) | Sí |
+| Texto extraído del ticket: monto, comercio, medio de pago, promoción aplicada, descuento obtenido, reintegro esperado, fecha estimada de acreditación, origen del registro (`ticket` / `excepción` / `manual`) | Extractor (ADR-006), `01-data-models.md` §Compra | Sí, 90 días (ver abajo) |
+| Registro de compra confirmado | Confirmación del usuario (RF-09) | Sí, 90 días (ver abajo) |
 
 ## Imágenes de ticket: retención durante el procesamiento
 
@@ -27,10 +29,21 @@ usuario vuelve a fotografiar el ticket.
 
 ## Qué se persiste y por cuánto tiempo
 
-- **Texto extraído del ticket**: se guarda junto al registro de compra
-  mientras la cuenta exista, porque es la base de los topes estimados
-  (ADR-006, RF-07) — sin este historial no se puede mostrar de dónde sale
-  un "≈$18.000". Se borra si el usuario borra su cuenta.
+- **Registro de compra** (texto extraído del ticket + el resto de los
+  campos de `Compra`): se retiene en Supabase **90 días desde la fecha de
+  la compra**, porque es la base de los topes estimados (ADR-006, RF-07) —
+  sin este historial no se puede mostrar de dónde sale un "≈$18.000".
+  Pasados los 90 días, el registro se elimina.
+  - El **borrado automático queda fuera de alcance del MVP**: es una
+    política declarada, no un proceso corriendo — no hay job de limpieza
+    implementado.
+  - Conservar el historial más allá de 90 días es una funcionalidad de una
+    **versión paga** (fuera de alcance del MVP, mencionada en el pitch como
+    camino de crecimiento) que retiene las capturas para siempre.
+  - Esto es independiente de cuánto historial sincroniza el celular para
+    calcular: el motor solo necesita la ventana del mes en curso (≤31 días,
+    issue #42); los 90 días son la política de retención del lado del
+    servidor, no lo que se descarga al dispositivo.
 - **Perfil** (medios de pago, comercios): se guarda mientras la cuenta
   exista.
 - **Aislamiento entre usuarios**: cada tabla lleva row-level security desde
