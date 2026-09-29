@@ -15,7 +15,12 @@
 - [ ] Proveedor/modelo del extractor, con salida estructurada
 - [ ] Dónde corre el cron de ingesta
 - [ ] Expo vs. Flutter formalmente (nivel real del equipo en TS/Dart)
-- [ ] Estrategia de sincronización del corpus al dispositivo
+- [x] Estrategia de sincronización del corpus al dispositivo — ver issue #42:
+      descarga completa de promociones vigentes (no incremental) + últimos 30
+      días de compras del usuario, cacheado local (expo-sqlite/AsyncStorage).
+      30 días en vez de "mes calendario" para cubrir semanas que cruzan el 1º
+      del mes sin quedarse corto; el motor (#37/#38) recorta después la
+      sub-ventana exacta (mes calendario o semana lun-dom) sobre ese set.
 - [ ] Probar el extractor contra 15-20 tickets reales
 - [x] Política de retención de imágenes de ticket — ver `privacidad.md`
 - [ ] Gasto en grupo: promoción de débito, redondeo de la división
