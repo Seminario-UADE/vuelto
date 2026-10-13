@@ -1,7 +1,7 @@
-# Specification Quality Checklist: Perfil — declarar billeteras y bancos
+# Specification Quality Checklist: Perfil — declarar bancos, tarjetas y redes (MODO)
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-09-19
+**Created**: 2026-10-13
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -31,7 +31,25 @@
 
 ## Notes
 
-- Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`.
-- Feature de prueba, creada solo para comparar el formato de salida de spec-kit contra
-  el de la cátedra (Paso 5 del runbook de configuración agéntica) — no avanza a
-  `/speckit-plan` todavía.
+- **Primera pasada (generación inicial)**: todo marcado en verde sin que nadie lo revisara
+  de verdad — el propio flujo de `/speckit-specify` se autoaprueba. No confiar en esta
+  sección sin pasar `spec-critic` primero.
+- **Segunda pasada (`spec-critic`, 2026-10-13)**: encontró 3 bloqueantes y 7 hallazgos
+  altos reales. Todos corregidos en `spec.md`:
+  - Clave de join del banco sin definir (ahora: `id` del catálogo, con tratamiento de
+    referencia obsoleta documentado).
+  - Cardinalidad banco×tipo×red contradictoria (ahora: tripleta única por usuario,
+    con escenario explícito de duplicado permitido vs. rechazado).
+  - Redes sin emisor catalogable (`confiable`, `tarjeta_sol`) — verificado contra la
+    API real de MODO el 2026-10-13: no tienen banco homónimo en el catálogo de 82.
+    Se documentó como limitación conocida del MVP, con su propio acceptance scenario.
+  - Más: semántica de búsqueda (FR-001/FR-002), estado transitorio de "banco sin
+    tarjeta" (FR-006), edición offline y atomicidad del guardado (FR-010/FR-011),
+    aislamiento por usuario (FR-013), mapeo valor↔etiqueta de redes (Key Entities),
+    Success Criteria reescritos para ser verificables sin depender de features que
+    no existen todavía (recomendación, motor).
+  - Hallazgos A4 y A5 del spec-critic (términos "billetera" en `requisitos.md` /
+    `01-data-models.md`, y el conteo "~28 bancos" en `docs/product/fuentes-promos.md`)
+    **no se tocaron en esta spec** — son correcciones de otros documentos, fuera del
+    alcance de esta sesión (solo spec de #41). Pendiente como follow-up de una
+    próxima sesión de docs.
