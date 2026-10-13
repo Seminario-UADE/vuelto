@@ -22,9 +22,29 @@ Declaración end-to-end de dónde se usa IA en el proyecto: `docs/uso-de-ia.md`.
 
 ## Estado
 
-Etapa de definición del problema / research. **No hay código todavía.**
-Cuando se inicialicen los paquetes, actualizar este archivo con comandos
-reales de dev/build/test.
+Monorepo con npm workspaces inicializado (issue #32). Requiere Node ≥ 22.13
+(versión fijada en `.nvmrc`; ESLint 10 y Vitest 5 no soportan Node 20).
+
+| Workspace | Contenido |
+|---|---|
+| `packages/motor` (`@vuelto/motor`) | Motor de reglas: TS puro, sin `dependencies`, tests Vitest |
+| `apps/mobile` | Reservado — la app Expo la crea la issue #39 |
+| `supabase` | Reservado — migraciones, seed, Edge Functions |
+| `ingesta` | Reservado — script de ingesta de MODO |
+
+Comandos (desde la raíz; recorren todos los workspaces, los mismos que corre el CI):
+
+```bash
+npm ci              # instalar dependencias
+npm run lint        # ESLint (config en eslint.config.js)
+npm run typecheck   # tsc --noEmit (strict, tsconfig.base.json)
+npm run test        # Vitest
+npm run build       # compilación TS a dist/ (no es build de Expo/EAS)
+```
+
+Un solo workspace: `npm run test -w @vuelto/motor`. Tests en modo watch:
+`npx vitest` dentro de `packages/motor`. Un workspace nuevo se suma a
+`workspaces` del `package.json` raíz y define los scripts que le apliquen.
 
 ## Stack decidido (costo $0 durante el cuatrimestre)
 

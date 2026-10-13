@@ -310,6 +310,52 @@ humana que ADR-005 había eliminado.
 
 ---
 
+## 2026-10-13 — Monorepo con npm workspaces y CI en verde (issue #32)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` y los subagentes
+`test-runner` y `code-review` (ejes Standards y Spec en paralelo).
+
+**Objetivo:** implementar la issue #32 (que también cierra la #5). Es una
+issue S, así que fue sin spec-kit: estructura del monorepo, configuración
+compartida de TypeScript y ESLint, esqueleto de `@vuelto/motor` y CI
+funcionando con código real.
+
+**Prompts principales:**
+1. "Vamos a resolver la issue #32 [...] Es una issue S: va SIN spec-kit."
+   Venía con las reglas que no se negocian: el motor no tiene
+   `dependencies`, `strict: true`, solo se reservan los cuatro workspaces y
+   no se suman dependencias que ningún criterio justifique.
+2. Pipeline pedido: implementar, actualizar `CLAUDE.md` §Estado, pasar por
+   `test-runner` (y `debugger` si algo fallaba), `/code-review`, bitácora,
+   commit y un punto de control antes del push y el PR.
+
+**Resultado:**
+- Se creó el `package.json` raíz con los workspaces `packages/motor`,
+  `apps/mobile`, `supabase` e `ingesta`. Los scripts `lint`, `typecheck`,
+  `test` y `build` recorren todos los workspaces con
+  `--workspaces --if-present`.
+- `tsconfig.base.json` usa `strict` y `noUncheckedIndexedAccess`. ESLint 10
+  quedó con flat config y `typescript-eslint` en la raíz.
+- Se creó `packages/motor` (`@vuelto/motor`). Sus únicas devDependencies son
+  `typescript` y `vitest`, y tiene un `src/index.ts` y un test trivial. Los
+  otros tres workspaces son solo un `package.json` mínimo; la app Expo
+  queda para la #39.
+- Vitest 5 y ESLint 10 no soportan Node 20, que además está fuera de
+  soporte, así que el CI pasó a Node 22. La versión se fija en `.nvmrc` y
+  `engines` pide `>=22.13`. TypeScript quedó alineado en 6.0.3 en la raíz y
+  en el motor, porque `typescript-eslint` todavía no acepta la 7.
+- La revisión de código encontró los jobs `check-project` y `no-code-yet`,
+  que ya eran código muerto, y se borraron del CI. También corrigió la
+  versión mínima de Node, que había quedado en 22.12 y ESLint pide 22.13.
+  Quedó anotado como pendiente que el `dist` del motor no va a cargar en
+  Node ESM ni en Deno cuando tenga imports relativos internos.
+- Se actualizaron `CLAUDE.md` §Estado (con los comandos reales),
+  `docs/product/estado.md` y `docs/architecture/04-infrastructure.md` §CI.
+- `npm ci && npm run lint && npm run typecheck && npm run test && npm run build`
+  pasa en local.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
