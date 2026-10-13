@@ -26,9 +26,10 @@ Costo total durante el cuatrimestre: **$0**.
 TS, no build de Expo/EAS) en cada push/PR a `main`, con los mismos comandos
 que usa el subagente `test-runner` (`npm run lint|typecheck|test|build`). No
 tiene relación con el cron de ingesta de abajo — comparten runner
-(GitHub Actions) pero no credenciales ni objetivo. Mientras no exista
-`package.json` en la raíz (ver `../product/estado.md`), el workflow lo
-detecta y no falla: queda en verde con un aviso hasta que haya código.
+(GitHub Actions) pero no credenciales ni objetivo. La versión de Node sale
+de `.nvmrc` (22; ESLint 10 y Vitest 5 exigen ≥ 22.13). Hasta la issue #32 el
+workflow tenía un job `no-code-yet` que lo mantenía en verde sin
+`package.json`; se eliminó al crear el monorepo.
 
 ## Pipeline de ingesta
 
