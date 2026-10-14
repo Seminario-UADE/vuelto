@@ -97,7 +97,7 @@ prioridad del MVP.
 | ID | Requisito | Criterio de aceptación verificable | Fuente |
 |---|---|---|---|
 | RNF-01 | **Determinismo.** El LLM nunca participa de la recomendación. | El paquete del motor no tiene dependencias ni importa ningún cliente de IA (revisable en `package.json` y en el código). | ADR-004, `CLAUDE.md` |
-| RNF-02 | **Motor autónomo.** Corre en el dispositivo, sin red. | Con el celular en modo avión, RF-03 devuelve resultado. | `00-overview.md` §1 |
+| RNF-02 | **Motor solo del lado del servidor.** `@vuelto/motor` no hace llamadas de red propias (es una función pura) y lo ejecuta exclusivamente la Edge Function — la app (Expo) no lo importa ni calcula nada localmente. | El código de `packages/motor` no importa ningún cliente HTTP/SDK de red; `apps/mobile/package.json` no tiene `@vuelto/motor` como dependencia (ambos revisables por búsqueda/imports). | `00-overview.md` §1, ADR-001 §Actualización |
 | RNF-03 | **Testeabilidad.** El motor tiene su propia suite. | `vitest run` pasa sin red ni servicios externos; cubre las dimensiones de RF-04. | ADR-001, ADR-004 |
 | RNF-04 | **Secretos.** La API key de Gemini nunca está en la app. | Búsqueda de la key en el bundle de la app: 0 resultados. Letra chica sale del script de ingesta; ticket, de una Edge Function. | `04-infrastructure.md`, `CLAUDE.md` |
 | RNF-05 | **Llave maestra.** La service role key solo la usa el proceso de ingesta. | No aparece en el cliente ni en el repo. | `04-infrastructure.md` |
