@@ -356,6 +356,65 @@ funcionando con código real.
 
 ---
 
+## 2026-10-13 — Mover el motor de recomendación al backend (issues #43, #45, #36, #19, #39, #42)
+
+**Herramienta:** Claude Code (Sonnet 5 / Opus 5), con `gh` CLI.
+
+**Objetivo:** corregir las historias de «¿Con qué pago?» y «Mis topes» para
+que el cálculo de la recomendación deje de correr en el dispositivo, y
+resolver en cascada las issues que quedaron desactualizadas con esa
+decisión.
+
+**Prompts principales:**
+1. Pedido de cambiar la pantalla «¿Con qué pago?» de recalcular en cada
+   dígito tipeado a un botón explícito que dispare el cálculo en el
+   backend, en vez de en vivo en el cliente.
+2. Señalamiento del conflicto de esa decisión con reglas ya documentadas
+   (ADR-001, RNF-02, "modo avión") antes de aplicar el cambio, y
+   confirmación explícita de seguir adelante aceptando el costo de perder
+   la garantía de funcionamiento offline para ese flujo.
+3. Corrección de una ambigüedad propia en la primera redacción ("el motor
+   lo puede ejecutar tanto el dispositivo como la Edge Function"), tras la
+   aclaración de que la app no debe tener ninguna lógica de cálculo, ni
+   siquiera como fallback — solo el backend.
+4. Pedido de revisar si alguna otra issue había quedado inconsistente con
+   el cambio (escaneo de los 56 issues abiertos por palabras clave), y
+   confirmación de que ninguna estaba ya resuelta antes de tocarlas.
+5. Decisión de qué hacer con la issue #42 (sincronizar el corpus al
+   dispositivo), que quedó sin objeto: cerrarla y recortar el PR que la
+   tocaba a solo la parte todavía válida.
+
+**Resultado:**
+- Issue #43 («¿Con qué pago?»): reescrita con el contrato de
+  `POST /functions/v1/recomendar` (Edge Function que llama a
+  `recomendar()` de `@vuelto/motor`), botón "Simular", manejo explícito de
+  sin conexión, y el criterio de que `apps/mobile` no tenga
+  `@vuelto/motor` como dependencia.
+- Issue #45 («Mis topes»): mismo patrón, con `GET /functions/v1/topes`; se
+  avisó a la persona asignada (jeqm0302) con un comentario, porque el
+  cambio le reescribe el enfoque de implementación.
+- ADR-001: sección "Actualización (13/10/2026)" documentando el cambio sin
+  reescribir el registro histórico original.
+- RNF-02 (`requisitos.md`): deja de exigir "funciona en modo avión"; pasa
+  a exigir que `@vuelto/motor` no tenga dependencias de red propias y que
+  la app no lo tenga como dependencia.
+- Issues #36, #19 (motor y su épica): se corrigió la frase "corre en el
+  celular" / "en el dispositivo y sin red", que había quedado
+  contradictoria con el cambio.
+- Issue #39 (app base): se sacó el criterio de aceptación que pedía
+  importar `@vuelto/motor` en una pantalla de prueba — ya no aplica.
+- Issue #42 cerrada: su objetivo completo ("recomendación sin señal")
+  quedó obsoleto. El PR #58, que originalmente corregía la ventana de
+  sincronización de esa issue, se recortó a solo la política de retención
+  de 90 días en `privacidad.md` (lo único que seguía siendo válido);
+  `pendientes.md` se actualizó para reflejar que la sincronización quedó
+  descartada, no resuelta.
+- PR #60 (dos commits — el segundo corrige la ambigüedad "dispositivo o
+  Edge Function"), y PR #58 recortado — ambos sin conflictos contra
+  `main`.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
