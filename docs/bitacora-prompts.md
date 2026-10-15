@@ -415,6 +415,59 @@ decisión.
 
 ---
 
+## 2026-10-15 — Auditoría UX del mockup de Stitch y design system
+
+**Herramienta:** Claude Code (Opus 5.5), con el MCP de Google Stitch y las
+skills `design:design-critique`, `design:accessibility-review`,
+`design:ux-copy` y `stitch-design-taste`.
+
+**Objetivo:** revisar el mockup de Stitch ("Remix of Vuelto App Mobile
+Design v2", 7 pantallas) contra los requisitos del producto, definir un
+design system propio y regenerar las pantallas sin perder lo que ya
+funcionaba.
+
+**Prompts principales:**
+1. Conectar el proyecto de Stitch y confirmar que se podían leer las 7
+   pantallas (screenshots + HTML).
+2. Instalar skills de diseño (`taste-skill`, `expo-native-ui`) y pedir una
+   recomendación de cuáles aplicar para mejorar la UX, incluyendo las ya
+   instaladas (`apple-design`, `emil-design-eng`, etc.).
+3. "Dale, arrancá con la auditoría" → después, "hagamos el design md de
+   stitch" y crear 7 pantallas nuevas sin modificar las originales.
+4. Objeción: las pantallas nuevas quedaron "demasiado vacías y sin
+   personalidad" respecto de las anteriores; pedido de justificarlo o
+   recuperar elementos de las originales.
+5. Pedido de revisar si tenían demasiado color y llevarlas a la paleta de
+   la marca.
+
+**Resultado:**
+- `docs/design/auditoria-stitch-v2.md`: auditoría con 8 choques contra
+  requisitos (topes sin "≈" ni base — RF-07; medio de pago preseleccionado
+  en el ticket — RF-10; "Tope ok" de otro integrante en grupo — RF-19;
+  Mercado Pago con topes aunque el MVP solo ingesta MODO; "estrategia
+  semanal" fuera de alcance; "OCR 98%"), contrastes medidos (el gris
+  secundario `#65786C` y el ámbar no llegaban a 4.5:1) y tabla de copy.
+- `docs/design/DESIGN.md`: design system con paleta accesible medida,
+  regla de topes estimados como componente, tab bar fija, glosario de
+  copy, set único de datos ficticios con cuentas verificadas y lista de
+  prohibiciones. Subido a Stitch como design system "Vuelto".
+- Pantallas en Stitch (las originales no se tocaron): v3 corrigió las
+  reglas pero quedó vacía — error de la IA, que aplicó como reglas del
+  producto lo que eran preferencias de estilo. v4 recuperó la personalidad
+  de las originales (tarjeta oscura, alcancía, cuenta regresiva, ticket
+  dibujado) y la versión sobria de v4 sacó los colores de marca de bancos
+  y comercios que había agregado la IA. El DESIGN.md quedó con las dos
+  lecciones: "calma no es vacío" y "el color comunica, no decora".
+- Skills instaladas a nivel proyecto: las 14 de `leonxlnx/taste-skill` y
+  `expo-native-ui` de `expo/skills` (`skills-lock.json`). Se recomendó
+  aplicar solo `redesign-existing-projects`, `stitch-design-taste` y, para
+  la etapa de código, `expo-native-ui`, `apple-design`, `animate-expo` y
+  `emil-design-eng`; el resto apunta a landings web.
+- La "estrategia semanal" quedó fuera del MVP por ahora, a pedido del
+  usuario.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
