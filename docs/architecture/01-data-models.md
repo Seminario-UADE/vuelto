@@ -51,8 +51,34 @@ Declarado manualmente, en tres capas de prioridad:
 2. **Comercios recurridos** (alta) — dónde compra habitualmente
 3. **Gustos y preferencias** (diferible, no entra al MVP)
 
-## Grupo (contexto §4.5 — nivel 0 del alcance)
+## Grupo (contexto §4.5 — nivel 1 del alcance, ADR-008)
 
-Integrantes con sus medios de pago declarados. No usa topes ajenos en el
-nivel 0. El motor evalúa la unión de medios del grupo en vez de los de una
-sola persona.
+Integrantes: contactos vinculados y, opcionalmente, personas sin cuenta
+declaradas a mano (nombre y medios de pago). El motor evalúa la unión de
+medios del grupo, cada uno con el tope de su dueño; un integrante sin cuenta
+no tiene tope conocido.
+
+## Invitación (`invitacion`)
+
+| Campo | Nota |
+|---|---|
+| Emisor | Usuario que generó el link/QR |
+| Hash del token | Nunca el token en claro |
+| Vence | 24 h desde la creación |
+| Usada | Fecha de aceptación, `null` si no se usó. Un solo uso |
+
+## Contacto (`contacto`)
+
+Vínculo simétrico entre dos cuentas (un par, sin duplicados ni
+auto-vínculo), con fecha de creación. Se borra si cualquiera de los dos lo
+quita o borra su cuenta. Las dos tablas llevan RLS en la misma migración
+que las crea: `contacto`, visible para sus dos integrantes; `invitacion`,
+solo para su emisor. Aceptar una invitación pasa por la función
+`security definer` `aceptar_invitacion(token)` (ADR-008 §4).
+
+Los datos de un contacto no se leen por RLS: la Edge Function del motor
+llama a una función `security definer` que verifica el vínculo con
+`auth.uid()` y devuelve solo nombre para mostrar, medios de pago, tope
+consumido agregado por promo y cantidad de compras (ver
+`../product/privacidad.md`). El perfil suma el campo **nombre para
+mostrar**, que elige el usuario.
