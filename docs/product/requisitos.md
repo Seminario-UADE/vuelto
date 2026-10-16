@@ -81,16 +81,24 @@ prioridad del MVP.
 - RF-17: simular una fuente vacía genera un aviso.
 - RF-18: la demo del pitch corre con el corpus sembrado, con la ingesta apagada.
 
-### Gasto en grupo (nivel 0)
+### Gasto en grupo (nivel 1)
 
 | ID | Requisito | Prior. | Fuente |
 |---|---|---|---|
-| RF-19 | Un grupo declara sus integrantes con sus medios de pago; el motor evalúa la unión de medios y recomienda quién paga. | C | `alcance-mvp.md` §Gasto en grupo, `01-data-models.md` §Grupo |
+| RF-19 | Un grupo se arma con contactos vinculados y, opcionalmente, integrantes sin cuenta declarados a mano; el motor evalúa la unión de medios del grupo, cada uno con el tope de su dueño, y recomienda quién paga y con qué medio. | C | ADR-008, `alcance-mvp.md` §Gasto en grupo, `01-data-models.md` §Grupo |
 | RF-20 | La división del gasto se genera sola a partir del resultado; nunca se carga a mano. | C | `alcance-mvp.md` §Gasto en grupo |
+| RF-21 | El usuario vincula contactos solo por invitación (link o QR desde su perfil) que el otro acepta explícitamente; no hay búsqueda de usuarios. | C | ADR-008 §1 |
+| RF-22 | Cualquiera de los dos puede quitar un contacto; el vínculo se rompe para ambos. | C | ADR-008 §2 |
 
 **Criterios de aceptación**
-- RF-19: el nivel 0 no usa topes de otros integrantes.
+- RF-19: con un contacto que tiene agotado el tope de la promo que más reintegra, el motor no lo recomienda para esa promo (test del motor).
+- RF-19: ninguna pantalla muestra el tope, la cantidad de compras ni las compras de un contacto; muestra qué medio del contacto conviene y el reintegro estimado de esa compra, con su base en palabras (Principio V). Un contacto sin compras registradas se informa como "sin base". Lo que el estimado deja inferir está advertido en la aceptación (ADR-008 §3).
+- RF-19: un integrante sin cuenta no tiene tope conocido y la recomendación lo indica.
+- RF-19: ante un empate gana quien pide la recomendación; entre los demás, el orden canónico por id. Mismo grupo, compra y estado dan siempre la misma recomendación.
+- RF-19: pedir datos de un id que no es contacto vinculado devuelve error, no datos.
 - RF-20: no existe pantalla de carga manual de gastos compartidos.
+- RF-21: la invitación es de un solo uso y vence a las 24 h. Abrir la propia, una vencida, una usada o la de alguien que ya es contacto no crea vínculo. Abrir el link sin aceptar no crea vínculo.
+- RF-22: después de quitar el contacto, la siguiente recomendación de cualquiera de los dos no puede incluir al otro.
 
 ## Requisitos no funcionales
 
@@ -124,6 +132,7 @@ No se dan por chequeados hasta resolver el pendiente que los frena
 | RF-16 | Umbral de validación automática de la ingesta (campos obligatorios) | `pendientes.md` |
 | RF-05 | Cómo se dispara el momento de uso (notificación / geolocalización) | `pendientes.md` |
 | RF-19, RF-20 | Promoción de débito y redondeo de la división | `pendientes.md` |
+| RF-19 | Constitución (Principio II) desactualizada: dice que el motor corre en el dispositivo; ADR-001 §Actualización y RNF-02 dicen que corre solo en la Edge Function. Bloquea el chequeo de `/speckit-plan` | — |
 | RNF-14 | Cronograma real del cuatrimestre y tamaño del equipo | `restricciones-catedra.md`, `estado.md` |
 
 ## Chequeo de coherencia (issue #3)
