@@ -16,8 +16,10 @@ la app (Expo) como el backend.
 
 ## Rationale
 
-- **Corre en el dispositivo.** Es una función pura sobre datos ya
-  sincronizados: no necesita servidor, no hay viaje de red.
+- ~~**Corre en el dispositivo.** Es una función pura sobre datos ya
+  sincronizados: no necesita servidor, no hay viaje de red.~~ *Superado por
+  la Actualización del 13/10/2026: el motor sigue siendo una función pura,
+  pero lo ejecuta solo la Edge Function.*
 - **Es testeable de verdad.** Sin base, sin red, sin interfaz — los casos
   límite corren en milisegundos con Vitest.
 - **Es lo que se muestra.** Separarlo como artefacto con tests propios lo
@@ -28,6 +30,8 @@ la app (Expo) como el backend.
 - El celular necesita el corpus de promociones sincronizado localmente:
   falta diseñar cuándo baja, qué pasa si queda desactualizado, cómo se
   detecta que una promo venció mientras el usuario estaba sin señal.
+  *Superado por la Actualización del 13/10/2026: la app ya no sincroniza
+  el corpus (la issue #42 se cerró por eso).*
 - El motor queda desacoplado del backend y de la UI — cualquier cambio en la
   lógica de reglas se valida con la suite del paquete, no con la app.
 
