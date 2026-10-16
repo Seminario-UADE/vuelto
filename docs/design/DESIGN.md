@@ -256,12 +256,36 @@ Compra de ejemplo: **Coto, miércoles, $24.500**.
 - Alternativas: Provincia Visa débito (hoy no aplica, la promo es los
   sábados); Santander Mastercard (sin promo en supermercados).
 
+Contactos de Martín (ADR-008, nivel 1): **Lucía** y **Mateo**, vinculados
+por invitación. **Sofía** no tiene cuenta: se declara a mano en cada grupo.
+
 Gasto en grupo: **Cena del sábado, $41.000, 4 personas** (Martín, Lucía,
 Mateo, Sofía).
-- Que pague Mateo con Provincia Visa débito → les devuelven ≈$5.000 (tope de
-  la promo) → cada uno pone ≈$9.000.
-- Aclaración visible: "Suponemos que Mateo no usó este tope esta semana."
-  (Nivel 0: no se consultan topes de otros integrantes.)
+- Que pague Mateo con su Provincia Visa débito → les devuelven ≈$5.000,
+  "según las compras que registró Mateo" → cada uno pone ≈$9.000.
+- Lucía: "≈$0 · no tiene promo de gastronomía hoy" (sin nombrar sus medios)
+  y "Lucía no tiene compras registradas: sin base".
+- Sofía: "Sin cuenta: no conocemos su tope".
+- Martín (vos): Santander Mastercard crédito, sin promo en gastronomía (los
+  medios propios sí se muestran).
+
+Invitación de ejemplo: la genera Martín; link `vuelto.app/i/…` + QR,
+"Vence en 24 h · sirve una sola vez".
+
+## 9b. Reglas de contactos y grupo (ADR-008)
+
+- De un contacto se muestra: nombre para mostrar, **solo el medio que se
+  recomienda usar**, el reintegro estimado de esta compra y la base **en
+  palabras** ("según las compras que registró Ana" / "Ana no tiene compras
+  registradas: sin base"). Nunca su tope, la cantidad de compras, sus
+  compras ni sus otros medios.
+- Integrante sin cuenta: se dice "no conocemos su tope".
+- La pantalla de aceptación dice quién invita, qué se comparte (tabla del
+  ADR) y lo que se puede inferir ("puede deducir cuánto reintegro te queda
+  en una promo a partir de la recomendación"). Dos botones: aceptar y no
+  ahora; ninguno preseleccionado por defecto ni con trampa visual.
+- Quitar un contacto pide confirmación y dice que se rompe para los dos.
+- No hay buscador de usuarios en ninguna pantalla.
 
 Medio sin cobertura (solo en onboarding): Mercado Pago, con la nota
 "Todavía no tenemos promos de este medio".
@@ -271,7 +295,9 @@ Medio sin cobertura (solo en onboarding): Mercado Pago, con la nota
 - Mostrar un tope sin ≈ y sin su base, o porcentajes de tope sueltos.
 - Preseleccionar el medio de pago al registrar un ticket. Si el ticket no lo
   trae, ningún medio marcado y se pregunta "¿Con qué pagaste?".
-- Mostrar topes de otros integrantes en gasto en grupo.
+- Mostrar el tope, la cantidad de compras, las compras o los medios no
+  recomendados de un contacto (ADR-008 §3).
+- Buscador de usuarios por nombre o email.
 - Estados de cobro ("Pendiente", "Recibe de…") en gasto en grupo: la
   división se muestra, no se gestiona.
 - Planificación entre varios días ("estrategia semanal") en el MVP.
