@@ -40,10 +40,10 @@ usuario vuelve a fotografiar el ticket.
   - Conservar el historial más allá de 90 días es una funcionalidad de una
     **versión paga** (fuera de alcance del MVP, mencionada en el pitch como
     camino de crecimiento) que retiene las capturas para siempre.
-  - Esto es independiente de cuánto historial sincroniza el celular para
-    calcular: el motor solo necesita la ventana del mes en curso (≤31 días,
-    issue #42); los 90 días son la política de retención del lado del
-    servidor, no lo que se descarga al dispositivo.
+  - Esto es independiente de cuánto historial usa el motor para calcular:
+    solo necesita la ventana del mes en curso (≤31 días), y la lee la Edge
+    Function del lado del servidor. El celular no descarga ni cachea el
+    historial de compras (ADR-001 §Actualización).
 - **Perfil** (medios de pago, comercios): se guarda mientras la cuenta
   exista.
 - **Aislamiento entre usuarios**: cada tabla lleva row-level security desde

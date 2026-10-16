@@ -50,7 +50,7 @@ Un solo workspace: `npm run test -w @vuelto/motor`. Tests en modo watch:
 
 | Pieza | Elección |
 |---|---|
-| Motor de reglas | Paquete TypeScript propio, sin dependencias, con su suite de tests. Corre **en el dispositivo** |
+| Motor de reglas | Paquete TypeScript propio, sin dependencias, con su suite de tests. Corre **solo en la Edge Function** de Supabase; la app no lo importa |
 | Cliente mobile | Expo (React Native) |
 | Backend / DB | Supabase (Postgres + Auth) |
 | Extractor | Gemini API — **siempre del lado del servidor**, nunca en el cliente |
