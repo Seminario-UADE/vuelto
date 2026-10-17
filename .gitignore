@@ -2,3 +2,12 @@
 node_modules/
 dist/
 *.tsbuildinfo
+
+# Expo (apps/mobile)
+.env
+.env.local
+.expo/
+expo-env.d.ts
+apps/mobile/ios/
+apps/mobile/android/
+apps/mobile/dist/
