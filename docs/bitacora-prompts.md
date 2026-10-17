@@ -356,6 +356,55 @@ funcionando con código real.
 
 ---
 
+
+## 2026-10-13 — Spec de perfil: bancos, tarjetas y redes (issue #41)
+
+**Herramienta:** Claude Code (Sonnet 5), con `gh` CLI, `/speckit-specify`, el subagente
+`spec-critic` y `curl` directo contra la API pública de MODO para verificar datos.
+
+**Objetivo:** regenerar `specs/001-perfil-billeteras/spec.md` (desactualizada desde el
+19/09, listaba 6 billeteras genéricas) para la issue #41, alineada al alcance vigente
+(una sola fuente, MODO, donde las promociones se definen por banco + tipo de tarjeta +
+red). Solo la spec — la implementación queda bloqueada por #34 y #40, ambas abiertas.
+
+**Prompts principales:**
+1. Traer la issue #41, leer la spec vieja y `alcance-mvp.md`/`requisitos.md`, con datos
+   ya verificados contra la API real de MODO que corrigen a la issue original: el
+   catálogo trae 82 bancos (no ~28), 32 marcados `on_hub_list`; tipo de tarjeta y red
+   no están en el catálogo de bancos sino en cada promoción; la red es un enum fijo de
+   9 marcas de tarjeta (no redes interbancarias).
+2. `/speckit-specify` con el cuerpo de la issue como entrada, reemplazando el spec.md
+   existente en la misma carpeta `001-perfil-billeteras` (no una carpeta nueva).
+3. `spec-critic` sobre la spec recién generada: encontró 3 huecos de modelado
+   bloqueantes (clave de join del banco sin definir, cardinalidad banco×tipo×red
+   contradictoria entre requisitos y ejemplos, y redes del enum sin emisor
+   catalogable) más 7 hallazgos altos (semántica de búsqueda, estado transitorio de
+   "banco sin tarjeta", edición offline y atomicidad del guardado, aislamiento por
+   usuario, mapeo valor↔etiqueta de redes, alcance real de las historias de usuario,
+   y una inconsistencia con `docs/product/fuentes-promos.md` sobre el conteo de
+   bancos).
+4. Verificación directa contra la API real (`GET /promos/api/rewards/banks`) para
+   resolver dos de los bloqueantes con datos en vez de supuestos: confirmó 82
+   bancos / 32 `on_hub_list`, y que de los 9 valores de red, `naranja` sí tiene banco
+   homónimo en el catálogo ("NaranjaX") pero `confiable` y `tarjeta_sol` no — se
+   documentó como limitación conocida del MVP, no como bug.
+5. Reescritura de la spec con las 3 correcciones bloqueantes y los 7 hallazgos altos
+   aplicados; checklist de calidad actualizado para no autoaprobarse en silencio.
+
+**Resultado:** `specs/001-perfil-billeteras/spec.md` reemplazada y
+`specs/001-perfil-billeteras/checklists/requirements.md` actualizado, en la rama
+`spec/issue-41-perfil-bancos-tarjetas`. Lista para `/speckit-plan` apenas cierren #34 y
+#40. Quedan como pendiente de otra sesión (fuera de alcance de esta): corregir
+`docs/product/fuentes-promos.md` (dice "~28 bancos", el dato real es 82) y revisar el
+uso de "billetera" en `docs/product/requisitos.md` y `docs/architecture/01-data-models.md`
+ahora que el perfil declara banco + tarjeta + red, no una billetera genérica. El
+subagente `spec-critic` también sumó 2 entradas a su memoria persistente del proyecto
+(`.claude/agent-memory/spec-critic/`): el patrón de "clave de join sin definir" y el
+de "checklist autoaprobada" (spec-kit marca todo en verde sin revisión real) — quedan
+para que la próxima corrida de `spec-critic` los busque de entrada en otras specs.
+
+---
+
 ## 2026-10-13 — Mover el motor de recomendación al backend (issues #43, #45, #36, #19, #39, #42)
 
 **Herramienta:** Claude Code (Sonnet 5 / Opus 5), con `gh` CLI.
@@ -465,6 +514,7 @@ funcionaba.
   `emil-design-eng`; el resto apunta a landings web.
 - La "estrategia semanal" quedó fuera del MVP por ahora, a pedido del
   usuario.
+
 
 ---
 
