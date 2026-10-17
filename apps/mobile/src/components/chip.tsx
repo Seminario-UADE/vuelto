@@ -19,6 +19,7 @@ export function Chip({ label, onPress, selected, icon, accessibilityHint }: Prop
       onPress={onPress}
       accessibilityRole="button"
       accessibilityState={{ selected: Boolean(selected) }}
+      aria-selected={Boolean(selected)}
       accessibilityHint={accessibilityHint}
       hitSlop={{ top: 2, bottom: 2 }}
       style={{

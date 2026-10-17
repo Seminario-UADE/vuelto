@@ -33,6 +33,8 @@ export type MedioDePago = {
   nombre: string;
   /** "Galicia", para "Usar Galicia". */
   nombreCorto: string;
+  /** "Crédito · Banco Galicia", "Billetera virtual". */
+  detalle: string;
   inicial: string;
   /** `false`: medio sin promos en el corpus (Mercado Pago). Sin topes ni reintegros. */
   conCobertura: boolean;

@@ -81,6 +81,11 @@ export async function getPerfil(): Promise<Perfil> {
   });
 }
 
+/** Medios del perfil guardado en el servidor (para quien entra con una cuenta existente). */
+export function mediosDeclaradosIds(): string[] {
+  return mediosDeclarados.map((m) => m.id);
+}
+
 export async function getMediosDisponibles(): Promise<MedioDePago[]> {
   return red(catalogoMedios);
 }

@@ -11,7 +11,7 @@ export function ProgressSegments({ total, actual }: { total: number; actual: num
       accessible
       accessibilityRole="progressbar"
       accessibilityLabel={`Configuración, paso ${actual} de ${total}`}
-      style={{ flexDirection: "row", gap: space.xs, flex: 1, maxWidth: 160 }}
+      style={{ flexDirection: "row", gap: space.xs, width: 120 }}
     >
       {Array.from({ length: total }, (_, i) => (
         <View

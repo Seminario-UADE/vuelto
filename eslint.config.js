@@ -26,6 +26,8 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // Los assets de React Native se cargan con require() para que Metro los empaquete.
+      "@typescript-eslint/no-require-imports": "off",
       "no-restricted-syntax": [
         "error",
         {

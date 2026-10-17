@@ -36,6 +36,7 @@ export function Button({ label, onPress, variant = "primary", disabled, loading,
       accessibilityLabel={label}
       accessibilityHint={hint}
       accessibilityState={{ disabled: Boolean(disabled), busy: Boolean(loading) }}
+      aria-disabled={Boolean(inactivo)}
       style={{
         minHeight: variant === "text" ? size.hit : size.primaryButton,
         borderRadius: radius.pill,
@@ -47,7 +48,7 @@ export function Button({ label, onPress, variant = "primary", disabled, loading,
         paddingVertical: space.md,
         alignItems: "center",
         justifyContent: "center",
-        alignSelf: variant === "text" ? "flex-start" : "stretch",
+        alignSelf: variant === "text" ? "center" : "stretch",
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>

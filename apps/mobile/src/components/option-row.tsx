@@ -29,6 +29,8 @@ export function OptionRow({ title, detail, note, leading, selected, onPress, kin
       disabled={disabled}
       accessibilityRole={kind === "radio" ? "radio" : "checkbox"}
       accessibilityState={kind === "radio" ? { selected, disabled } : { checked: selected, disabled }}
+      aria-checked={selected}
+      aria-disabled={disabled}
       accessibilityLabel={[title, detail, note].filter(Boolean).join(", ")}
       style={{
         minHeight: size.rowMin,
