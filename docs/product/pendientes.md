@@ -15,7 +15,18 @@
 - [ ] Proveedor/modelo del extractor, con salida estructurada
 - [ ] Dónde corre el cron de ingesta
 - [ ] Expo vs. Flutter formalmente (nivel real del equipo en TS/Dart)
-- [ ] Estrategia de sincronización del corpus al dispositivo
+- [x] Estrategia de sincronización del corpus al dispositivo — **descartada**
+      (13/10/2026): el cálculo de recomendación/topes se movió a una Edge
+      Function del backend (issue #43, ADR-001 §Actualización), así que la
+      app ya no necesita el corpus de promociones ni las compras del usuario
+      sincronizados localmente. La issue #42, que originalmente diseñaba esta
+      sincronización, se cerró por eso.
+- [x] Retención de registros de compra en Supabase — ver `privacidad.md`:
+      90 días desde la fecha de la compra, luego se eliminan. El borrado
+      automático queda fuera de alcance del MVP (política declarada, sin job
+      de limpieza implementado). Conservar el historial más allá de 90 días
+      es una funcionalidad de una versión paga (fuera de alcance del MVP,
+      mencionada en el pitch como camino de crecimiento).
 - [ ] Probar el extractor contra 15-20 tickets reales
 - [x] Política de retención de imágenes de ticket — ver `privacidad.md`
 - [ ] Gasto en grupo: promoción de débito, redondeo de la división

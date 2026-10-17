@@ -356,6 +356,7 @@ funcionando con código real.
 
 ---
 
+
 ## 2026-10-13 — Spec de perfil: bancos, tarjetas y redes (issue #41)
 
 **Herramienta:** Claude Code (Sonnet 5), con `gh` CLI, `/speckit-specify`, el subagente
@@ -401,6 +402,119 @@ subagente `spec-critic` también sumó 2 entradas a su memoria persistente del p
 (`.claude/agent-memory/spec-critic/`): el patrón de "clave de join sin definir" y el
 de "checklist autoaprobada" (spec-kit marca todo en verde sin revisión real) — quedan
 para que la próxima corrida de `spec-critic` los busque de entrada en otras specs.
+
+---
+
+## 2026-10-13 — Mover el motor de recomendación al backend (issues #43, #45, #36, #19, #39, #42)
+
+**Herramienta:** Claude Code (Sonnet 5 / Opus 5), con `gh` CLI.
+
+**Objetivo:** corregir las historias de «¿Con qué pago?» y «Mis topes» para
+que el cálculo de la recomendación deje de correr en el dispositivo, y
+resolver en cascada las issues que quedaron desactualizadas con esa
+decisión.
+
+**Prompts principales:**
+1. Pedido de cambiar la pantalla «¿Con qué pago?» de recalcular en cada
+   dígito tipeado a un botón explícito que dispare el cálculo en el
+   backend, en vez de en vivo en el cliente.
+2. Señalamiento del conflicto de esa decisión con reglas ya documentadas
+   (ADR-001, RNF-02, "modo avión") antes de aplicar el cambio, y
+   confirmación explícita de seguir adelante aceptando el costo de perder
+   la garantía de funcionamiento offline para ese flujo.
+3. Corrección de una ambigüedad propia en la primera redacción ("el motor
+   lo puede ejecutar tanto el dispositivo como la Edge Function"), tras la
+   aclaración de que la app no debe tener ninguna lógica de cálculo, ni
+   siquiera como fallback — solo el backend.
+4. Pedido de revisar si alguna otra issue había quedado inconsistente con
+   el cambio (escaneo de los 56 issues abiertos por palabras clave), y
+   confirmación de que ninguna estaba ya resuelta antes de tocarlas.
+5. Decisión de qué hacer con la issue #42 (sincronizar el corpus al
+   dispositivo), que quedó sin objeto: cerrarla y recortar el PR que la
+   tocaba a solo la parte todavía válida.
+
+**Resultado:**
+- Issue #43 («¿Con qué pago?»): reescrita con el contrato de
+  `POST /functions/v1/recomendar` (Edge Function que llama a
+  `recomendar()` de `@vuelto/motor`), botón "Simular", manejo explícito de
+  sin conexión, y el criterio de que `apps/mobile` no tenga
+  `@vuelto/motor` como dependencia.
+- Issue #45 («Mis topes»): mismo patrón, con `GET /functions/v1/topes`; se
+  avisó a la persona asignada (jeqm0302) con un comentario, porque el
+  cambio le reescribe el enfoque de implementación.
+- ADR-001: sección "Actualización (13/10/2026)" documentando el cambio sin
+  reescribir el registro histórico original.
+- RNF-02 (`requisitos.md`): deja de exigir "funciona en modo avión"; pasa
+  a exigir que `@vuelto/motor` no tenga dependencias de red propias y que
+  la app no lo tenga como dependencia.
+- Issues #36, #19 (motor y su épica): se corrigió la frase "corre en el
+  celular" / "en el dispositivo y sin red", que había quedado
+  contradictoria con el cambio.
+- Issue #39 (app base): se sacó el criterio de aceptación que pedía
+  importar `@vuelto/motor` en una pantalla de prueba — ya no aplica.
+- Issue #42 cerrada: su objetivo completo ("recomendación sin señal")
+  quedó obsoleto. El PR #58, que originalmente corregía la ventana de
+  sincronización de esa issue, se recortó a solo la política de retención
+  de 90 días en `privacidad.md` (lo único que seguía siendo válido);
+  `pendientes.md` se actualizó para reflejar que la sincronización quedó
+  descartada, no resuelta.
+- PR #60 (dos commits — el segundo corrige la ambigüedad "dispositivo o
+  Edge Function"), y PR #58 recortado — ambos sin conflictos contra
+  `main`.
+
+---
+
+## 2026-10-15 — Auditoría UX del mockup de Stitch y design system
+
+**Herramienta:** Claude Code (Opus 5.5), con el MCP de Google Stitch y las
+skills `design:design-critique`, `design:accessibility-review`,
+`design:ux-copy` y `stitch-design-taste`.
+
+**Objetivo:** revisar el mockup de Stitch ("Remix of Vuelto App Mobile
+Design v2", 7 pantallas) contra los requisitos del producto, definir un
+design system propio y regenerar las pantallas sin perder lo que ya
+funcionaba.
+
+**Prompts principales:**
+1. Conectar el proyecto de Stitch y confirmar que se podían leer las 7
+   pantallas (screenshots + HTML).
+2. Instalar skills de diseño (`taste-skill`, `expo-native-ui`) y pedir una
+   recomendación de cuáles aplicar para mejorar la UX, incluyendo las ya
+   instaladas (`apple-design`, `emil-design-eng`, etc.).
+3. "Dale, arrancá con la auditoría" → después, "hagamos el design md de
+   stitch" y crear 7 pantallas nuevas sin modificar las originales.
+4. Objeción: las pantallas nuevas quedaron "demasiado vacías y sin
+   personalidad" respecto de las anteriores; pedido de justificarlo o
+   recuperar elementos de las originales.
+5. Pedido de revisar si tenían demasiado color y llevarlas a la paleta de
+   la marca.
+
+**Resultado:**
+- `docs/design/auditoria-stitch-v2.md`: auditoría con 8 choques contra
+  requisitos (topes sin "≈" ni base — RF-07; medio de pago preseleccionado
+  en el ticket — RF-10; "Tope ok" de otro integrante en grupo — RF-19;
+  Mercado Pago con topes aunque el MVP solo ingesta MODO; "estrategia
+  semanal" fuera de alcance; "OCR 98%"), contrastes medidos (el gris
+  secundario `#65786C` y el ámbar no llegaban a 4.5:1) y tabla de copy.
+- `docs/design/DESIGN.md`: design system con paleta accesible medida,
+  regla de topes estimados como componente, tab bar fija, glosario de
+  copy, set único de datos ficticios con cuentas verificadas y lista de
+  prohibiciones. Subido a Stitch como design system "Vuelto".
+- Pantallas en Stitch (las originales no se tocaron): v3 corrigió las
+  reglas pero quedó vacía — error de la IA, que aplicó como reglas del
+  producto lo que eran preferencias de estilo. v4 recuperó la personalidad
+  de las originales (tarjeta oscura, alcancía, cuenta regresiva, ticket
+  dibujado) y la versión sobria de v4 sacó los colores de marca de bancos
+  y comercios que había agregado la IA. El DESIGN.md quedó con las dos
+  lecciones: "calma no es vacío" y "el color comunica, no decora".
+- Skills instaladas a nivel proyecto: las 14 de `leonxlnx/taste-skill` y
+  `expo-native-ui` de `expo/skills` (`skills-lock.json`). Se recomendó
+  aplicar solo `redesign-existing-projects`, `stitch-design-taste` y, para
+  la etapa de código, `expo-native-ui`, `apple-design`, `animate-expo` y
+  `emil-design-eng`; el resto apunta a landings web.
+- La "estrategia semanal" quedó fuera del MVP por ahora, a pedido del
+  usuario.
+
 
 ---
 

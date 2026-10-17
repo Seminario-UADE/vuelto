@@ -6,7 +6,7 @@ MODO (ver detalle abajo), flujo de compra optimizado para esas 13 categorías
 (no solo supermercado), una sola billetera como fuente de ingesta (MODO),
 cadenas de supermercado, ingesta 100% automática (sin revisión humana,
 validada contra esquema), perfil declarado por el usuario, registro por
-ticket, gasto en grupo nivel 0 (ver abajo).
+ticket, gasto en grupo nivel 1 con contactos vinculados (ver abajo).
 
 **Fuera:** integración bancaria, lectura de resúmenes, cobertura nacional,
 app nativa (se usa Expo).
@@ -122,12 +122,23 @@ afectar qué tan útil es el flujo de compra de supermercado si las cadenas
 grandes (Coto, Carrefour, Jumbo, Disco, Vea, Día) tienen poca o ninguna
 promoción vigente vía MODO.
 
-## Gasto en grupo (nivel 0, última prioridad del MVP)
+## Gasto en grupo (nivel 1, última prioridad del MVP)
 
 Responde "¿quién de nosotros debería pagar hoy?", no "con cuál de mis
-tarjetas". El motor evalúa los medios de pago de todo el grupo (declarados
-de antemano, sin cuentas ni topes ajenos en nivel 0) y la división se
-genera sola a partir del resultado — nunca se carga a mano.
+tarjetas". El motor evalúa los medios de pago de todo el grupo, cada uno
+con el tope de su dueño, y la división se genera sola a partir del
+resultado — nunca se carga a mano.
+
+Los integrantes son **contactos vinculados**: se agregan con un link o QR
+de invitación desde el perfil, que el otro acepta (no hay buscador de
+usuarios). Aceptar es consentir que el motor use tus medios y topes en las
+recomendaciones del grupo; el otro nunca ve tus topes en pesos ni tus
+compras. Se pueden sumar integrantes sin cuenta declarados a mano (lo que
+era el nivel 0), sin tope conocido. Detalle: ADR-008.
+
+Hasta el 15/10/2026 el alcance era el **nivel 0** (integrantes declarados a
+mano, sin cuentas ni topes ajenos). Se amplió porque sin topes ajenos el
+motor podía recomendar que pague alguien con el tope ya agotado.
 
 El registro de gastos y saldos es andamiaje mínimo: el producto es la
 decisión de quién paga, no la gestión del gasto compartido.

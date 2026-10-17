@@ -6,8 +6,10 @@ el tope de reintegro mensual consumido. No es un listado de promociones.
 ## Núcleo técnico: tres piezas, un mismo patrón de extracción
 
 1. **Motor de reglas** — paquete TypeScript propio, sin dependencias, con su
-   propia suite de tests. Corre **en el dispositivo**: recomendación
-   instantánea, sin red. Evalúa combinaciones válidas (medio de pago × compra
+   propia suite de tests. Es una función pura sin llamadas de red propias y
+   lo ejecuta **exclusivamente una Edge Function** de Supabase; la app solo
+   manda la compra y pinta la respuesta (ADR-001 §Actualización, RNF-02).
+   Evalúa combinaciones válidas (medio de pago × compra
    × tope ya consumido × jurisdicción × acumulabilidad) y devuelve la óptima.
    Es código **determinístico** — el LLM nunca entra acá.
 2. **Ingesta automática** — la letra chica de cada promoción viene en prosa
@@ -25,7 +27,7 @@ el tope de reintegro mensual consumido. No es un listado de promociones.
 
 | Pieza | Elección | Corre en |
 |---|---|---|
-| Motor de reglas | TypeScript, paquete propio | Dispositivo (app) y backend |
+| Motor de reglas | TypeScript, paquete propio | Servidor únicamente (Edge Function) |
 | Cliente mobile | Expo (React Native) | Dispositivo |
 | Backend / DB | Supabase (Postgres + Auth) | Servidor |
 | Extractor | Gemini API | Servidor únicamente |
@@ -41,8 +43,8 @@ Fuentes web (bancos/billeteras)
   → Gemini extrae contra esquema (offline, batch)
   → validación automática de esquema (sin persona)
   → base validada (Postgres)
-  → motor de reglas (dispositivo) ← perfil del usuario + tope consumido
-  → recomendación al usuario
+  → motor de reglas (Edge Function, server-side) ← perfil del usuario + tope consumido
+  → recomendación al usuario (la app la pinta)
 
 Ticket fotografiado
   → Gemini extrae (Edge Function, server-side)

@@ -81,23 +81,31 @@ prioridad del MVP.
 - RF-17: simular una fuente vacía genera un aviso.
 - RF-18: la demo del pitch corre con el corpus sembrado, con la ingesta apagada.
 
-### Gasto en grupo (nivel 0)
+### Gasto en grupo (nivel 1)
 
 | ID | Requisito | Prior. | Fuente |
 |---|---|---|---|
-| RF-19 | Un grupo declara sus integrantes con sus medios de pago; el motor evalúa la unión de medios y recomienda quién paga. | C | `alcance-mvp.md` §Gasto en grupo, `01-data-models.md` §Grupo |
+| RF-19 | Un grupo se arma con contactos vinculados y, opcionalmente, integrantes sin cuenta declarados a mano; el motor evalúa la unión de medios del grupo, cada uno con el tope de su dueño, y recomienda quién paga y con qué medio. | C | ADR-008, `alcance-mvp.md` §Gasto en grupo, `01-data-models.md` §Grupo |
 | RF-20 | La división del gasto se genera sola a partir del resultado; nunca se carga a mano. | C | `alcance-mvp.md` §Gasto en grupo |
+| RF-21 | El usuario vincula contactos solo por invitación (link o QR desde su perfil) que el otro acepta explícitamente; no hay búsqueda de usuarios. | C | ADR-008 §1 |
+| RF-22 | Cualquiera de los dos puede quitar un contacto; el vínculo se rompe para ambos. | C | ADR-008 §2 |
 
 **Criterios de aceptación**
-- RF-19: el nivel 0 no usa topes de otros integrantes.
+- RF-19: con un contacto que tiene agotado el tope de la promo que más reintegra, el motor no lo recomienda para esa promo (test del motor).
+- RF-19: ninguna pantalla muestra el tope, la cantidad de compras ni las compras de un contacto; muestra qué medio del contacto conviene y el reintegro estimado de esa compra, con su base en palabras (Principio V). Un contacto sin compras registradas se informa como "sin base". Lo que el estimado deja inferir está advertido en la aceptación (ADR-008 §3).
+- RF-19: un integrante sin cuenta no tiene tope conocido y la recomendación lo indica.
+- RF-19: ante un empate gana quien pide la recomendación; entre los demás, el orden canónico por id. Mismo grupo, compra y estado dan siempre la misma recomendación.
+- RF-19: pedir datos de un id que no es contacto vinculado devuelve error, no datos.
 - RF-20: no existe pantalla de carga manual de gastos compartidos.
+- RF-21: la invitación es de un solo uso y vence a las 24 h. Abrir la propia, una vencida, una usada o la de alguien que ya es contacto no crea vínculo. Abrir el link sin aceptar no crea vínculo.
+- RF-22: después de quitar el contacto, la siguiente recomendación de cualquiera de los dos no puede incluir al otro.
 
 ## Requisitos no funcionales
 
 | ID | Requisito | Criterio de aceptación verificable | Fuente |
 |---|---|---|---|
 | RNF-01 | **Determinismo.** El LLM nunca participa de la recomendación. | El paquete del motor no tiene dependencias ni importa ningún cliente de IA (revisable en `package.json` y en el código). | ADR-004, `CLAUDE.md` |
-| RNF-02 | **Motor autónomo.** Corre en el dispositivo, sin red. | Con el celular en modo avión, RF-03 devuelve resultado. | `00-overview.md` §1 |
+| RNF-02 | **Motor solo del lado del servidor.** `@vuelto/motor` no hace llamadas de red propias (es una función pura) y lo ejecuta exclusivamente la Edge Function — la app (Expo) no lo importa ni calcula nada localmente. | El código de `packages/motor` no importa ningún cliente HTTP/SDK de red; `apps/mobile/package.json` no tiene `@vuelto/motor` como dependencia (ambos revisables por búsqueda/imports). | `00-overview.md` §1, ADR-001 §Actualización |
 | RNF-03 | **Testeabilidad.** El motor tiene su propia suite. | `vitest run` pasa sin red ni servicios externos; cubre las dimensiones de RF-04. | ADR-001, ADR-004 |
 | RNF-04 | **Secretos.** La API key de Gemini nunca está en la app. | Búsqueda de la key en el bundle de la app: 0 resultados. Letra chica sale del script de ingesta; ticket, de una Edge Function. | `04-infrastructure.md`, `CLAUDE.md` |
 | RNF-05 | **Llave maestra.** La service role key solo la usa el proceso de ingesta. | No aparece en el cliente ni en el repo. | `04-infrastructure.md` |
@@ -124,6 +132,7 @@ No se dan por chequeados hasta resolver el pendiente que los frena
 | RF-16 | Umbral de validación automática de la ingesta (campos obligatorios) | `pendientes.md` |
 | RF-05 | Cómo se dispara el momento de uso (notificación / geolocalización) | `pendientes.md` |
 | RF-19, RF-20 | Promoción de débito y redondeo de la división | `pendientes.md` |
+| RF-19 | Constitución (Principio II) desactualizada: dice que el motor corre en el dispositivo; ADR-001 §Actualización y RNF-02 dicen que corre solo en la Edge Function. Bloquea el chequeo de `/speckit-plan` | — |
 | RNF-14 | Cronograma real del cuatrimestre y tamaño del equipo | `restricciones-catedra.md`, `estado.md` |
 
 ## Chequeo de coherencia (issue #3)

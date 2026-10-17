@@ -1,3 +1,23 @@
+<!--
+Sync Impact Report
+- Versión: 1.0.0 → 2.0.0 (MAJOR: se redefine el Principio II)
+- Principios modificados:
+  - II. "Motor de reglas determinístico": "Corre en el dispositivo sin red" pasa a
+    "función pura sin llamadas de red propias, ejecutada exclusivamente por la Edge
+    Function; la app Expo no lo importa". El "Por qué" deja de citar el uso offline.
+- Secciones agregadas: ninguna. Secciones eliminadas: ninguna.
+- Decisión de origen: ADR-001 §Actualización (13/10/2026) y RNF-02 de
+  docs/product/requisitos.md (no hace falta un ADR nuevo: ya está actualizado).
+- Archivos alineados:
+  ✅ CLAUDE.md (tabla Stack)
+  ✅ docs/architecture/00-overview.md (§1, tabla Stack, flujo de datos)
+  ✅ docs/decisions/001-motor-de-reglas-paquete-separado.md (notas de "superado" en Rationale y Consequences)
+  ✅ docs/product/privacidad.md (ya no cita la issue #42, cerrada como obsoleta)
+  ✅ .specify/templates/*: sin referencias al principio, no requieren cambios
+  ✅ specs/001-perfil-billeteras: no depende del motor en el dispositivo
+- Pendientes: ninguno.
+-->
+
 # Constitución de Vuelto
 
 Principios no negociables del proyecto. Salen de `CLAUDE.md`, de los ADR en `docs/decisions/` y
@@ -21,13 +41,17 @@ reintegro queda**.
 
 - El motor es un paquete TypeScript propio (`packages/motor`). No tiene `dependencies` de
   runtime y expone funciones puras.
-- Corre en el dispositivo sin red. La hora actual se recibe como parámetro, nunca se lee adentro.
+- El paquete no hace llamadas de red propias ni lee estado externo: la hora actual se recibe
+  como parámetro, nunca se lee adentro.
+- Lo importa y ejecuta exclusivamente la Edge Function de recomendación. La app Expo NO lo
+  importa (`apps/mobile/package.json` no lo tiene como dependencia) ni calcula recomendaciones
+  localmente, ni siquiera como fallback: junta el input, llama al endpoint y pinta la respuesta.
 - Con el mismo perfil, la misma compra y el mismo corpus, el resultado DEBE ser idéntico.
 - Un modelo de lenguaje NUNCA participa de la recomendación, ni directa ni indirectamente.
   Tampoco genera los textos de explicación (son plantillas determinísticas).
 
-**Por qué:** ADR-001 y ADR-004. Sin esto se pierden los tests, el uso offline y el argumento de
-innovación de la materia.
+**Por qué:** ADR-001 (§Actualización 13/10/2026), ADR-004 y RNF-02. Sin esto se pierden los tests,
+la reproducibilidad de la recomendación y el argumento de innovación de la materia.
 
 ### III. Extracción con esquema y null explícito
 
@@ -122,4 +146,4 @@ tiempo.
 - La guía operativa del día a día está en `CLAUDE.md`. Si contradice a esta constitución, se
   corrige `CLAUDE.md`.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-09-26
+**Version**: 2.0.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-10-15
