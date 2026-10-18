@@ -518,6 +518,80 @@ funcionaba.
 
 ---
 
+## 2026-10-18 — Contrato de tipos del dominio y arquitectura de la capa externa (issue #33, ADR-009)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI, `curl` contra la
+API pública de MODO para verificar datos, `/code-review` (ejes Standards y
+Spec en paralelo) y el subagente `rules-guardian`.
+
+**Objetivo:** retomar la implementación priorizando lo que destraba al
+resto del Sprint 1. La issue #33 (contrato de tipos) bloquea a #34, #35,
+#36 y #48. En el camino, revisar el PR #61 (spec de perfil, issue #41)
+porque define parte de esos tipos, y dejar documentada la arquitectura de
+las Edge Functions antes de que el equipo empiece a implementarlas.
+
+**Prompts principales:**
+1. Relevamiento del estado del proyecto: issues asignadas, dependencias
+   entre ellas y blockers, para definir por dónde arrancar.
+2. Revisión del PR #61 contra el contrato de tipos de la issue #33, con
+   verificación directa contra la API de MODO, y aviso a las issues #51 y
+   #35 de que el banco de cada promo se traduce de nombre a id del
+   catálogo con comparación normalizada.
+3. Revisión del diseño del contrato antes de escribir código: qué venía
+   definido por la issue, los RF y el PR #61, y qué se agregaba en esta
+   issue. Decisión de tratar las categorías como datos para que una
+   categoría nueva de MODO no descarte promos en silencio.
+4. Discusión de diseño sobre clases frente a interfaces y funciones, y
+   sobre cómo organizar el backend (controller, service, repositorio,
+   inyección de dependencias, SOLID), incluyendo cómo funciona la
+   autenticación de Supabase y cómo escalaría la arquitectura si el
+   producto crece.
+5. Decisión de documentar la arquitectura en un ADR referenciado desde
+   `CLAUDE.md`, en vez de comentar en cada issue, para que cualquier
+   integrante que tome una Edge Function con Claude la siga sin ruido extra.
+6. Triage de los hallazgos de la revisión: qué se corrige en esta issue y
+   qué se deriva a la issue que corresponde (#36, #38, #51), para no
+   adelantar diseño ajeno.
+
+**Resultado:**
+- PR #61 aprobado. Comentarios en las issues #51 y #35: las promos de MODO
+  solo traen `name_bank`, y hay que traducirlo al UUID del catálogo
+  comparando normalizado (minúsculas, sin acentos).
+- `packages/motor/src/tipos.ts`: contrato completo, sin campos opcionales.
+  Se aparta de la propuesta de la issue en: `Red` con los 9 valores de
+  MODO (del PR #61), `CategoriaId = number` (categorías como datos, con la
+  lista inicial en `categorias.ts`), `BorradorPromocion` para la salida de
+  la ingesta y `nombreParaMostrar` en `Perfil` (ADR-008).
+- `publicable.ts`: `CAMPOS_OBLIGATORIOS_PROMO`, `camposFaltantes()` (para
+  registrar por qué se descarta un borrador, útil para la issue #53) y
+  `esPromocionPublicable()` como guardia de tipo. 11 tests.
+- ADR-009 (núcleo funcional, capa imperativa): datos del dominio como
+  interfaces, Edge Functions con handler → service → repositorios
+  inyectados, sin framework ni contenedor de DI, y etapas de crecimiento
+  fuera del MVP. Referenciado desde `CLAUDE.md`.
+- `01-data-models.md`: qué es `bancoId`, campos obligatorios, categorías
+  como datos y lo que queda fuera de alcance (sucursales, tarjetas
+  excluidas). `pendientes.md`: RF-16 resuelto; nuevos pendientes para
+  distinguir "sin tope" de "tope no informado" y para validar rangos
+  (porcentaje, vigencia) en el esquema del extractor (issue #51).
+- Revisión: `rules-guardian` pasó todas las reglas duras. `/code-review`
+  cumplió los 5 criterios de aceptación. Se corrigieron una contradicción
+  en `01-data-models.md` y varios nombres de tipos. La base del tope
+  estimado queda para la issue #36 (reusando el tipo de la issue #38) y el
+  fragmento de origen de cada campo, para la issue #51. La jurisdicción de
+  la compra no hacía falta en el contrato: la issue #36 ya la fija como
+  constante del MVP (CABA/AMBA).
+- Se detectó que la definición del subagente `rules-guardian` está
+  desactualizada (todavía exige revisión humana antes de publicar promos,
+  contra ADR-005); queda para un PR aparte.
+- Error de la IA en el proceso: el primer commit incluyó un archivo que no
+  estaba en la lista aprobada (un borrado que había quedado en staging).
+  Se detectó al verificar el commit y se rehízo antes de subirlo.
+- Queda para la issue #34: sumar la tabla `categorias`.
+
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
