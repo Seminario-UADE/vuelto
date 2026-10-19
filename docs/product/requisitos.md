@@ -132,7 +132,7 @@ No se dan por chequeados hasta resolver el pendiente que los frena
 | RF-16 | Umbral de validación automática de la ingesta (campos obligatorios) | `pendientes.md` |
 | RF-05 | Cómo se dispara el momento de uso (notificación / geolocalización) | `pendientes.md` |
 | RF-19, RF-20 | Promoción de débito y redondeo de la división | `pendientes.md` |
-| RF-19 | Constitución (Principio II) desactualizada: dice que el motor corre en el dispositivo; ADR-001 §Actualización y RNF-02 dicen que corre solo en la Edge Function. Bloquea el chequeo de `/speckit-plan` | — |
+
 | RNF-14 | Cronograma real del cuatrimestre y tamaño del equipo | `restricciones-catedra.md`, `estado.md` |
 
 ## Chequeo de coherencia (issue #3)
