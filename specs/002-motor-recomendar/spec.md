@@ -88,6 +88,7 @@ Si el usuario ya registró compras con una promoción este mes, el ahorro de esa
 - **Varias causas a la vez**: si una promoción falla más de una regla, se informa una sola causa, siempre la misma para los mismos datos, según el orden fijo de FR-015.
 - **Promoción que falla para un medio y aplica para otro**: aparece como opción (con el medio que aplica) y no como descartada.
 - **Tope justo agotado**: si el tope restante antes de la compra es exactamente $0, la promoción se descarta con causa `tope_agotado` (no genera una opción con ahorro $0). Como los importes se calculan en centavos enteros (FR-018), "exactamente $0" no depende de errores de redondeo.
+- **Ahorro que redondea a $0**: si a la promoción le queda tope pero el porcentaje sobre una compra de pocos centavos redondea a $0, se genera una opción con ahorro $0. No es un caso realista y se deja así (decisión de la revisión de código, 20/10).
 - **Tope de $0**: una promoción con tope informado de $0 se descarta con causa `tope_agotado`.
 - **Período del tope no informado**: se trata como mensual.
 - **Compras registradas con fecha posterior a hoy**: no consumen tope ni cuentan en la base (el motor no las "adelanta").

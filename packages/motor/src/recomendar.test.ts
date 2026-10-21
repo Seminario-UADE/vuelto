@@ -199,6 +199,26 @@ describe("recomendar: US3", () => {
     ]);
   });
 
+  it("US3-3: las compras del mes anterior no consumen el tope de este mes", () => {
+    const compras = [compraRegistrada({ fecha: "2026-09-30", descuentoObtenido: 5000 })];
+    const r = recomendar(compra(), perfil(), [conTope(5000)], compras, AHORA);
+    expect(r.mejor).toMatchObject({
+      ahorroEstimado: 2000,
+      topeRestanteTrasCompra: 3000,
+      base: { comprasRegistradas: 0, comprasSinDescuentoInformado: 0 },
+    });
+  });
+
+  it("US3-4: una compra sin descuento informado se estima con el porcentaje y cuenta como estimada", () => {
+    const compras = [compraRegistrada({ monto: 10000, descuentoObtenido: null })];
+    const r = recomendar(compra(), perfil(), [conTope(5000)], compras, AHORA);
+    expect(r.mejor).toMatchObject({
+      ahorroEstimado: 2000,
+      topeRestanteTrasCompra: 1000,
+      base: { comprasRegistradas: 1, comprasSinDescuentoInformado: 1 },
+    });
+  });
+
   it("US3-5: una compra estimada que llena el tope lo agota, con su base", () => {
     const compras = [compraRegistrada({ monto: 100000 })];
     const r = recomendar(compra(), perfil(), [conTope(5000)], compras, AHORA);

@@ -626,6 +626,10 @@ compartidos) y #38 (estimación de topes).
 6. "¿Cómo es eso de que el motor compilado no carga en Deno? ¿Qué es Deno y
    dónde se usa? ¿No sirve importar con `.ts`?" Se eligió escribir los
    imports con `.ts` y que TypeScript los pase a `.js` al compilar.
+7. "Corregí lo chico de la revisión de código; el texto del motivo de
+   jurisdicción tiene que ser más formal." Lo que la revisión marcó sobre
+   cómo se guarda el tope se deja para la issue #37, que va a rehacer esa
+   parte.
 
 **Resultado:**
 - Quedó documentada la funcionalidad completa en
@@ -655,6 +659,12 @@ compartidos) y #38 (estimación de topes).
   que corre en Deno. Ahora los imports llevan `.ts` y TypeScript rechaza
   cualquier import sin extensión, así que el error no puede volver sin que
   el typecheck lo marque.
+- La revisión de código (estándares y cumplimiento de la spec), los tests y
+  el control de reglas del proyecto no encontraron incumplimientos. Se
+  corrigieron cuatro detalles: el monto mínimo ahora también se compara en
+  centavos, se sumaron dos pruebas de punta a punta del tope, el motivo de
+  jurisdicción pasó a "La promo no es válida en tu jurisdicción" y el
+  ADR-009 aclara que las clases de error sí se permiten en el motor.
 - Queda para la issue #51: que el extractor marque las promos de otras
   provincias.
 

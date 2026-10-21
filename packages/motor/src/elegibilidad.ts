@@ -5,6 +5,7 @@
  * del usuario. `medio_de_pago` y `tope_agotado` se evalúan después, en
  * `recomendar`, porque no dependen solo de la promo y la compra.
  */
+import { aCentavos } from "./dinero.ts";
 import type {
   CausaDescarte,
   CompraPropuesta,
@@ -65,7 +66,8 @@ export const REGLAS_DE_PROMOCION: readonly Regla[] = [
   },
   {
     causa: "monto_minimo",
-    cumple: (p, { compra }) => p.montoMinimo === null || compra.monto >= p.montoMinimo,
+    cumple: (p, { compra }) =>
+      p.montoMinimo === null || aCentavos(compra.monto) >= aCentavos(p.montoMinimo),
   },
 ];
 

@@ -75,7 +75,7 @@ export function motivoDescarte(
     case "canal":
       return compra.canal === "presencial" ? "La promo es solo online" : "La promo es solo presencial";
     case "jurisdiccion":
-      return "La promo no vale en CABA ni en AMBA";
+      return "La promo no es válida en tu jurisdicción";
     case "monto_minimo":
       return `La promo pide una compra mínima de ${pesos(promo.montoMinimo ?? 0)}`;
     case "medio_de_pago":
