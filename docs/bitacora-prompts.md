@@ -592,6 +592,85 @@ las Edge Functions antes de que el equipo empiece a implementarlas.
 
 ---
 
+## 2026-10-20 — Motor de recomendación: spec, plan e implementación (issue #36)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-specify`,
+`/speckit-plan`, `/speckit-tasks`, `/speckit-implement`), el subagente
+`spec-critic` (dos pasadas) y `gh` CLI para leer las issues #36, #37 y #38.
+
+**Objetivo:** implementar el núcleo del producto: dada una compra, decidir
+con qué medio de pago conviene pagar y por qué las demás promos no sirven.
+Antes de escribir código, cerrar las decisiones de producto que la issue
+dejaba abiertas y acordar la frontera con las issues #37 (topes
+compartidos) y #38 (estimación de topes).
+
+**Prompts principales:**
+1. "Antes de escribir la spec, leé completas las issues #36 y #37 y decime
+   dónde termina una y empieza la otra." Así quedó claro que los topes
+   semanales y "por compra" ya eran de la #37, y se respetó esa división.
+2. "Mostrame qué encontró el revisor de specs y qué proponés para cada
+   punto." Después, decisión por decisión:
+   - Si el usuario no tiene tarjetas cargadas, que la app se lo pida.
+   - Los montos, en centavos.
+   - Una compra grande nunca puede gastar más tope del que existe.
+   - Si la promo no informa tope, se aplica el porcentaje completo.
+3. "No entiendo para qué sirve marcar una compra como estimada: ¿es para
+   recomendar, es por si no cargan el ticket? ¿Cómo está pensado en la
+   UI?" Revisando las pantallas diseñadas vimos que hoy la app no tiene
+   dónde cargar el reintegro real, y se decidió mantener el dato como lo
+   proponía la issue #38.
+4. "Contá las promos de CABA, Provincia de Buenos Aires y las nacionales;
+   las de otras provincias, como Córdoba, no."
+5. "Implementalo por etapas y frená al terminar cada una para que revise el
+   código antes de seguir."
+6. "¿Cómo es eso de que el motor compilado no carga en Deno? ¿Qué es Deno y
+   dónde se usa? ¿No sirve importar con `.ts`?" Se eligió escribir los
+   imports con `.ts` y que TypeScript los pase a `.js` al compilar.
+7. "Corregí lo chico de la revisión de código; el texto del motivo de
+   jurisdicción tiene que ser más formal." Lo que la revisión marcó sobre
+   cómo se guarda el tope se deja para la issue #37, que va a rehacer esa
+   parte.
+
+**Resultado:**
+- Quedó documentada la funcionalidad completa en
+  `specs/002-motor-recomendar/`: qué tiene que hacer, el plan técnico y 25
+  tareas internas.
+- El motor ya recomienda. Recibe la compra, las tarjetas del usuario y las
+  promos, y devuelve con cuál conviene pagar, las alternativas ordenadas y,
+  para cada promo que no sirve, el motivo (por ejemplo, "Hoy no aplica: la
+  promo es los sábados").
+- Tiene en cuenta el tope que el usuario ya usó en el mes. Si está agotado,
+  la promo se descarta y se indica en cuántas compras se basa esa
+  estimación.
+- Se agregó al modelo de datos la opción de marcar una promo como "de otra
+  provincia". Sin eso, una promo válida solo en Córdoba se habría
+  recomendado en CABA.
+- Pasan 79 tests automáticos, incluido uno que verifica que con 2.000 promos
+  la respuesta tarda menos de un segundo.
+- Errores de la IA en el proceso:
+  - Marcó como completa la lista de control de la spec cuando no lo estaba;
+    el revisor encontró una regla que nunca podía fallar.
+  - Recomendó resolver los topes "por compra" en esta issue sin haber leído
+    antes la issue #37, y lo corrigió al leerla.
+  - Uno de los hallazgos del revisor era incorrecto y no se aplicó.
+- Se resolvió un pendiente que venía de la issue #32: el motor compilado no
+  cargaba fuera de los tests, porque sus archivos se importaban entre sí
+  sin extensión. Eso habría hecho fallar la Edge Function de la issue #43,
+  que corre en Deno. Ahora los imports llevan `.ts` y TypeScript rechaza
+  cualquier import sin extensión, así que el error no puede volver sin que
+  el typecheck lo marque.
+- La revisión de código (estándares y cumplimiento de la spec), los tests y
+  el control de reglas del proyecto no encontraron incumplimientos. Se
+  corrigieron cuatro detalles: el monto mínimo ahora también se compara en
+  centavos, se sumaron dos pruebas de punta a punta del tope, el motivo de
+  jurisdicción pasó a "La promo no es válida en tu jurisdicción" y el
+  ADR-009 aclara que las clases de error sí se permiten en el motor.
+- Queda para la issue #51: que el extractor marque las promos de otras
+  provincias.
+
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

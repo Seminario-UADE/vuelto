@@ -19,7 +19,9 @@ Se adopta el patrón **functional core, imperative shell**:
 - **Núcleo funcional** (`packages/motor`): funciones puras sobre datos
   planos. Los datos del dominio son `interface`/`type` de TypeScript, no
   clases. Sin I/O, sin LLM, sin reloj: todo lo que varía entra por
-  parámetro (`ahora`, compras del período).
+  parámetro (`ahora`, compras del período). La excepción son los errores
+  (`class PerfilSinMediosError extends Error`): no son datos del dominio ni
+  viajan como JSON, y la capa imperativa los distingue con `instanceof`.
 - **Capa imperativa** (Edge Functions): hace todo el I/O. Verifica la
   sesión, lee de Postgres, llama a Gemini, arma los datos que el núcleo
   necesita, lo invoca y responde. Se organiza en capas:

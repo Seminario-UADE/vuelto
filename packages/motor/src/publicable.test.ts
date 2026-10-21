@@ -3,8 +3,8 @@ import {
   CAMPOS_OBLIGATORIOS_PROMO,
   camposFaltantes,
   esPromocionPublicable,
-} from "./publicable";
-import type { BorradorPromocion } from "./tipos";
+} from "./publicable.ts";
+import type { BorradorPromocion } from "./tipos.ts";
 
 function borradorCompleto(): BorradorPromocion {
   return {

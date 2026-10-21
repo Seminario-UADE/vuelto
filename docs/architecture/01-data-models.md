@@ -10,7 +10,7 @@ Atributos que necesita sí o sí (contexto §5):
 
 | Campo | Nota |
 |---|---|
-| Jurisdicción | Nacional / provincial / CABA. Determina si la promo aplica donde está el usuario |
+| Jurisdicción | `nacional`, `caba`, `pba` u `otra_provincia` (o `null` si no se informa). El MVP (CABA y AMBA) acepta `nacional`, `caba`, `pba` y `null`; las de otra provincia se descartan (`JURISDICCIONES_VALIDAS`, issue #36) |
 | Tope de reintegro | Con su período, su banco y su alcance (compartido entre promociones del mismo banco, o exclusivo de esta) |
 | Vigencia | Fecha de inicio y fin, días de la semana aplicables |
 | Comercios y sucursales adheridas | No todas las sucursales de una cadena participan. En el MVP solo comercio; sucursales fuera de alcance (ver abajo) |
