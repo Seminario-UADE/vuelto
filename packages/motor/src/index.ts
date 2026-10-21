@@ -5,3 +5,6 @@
 export * from "./tipos";
 export * from "./categorias";
 export * from "./publicable";
+export { recomendar } from "./recomendar";
+export { PerfilSinMediosError } from "./errores";
+export { JURISDICCIONES_VALIDAS } from "./elegibilidad";

@@ -43,7 +43,11 @@ export type Red =
   | "tarjeta_sol";
 
 export type TipoTarjeta = "debito" | "credito";
-export type Jurisdiccion = "nacional" | "pba" | "caba";
+/**
+ * `otra_provincia` = vale solo en una provincia fuera del alcance del MVP
+ * (CABA y AMBA), por ejemplo Córdoba. El motor la descarta.
+ */
+export type Jurisdiccion = "nacional" | "pba" | "caba" | "otra_provincia";
 /** Canal de una compra concreta. */
 export type Canal = "presencial" | "online";
 /** Canal en que vale una promo. */
@@ -150,22 +154,47 @@ export interface CompraPropuesta {
   canal: Canal;
 }
 
+/**
+ * En qué se apoya un tope estimado (constitución §V): "≈$3.000, según 4
+ * compras registradas". Forma propuesta en la issue #38, que la reutiliza.
+ */
+export interface BaseEstimacion {
+  /** Compras con la promo en el período, hasta la fecha de la consulta. */
+  comprasRegistradas: number;
+  /** De esas, cuántas no informan `descuentoObtenido` (consumo calculado). */
+  comprasSinDescuentoInformado: number;
+}
+
 export interface OpcionDePago {
   medioDePagoId: string;
   promocionId: string | null;
   ahorroEstimado: number;
-  /**
-   * Siempre es un estimado. Su base (cuántas compras lo sostienen) la suma
-   * la issue #36, reusando la forma de `EstimacionTope.base` de la issue #38.
-   */
+  /** Siempre es un estimado, sostenido por `base`. `null` = la promo no informa tope. */
   topeRestanteTrasCompra: number | null;
+  /** `null` solo si la promo no informa tope. */
+  base: BaseEstimacion | null;
   /** Texto determinístico por plantilla, nunca de un LLM (ADR-004). */
   motivo: string;
 }
 
+/** Una por regla de elegibilidad, en el orden en que se evalúan. */
+export type CausaDescarte =
+  | "categoria"
+  | "comercio"
+  | "vigencia"
+  | "dia"
+  | "canal"
+  | "jurisdiccion"
+  | "monto_minimo"
+  | "medio_de_pago"
+  | "tope_agotado";
+
 /** Promo que no aplica a la compra, con el motivo para mostrarle al usuario. */
 export interface Descarte {
   promocionId: string;
+  causa: CausaDescarte;
+  /** Solo con causa `tope_agotado`: un tope agotado también es un estimado. */
+  base: BaseEstimacion | null;
   motivo: string;
 }
 
