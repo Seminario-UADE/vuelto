@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { PerfilSinMediosError } from "./errores";
 import { recomendar } from "./recomendar";
-import { AHORA, compra, medio, perfil, promo, SANTANDER } from "./test/fabricas";
+import { AHORA, compra, compraRegistrada, medio, perfil, promo, SANTANDER } from "./test/fabricas";
+import type { Promocion } from "./tipos";
 
 const galicia = medio();
 const santander = medio({
@@ -159,5 +160,106 @@ describe("recomendar: US2", () => {
     const r = recomendar(compra(), perfil(), promos, [], AHORA);
     const motivos = [r.mejor, ...r.alternativas, ...r.descartadas].map((x) => x?.motivo);
     expect(motivos.every((m) => typeof m === "string" && m.length > 0)).toBe(true);
+  });
+});
+
+describe("recomendar: US3", () => {
+  const conTope = (monto: number | null): Promocion =>
+    promo({ tope: { monto, periodo: "mensual", alcance: null, grupoTopeId: null } });
+
+  it("US3-1: el ahorro se limita al tope restante y la opción lleva su base", () => {
+    const compras = [
+      compraRegistrada({ id: "c1", descuentoObtenido: 1500 }),
+      compraRegistrada({ id: "c2", descuentoObtenido: 2500 }),
+    ];
+    const r = recomendar(compra(), perfil(), [conTope(5000)], compras, AHORA);
+    expect(r.mejor).toMatchObject({
+      ahorroEstimado: 1000,
+      topeRestanteTrasCompra: 0,
+      base: { comprasRegistradas: 2, comprasSinDescuentoInformado: 0 },
+    });
+  });
+
+  it("con tope de sobra, el restante tras la compra descuenta el ahorro", () => {
+    const r = recomendar(compra(), perfil(), [conTope(5000)], [], AHORA);
+    expect(r.mejor).toMatchObject({ ahorroEstimado: 2000, topeRestanteTrasCompra: 3000 });
+  });
+
+  it("US3-2: con el tope agotado la promo se descarta y nunca es la mejor", () => {
+    const compras = [compraRegistrada({ descuentoObtenido: 5000 })];
+    const r = recomendar(compra(), perfil(), [conTope(5000)], compras, AHORA);
+    expect(r.mejor).toBeNull();
+    expect(r.descartadas).toEqual([
+      {
+        promocionId: "promo-galicia",
+        causa: "tope_agotado",
+        base: { comprasRegistradas: 1, comprasSinDescuentoInformado: 0 },
+        motivo: "Tope agotado",
+      },
+    ]);
+  });
+
+  it("US3-5: una compra estimada que llena el tope lo agota, con su base", () => {
+    const compras = [compraRegistrada({ monto: 100000 })];
+    const r = recomendar(compra(), perfil(), [conTope(5000)], compras, AHORA);
+    expect(r.descartadas[0]).toMatchObject({
+      causa: "tope_agotado",
+      base: { comprasRegistradas: 1, comprasSinDescuentoInformado: 1 },
+    });
+  });
+
+  it("US3-6: sin tope informado, porcentaje completo, sin restante ni base, y el motivo lo dice", () => {
+    const r = recomendar(compra(), perfil(), [conTope(null)], [compraRegistrada()], AHORA);
+    expect(r.mejor).toMatchObject({ ahorroEstimado: 2000, topeRestanteTrasCompra: null, base: null });
+    expect(r.mejor?.motivo).toContain("no informa tope");
+  });
+
+  it("US3-7: con tope y sin compras, la base es cero y cero", () => {
+    const r = recomendar(compra(), perfil(), [conTope(5000)], [], AHORA);
+    expect(r.mejor?.base).toEqual({ comprasRegistradas: 0, comprasSinDescuentoInformado: 0 });
+  });
+
+  it("una promo agotada no impide recomendar otra que sí tiene tope", () => {
+    const agotada = { ...conTope(5000), id: "promo-agotada" };
+    const compras = [compraRegistrada({ promocionId: "promo-agotada", descuentoObtenido: 5000 })];
+    const r = recomendar(compra(), perfil(), [agotada, conTope(5000)], compras, AHORA);
+    expect(r.mejor?.promocionId).toBe("promo-galicia");
+    expect(r.descartadas.map((d) => d.causa)).toEqual(["tope_agotado"]);
+  });
+
+  it("SC-005: ningún tope sin su base; los descartes por otra causa no llevan base", () => {
+    const promos = [
+      conTope(5000),
+      { ...conTope(5000), id: "promo-agotada" },
+      { ...conTope(null), id: "promo-sin-tope" },
+      { ...conTope(5000), id: "promo-farmacia", categoriaId: 4 },
+    ];
+    const compras = [compraRegistrada({ promocionId: "promo-agotada", descuentoObtenido: 5000 })];
+    const r = recomendar(compra(), perfil(), promos, compras, AHORA);
+    for (const o of [r.mejor, ...r.alternativas]) {
+      expect(o?.topeRestanteTrasCompra === null || o?.base !== null, o?.promocionId ?? "").toBe(true);
+    }
+    for (const d of r.descartadas) {
+      expect(d.base !== null, d.promocionId).toBe(d.causa === "tope_agotado");
+    }
+  });
+});
+
+describe("recomendar: rendimiento", () => {
+  it("SC-003: 2.000 promos y 100 compras en menos de 1 segundo", () => {
+    const promos = Array.from({ length: 2000 }, (_, i) =>
+      promo({
+        id: `promo-${i}`,
+        categoriaId: i % 2 === 0 ? 1 : 4,
+        tope: { monto: 5000, periodo: "mensual", alcance: null, grupoTopeId: null },
+      }),
+    );
+    const compras = Array.from({ length: 100 }, (_, i) =>
+      compraRegistrada({ id: `compra-${i}`, promocionId: `promo-${i * 2}` }),
+    );
+    const inicio = Date.now();
+    const r = recomendar(compra(), perfil([galicia, santander]), promos, compras, AHORA);
+    expect(Date.now() - inicio).toBeLessThan(1000);
+    expect(r.alternativas.length + r.descartadas.length + 1).toBe(2000);
   });
 });

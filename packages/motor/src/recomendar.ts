@@ -8,7 +8,10 @@ import { mediosCompatibles, primeraReglaQueFalla, type ContextoDeCompra } from "
 import { PerfilSinMediosError } from "./errores";
 import { diaArgentina, fechaArgentina } from "./fecha";
 import { motivoDescarte, motivoOpcion } from "./motivos";
+import { comprasPorPromocion, estadoDeTope } from "./tope";
 import type {
+  BaseEstimacion,
+  CausaDescarte,
   Compra,
   CompraPropuesta,
   Descarte,
@@ -35,8 +38,7 @@ export function recomendar(
   compra: CompraPropuesta,
   perfil: Perfil,
   promociones: Promocion[],
-  // Se usa desde la US3 (tope consumido).
-  _comprasDelPeriodo: Compra[],
+  comprasDelPeriodo: Compra[],
   ahora: Date,
 ): Recomendacion {
   if (perfil.mediosDePago.length === 0) throw new PerfilSinMediosError();
@@ -45,28 +47,34 @@ export function recomendar(
   const montoCentavos = aCentavos(compra.monto);
   const opciones: OpcionDePago[] = [];
   const descartadas: Descarte[] = [];
+  const comprasDe = comprasPorPromocion(comprasDelPeriodo);
 
   for (const promo of promociones) {
     const medios = mediosCompatibles(promo, perfil.mediosDePago);
+    const descartar = (causa: CausaDescarte, base: BaseEstimacion | null) =>
+      descartadas.push({ promocionId: promo.id, causa, base, motivo: motivoDescarte(causa, promo, ctx) });
+
     const causa = primeraReglaQueFalla(promo, ctx) ?? (medios.length === 0 ? "medio_de_pago" : null);
     if (causa !== null) {
-      descartadas.push({
-        promocionId: promo.id,
-        causa,
-        base: null,
-        motivo: motivoDescarte(causa, promo, ctx),
-      });
+      descartar(causa, null);
       continue;
     }
-    const ahorro = aplicarPorcentaje(montoCentavos, aCentesimosDePunto(promo.porcentaje));
+    // El tope es de la promo, no del medio: se calcula una vez por promo.
+    const tope = estadoDeTope(promo, comprasDe.get(promo.id) ?? [], ctx.fecha);
+    if (tope.restante === 0) {
+      // Un tope agotado también es un estimado: lleva su base (constitución §V).
+      descartar("tope_agotado", tope.base);
+      continue;
+    }
+    const sinTecho = aplicarPorcentaje(montoCentavos, aCentesimosDePunto(promo.porcentaje));
+    const ahorro = tope.restante === null ? sinTecho : Math.min(sinTecho, tope.restante);
     for (const medio of medios) {
       opciones.push({
         medioDePagoId: medio.id,
         promocionId: promo.id,
         ahorroEstimado: aPesos(ahorro),
-        // Tope y base llegan con la US3.
-        topeRestanteTrasCompra: null,
-        base: null,
+        topeRestanteTrasCompra: tope.restante === null ? null : aPesos(tope.restante - ahorro),
+        base: tope.base,
         motivo: motivoOpcion(promo),
       });
     }
