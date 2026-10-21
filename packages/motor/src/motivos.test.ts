@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { diaArgentina, fechaArgentina } from "./fecha";
-import { motivoDescarte, motivoOpcion } from "./motivos";
-import { AHORA, compra, promo } from "./test/fabricas";
+import { diaArgentina, fechaArgentina } from "./fecha.ts";
+import { motivoDescarte, motivoOpcion } from "./motivos.ts";
+import { AHORA, compra, promo } from "./test/fabricas.ts";
 
 const ctx = { compra: compra(), fecha: fechaArgentina(AHORA), dia: diaArgentina(AHORA) };
 

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { fechaArgentina } from "./fecha";
-import { compraRegistrada, promo } from "./test/fabricas";
-import type { Tope } from "./tipos";
-import { estadoDeTope } from "./tope";
+import { fechaArgentina } from "./fecha.ts";
+import { compraRegistrada, promo } from "./test/fabricas.ts";
+import type { Tope } from "./tipos.ts";
+import { estadoDeTope } from "./tope.ts";
 
 const HOY = "2026-10-21";
 const conTope = (monto: number | null, periodo: Tope["periodo"] = "mensual") =>

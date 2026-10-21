@@ -3,12 +3,12 @@
  * Función pura: todo lo que varía entra por parámetro, incluido `ahora`
  * (constitución §II). Contrato: `specs/002-motor-recomendar/contracts/`.
  */
-import { aCentavos, aCentesimosDePunto, aPesos, aplicarPorcentaje } from "./dinero";
-import { mediosCompatibles, primeraReglaQueFalla, type ContextoDeCompra } from "./elegibilidad";
-import { PerfilSinMediosError } from "./errores";
-import { diaArgentina, fechaArgentina } from "./fecha";
-import { motivoDescarte, motivoOpcion } from "./motivos";
-import { comprasPorPromocion, estadoDeTope } from "./tope";
+import { aCentavos, aCentesimosDePunto, aPesos, aplicarPorcentaje } from "./dinero.ts";
+import { mediosCompatibles, primeraReglaQueFalla, type ContextoDeCompra } from "./elegibilidad.ts";
+import { PerfilSinMediosError } from "./errores.ts";
+import { diaArgentina, fechaArgentina } from "./fecha.ts";
+import { motivoDescarte, motivoOpcion } from "./motivos.ts";
+import { comprasPorPromocion, estadoDeTope } from "./tope.ts";
 import type {
   BaseEstimacion,
   CausaDescarte,
@@ -19,7 +19,7 @@ import type {
   Perfil,
   Promocion,
   Recomendacion,
-} from "./tipos";
+} from "./tipos.ts";
 
 /** Por código de carácter, no por idioma: el mismo orden en Node y en Deno. */
 function compararIds(a: string, b: string): number {

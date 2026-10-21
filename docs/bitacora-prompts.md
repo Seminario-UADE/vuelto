@@ -623,6 +623,9 @@ compartidos) y #38 (estimación de topes).
    las de otras provincias, como Córdoba, no."
 5. "Implementalo por etapas y frená al terminar cada una para que revise el
    código antes de seguir."
+6. "¿Cómo es eso de que el motor compilado no carga en Deno? ¿Qué es Deno y
+   dónde se usa? ¿No sirve importar con `.ts`?" Se eligió escribir los
+   imports con `.ts` y que TypeScript los pase a `.js` al compilar.
 
 **Resultado:**
 - Quedó documentada la funcionalidad completa en
@@ -646,6 +649,12 @@ compartidos) y #38 (estimación de topes).
   - Recomendó resolver los topes "por compra" en esta issue sin haber leído
     antes la issue #37, y lo corrigió al leerla.
   - Uno de los hallazgos del revisor era incorrecto y no se aplicó.
+- Se resolvió un pendiente que venía de la issue #32: el motor compilado no
+  cargaba fuera de los tests, porque sus archivos se importaban entre sí
+  sin extensión. Eso habría hecho fallar la Edge Function de la issue #43,
+  que corre en Deno. Ahora los imports llevan `.ts` y TypeScript rechaza
+  cualquier import sin extensión, así que el error no puede volver sin que
+  el typecheck lo marque.
 - Queda para la issue #51: que el extractor marque las promos de otras
   provincias.
 

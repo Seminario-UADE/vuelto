@@ -4,11 +4,11 @@ import {
   mediosCompatibles,
   normalizar,
   primeraReglaQueFalla,
-} from "./elegibilidad";
-import { diaArgentina, fechaArgentina } from "./fecha";
-import { recomendar } from "./recomendar";
-import { AHORA, compra, medio, perfil, promo, SANTANDER } from "./test/fabricas";
-import type { CausaDescarte, CompraPropuesta, Promocion } from "./tipos";
+} from "./elegibilidad.ts";
+import { diaArgentina, fechaArgentina } from "./fecha.ts";
+import { recomendar } from "./recomendar.ts";
+import { AHORA, compra, medio, perfil, promo, SANTANDER } from "./test/fabricas.ts";
+import type { CausaDescarte, CompraPropuesta, Promocion } from "./tipos.ts";
 
 const contexto = (datos = compra()) => ({
   compra: datos,

@@ -13,7 +13,7 @@ import type {
   Jurisdiccion,
   MedioDePago,
   Promocion,
-} from "./tipos";
+} from "./tipos.ts";
 
 /** Alcance del MVP: CABA y AMBA. Una promo sin jurisdicción también aplica. */
 export const JURISDICCIONES_VALIDAS: readonly Jurisdiccion[] = ["nacional", "caba", "pba"];

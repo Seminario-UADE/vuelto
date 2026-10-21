@@ -2,9 +2,9 @@
  * Textos de motivo por plantilla, nunca de un LLM (constitución §II).
  * Tono de `docs/design/DESIGN.md` §8; la redacción final es de la issue #46.
  */
-import { CATEGORIAS_MODO } from "./categorias";
-import type { ContextoDeCompra } from "./elegibilidad";
-import type { CausaDescarte, Dia, FechaISO, Promocion } from "./tipos";
+import { CATEGORIAS_MODO } from "./categorias.ts";
+import type { ContextoDeCompra } from "./elegibilidad.ts";
+import type { CausaDescarte, Dia, FechaISO, Promocion } from "./tipos.ts";
 
 const NOMBRE_DIA: Record<Dia, string> = {
   lun: "lunes",

@@ -3,7 +3,7 @@
  * sus datos de zona horaria dependen del runtime, y el motor corre en Deno
  * (Edge Function) y se testea en Node.
  */
-import type { Dia, FechaISO } from "./tipos";
+import type { Dia, FechaISO } from "./tipos.ts";
 
 const DESFASE_ARGENTINA_MS = -3 * 60 * 60 * 1000;
 const DIAS: readonly Dia[] = ["dom", "lun", "mar", "mie", "jue", "vie", "sab"];

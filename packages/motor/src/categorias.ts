@@ -6,7 +6,7 @@
  *
  * Se filtra siempre por id: el slug de texto devuelve 0 resultados.
  */
-import type { CategoriaId } from "./tipos";
+import type { CategoriaId } from "./tipos.ts";
 
 export const CATEGORIAS_MODO: readonly { id: CategoriaId; nombre: string }[] = [
   { id: 1, nombre: "Supermercados" },

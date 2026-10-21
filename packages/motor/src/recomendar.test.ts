@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { PerfilSinMediosError } from "./errores";
-import { recomendar } from "./recomendar";
-import { AHORA, compra, compraRegistrada, medio, perfil, promo, SANTANDER } from "./test/fabricas";
-import type { Promocion } from "./tipos";
+import { PerfilSinMediosError } from "./errores.ts";
+import { recomendar } from "./recomendar.ts";
+import { AHORA, compra, compraRegistrada, medio, perfil, promo, SANTANDER } from "./test/fabricas.ts";
+import type { Promocion } from "./tipos.ts";
 
 const galicia = medio();
 const santander = medio({

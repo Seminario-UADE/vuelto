@@ -1,4 +1,4 @@
-import type { BorradorPromocion, Promocion } from "./tipos";
+import type { BorradorPromocion, Promocion } from "./tipos.ts";
 
 /**
  * Decisión del PO (issue #33, RF-16): sin estos campos una promo no se

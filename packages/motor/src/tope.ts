@@ -4,9 +4,9 @@
  * tope compartido y los períodos semanal y por compra los suma la issue #37;
  * la issue #38 reutiliza este cálculo para «Mis topes».
  */
-import { aCentavos, aCentesimosDePunto, aplicarPorcentaje } from "./dinero";
-import { mesDe } from "./fecha";
-import type { BaseEstimacion, Compra, FechaISO, Promocion } from "./tipos";
+import { aCentavos, aCentesimosDePunto, aplicarPorcentaje } from "./dinero.ts";
+import { mesDe } from "./fecha.ts";
+import type { BaseEstimacion, Compra, FechaISO, Promocion } from "./tipos.ts";
 
 /** Importes en centavos. `tope`, `restante` y `base` son `null` si la promo no informa tope. */
 export interface EstadoDeTope {

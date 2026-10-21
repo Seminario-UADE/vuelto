@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aCentavos, aCentesimosDePunto, aPesos, aplicarPorcentaje } from "./dinero";
+import { aCentavos, aCentesimosDePunto, aPesos, aplicarPorcentaje } from "./dinero.ts";
 
 describe("dinero", () => {
   it("convierte pesos a centavos redondeando al más cercano", () => {

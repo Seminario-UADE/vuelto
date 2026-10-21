@@ -1,5 +1,5 @@
 /** Datos de prueba compartidos por los tests del motor. No se compila a `dist/`. */
-import type { Compra, CompraPropuesta, MedioDePago, Perfil, Promocion } from "../tipos";
+import type { Compra, CompraPropuesta, MedioDePago, Perfil, Promocion } from "../tipos.ts";
 
 export const GALICIA = "88d8705e-2dda-46f9-8411-bb4916af858e";
 export const SANTANDER = "5b1c3a7e-0000-4000-8000-000000000072";

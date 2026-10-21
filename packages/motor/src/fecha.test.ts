@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { diaArgentina, fechaArgentina, mesDe } from "./fecha";
+import { diaArgentina, fechaArgentina, mesDe } from "./fecha.ts";
 
 describe("fecha en hora de Argentina", () => {
   it("23:30 del 31/10 en Argentina sigue siendo sábado 31 de octubre", () => {
