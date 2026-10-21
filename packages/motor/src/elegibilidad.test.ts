@@ -6,7 +6,9 @@ import {
   primeraReglaQueFalla,
 } from "./elegibilidad";
 import { diaArgentina, fechaArgentina } from "./fecha";
-import { AHORA, compra, medio, promo, SANTANDER } from "./test/fabricas";
+import { recomendar } from "./recomendar";
+import { AHORA, compra, medio, perfil, promo, SANTANDER } from "./test/fabricas";
+import type { CausaDescarte, CompraPropuesta, Promocion } from "./tipos";
 
 const contexto = (datos = compra()) => ({
   compra: datos,
@@ -57,5 +59,39 @@ describe("elegibilidad: caso feliz", () => {
       credito,
       debitoMaster,
     ]);
+  });
+});
+
+describe("elegibilidad: una regla que falla sola da su causa (SC-002)", () => {
+  const casos: [string, CausaDescarte, Partial<Promocion>, Partial<CompraPropuesta>][] = [
+    ["solo los viernes, consulta un miércoles", "dia", { vigencia: { desde: "2026-10-01", hasta: "2026-10-31", dias: ["vie"] } }, {}],
+    ["venció ayer", "vigencia", { vigencia: { desde: "2026-10-01", hasta: "2026-10-20", dias: null } }, {}],
+    ["empieza mañana", "vigencia", { vigencia: { desde: "2026-10-22", hasta: "2026-10-31", dias: null } }, {}],
+    ["banco no declarado", "medio_de_pago", { bancoId: SANTANDER }, {}],
+    ["red no declarada", "medio_de_pago", { tarjetas: { debito: [], credito: ["master"] } }, {}],
+    ["monto mínimo no alcanzado", "monto_minimo", { montoMinimo: 20000 }, { monto: 15000 }],
+    ["solo online, compra presencial", "canal", { canal: "online" }, { canal: "presencial" }],
+    ["otra categoría", "categoria", { categoriaId: 4 }, {}],
+    ["otro comercio", "comercio", { comercio: "Coto" }, { comercio: "Jumbo" }],
+    ["compra sin comercio contra promo de un comercio", "comercio", { comercio: "Coto" }, { comercio: null }],
+    ["otra provincia", "jurisdiccion", { jurisdiccion: "otra_provincia" }, {}],
+  ];
+
+  it.each(casos)("%s ⇒ %s", (_, causa, datosPromo, datosCompra) => {
+    const r = recomendar(compra(datosCompra), perfil(), [promo(datosPromo)], [], AHORA);
+    expect(r.mejor).toBeNull();
+    expect(r.descartadas).toHaveLength(1);
+    expect(r.descartadas[0]?.causa).toBe(causa);
+    expect(r.descartadas[0]?.motivo).not.toBe("");
+  });
+
+  it.each(["nacional", "caba", "pba"] as const)("una promo de jurisdicción %s aplica", (jurisdiccion) => {
+    const r = recomendar(compra(), perfil(), [promo({ jurisdiccion })], [], AHORA);
+    expect(r.mejor).not.toBeNull();
+  });
+
+  it("el monto mínimo se cumple con el monto justo", () => {
+    const r = recomendar(compra({ monto: 20000 }), perfil(), [promo({ montoMinimo: 20000 })], [], AHORA);
+    expect(r.mejor).not.toBeNull();
   });
 });

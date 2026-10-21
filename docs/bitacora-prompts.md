@@ -592,6 +592,67 @@ las Edge Functions antes de que el equipo empiece a implementarlas.
 
 ---
 
+## 2026-10-20 — Motor de recomendación: spec, plan y elegibilidad (issue #36, en curso)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-specify`,
+`/speckit-plan`, `/speckit-tasks`, `/speckit-implement`), el subagente
+`spec-critic` (dos pasadas) y `gh` CLI para leer las issues #36, #37 y #38.
+
+**Objetivo:** implementar el núcleo del producto: dada una compra, decidir
+con qué medio de pago conviene pagar y por qué las demás promos no sirven.
+Antes de escribir código, cerrar las decisiones de producto que la issue
+dejaba abiertas y acordar la frontera con las issues #37 (topes
+compartidos) y #38 (estimación de topes).
+
+**Prompts principales:**
+1. Delimitación de la issue #36 frente a las issues #37 y #38, leyendo sus
+   cuerpos: esta issue calcula el tope de cada promo por separado y en el
+   mes calendario. Los períodos semanal y por compra, los grupos de tope y
+   la acumulabilidad quedan para la #37, como dicen las issues.
+2. Revisión crítica de la spec con `spec-critic` y decisión, punto por
+   punto, de cada hallazgo: error propio cuando el perfil no tiene medios de
+   pago (la app le pide al usuario que cargue uno), cálculo en centavos
+   enteros, consumo estimado que nunca supera el tope ni deja saldo
+   negativo, y promos sin tope con el porcentaje completo.
+3. Análisis de qué significa "tope estimado" a partir del diseño de las
+   pantallas: como hoy la app no tiene dónde cargar el reintegro real, casi
+   todas las compras van a ser estimadas. Se mantiene la base propuesta en
+   la issue #38 (compras registradas y cuántas sin descuento informado).
+4. Definición del alcance geográfico: aplican las promos nacionales, de CABA
+   y de Provincia de Buenos Aires; las de otras provincias (por ejemplo,
+   Córdoba) se descartan.
+5. Implementación por etapas, una por historia de usuario, con revisión del
+   código al terminar cada una antes de seguir.
+
+**Resultado:**
+- `specs/002-motor-recomendar/`: spec, checklist, plan, research, modelo de
+  datos, contrato de `recomendar()`, quickstart y 25 tareas internas.
+- Contrato de tipos ampliado: `CausaDescarte` (9 causas), `BaseEstimacion`
+  en opciones y en descartes por tope agotado, y `"otra_provincia"` en
+  `Jurisdiccion`. Sin ese valor, el extractor no podía expresar "solo
+  Córdoba" y la dejaba en `null`, que aplica en todos lados.
+- Etapa 1: `recomendar()` con las reglas de elegibilidad como lista
+  ordenada, ranking con desempate por id comparado por código de carácter
+  (mismo orden en Node y en Deno), fechas en hora de Argentina sin `Intl` y
+  aritmética en centavos. `PerfilSinMediosError` es la única clase del
+  motor (ADR-009).
+- Etapa 2: un test por regla que falla sola, orden fijo de causas y textos
+  de motivo por plantilla. 56 tests en verde.
+- Falta la etapa 3: tope consumido, techo y base del estimado. Hasta
+  entonces las opciones salen sin base, así que no se puede mergear antes.
+- Errores de la IA en el proceso: la primera versión de la spec marcó toda
+  la checklist como cumplida, y `spec-critic` encontró una regla que nunca
+  podía fallar (jurisdicción). Además, la IA recomendó resolver el período
+  "por compra" en esta issue sin haber leído antes la issue #37, que ya lo
+  incluía; al leerla se revirtió la recomendación. Un hallazgo de
+  `spec-critic` sobre un comentario de `tipos.ts` resultó equivocado y no se
+  aplicó.
+- Queda para la issue #51: que el extractor devuelva `otra_provincia` para
+  las promos de otras provincias.
+
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

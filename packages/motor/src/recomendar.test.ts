@@ -107,3 +107,57 @@ describe("recomendar: US1", () => {
     expect({ c, pf, promos }).toEqual(copia);
   });
 });
+
+describe("recomendar: US2", () => {
+  it("si falla varias reglas, informa la primera del orden fijo (FR-015)", () => {
+    const p = promo({
+      categoriaId: 4,
+      vigencia: { desde: "2026-10-01", hasta: "2026-10-31", dias: ["vie"] },
+    });
+    expect(recomendar(compra(), perfil(), [p], [], AHORA).descartadas[0]?.causa).toBe("categoria");
+  });
+
+  it("una regla de la promo va antes que el medio de pago", () => {
+    const p = promo({
+      bancoId: SANTANDER,
+      vigencia: { desde: "2026-10-01", hasta: "2026-10-31", dias: ["vie"] },
+    });
+    expect(recomendar(compra(), perfil([galicia]), [p], [], AHORA).descartadas[0]?.causa).toBe("dia");
+  });
+
+  it("una promo que falla con un medio y aplica con otro es opción, no descarte", () => {
+    const r = recomendar(compra(), perfil([santander, galicia]), [promoGalicia], [], AHORA);
+    expect(r.mejor?.medioDePagoId).toBe(galicia.id);
+    expect(r.alternativas).toEqual([]);
+    expect(r.descartadas).toEqual([]);
+  });
+
+  it("las descartadas se ordenan por id de promo, sin importar el orden de entrada (FR-023)", () => {
+    const promos = ["p-c", "p-a", "p-b"].map((id) => promo({ id, categoriaId: 4 }));
+    const r = recomendar(compra(), perfil(), promos, [], AHORA);
+    expect(r.descartadas.map((d) => d.promocionId)).toEqual(["p-a", "p-b", "p-c"]);
+  });
+
+  it("cada promo queda en una opción o en exactamente un descarte (FR-003, SC-004)", () => {
+    const promos = [
+      promoGalicia,
+      promoSantander,
+      promo({ id: "promo-farmacia", categoriaId: 4 }),
+      promo({ id: "promo-viernes", vigencia: { desde: "2026-10-01", hasta: "2026-10-31", dias: ["vie"] } }),
+    ];
+    const r = recomendar(compra(), perfil([galicia]), promos, [], AHORA);
+    const enOpciones = new Set([r.mejor, ...r.alternativas].map((o) => o?.promocionId));
+    const enDescartes = r.descartadas.map((d) => d.promocionId);
+    for (const p of promos) {
+      const veces = (enOpciones.has(p.id) ? 1 : 0) + enDescartes.filter((id) => id === p.id).length;
+      expect(veces, p.id).toBe(1);
+    }
+  });
+
+  it("todo motivo es un texto no vacío", () => {
+    const promos = [promoGalicia, promo({ id: "promo-farmacia", categoriaId: 4 })];
+    const r = recomendar(compra(), perfil(), promos, [], AHORA);
+    const motivos = [r.mejor, ...r.alternativas, ...r.descartadas].map((x) => x?.motivo);
+    expect(motivos.every((m) => typeof m === "string" && m.length > 0)).toBe(true);
+  });
+});

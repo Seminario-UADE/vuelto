@@ -7,7 +7,7 @@ import { aCentavos, aCentesimosDePunto, aPesos, aplicarPorcentaje } from "./dine
 import { mediosCompatibles, primeraReglaQueFalla, type ContextoDeCompra } from "./elegibilidad";
 import { PerfilSinMediosError } from "./errores";
 import { diaArgentina, fechaArgentina } from "./fecha";
-import { motivoOpcion } from "./motivos";
+import { motivoDescarte, motivoOpcion } from "./motivos";
 import type {
   Compra,
   CompraPropuesta,
@@ -50,8 +50,12 @@ export function recomendar(
     const medios = mediosCompatibles(promo, perfil.mediosDePago);
     const causa = primeraReglaQueFalla(promo, ctx) ?? (medios.length === 0 ? "medio_de_pago" : null);
     if (causa !== null) {
-      // El motivo por causa llega con la US2.
-      descartadas.push({ promocionId: promo.id, causa, base: null, motivo: "No aplica a esta compra" });
+      descartadas.push({
+        promocionId: promo.id,
+        causa,
+        base: null,
+        motivo: motivoDescarte(causa, promo, ctx),
+      });
       continue;
     }
     const ahorro = aplicarPorcentaje(montoCentavos, aCentesimosDePunto(promo.porcentaje));
