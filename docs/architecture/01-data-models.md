@@ -10,15 +10,42 @@ Atributos que necesita sí o sí (contexto §5):
 
 | Campo | Nota |
 |---|---|
-| Jurisdicción | Nacional / provincial / CABA. Determina si la promo aplica donde está el usuario |
+| Jurisdicción | `nacional`, `caba`, `pba` u `otra_provincia` (o `null` si no se informa). El MVP (CABA y AMBA) acepta `nacional`, `caba`, `pba` y `null`; las de otra provincia se descartan (`JURISDICCIONES_VALIDAS`, issue #36) |
 | Tope de reintegro | Con su período, su banco y su alcance (compartido entre promociones del mismo banco, o exclusivo de esta) |
 | Vigencia | Fecha de inicio y fin, días de la semana aplicables |
-| Comercios y sucursales adheridas | No todas las sucursales de una cadena participan |
-| Tarjetas incluidas / excluidas | — |
+| Comercios y sucursales adheridas | No todas las sucursales de una cadena participan. En el MVP solo comercio; sucursales fuera de alcance (ver abajo) |
+| Tarjetas incluidas / excluidas | En el MVP solo incluidas; excluidas fuera de alcance (ver abajo) |
 | Acumulable | Si se puede sumar a otro beneficio sobre la misma compra. Default: no |
 
 Campos ausentes en la fuente se guardan `null` explícito — nunca inferidos
 (ver regla en `CLAUDE.md`).
+
+El contrato de tipos que usan el motor, la ingesta y la Edge Function está
+en `packages/motor/src/tipos.ts` (issue #33). Decisiones que fija:
+
+- **Campos obligatorios para publicar** (RF-16): `bancoId`, `categoriaId`,
+  `porcentaje`, `vigencia.desde`, `vigencia.hasta` y `tarjetas` (con al
+  menos una red en débito o crédito). Si alguno falta, la ingesta descarta
+  el borrador (`esPromocionPublicable`, `camposFaltantes`). El resto puede
+  ser `null`, incluido `tope.monto`: el motor lo trata como "tope no
+  informado".
+- **`bancoId`** es el `id` del catálogo de bancos de MODO
+  (`GET /promos/api/rewards/banks`), un UUID string; no el nombre ni el
+  `bcra_code`. Es la misma clave que usa el medio de pago del perfil
+  (`specs/001-perfil-billeteras/spec.md`). Las promos de MODO solo traen el
+  nombre del banco (`name_bank`): la ingesta y el seed lo traducen al `id`
+  comparando contra `name` del catálogo **normalizado** (minúsculas, sin
+  acentos, sin espacios de más). Si no matchea, `bancoId` queda `null` y la
+  promo no se publica.
+- **Categorías como datos**: `categoriaId` es el id numérico de MODO y el
+  catálogo vive en una tabla `categorias`, sembrada desde MODO como
+  `bancos`. Una categoría nueva no requiere cambiar el motor.
+- **Red**: los 9 valores tal cual los usa MODO en `debit_list` /
+  `credit_list`.
+
+**Fuera de alcance del MVP:** sucursales adheridas y tarjetas excluidas.
+MODO no las trae estructuradas y ninguna historia del MVP las usa; quedan
+para cuando se sumen fuentes que las informen.
 
 ## Compra (registro por ticket, contexto §4.4)
 

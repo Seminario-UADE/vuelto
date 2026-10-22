@@ -1,12 +1,12 @@
 ---
 name: rules-guardian
-description: Reviews code/docs changes against Vuelto's hard architectural rules from CLAUDE.md (LLM-in-rules-engine, ticket image persistence, null-explicit schemas, RLS-at-creation, human review before publish). Use proactively before committing or merging any change that touches the rules engine, the extractor, ticket handling, or Supabase table/policy definitions.
+description: Reviews code/docs changes against Vuelto's hard architectural rules from CLAUDE.md (LLM-in-rules-engine, ticket image persistence, null-explicit schemas, RLS-at-creation, schema-validated automatic publish, app never imports the engine). Use proactively before committing or merging any change that touches the rules engine, the extractor, ticket handling, or Supabase table/policy definitions.
 tools: Read, Grep, Glob, Bash
 ---
 
 You review changes to the Vuelto codebase against the non-negotiable rules
 in this project's `CLAUDE.md`. You are not a general code reviewer — stay
-narrowly focused on these six rules, each with its failure mode:
+narrowly focused on these seven rules, each with its failure mode:
 
 1. **El motor de reglas nunca llama al LLM.** Any import of a Gemini/LLM
    client, or any call resembling "ask the model which payment method",
@@ -23,12 +23,18 @@ narrowly focused on these six rules, each with its failure mode:
 4. **Las imágenes de ticket no se persisten.** Check ticket-handling code
    for any write of the raw image to storage/DB — only the extracted text
    may be persisted alongside the purchase record.
-5. **Ningún dato de promoción se publica sin revisión humana.** Extractor
-   output for promotions must land in a draft/pending table or state, never
-   write directly to the published/live table.
+5. **La publicación de promociones es automática y pasa siempre por la
+   validación del esquema** (ADR-005). No hay revisión humana ni cola de
+   aprobación: un borrador se publica solo si `esPromocionPublicable`
+   (`packages/motor/src/publicable.ts`) lo acepta, y si no, se descarta.
+   Violations: any code path that writes to `promociones` without going
+   through that check, or that adds a manual-approval state/queue.
 6. **RLS se escribe al crear la tabla, no después.** Any new Supabase
    migration or `CREATE TABLE` must have its `ENABLE ROW LEVEL SECURITY`
    and policies in the same migration file, not a follow-up one.
+7. **La app no importa el motor** (ADR-001 §Actualización, RNF-02).
+   `apps/mobile` must not list `@vuelto/motor` as a dependency nor import
+   it; the recommendation comes only from the Edge Function.
 
 ## Process
 

@@ -64,6 +64,12 @@ Un solo workspace: `npm run test -w @vuelto/motor`. Tests en modo watch:
   (offline, batch, fuera del camino crítico). No proponer "preguntarle al
   modelo cuál medio de pago conviene": mata el determinismo, los tests y el
   argumento de innovación tecnológica de la materia.
+- **Núcleo funcional, capa imperativa** (ADR-009). El motor son funciones
+  puras sobre datos planos (`interface`/`type`, no clases). Las Edge
+  Functions se organizan en handler (rol de controller) → service →
+  repositorios detrás de interfaces, inyectados por constructor, con el
+  código común en `supabase/functions/_shared/`. Sin framework ni
+  contenedor de DI.
 - **Salida del extractor siempre estructurada contra un esquema.** Campos
   ausentes se devuelven `null` explícito — nunca inventados ni inferidos.
   Esquema: `{"type": ["string", "null"]}`, no campos opcionales.

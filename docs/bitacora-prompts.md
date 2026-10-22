@@ -518,6 +518,159 @@ funcionaba.
 
 ---
 
+## 2026-10-18 — Contrato de tipos del dominio y arquitectura de la capa externa (issue #33, ADR-009)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI, `curl` contra la
+API pública de MODO para verificar datos, `/code-review` (ejes Standards y
+Spec en paralelo) y el subagente `rules-guardian`.
+
+**Objetivo:** retomar la implementación priorizando lo que destraba al
+resto del Sprint 1. La issue #33 (contrato de tipos) bloquea a #34, #35,
+#36 y #48. En el camino, revisar el PR #61 (spec de perfil, issue #41)
+porque define parte de esos tipos, y dejar documentada la arquitectura de
+las Edge Functions antes de que el equipo empiece a implementarlas.
+
+**Prompts principales:**
+1. Relevamiento del estado del proyecto: issues asignadas, dependencias
+   entre ellas y blockers, para definir por dónde arrancar.
+2. Revisión del PR #61 contra el contrato de tipos de la issue #33, con
+   verificación directa contra la API de MODO, y aviso a las issues #51 y
+   #35 de que el banco de cada promo se traduce de nombre a id del
+   catálogo con comparación normalizada.
+3. Revisión del diseño del contrato antes de escribir código: qué venía
+   definido por la issue, los RF y el PR #61, y qué se agregaba en esta
+   issue. Decisión de tratar las categorías como datos para que una
+   categoría nueva de MODO no descarte promos en silencio.
+4. Discusión de diseño sobre clases frente a interfaces y funciones, y
+   sobre cómo organizar el backend (controller, service, repositorio,
+   inyección de dependencias, SOLID), incluyendo cómo funciona la
+   autenticación de Supabase y cómo escalaría la arquitectura si el
+   producto crece.
+5. Decisión de documentar la arquitectura en un ADR referenciado desde
+   `CLAUDE.md`, en vez de comentar en cada issue, para que cualquier
+   integrante que tome una Edge Function con Claude la siga sin ruido extra.
+6. Triage de los hallazgos de la revisión: qué se corrige en esta issue y
+   qué se deriva a la issue que corresponde (#36, #38, #51), para no
+   adelantar diseño ajeno.
+
+**Resultado:**
+- PR #61 aprobado. Comentarios en las issues #51 y #35: las promos de MODO
+  solo traen `name_bank`, y hay que traducirlo al UUID del catálogo
+  comparando normalizado (minúsculas, sin acentos).
+- `packages/motor/src/tipos.ts`: contrato completo, sin campos opcionales.
+  Se aparta de la propuesta de la issue en: `Red` con los 9 valores de
+  MODO (del PR #61), `CategoriaId = number` (categorías como datos, con la
+  lista inicial en `categorias.ts`), `BorradorPromocion` para la salida de
+  la ingesta y `nombreParaMostrar` en `Perfil` (ADR-008).
+- `publicable.ts`: `CAMPOS_OBLIGATORIOS_PROMO`, `camposFaltantes()` (para
+  registrar por qué se descarta un borrador, útil para la issue #53) y
+  `esPromocionPublicable()` como guardia de tipo. 11 tests.
+- ADR-009 (núcleo funcional, capa imperativa): datos del dominio como
+  interfaces, Edge Functions con handler → service → repositorios
+  inyectados, sin framework ni contenedor de DI, y etapas de crecimiento
+  fuera del MVP. Referenciado desde `CLAUDE.md`.
+- `01-data-models.md`: qué es `bancoId`, campos obligatorios, categorías
+  como datos y lo que queda fuera de alcance (sucursales, tarjetas
+  excluidas). `pendientes.md`: RF-16 resuelto; nuevos pendientes para
+  distinguir "sin tope" de "tope no informado" y para validar rangos
+  (porcentaje, vigencia) en el esquema del extractor (issue #51).
+- Revisión: `rules-guardian` pasó todas las reglas duras. `/code-review`
+  cumplió los 5 criterios de aceptación. Se corrigieron una contradicción
+  en `01-data-models.md` y varios nombres de tipos. La base del tope
+  estimado queda para la issue #36 (reusando el tipo de la issue #38) y el
+  fragmento de origen de cada campo, para la issue #51. La jurisdicción de
+  la compra no hacía falta en el contrato: la issue #36 ya la fija como
+  constante del MVP (CABA/AMBA).
+- Se detectó que la definición del subagente `rules-guardian` está
+  desactualizada (todavía exige revisión humana antes de publicar promos,
+  contra ADR-005); queda para un PR aparte.
+- Error de la IA en el proceso: el primer commit incluyó un archivo que no
+  estaba en la lista aprobada (un borrado que había quedado en staging).
+  Se detectó al verificar el commit y se rehízo antes de subirlo.
+- Queda para la issue #34: sumar la tabla `categorias`.
+
+
+---
+
+## 2026-10-20 — Motor de recomendación: spec, plan e implementación (issue #36)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-specify`,
+`/speckit-plan`, `/speckit-tasks`, `/speckit-implement`), el subagente
+`spec-critic` (dos pasadas) y `gh` CLI para leer las issues #36, #37 y #38.
+
+**Objetivo:** implementar el núcleo del producto: dada una compra, decidir
+con qué medio de pago conviene pagar y por qué las demás promos no sirven.
+Antes de escribir código, cerrar las decisiones de producto que la issue
+dejaba abiertas y acordar la frontera con las issues #37 (topes
+compartidos) y #38 (estimación de topes).
+
+**Prompts principales:**
+1. "Antes de escribir la spec, leé completas las issues #36 y #37 y decime
+   dónde termina una y empieza la otra." Así quedó claro que los topes
+   semanales y "por compra" ya eran de la #37, y se respetó esa división.
+2. "Mostrame qué encontró el revisor de specs y qué proponés para cada
+   punto." Después, decisión por decisión:
+   - Si el usuario no tiene tarjetas cargadas, que la app se lo pida.
+   - Los montos, en centavos.
+   - Una compra grande nunca puede gastar más tope del que existe.
+   - Si la promo no informa tope, se aplica el porcentaje completo.
+3. "No entiendo para qué sirve marcar una compra como estimada: ¿es para
+   recomendar, es por si no cargan el ticket? ¿Cómo está pensado en la
+   UI?" Revisando las pantallas diseñadas vimos que hoy la app no tiene
+   dónde cargar el reintegro real, y se decidió mantener el dato como lo
+   proponía la issue #38.
+4. "Contá las promos de CABA, Provincia de Buenos Aires y las nacionales;
+   las de otras provincias, como Córdoba, no."
+5. "Implementalo por etapas y frená al terminar cada una para que revise el
+   código antes de seguir."
+6. "¿Cómo es eso de que el motor compilado no carga en Deno? ¿Qué es Deno y
+   dónde se usa? ¿No sirve importar con `.ts`?" Se eligió escribir los
+   imports con `.ts` y que TypeScript los pase a `.js` al compilar.
+7. "Corregí lo chico de la revisión de código; el texto del motivo de
+   jurisdicción tiene que ser más formal." Lo que la revisión marcó sobre
+   cómo se guarda el tope se deja para la issue #37, que va a rehacer esa
+   parte.
+
+**Resultado:**
+- Quedó documentada la funcionalidad completa en
+  `specs/002-motor-recomendar/`: qué tiene que hacer, el plan técnico y 25
+  tareas internas.
+- El motor ya recomienda. Recibe la compra, las tarjetas del usuario y las
+  promos, y devuelve con cuál conviene pagar, las alternativas ordenadas y,
+  para cada promo que no sirve, el motivo (por ejemplo, "Hoy no aplica: la
+  promo es los sábados").
+- Tiene en cuenta el tope que el usuario ya usó en el mes. Si está agotado,
+  la promo se descarta y se indica en cuántas compras se basa esa
+  estimación.
+- Se agregó al modelo de datos la opción de marcar una promo como "de otra
+  provincia". Sin eso, una promo válida solo en Córdoba se habría
+  recomendado en CABA.
+- Pasan 79 tests automáticos, incluido uno que verifica que con 2.000 promos
+  la respuesta tarda menos de un segundo.
+- Errores de la IA en el proceso:
+  - Marcó como completa la lista de control de la spec cuando no lo estaba;
+    el revisor encontró una regla que nunca podía fallar.
+  - Recomendó resolver los topes "por compra" en esta issue sin haber leído
+    antes la issue #37, y lo corrigió al leerla.
+  - Uno de los hallazgos del revisor era incorrecto y no se aplicó.
+- Se resolvió un pendiente que venía de la issue #32: el motor compilado no
+  cargaba fuera de los tests, porque sus archivos se importaban entre sí
+  sin extensión. Eso habría hecho fallar la Edge Function de la issue #43,
+  que corre en Deno. Ahora los imports llevan `.ts` y TypeScript rechaza
+  cualquier import sin extensión, así que el error no puede volver sin que
+  el typecheck lo marque.
+- La revisión de código (estándares y cumplimiento de la spec), los tests y
+  el control de reglas del proyecto no encontraron incumplimientos. Se
+  corrigieron cuatro detalles: el monto mínimo ahora también se compara en
+  centavos, se sumaron dos pruebas de punta a punta del tope, el motivo de
+  jurisdicción pasó a "La promo no es válida en tu jurisdicción" y el
+  ADR-009 aclara que las clases de error sí se permiten en el motor.
+- Queda para la issue #51: que el extractor marque las promos de otras
+  provincias.
+
+
+---
+
 ## 2026-10-22 — Tabla de requisitos bloqueados (PR #69)
 
 **Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
