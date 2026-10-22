@@ -129,10 +129,8 @@ No se dan por chequeados hasta resolver el pendiente que los frena
 | RF-18 | Tamaño del corpus sembrado a mano: el alcance ya está definido (`alcance-mvp.md`) pero falta verificar sucursales reales de las cadenas | #8 |
 | RF-13, RNF-13 | Dónde corre el cron de ingesta (relevamiento de fuentes ya resuelto, ver `fuentes-promos.md`) | `pendientes.md` |
 | RF-08, RNF-09 | Proveedor/modelo del extractor y precisión sobre tickets reales | #10 |
-| RF-16 | Umbral de validación automática de la ingesta (campos obligatorios) | `pendientes.md` |
 | RF-05 | Cómo se dispara el momento de uso (notificación / geolocalización) | `pendientes.md` |
 | RF-19, RF-20 | Promoción de débito y redondeo de la división | `pendientes.md` |
-| RF-19 | Constitución (Principio II) desactualizada: dice que el motor corre en el dispositivo; ADR-001 §Actualización y RNF-02 dicen que corre solo en la Edge Function. Bloquea el chequeo de `/speckit-plan` | — |
 | RNF-14 | Cronograma real del cuatrimestre y tamaño del equipo | `restricciones-catedra.md`, `estado.md` |
 
 ## Chequeo de coherencia (issue #3)
