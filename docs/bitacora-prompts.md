@@ -518,6 +518,28 @@ funcionaba.
 
 ---
 
+## 2026-10-22 — Tabla de requisitos bloqueados (PR #69)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** dejar al día la tabla "Requisitos bloqueados por definiciones
+pendientes" de `docs/product/requisitos.md`.
+
+**Prompts principales:**
+1. "Arreglá el #69."
+2. "Verificá si está resuelto el #33; si está resuelto, sumalo."
+
+**Resultado:**
+- Al sacar la fila de la constitución (ya resuelta en la 2.0.0) había
+  quedado una línea vacía en el medio de la tabla, que la cortaba en dos y
+  dejaba afuera la fila de RNF-14. Se borró.
+- Se sacó la fila de RF-16: el umbral de campos obligatorios para publicar
+  una promo se resolvió en la issue #33 (PR #67, `CAMPOS_OBLIGATORIOS_PROMO`
+  en `packages/motor/src/publicable.ts`). La definición de RF-16 sigue en
+  la tabla de requisitos; solo dejó de estar bloqueado.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
