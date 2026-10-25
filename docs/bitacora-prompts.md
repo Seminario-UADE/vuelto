@@ -788,6 +788,77 @@ testear la parte del servidor que no necesita la base de datos.
 
 ---
 
+## 2026-10-25 — Plan y tareas del perfil de bancos y tarjetas (issue #41)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-plan`,
+`/speckit-tasks`) y `gh` CLI para leer las issues #34, #41 y #45.
+
+**Objetivo:** dejar lista la implementación de la issue #41 (perfil: bancos,
+tarjetas y redes) mientras siguen abiertas las issues de las que depende
+(#34 esquema de Supabase, #39 app base, #40 login). La spec era del 13/10,
+anterior a varias decisiones de arquitectura, así que había que cruzarla
+con lo decidido después.
+
+**Prompts principales:**
+1. "Generá el plan de la spec `specs/001-perfil-billeteras/` cruzándola con
+   lo decidido después del 13/10: constitución 2.0.0, ADR-001
+   §Actualización, RNF-02, ADR-009 y el contrato de tipos de la issue #33.
+   Indicá qué partes quedan bloqueadas por #34, #39 y #40."
+2. "Generá las tareas y marcá cada fase bloqueada con la issue que la
+   bloquea."
+3. "Revisá los artefactos del plan y uní en `plan.md` y `tasks.md` todo lo
+   que esté repetido entre archivos."
+4. "Releé el plan y las tareas como si tuvieras que implementar la issue sin
+   contexto, y completá lo que te haría dudar o perder tiempo."
+
+**Resultado:**
+- El plan confirma que la spec sigue vigente y no hubo que cambiarla. Lo
+  decidido después se resolvió así:
+  - El perfil no necesita Edge Function: la app lee y escribe directo en
+    Supabase, y el RLS garantiza que cada usuario vea solo lo suyo
+    (ADR-009).
+  - La app no puede importar el motor, ni siquiera sus tipos (RNF-02).
+    Declara los suyos con los mismos valores, y la base rechaza cualquier
+    otro.
+  - Se mantiene la lectura del perfil sin conexión. La actualización del
+    13/10 sacó del celular el motor y el cálculo, pero no el perfil, que
+    solo se muestra.
+- Ocho decisiones técnicas, entre ellas:
+  - Que no se repita la misma tarjeta lo controla la base, no la pantalla.
+    Así también se cubre el caso de dos celulares o un doble toque.
+  - Que el perfil no quede vacío lo controla la app. Una regla en la base
+    habría impedido borrar la cuenta, y si el perfil igual queda vacío, la
+    Edge Function de la issue #43 ya lo detecta.
+  - El onboarding se guarda en un solo pedido: entra todo o nada.
+  - El buscador filtra los 82 bancos en el celular, sin acentos ni
+    mayúsculas, con los bancos frecuentes primero y un orden que no depende
+    del idioma del teléfono.
+  - Los bancos nunca se borran del catálogo, para que una tarjeta ya
+    declarada siempre tenga su banco.
+- Quedó una lista de lo que la issue #34 tiene que garantizar en las tablas
+  `bancos` y `medios_de_pago`, para coordinarlo con quien la tiene asignada.
+- 13 tareas. Las funciones puras (reglas del perfil, buscador y clasificación
+  de errores) se pueden hacer con sus tests apenas cierre la #39. Las
+  pantallas necesitan además la #34 y la #40.
+- Errores de la IA en el proceso:
+  - La primera versión del plan repartía el mismo contenido en seis
+    archivos: la tabla de medios de pago aparecía descrita tres veces y los
+    escenarios de prueba copiaban los de la spec. Se unió todo en `plan.md`
+    y `tasks.md`.
+  - Al unirlos quedaron huecos para implementar, que se encontraron en una
+    segunda lectura:
+    - no se decía cómo detectar cada error;
+    - Perfil necesitaba bajar el catálogo solo para mostrar el nombre del
+      banco;
+    - el selector de tarjeta lo usaban dos pantallas y no tenía un archivo
+      propio.
+- Queda pendiente:
+  - Avisar en la issue #34 qué necesita esta feature de las tablas.
+  - El catálogo crudo de bancos de MODO que cita un comentario de la #34
+    (`docs/product/data/modo-bancos-raw.json`) no está en el repo.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
