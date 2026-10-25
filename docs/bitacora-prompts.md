@@ -742,6 +742,8 @@ dejaba abiertas, con datos reales de MODO.
   promos de una combinación se reparten el saldo en un orden fijo, así el
   resultado es siempre el mismo. La cobertura se mide con la herramienta de
   Vitest dentro del mismo paso de tests del CI.
+- 23 tareas internas en tres etapas con revisión entre cada una: topes
+  semanales y por compra; promos acumulables; topes compartidos y cierre.
 
 ---
 
