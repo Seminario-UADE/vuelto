@@ -737,6 +737,11 @@ dejaba abiertas, con datos reales de MODO.
   entre ellos qué promos cuentan como parte de un grupo y que la Edge
   Function mande las compras desde el lunes de la semana cuando la semana
   empieza en el mes anterior.
+- Plan técnico: el cálculo pasa a "saldos" de tope, propios de una promo o
+  compartidos por un grupo, que se calculan una sola vez por consulta. Las
+  promos de una combinación se reparten el saldo en un orden fijo, así el
+  resultado es siempre el mismo. La cobertura se mide con la herramienta de
+  Vitest dentro del mismo paso de tests del CI.
 
 ---
 
