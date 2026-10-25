@@ -29,3 +29,10 @@ describe("motivos", () => {
     );
   });
 });
+
+describe("motivos: tope por compra (US1)", () => {
+  it("dice el monto del tope por compra", () => {
+    const p = promo({ tope: { monto: 3000, periodo: "por_compra", alcance: null, grupoTopeId: null } });
+    expect(motivoOpcion(p)).toBe("20% en supermercados · hasta $3.000 por compra");
+  });
+});

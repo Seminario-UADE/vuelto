@@ -36,13 +36,17 @@ export interface OpcionDePago {
 
 ```ts
 export interface Saldo {
-  tope: number | null;          // centavos; null = el grupo no tiene tope informado
+  tope: number;                 // centavos
   periodo: "mensual" | "semanal";
   consumido: number;            // centavos
-  restante: number | null;      // centavos, ≥ 0; null si tope es null
-  base: BaseEstimacion | null;  // null si tope es null
+  restante: number;             // centavos, ≥ 0
+  base: BaseEstimacion;
 }
 ```
+
+`calcularSaldos` devuelve un `Map` de id de promoción a `Saldo`. Una promoción **sin entrada**
+no tiene saldo: no informa tope, su tope es por compra o (US3) su grupo no tiene ningún miembro
+vigente con tope. Así los campos del saldo nunca son `null`.
 
 ## Reglas (resumen; detalle en la spec)
 

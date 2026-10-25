@@ -18,10 +18,11 @@
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "build": "tsc -p tsconfig.build.json"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "~5.0.4",
     "typescript": "^6.0.3",
     "vitest": "^5.0.4"
   }

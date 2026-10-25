@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 import { PerfilSinMediosError } from "./errores.ts";
 import { recomendar } from "./recomendar.ts";
 import { AHORA, compra, compraRegistrada, medio, perfil, promo, SANTANDER } from "./test/fabricas.ts";
-import type { Promocion } from "./tipos.ts";
+import type { OpcionDePago, Promocion, Tope } from "./tipos.ts";
+
+/** La única promo de una opción individual. */
+const unica = (o: OpcionDePago | null | undefined) => o?.promociones[0];
 
 const galicia = medio();
 const santander = medio({
@@ -28,17 +31,11 @@ describe("recomendar: US1", () => {
       [],
       AHORA,
     );
-    expect(r.mejor).toMatchObject({
-      medioDePagoId: galicia.id,
-      promocionId: promoGalicia.id,
-      ahorroEstimado: 2000,
-    });
+    expect(r.mejor).toMatchObject({ medioDePagoId: galicia.id, ahorroEstimado: 2000 });
+    expect(unica(r.mejor)?.promocionId).toBe(promoGalicia.id);
     expect(r.alternativas).toHaveLength(1);
-    expect(r.alternativas[0]).toMatchObject({
-      medioDePagoId: santander.id,
-      promocionId: promoSantander.id,
-      ahorroEstimado: 1000,
-    });
+    expect(r.alternativas[0]).toMatchObject({ medioDePagoId: santander.id, ahorroEstimado: 1000 });
+    expect(unica(r.alternativas[0])?.promocionId).toBe(promoSantander.id);
     expect(r.descartadas).toEqual([]);
   });
 
@@ -48,7 +45,7 @@ describe("recomendar: US1", () => {
     const medioZ = medio({ id: "Z-medio" });
     const promos = [promo({ id: "p2" }), promo({ id: "p1" })];
     const r = recomendar(compra(), perfil([medioA, medioZ]), promos, [], AHORA);
-    const orden = [r.mejor, ...r.alternativas].map((o) => `${o?.medioDePagoId}/${o?.promocionId}`);
+    const orden = [r.mejor, ...r.alternativas].map((o) => `${o?.medioDePagoId}/${unica(o)?.promocionId}`);
     expect(orden).toEqual(["Z-medio/p1", "Z-medio/p2", "a-medio/p1", "a-medio/p2"]);
   });
 
@@ -147,7 +144,7 @@ describe("recomendar: US2", () => {
       promo({ id: "promo-viernes", vigencia: { desde: "2026-10-01", hasta: "2026-10-31", dias: ["vie"] } }),
     ];
     const r = recomendar(compra(), perfil([galicia]), promos, [], AHORA);
-    const enOpciones = new Set([r.mejor, ...r.alternativas].map((o) => o?.promocionId));
+    const enOpciones = new Set([r.mejor, ...r.alternativas].flatMap((o) => o?.promociones ?? []).map((a) => a.promocionId));
     const enDescartes = r.descartadas.map((d) => d.promocionId);
     for (const p of promos) {
       const veces = (enOpciones.has(p.id) ? 1 : 0) + enDescartes.filter((id) => id === p.id).length;
@@ -173,7 +170,7 @@ describe("recomendar: US3", () => {
       compraRegistrada({ id: "c2", descuentoObtenido: 2500 }),
     ];
     const r = recomendar(compra(), perfil(), [conTope(5000)], compras, AHORA);
-    expect(r.mejor).toMatchObject({
+    expect(unica(r.mejor)).toMatchObject({
       ahorroEstimado: 1000,
       topeRestanteTrasCompra: 0,
       base: { comprasRegistradas: 2, comprasSinDescuentoInformado: 0 },
@@ -182,7 +179,7 @@ describe("recomendar: US3", () => {
 
   it("con tope de sobra, el restante tras la compra descuenta el ahorro", () => {
     const r = recomendar(compra(), perfil(), [conTope(5000)], [], AHORA);
-    expect(r.mejor).toMatchObject({ ahorroEstimado: 2000, topeRestanteTrasCompra: 3000 });
+    expect(unica(r.mejor)).toMatchObject({ ahorroEstimado: 2000, topeRestanteTrasCompra: 3000 });
   });
 
   it("US3-2: con el tope agotado la promo se descarta y nunca es la mejor", () => {
@@ -202,7 +199,7 @@ describe("recomendar: US3", () => {
   it("US3-3: las compras del mes anterior no consumen el tope de este mes", () => {
     const compras = [compraRegistrada({ fecha: "2026-09-30", descuentoObtenido: 5000 })];
     const r = recomendar(compra(), perfil(), [conTope(5000)], compras, AHORA);
-    expect(r.mejor).toMatchObject({
+    expect(unica(r.mejor)).toMatchObject({
       ahorroEstimado: 2000,
       topeRestanteTrasCompra: 3000,
       base: { comprasRegistradas: 0, comprasSinDescuentoInformado: 0 },
@@ -212,7 +209,7 @@ describe("recomendar: US3", () => {
   it("US3-4: una compra sin descuento informado se estima con el porcentaje y cuenta como estimada", () => {
     const compras = [compraRegistrada({ monto: 10000, descuentoObtenido: null })];
     const r = recomendar(compra(), perfil(), [conTope(5000)], compras, AHORA);
-    expect(r.mejor).toMatchObject({
+    expect(unica(r.mejor)).toMatchObject({
       ahorroEstimado: 2000,
       topeRestanteTrasCompra: 1000,
       base: { comprasRegistradas: 1, comprasSinDescuentoInformado: 1 },
@@ -230,20 +227,20 @@ describe("recomendar: US3", () => {
 
   it("US3-6: sin tope informado, porcentaje completo, sin restante ni base, y el motivo lo dice", () => {
     const r = recomendar(compra(), perfil(), [conTope(null)], [compraRegistrada()], AHORA);
-    expect(r.mejor).toMatchObject({ ahorroEstimado: 2000, topeRestanteTrasCompra: null, base: null });
+    expect(unica(r.mejor)).toMatchObject({ ahorroEstimado: 2000, topeRestanteTrasCompra: null, base: null });
     expect(r.mejor?.motivo).toContain("no informa tope");
   });
 
   it("US3-7: con tope y sin compras, la base es cero y cero", () => {
     const r = recomendar(compra(), perfil(), [conTope(5000)], [], AHORA);
-    expect(r.mejor?.base).toEqual({ comprasRegistradas: 0, comprasSinDescuentoInformado: 0 });
+    expect(unica(r.mejor)?.base).toEqual({ comprasRegistradas: 0, comprasSinDescuentoInformado: 0 });
   });
 
   it("una promo agotada no impide recomendar otra que sí tiene tope", () => {
     const agotada = { ...conTope(5000), id: "promo-agotada" };
     const compras = [compraRegistrada({ promocionId: "promo-agotada", descuentoObtenido: 5000 })];
     const r = recomendar(compra(), perfil(), [agotada, conTope(5000)], compras, AHORA);
-    expect(r.mejor?.promocionId).toBe("promo-galicia");
+    expect(unica(r.mejor)?.promocionId).toBe("promo-galicia");
     expect(r.descartadas.map((d) => d.causa)).toEqual(["tope_agotado"]);
   });
 
@@ -256,12 +253,67 @@ describe("recomendar: US3", () => {
     ];
     const compras = [compraRegistrada({ promocionId: "promo-agotada", descuentoObtenido: 5000 })];
     const r = recomendar(compra(), perfil(), promos, compras, AHORA);
-    for (const o of [r.mejor, ...r.alternativas]) {
-      expect(o?.topeRestanteTrasCompra === null || o?.base !== null, o?.promocionId ?? "").toBe(true);
+    for (const a of [r.mejor, ...r.alternativas].flatMap((o) => o?.promociones ?? [])) {
+      expect(a.topeRestanteTrasCompra === null || a.base !== null, a.promocionId).toBe(true);
     }
     for (const d of r.descartadas) {
       expect(d.base !== null, d.promocionId).toBe(d.causa === "tope_agotado");
     }
+  });
+});
+
+describe("recomendar: períodos del tope (issue #37, US1)", () => {
+  const conTope = (monto: number, periodo: Tope["periodo"]): Promocion =>
+    promo({ tope: { monto, periodo, alcance: null, grupoTopeId: null } });
+
+  it("US1-1: semanal con una compra del lunes", () => {
+    const compras = [compraRegistrada({ fecha: "2026-10-19", descuentoObtenido: 4000 })];
+    const r = recomendar(compra(), perfil(), [conTope(6000, "semanal")], compras, AHORA);
+    expect(unica(r.mejor)).toMatchObject({
+      ahorroEstimado: 2000,
+      topeRestanteTrasCompra: 0,
+      base: { comprasRegistradas: 1, comprasSinDescuentoInformado: 0 },
+    });
+  });
+
+  it("US1-2: semanal, la compra de la semana anterior no cuenta", () => {
+    const compras = [compraRegistrada({ fecha: "2026-10-18", descuentoObtenido: 6000 })];
+    const r = recomendar(compra(), perfil(), [conTope(6000, "semanal")], compras, AHORA);
+    expect(unica(r.mejor)).toMatchObject({
+      ahorroEstimado: 2000,
+      topeRestanteTrasCompra: 4000,
+      base: { comprasRegistradas: 0, comprasSinDescuentoInformado: 0 },
+    });
+  });
+
+  it("US1-3: semanal agotado se descarta con su base", () => {
+    const compras = [compraRegistrada({ fecha: "2026-10-20", descuentoObtenido: 6000 })];
+    const r = recomendar(compra(), perfil(), [conTope(6000, "semanal")], compras, AHORA);
+    expect(r.mejor).toBeNull();
+    expect(r.descartadas[0]).toMatchObject({
+      causa: "tope_agotado",
+      base: { comprasRegistradas: 1, comprasSinDescuentoInformado: 0 },
+    });
+  });
+
+  it("US1-4: por compra limita el ahorro en cada compra, sin mirar las anteriores", () => {
+    const compras = [compraRegistrada({ descuentoObtenido: 9000 })];
+    const r = recomendar(compra({ monto: 20000 }), perfil(), [conTope(3000, "por_compra")], compras, AHORA);
+    expect(unica(r.mejor)).toMatchObject({ ahorroEstimado: 3000, topeRestanteTrasCompra: null, base: null });
+    expect(r.mejor?.motivo).toContain("$3.000 por compra");
+  });
+
+  it("US1-5: mensual se comporta como en la issue #36", () => {
+    const compras = [compraRegistrada({ fecha: "2026-10-02", descuentoObtenido: 4000 })];
+    const r = recomendar(compra(), perfil(), [conTope(5000, "mensual")], compras, AHORA);
+    expect(unica(r.mejor)).toMatchObject({ ahorroEstimado: 1000, topeRestanteTrasCompra: 0 });
+  });
+
+  it("tope por compra de $0: descarte por tope agotado sin base (FR-015)", () => {
+    const r = recomendar(compra(), perfil(), [conTope(0, "por_compra")], [], AHORA);
+    expect(r.descartadas).toEqual([
+      { promocionId: "promo-galicia", causa: "tope_agotado", base: null, motivo: "Tope agotado" },
+    ]);
   });
 });
 

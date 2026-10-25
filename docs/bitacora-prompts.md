@@ -744,6 +744,11 @@ dejaba abiertas, con datos reales de MODO.
   Vitest dentro del mismo paso de tests del CI.
 - 23 tareas internas en tres etapas con revisión entre cada una: topes
   semanales y por compra; promos acumulables; topes compartidos y cierre.
+- Etapa 1: la opción de pago pasó al formato nuevo (lista de promos) sin
+  cambiar ningún resultado de la issue #36, y el motor ya distingue topes
+  mensuales, semanales (de lunes a domingo, aunque la semana cruce de mes)
+  y por compra. Se sumó la medición de cobertura a los tests: da 100% de
+  las líneas del motor.
 
 ---
 

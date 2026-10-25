@@ -25,3 +25,17 @@ export function diaArgentina(ahora: Date): Dia {
 export function mesDe(fecha: FechaISO): string {
   return fecha.slice(0, 7);
 }
+
+const DIA_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Primer día del período de tope que contiene a `hoy`: el día 1 del mes, o el
+ * lunes de la semana (semanas de lunes a domingo).
+ */
+export function inicioDelPeriodo(periodo: "mensual" | "semanal", hoy: FechaISO): FechaISO {
+  if (periodo === "mensual") return `${hoy.slice(0, 7)}-01`;
+  const fecha = new Date(`${hoy}T00:00:00Z`);
+  // getUTCDay(): domingo = 0, lunes = 1.
+  const diasDesdeLunes = (fecha.getUTCDay() + 6) % 7;
+  return new Date(fecha.getTime() - diasDesdeLunes * DIA_MS).toISOString().slice(0, 10);
+}

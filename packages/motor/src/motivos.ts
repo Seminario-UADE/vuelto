@@ -51,8 +51,13 @@ function textoDias(promo: Promocion): string {
 /** Ej.: "20% en supermercados los miércoles · la promo no informa tope". */
 export function motivoOpcion(promo: Promocion): string {
   const lugar = promo.comercio ?? nombreCategoria(promo);
-  const sinTope = promo.tope.monto === null ? " · la promo no informa tope" : "";
-  return `${porcentaje(promo)} en ${lugar}${textoDias(promo)}${sinTope}`;
+  const tope =
+    promo.tope.monto === null
+      ? " · la promo no informa tope"
+      : promo.tope.periodo === "por_compra"
+        ? ` · hasta ${pesos(promo.tope.monto)} por compra`
+        : "";
+  return `${porcentaje(promo)} en ${lugar}${textoDias(promo)}${tope}`;
 }
 
 /** Por qué una promo no sirve para esta compra, una plantilla por causa. */

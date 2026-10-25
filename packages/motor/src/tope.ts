@@ -1,23 +1,24 @@
 /**
- * Tope consumido de una promo y la base del estimado (FR-016, FR-017,
- * FR-020). Cada promo por separado y en el mes calendario: los grupos de
- * tope compartido y los períodos semanal y por compra los suma la issue #37;
- * la issue #38 reutiliza este cálculo para «Mis topes».
+ * Saldos de tope de las promos de una consulta (issue #37). Un saldo es lo
+ * que se va consumiendo con las compras del período: propio de una promo o,
+ * más adelante, compartido por un grupo. Se calculan una vez por consulta y
+ * la issue #38 los reutiliza para «Mis topes».
  */
 import { aCentavos, aCentesimosDePunto, aplicarPorcentaje } from "./dinero.ts";
-import { mesDe } from "./fecha.ts";
+import { inicioDelPeriodo } from "./fecha.ts";
 import type { BaseEstimacion, Compra, FechaISO, Promocion } from "./tipos.ts";
 
-/** Importes en centavos. `tope`, `restante` y `base` son `null` si la promo no informa tope. */
-export interface EstadoDeTope {
-  tope: number | null;
+/** Importes en centavos. */
+export interface Saldo {
+  tope: number;
+  periodo: "mensual" | "semanal";
   consumido: number;
-  restante: number | null;
-  base: BaseEstimacion | null;
+  restante: number;
+  base: BaseEstimacion;
 }
 
 /** Agrupa una sola vez las compras por promo, para no recorrerlas por cada promo. */
-export function comprasPorPromocion(compras: Compra[]): Map<string, Compra[]> {
+function comprasPorPromocion(compras: Compra[]): Map<string, Compra[]> {
   const porPromo = new Map<string, Compra[]>();
   for (const c of compras) {
     if (c.promocionId === null) continue;
@@ -29,35 +30,60 @@ export function comprasPorPromocion(compras: Compra[]): Map<string, Compra[]> {
 }
 
 /**
- * `hoy` es la fecha de `ahora` en hora de Argentina. Cuentan las compras con
- * esta promo, del mismo mes y no posteriores a hoy.
+ * Consumo de las compras del período de las promos `miembros`. Una compra sin
+ * descuento informado se estima con el porcentaje de su propia promo.
  */
-export function estadoDeTope(promo: Promocion, compras: Compra[], hoy: FechaISO): EstadoDeTope {
-  if (promo.tope.monto === null) return { tope: null, consumido: 0, restante: null, base: null };
-
-  const tope = aCentavos(promo.tope.monto);
-  const centesimos = aCentesimosDePunto(promo.porcentaje);
-  const mes = mesDe(hoy);
-  const delPeriodo = compras.filter(
-    (c) => c.promocionId === promo.id && mesDe(c.fecha) === mes && c.fecha <= hoy,
-  );
-
+function armarSaldo(
+  tope: number,
+  periodo: Saldo["periodo"],
+  miembros: Promocion[],
+  comprasDe: Map<string, Compra[]>,
+  hoy: FechaISO,
+): Saldo {
+  const inicio = inicioDelPeriodo(periodo, hoy);
   let suma = 0;
+  let registradas = 0;
   let sinDescuento = 0;
-  for (const c of delPeriodo) {
-    if (c.descuentoObtenido === null) {
-      sinDescuento++;
-      suma += Math.min(aplicarPorcentaje(aCentavos(c.monto), centesimos), tope);
-    } else {
-      suma += Math.max(aCentavos(c.descuentoObtenido), 0);
+  for (const promo of miembros) {
+    const centesimos = aCentesimosDePunto(promo.porcentaje);
+    for (const c of comprasDe.get(promo.id) ?? []) {
+      if (c.fecha < inicio || c.fecha > hoy) continue;
+      registradas++;
+      if (c.descuentoObtenido === null) {
+        sinDescuento++;
+        suma += Math.min(aplicarPorcentaje(aCentavos(c.monto), centesimos), tope);
+      } else {
+        suma += Math.max(aCentavos(c.descuentoObtenido), 0);
+      }
     }
   }
-
   const consumido = Math.min(suma, tope);
   return {
     tope,
+    periodo,
     consumido,
     restante: tope - consumido,
-    base: { comprasRegistradas: delPeriodo.length, comprasSinDescuentoInformado: sinDescuento },
+    base: { comprasRegistradas: registradas, comprasSinDescuentoInformado: sinDescuento },
   };
+}
+
+/**
+ * Saldo de cada promo que lo tiene, por id. Una promo sin entrada no informa
+ * tope o su tope es por compra. `hoy` es la fecha de la consulta en hora de
+ * Argentina.
+ */
+export function calcularSaldos(
+  promociones: Promocion[],
+  compras: Compra[],
+  hoy: FechaISO,
+): Map<string, Saldo> {
+  const comprasDe = comprasPorPromocion(compras);
+  const saldos = new Map<string, Saldo>();
+  for (const promo of promociones) {
+    // Por compra no acumula: cada compra tiene su propio límite (FR-007).
+    if (promo.tope.monto === null || promo.tope.periodo === "por_compra") continue;
+    const periodo = promo.tope.periodo ?? "mensual";
+    saldos.set(promo.id, armarSaldo(aCentavos(promo.tope.monto), periodo, [promo], comprasDe, hoy));
+  }
+  return saldos;
 }
