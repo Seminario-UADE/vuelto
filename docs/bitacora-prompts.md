@@ -693,6 +693,53 @@ pendientes" de `docs/product/requisitos.md`.
 
 ---
 
+## 2026-10-25 — Topes semanales, compartidos y promos acumulables (issue #37, en curso)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-specify`),
+el subagente `spec-critic`, `gh` CLI y consultas a la API pública de MODO y
+a la página de cada promo para leer su letra chica.
+
+**Objetivo:** completar el cálculo del tope en el motor: que se renueve en
+el período real de cada promo (mes, semana o compra), que varias promos
+puedan compartir un mismo tope y que las promos acumulables se sumen sobre
+la misma compra. Antes de especificar, cerrar las decisiones que la issue
+dejaba abiertas, con datos reales de MODO.
+
+**Prompts principales:**
+1. "Traete los últimos cambios y arrancá con la issue #37."
+2. "Si dos promos del mismo grupo informan montos distintos, dame un
+   ejemplo. Si dos promos aplican al mismo comercio, se tiene que aplicar
+   la que más da." Se aclaró que el motor compara pesos de ahorro y no
+   porcentaje (con tope, un 20% puede devolver más que un 30%), y se
+   confirmó ese criterio.
+3. "No entendí el escenario de las compras de promos vencidas: mostrame un
+   ejemplo. ¿Cuál sería el grupo de una compra?" Con el ejemplo de dos
+   promos que comparten tope, una ya vencida, se decidió que la Edge
+   Function le pase al motor también las promos de las compras del mes.
+4. "¿Hay promociones acumulables realmente en MODO?" Se revisó la letra
+   chica de 15 promos de supermercados: 9 se declaran acumulables, 2 no y
+   4 no lo dicen. También apareció que el tope más común es semanal y que
+   no hay topes compartidos explícitos.
+5. "Opción 1 en A y no en B": una promo que se queda sin tope dentro de
+   una combinación sigue en ella con $0, y las promos vencidas de un grupo
+   cuentan su consumo pero no su monto.
+
+**Resultado:**
+- Spec en `specs/003-motor-topes-acumulables/`: topes mensuales, semanales
+  (de lunes a domingo) y por compra; topes compartidos entre promos de un
+  mismo grupo; y promos acumulables sumadas en una sola opción, con el
+  detalle de cuánto aporta cada una.
+- Cambio de contrato acordado: cada opción de pago pasa a llevar una lista
+  de promos aplicadas, cada una con su ahorro, su tope restante y su base.
+- Se suma la medición de cobertura de tests al CI (mínimo 90%), como pide
+  la issue.
+- `spec-critic` no encontró nada bloqueante; se corrigieron 8 detalles,
+  entre ellos qué promos cuentan como parte de un grupo y que la Edge
+  Function mande las compras desde el lunes de la semana cuando la semana
+  empieza en el mes anterior.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
