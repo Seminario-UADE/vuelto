@@ -671,6 +671,102 @@ compartidos) y #38 (estimación de topes).
 
 ---
 
+## 2026-10-24 — Edge Function de recomendación: spec, plan e implementación del servidor (issue #43)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-specify`,
+`/speckit-plan`, `/speckit-tasks`, `/speckit-implement`), los subagentes
+`spec-critic` y `rules-guardian`, la skill `/code-review` (ejes de
+estándares y de spec) y `gh` CLI para leer las issues.
+
+**Objetivo:** adelantar la issue #43 (pantalla «¿Con qué pago?») mientras
+siguen abiertas las issues de las que depende (#34 esquema de Supabase, #39
+app base, #40 login, #41 perfil): escribir la spec completa y construir y
+testear la parte del servidor que no necesita la base de datos.
+
+**Prompts principales:**
+1. "Escribí la spec de la issue #43 con el endpoint que recomienda del
+   lado del servidor, según ADR-001 y ADR-009. Marcá la frontera con las
+   issues #36, #37, #41, #44 y #46, y dejá bloqueado lo que depende de
+   #34, #39, #40 y #41."
+2. "Pasá la spec por `spec-critic` y corregí cada hallazgo. Ojo con
+   cualquier filtro que haga el servidor antes del motor: no puede
+   duplicar ni esconder reglas del motor."
+3. "Definí el contrato HTTP del endpoint, con un código y un cuerpo para
+   cada error, y que los registros del servidor no guarden datos del
+   usuario."
+4. "Implementá la capa del servidor escribiendo primero los tests y con
+   repositorios en memoria, sin depender de la base. Cubrí las fechas en
+   hora de Argentina, el cambio de mes y el aislamiento entre usuarios."
+5. "Revisá los cambios con `rules-guardian` y `/code-review`, y corregí
+   lo que encuentren."
+
+**Resultado:**
+- Quedó documentada la funcionalidad completa en
+  `specs/003-recomendar-pantalla/`: 4 historias de usuario, 30 requisitos,
+  el plan técnico, 10 decisiones técnicas, el contrato del endpoint y 42
+  tareas. Las tareas que dependen de otras issues quedaron marcadas como
+  bloqueadas, con la issue que las bloquea.
+- El revisor de specs (`spec-critic`) encontró 13 problemas en la primera
+  versión y se corrigieron todos. Los principales:
+  - El servidor iba a filtrar las promos "vigentes hoy" antes de pasarlas
+    al motor. Eso escondía las promos de otro día de la semana, y el
+    usuario no se enteraba de que existían. Ahora el servidor filtra solo
+    por rubro y fechas, y el día lo evalúa el motor.
+  - No estaba definido qué responde el servidor cuando algo falla. Ahora
+    cada caso tiene su código y su mensaje, y la app sabe qué mostrar en
+    cada uno.
+  - Entrar con la clave pública de la app, sin haber iniciado sesión, no
+    tiene que contar como usuario logueado.
+  - La pantalla no puede llegar a usuarios reales antes de la issue #37:
+    hasta entonces, los topes semanales y "por compra" se calculan como si
+    fueran mensuales.
+- Ya existe la primera Edge Function del proyecto (`recomendar`, en
+  `supabase/functions/`). Recibe la compra que carga el usuario, verifica
+  que haya iniciado sesión, valida los datos, junta sus tarjetas, las
+  promos del rubro y sus compras del mes, y llama al motor. No agrega
+  ninguna regla propia: la recomendación sigue saliendo solo del motor.
+- Las piezas comunes (sesión, mensajes de error, validación y acceso a
+  datos) quedaron en `supabase/functions/_shared/`, para reusarlas en las
+  próximas funciones (#45 topes, #48 tickets).
+- El motor ahora comparte su función de fecha con el servidor, para que
+  los dos calculen "hoy" con la hora de Argentina. No cambia ninguna regla
+  del motor.
+- Pasan 34 tests nuevos, que corren sin base de datos ni internet. Entre
+  otros, verifican que:
+  - el resultado es el mismo que llamar al motor directamente;
+  - una consulta a las 22:00 del último día del mes cuenta las compras de
+    ese mes y no del siguiente;
+  - nunca se mezclan datos de otro usuario;
+  - cada error responde lo que dice el contrato;
+  - los registros del servidor no guardan datos del usuario.
+- El CI ahora también revisa la carpeta `supabase` (lint, tipos y tests).
+  Se completó `docs/architecture/02-api-routes.md`, que estaba vacío.
+- El control de reglas del proyecto (`rules-guardian`) no encontró
+  incumplimientos. La revisión de código encontró dos problemas, ya
+  corregidos:
+  - Si el servicio de inicio de sesión de Supabase estaba caído, la app
+    iba a decir "sesión vencida" y mandar al usuario a loguearse de nuevo,
+    lo que no arreglaba nada. Ahora muestra "Probá de nuevo".
+  - Un emoji en el nombre del comercio contaba como 2 caracteres.
+- Errores de la IA en el proceso:
+  - Lanzó un comando de consola que quedó esperando una respuesta y lo
+    tuvo que cortar.
+  - Las dos primeras corridas de lint y typecheck fallaron por detalles de
+    configuración y de tests, y se corrigieron.
+  - El caso del inicio de sesión caído no lo previó al escribir el código;
+    lo detectó la revisión.
+- Queda pendiente:
+  - La conexión con la base de datos real y la lista de comercios, que
+    dependen de la issue #34.
+  - La pantalla en la app, que depende de #39, #40 y #41.
+  - Proponer al equipo dos ajustes al ADR-009, que hoy no coinciden con
+    cómo quedó el código: el handler vive en su propio archivo y la
+    verificación de sesión se inyecta como las demás dependencias
+    (motivos en el research, R3 y R4).
+
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
