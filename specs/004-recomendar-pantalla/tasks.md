@@ -5,7 +5,7 @@ description: "Tareas para la pantalla «¿Con qué pago?» y la Edge Function re
 
 # Tasks: Pantalla «¿Con qué pago?» y Edge Function `recomendar`
 
-**Input**: `specs/003-recomendar-pantalla/` (spec.md, plan.md, research.md, data-model.md, contracts/recomendar.md, quickstart.md)
+**Input**: `specs/004-recomendar-pantalla/` (spec.md, plan.md, research.md, data-model.md, contracts/recomendar.md, quickstart.md)
 
 **Tests**: obligatorios. FR-018, FR-024 y FR-025 piden tests explícitos, y la capa del servidor se escribe test-first igual que el motor (plan, Constitution Check §VI). En cada fase, los tests se escriben antes que el código y tienen que fallar primero.
 

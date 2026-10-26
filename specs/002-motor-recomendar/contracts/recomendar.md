@@ -1,5 +1,9 @@
 # Contrato: `recomendar()`
 
+> **Actualizado por la issue #37:** `OpcionDePago` ya no tiene `promocionId`,
+> `topeRestanteTrasCompra` ni `base`; ahora lleva una lista `promociones`. Ver
+> `specs/003-motor-topes-acumulables/data-model.md` y `contracts/recomendar.md`.
+
 Interfaz pública que `@vuelto/motor` agrega en esta issue. La consume solo el service de la Edge
 Function de recomendación (issue #43, ADR-009); la app no importa el motor.
 

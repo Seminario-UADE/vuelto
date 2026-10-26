@@ -77,8 +77,14 @@ describe("ServicioRecomendacion: US1", () => {
 
     expect(r.mejor?.medioDePagoId).toBe("galicia-credito-visa");
     expect(r.mejor?.ahorroEstimado).toBe(3000);
-    expect(r.mejor?.topeRestanteTrasCompra).toBe(7000);
-    expect(r.mejor?.base).toEqual({ comprasRegistradas: 2, comprasSinDescuentoInformado: 0 });
+    expect(r.mejor?.promociones).toEqual([
+      {
+        promocionId: "promo-galicia",
+        ahorroEstimado: 3000,
+        topeRestanteTrasCompra: 7000,
+        base: { comprasRegistradas: 2, comprasSinDescuentoInformado: 0 },
+      },
+    ]);
   });
 
   it("FR-025: pide los datos del usuario, del rubro, de hoy y del mes en Argentina", async () => {
@@ -102,6 +108,52 @@ describe("ServicioRecomendacion: US1", () => {
     expect(compras.llamadas).toEqual([{ usuarioId: "u1", desde: "2026-10-01", hasta: "2026-10-31" }]);
   });
 
+  it("issue #37: si la semana empezó el mes anterior, pide las compras desde ese lunes", async () => {
+    const { servicio, compras } = armar({});
+    // Domingo 1/11/2026, 12:00 en Argentina: la semana arrancó el lunes 26/10.
+    const ahora = new Date("2026-11-01T15:00:00Z");
+
+    await servicio.recomendar("u1", compraPropuesta(), ahora);
+
+    expect(compras.llamadas).toEqual([{ usuarioId: "u1", desde: "2026-10-26", hasta: "2026-11-01" }]);
+  });
+
+  it("issue #37: una compra con una promo vencida de un grupo descuenta el tope compartido", async () => {
+    const grupo = { monto: 5000, periodo: "mensual" as const, alcance: "compartido" as const, grupoTopeId: "g-galicia" };
+    const vencida = promo({ id: "promo-vieja", tope: grupo, vigencia: { desde: "2026-10-01", hasta: "2026-10-10", dias: null } });
+    const vigente = promo({ tope: grupo });
+    const comprasU1 = [compraRegistrada({ fecha: "2026-10-05", promocionId: "promo-vieja", descuentoObtenido: 4000 })];
+    const { servicio, promociones } = armar({
+      promociones: [vencida, vigente],
+      compras: comprasU1.map((dato) => ({ usuarioId: "u1", dato })),
+    });
+
+    const r = await servicio.recomendar("u1", compraPropuesta(), AHORA);
+
+    expect(promociones.llamadasPorIds).toEqual([{ ids: ["promo-vieja"] }]);
+    // Del tope de $5.000 del grupo quedan $1.000, aunque la promo usada ya venció.
+    expect(r.mejor?.ahorroEstimado).toBe(1000);
+    expect(r.descartadas.map((d) => [d.promocionId, d.causa])).toEqual([["promo-vieja", "vigencia"]]);
+    const directo = recomendar(
+      compraPropuesta(),
+      { nombreParaMostrar: null, mediosDePago: [galicia], comerciosHabituales: [] },
+      [vigente, vencida],
+      comprasU1,
+      AHORA,
+    );
+    expect(r).toEqual(directo);
+  });
+
+  it("issue #37: no vuelve a pedir las promos de compras que ya llegaron con el rubro", async () => {
+    const { servicio, promociones } = armar({
+      compras: [{ usuarioId: "u1", dato: compraRegistrada({ promocionId: "promo-galicia" }) }],
+    });
+
+    await servicio.recomendar("u1", compraPropuesta(), AHORA);
+
+    expect(promociones.llamadasPorIds).toEqual([]);
+  });
+
   it("FR-025: no mezcla datos de otro usuario", async () => {
     const { servicio } = armar({
       medios: [
@@ -119,7 +171,7 @@ describe("ServicioRecomendacion: US1", () => {
     const r = await servicio.recomendar("u1", compraPropuesta(), AHORA);
 
     expect(r.mejor?.medioDePagoId).toBe("galicia-credito-visa");
-    expect(r.mejor?.base).toEqual({ comprasRegistradas: 0, comprasSinDescuentoInformado: 0 });
+    expect(r.mejor?.promociones[0]?.base).toEqual({ comprasRegistradas: 0, comprasSinDescuentoInformado: 0 });
     expect(r.alternativas).toEqual([]);
     expect(r.descartadas.map((d) => [d.promocionId, d.causa])).toEqual([["promo-santander", "medio_de_pago"]]);
   });
@@ -172,7 +224,9 @@ describe("ServicioRecomendacion: US2", () => {
 
     const r = await servicio.recomendar("u1", compraPropuesta(), AHORA);
 
-    const ids = [r.mejor, ...r.alternativas].map((o) => o?.promocionId).concat(r.descartadas.map((d) => d.promocionId));
+    const ids = [r.mejor, ...r.alternativas]
+      .flatMap((o) => o?.promociones.map((p) => p.promocionId) ?? [])
+      .concat(r.descartadas.map((d) => d.promocionId));
     expect(ids).toEqual(["promo-galicia"]);
   });
 
@@ -185,8 +239,8 @@ describe("ServicioRecomendacion: US2", () => {
 
     const r = await servicio.recomendar("u1", compraPropuesta(), AHORA);
 
-    expect(r.mejor?.promocionId).toBe("promo-galicia");
-    expect(r.alternativas.map((o) => o.promocionId)).toEqual(["promo-santander"]);
+    expect(r.mejor?.promociones.map((p) => p.promocionId)).toEqual(["promo-galicia"]);
+    expect(r.alternativas.map((o) => o.promociones.map((p) => p.promocionId))).toEqual([["promo-santander"]]);
   });
 
   it("si ninguna aplica: mejor null y sin alternativas, con las descartadas", async () => {

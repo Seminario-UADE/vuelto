@@ -1,5 +1,5 @@
 /**
- * Autenticación de las Edge Functions (ADR-009, spec 003 FR-018).
+ * Autenticación de las Edge Functions (ADR-009, spec 004 FR-018).
  *
  * El gateway de Supabase verifica la firma del JWT, pero la anon key también
  * es un JWT válido y no identifica a ningún usuario. Por eso cada función

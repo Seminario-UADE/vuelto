@@ -5,7 +5,7 @@
  *
  * Los filtros por usuario son explícitos aunque el RLS ya los garantice:
  * es defensa en profundidad y hace verificable en los tests que se piden los
- * datos del usuario autenticado (spec 003, FR-025).
+ * datos del usuario autenticado (spec 004, FR-025).
  */
 import type { CategoriaId, Compra, FechaISO, MedioDePago, Promocion } from "@vuelto/motor";
 
@@ -20,9 +20,15 @@ export interface RepositorioPromociones {
   /**
    * Promociones publicadas del rubro cuya vigencia incluye `hoy`
    * (`desde ≤ hoy ≤ hasta`). No filtra por día de la semana ni por ningún
-   * otro campo: esas reglas las aplica el motor (spec 003, FR-020).
+   * otro campo: esas reglas las aplica el motor (spec 004, FR-020).
    */
   publicadasVigentes(categoriaId: CategoriaId, hoy: FechaISO): Promise<Promocion[]>;
+  /**
+   * Promociones con esos ids, sin filtrar por rubro ni vigencia. Son las que
+   * referencian las compras registradas: el motor las necesita aunque hayan
+   * vencido, para descontar los topes compartidos (contrato de la issue #37).
+   */
+  porIds(ids: string[]): Promise<Promocion[]>;
 }
 
 export interface RepositorioCompras {

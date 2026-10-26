@@ -32,7 +32,10 @@ interface Autenticador {
 }
 
 interface RepositorioMediosDePago { deUsuario(usuarioId: UsuarioId): Promise<MedioDePago[]>; }
-interface RepositorioPromociones { publicadasVigentes(categoriaId: CategoriaId, hoy: FechaISO): Promise<Promocion[]>; }
+interface RepositorioPromociones {
+  publicadasVigentes(categoriaId: CategoriaId, hoy: FechaISO): Promise<Promocion[]>;
+  porIds(ids: string[]): Promise<Promocion[]>; // issue #37
+}
 interface RepositorioCompras { delUsuarioEntre(usuarioId: UsuarioId, desde: FechaISO, hasta: FechaISO): Promise<Compra[]>; }
 interface RepositorioCategorias { existe(categoriaId: CategoriaId): Promise<boolean>; }
 
@@ -49,9 +52,9 @@ type CodigoError = "invalido" | "no_autenticado" | "perfil_sin_medios" | "metodo
 |---|---|
 | `ahora` | `reloj()` del handler, una sola vez por pedido |
 | `hoy` | `fechaArgentina(ahora)` del motor |
-| `inicioDeMes` | `hoy.slice(0, 8) + "01"` |
-| Promociones | `publicadasVigentes(compra.categoriaId, hoy)`: `vigencia.desde ≤ hoy ≤ vigencia.hasta`, sin mirar `dias` |
-| Compras | `delUsuarioEntre(usuarioId, inicioDeMes, hoy)`, ambos incluidos |
+| `desde` | el menor entre `inicioDelPeriodo("mensual", hoy)` y `inicioDelPeriodo("semanal", hoy)` del motor (issue #37) |
+| Promociones | `publicadasVigentes(compra.categoriaId, hoy)`: `vigencia.desde ≤ hoy ≤ vigencia.hasta`, sin mirar `dias`; más `porIds(...)` con las promos de las compras que no vinieron ahí (issue #37) |
+| Compras | `delUsuarioEntre(usuarioId, desde, hoy)`, ambos incluidos |
 | `Perfil` | `{ nombreParaMostrar: null, mediosDePago, comerciosHabituales: [] }` (el motor no usa los otros dos campos) |
 
 ## Mapeo a tablas (para cuando cierre la #34, provisorio)
@@ -62,6 +65,7 @@ Los nombres de columna los fija la #34; esto es lo que cada repositorio necesita
 |---|---|---|---|
 | Medios de pago | `medios_de_pago` | `usuario_id = :usuarioId` | `MedioDePago` (`id`, `bancoId`, `tipo`, `red`) |
 | Promociones | `promociones` | `categoria_id = :c and vigencia_desde <= :hoy and vigencia_hasta >= :hoy` (solo publicadas: la tabla ya es la base validada) | `Promocion` completa |
+| Promociones (por id, #37) | `promociones` | `id in (:ids)`, sin filtro de rubro ni vigencia | `Promocion` completa |
 | Compras | `compras` | `usuario_id = :u and fecha between :desde and :hasta` | `Compra` |
 | Categorías | `categorias` | `id = :c` | `boolean` |
 | Comercios (vista, R10) | `comercios_corpus` | lectura directa desde la app | `{ comercio, categoriaId }` |

@@ -1,6 +1,6 @@
 /**
  * Repositorios en memoria para los tests. Filtran igual que las consultas
- * reales (`specs/003-recomendar-pantalla/data-model.md`) y registran con qué
+ * reales (`specs/004-recomendar-pantalla/data-model.md`) y registran con qué
  * argumentos los llamaron, para verificar qué datos pide el servicio (FR-025).
  */
 import type { CategoriaId, Compra, FechaISO, MedioDePago, Promocion } from "@vuelto/motor";
@@ -30,6 +30,7 @@ export class MediosDePagoEnMemoria implements RepositorioMediosDePago {
 
 export class PromocionesEnMemoria implements RepositorioPromociones {
   readonly llamadas: { categoriaId: CategoriaId; hoy: FechaISO }[] = [];
+  readonly llamadasPorIds: { ids: string[] }[] = [];
   constructor(private readonly promociones: Promocion[]) {}
 
   async publicadasVigentes(categoriaId: CategoriaId, hoy: FechaISO): Promise<Promocion[]> {
@@ -38,6 +39,11 @@ export class PromocionesEnMemoria implements RepositorioPromociones {
     return this.promociones.filter(
       (p) => p.categoriaId === categoriaId && p.vigencia.desde <= hoy && hoy <= p.vigencia.hasta,
     );
+  }
+
+  async porIds(ids: string[]): Promise<Promocion[]> {
+    this.llamadasPorIds.push({ ids });
+    return this.promociones.filter((p) => ids.includes(p.id));
   }
 }
 

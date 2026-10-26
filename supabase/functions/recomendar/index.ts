@@ -5,7 +5,7 @@
  * `servicio.ts`.
  *
  * Deploy: `supabase functions deploy recomendar --use-api` (importa el motor
- * desde `packages/motor`, ver `deno.json` y research R1 de la spec 003).
+ * desde `packages/motor`, ver `deno.json` y research R1 de la spec 004).
  */
 import { createClient } from "@supabase/supabase-js";
 import { AutenticadorSupabase } from "../_shared/autenticar.ts";

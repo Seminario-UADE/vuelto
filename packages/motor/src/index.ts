@@ -8,5 +8,8 @@ export * from "./publicable.ts";
 export { recomendar } from "./recomendar.ts";
 export { PerfilSinMediosError } from "./errores.ts";
 export { JURISDICCIONES_VALIDAS } from "./elegibilidad.ts";
-/** La Edge Function calcula "hoy" y el mes con la misma conversión que el motor (issue #43). */
-export { fechaArgentina } from "./fecha.ts";
+/**
+ * La Edge Function calcula "hoy" y desde cuándo pedir compras con las mismas
+ * funciones que el motor (issues #43 y #37).
+ */
+export { fechaArgentina, inicioDelPeriodo } from "./fecha.ts";

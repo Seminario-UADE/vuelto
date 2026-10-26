@@ -1,5 +1,5 @@
 /**
- * Validación del body de `POST /recomendar` (spec 003, FR-019). Vive en la
+ * Validación del body de `POST /recomendar` (spec 004, FR-019). Vive en la
  * capa imperativa: el motor recibe datos ya validados (ADR-009).
  *
  * La existencia del rubro en el catálogo la chequea el servicio, porque

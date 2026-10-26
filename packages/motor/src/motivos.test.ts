@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { diaArgentina, fechaArgentina } from "./fecha.ts";
-import { motivoDescarte, motivoOpcion } from "./motivos.ts";
+import { motivoCombinado, motivoDescarte, motivoOpcion } from "./motivos.ts";
 import { AHORA, compra, promo } from "./test/fabricas.ts";
 
 const ctx = { compra: compra(), fecha: fechaArgentina(AHORA), dia: diaArgentina(AHORA) };
@@ -26,6 +26,31 @@ describe("motivos", () => {
   it("descarte por monto mínimo con separador de miles", () => {
     expect(motivoDescarte("monto_minimo", promo({ montoMinimo: 20000 }), ctx)).toBe(
       "La promo pide una compra mínima de $20.000",
+    );
+  });
+});
+
+describe("motivos: tope por compra (US1)", () => {
+  it("dice el monto del tope por compra", () => {
+    const p = promo({ tope: { monto: 3000, periodo: "por_compra", alcance: null, grupoTopeId: null } });
+    expect(motivoOpcion(p)).toBe("20% en supermercados · hasta $3.000 por compra");
+  });
+});
+
+describe("motivos: opción combinada (US2)", () => {
+  it("une el motivo de cada promo con \" + \", en el orden recibido", () => {
+    const a = promo({ id: "A", porcentaje: 20 });
+    const b = promo({ id: "B", porcentaje: 10, comercio: "Coto" });
+    expect(motivoCombinado([a, b])).toBe(`${motivoOpcion(a)} + ${motivoOpcion(b)}`);
+  });
+});
+
+describe("motivos: promo sin saldo dentro de una combinada (US3)", () => {
+  it("aclara que el tope lo usa otra promoción de este banco", () => {
+    const a = promo({ id: "A", porcentaje: 20 });
+    const b = promo({ id: "B", porcentaje: 10 });
+    expect(motivoCombinado([a, b], new Set(["B"]))).toBe(
+      `${motivoOpcion(a)} + ${motivoOpcion(b)} (sin tope disponible: lo usa otra promoción de este banco)`,
     );
   });
 });

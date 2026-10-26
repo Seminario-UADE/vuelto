@@ -165,14 +165,26 @@ export interface BaseEstimacion {
   comprasSinDescuentoInformado: number;
 }
 
+/** Una promo dentro de una opción de pago (issue #37). */
+export interface PromocionAplicada {
+  promocionId: string;
+  /** Puede ser 0 si otra promo de la misma opción agotó el tope compartido. */
+  ahorroEstimado: number;
+  /**
+   * Siempre es un estimado, sostenido por `base`. `null` = la promo no
+   * informa tope o su tope es por compra.
+   */
+  topeRestanteTrasCompra: number | null;
+  /** `null` en los mismos casos que `topeRestanteTrasCompra`. */
+  base: BaseEstimacion | null;
+}
+
 export interface OpcionDePago {
   medioDePagoId: string;
-  promocionId: string | null;
+  /** Suma del ahorro de `promociones`. */
   ahorroEstimado: number;
-  /** Siempre es un estimado, sostenido por `base`. `null` = la promo no informa tope. */
-  topeRestanteTrasCompra: number | null;
-  /** `null` solo si la promo no informa tope. */
-  base: BaseEstimacion | null;
+  /** Una, o varias si son acumulables entre sí. */
+  promociones: PromocionAplicada[];
   /** Texto determinístico por plantilla, nunca de un LLM (ADR-004). */
   motivo: string;
 }

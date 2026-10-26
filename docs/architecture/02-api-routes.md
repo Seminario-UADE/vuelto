@@ -9,7 +9,7 @@ código propio (ADR-009).
 
 | Endpoint | Issue | Qué hace | Contrato |
 |---|---|---|---|
-| `POST /functions/v1/recomendar` | #43 | Recomienda con qué medio pagar una compra concreta: junta medios, promos del rubro vigentes y compras del mes del usuario, y llama a `recomendar()` del motor | `specs/003-recomendar-pantalla/contracts/recomendar.md` |
+| `POST /functions/v1/recomendar` | #43 | Recomienda con qué medio pagar una compra concreta: junta medios, promos del rubro vigentes, compras del período (mes o semana, lo que empiece antes) y las promos de esas compras, y llama a `recomendar()` del motor | `specs/004-recomendar-pantalla/contracts/recomendar.md` |
 | `GET /functions/v1/topes` | #45 | Topes restantes del mes (pendiente) | — |
 | Extracción de ticket | #48 | Gemini sobre la imagen, sin guardarla (pendiente) | — |
 

@@ -1,6 +1,6 @@
 /**
  * Respuestas HTTP comunes de las Edge Functions. Contrato de errores:
- * `specs/003-recomendar-pantalla/contracts/recomendar.md` (FR-022).
+ * `specs/004-recomendar-pantalla/contracts/recomendar.md` (FR-022).
  */
 
 export type CodigoError =

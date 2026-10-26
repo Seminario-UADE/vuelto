@@ -1,7 +1,7 @@
 /**
  * Handler de `POST /functions/v1/recomendar` (rol de controller, ADR-009).
  * HTTP, sesión, validación del body y códigos de respuesta; el cálculo es del
- * servicio. Contrato: `specs/003-recomendar-pantalla/contracts/recomendar.md`.
+ * servicio. Contrato: `specs/004-recomendar-pantalla/contracts/recomendar.md`.
  */
 import { PerfilSinMediosError } from "@vuelto/motor";
 import type { Autenticador } from "../_shared/autenticar.ts";

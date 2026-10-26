@@ -15,5 +15,7 @@ Patrones que aparecieron en specs/002-motor-recomendar (issue #36, 2026-10-18):
 
 6. **(2da pasada, 2026-10-20) La corrección deja huecos laterales**: "centavos enteros" sin regla de conversión pesos→centavos en la entrada (floor de 0.29*100 da 28); la base se exige en opciones pero no en el descarte `tope_agotado`, que también le muestra un tope estimado al usuario (constitución §V); unicidad de ids sin supuesto, aunque el desempate y FR-003 dependen de ella.
 
+7. **(specs/003, issue #37, 2026-10-25) Spec que extiende otra**: (a) al reescribir un FR se pierde el default del original (FR-001 nuevo solo cubre periodo mensual|semanal; el `null`→mensual de 002 quedó solo en el FR del grupo); (b) la excepción nueva (base `null` en descarte por_compra) contradice un SC/postcondición de la spec vieja que "sigue vigente" sin enmienda explícita; (c) una agregación (opción combinada) puede dejar un miembro con ahorro 0: chocar contra el invariante "cada promo en exactamente un lugar"; (d) la ventana de datos que entrega la capa externa (compras "del mes") no cubre el período nuevo (semana que cruza de mes); (e) "miembro del grupo" sin definir cuando el mismo grupoTopeId llega con alcance mixto.
+
 **Why:** son fallas que un checklist de spec-kit autoaprobado no detecta ([[patron-checklist-autoaprobada]]) y que rompen SC de determinismo y de "un test por regla".
 **How to apply:** en toda spec del motor (#37, #38, #46), revisar enums contra listas válidas, aritmética de montos, criterio de orden y forma de los errores.

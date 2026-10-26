@@ -17,7 +17,7 @@
 - **Issue #34** (esquema de Supabase con RLS): define las tablas que lee la Edge Function (perfil, medios de pago, promociones, compras, catálogos). Esta spec fija qué datos necesita, no cómo se guardan.
 - **Issue #44** (registrar una compra): el botón "Pagué con esto" de esta pantalla lleva al registro de esa issue con los datos precargados. El registro en sí es de la #44.
 - **Issue #46** (explicar la recomendación): la redacción final de los motivos es de esa issue. Esta pantalla muestra el motivo que trae la respuesta, sin reescribirlo.
-- **Issue #37** (topes compartidos y períodos): hasta que cierre, el motor trata todos los topes como mensuales (ver Assumptions de la spec 002). Esta pantalla no lo corrige ni lo reinterpreta. **La #37 bloquea que esta pantalla llegue a usuarios reales** (ver FR-029); la demo usa el corpus sembrado.
+- **Issue #37** (topes compartidos y períodos, cerrada en el PR #73): el motor calcula topes mensuales, semanales y por compra, topes compartidos por grupo y promos acumulables. Cada opción de pago trae una lista de promociones aplicadas, cada una con su ahorro, su tope restante y su base (`specs/003-motor-topes-acumulables/`). El servidor cumple las dos precondiciones nuevas del motor (FR-020) y esta pantalla no corrige ni reinterpreta el cálculo.
 - **Issue #47** (comercios habituales): los accesos rápidos a comercios habituales en esta pantalla son de esa issue.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -146,8 +146,9 @@ Desde la recomendación (o desde una alternativa), el usuario toca "Pagué con e
 - **FR-020**: Para cada pedido válido, el servidor MUST tomar `ahora` del reloj del servidor una sola vez y derivar de ese mismo `ahora`, con la función de fecha del motor, la fecha de hoy y el mes calendario en hora de Argentina (nunca la fecha de la base, que está en UTC). Con eso junta, del usuario autenticado y de ningún otro:
   - sus medios de pago;
   - las promociones publicadas cuyo rubro es el de la compra y cuya vigencia incluye la fecha de hoy (inicio ≤ hoy ≤ fin). Este filtro previo MUST NOT usar los días de la semana ni ningún otro campo: las demás reglas las aplica el motor;
-  - sus compras registradas con fecha desde el primer día del mes calendario de hoy hasta hoy, incluidos ambos.
-- **FR-021**: El servidor MUST armar el perfil con los medios de pago del usuario (el nombre para mostrar y los comercios habituales no los usa el motor y van vacíos), llamar a `recomendar()` con ese perfil, las promociones, las compras, la compra del pedido y `ahora`, y MUST NOT agregar, quitar ni reordenar nada del resultado. El filtro previo de FR-020 no cambia la mejor opción ni las alternativas respecto de pasarle al motor todas las promociones publicadas: solo evita que aparezcan como descartadas las de otros rubros o fuera de vigencia, que no ayudan a la decisión.
+  - sus compras registradas con fecha desde el primer día del mes calendario de hoy o el lunes de la semana de hoy, lo que sea anterior, hasta hoy, incluidos ambos (precondición del motor, issue #37);
+  - las promociones referenciadas por esas compras que no vinieron en el filtro anterior, sin filtrar por rubro ni vigencia: el motor las necesita para descontar los topes compartidos de su grupo (precondición del motor, issue #37).
+- **FR-021**: El servidor MUST armar el perfil con los medios de pago del usuario (el nombre para mostrar y los comercios habituales no los usa el motor y van vacíos), llamar a `recomendar()` con ese perfil, las promociones, las compras, la compra del pedido y `ahora`, y MUST NOT agregar, quitar ni reordenar nada del resultado. El filtro previo de FR-020 no cambia la mejor opción ni las alternativas respecto de pasarle al motor todas las promociones publicadas: solo evita que aparezcan como descartadas las de otros rubros o fuera de vigencia, que no ayudan a la decisión. Las promociones de las compras registradas sí pueden aparecer como descartadas aunque sean de otro rubro o estén vencidas.
 - **FR-022**: Las respuestas del servidor MUST seguir este contrato, para que la app distinga cada caso de US3:
 
   | Caso | Código | Cuerpo |
@@ -161,14 +162,14 @@ Desde la recomendación (o desde una alternativa), el usuario toca "Pagué con e
 
 - **FR-023**: Ninguna respuesta de error MUST exponer detalles internos (mensajes de la base, trazas). Los registros del servidor MUST NOT incluir el cuerpo del pedido, los medios de pago ni las compras del usuario; solo el tipo de error (`docs/product/privacidad.md`).
 - **FR-024**: Para los mismos medios de pago, promociones, compras y `ahora`, la respuesta del servidor MUST ser idéntica a llamar `recomendar()` directamente con esos argumentos. MUST existir un test que lo verifique sin base de datos ni red, con un acceso a datos falso.
-- **FR-025**: MUST existir tests, con un acceso a datos falso que registra con qué lo llamaron, que verifiquen que el servidor pide: los datos del usuario autenticado y de ningún otro; las promociones del rubro de la compra con la fecha de hoy en Argentina; y las compras del mes calendario en Argentina. Uno de los casos MUST ser un pedido a las 22:00 del último día del mes en Argentina (ya el día siguiente en UTC).
+- **FR-025**: MUST existir tests, con un acceso a datos falso que registra con qué lo llamaron, que verifiquen que el servidor pide: los datos del usuario autenticado y de ningún otro; las promociones del rubro de la compra con la fecha de hoy en Argentina; y las compras desde el día 1 del mes o el lunes de la semana en Argentina, lo que sea anterior. Uno de los casos MUST ser un pedido a las 22:00 del último día del mes en Argentina (ya el día siguiente en UTC) y otro, un pedido en una semana que empezó el mes anterior.
 - **FR-026**: Ningún modelo de lenguaje participa del cálculo ni de los textos de la respuesta (constitución §II).
 
 **Restricciones**
 
 - **FR-027**: La app MUST NOT tener al motor como dependencia ni importarlo (RNF-02). Es revisable en el manifiesto de dependencias de la app y en sus imports.
 - **FR-028**: Las lecturas del servidor MUST respetar la seguridad por fila de cada tabla: el servidor accede a los datos con la sesión del usuario, nunca con una credencial que se la saltee.
-- **FR-029**: Esta pantalla MUST NOT publicarse para usuarios reales mientras la issue #37 esté abierta: hasta entonces el motor trata los topes semanales y por compra como mensuales y el tope restante de esas promociones no sería correcto (constitución §V). Para la demo, el corpus sembrado (issue #35) solo debe tener topes mensuales o sin tope, y eso MUST verificarse antes de la Sprint Review.
+- **FR-029**: ~~Esta pantalla MUST NOT publicarse para usuarios reales mientras la issue #37 esté abierta.~~ Resuelto: la #37 cerró (PR #73) y el motor ya calcula los topes semanales y por compra en su período real. El corpus de la demo puede tener cualquier período de tope.
 
 **Comercios del corpus**
 
@@ -202,7 +203,7 @@ Usa el contrato de la issue #33 (`packages/motor/src/tipos.ts`) sin cambios.
 - **Fecha de Argentina**: el motor ya calcula la fecha en hora de Argentina (`fechaArgentina`, spec 002), pero hoy no la exporta. El plan la exporta desde el paquete del motor (un cambio de una línea, sin tocar ninguna regla) para que el servidor no duplique ese cálculo.
 - **Nombres para mostrar**: la respuesta trae identificadores, no nombres (el tipo `Recomendacion` no cambia). La app ya tiene los medios de pago del usuario (issue #41) y el catálogo de bancos; los títulos de las promociones los lee de la tabla de promociones publicadas, que es de lectura para cualquier usuario autenticado (la define la issue #34). Después de cada simulación vuelve a leer lo que no tenga (Edge Cases). Leer datos públicos no es calcular la recomendación (ADR-009).
 - **Formato de la base**: el texto "≈$X, según N compras registradas" lo arma la pantalla con plantilla fija a partir del número y la base que trae la respuesta. Es formato, no lógica de negocio. Si la issue #38 publica un formato común, se usa ese.
-- **Topes semanales y por compra**: hasta la issue #37, el motor los trata como mensuales (spec 002, Assumptions). La pantalla no lo corrige por su cuenta (FR-011); en cambio, la #37 bloquea el release a usuarios reales y el corpus de la demo se limita a topes mensuales (FR-029).
+- **Topes semanales y por compra**: los calcula el motor desde la issue #37. La pantalla no los corrige por su cuenta (FR-011).
 - **Rubro del comercio**: un comercio del corpus pertenece al rubro de sus promociones. Si un comercio tiene promociones en dos rubros, se lista dos veces (Edge Cases).
 - **Hora del servidor**: el reloj del servidor es confiable y se interpreta en hora de Argentina (UTC−3, sin horario de verano), igual que el motor.
 - **Comercios habituales**: los accesos rápidos a comercios habituales en esta pantalla los agrega la issue #47. Esta spec deja el buscador listo para sumarlos arriba.

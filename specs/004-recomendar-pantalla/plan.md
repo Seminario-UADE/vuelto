@@ -2,7 +2,7 @@
 
 **Branch**: `feat/43-recomendar-edge-function` | **Date**: 2026-10-24 | **Spec**: [spec.md](spec.md)
 
-**Input**: Feature specification from `specs/003-recomendar-pantalla/spec.md`
+**Input**: Feature specification from `specs/004-recomendar-pantalla/spec.md`
 
 ## Summary
 
@@ -71,7 +71,7 @@ capa imperativa, permitidas por ADR-009; los datos siguen siendo `interface`.
 ### Documentation (this feature)
 
 ```text
-specs/003-recomendar-pantalla/
+specs/004-recomendar-pantalla/
 ├── plan.md              # Este archivo
 ├── research.md          # Decisiones técnicas R1–R10
 ├── data-model.md        # Entidades, validación y mapeo a tablas

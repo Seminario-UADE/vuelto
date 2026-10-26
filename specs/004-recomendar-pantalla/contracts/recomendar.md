@@ -41,10 +41,15 @@ mensajes de la base ni trazas.
 {
   "mejor": {
     "medioDePagoId": "mp-galicia-credito-visa",
-    "promocionId": "promo-kansas-20",
     "ahorroEstimado": 3000,
-    "topeRestanteTrasCompra": 7000,
-    "base": { "comprasRegistradas": 2, "comprasSinDescuentoInformado": 0 },
+    "promociones": [
+      {
+        "promocionId": "promo-kansas-20",
+        "ahorroEstimado": 3000,
+        "topeRestanteTrasCompra": 7000,
+        "base": { "comprasRegistradas": 2, "comprasSinDescuentoInformado": 0 }
+      }
+    ],
     "motivo": "…"
   },
   "alternativas": [],
@@ -69,5 +74,10 @@ mensajes de la base ni trazas.
 
 - Para los mismos medios, promociones, compras y `ahora`, el cuerpo 200 es idéntico al de
   `recomendar()` llamado directamente (FR-024).
-- Las promociones evaluadas son las del rubro con vigencia que incluye hoy en Argentina; las
-  compras, las del mes calendario en Argentina hasta hoy (FR-020).
+- Las promociones evaluadas son las del rubro con vigencia que incluye hoy en Argentina, más las
+  que referencian las compras registradas aunque estén vencidas o sean de otro rubro (esas salen
+  en `descartadas`). Las compras van desde el día 1 del mes o el lunes de la semana en Argentina,
+  lo que sea anterior, hasta hoy (FR-020, precondiciones de la issue #37).
+- Cada opción trae una o más `promociones` (varias si son acumulables); `ahorroEstimado` de la
+  opción es la suma de las suyas. Forma de la issue #37:
+  `specs/003-motor-topes-acumulables/data-model.md`.

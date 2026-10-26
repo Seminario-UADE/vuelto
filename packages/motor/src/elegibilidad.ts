@@ -31,6 +31,11 @@ interface Regla {
   cumple: (promo: Promocion, ctx: ContextoDeCompra) => boolean;
 }
 
+/** La promo está vigente en `fecha` (FR-006). `YYYY-MM-DD` ordena como string igual que como fecha. */
+export function vigenteEn(promo: Promocion, fecha: FechaISO): boolean {
+  return promo.vigencia.desde <= fecha && fecha <= promo.vigencia.hasta;
+}
+
 /** Sin mayúsculas, sin acentos y sin espacios de más: "  COTO " = "coto". */
 export function normalizar(texto: string): string {
   return texto
@@ -52,8 +57,7 @@ export const REGLAS_DE_PROMOCION: readonly Regla[] = [
   },
   {
     causa: "vigencia",
-    // `YYYY-MM-DD` ordena como string igual que como fecha.
-    cumple: (p, { fecha }) => p.vigencia.desde <= fecha && fecha <= p.vigencia.hasta,
+    cumple: (p, { fecha }) => vigenteEn(p, fecha),
   },
   { causa: "dia", cumple: (p, { dia }) => p.vigencia.dias === null || p.vigencia.dias.includes(dia) },
   {

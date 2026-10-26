@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Visto en specs/003-recomendar-pantalla (issue #43, 2026-10-24):
+Visto en specs/004-recomendar-pantalla (issue #43, 2026-10-24):
 
 1. **Prefiltro que duplica reglas**: el servidor filtra promos "del rubro y vigentes hoy" antes del motor, mientras dice "no duplica ninguna regla del motor". Las causas `categoria`/`vigencia` nunca se disparan, y "vigente hoy" puede leerse incluyendo el día de semana (borra el descarte `dia` de los escenarios). Fecha del SQL (UTC/`current_date`) puede diferir de `fechaArgentina`.
 2. **Test de equivalencia tautológico**: "respuesta idéntica a llamar recomendar() con los mismos datos, con repos falsos" no prueba la selección de datos (rubro, mes, zona horaria, RLS), que es la única lógica nueva.
