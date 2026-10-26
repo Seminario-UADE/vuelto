@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { estimarTopes } from "./estimar.ts";
+import { estimarTopes, formatearEstimacion } from "./estimar.ts";
 import { AHORA, compraRegistrada, GALICIA, medio, perfil, promo, SANTANDER } from "./test/fabricas.ts";
-import type { Promocion, Tope } from "./tipos.ts";
+import type { EstimacionTope, Promocion, Tope } from "./tipos.ts";
 
 const conTope = (id: string, monto: number | null, tope: Partial<Tope> = {}, datos: Partial<Promocion> = {}) =>
   promo({ id, tope: { monto, periodo: "mensual", alcance: null, grupoTopeId: null, ...tope }, ...datos });
@@ -97,5 +97,110 @@ describe("estimarTopes (US1)", () => {
     const otroBanco = medio({ id: "santander-credito-visa", bancoId: SANTANDER });
     const r = estimarTopes([conTope("galicia", 10000)], [], perfil([debito, otroBanco, medio()]), AHORA);
     expect(r[0]?.mediosDePagoIds).toEqual(["galicia-credito-visa"]);
+  });
+});
+
+describe("formatearEstimacion (US2)", () => {
+  const OCTUBRE = { tipo: "mensual" as const, desde: "2026-10-01", hasta: "2026-10-31" };
+  const SEMANA_DEL_1_10 = { tipo: "semanal" as const, desde: "2026-09-28", hasta: "2026-10-04" };
+  const estimacion = (
+    tope: number,
+    restante: number,
+    compras: number,
+    periodo: EstimacionTope["periodo"] = OCTUBRE,
+  ): EstimacionTope => ({
+    grupoTopeId: null,
+    bancoId: GALICIA,
+    promocionIds: ["p"],
+    mediosDePagoIds: [],
+    tope,
+    consumido: tope - restante,
+    restante,
+    base: { comprasRegistradas: compras, comprasSinDescuentoInformado: 0 },
+    periodo,
+  });
+
+  it("US2-1: disponible, con la cifra redondeada hacia abajo a la centena", () => {
+    expect(formatearEstimacion(estimacion(10000, 6540, 3))).toEqual({
+      estado: "disponible",
+      cifra: "≈$6.500",
+      base: "según 3 compras de octubre",
+    });
+  });
+
+  it("US2-2: exactamente el 20% es queda poco", () => {
+    expect(formatearEstimacion(estimacion(8000, 1600, 4))).toMatchObject({ estado: "queda_poco", cifra: "≈$1.600" });
+  });
+
+  it("US2-3: el umbral se compara con el restante exacto, no con la cifra", () => {
+    expect(formatearEstimacion(estimacion(10000, 2050, 2))).toMatchObject({ estado: "disponible", cifra: "≈$2.000" });
+  });
+
+  it("US2-4: agotado, sin cifra y con la fecha en que vuelve", () => {
+    expect(formatearEstimacion(estimacion(6000, 0, 2))).toEqual({
+      estado: "agotado",
+      cifra: null,
+      base: "según 2 compras de octubre · vuelve el 1/11",
+    });
+  });
+
+  it("US2-5: semanal sin compras, sin cifra", () => {
+    expect(formatearEstimacion(estimacion(5000, 5000, 0, SEMANA_DEL_1_10))).toEqual({
+      estado: "sin_compras",
+      cifra: null,
+      base: "Sin compras registradas esta semana: todavía no podemos estimar cuánto te queda.",
+    });
+  });
+
+  it("mensual sin compras", () => {
+    expect(formatearEstimacion(estimacion(10000, 10000, 0)).base).toBe(
+      "Sin compras registradas este mes: todavía no podemos estimar cuánto te queda.",
+    );
+  });
+
+  it("US2-6: una compra va en singular", () => {
+    expect(formatearEstimacion(estimacion(10000, 8000, 1)).base).toBe("según 1 compra de octubre");
+  });
+
+  it("US2-7: semanal dice 'de esta semana' y vuelve el lunes siguiente", () => {
+    expect(formatearEstimacion(estimacion(5000, 3000, 2, SEMANA_DEL_1_10)).base).toBe("según 2 compras de esta semana");
+    expect(formatearEstimacion(estimacion(5000, 0, 2, SEMANA_DEL_1_10)).base).toBe(
+      "según 2 compras de esta semana · vuelve el 5/10",
+    );
+  });
+
+  it("US2-8: menos de $100 sin estar agotado", () => {
+    expect(formatearEstimacion(estimacion(10000, 40, 3))).toMatchObject({ estado: "queda_poco", cifra: "menos de $100" });
+  });
+
+  it("US2-9: agotado en diciembre vuelve el 1/1", () => {
+    const diciembre = { tipo: "mensual" as const, desde: "2026-12-01", hasta: "2026-12-31" };
+    expect(formatearEstimacion(estimacion(6000, 0, 1, diciembre)).base).toBe("según 1 compra de diciembre · vuelve el 1/1");
+  });
+
+  it("un tope de $0 está agotado aunque no haya compras", () => {
+    expect(formatearEstimacion(estimacion(0, 0, 0))).toEqual({
+      estado: "agotado",
+      cifra: null,
+      base: "según 0 compras de octubre · vuelve el 1/11",
+    });
+  });
+
+  it("FR-011: si hay cifra hay base, y la cifra nunca supera el restante", () => {
+    const promos = [conTope("a", 10000), conTope("b", 8000), conTope("c", 5000, { periodo: "semanal" }), deGrupo("g", 6000)];
+    const compras = [
+      compraRegistrada({ id: "c1", promocionId: "a", descuentoObtenido: 3460 }),
+      compraRegistrada({ id: "c2", promocionId: "b", descuentoObtenido: 7960 }),
+      compraRegistrada({ id: "c3", promocionId: "g", descuentoObtenido: 6000 }),
+    ];
+    const estimaciones = estimarTopes(promos, compras, perfil(), AHORA);
+    expect(estimaciones).toHaveLength(4);
+    for (const e of estimaciones) {
+      const texto = formatearEstimacion(e);
+      if (texto.cifra === null) continue;
+      expect(texto.base).not.toBe("");
+      const numero = texto.cifra === "menos de $100" ? 0 : Number(texto.cifra.replace(/[≈$.]/g, ""));
+      expect(numero).toBeLessThanOrEqual(e.restante);
+    }
   });
 });

@@ -52,8 +52,8 @@ description: "Tareas para estimar el tope restante, con su base (issue #38)"
 
 **Independent Test**: estimaciones fijas ⇒ estado, cifra y base exactos.
 
-- [ ] T010 [P] [US2] Ampliar `packages/motor/src/estimar.test.ts` con US2-1 a US2-9: "≈$6.500" disponible; $1.600 de $8.000 `queda_poco`; $2.050 de $10.000 "≈$2.000" `disponible`; agotado "según 2 compras de octubre · vuelve el 1/11"; semanal sin compras con el texto exacto de "esta semana"; "según 1 compra de octubre"; semanal "según 2 compras de esta semana" y "vuelve el 5/10"; $40 ⇒ "menos de $100" `queda_poco`; agotado en diciembre ⇒ "vuelve el 1/1". Además: mensual sin compras con el texto de "este mes", tope de $0 ⇒ `agotado`, y el invariante de FR-011 sobre todas las estimaciones de T008 (cifra no `null` ⇒ base no vacía y cifra ≤ restante).
-- [ ] T011 [US2] Implementar `formatearEstimacion(estimacion)` en `packages/motor/src/estimar.ts` (research R4, R5): estado en centavos (`restante === 0` → `agotado`; `comprasRegistradas === 0` → `sin_compras`; `restante × 5 ≤ tope` → `queda_poco`; si no, `disponible`); cifra con el restante redondeado hacia abajo a la centena y `pesos()`, o "menos de $100", o `null`; base con singular y plural, "de <mes>" o "de esta semana", " · vuelve el D/M" en `agotado` y el texto de sin compras. Exportar desde `index.ts`. Hace pasar T010.
+- [X] T010 [P] [US2] Ampliar `packages/motor/src/estimar.test.ts` con US2-1 a US2-9: "≈$6.500" disponible; $1.600 de $8.000 `queda_poco`; $2.050 de $10.000 "≈$2.000" `disponible`; agotado "según 2 compras de octubre · vuelve el 1/11"; semanal sin compras con el texto exacto de "esta semana"; "según 1 compra de octubre"; semanal "según 2 compras de esta semana" y "vuelve el 5/10"; $40 ⇒ "menos de $100" `queda_poco`; agotado en diciembre ⇒ "vuelve el 1/1". Además: mensual sin compras con el texto de "este mes", tope de $0 ⇒ `agotado`, y el invariante de FR-011 sobre todas las estimaciones de T008 (cifra no `null` ⇒ base no vacía y cifra ≤ restante).
+- [X] T011 [US2] Implementar `formatearEstimacion(estimacion)` en `packages/motor/src/estimar.ts` (research R4, R5): estado en centavos (`restante === 0` → `agotado`; `comprasRegistradas === 0` → `sin_compras`; `restante × 5 ≤ tope` → `queda_poco`; si no, `disponible`); cifra con el restante redondeado hacia abajo a la centena y `pesos()`, o "menos de $100", o `null`; base con singular y plural, "de <mes>" o "de esta semana", " · vuelve el D/M" en `agotado` y el texto de sin compras. Exportar desde `index.ts`. Hace pasar T010.
 
 **Checkpoint**: US1 y US2 en verde.
 
@@ -61,8 +61,8 @@ description: "Tareas para estimar el tope restante, con su base (issue #38)"
 
 ## Phase 4: Polish
 
-- [ ] T012 Correr `npm run lint`, `npm run typecheck`, `npm run test` (cobertura ≥ 90%) y `npm run build` desde la raíz; verificar que el `dist/` carga en Node y exporta `estimarTopes` y `formatearEstimacion`, que el motor sigue sin `dependencies` y sin lecturas del reloj ni red fuera de los tests.
-- [ ] T013 Completar la entrada del 26/10 en `docs/bitacora-prompts.md` (sacar "en curso") y mostrarla en el chat antes de proponer el commit.
+- [X] T012 Correr `npm run lint`, `npm run typecheck`, `npm run test` (cobertura ≥ 90%) y `npm run build` desde la raíz; verificar que el `dist/` carga en Node y exporta `estimarTopes` y `formatearEstimacion`, que el motor sigue sin `dependencies` y sin lecturas del reloj ni red fuera de los tests.
+- [X] T013 Completar la entrada del 26/10 en `docs/bitacora-prompts.md` (sacar "en curso") y mostrarla en el chat antes de proponer el commit.
 
 ---
 

@@ -778,7 +778,7 @@ dejaba abiertas, con datos reales de MODO.
 
 ---
 
-## 2026-10-26 — Revisión de la Edge Function de recomendación (PR #71) y estimación de topes (issue #38, en curso)
+## 2026-10-26 — Revisión de la Edge Function de recomendación (PR #71) y estimación de topes (issue #38)
 
 **Herramienta:** Claude Code (Opus 5.5), con `gh` CLI, los subagentes
 `test-runner`, `rules-guardian` y `spec-critic`, la revisión de código en
@@ -837,6 +837,16 @@ base, para la pantalla «Mis topes».
   anteriores. El motor ya devuelve, para cada tope que se va gastando, cuánto
   es, cuánto se usó, cuánto queda, en qué compras se basa, hasta cuándo dura
   y con qué tarjetas del usuario se usa.
+- Etapa 2: el motor arma los textos de cada tope como los pide el diseño:
+  la cifra con "≈" y redondeada hacia abajo, "según 3 compras de octubre",
+  "queda poco", "vuelve el 1/11" y el aviso de que sin compras todavía no se
+  puede estimar. Ningún texto muestra una cifra sin su base.
+- Cierre: 168 tests en verde, 99,5% de las líneas del motor cubiertas;
+  lint, typecheck y build limpios, y el motor sigue sin dependencias.
+- Error de la IA en el proceso: al unificar la regla del tope, el primer
+  diseño hacía que una promo de un grupo sin monto informado dejara de
+  aportar sus compras al grupo. Se detectó al leer el código antes de
+  escribirlo y se ajustó el diseño.
 
 ---
 
