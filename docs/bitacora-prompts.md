@@ -693,6 +693,91 @@ pendientes" de `docs/product/requisitos.md`.
 
 ---
 
+## 2026-10-25 — Topes semanales, compartidos y promos acumulables (issue #37)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-specify`),
+el subagente `spec-critic`, `gh` CLI y consultas a la API pública de MODO y
+a la página de cada promo para leer su letra chica.
+
+**Objetivo:** completar el cálculo del tope en el motor: que se renueve en
+el período real de cada promo (mes, semana o compra), que varias promos
+puedan compartir un mismo tope y que las promos acumulables se sumen sobre
+la misma compra. Antes de especificar, cerrar las decisiones que la issue
+dejaba abiertas, con datos reales de MODO.
+
+**Prompts principales:**
+1. "Traete los últimos cambios y arrancá con la issue #37."
+2. "Si dos promos del mismo grupo informan montos distintos, dame un
+   ejemplo. Si dos promos aplican al mismo comercio, se tiene que aplicar
+   la que más da." Se aclaró que el motor compara pesos de ahorro y no
+   porcentaje (con tope, un 20% puede devolver más que un 30%), y se
+   confirmó ese criterio.
+3. "No entendí el escenario de las compras de promos vencidas: mostrame un
+   ejemplo. ¿Cuál sería el grupo de una compra?" Con el ejemplo de dos
+   promos que comparten tope, una ya vencida, se decidió que la Edge
+   Function le pase al motor también las promos de las compras del mes.
+4. "¿Hay promociones acumulables realmente en MODO?" Se revisó la letra
+   chica de 15 promos de supermercados: 9 se declaran acumulables, 2 no y
+   4 no lo dicen. También apareció que el tope más común es semanal y que
+   no hay topes compartidos explícitos.
+5. "Opción 1 en A y no en B": una promo que se queda sin tope dentro de
+   una combinación sigue en ella con $0, y las promos vencidas de un grupo
+   cuentan su consumo pero no su monto.
+6. "No entendí lo de 'el tope compartido se agota con el 20% en
+   supermercados'." Con el ejemplo de dos promos del mismo banco que se
+   reparten un tope, se eligió un texto más simple para la que queda en $0:
+   "sin tope disponible: lo usa otra promoción de este banco".
+
+**Resultado:**
+- Spec en `specs/003-motor-topes-acumulables/`: topes mensuales, semanales
+  (de lunes a domingo) y por compra; topes compartidos entre promos de un
+  mismo grupo; y promos acumulables sumadas en una sola opción, con el
+  detalle de cuánto aporta cada una.
+- Cambio de contrato acordado: cada opción de pago pasa a llevar una lista
+  de promos aplicadas, cada una con su ahorro, su tope restante y su base.
+- Se suma la medición de cobertura de tests al CI (mínimo 90%), como pide
+  la issue.
+- `spec-critic` no encontró nada bloqueante; se corrigieron 8 detalles,
+  entre ellos qué promos cuentan como parte de un grupo y que la Edge
+  Function mande las compras desde el lunes de la semana cuando la semana
+  empieza en el mes anterior.
+- Plan técnico: el cálculo pasa a "saldos" de tope, propios de una promo o
+  compartidos por un grupo, que se calculan una sola vez por consulta. Las
+  promos de una combinación se reparten el saldo en un orden fijo, así el
+  resultado es siempre el mismo. La cobertura se mide con la herramienta de
+  Vitest dentro del mismo paso de tests del CI.
+- 23 tareas internas en tres etapas con revisión entre cada una: topes
+  semanales y por compra; promos acumulables; topes compartidos y cierre.
+- Etapa 1: la opción de pago pasó al formato nuevo (lista de promos) sin
+  cambiar ningún resultado de la issue #36, y el motor ya distingue topes
+  mensuales, semanales (de lunes a domingo, aunque la semana cruce de mes)
+  y por compra. Se sumó la medición de cobertura a los tests: da 100% de
+  las líneas del motor.
+- Etapa 2: las promos acumulables de una misma tarjeta se suman en una sola
+  opción, que muestra cuánto aporta cada una y respeta el tope de cada
+  promo. Las no acumulables, o las que no lo informan, siguen compitiendo
+  por separado.
+- Etapa 3: las promos de un mismo grupo comparten un único tope. Lo que se
+  gasta con una se descuenta para las otras, aunque la promo con la que se
+  compró ya haya vencido. Si dos promos del grupo se suman en una misma
+  compra, entre las dos nunca pasan lo que le queda al grupo.
+- Cierre: 128 tests en verde y 100% de las líneas del motor cubiertas; lint,
+  typecheck y build limpios, y el motor sigue sin dependencias.
+- La revisión de código (estándares y cumplimiento de la spec), los tests y
+  el control de reglas del proyecto no encontraron incumplimientos. Se
+  corrigieron: el texto de la promo que queda en $0, que además ahora solo
+  aparece cuando otra promo de la misma opción usó el tope; el desempate
+  entre opciones, que compara la lista de promos una por una; un test que
+  faltaba (una promo vencida no aporta su período al grupo); y detalles de
+  nombres y código repetido. Unificar en un solo lugar la regla de qué promo
+  tiene tope queda para la issue #38. Quedan 131 tests en verde.
+- Errores de la IA en el proceso: en dos tests escritos antes del código
+  puso mal el resultado esperado (el orden de las promos dentro de una
+  opción y la causa de descarte de una promo vencida). Los detectó al
+  revisarlos contra la spec y los corrigió antes de escribir el código.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
