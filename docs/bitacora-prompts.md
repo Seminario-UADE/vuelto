@@ -830,6 +830,8 @@ base, para la pantalla «Mis topes».
   función nueva deja en un solo lugar la regla de qué tipo de tope tiene
   cada promo, y los textos se arman con los montos exactos para que el
   redondeo de la cifra no cambie el estado del tope.
+- 13 tareas internas en dos etapas con revisión entre ellas: unificar la
+  regla del tope y estimar cada saldo; después, los textos y el cierre.
 
 ---
 
