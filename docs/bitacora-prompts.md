@@ -944,61 +944,57 @@ dejaba abiertas, con datos reales de MODO.
 
 ---
 
-## 2026-10-26 — Integrar la Edge Function de recomendación con los topes nuevos del motor (PR #71, issues #43 y #37)
+## 2026-10-26 — Edge Function de recomendación con los topes de la issue #37 (PR #71)
 
-**Herramienta:** Claude Code (Opus 5.5), con `git`, `gh` CLI y el
-subagente `rules-guardian`.
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI y el subagente
+`rules-guardian`.
 
-**Objetivo:** cuando entró a `main` el PR #73 (issue #37, topes del motor),
-el PR #71 (Edge Function de la issue #43) quedó en conflicto. Había que
-resolverlo sin romper nada, quedándose con lo mejor de los dos trabajos, y
-revisar si alguna issue asignada quedaba desbloqueada.
+**Objetivo:** resolver los conflictos del PR #71 (issue #43) con `main`
+después del merge del PR #73 (issue #37), sin romper ninguno de los dos, y
+revisar qué issues de la #41, #43, #45, #47 y #56 se pueden avanzar.
 
 **Prompts principales:**
-1. "Mirá el repo: aprobé un issue de un compañero y mi rama en espera de
-   aprobación quedó con conflictos en `.claude/agent-memory/spec-critic/MEMORY.md`,
-   `.gitignore` y `docs/bitacora-prompts.md`. Resolvelo y fijate si puedo
-   avanzar alguna de mis issues. No subas nada sin mi aprobación."
-2. "Hacé todo lo que haya que resolver, lo más simple posible. Analizá lo
-   que hizo mi compañero y lo que hice yo y quedate con lo mejor de los
-   dos, sin que se rompa nada."
+1. "Resolvé los conflictos del PR #71 con `main` en
+   `.claude/agent-memory/spec-critic/MEMORY.md`, `.gitignore` y
+   `docs/bitacora-prompts.md`, y revisá si alguna de las issues #41, #43,
+   #45, #47 y #56 se puede avanzar."
+2. "Compará los cambios del PR #73 y del PR #71, quedate con lo mejor de
+   cada uno y dejá todo funcionando con la solución más simple."
 
 **Resultado:**
-- Los tres conflictos que marcaba GitHub eran de texto y se resolvieron
-  conservando los dos lados (las líneas de `.env` y la de `coverage/` en
-  `.gitignore`, las dos notas del revisor de specs y las tres entradas de
-  la bitácora en orden de fecha).
-- La IA encontró además un conflicto que git no marca: la #37 cambió la
-  respuesta del motor (cada opción de pago trae ahora una lista de promos)
-  y le pide dos cosas nuevas a quien lo llama. Con eso fallaban 4 tests y
-  el typecheck de la Edge Function. Se adaptó así:
+- Los tres conflictos eran de texto y se resolvieron conservando los dos
+  lados: las líneas de `.env` y la de `coverage/` en `.gitignore`, las dos
+  notas del revisor de specs y las entradas de la bitácora en orden de
+  fecha.
+- Había un conflicto más que git no marca. La #37 cambió la respuesta del
+  motor (cada opción de pago trae ahora una lista de promos) y le pide dos
+  cosas nuevas a quien lo llama. Por eso fallaban 4 tests y el typecheck de
+  la Edge Function. Se adaptó así:
   - las compras se piden desde el lunes de la semana cuando la semana
-    empezó el mes anterior, usando la función de fechas del motor (no se
-    duplica el cálculo en el servidor);
+    empezó el mes anterior, con la función de fechas del motor, sin
+    duplicar el cálculo en el servidor;
   - se le pasan al motor también las promos de las compras registradas
     aunque hayan vencido, para que descuente bien los topes compartidos;
-  - se corrigieron los 4 tests y se sumaron 3 (semana que cruza de mes,
-    tope compartido con una promo vencida, y no pedir dos veces la misma
-    promo).
-- De lo de cada uno:
-  - Del compañero se adoptó la medición de cobertura con mínimo de 90%,
-    también para la Edge Function: da 100% de las líneas.
-  - De lo propio se mantuvo la Edge Function, sus piezas comunes y las specs.
+  - se corrigieron los 4 tests y se sumaron 3: semana que cruza de mes,
+    tope compartido con una promo vencida y no pedir dos veces la misma
+    promo.
+- Del PR #73 se adoptó la medición de cobertura con un mínimo de 90%,
+  también para la Edge Function, que da 100% de las líneas. Del PR #71 se
+  mantuvieron la Edge Function, sus piezas comunes y las specs.
 - Se actualizaron la spec, el contrato del endpoint y
-  `docs/architecture/02-api-routes.md` con la respuesta nueva. Se dio por
+  `docs/architecture/02-api-routes.md` con la respuesta nueva. Quedó
   resuelto el requisito que impedía publicar la pantalla hasta que cerrara
   la #37.
 - Había dos specs con el número `003`. La de la issue #43 pasó a
   `specs/004-recomendar-pantalla/` y se actualizaron todas sus referencias.
-- Resultado: lint, typecheck y build limpios, con 131 tests del motor y 37
-  de la Edge Function en verde. `rules-guardian` no encontró
-  incumplimientos.
-- Ninguna issue asignada (#41, #43, #45, #47, #56) quedó desbloqueada del
-  todo: siguen esperando #34, #38, #39, #40 y #44. La #43 ya no depende de
-  la #37.
+- Lint, typecheck y build limpios, con 131 tests del motor y 37 de la Edge
+  Function en verde. `rules-guardian` no encontró incumplimientos.
 - Errores de la IA en el proceso: dos scripts de edición fallaron, uno por
   los finales de línea de Windows (CRLF) y otro por las comillas de la
   consola. Se corrigieron con un script en archivo aparte.
+- Queda pendiente:
+  - Las issues #41, #43, #45, #47 y #56 siguen esperando a #34, #38, #39,
+    #40 y #44. La #43 ya no depende de la #37.
 
 ---
 
