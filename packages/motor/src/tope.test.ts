@@ -187,6 +187,11 @@ describe("calcularSaldos: topes compartidos (US3)", () => {
     expect(saldos.get("dia")).toMatchObject({ tope: 1000000, consumido: 300000 });
   });
 
+  it("un miembro vencido tampoco aporta su período", () => {
+    const saldos = calcularSaldos([deGrupo("coto", 10000, vencida), deGrupo("dia", 10000, {}, "semanal")], [], HOY);
+    expect(saldos.get("dia")?.periodo).toBe("semanal");
+  });
+
   it("con miembros semanal y mensual vigentes, el período es mensual", () => {
     const saldos = calcularSaldos([deGrupo("coto", 10000, {}, "semanal"), deGrupo("dia", 10000)], [], HOY);
     expect(saldos.get("coto")?.periodo).toBe("mensual");

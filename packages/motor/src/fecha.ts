@@ -3,7 +3,10 @@
  * sus datos de zona horaria dependen del runtime, y el motor corre en Deno
  * (Edge Function) y se testea en Node.
  */
-import type { Dia, FechaISO } from "./tipos.ts";
+import type { Dia, FechaISO, Tope } from "./tipos.ts";
+
+/** Los períodos que acumulan consumo: "por compra" no acumula. */
+export type PeriodoAcumulable = Exclude<Tope["periodo"], "por_compra" | null>;
 
 const DESFASE_ARGENTINA_MS = -3 * 60 * 60 * 1000;
 const DIAS: readonly Dia[] = ["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
@@ -32,7 +35,7 @@ const DIA_MS = 24 * 60 * 60 * 1000;
  * Primer día del período de tope que contiene a `hoy`: el día 1 del mes, o el
  * lunes de la semana (semanas de lunes a domingo).
  */
-export function inicioDelPeriodo(periodo: "mensual" | "semanal", hoy: FechaISO): FechaISO {
+export function inicioDelPeriodo(periodo: PeriodoAcumulable, hoy: FechaISO): FechaISO {
   if (periodo === "mensual") return `${hoy.slice(0, 7)}-01`;
   const fecha = new Date(`${hoy}T00:00:00Z`);
   // getUTCDay(): domingo = 0, lunes = 1.

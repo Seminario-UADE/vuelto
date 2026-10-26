@@ -5,13 +5,14 @@
  * la issue #38 los reutiliza para «Mis topes».
  */
 import { aCentavos, aCentesimosDePunto, aplicarPorcentaje } from "./dinero.ts";
-import { inicioDelPeriodo } from "./fecha.ts";
+import { vigenteEn } from "./elegibilidad.ts";
+import { inicioDelPeriodo, type PeriodoAcumulable } from "./fecha.ts";
 import type { BaseEstimacion, Compra, FechaISO, Promocion } from "./tipos.ts";
 
 /** Importes en centavos. */
 export interface Saldo {
   tope: number;
-  periodo: "mensual" | "semanal";
+  periodo: PeriodoAcumulable;
   consumido: number;
   restante: number;
   base: BaseEstimacion;
@@ -73,24 +74,22 @@ function grupoDe(promo: Promocion): string | null {
   return alcance === "compartido" && periodo !== "por_compra" ? grupoTopeId : null;
 }
 
-function vigente(promo: Promocion, hoy: FechaISO): boolean {
-  return promo.vigencia.desde <= hoy && hoy <= promo.vigencia.hasta;
-}
-
 /**
  * Saldo de un grupo (FR-002): el menor tope y el período más largo entre los
- * miembros vigentes. Los vencidos solo aportan sus compras. `null` si ningún
- * miembro vigente informa tope.
+ * miembros vigentes que informan tope. Los vencidos solo aportan sus compras.
+ * `null` si ningún miembro vigente informa tope.
  */
 function saldoDeGrupo(
   miembros: Promocion[],
   comprasDe: Map<string, Compra[]>,
   hoy: FechaISO,
 ): Saldo | null {
-  const conTope = miembros.filter((m) => vigente(m, hoy) && m.tope.monto !== null);
+  const conTope = miembros.flatMap((m) =>
+    vigenteEn(m, hoy) && m.tope.monto !== null ? [{ monto: m.tope.monto, periodo: m.tope.periodo }] : [],
+  );
   if (conTope.length === 0) return null;
-  const tope = Math.min(...conTope.map((m) => aCentavos(m.tope.monto ?? 0)));
-  const periodo = conTope.some((m) => m.tope.periodo !== "semanal") ? "mensual" : "semanal";
+  const tope = Math.min(...conTope.map((m) => aCentavos(m.monto)));
+  const periodo = conTope.some((m) => m.periodo !== "semanal") ? "mensual" : "semanal";
   return armarSaldo(tope, periodo, miembros, comprasDe, hoy);
 }
 

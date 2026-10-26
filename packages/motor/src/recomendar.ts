@@ -27,23 +27,29 @@ function compararIds(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
-function idsDePromos(o: OpcionDePago): string {
-  return o.promociones
-    .map((p) => p.promocionId)
-    .sort(compararIds)
-    .join(",");
+function idsDePromos(o: OpcionDePago): string[] {
+  return o.promociones.map((p) => p.promocionId).sort(compararIds);
+}
+
+/** Elemento por elemento; si una lista es prefijo de la otra, va primero la más corta. */
+function compararListasDeIds(a: string[], b: string[]): number {
+  for (let i = 0; i < Math.min(a.length, b.length); i++) {
+    const r = compararIds(a[i] ?? "", b[i] ?? "");
+    if (r !== 0) return r;
+  }
+  return a.length - b.length;
 }
 
 function compararOpciones(a: OpcionDePago, b: OpcionDePago): number {
   return (
     b.ahorroEstimado - a.ahorroEstimado ||
     compararIds(a.medioDePagoId, b.medioDePagoId) ||
-    compararIds(idsDePromos(a), idsDePromos(b))
+    compararListasDeIds(idsDePromos(a), idsDePromos(b))
   );
 }
 
 /** Una promo que pasó todas las reglas y le queda tope. */
-interface Aplicable {
+interface PromoAplicable {
   promo: Promocion;
   medios: MedioDePago[];
   /** `null` = sin saldo: no informa tope o es por compra. */
@@ -59,15 +65,20 @@ interface Aplicable {
  * reparten el saldo en orden de ahorro sin tope y luego por id, así ninguna
  * combinación supera el restante de un saldo (FR-010).
  */
-function armarOpcion(medio: MedioDePago, grupo: Aplicable[]): OpcionDePago {
+function armarOpcion(medio: MedioDePago, grupo: PromoAplicable[]): OpcionDePago {
   const ordenadas = [...grupo].sort(
     (a, b) => b.ahorroSinTope - a.ahorroSinTope || compararIds(a.promo.id, b.promo.id),
   );
   const restantes = new Map<Saldo, number>();
+  // Las que quedan en $0 porque otra promo de esta misma opción agotó el saldo (FR-010).
+  const sinSaldo = new Set<string>();
   const ahorros = ordenadas.map((a) => {
     const limite = a.saldo ? (restantes.get(a.saldo) ?? a.saldo.restante) : a.topePorCompra;
     const ahorro = limite === null ? a.ahorroSinTope : Math.min(a.ahorroSinTope, limite);
-    if (a.saldo && limite !== null) restantes.set(a.saldo, limite - ahorro);
+    if (a.saldo && limite !== null) {
+      if (limite === 0 && restantes.has(a.saldo)) sinSaldo.add(a.promo.id);
+      restantes.set(a.saldo, limite - ahorro);
+    }
     return ahorro;
   });
   const promociones = ordenadas.map((a, i) => ({
@@ -77,9 +88,6 @@ function armarOpcion(medio: MedioDePago, grupo: Aplicable[]): OpcionDePago {
     topeRestanteTrasCompra: a.saldo ? aPesos(restantes.get(a.saldo) ?? a.saldo.restante) : null,
     base: a.saldo ? a.saldo.base : null,
   }));
-  const sinSaldo = new Set(
-    ordenadas.filter((a, i) => a.saldo !== null && ahorros[i] === 0).map((a) => a.promo.id),
-  );
   return {
     medioDePagoId: medio.id,
     ahorroEstimado: aPesos(ahorros.reduce((t, x) => t + x, 0)),
@@ -105,7 +113,7 @@ export function recomendar(
 
   const ctx: ContextoDeCompra = { compra, fecha: fechaArgentina(ahora), dia: diaArgentina(ahora) };
   const montoCentavos = aCentavos(compra.monto);
-  const aplicables: Aplicable[] = [];
+  const aplicables: PromoAplicable[] = [];
   const descartadas: Descarte[] = [];
   const saldos = calcularSaldos(promociones, comprasDelPeriodo, ctx.fecha);
 
@@ -149,9 +157,12 @@ export function recomendar(
   for (const medio of perfil.mediosDePago) {
     const delMedio = aplicables.filter((a) => a.medios.includes(medio));
     const acumulables = delMedio.filter((a) => a.promo.acumulable === true);
-    const solas = acumulables.length >= 2 ? delMedio.filter((a) => a.promo.acumulable !== true) : delMedio;
-    if (acumulables.length >= 2) opciones.push(armarOpcion(medio, acumulables));
-    for (const a of solas) opciones.push(armarOpcion(medio, [a]));
+    if (acumulables.length >= 2) {
+      opciones.push(armarOpcion(medio, acumulables));
+      for (const a of delMedio) if (a.promo.acumulable !== true) opciones.push(armarOpcion(medio, [a]));
+    } else {
+      for (const a of delMedio) opciones.push(armarOpcion(medio, [a]));
+    }
   }
 
   opciones.sort(compararOpciones);

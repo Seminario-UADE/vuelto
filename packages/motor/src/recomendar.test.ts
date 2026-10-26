@@ -479,8 +479,29 @@ describe("recomendar: topes compartidos (issue #37, US3)", () => {
       ["A", 2000],
       ["B", 0],
     ]);
-    expect(r.mejor?.motivo).toContain("el tope compartido se agota con la otra promo");
+    expect(r.mejor?.motivo).toContain("sin tope disponible: lo usa otra promoción de este banco");
     expect(r.descartadas).toEqual([]);
+  });
+
+  it("una promo con ahorro $0 por su propio monto no lleva la aclaración del tope compartido", () => {
+    const a = promo({ id: "A", acumulable: true, tope: { monto: 5000, periodo: "mensual", alcance: null, grupoTopeId: null } });
+    const b = promo({ id: "B", porcentaje: 10, acumulable: true });
+    // 20% de 4 centavos redondea a 0 centavos.
+    const r = recomendar(compra({ monto: 0.04 }), perfil(), [a, b], [], AHORA);
+    expect(r.mejor?.promociones.map((p) => p.ahorroEstimado)).toEqual([0, 0]);
+    expect(r.mejor?.motivo).not.toContain("sin tope disponible");
+  });
+
+  it("desempate: compara las listas de promos elemento por elemento", () => {
+    // Por texto unido con ",", "a b,..." quedaría antes que "a,..." porque " " < ",".
+    const p1 = promo({ id: "a", acumulable: true });
+    const p2 = promo({ id: "z", acumulable: true });
+    const p3 = promo({ id: "a b", porcentaje: 40 });
+    const r = recomendar(compra(), perfil(), [p3, p1, p2], [], AHORA);
+    expect([r.mejor, ...r.alternativas].map((o) => o?.promociones.map((x) => x.promocionId))).toEqual([
+      ["a", "z"],
+      ["a b"],
+    ]);
   });
 
   it("US3-8: el monto de una promo vencida no achica el saldo del grupo", () => {

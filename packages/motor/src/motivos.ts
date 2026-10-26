@@ -69,7 +69,7 @@ export function motivoCombinado(promos: Promocion[], sinSaldo: ReadonlySet<strin
   return promos
     .map((p) =>
       sinSaldo.has(p.id)
-        ? `${motivoOpcion(p)} (el tope compartido se agota con la otra promo)`
+        ? `${motivoOpcion(p)} (sin tope disponible: lo usa otra promoción de este banco)`
         : motivoOpcion(p),
     )
     .join(" + ");

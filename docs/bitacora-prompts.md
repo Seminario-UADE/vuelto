@@ -723,6 +723,10 @@ dejaba abiertas, con datos reales de MODO.
 5. "Opción 1 en A y no en B": una promo que se queda sin tope dentro de
    una combinación sigue en ella con $0, y las promos vencidas de un grupo
    cuentan su consumo pero no su monto.
+6. "No entendí lo de 'el tope compartido se agota con el 20% en
+   supermercados'." Con el ejemplo de dos promos del mismo banco que se
+   reparten un tope, se eligió un texto más simple para la que queda en $0:
+   "sin tope disponible: lo usa otra promoción de este banco".
 
 **Resultado:**
 - Spec en `specs/003-motor-topes-acumulables/`: topes mensuales, semanales
@@ -759,6 +763,14 @@ dejaba abiertas, con datos reales de MODO.
   compra, entre las dos nunca pasan lo que le queda al grupo.
 - Cierre: 128 tests en verde y 100% de las líneas del motor cubiertas; lint,
   typecheck y build limpios, y el motor sigue sin dependencias.
+- La revisión de código (estándares y cumplimiento de la spec), los tests y
+  el control de reglas del proyecto no encontraron incumplimientos. Se
+  corrigieron: el texto de la promo que queda en $0, que además ahora solo
+  aparece cuando otra promo de la misma opción usó el tope; el desempate
+  entre opciones, que compara la lista de promos una por una; un test que
+  faltaba (una promo vencida no aporta su período al grupo); y detalles de
+  nombres y código repetido. Unificar en un solo lugar la regla de qué promo
+  tiene tope queda para la issue #38. Quedan 131 tests en verde.
 - Errores de la IA en el proceso: en dos tests escritos antes del código
   puso mal el resultado esperado (el orden de las promos dentro de una
   opción y la causa de descarte de una promo vencida). Los detectó al

@@ -46,11 +46,11 @@ describe("motivos: opción combinada (US2)", () => {
 });
 
 describe("motivos: promo sin saldo dentro de una combinada (US3)", () => {
-  it("aclara que el tope compartido se agota con la otra promo", () => {
+  it("aclara que el tope lo usa otra promoción de este banco", () => {
     const a = promo({ id: "A", porcentaje: 20 });
     const b = promo({ id: "B", porcentaje: 10 });
     expect(motivoCombinado([a, b], new Set(["B"]))).toBe(
-      `${motivoOpcion(a)} + ${motivoOpcion(b)} (el tope compartido se agota con la otra promo)`,
+      `${motivoOpcion(a)} + ${motivoOpcion(b)} (sin tope disponible: lo usa otra promoción de este banco)`,
     );
   });
 });
