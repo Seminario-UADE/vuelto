@@ -35,7 +35,7 @@ export interface TextoEstimacion {
 
 ```ts
 export type ClaseDeTope =
-  | { tipo: "sin_tope" }
+  | { tipo: "sin_tope"; grupo: string | null }            // sin monto, pero puede aportar compras a su grupo
   | { tipo: "por_compra"; monto: number }                       // centavos
   | { tipo: "acumulable"; monto: number; periodo: PeriodoAcumulable; grupo: string | null };
 

@@ -215,3 +215,32 @@ export interface Recomendacion {
   alternativas: OpcionDePago[];
   descartadas: Descarte[];
 }
+
+/** Cuánto le queda al usuario de un tope que se va gastando (issue #38). */
+export interface EstimacionTope {
+  /** `null` si el saldo es propio de una promo. */
+  grupoTopeId: string | null;
+  /** `null` si las promos vigentes del saldo son de bancos distintos. */
+  bancoId: BancoId | null;
+  /** Promos vigentes del saldo. */
+  promocionIds: string[];
+  /** Medios del usuario que sirven para alguna de ellas; vacía si no se pasó perfil. */
+  mediosDePagoIds: string[];
+  /** En pesos. Siempre estimados, sostenidos por `base`. */
+  tope: number;
+  consumido: number;
+  restante: number;
+  base: BaseEstimacion;
+  periodo: { tipo: "mensual" | "semanal"; desde: FechaISO; hasta: FechaISO };
+}
+
+export type EstadoTope = "disponible" | "queda_poco" | "agotado" | "sin_compras";
+
+/** Textos de una estimación, por plantilla (DESIGN.md §5). Las etiquetas las pone cada pantalla. */
+export interface TextoEstimacion {
+  estado: EstadoTope;
+  /** "≈$6.500", "menos de $100", o `null` si está agotado o no hay compras. */
+  cifra: string | null;
+  /** "según 3 compras de octubre", con " · vuelve el 1/11" si está agotado, o el texto sin compras. */
+  base: string;
+}

@@ -3,7 +3,9 @@
  * Tono de `docs/design/DESIGN.md` §8; la redacción final es de la issue #46.
  */
 import { CATEGORIAS_MODO } from "./categorias.ts";
+import { aPesos } from "./dinero.ts";
 import type { ContextoDeCompra } from "./elegibilidad.ts";
+import { clasificarTope } from "./tope.ts";
 import type { CausaDescarte, Dia, FechaISO, Promocion } from "./tipos.ts";
 
 const NOMBRE_DIA: Record<Dia, string> = {
@@ -38,7 +40,7 @@ function diaYMes(fecha: FechaISO): string {
 }
 
 /** 20000 → "$20.000"; 1500.5 → "$1.500,50". Sin `toLocaleString`: depende del runtime. */
-function pesos(monto: number): string {
+export function pesos(monto: number): string {
   const [entero = "0", decimales = "00"] = monto.toFixed(2).split(".");
   const conMiles = entero.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   return decimales === "00" ? `$${conMiles}` : `$${conMiles},${decimales}`;
@@ -51,11 +53,12 @@ function textoDias(promo: Promocion): string {
 /** Ej.: "20% en supermercados los miércoles · la promo no informa tope". */
 export function motivoOpcion(promo: Promocion): string {
   const lugar = promo.comercio ?? nombreCategoria(promo);
+  const clase = clasificarTope(promo);
   const tope =
-    promo.tope.monto === null
+    clase.tipo === "sin_tope"
       ? " · la promo no informa tope"
-      : promo.tope.periodo === "por_compra"
-        ? ` · hasta ${pesos(promo.tope.monto)} por compra`
+      : clase.tipo === "por_compra"
+        ? ` · hasta ${pesos(aPesos(clase.monto))} por compra`
         : "";
   return `${porcentaje(promo)} en ${lugar}${textoDias(promo)}${tope}`;
 }

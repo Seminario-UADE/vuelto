@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fechaArgentina } from "./fecha.ts";
 import { compraRegistrada, promo } from "./test/fabricas.ts";
 import type { Compra, Promocion, Tope } from "./tipos.ts";
-import { calcularSaldos } from "./tope.ts";
+import { calcularSaldos, clasificarTope } from "./tope.ts";
 
 const HOY = "2026-10-21";
 const conTope = (monto: number | null, periodo: Tope["periodo"] = "mensual", id = "promo-galicia") =>
@@ -19,6 +19,7 @@ describe("calcularSaldos: saldo propio", () => {
       compraRegistrada({ id: "c2", descuentoObtenido: 2500 }),
     ];
     expect(saldoDe(conTope(5000), compras)).toEqual({
+      grupoTopeId: null,
       tope: 500000,
       periodo: "mensual",
       consumido: 400000,
@@ -220,5 +221,52 @@ describe("calcularSaldos: topes compartidos (US3)", () => {
     const compras = [compraRegistrada({ promocionId: "coto", monto: 10000, descuentoObtenido: null })];
     const saldos = calcularSaldos([deGrupo("coto", 10000, { porcentaje: 30 }), deGrupo("dia", 10000)], compras, HOY);
     expect(saldos.get("dia")?.consumido).toBe(300000);
+  });
+});
+
+describe("clasificarTope (issue #38, FR-012)", () => {
+  const conTope = (tope: Partial<Tope>) =>
+    promo({ tope: { monto: 5000, periodo: "mensual", alcance: null, grupoTopeId: null, ...tope } });
+
+  it("sin monto informado: sin tope", () => {
+    expect(clasificarTope(conTope({ monto: null }))).toEqual({ tipo: "sin_tope", grupo: null });
+  });
+
+  it("sin monto pero miembro de un grupo: sin tope, con su grupo (aporta compras al grupo)", () => {
+    expect(clasificarTope(conTope({ monto: null, alcance: "compartido", grupoTopeId: "g" }))).toEqual({
+      tipo: "sin_tope",
+      grupo: "g",
+    });
+  });
+
+  it("por compra: con su monto en centavos y sin grupo", () => {
+    expect(clasificarTope(conTope({ monto: 3000, periodo: "por_compra", alcance: "compartido", grupoTopeId: "g" }))).toEqual({
+      tipo: "por_compra",
+      monto: 300000,
+    });
+  });
+
+  it("acumulable propio: período y monto", () => {
+    expect(clasificarTope(conTope({}))).toEqual({ tipo: "acumulable", monto: 500000, periodo: "mensual", grupo: null });
+  });
+
+  it("período no informado se trata como mensual", () => {
+    expect(clasificarTope(conTope({ periodo: null }))).toMatchObject({ periodo: "mensual" });
+  });
+
+  it("compartido con grupo: es miembro", () => {
+    expect(clasificarTope(conTope({ periodo: "semanal", alcance: "compartido", grupoTopeId: "g" }))).toEqual({
+      tipo: "acumulable",
+      monto: 500000,
+      periodo: "semanal",
+      grupo: "g",
+    });
+  });
+
+  it.each([
+    ["exclusivo", "exclusivo" as const],
+    ["sin alcance", null],
+  ])("%s con grupo: no es miembro", (_, alcance) => {
+    expect(clasificarTope(conTope({ alcance, grupoTopeId: "g" }))).toMatchObject({ grupo: null });
   });
 });

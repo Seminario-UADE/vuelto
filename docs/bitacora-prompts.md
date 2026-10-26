@@ -832,6 +832,11 @@ base, para la pantalla «Mis topes».
   redondeo de la cifra no cambie el estado del tope.
 - 13 tareas internas en dos etapas con revisión entre ellas: unificar la
   regla del tope y estimar cada saldo; después, los textos y el cierre.
+- Etapa 1: la regla de qué tipo de tope tiene cada promo quedó en una sola
+  función que usa todo el motor, sin cambiar ningún resultado de las issues
+  anteriores. El motor ya devuelve, para cada tope que se va gastando, cuánto
+  es, cuánto se usó, cuánto queda, en qué compras se basa, hasta cuándo dura
+  y con qué tarjetas del usuario se usa.
 
 ---
 

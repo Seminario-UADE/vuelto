@@ -42,3 +42,39 @@ export function inicioDelPeriodo(periodo: PeriodoAcumulable, hoy: FechaISO): Fec
   const diasDesdeLunes = (fecha.getUTCDay() + 6) % 7;
   return new Date(fecha.getTime() - diasDesdeLunes * DIA_MS).toISOString().slice(0, 10);
 }
+
+function sumarDias(fecha: FechaISO, dias: number): FechaISO {
+  return new Date(new Date(`${fecha}T00:00:00Z`).getTime() + dias * DIA_MS).toISOString().slice(0, 10);
+}
+
+/** Último día del período de tope que contiene a `hoy`: fin de mes, o el domingo. */
+export function finDelPeriodo(periodo: PeriodoAcumulable, hoy: FechaISO): FechaISO {
+  if (periodo === "semanal") return sumarDias(inicioDelPeriodo("semanal", hoy), 6);
+  const [anio, mes] = hoy.split("-").map(Number);
+  // Día 0 del mes siguiente = último día de este mes.
+  return new Date(Date.UTC(anio ?? 0, mes ?? 0, 0)).toISOString().slice(0, 10);
+}
+
+export function diaSiguiente(fecha: FechaISO): FechaISO {
+  return sumarDias(fecha, 1);
+}
+
+const MESES = [
+  "enero",
+  "febrero",
+  "marzo",
+  "abril",
+  "mayo",
+  "junio",
+  "julio",
+  "agosto",
+  "septiembre",
+  "octubre",
+  "noviembre",
+  "diciembre",
+] as const;
+
+/** `"2026-10-21"` → `"octubre"`. */
+export function nombreDelMes(fecha: FechaISO): string {
+  return MESES[Number(fecha.slice(5, 7)) - 1] ?? "";
+}
