@@ -6,8 +6,8 @@
  */
 import { aCentavos, aCentesimosDePunto, aplicarPorcentaje } from "./dinero.ts";
 import { vigenteEn } from "./elegibilidad.ts";
-import { inicioDelPeriodo, type PeriodoAcumulable } from "./fecha.ts";
-import type { BaseEstimacion, Compra, FechaISO, Promocion } from "./tipos.ts";
+import { inicioDelPeriodo } from "./fecha.ts";
+import type { BaseEstimacion, Compra, FechaISO, PeriodoAcumulable, Promocion } from "./tipos.ts";
 
 /**
  * Qué tope tiene una promo (FR-012 de la issue #38): la única lectura de

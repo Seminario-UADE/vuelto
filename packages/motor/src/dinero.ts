@@ -24,3 +24,10 @@ export function aplicarPorcentaje(centavos: number, centesimosDePunto: number): 
 export function aPesos(centavos: number): number {
   return centavos / 100;
 }
+
+/** 20000 → "$20.000"; 1500.5 → "$1.500,50". Sin `toLocaleString`: depende del runtime. */
+export function pesos(monto: number): string {
+  const [entero = "0", decimales = "00"] = monto.toFixed(2).split(".");
+  const conMiles = entero.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return decimales === "00" ? `$${conMiles}` : `$${conMiles},${decimales}`;
+}

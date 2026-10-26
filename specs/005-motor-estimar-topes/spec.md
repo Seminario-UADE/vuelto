@@ -80,7 +80,7 @@ Para cada estimación, el motor arma los textos que la pantalla necesita, siguie
 
 - **FR-001**: El motor MUST ofrecer una función `estimarTopes(promociones, comprasDelPeriodo, perfil, ahora)` que devuelva una lista de estimaciones de tope. Aplican las precondiciones de la issue #37: la capa externa (issue #45) pasa también las promociones referenciadas por las compras del período, y las compras desde el lunes de la semana de la consulta o desde el día 1 del mes, lo que sea anterior.
 - **FR-002**: MUST haber una estimación por cada **saldo** de la issue #37 que tenga al menos una promoción **vigente** en la fecha de la consulta que, si hay perfil, aplique a al menos un medio del perfil. Las promociones sin tope informado, con tope por compra o no vigentes (vencidas o que todavía no empezaron) no generan estimación propia.
-- **FR-003**: Cada estimación MUST informar: el grupo (o `null` si el saldo es propio), el banco (o `null` si los miembros vigentes son de bancos distintos), los identificadores de las promociones vigentes del saldo, los identificadores de los medios del usuario que sirven para alguna de ellas (lista vacía sin perfil), el tope, lo consumido y lo restante (en pesos), la base y el período (tipo, desde y hasta).
+- **FR-003**: Cada estimación MUST informar: el grupo (o `null` si el saldo es propio), el banco (o `null` si los miembros vigentes son de bancos distintos), los identificadores de las promociones vigentes del saldo (incluidas las del grupo que no informan monto, que aportan sus compras), los identificadores de los medios del usuario que sirven para alguna de ellas (lista vacía sin perfil), el tope, lo consumido y lo restante (en pesos), la base y el período (tipo, desde y hasta).
 - **FR-004**: Con perfil `null`, la función MUST no filtrar por medios de pago. Uso previsto: estimar los topes de un conjunto de promociones sin depender de un usuario (tests, herramientas del equipo). La issue #45 siempre pasa el perfil. Con un perfil sin medios, la lista es vacía.
 - **FR-005**: El período MUST ir del inicio del período de la issue #37 hasta su último día: el último día del mes si es mensual, el domingo si es semanal.
 - **FR-006**: El orden de la lista MUST ser fijo: por el identificador del grupo, o de la promoción si el saldo es propio, comparado por código de carácter.
@@ -96,7 +96,7 @@ Para cada estimación, el motor arma los textos que la pantalla necesita, siguie
 **Unificación del tope** (pendiente de la revisión de la issue #37)
 
 - **FR-012**: El motor MUST tener una única función `clasificarTope(promo)` que diga si la promoción no informa tope, tiene tope por compra (con su monto) o tiene un tope que se acumula (con su monto, su período y su grupo si es miembro de uno). El cálculo de saldos, la recomendación y los motivos MUST usarla, y fuera de ella el motor no lee `tope.monto`, `tope.periodo`, `tope.alcance` ni `tope.grupoTopeId`. Se verifica en la revisión de código (búsqueda de esos campos fuera de la función).
-- **FR-013**: La suite de las issues #36 y #37 MUST seguir pasando sin cambios en sus expectativas después de FR-012.
+- **FR-013**: La suite de las issues #36 y #37 MUST seguir pasando sin cambios en los valores esperados después de FR-012. Único ajuste de forma aceptado: el saldo interno suma el campo `grupoTopeId` (lo necesita la estimación), así que el test que compara el saldo completo lo incluye.
 
 **Restricciones**
 
@@ -119,7 +119,7 @@ Sin cambios: el contrato de `recomendar()` (issues #36 y #37).
 - **SC-002**: En el 100% de los casos de prueba se cumple el invariante de FR-011.
 - **SC-003**: Para los mismos datos, el resultado es idéntico en el 100% de las ejecuciones, sin importar el orden de las listas de entrada.
 - **SC-004**: Los textos de los escenarios de US2 se reproducen exactamente.
-- **SC-005**: La suite de las issues #36 y #37 sigue pasando sin cambios en sus expectativas (FR-013).
+- **SC-005**: La suite de las issues #36 y #37 sigue pasando sin cambios en los valores esperados (FR-013).
 
 ## Assumptions
 

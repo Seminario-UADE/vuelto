@@ -92,6 +92,30 @@ describe("estimarTopes (US1)", () => {
     expect(r[0]?.bancoId).toBeNull();
   });
 
+  it("un miembro vencido de otro banco no anula el banco del grupo", () => {
+    const r = estimarTopes([deGrupo("coto", 10000), deGrupo("dia", 10000, { bancoId: SANTANDER, ...vencida })], [], null, AHORA);
+    expect(r[0]).toMatchObject({ bancoId: GALICIA, promocionIds: ["coto"] });
+  });
+
+  it("en un grupo, lista solo los medios de las promos vigentes que le sirven al usuario", () => {
+    const debito = medio({ id: "galicia-debito-visa", tipo: "debito" });
+    const soloDebito = deGrupo("dia", 10000, { tarjetas: { debito: ["visa"], credito: [] } });
+    const r = estimarTopes([soloDebito, deGrupo("coto", 10000, { tarjetas: { debito: [], credito: ["master"] } })], [], perfil([debito, medio()]), AHORA);
+    expect(r[0]).toMatchObject({ promocionIds: ["coto", "dia"], mediosDePagoIds: ["galicia-debito-visa"] });
+  });
+
+  it("una promo vigente del grupo sin monto informado figura entre las del tope", () => {
+    const r = estimarTopes([deGrupo("coto", 10000), deGrupo("dia", null)], [], null, AHORA);
+    expect(r[0]?.promocionIds).toEqual(["coto", "dia"]);
+  });
+
+  it("si un grupo y una promo tienen el mismo id, el orden no depende de la entrada", () => {
+    const grupo = conTope("g1", 10000, { alcance: "compartido", grupoTopeId: "x" });
+    const propia = conTope("x", 5000);
+    const r = estimarTopes([grupo, propia], [], null, AHORA);
+    expect(estimarTopes([propia, grupo], [], null, AHORA)).toEqual(r);
+  });
+
   it("lista solo los medios del usuario que sirven para alguna promo vigente del saldo", () => {
     const debito = medio({ id: "galicia-debito-visa", tipo: "debito" });
     const otroBanco = medio({ id: "santander-credito-visa", bancoId: SANTANDER });

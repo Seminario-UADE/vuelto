@@ -76,6 +76,9 @@ export interface Tope {
   grupoTopeId: string | null;
 }
 
+/** Los períodos que acumulan consumo: "por compra" no acumula. */
+export type PeriodoAcumulable = Exclude<Tope["periodo"], "por_compra" | null>;
+
 /** Redes aceptadas por tipo de tarjeta. Lista vacía = ese tipo no participa. */
 export interface TarjetasAceptadas {
   debito: Red[];
@@ -231,7 +234,7 @@ export interface EstimacionTope {
   consumido: number;
   restante: number;
   base: BaseEstimacion;
-  periodo: { tipo: "mensual" | "semanal"; desde: FechaISO; hasta: FechaISO };
+  periodo: { tipo: PeriodoAcumulable; desde: FechaISO; hasta: FechaISO };
 }
 
 export type EstadoTope = "disponible" | "queda_poco" | "agotado" | "sin_compras";

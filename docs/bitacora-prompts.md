@@ -843,6 +843,12 @@ base, para la pantalla «Mis topes».
   puede estimar. Ningún texto muestra una cifra sin su base.
 - Cierre: 168 tests en verde, 99,5% de las líneas del motor cubiertas;
   lint, typecheck y build limpios, y el motor sigue sin dependencias.
+- La revisión de código (estándares y cumplimiento de la spec), los tests y
+  el control de reglas del proyecto no encontraron incumplimientos. Se
+  corrigieron detalles: dos funciones de fecha con el mismo nombre y distinto
+  formato, código repetido, números sin nombre, un posible empate en el orden
+  de los topes y cuatro tests de casos borde que faltaban. Quedan 172 tests en
+  verde.
 - Error de la IA en el proceso: al unificar la regla del tope, el primer
   diseño hacía que una promo de un grupo sin monto informado dejara de
   aportar sus compras al grupo. Se detectó al leer el código antes de

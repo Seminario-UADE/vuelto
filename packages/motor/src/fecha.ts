@@ -3,10 +3,7 @@
  * sus datos de zona horaria dependen del runtime, y el motor corre en Deno
  * (Edge Function) y se testea en Node.
  */
-import type { Dia, FechaISO, Tope } from "./tipos.ts";
-
-/** Los períodos que acumulan consumo: "por compra" no acumula. */
-export type PeriodoAcumulable = Exclude<Tope["periodo"], "por_compra" | null>;
+import type { Dia, FechaISO, PeriodoAcumulable } from "./tipos.ts";
 
 const DESFASE_ARGENTINA_MS = -3 * 60 * 60 * 1000;
 const DIAS: readonly Dia[] = ["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
@@ -77,4 +74,14 @@ const MESES = [
 /** `"2026-10-21"` → `"octubre"`. */
 export function nombreDelMes(fecha: FechaISO): string {
   return MESES[Number(fecha.slice(5, 7)) - 1] ?? "";
+}
+
+/** `"2026-10-20"` → `"20/10"`, con ceros: el formato de los motivos de descarte. */
+export function diaMesConCeros(fecha: FechaISO): string {
+  return `${fecha.slice(8, 10)}/${fecha.slice(5, 7)}`;
+}
+
+/** `"2026-11-01"` → `"1/11"`, sin ceros: el formato de «vuelve el» (DESIGN.md). */
+export function diaMesSinCeros(fecha: FechaISO): string {
+  return `${Number(fecha.slice(8, 10))}/${Number(fecha.slice(5, 7))}`;
 }

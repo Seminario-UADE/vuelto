@@ -3,10 +3,11 @@
  * Tono de `docs/design/DESIGN.md` §8; la redacción final es de la issue #46.
  */
 import { CATEGORIAS_MODO } from "./categorias.ts";
-import { aPesos } from "./dinero.ts";
+import { aPesos, pesos } from "./dinero.ts";
+import { diaMesConCeros } from "./fecha.ts";
 import type { ContextoDeCompra } from "./elegibilidad.ts";
 import { clasificarTope } from "./tope.ts";
-import type { CausaDescarte, Dia, FechaISO, Promocion } from "./tipos.ts";
+import type { CausaDescarte, Dia, Promocion } from "./tipos.ts";
 
 const NOMBRE_DIA: Record<Dia, string> = {
   lun: "lunes",
@@ -32,18 +33,6 @@ function enumerar(partes: string[]): string {
 /** "33.3" → "33,3%". */
 function porcentaje(promo: Promocion): string {
   return `${String(promo.porcentaje).replace(".", ",")}%`;
-}
-
-/** "2026-10-20" → "20/10". */
-function diaYMes(fecha: FechaISO): string {
-  return `${fecha.slice(8, 10)}/${fecha.slice(5, 7)}`;
-}
-
-/** 20000 → "$20.000"; 1500.5 → "$1.500,50". Sin `toLocaleString`: depende del runtime. */
-export function pesos(monto: number): string {
-  const [entero = "0", decimales = "00"] = monto.toFixed(2).split(".");
-  const conMiles = entero.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  return decimales === "00" ? `$${conMiles}` : `$${conMiles},${decimales}`;
 }
 
 function textoDias(promo: Promocion): string {
@@ -91,8 +80,8 @@ export function motivoDescarte(
       return `La promo es solo en ${promo.comercio ?? "otro comercio"}`;
     case "vigencia":
       return fecha < promo.vigencia.desde
-        ? `La promo empieza el ${diaYMes(promo.vigencia.desde)}`
-        : `La promo venció el ${diaYMes(promo.vigencia.hasta)}`;
+        ? `La promo empieza el ${diaMesConCeros(promo.vigencia.desde)}`
+        : `La promo venció el ${diaMesConCeros(promo.vigencia.hasta)}`;
     case "dia":
       return `Hoy no aplica: la promo es${textoDias(promo)}`;
     case "canal":
