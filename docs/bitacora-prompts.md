@@ -778,6 +778,57 @@ dejaba abiertas, con datos reales de MODO.
 
 ---
 
+## 2026-10-26 — Revisión de la Edge Function de recomendación (PR #71) y estimación de topes (issue #38, en curso)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI, los subagentes
+`test-runner`, `rules-guardian` y `spec-critic`, la revisión de código en
+dos ejes (estándares y cumplimiento de la spec) y spec-kit
+(`/speckit-specify`).
+
+**Objetivo:** revisar antes de aprobar el PR #71 de jeqm0302, que conecta
+el motor con la Edge Function de «¿Con qué pago?», y arrancar la issue #38:
+que el motor estime cuánto tope le queda al usuario en cada uno, con su
+base, para la pantalla «Mis topes».
+
+**Prompts principales:**
+1. "¿El PR #71 está listo para aprobar y mergear? ¿No tiene conflictos?"
+   No tenía conflictos y el CI estaba en verde, pero faltaba revisarlo. Se
+   pidió revisarlo antes de aprobar.
+2. "Publicá el comentario y aprobá el PR, pero en vez de 'todo bien,
+   apruebo' poné 'aprobado'."
+3. "Arrancá con la issue #38." Al comparar la issue con el diseño de la
+   pantalla aparecieron diferencias, y se decidió seguir el diseño.
+4. "Para el filtro por tarjetas, ¿se puede hacer parametrizable, por si se
+   quiere usar sin la información del perfil?" Se hizo opcional, dejando
+   escrito para qué sirve.
+5. "1a, 2 y 3a": respetar la regla del 20% para "queda poco" aunque un
+   ejemplo del diseño no la cumpla, que cada pantalla ponga sus etiquetas y
+   mostrar "menos de $100" cuando queda casi nada.
+
+**Resultado:**
+- PR #71 revisado: 168 tests en verde, sin violaciones de las reglas del
+  proyecto y sin errores de lógica. Cumple las dos condiciones que el motor
+  le pide a la Edge Function. Se aprobó con un comentario de 7 pendientes
+  que no bloquean (documentación desactualizada, el código de error cuando
+  el usuario no tiene tarjetas, dos tests de casos borde y un chequeo de
+  Deno en el CI). La función todavía no lee la base de datos: eso queda para
+  la issue #34.
+- Spec de la issue #38 en `specs/005-motor-estimar-topes/`: una estimación
+  por cada tope que se va gastando, solo de promos vigentes que sirven para
+  las tarjetas del usuario, con su base y los textos del diseño
+  ("≈$6.500", "según 3 compras de octubre", "queda poco", "vuelve el
+  1/11", "Sin compras registradas este mes: todavía no podemos estimar
+  cuánto te queda.").
+- Se suma a la issue #38 lo que quedó pendiente de la revisión de la issue
+  #37: dejar en un solo lugar la regla de qué tipo de tope tiene cada promo.
+- `spec-critic` encontró dos bloqueantes: un criterio que pedía reproducir
+  textos del diseño que se contradicen entre sí, y etiquetas sin dueño
+  claro. Se corrigieron junto con los demás hallazgos.
+- Error del diseño detectado: un ejemplo de `DESIGN.md` marca "queda poco"
+  con el 29% de tope restante, contra su propia regla del 20%.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
