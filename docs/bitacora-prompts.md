@@ -693,6 +693,172 @@ pendientes" de `docs/product/requisitos.md`.
 
 ---
 
+## 2026-10-24 — Edge Function de recomendación: spec, plan e implementación del servidor (issue #43)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-specify`,
+`/speckit-plan`, `/speckit-tasks`, `/speckit-implement`), los subagentes
+`spec-critic` y `rules-guardian`, la skill `/code-review` (ejes de
+estándares y de spec) y `gh` CLI para leer las issues.
+
+**Objetivo:** adelantar la issue #43 (pantalla «¿Con qué pago?») mientras
+siguen abiertas las issues de las que depende (#34 esquema de Supabase, #39
+app base, #40 login, #41 perfil): escribir la spec completa y construir y
+testear la parte del servidor que no necesita la base de datos.
+
+**Prompts principales:**
+1. "Escribí la spec de la issue #43 con el endpoint que recomienda del
+   lado del servidor, según ADR-001 y ADR-009. Marcá la frontera con las
+   issues #36, #37, #41, #44 y #46, y dejá bloqueado lo que depende de
+   #34, #39, #40 y #41."
+2. "Pasá la spec por `spec-critic` y corregí cada hallazgo. Ojo con
+   cualquier filtro que haga el servidor antes del motor: no puede
+   duplicar ni esconder reglas del motor."
+3. "Definí el contrato HTTP del endpoint, con un código y un cuerpo para
+   cada error, y que los registros del servidor no guarden datos del
+   usuario."
+4. "Implementá la capa del servidor escribiendo primero los tests y con
+   repositorios en memoria, sin depender de la base. Cubrí las fechas en
+   hora de Argentina, el cambio de mes y el aislamiento entre usuarios."
+5. "Revisá los cambios con `rules-guardian` y `/code-review`, y corregí
+   lo que encuentren."
+
+**Resultado:**
+- Quedó documentada la funcionalidad completa en
+  `specs/004-recomendar-pantalla/`: 4 historias de usuario, 30 requisitos,
+  el plan técnico, 10 decisiones técnicas, el contrato del endpoint y 42
+  tareas. Las tareas que dependen de otras issues quedaron marcadas como
+  bloqueadas, con la issue que las bloquea.
+- El revisor de specs (`spec-critic`) encontró 13 problemas en la primera
+  versión y se corrigieron todos. Los principales:
+  - El servidor iba a filtrar las promos "vigentes hoy" antes de pasarlas
+    al motor. Eso escondía las promos de otro día de la semana, y el
+    usuario no se enteraba de que existían. Ahora el servidor filtra solo
+    por rubro y fechas, y el día lo evalúa el motor.
+  - No estaba definido qué responde el servidor cuando algo falla. Ahora
+    cada caso tiene su código y su mensaje, y la app sabe qué mostrar en
+    cada uno.
+  - Entrar con la clave pública de la app, sin haber iniciado sesión, no
+    tiene que contar como usuario logueado.
+  - La pantalla no puede llegar a usuarios reales antes de la issue #37:
+    hasta entonces, los topes semanales y "por compra" se calculan como si
+    fueran mensuales.
+- Ya existe la primera Edge Function del proyecto (`recomendar`, en
+  `supabase/functions/`). Recibe la compra que carga el usuario, verifica
+  que haya iniciado sesión, valida los datos, junta sus tarjetas, las
+  promos del rubro y sus compras del mes, y llama al motor. No agrega
+  ninguna regla propia: la recomendación sigue saliendo solo del motor.
+- Las piezas comunes (sesión, mensajes de error, validación y acceso a
+  datos) quedaron en `supabase/functions/_shared/`, para reusarlas en las
+  próximas funciones (#45 topes, #48 tickets).
+- El motor ahora comparte su función de fecha con el servidor, para que
+  los dos calculen "hoy" con la hora de Argentina. No cambia ninguna regla
+  del motor.
+- Pasan 34 tests nuevos, que corren sin base de datos ni internet. Entre
+  otros, verifican que:
+  - el resultado es el mismo que llamar al motor directamente;
+  - una consulta a las 22:00 del último día del mes cuenta las compras de
+    ese mes y no del siguiente;
+  - nunca se mezclan datos de otro usuario;
+  - cada error responde lo que dice el contrato;
+  - los registros del servidor no guardan datos del usuario.
+- El CI ahora también revisa la carpeta `supabase` (lint, tipos y tests).
+  Se completó `docs/architecture/02-api-routes.md`, que estaba vacío.
+- El control de reglas del proyecto (`rules-guardian`) no encontró
+  incumplimientos. La revisión de código encontró dos problemas, ya
+  corregidos:
+  - Si el servicio de inicio de sesión de Supabase estaba caído, la app
+    iba a decir "sesión vencida" y mandar al usuario a loguearse de nuevo,
+    lo que no arreglaba nada. Ahora muestra "Probá de nuevo".
+  - Un emoji en el nombre del comercio contaba como 2 caracteres.
+- Errores de la IA en el proceso:
+  - Lanzó un comando de consola que quedó esperando una respuesta y lo
+    tuvo que cortar.
+  - Las dos primeras corridas de lint y typecheck fallaron por detalles de
+    configuración y de tests, y se corrigieron.
+  - El caso del inicio de sesión caído no lo previó al escribir el código;
+    lo detectó la revisión.
+- Queda pendiente:
+  - La conexión con la base de datos real y la lista de comercios, que
+    dependen de la issue #34.
+  - La pantalla en la app, que depende de #39, #40 y #41.
+  - Proponer al equipo dos ajustes al ADR-009, que hoy no coinciden con
+    cómo quedó el código: el handler vive en su propio archivo y la
+    verificación de sesión se inyecta como las demás dependencias
+    (motivos en el research, R3 y R4).
+
+---
+
+## 2026-10-25 — Plan y tareas del perfil de bancos y tarjetas (issue #41)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-plan`,
+`/speckit-tasks`) y `gh` CLI para leer las issues #34, #41 y #45.
+
+**Objetivo:** dejar lista la implementación de la issue #41 (perfil: bancos,
+tarjetas y redes) mientras siguen abiertas las issues de las que depende
+(#34 esquema de Supabase, #39 app base, #40 login). La spec era del 13/10,
+anterior a varias decisiones de arquitectura, así que había que cruzarla
+con lo decidido después.
+
+**Prompts principales:**
+1. "Generá el plan de la spec `specs/001-perfil-billeteras/` cruzándola con
+   lo decidido después del 13/10: constitución 2.0.0, ADR-001
+   §Actualización, RNF-02, ADR-009 y el contrato de tipos de la issue #33.
+   Indicá qué partes quedan bloqueadas por #34, #39 y #40."
+2. "Generá las tareas y marcá cada fase bloqueada con la issue que la
+   bloquea."
+3. "Revisá los artefactos del plan y uní en `plan.md` y `tasks.md` todo lo
+   que esté repetido entre archivos."
+4. "Releé el plan y las tareas como si tuvieras que implementar la issue sin
+   contexto, y completá lo que te haría dudar o perder tiempo."
+
+**Resultado:**
+- El plan confirma que la spec sigue vigente y no hubo que cambiarla. Lo
+  decidido después se resolvió así:
+  - El perfil no necesita Edge Function: la app lee y escribe directo en
+    Supabase, y el RLS garantiza que cada usuario vea solo lo suyo
+    (ADR-009).
+  - La app no puede importar el motor, ni siquiera sus tipos (RNF-02).
+    Declara los suyos con los mismos valores, y la base rechaza cualquier
+    otro.
+  - Se mantiene la lectura del perfil sin conexión. La actualización del
+    13/10 sacó del celular el motor y el cálculo, pero no el perfil, que
+    solo se muestra.
+- Ocho decisiones técnicas, entre ellas:
+  - Que no se repita la misma tarjeta lo controla la base, no la pantalla.
+    Así también se cubre el caso de dos celulares o un doble toque.
+  - Que el perfil no quede vacío lo controla la app. Una regla en la base
+    habría impedido borrar la cuenta, y si el perfil igual queda vacío, la
+    Edge Function de la issue #43 ya lo detecta.
+  - El onboarding se guarda en un solo pedido: entra todo o nada.
+  - El buscador filtra los 82 bancos en el celular, sin acentos ni
+    mayúsculas, con los bancos frecuentes primero y un orden que no depende
+    del idioma del teléfono.
+  - Los bancos nunca se borran del catálogo, para que una tarjeta ya
+    declarada siempre tenga su banco.
+- Quedó una lista de lo que la issue #34 tiene que garantizar en las tablas
+  `bancos` y `medios_de_pago`, para coordinarlo con quien la tiene asignada.
+- 13 tareas. Las funciones puras (reglas del perfil, buscador y clasificación
+  de errores) se pueden hacer con sus tests apenas cierre la #39. Las
+  pantallas necesitan además la #34 y la #40.
+- Errores de la IA en el proceso:
+  - La primera versión del plan repartía el mismo contenido en seis
+    archivos: la tabla de medios de pago aparecía descrita tres veces y los
+    escenarios de prueba copiaban los de la spec. Se unió todo en `plan.md`
+    y `tasks.md`.
+  - Al unirlos quedaron huecos para implementar, que se encontraron en una
+    segunda lectura:
+    - no se decía cómo detectar cada error;
+    - Perfil necesitaba bajar el catálogo solo para mostrar el nombre del
+      banco;
+    - el selector de tarjeta lo usaban dos pantallas y no tenía un archivo
+      propio.
+- Queda pendiente:
+  - Avisar en la issue #34 qué necesita esta feature de las tablas.
+  - El catálogo crudo de bancos de MODO que cita un comentario de la #34
+    (`docs/product/data/modo-bancos-raw.json`) no está en el repo.
+
+---
+
 ## 2026-10-25 — Topes semanales, compartidos y promos acumulables (issue #37)
 
 **Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-specify`),
@@ -775,6 +941,100 @@ dejaba abiertas, con datos reales de MODO.
   puso mal el resultado esperado (el orden de las promos dentro de una
   opción y la causa de descarte de una promo vencida). Los detectó al
   revisarlos contra la spec y los corrigió antes de escribir el código.
+
+---
+
+## 2026-10-26 — Edge Function de recomendación con los topes de la issue #37 (PR #71)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI y el subagente
+`rules-guardian`.
+
+**Objetivo:** resolver los conflictos del PR #71 (issue #43) con `main`
+después del merge del PR #73 (issue #37), sin romper ninguno de los dos, y
+revisar qué issues de la #41, #43, #45, #47 y #56 se pueden avanzar.
+
+**Prompts principales:**
+1. "Resolvé los conflictos del PR #71 con `main` en
+   `.claude/agent-memory/spec-critic/MEMORY.md`, `.gitignore` y
+   `docs/bitacora-prompts.md`, y revisá si alguna de las issues #41, #43,
+   #45, #47 y #56 se puede avanzar."
+2. "Compará los cambios del PR #73 y del PR #71, quedate con lo mejor de
+   cada uno y dejá todo funcionando con la solución más simple."
+
+**Resultado:**
+- Los tres conflictos eran de texto y se resolvieron conservando los dos
+  lados: las líneas de `.env` y la de `coverage/` en `.gitignore`, las dos
+  notas del revisor de specs y las entradas de la bitácora en orden de
+  fecha.
+- Había un conflicto más que git no marca. La #37 cambió la respuesta del
+  motor (cada opción de pago trae ahora una lista de promos) y le pide dos
+  cosas nuevas a quien lo llama. Por eso fallaban 4 tests y el typecheck de
+  la Edge Function. Se adaptó así:
+  - las compras se piden desde el lunes de la semana cuando la semana
+    empezó el mes anterior, con la función de fechas del motor, sin
+    duplicar el cálculo en el servidor;
+  - se le pasan al motor también las promos de las compras registradas
+    aunque hayan vencido, para que descuente bien los topes compartidos;
+  - se corrigieron los 4 tests y se sumaron 3: semana que cruza de mes,
+    tope compartido con una promo vencida y no pedir dos veces la misma
+    promo.
+- Del PR #73 se adoptó la medición de cobertura con un mínimo de 90%,
+  también para la Edge Function, que da 100% de las líneas. Del PR #71 se
+  mantuvieron la Edge Function, sus piezas comunes y las specs.
+- Se actualizaron la spec, el contrato del endpoint y
+  `docs/architecture/02-api-routes.md` con la respuesta nueva. Quedó
+  resuelto el requisito que impedía publicar la pantalla hasta que cerrara
+  la #37.
+- Había dos specs con el número `003`. La de la issue #43 pasó a
+  `specs/004-recomendar-pantalla/` y se actualizaron todas sus referencias.
+- Lint, typecheck y build limpios, con 131 tests del motor y 37 de la Edge
+  Function en verde. `rules-guardian` no encontró incumplimientos.
+- Errores de la IA en el proceso: dos scripts de edición fallaron, uno por
+  los finales de línea de Windows (CRLF) y otro por las comillas de la
+  consola. Se corrigieron con un script en archivo aparte.
+- Queda pendiente:
+  - Las issues #41, #43, #45, #47 y #56 siguen esperando a #34, #38, #39,
+    #40 y #44. La #43 ya no depende de la #37.
+
+---
+
+## 2026-10-26 — Pendientes de la revisión del PR #71 (issue #43)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI y Deno.
+
+**Objetivo:** resolver los 7 pendientes no bloqueantes que dejó el
+compañero al aprobar el PR #71.
+
+**Prompts principales:**
+1. "Mirá lo que aprobó mi compañero y lo que comentó. En base a eso,
+   resolvé todas las indicaciones del comentario. No subas nada ni hagas
+   un merge hasta que yo lo apruebe."
+2. "Velo bien y decime si cumple con todo esto."
+
+**Resultado:**
+- Perfil sin medios de pago responde 422 en vez de 409, el código acordado
+  en la issue #36. Se cambió en el código, los tests, la spec, el contrato
+  (también en lo que muestra la pantalla), el plan del perfil (#41) y
+  `docs/architecture/02-api-routes.md`.
+- `tasks.md`, `plan.md` y `research.md` de la spec 004 describen la versión
+  posterior a la #37: se exportan `fechaArgentina` e `inicioDelPeriodo`, las
+  compras se piden desde el día 1 del mes o el lunes de la semana y el
+  autenticador lanza un error propio si Supabase Auth no responde.
+- ADR-009 suma una sección «Actualización»: el handler vive en
+  `handler.ts`, separado de `index.ts`, y la autenticación es la interfaz
+  `Autenticador` con la clase `AutenticadorSupabase`.
+- `CLAUDE.md` ya no marca el workspace `supabase` como reservado.
+- El CI suma el job `deno-check`, que chequea los `index.ts` de las Edge
+  Functions (quedaban fuera de `tsc`, ESLint y la cobertura).
+- 3 tests nuevos: una compra registrada sin promo (`promocionId: null`) y
+  un pedido sin comercio, en el servicio y en el handler. 131 tests del
+  motor y 40 de la Edge Function en verde, 100% de líneas cubiertas.
+- Se corrigió la descripción del PR (la spec es la `004`, y son las compras
+  del período, no del mes).
+- Errores de la IA en el proceso: un test nuevo no compilaba porque la base
+  del tope puede ser `null`; lo detectó el typecheck y se corrigió.
+- Queda pendiente: la #43 sigue abierta hasta que existan las tablas (#34)
+  y la pantalla (#39, #40, #41).
 
 ---
 
