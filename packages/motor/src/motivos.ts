@@ -60,9 +60,19 @@ export function motivoOpcion(promo: Promocion): string {
   return `${porcentaje(promo)} en ${lugar}${textoDias(promo)}${tope}`;
 }
 
-/** Opción con varias promos acumulables: el motivo de cada una, en orden (FR-014). */
-export function motivoCombinado(promos: Promocion[]): string {
-  return promos.map(motivoOpcion).join(" + ");
+/**
+ * Opción con varias promos acumulables: el motivo de cada una, en orden
+ * (FR-014). `sinSaldo` son las que quedaron en $0 porque otra de la misma
+ * opción agotó el tope compartido (FR-010).
+ */
+export function motivoCombinado(promos: Promocion[], sinSaldo: ReadonlySet<string> = new Set()): string {
+  return promos
+    .map((p) =>
+      sinSaldo.has(p.id)
+        ? `${motivoOpcion(p)} (el tope compartido se agota con la otra promo)`
+        : motivoOpcion(p),
+    )
+    .join(" + ");
 }
 
 /** Por qué una promo no sirve para esta compra, una plantilla por causa. */

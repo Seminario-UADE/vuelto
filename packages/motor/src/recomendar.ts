@@ -77,6 +77,9 @@ function armarOpcion(medio: MedioDePago, grupo: Aplicable[]): OpcionDePago {
     topeRestanteTrasCompra: a.saldo ? aPesos(restantes.get(a.saldo) ?? a.saldo.restante) : null,
     base: a.saldo ? a.saldo.base : null,
   }));
+  const sinSaldo = new Set(
+    ordenadas.filter((a, i) => a.saldo !== null && ahorros[i] === 0).map((a) => a.promo.id),
+  );
   return {
     medioDePagoId: medio.id,
     ahorroEstimado: aPesos(ahorros.reduce((t, x) => t + x, 0)),
@@ -84,7 +87,10 @@ function armarOpcion(medio: MedioDePago, grupo: Aplicable[]): OpcionDePago {
     motivo:
       ordenadas.length === 1 && ordenadas[0]
         ? motivoOpcion(ordenadas[0].promo)
-        : motivoCombinado(ordenadas.map((a) => a.promo)),
+        : motivoCombinado(
+            ordenadas.map((a) => a.promo),
+            sinSaldo,
+          ),
   };
 }
 

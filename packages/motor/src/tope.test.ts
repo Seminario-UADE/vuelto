@@ -137,3 +137,83 @@ describe("calcularSaldos: períodos (US1)", () => {
     expect(saldoDe(conTope(3000, "por_compra"), [compraRegistrada()])).toBeUndefined();
   });
 });
+
+describe("calcularSaldos: topes compartidos (US3)", () => {
+  const deGrupo = (id: string, monto: number | null, datos: Partial<Promocion> = {}, periodo: Tope["periodo"] = "mensual") =>
+    promo({ id, tope: { monto, periodo, alcance: "compartido", grupoTopeId: "galicia-super" }, ...datos });
+  const vencida = { vigencia: { desde: "2026-10-01", hasta: "2026-10-10", dias: null } };
+
+  it("los miembros del grupo comparten el mismo saldo", () => {
+    const saldos = calcularSaldos([deGrupo("coto", 10000), deGrupo("dia", 10000)], [], HOY);
+    expect(saldos.get("coto")).toBe(saldos.get("dia"));
+  });
+
+  it("lo consumido con una promo del grupo descuenta del saldo de la otra (SC-002)", () => {
+    const compras = [compraRegistrada({ promocionId: "coto", descuentoObtenido: 6000 })];
+    const saldos = calcularSaldos([deGrupo("coto", 10000), deGrupo("dia", 10000)], compras, HOY);
+    expect(saldos.get("dia")).toMatchObject({
+      restante: 400000,
+      base: { comprasRegistradas: 1, comprasSinDescuentoInformado: 0 },
+    });
+  });
+
+  it("una promo exclusiva del mismo banco no se ve afectada", () => {
+    const exclusiva = promo({ id: "excl", tope: { monto: 5000, periodo: "mensual", alcance: "exclusivo", grupoTopeId: null } });
+    const compras = [compraRegistrada({ promocionId: "coto", descuentoObtenido: 6000 })];
+    const saldos = calcularSaldos([deGrupo("coto", 10000), exclusiva], compras, HOY);
+    expect(saldos.get("excl")?.consumido).toBe(0);
+  });
+
+  it.each([
+    ["exclusivo con el mismo grupo", { alcance: "exclusivo" as const, grupoTopeId: "galicia-super" }],
+    ["sin alcance con el mismo grupo", { alcance: null, grupoTopeId: "galicia-super" }],
+    ["compartido sin grupo", { alcance: "compartido" as const, grupoTopeId: null }],
+  ])("%s: tiene saldo propio", (_, datos) => {
+    const propia = promo({ id: "propia", tope: { monto: 5000, periodo: "mensual", ...datos } });
+    const compras = [compraRegistrada({ promocionId: "coto", descuentoObtenido: 6000 })];
+    const saldos = calcularSaldos([deGrupo("coto", 10000), propia], compras, HOY);
+    expect(saldos.get("propia")).not.toBe(saldos.get("coto"));
+    expect(saldos.get("propia")?.consumido).toBe(0);
+  });
+
+  it("con montos distintos se usa el menor", () => {
+    const saldos = calcularSaldos([deGrupo("coto", 10000), deGrupo("dia", 8000)], [], HOY);
+    expect(saldos.get("coto")?.tope).toBe(800000);
+  });
+
+  it("un miembro vencido aporta su consumo pero no su monto (US3-8)", () => {
+    const compras = [compraRegistrada({ promocionId: "coto", descuentoObtenido: 3000 })];
+    const saldos = calcularSaldos([deGrupo("coto", 5000, vencida), deGrupo("dia", 10000)], compras, HOY);
+    expect(saldos.get("dia")).toMatchObject({ tope: 1000000, consumido: 300000 });
+  });
+
+  it("con miembros semanal y mensual vigentes, el período es mensual", () => {
+    const saldos = calcularSaldos([deGrupo("coto", 10000, {}, "semanal"), deGrupo("dia", 10000)], [], HOY);
+    expect(saldos.get("coto")?.periodo).toBe("mensual");
+  });
+
+  it("si ningún miembro vigente informa tope, el grupo no tiene saldo", () => {
+    const saldos = calcularSaldos([deGrupo("coto", 5000, vencida), deGrupo("dia", null)], [], HOY);
+    expect(saldos.get("dia")).toBeUndefined();
+    expect(saldos.get("coto")).toBeUndefined();
+  });
+
+  it("una promo por compra con el mismo grupo no es miembro ni consume del grupo", () => {
+    const porCompra = deGrupo("pc", 3000, {}, "por_compra");
+    const compras = [compraRegistrada({ promocionId: "pc", descuentoObtenido: 3000 })];
+    const saldos = calcularSaldos([deGrupo("coto", 10000), porCompra], compras, HOY);
+    expect(saldos.get("pc")).toBeUndefined();
+    expect(saldos.get("coto")?.consumido).toBe(0);
+  });
+
+  it("una compra de una promo que el motor no recibió no descuenta", () => {
+    const compras = [compraRegistrada({ promocionId: "no-recibida", descuentoObtenido: 6000 })];
+    expect(calcularSaldos([deGrupo("dia", 10000)], compras, HOY).get("dia")?.consumido).toBe(0);
+  });
+
+  it("una compra sin descuento se estima con el porcentaje de su propia promo", () => {
+    const compras = [compraRegistrada({ promocionId: "coto", monto: 10000, descuentoObtenido: null })];
+    const saldos = calcularSaldos([deGrupo("coto", 10000, { porcentaje: 30 }), deGrupo("dia", 10000)], compras, HOY);
+    expect(saldos.get("dia")?.consumido).toBe(300000);
+  });
+});

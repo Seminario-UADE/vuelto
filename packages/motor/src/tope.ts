@@ -1,7 +1,7 @@
 /**
  * Saldos de tope de las promos de una consulta (issue #37). Un saldo es lo
- * que se va consumiendo con las compras del período: propio de una promo o,
- * más adelante, compartido por un grupo. Se calculan una vez por consulta y
+ * que se va consumiendo con las compras del período: propio de una promo o
+ * compartido por las promos de un grupo. Se calculan una vez por consulta y
  * la issue #38 los reutiliza para «Mis topes».
  */
 import { aCentavos, aCentesimosDePunto, aplicarPorcentaje } from "./dinero.ts";
@@ -67,10 +67,38 @@ function armarSaldo(
   };
 }
 
+/** Comparte saldo con su grupo: compartida, con grupo y que no sea por compra (FR-001). */
+function grupoDe(promo: Promocion): string | null {
+  const { alcance, grupoTopeId, periodo } = promo.tope;
+  return alcance === "compartido" && periodo !== "por_compra" ? grupoTopeId : null;
+}
+
+function vigente(promo: Promocion, hoy: FechaISO): boolean {
+  return promo.vigencia.desde <= hoy && hoy <= promo.vigencia.hasta;
+}
+
 /**
- * Saldo de cada promo que lo tiene, por id. Una promo sin entrada no informa
- * tope o su tope es por compra. `hoy` es la fecha de la consulta en hora de
- * Argentina.
+ * Saldo de un grupo (FR-002): el menor tope y el período más largo entre los
+ * miembros vigentes. Los vencidos solo aportan sus compras. `null` si ningún
+ * miembro vigente informa tope.
+ */
+function saldoDeGrupo(
+  miembros: Promocion[],
+  comprasDe: Map<string, Compra[]>,
+  hoy: FechaISO,
+): Saldo | null {
+  const conTope = miembros.filter((m) => vigente(m, hoy) && m.tope.monto !== null);
+  if (conTope.length === 0) return null;
+  const tope = Math.min(...conTope.map((m) => aCentavos(m.tope.monto ?? 0)));
+  const periodo = conTope.some((m) => m.tope.periodo !== "semanal") ? "mensual" : "semanal";
+  return armarSaldo(tope, periodo, miembros, comprasDe, hoy);
+}
+
+/**
+ * Saldo de cada promo que lo tiene, por id. Las promos de un mismo grupo
+ * apuntan al mismo objeto. Una promo sin entrada no informa
+ * tope, su tope es por compra o su grupo no tiene ningún miembro vigente con
+ * tope. `hoy` es la fecha de la consulta en hora de Argentina.
  */
 export function calcularSaldos(
   promociones: Promocion[],
@@ -79,9 +107,21 @@ export function calcularSaldos(
 ): Map<string, Saldo> {
   const comprasDe = comprasPorPromocion(compras);
   const saldos = new Map<string, Saldo>();
+  const grupos = new Map<string, Promocion[]>();
+  for (const promo of promociones) {
+    const grupo = grupoDe(promo);
+    if (grupo === null) continue;
+    const miembros = grupos.get(grupo);
+    if (miembros) miembros.push(promo);
+    else grupos.set(grupo, [promo]);
+  }
+  for (const miembros of grupos.values()) {
+    const saldo = saldoDeGrupo(miembros, comprasDe, hoy);
+    if (saldo) for (const m of miembros) saldos.set(m.id, saldo);
+  }
   for (const promo of promociones) {
     // Por compra no acumula: cada compra tiene su propio límite (FR-007).
-    if (promo.tope.monto === null || promo.tope.periodo === "por_compra") continue;
+    if (grupoDe(promo) !== null || promo.tope.monto === null || promo.tope.periodo === "por_compra") continue;
     const periodo = promo.tope.periodo ?? "mensual";
     saldos.set(promo.id, armarSaldo(aCentavos(promo.tope.monto), periodo, [promo], comprasDe, hoy));
   }

@@ -693,7 +693,7 @@ pendientes" de `docs/product/requisitos.md`.
 
 ---
 
-## 2026-10-25 — Topes semanales, compartidos y promos acumulables (issue #37, en curso)
+## 2026-10-25 — Topes semanales, compartidos y promos acumulables (issue #37)
 
 **Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-specify`),
 el subagente `spec-critic`, `gh` CLI y consultas a la API pública de MODO y
@@ -753,6 +753,16 @@ dejaba abiertas, con datos reales de MODO.
   opción, que muestra cuánto aporta cada una y respeta el tope de cada
   promo. Las no acumulables, o las que no lo informan, siguen compitiendo
   por separado.
+- Etapa 3: las promos de un mismo grupo comparten un único tope. Lo que se
+  gasta con una se descuenta para las otras, aunque la promo con la que se
+  compró ya haya vencido. Si dos promos del grupo se suman en una misma
+  compra, entre las dos nunca pasan lo que le queda al grupo.
+- Cierre: 128 tests en verde y 100% de las líneas del motor cubiertas; lint,
+  typecheck y build limpios, y el motor sigue sin dependencias.
+- Errores de la IA en el proceso: en dos tests escritos antes del código
+  puso mal el resultado esperado (el orden de las promos dentro de una
+  opción y la causa de descarte de una promo vencida). Los detectó al
+  revisarlos contra la spec y los corrigió antes de escribir el código.
 
 ---
 

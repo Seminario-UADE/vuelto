@@ -409,6 +409,87 @@ describe("recomendar: promos acumulables (issue #37, US2)", () => {
   });
 });
 
+describe("recomendar: topes compartidos (issue #37, US3)", () => {
+  const deGrupo = (id: string, monto: number, datos: Partial<Promocion> = {}) =>
+    promo({ id, tope: { monto, periodo: "mensual", alcance: "compartido", grupoTopeId: "galicia-super" }, ...datos });
+  const coto = (monto = 10000, datos: Partial<Promocion> = {}) => deGrupo("coto", monto, { comercio: "Coto", ...datos });
+  const dia = (monto = 10000) => deGrupo("dia", monto, { comercio: "Día" });
+  const enDia = (monto: number) => compra({ comercio: "Día", monto });
+  const vencida = { vigencia: { desde: "2026-10-01", hasta: "2026-10-10", dias: null } };
+
+  it("US3-1: lo consumido con Coto limita el ahorro con Día", () => {
+    const compras = [compraRegistrada({ promocionId: "coto", descuentoObtenido: 6000 })];
+    const r = recomendar(enDia(30000), perfil(), [coto(), dia()], compras, AHORA);
+    expect(unica(r.mejor)).toMatchObject({
+      promocionId: "dia",
+      ahorroEstimado: 4000,
+      topeRestanteTrasCompra: 0,
+      base: { comprasRegistradas: 1, comprasSinDescuentoInformado: 0 },
+    });
+  });
+
+  it("US3-2: una promo exclusiva no se ve afectada por el consumo de otra", () => {
+    const exclusiva = promo({ id: "excl", tope: { monto: 5000, periodo: "mensual", alcance: "exclusivo", grupoTopeId: null } });
+    const compras = [compraRegistrada({ promocionId: "coto", descuentoObtenido: 6000 })];
+    const r = recomendar(compra(), perfil(), [coto(), exclusiva], compras, AHORA);
+    expect(unica(r.mejor)).toMatchObject({ promocionId: "excl", ahorroEstimado: 2000, topeRestanteTrasCompra: 3000 });
+  });
+
+  it("US3-3: con topes distintos en el grupo se usa el menor", () => {
+    const r = recomendar(enDia(50000), perfil(), [coto(10000), dia(8000)], [], AHORA);
+    expect(unica(r.mejor)).toMatchObject({ promocionId: "dia", ahorroEstimado: 8000, topeRestanteTrasCompra: 0 });
+  });
+
+  it("US3-4: la compra con una promo vencida del grupo descuenta, y la vencida queda descartada", () => {
+    const compras = [compraRegistrada({ promocionId: "coto", descuentoObtenido: 6000 })];
+    // Sin restricción de comercio, para que la causa sea la vigencia y no el comercio.
+    const r = recomendar(enDia(30000), perfil(), [deGrupo("coto", 10000, vencida), dia()], compras, AHORA);
+    expect(unica(r.mejor)).toMatchObject({ promocionId: "dia", ahorroEstimado: 4000 });
+    expect(r.descartadas.map((d) => [d.promocionId, d.causa])).toEqual([["coto", "vigencia"]]);
+  });
+
+  it("US3-5 y SC-003: dos acumulables del grupo no superan el saldo", () => {
+    const a = deGrupo("A", 10000, { acumulable: true });
+    const b = deGrupo("B", 10000, { porcentaje: 10, acumulable: true });
+    const compras = [compraRegistrada({ promocionId: "A", descuentoObtenido: 7500 })];
+    const r = recomendar(compra(), perfil(), [a, b], compras, AHORA);
+    expect(r.mejor?.ahorroEstimado).toBe(2500);
+    expect(r.mejor?.promociones.map((p) => [p.promocionId, p.ahorroEstimado, p.topeRestanteTrasCompra])).toEqual([
+      ["A", 2000, 0],
+      ["B", 500, 0],
+    ]);
+  });
+
+  it("US3-6: con el grupo agotado, todas sus promos se descartan con la base del grupo", () => {
+    const compras = [compraRegistrada({ promocionId: "coto", descuentoObtenido: 10000 })];
+    const r = recomendar(compra(), perfil(), [deGrupo("coto", 10000), deGrupo("dia", 10000)], compras, AHORA);
+    expect(r.mejor).toBeNull();
+    expect(r.descartadas.map((d) => [d.promocionId, d.causa, d.base?.comprasRegistradas])).toEqual([
+      ["coto", "tope_agotado", 1],
+      ["dia", "tope_agotado", 1],
+    ]);
+  });
+
+  it("US3-7: si otra promo de la combinada agota el saldo, la segunda queda con $0 y no se descarta", () => {
+    const a = deGrupo("A", 10000, { acumulable: true });
+    const b = deGrupo("B", 10000, { porcentaje: 10, acumulable: true });
+    const compras = [compraRegistrada({ promocionId: "A", descuentoObtenido: 8000 })];
+    const r = recomendar(compra(), perfil(), [a, b], compras, AHORA);
+    expect(r.mejor?.promociones.map((p) => [p.promocionId, p.ahorroEstimado])).toEqual([
+      ["A", 2000],
+      ["B", 0],
+    ]);
+    expect(r.mejor?.motivo).toContain("el tope compartido se agota con la otra promo");
+    expect(r.descartadas).toEqual([]);
+  });
+
+  it("US3-8: el monto de una promo vencida no achica el saldo del grupo", () => {
+    const compras = [compraRegistrada({ promocionId: "coto", descuentoObtenido: 3000 })];
+    const r = recomendar(enDia(50000), perfil(), [coto(5000, vencida), dia(10000)], compras, AHORA);
+    expect(unica(r.mejor)).toMatchObject({ promocionId: "dia", ahorroEstimado: 7000, topeRestanteTrasCompra: 0 });
+  });
+});
+
 describe("recomendar: rendimiento", () => {
   it("SC-003: 2.000 promos y 100 compras en menos de 1 segundo", () => {
     const promos = Array.from({ length: 2000 }, (_, i) =>
