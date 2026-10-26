@@ -29,7 +29,7 @@ sesión).
 | 400 | Body inválido o rubro inexistente | `{ "error": "invalido", "campo": "monto" }` |
 | 401 | Sin header, token inválido o sin usuario (anon key) | `{ "error": "no_autenticado" }` |
 | 405 | Método distinto de POST | `{ "error": "metodo_no_permitido" }` |
-| 409 | El usuario no tiene medios de pago (`PerfilSinMediosError`) | `{ "error": "perfil_sin_medios" }` |
+| 422 | El usuario no tiene medios de pago (`PerfilSinMediosError`). 422 y no 409: el pedido es válido pero el perfil no permite procesarlo; es el código acordado en la issue #36 (`specs/002-motor-recomendar/contracts/recomendar.md`) | `{ "error": "perfil_sin_medios" }` |
 | 500 | Cualquier otro error, incluido Supabase Auth caído o sin responder (no es "sesión vencida") | `{ "error": "interno" }` |
 
 Todas las respuestas son `Content-Type: application/json; charset=utf-8`. Ninguna incluye
@@ -66,7 +66,7 @@ mensajes de la base ni trazas.
 | 200 con `mejor` | Resultado (FR-006 a FR-008) |
 | 200 con `mejor: null` | "Ninguno de tus medios tiene promo acá hoy" (FR-009) |
 | 401 | Pedir volver a iniciar sesión, conservando lo cargado (FR-015) |
-| 409 | "Cargá al menos un medio de pago" + acceso a Perfil (FR-014) |
+| 422 | "Cargá al menos un medio de pago" + acceso a Perfil (FR-014) |
 | 400, 405, 500, timeout de 15 s, respuesta que no es JSON | "No pudimos calcular. Probá de nuevo" (FR-016) |
 | Falla antes de llegar al servidor | "Necesitás conexión para calcular" (FR-013) |
 

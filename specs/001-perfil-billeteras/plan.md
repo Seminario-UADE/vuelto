@@ -49,7 +49,7 @@ ADR-001 §Actualización, RNF-02, ADR-009, contrato de tipos #33). La spec no ca
    y FR-011. Sin `update`: la spec solo pide agregar y sacar.
 4. **"Al menos un medio" lo controla la app** (FR-007, FR-009). Un trigger en la base frenaría
    el borrado en cascada al eliminar la cuenta. Si el perfil igual queda vacío, `recomendar`
-   (#43) responde 409 `perfil_sin_medios` y la app lleva al onboarding.
+   (#43) responde 422 `perfil_sin_medios` y la app lleva al onboarding.
 5. **El onboarding se guarda en un solo `insert` de varias filas** (FR-011): entra todo o nada.
    Desde Perfil, cada alta o baja es un pedido aparte.
 6. **Se mantiene la lectura sin conexión** (FR-012, SC-003). La Actualización del 13/10 sacó del

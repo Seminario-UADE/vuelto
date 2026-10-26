@@ -38,7 +38,7 @@ supabase/functions/
 ```
 
 - **Contrato de errores** común: 400 `{error:"invalido", campo}`, 401
-  `no_autenticado`, 405 `metodo_no_permitido`, 409 (de negocio, por ejemplo
+  `no_autenticado`, 405 `metodo_no_permitido`, 422 (de negocio, por ejemplo
   `perfil_sin_medios`), 500 `interno` sin detalles. Los registros solo
   incluyen el tipo de error, nunca datos del usuario (`privacidad.md`).
 - **Sesión**: el cliente de Supabase se crea por pedido con el JWT del

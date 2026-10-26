@@ -54,7 +54,7 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
   - "Confirmar" llama `confirmarOnboarding` en un solo pedido (FR-011);
   - hasta confirmar, nada se guarda (FR-006);
   - errores según `clasificarError`.
-- [ ] T009 [US1] En el control de sesión que deja la #40, si `leerMisMedios()` devuelve `[]`, llevar al onboarding sin salida hasta confirmar. La ruta tiene que ser la misma a la que lleva la #43 cuando `recomendar` responde 409 `perfil_sin_medios`.
+- [ ] T009 [US1] En el control de sesión que deja la #40, si `leerMisMedios()` devuelve `[]`, llevar al onboarding sin salida hasta confirmar. La ruta tiene que ser la misma a la que lleva la #43 cuando `recomendar` responde 422 `perfil_sin_medios`.
 
 **Checkpoint**: escenarios US1-1 a US1-7 de la spec OK en Expo Go.
 

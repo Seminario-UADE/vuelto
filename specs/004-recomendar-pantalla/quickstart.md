@@ -18,7 +18,7 @@ Resultado esperado: todo en verde. Los tests cubren:
 |---|---|---|
 | Mismo resultado que `recomendar()` directo | `servicio.test.ts` | FR-024, SC-003 |
 | Pide los datos del usuario autenticado, rubro, hoy y mes en Argentina (incluido el pedido a las 22:00 del último día del mes) | `servicio.test.ts` | FR-020, FR-025 |
-| 400 por cada campo inválido, 401 sin sesión y con anon key, 405, 409, 500 sin detalles | `handler.test.ts` | FR-018, FR-019, FR-022, FR-023 |
+| 400 por cada campo inválido, 401 sin sesión y con anon key, 405, 422, 500 sin detalles | `handler.test.ts` | FR-018, FR-019, FR-022, FR-023 |
 | Validación del body | `validacion.test.ts` | FR-019 |
 
 Chequeo de RNF-02 (la app no importa el motor):
@@ -38,7 +38,7 @@ curl -i -X POST http://127.0.0.1:54321/functions/v1/recomendar \
   -d '{"comercio":"Kansas","categoriaId":2,"monto":15000,"canal":"presencial"}'
 ```
 
-Repetir con el JWT de la anon key (espera 401) y con un usuario sin medios (espera 409).
+Repetir con el JWT de la anon key (espera 401) y con un usuario sin medios (espera 422).
 
 Deploy (verificar antes que el flag siga disponible, research R1):
 

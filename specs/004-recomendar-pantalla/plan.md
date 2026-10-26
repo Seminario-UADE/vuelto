@@ -8,9 +8,10 @@
 
 Crear la Edge Function `POST /functions/v1/recomendar`: autentica al usuario, valida la compra
 propuesta, junta sus medios de pago, las promociones publicadas del rubro vigentes hoy y sus
-compras del mes (fecha en hora de Argentina, calculada con el motor), llama a `recomendar()` de
+compras del período (desde el día 1 del mes o el lunes de la semana, lo que sea anterior, en hora
+de Argentina, calculado con el motor; más las promos de esas compras, issue #37), llama a `recomendar()` de
 `@vuelto/motor` y devuelve la `Recomendacion` sin tocarla, con un contrato de errores fijo
-(400/401/405/409/500). Es la primera Edge Function del proyecto, así que crea
+(400/401/405/422/500). Es la primera Edge Function del proyecto, así que crea
 `supabase/functions/_shared/` con la estructura de ADR-009 (handler → servicio → repositorios
 detrás de interfaces) para que la reusen #45, #48 y #54. La pantalla Expo consume ese contrato.
 

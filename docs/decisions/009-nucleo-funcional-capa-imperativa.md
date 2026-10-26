@@ -27,8 +27,10 @@ Se adopta el patrón **functional core, imperative shell**:
   necesita, lo invoca y responde. Se organiza en capas:
 
 ```
-handler (index.ts)  ── rol de controller: HTTP, sesión, validar body, códigos de respuesta
-      │                 y composition root: arma las piezas de abajo
+index.ts            ── composition root: lee el entorno, arma las piezas y llama a Deno.serve
+      │
+handler (handler.ts) ── rol de controller: HTTP, sesión, validar body, códigos de respuesta
+      │
 service             ── caso de uso: qué datos juntar y qué regla aplicar; llama al motor
       │
 repositorios        ── acceso a datos, detrás de una interfaz
@@ -38,15 +40,15 @@ repositorios        ── acceso a datos, detrás de una interfaz
 |---|---|---|
 | Repositorios | Clases que implementan una interfaz (`RepositorioPromociones`, `RepositorioCompras`…), inyectadas por constructor | Las comparten varias Edge Functions (`recomendar`, `topes`, grupo) y permiten testear sin base, con una implementación en memoria |
 | Services | Clases (`ServicioRecomendacion`, `ServicioTopes`, `ServicioGrupo`) que reciben los repositorios por constructor | Concentran el caso de uso; dependen de interfaces, no del cliente de Supabase |
-| Controller | El handler del `index.ts` de cada Edge Function, sin clase | Con un endpoint por función, una clase controller no agrega nada |
+| Controller | Una fábrica `crearHandler…(dependencias)` en `handler.ts` de cada Edge Function, sin clase. El `index.ts` solo la arma | Con un endpoint por función, una clase controller no agrega nada. Separarlo de `index.ts` permite testearlo en Node (ver Actualización) |
 | Adaptadores externos | Interfaz más implementación (ej. `ExtractorTicket` sobre Gemini) | Para testear la issue #48 sin llamar a Gemini |
-| Autenticación | Función compartida `autenticar(req)` | Lo pesado lo hacen Supabase Auth y el RLS; lo que importa es que ninguna función se la saltee |
+| Autenticación | Interfaz `Autenticador` en `_shared/autenticar.ts`, implementada por la clase `AutenticadorSupabase` e inyectada en el handler | Lo pesado lo hacen Supabase Auth y el RLS; lo que importa es que ninguna función se la saltee. Ser interfaz permite un autenticador falso en los tests (ver Actualización) |
 
 El controller depende solo del service, nunca de los repositorios: así no
 hay dos caminos a los datos y las reglas del caso de uso no se saltean.
 
 El código común vive en `supabase/functions/_shared/` (repositorios,
-`autenticar`, validación). Las piezas se crean **por request** en el
+`Autenticador`, validación, respuestas HTTP). Las piezas se crean **por request** en el
 handler, porque el cliente de Supabase se crea con el token del usuario
 para que el RLS aplique (`auth.uid()`); son objetos sin estado y crearlos
 no tiene costo apreciable.
@@ -79,6 +81,24 @@ no tiene costo apreciable.
 - Todas las Edge Functions siguen la misma estructura: la primera que se
   implemente (issue #43, #45 o #48) crea `_shared/` y las siguientes lo
   reusan.
+
+## Actualización (26/10/2026, issue #43)
+
+La primera Edge Function (`recomendar`, PR #71) ajustó dos puntos del texto
+original, sin cambiar el patrón. Revisado por el equipo en ese PR.
+
+- **El handler vive en `handler.ts`, no en `index.ts`.** `index.ts` usa el
+  global `Deno` y no se puede chequear ni testear en Node, así que queda solo
+  como composition root, sin lógica. El handler es una fábrica que recibe
+  sus dependencias (autenticador, creación del servicio, reloj) y se testea
+  entero con un `Request` armado a mano. Detalle: research R3 de
+  `specs/004-recomendar-pantalla/`.
+- **La autenticación es una interfaz con una clase, no una función.**
+  `Autenticador` se inyecta en el handler para poder usar uno falso en los
+  tests; `AutenticadorSupabase` es la implementación real sobre
+  `auth.getUser`. Si Supabase Auth no responde, lanza un error propio y el
+  handler responde 500, no 401. El propósito (que ninguna función se saltee
+  la autenticación) no cambia. Detalle: research R4.
 
 ## Cómo crece si el proyecto escala
 

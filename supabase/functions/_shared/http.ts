@@ -14,7 +14,7 @@ const STATUS: Record<CodigoError, number> = {
   invalido: 400,
   no_autenticado: 401,
   metodo_no_permitido: 405,
-  perfil_sin_medios: 409,
+  perfil_sin_medios: 422,
   interno: 500,
 };
 

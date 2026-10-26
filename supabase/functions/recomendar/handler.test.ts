@@ -53,6 +53,20 @@ describe("handler recomendar: US1", () => {
     expect(await res.json()).toEqual(JSON.parse(JSON.stringify(esperado)));
     expect(reloj).toHaveBeenCalledTimes(1);
   });
+
+  it("responde 200 a un pedido sin comercio (comercio null)", async () => {
+    const handler = crearHandlerRecomendar({
+      autenticador: autenticadorFijo("u1"),
+      crearServicio: servicioDePrueba,
+      reloj: () => AHORA,
+    });
+
+    const res = await handler(pedido(compraPropuesta({ comercio: null })));
+
+    expect(res.status).toBe(200);
+    const esperado = await servicioDePrueba().recomendar("u1", compraPropuesta({ comercio: null }), AHORA);
+    expect(await res.json()).toEqual(JSON.parse(JSON.stringify(esperado)));
+  });
 });
 
 describe("handler recomendar: US3, contrato de errores (FR-022)", () => {
@@ -120,10 +134,10 @@ describe("handler recomendar: US3, contrato de errores (FR-022)", () => {
     expect(await res.json()).toEqual({ error: "invalido", campo: "categoriaId" });
   });
 
-  it("409 si el usuario no tiene medios de pago", async () => {
+  it("422 si el usuario no tiene medios de pago", async () => {
     const { handler } = handlerCon(servicioQueLanza(new PerfilSinMediosError()));
     const res = await handler(pedido(compraPropuesta()));
-    expect(res.status).toBe(409);
+    expect(res.status).toBe(422);
     expect(await res.json()).toEqual({ error: "perfil_sin_medios" });
   });
 

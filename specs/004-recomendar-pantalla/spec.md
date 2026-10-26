@@ -156,7 +156,7 @@ Desde la recomendación (o desde una alternativa), el usuario toca "Pagué con e
   | Recomendación calculada | 200 | la `Recomendacion` del motor |
   | Datos inválidos (FR-019) | 400 | `{ "error": "invalido", "campo": "<nombre del campo>" }` |
   | Sin usuario logueado (FR-018) | 401 | `{ "error": "no_autenticado" }` |
-  | Perfil sin medios de pago (el motor lanza `PerfilSinMediosError`) | 409 | `{ "error": "perfil_sin_medios" }` |
+  | Perfil sin medios de pago (el motor lanza `PerfilSinMediosError`) | 422 | `{ "error": "perfil_sin_medios" }` |
   | Método distinto de POST | 405 | `{ "error": "metodo_no_permitido" }` |
   | Cualquier otro error | 500 | `{ "error": "interno" }` |
 

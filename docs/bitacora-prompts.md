@@ -998,6 +998,46 @@ revisar qué issues de la #41, #43, #45, #47 y #56 se pueden avanzar.
 
 ---
 
+## 2026-10-26 — Pendientes de la revisión del PR #71 (issue #43)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI y Deno.
+
+**Objetivo:** resolver los 7 pendientes no bloqueantes que dejó el
+compañero al aprobar el PR #71.
+
+**Prompts principales:**
+1. "Mirá lo que aprobó mi compañero y lo que comentó. En base a eso,
+   resolvé todas las indicaciones del comentario. No subas nada ni hagas
+   un merge hasta que yo lo apruebe."
+2. "Velo bien y decime si cumple con todo esto."
+
+**Resultado:**
+- Perfil sin medios de pago responde 422 en vez de 409, el código acordado
+  en la issue #36. Se cambió en el código, los tests, la spec, el contrato
+  (también en lo que muestra la pantalla), el plan del perfil (#41) y
+  `docs/architecture/02-api-routes.md`.
+- `tasks.md`, `plan.md` y `research.md` de la spec 004 describen la versión
+  posterior a la #37: se exportan `fechaArgentina` e `inicioDelPeriodo`, las
+  compras se piden desde el día 1 del mes o el lunes de la semana y el
+  autenticador lanza un error propio si Supabase Auth no responde.
+- ADR-009 suma una sección «Actualización»: el handler vive en
+  `handler.ts`, separado de `index.ts`, y la autenticación es la interfaz
+  `Autenticador` con la clase `AutenticadorSupabase`.
+- `CLAUDE.md` ya no marca el workspace `supabase` como reservado.
+- El CI suma el job `deno-check`, que chequea los `index.ts` de las Edge
+  Functions (quedaban fuera de `tsc`, ESLint y la cobertura).
+- 3 tests nuevos: una compra registrada sin promo (`promocionId: null`) y
+  un pedido sin comercio, en el servicio y en el handler. 131 tests del
+  motor y 40 de la Edge Function en verde, 100% de líneas cubiertas.
+- Se corrigió la descripción del PR (la spec es la `004`, y son las compras
+  del período, no del mes).
+- Errores de la IA en el proceso: un test nuevo no compilaba porque la base
+  del tope puede ser `null`; lo detectó el typecheck y se corrigió.
+- Queda pendiente: la #43 sigue abierta hasta que existan las tablas (#34)
+  y la pantalla (#39, #40, #41).
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

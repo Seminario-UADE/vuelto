@@ -154,6 +154,49 @@ describe("ServicioRecomendacion: US1", () => {
     expect(promociones.llamadasPorIds).toEqual([]);
   });
 
+  it("una compra registrada sin promo (promocionId null) llega al motor sin pedir promos por id", async () => {
+    const comprasU1 = [
+      compraRegistrada({ id: "c-sin-promo", promocionId: null, descuentoObtenido: null }),
+      compraRegistrada({ id: "c-con-promo", descuentoObtenido: 1000 }),
+    ];
+    const promos = [promo({ tope: { monto: 12000, periodo: "mensual", alcance: "exclusivo", grupoTopeId: null } })];
+    const { servicio, promociones } = armar({
+      promociones: promos,
+      compras: comprasU1.map((dato) => ({ usuarioId: "u1", dato })),
+    });
+
+    const r = await servicio.recomendar("u1", compraPropuesta(), AHORA);
+
+    expect(promociones.llamadasPorIds).toEqual([]);
+    const directo = recomendar(
+      compraPropuesta(),
+      { nombreParaMostrar: null, mediosDePago: [galicia], comerciosHabituales: [] },
+      promos,
+      comprasU1,
+      AHORA,
+    );
+    expect(r).toEqual(directo);
+    // La compra sin promo no cuenta como base del tope de la promo.
+    expect(r.mejor?.promociones[0]?.base?.comprasRegistradas).toBe(1);
+  });
+
+  it("pedido sin comercio (comercio null): recomienda igual que el motor", async () => {
+    const { servicio } = armar({});
+    const sinComercio = compraPropuesta({ comercio: null });
+
+    const r = await servicio.recomendar("u1", sinComercio, AHORA);
+
+    const directo = recomendar(
+      sinComercio,
+      { nombreParaMostrar: null, mediosDePago: [galicia], comerciosHabituales: [] },
+      [promo()],
+      [],
+      AHORA,
+    );
+    expect(r).toEqual(directo);
+    expect(r.mejor?.medioDePagoId).toBe("galicia-credito-visa");
+  });
+
   it("FR-025: no mezcla datos de otro usuario", async () => {
     const { servicio } = armar({
       medios: [

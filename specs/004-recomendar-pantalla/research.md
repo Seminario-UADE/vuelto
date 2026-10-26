@@ -54,8 +54,8 @@ Decisiones técnicas del plan (`plan.md`). Cada una con lo que se eligió, por q
   último día del mes (FR-025) sin tocar el reloj real.
 - **Desvío del texto de ADR-009**: el ADR ubica el handler en `index.ts`. Acá el handler vive en
   `handler.ts` y `index.ts` queda solo como composition root, porque `index.ts` usa el global
-  `Deno` y no se puede testear ni chequear en Node. Se propone actualizar el ADR cuando el
-  equipo lo revise en el PR.
+  `Deno` y no se puede testear ni chequear en Node. Registrado en ADR-009 §Actualización
+  (revisado en el PR #71).
 - **Alternatives considered**: clase controller (ADR-009 la descarta: un endpoint por función).
 
 ## R4. Autenticación (FR-018)
@@ -72,7 +72,8 @@ Decisiones técnicas del plan (`plan.md`). Cada una con lo que se eligió, por q
   al usuario que vuelva a iniciar sesión no arreglaría nada (hallazgo de `/code-review`).
 - **Desvío del texto de ADR-009**: el ADR dice "función compartida `autenticar(req)`". Se usa una
   interfaz con una clase para poder inyectar un autenticador falso en los tests del handler; el
-  propósito del ADR (que ninguna función se saltee la autenticación) no cambia.
+  propósito del ADR (que ninguna función se saltee la autenticación) no cambia. Registrado en
+  ADR-009 §Actualización (revisado en el PR #71).
 - **Alternatives considered**: confiar solo en el gateway (deja pasar la anon key); decodificar
   el JWT a mano (duplica lo que ya hace Supabase Auth).
 
@@ -92,10 +93,11 @@ Decisiones técnicas del plan (`plan.md`). Cada una con lo que se eligió, por q
 
 ## R6. Fecha de hoy y mes calendario (FR-020, FR-025)
 
-- **Decision**: exportar `fechaArgentina` desde `packages/motor/src/index.ts` (hoy solo es
-  interna). El servicio calcula `hoy = fechaArgentina(ahora)` y
-  `inicioDeMes = hoy.slice(0, 8) + "01"`, y los pasa a los repositorios. Nunca usa
-  `current_date` de Postgres.
+- **Decision**: exportar `fechaArgentina` e `inicioDelPeriodo` desde `packages/motor/src/index.ts`
+  (antes eran internas). El servicio calcula `hoy = fechaArgentina(ahora)` y pide las compras
+  desde el anterior entre `inicioDelPeriodo("mensual", hoy)` e `inicioDelPeriodo("semanal", hoy)`
+  (precondición del motor de la issue #37: si no, el tope semanal falla en las semanas que cruzan
+  de mes). Nunca usa `current_date` de Postgres.
 - **Rationale**: el motor y el servidor usan exactamente la misma conversión a hora de Argentina,
   sin duplicarla. El cambio en el motor es un export, sin tocar ninguna regla ni test existente.
 - **Alternatives considered**: reimplementar el desfase UTC−3 en el servidor (duplica lógica y

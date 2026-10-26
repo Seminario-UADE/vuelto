@@ -1,8 +1,8 @@
 /**
  * Entrada de la Edge Function `recomendar` en Deno (composition root, ADR-009).
  * Sin lógica: arma las piezas y las conecta. No la chequea `tsc` en Node
- * (usa el global `Deno`); todo lo que se testea vive en `handler.ts` y
- * `servicio.ts`.
+ * (usa el global `Deno`): la chequea `deno check` en el CI. Todo lo que se
+ * testea vive en `handler.ts` y `servicio.ts`.
  *
  * Deploy: `supabase functions deploy recomendar --use-api` (importa el motor
  * desde `packages/motor`, ver `deno.json` y research R1 de la spec 004).
