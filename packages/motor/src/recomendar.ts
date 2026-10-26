@@ -8,7 +8,8 @@ import { mediosCompatibles, primeraReglaQueFalla, type ContextoDeCompra } from "
 import { PerfilSinMediosError } from "./errores.ts";
 import { diaArgentina, fechaArgentina } from "./fecha.ts";
 import { motivoCombinado, motivoDescarte, motivoOpcion } from "./motivos.ts";
-import { calcularSaldos, type Saldo } from "./tope.ts";
+import { compararIds } from "./orden.ts";
+import { calcularSaldos, clasificarTope, type Saldo } from "./tope.ts";
 import type {
   BaseEstimacion,
   CausaDescarte,
@@ -21,11 +22,6 @@ import type {
   Promocion,
   Recomendacion,
 } from "./tipos.ts";
-
-/** Por código de carácter, no por idioma: el mismo orden en Node y en Deno. */
-function compararIds(a: string, b: string): number {
-  return a < b ? -1 : a > b ? 1 : 0;
-}
 
 function idsDePromos(o: OpcionDePago): string[] {
   return o.promociones.map((p) => p.promocionId).sort(compararIds);
@@ -129,10 +125,8 @@ export function recomendar(
     }
     // El tope es de la promo, no del medio.
     const saldo = saldos.get(promo.id);
-    const topePorCompra =
-      promo.tope.periodo === "por_compra" && promo.tope.monto !== null
-        ? aCentavos(promo.tope.monto)
-        : null;
+    const clase = clasificarTope(promo);
+    const topePorCompra = clase.tipo === "por_compra" ? clase.monto : null;
     if (saldo?.restante === 0) {
       // Un tope agotado también es un estimado: lleva su base (constitución §V).
       descartar("tope_agotado", saldo.base);

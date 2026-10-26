@@ -998,6 +998,84 @@ revisar qué issues de la #41, #43, #45, #47 y #56 se pueden avanzar.
 
 ---
 
+## 2026-10-26 — Revisión de la Edge Function de recomendación (PR #71) y estimación de topes (issue #38)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI, los subagentes
+`test-runner`, `rules-guardian` y `spec-critic`, la revisión de código en
+dos ejes (estándares y cumplimiento de la spec) y spec-kit
+(`/speckit-specify`).
+
+**Objetivo:** revisar antes de aprobar el PR #71 de jeqm0302, que conecta
+el motor con la Edge Function de «¿Con qué pago?», y arrancar la issue #38:
+que el motor estime cuánto tope le queda al usuario en cada uno, con su
+base, para la pantalla «Mis topes».
+
+**Prompts principales:**
+1. "¿El PR #71 está listo para aprobar y mergear? ¿No tiene conflictos?"
+   No tenía conflictos y el CI estaba en verde, pero faltaba revisarlo. Se
+   pidió revisarlo antes de aprobar.
+2. "Publicá el comentario y aprobá el PR, pero en vez de 'todo bien,
+   apruebo' poné 'aprobado'."
+3. "Arrancá con la issue #38." Al comparar la issue con el diseño de la
+   pantalla aparecieron diferencias, y se decidió seguir el diseño.
+4. "Para el filtro por tarjetas, ¿se puede hacer parametrizable, por si se
+   quiere usar sin la información del perfil?" Se hizo opcional, dejando
+   escrito para qué sirve.
+5. "1a, 2 y 3a": respetar la regla del 20% para "queda poco" aunque un
+   ejemplo del diseño no la cumpla, que cada pantalla ponga sus etiquetas y
+   mostrar "menos de $100" cuando queda casi nada.
+
+**Resultado:**
+- PR #71 revisado: 168 tests en verde, sin violaciones de las reglas del
+  proyecto y sin errores de lógica. Cumple las dos condiciones que el motor
+  le pide a la Edge Function. Se aprobó con un comentario de 7 pendientes
+  que no bloquean (documentación desactualizada, el código de error cuando
+  el usuario no tiene tarjetas, dos tests de casos borde y un chequeo de
+  Deno en el CI). La función todavía no lee la base de datos: eso queda para
+  la issue #34.
+- Spec de la issue #38 en `specs/005-motor-estimar-topes/`: una estimación
+  por cada tope que se va gastando, solo de promos vigentes que sirven para
+  las tarjetas del usuario, con su base y los textos del diseño
+  ("≈$6.500", "según 3 compras de octubre", "queda poco", "vuelve el
+  1/11", "Sin compras registradas este mes: todavía no podemos estimar
+  cuánto te queda.").
+- Se suma a la issue #38 lo que quedó pendiente de la revisión de la issue
+  #37: dejar en un solo lugar la regla de qué tipo de tope tiene cada promo.
+- `spec-critic` encontró dos bloqueantes: un criterio que pedía reproducir
+  textos del diseño que se contradicen entre sí, y etiquetas sin dueño
+  claro. Se corrigieron junto con los demás hallazgos.
+- Error del diseño detectado: un ejemplo de `DESIGN.md` marca "queda poco"
+  con el 29% de tope restante, contra su propia regla del 20%.
+- Plan técnico: la estimación reutiliza los saldos de la issue #37, una
+  función nueva deja en un solo lugar la regla de qué tipo de tope tiene
+  cada promo, y los textos se arman con los montos exactos para que el
+  redondeo de la cifra no cambie el estado del tope.
+- 13 tareas internas en dos etapas con revisión entre ellas: unificar la
+  regla del tope y estimar cada saldo; después, los textos y el cierre.
+- Etapa 1: la regla de qué tipo de tope tiene cada promo quedó en una sola
+  función que usa todo el motor, sin cambiar ningún resultado de las issues
+  anteriores. El motor ya devuelve, para cada tope que se va gastando, cuánto
+  es, cuánto se usó, cuánto queda, en qué compras se basa, hasta cuándo dura
+  y con qué tarjetas del usuario se usa.
+- Etapa 2: el motor arma los textos de cada tope como los pide el diseño:
+  la cifra con "≈" y redondeada hacia abajo, "según 3 compras de octubre",
+  "queda poco", "vuelve el 1/11" y el aviso de que sin compras todavía no se
+  puede estimar. Ningún texto muestra una cifra sin su base.
+- Cierre: 168 tests en verde, 99,5% de las líneas del motor cubiertas;
+  lint, typecheck y build limpios, y el motor sigue sin dependencias.
+- La revisión de código (estándares y cumplimiento de la spec), los tests y
+  el control de reglas del proyecto no encontraron incumplimientos. Se
+  corrigieron detalles: dos funciones de fecha con el mismo nombre y distinto
+  formato, código repetido, números sin nombre, un posible empate en el orden
+  de los topes y cuatro tests de casos borde que faltaban. Quedan 172 tests en
+  verde.
+- Error de la IA en el proceso: al unificar la regla del tope, el primer
+  diseño hacía que una promo de un grupo sin monto informado dejara de
+  aportar sus compras al grupo. Se detectó al leer el código antes de
+  escribirlo y se ajustó el diseño.
+
+---
+
 ## 2026-10-26 — Pendientes de la revisión del PR #71 (issue #43)
 
 **Herramienta:** Claude Code (Opus 5.5), con `gh` CLI y Deno.

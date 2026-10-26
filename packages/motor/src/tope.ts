@@ -6,11 +6,34 @@
  */
 import { aCentavos, aCentesimosDePunto, aplicarPorcentaje } from "./dinero.ts";
 import { vigenteEn } from "./elegibilidad.ts";
-import { inicioDelPeriodo, type PeriodoAcumulable } from "./fecha.ts";
-import type { BaseEstimacion, Compra, FechaISO, Promocion } from "./tipos.ts";
+import { inicioDelPeriodo } from "./fecha.ts";
+import type { BaseEstimacion, Compra, FechaISO, PeriodoAcumulable, Promocion } from "./tipos.ts";
+
+/**
+ * Qué tope tiene una promo (FR-012 de la issue #38): la única lectura de
+ * `promo.tope` en el motor. Importes en centavos. `grupo` es el
+ * `grupoTopeId` solo si la promo es miembro de su grupo (FR-001 de la issue
+ * #37); una sin monto informado puede ser miembro: aporta sus compras.
+ */
+export type ClaseDeTope =
+  | { tipo: "sin_tope"; grupo: string | null }
+  | { tipo: "por_compra"; monto: number }
+  | { tipo: "acumulable"; monto: number; periodo: PeriodoAcumulable; grupo: string | null };
+
+export function clasificarTope(promo: Promocion): ClaseDeTope {
+  const { monto, periodo, alcance, grupoTopeId } = promo.tope;
+  if (periodo === "por_compra") {
+    return monto === null ? { tipo: "sin_tope", grupo: null } : { tipo: "por_compra", monto: aCentavos(monto) };
+  }
+  const grupo = alcance === "compartido" ? grupoTopeId : null;
+  if (monto === null) return { tipo: "sin_tope", grupo };
+  return { tipo: "acumulable", monto: aCentavos(monto), periodo: periodo ?? "mensual", grupo };
+}
 
 /** Importes en centavos. */
 export interface Saldo {
+  /** `null` si el saldo es propio de una promo. */
+  grupoTopeId: string | null;
   tope: number;
   periodo: PeriodoAcumulable;
   consumido: number;
@@ -35,6 +58,7 @@ function comprasPorPromocion(compras: Compra[]): Map<string, Compra[]> {
  * descuento informado se estima con el porcentaje de su propia promo.
  */
 function armarSaldo(
+  grupoTopeId: string | null,
   tope: number,
   periodo: Saldo["periodo"],
   miembros: Promocion[],
@@ -60,6 +84,7 @@ function armarSaldo(
   }
   const consumido = Math.min(suma, tope);
   return {
+    grupoTopeId,
     tope,
     periodo,
     consumido,
@@ -68,10 +93,9 @@ function armarSaldo(
   };
 }
 
-/** Comparte saldo con su grupo: compartida, con grupo y que no sea por compra (FR-001). */
 function grupoDe(promo: Promocion): string | null {
-  const { alcance, grupoTopeId, periodo } = promo.tope;
-  return alcance === "compartido" && periodo !== "por_compra" ? grupoTopeId : null;
+  const clase = clasificarTope(promo);
+  return clase.tipo === "por_compra" ? null : clase.grupo;
 }
 
 /**
@@ -80,17 +104,19 @@ function grupoDe(promo: Promocion): string | null {
  * `null` si ningún miembro vigente informa tope.
  */
 function saldoDeGrupo(
+  grupoTopeId: string,
   miembros: Promocion[],
   comprasDe: Map<string, Compra[]>,
   hoy: FechaISO,
 ): Saldo | null {
-  const conTope = miembros.flatMap((m) =>
-    vigenteEn(m, hoy) && m.tope.monto !== null ? [{ monto: m.tope.monto, periodo: m.tope.periodo }] : [],
-  );
+  const conTope = miembros.flatMap((m) => {
+    const clase = clasificarTope(m);
+    return vigenteEn(m, hoy) && clase.tipo === "acumulable" ? [clase] : [];
+  });
   if (conTope.length === 0) return null;
-  const tope = Math.min(...conTope.map((m) => aCentavos(m.monto)));
-  const periodo = conTope.some((m) => m.periodo !== "semanal") ? "mensual" : "semanal";
-  return armarSaldo(tope, periodo, miembros, comprasDe, hoy);
+  const tope = Math.min(...conTope.map((c) => c.monto));
+  const periodo = conTope.some((c) => c.periodo === "mensual") ? "mensual" : "semanal";
+  return armarSaldo(grupoTopeId, tope, periodo, miembros, comprasDe, hoy);
 }
 
 /**
@@ -114,15 +140,15 @@ export function calcularSaldos(
     if (miembros) miembros.push(promo);
     else grupos.set(grupo, [promo]);
   }
-  for (const miembros of grupos.values()) {
-    const saldo = saldoDeGrupo(miembros, comprasDe, hoy);
+  for (const [grupo, miembros] of grupos) {
+    const saldo = saldoDeGrupo(grupo, miembros, comprasDe, hoy);
     if (saldo) for (const m of miembros) saldos.set(m.id, saldo);
   }
   for (const promo of promociones) {
-    // Por compra no acumula: cada compra tiene su propio límite (FR-007).
-    if (grupoDe(promo) !== null || promo.tope.monto === null || promo.tope.periodo === "por_compra") continue;
-    const periodo = promo.tope.periodo ?? "mensual";
-    saldos.set(promo.id, armarSaldo(aCentavos(promo.tope.monto), periodo, [promo], comprasDe, hoy));
+    // Sin tope o por compra no tienen saldo propio: por compra no acumula (FR-007).
+    const clase = clasificarTope(promo);
+    if (clase.tipo !== "acumulable" || clase.grupo !== null) continue;
+    saldos.set(promo.id, armarSaldo(null, clase.monto, clase.periodo, [promo], comprasDe, hoy));
   }
   return saldos;
 }
