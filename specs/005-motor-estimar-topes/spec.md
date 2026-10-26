@@ -70,7 +70,7 @@ Para cada estimación, el motor arma los textos que la pantalla necesita, siguie
 - **Tope de $0**: siempre `agotado` (FR-008 evalúa agotado antes que sin compras). Sin compras, la base dice "según 0 compras de octubre · vuelve el 1/11".
 - **Grupo con miembros de distintos bancos**: el banco de la estimación es `null`. Solo cuentan los miembros vigentes.
 - **Grupo donde solo una promoción vigente aplica a los medios del usuario**: la estimación aparece (el saldo es del grupo) y lista solo los medios del usuario que sirven para alguna promoción vigente del grupo.
-- **Mes en el texto**: el nombre del mes es el de la fecha de la consulta en hora de Argentina, en minúscula ("de octubre"). "Vuelve el" es el día siguiente al fin del período: el 1 del mes siguiente si es mensual, el lunes siguiente si es semanal, cambiando de año si hace falta.
+- **Mes en el texto**: el nombre del mes es el del período de la estimación (el de la fecha de la consulta en hora de Argentina), en minúscula ("de octubre"). "Vuelve el" es el día siguiente al fin del período: el 1 del mes siguiente si es mensual, el lunes siguiente si es semanal, cambiando de año si hace falta.
 
 ## Requirements *(mandatory)*
 
@@ -87,7 +87,7 @@ Para cada estimación, el motor arma los textos que la pantalla necesita, siguie
 
 **Textos** (`DESIGN.md` §5 y §8)
 
-- **FR-007**: El motor MUST ofrecer una función `formatearEstimacion(estimacion, ahora)` que devuelva el **estado** (`disponible`, `queda_poco`, `agotado` o `sin_compras`), la **cifra** (texto o `null`) y la **base** en palabras, generados por plantilla, nunca por un modelo de lenguaje (constitución §II). Las etiquetas que rodean a esos textos en cada pantalla son de la issue #45.
+- **FR-007**: El motor MUST ofrecer una función `formatearEstimacion(estimacion)` que devuelva el **estado** (`disponible`, `queda_poco`, `agotado` o `sin_compras`), la **cifra** (texto o `null`) y la **base** en palabras, generados por plantilla, nunca por un modelo de lenguaje (constitución §II). Las etiquetas que rodean a esos textos en cada pantalla son de la issue #45.
 - **FR-008**: Estado, evaluado en este orden con los importes exactos en centavos: `agotado` si el restante es 0; si no, `sin_compras` si la base tiene cero compras; si no, `queda_poco` si el restante es menor o igual al 20% del tope (`restante × 5 ≤ tope`); si no, `disponible`.
 - **FR-009**: Cifra, en los estados `disponible` y `queda_poco`: "≈$X" con el restante redondeado hacia abajo a la centena y separador de miles con punto; si ese redondeo da $0, "menos de $100". En `agotado` y `sin_compras`, `null`.
 - **FR-010**: Base: "según N compras de <mes>" si el período es mensual, "según N compras de esta semana" si es semanal (singular con 1 compra). En `agotado` se agrega " · vuelve el D/M" (día siguiente al fin del período, sin ceros a la izquierda). En `sin_compras` la base es "Sin compras registradas este mes: todavía no podemos estimar cuánto te queda." (o "esta semana").

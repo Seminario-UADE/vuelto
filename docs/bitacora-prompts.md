@@ -826,6 +826,10 @@ base, para la pantalla «Mis topes».
   claro. Se corrigieron junto con los demás hallazgos.
 - Error del diseño detectado: un ejemplo de `DESIGN.md` marca "queda poco"
   con el 29% de tope restante, contra su propia regla del 20%.
+- Plan técnico: la estimación reutiliza los saldos de la issue #37, una
+  función nueva deja en un solo lugar la regla de qué tipo de tope tiene
+  cada promo, y los textos se arman con los montos exactos para que el
+  redondeo de la cifra no cambie el estado del tope.
 
 ---
 
