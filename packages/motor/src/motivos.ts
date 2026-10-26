@@ -60,6 +60,11 @@ export function motivoOpcion(promo: Promocion): string {
   return `${porcentaje(promo)} en ${lugar}${textoDias(promo)}${tope}`;
 }
 
+/** Opción con varias promos acumulables: el motivo de cada una, en orden (FR-014). */
+export function motivoCombinado(promos: Promocion[]): string {
+  return promos.map(motivoOpcion).join(" + ");
+}
+
 /** Por qué una promo no sirve para esta compra, una plantilla por causa. */
 export function motivoDescarte(
   causa: CausaDescarte,

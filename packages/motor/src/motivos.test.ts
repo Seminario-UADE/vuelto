@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { diaArgentina, fechaArgentina } from "./fecha.ts";
-import { motivoDescarte, motivoOpcion } from "./motivos.ts";
+import { motivoCombinado, motivoDescarte, motivoOpcion } from "./motivos.ts";
 import { AHORA, compra, promo } from "./test/fabricas.ts";
 
 const ctx = { compra: compra(), fecha: fechaArgentina(AHORA), dia: diaArgentina(AHORA) };
@@ -34,5 +34,13 @@ describe("motivos: tope por compra (US1)", () => {
   it("dice el monto del tope por compra", () => {
     const p = promo({ tope: { monto: 3000, periodo: "por_compra", alcance: null, grupoTopeId: null } });
     expect(motivoOpcion(p)).toBe("20% en supermercados · hasta $3.000 por compra");
+  });
+});
+
+describe("motivos: opción combinada (US2)", () => {
+  it("une el motivo de cada promo con \" + \", en el orden recibido", () => {
+    const a = promo({ id: "A", porcentaje: 20 });
+    const b = promo({ id: "B", porcentaje: 10, comercio: "Coto" });
+    expect(motivoCombinado([a, b])).toBe(`${motivoOpcion(a)} + ${motivoOpcion(b)}`);
   });
 });

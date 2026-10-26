@@ -749,6 +749,10 @@ dejaba abiertas, con datos reales de MODO.
   mensuales, semanales (de lunes a domingo, aunque la semana cruce de mes)
   y por compra. Se sumó la medición de cobertura a los tests: da 100% de
   las líneas del motor.
+- Etapa 2: las promos acumulables de una misma tarjeta se suman en una sola
+  opción, que muestra cuánto aporta cada una y respeta el tope de cada
+  promo. Las no acumulables, o las que no lo informan, siguen compitiendo
+  por separado.
 
 ---
 

@@ -317,6 +317,98 @@ describe("recomendar: períodos del tope (issue #37, US1)", () => {
   });
 });
 
+describe("recomendar: promos acumulables (issue #37, US2)", () => {
+  const acumulable = (id: string, porcentaje: number, datos: Partial<Promocion> = {}) =>
+    promo({ id, porcentaje, acumulable: true, ...datos });
+  const ids = (o: OpcionDePago | null | undefined) => o?.promociones.map((a) => a.promocionId);
+
+  it("US2-1: dos acumulables del mismo medio se suman en una sola opción", () => {
+    const r = recomendar(compra(), perfil(), [acumulable("B", 10), acumulable("A", 20)], [], AHORA);
+    expect(r.alternativas).toEqual([]);
+    expect(r.mejor).toMatchObject({ medioDePagoId: galicia.id, ahorroEstimado: 3000 });
+    expect(r.mejor?.promociones.map((a) => [a.promocionId, a.ahorroEstimado])).toEqual([
+      ["A", 2000],
+      ["B", 1000],
+    ]);
+  });
+
+  it("US2-2 y SC-004: con acumulabilidad no informada no se suman", () => {
+    const r = recomendar(compra(), perfil(), [acumulable("A", 20), acumulable("B", 10, { acumulable: null })], [], AHORA);
+    expect(ids(r.mejor)).toEqual(["A"]);
+    expect(r.alternativas.map(ids)).toEqual([["B"]]);
+  });
+
+  it("US2-3: la combinada compite con la no acumulable", () => {
+    const promos = [acumulable("A", 20), acumulable("B", 10), acumulable("C", 25, { acumulable: false })];
+    const r = recomendar(compra(), perfil(), promos, [], AHORA);
+    expect([r.mejor, ...r.alternativas].map((o) => [ids(o), o?.ahorroEstimado])).toEqual([
+      [["A", "B"], 3000],
+      [["C"], 2500],
+    ]);
+  });
+
+  it("US2-4: cada promo de la combinada respeta su propio tope", () => {
+    const a = acumulable("A", 20, { tope: { monto: 5000, periodo: "mensual", alcance: null, grupoTopeId: null } });
+    const compras = [compraRegistrada({ promocionId: "A", descuentoObtenido: 4500 })];
+    const r = recomendar(compra(), perfil(), [a, acumulable("B", 10)], compras, AHORA);
+    expect(r.mejor?.ahorroEstimado).toBe(1500);
+    // Orden de la lista: ahorro sin tope (A 20% antes que B 10%), aunque A aporte menos.
+    expect(r.mejor?.promociones).toEqual([
+      {
+        promocionId: "A",
+        ahorroEstimado: 500,
+        topeRestanteTrasCompra: 0,
+        base: { comprasRegistradas: 1, comprasSinDescuentoInformado: 0 },
+      },
+      {
+        promocionId: "B",
+        ahorroEstimado: 1000,
+        topeRestanteTrasCompra: null,
+        base: null,
+      },
+    ]);
+  });
+
+  it("US2-5: acumulables de medios distintos no se suman", () => {
+    const b = acumulable("B", 10, { bancoId: SANTANDER, tarjetas: { debito: ["master"], credito: [] } });
+    const r = recomendar(compra(), perfil([galicia, santander]), [acumulable("A", 20), b], [], AHORA);
+    expect([r.mejor, ...r.alternativas].map(ids)).toEqual([["A"], ["B"]]);
+  });
+
+  it("US2-6: una acumulable que aplica a dos medios se suma solo donde tiene con qué", () => {
+    const debito = medio({ id: "galicia-debito-visa", tipo: "debito" });
+    const a = acumulable("A", 20, { tarjetas: { debito: ["visa"], credito: ["visa"] } });
+    const r = recomendar(compra(), perfil([galicia, debito]), [a, acumulable("B", 10)], [], AHORA);
+    expect([r.mejor, ...r.alternativas].map((o) => [o?.medioDePagoId, ids(o)])).toEqual([
+      ["galicia-credito-visa", ["A", "B"]],
+      ["galicia-debito-visa", ["A"]],
+    ]);
+  });
+
+  it("una sola acumulable es una opción individual", () => {
+    const r = recomendar(compra(), perfil(), [acumulable("A", 20)], [], AHORA);
+    expect(ids(r.mejor)).toEqual(["A"]);
+    expect(r.mejor?.motivo).toBe("20% en supermercados · la promo no informa tope");
+  });
+
+  it("una acumulable con el tope agotado se descarta y las demás se combinan igual", () => {
+    const a = acumulable("A", 20, { tope: { monto: 5000, periodo: "mensual", alcance: null, grupoTopeId: null } });
+    const compras = [compraRegistrada({ promocionId: "A", descuentoObtenido: 5000 })];
+    const r = recomendar(compra(), perfil(), [a, acumulable("B", 10), acumulable("C", 15)], compras, AHORA);
+    expect(ids(r.mejor)).toEqual(["C", "B"]);
+    expect(r.descartadas.map((d) => [d.promocionId, d.causa])).toEqual([["A", "tope_agotado"]]);
+  });
+
+  it("el ahorro de la opción es la suma de sus promos y el motivo las nombra a todas", () => {
+    const r = recomendar(compra(), perfil(), [acumulable("A", 20), acumulable("B", 10)], [], AHORA);
+    const suma = r.mejor?.promociones.reduce((t, a) => t + a.ahorroEstimado, 0);
+    expect(r.mejor?.ahorroEstimado).toBe(suma);
+    expect(r.mejor?.motivo).toBe(
+      "20% en supermercados · la promo no informa tope + 10% en supermercados · la promo no informa tope",
+    );
+  });
+});
+
 describe("recomendar: rendimiento", () => {
   it("SC-003: 2.000 promos y 100 compras en menos de 1 segundo", () => {
     const promos = Array.from({ length: 2000 }, (_, i) =>
