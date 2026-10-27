@@ -1,5 +1,17 @@
 {
   "name": "@vuelto/supabase",
   "version": "0.0.0",
-  "private": true
+  "private": true,
+  "description": "Backend de Vuelto en Supabase: Edge Functions (y, con la issue #34, migraciones y seed).",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "~5.0.4",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.4"
+  }
 }

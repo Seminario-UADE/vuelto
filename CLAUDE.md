@@ -29,7 +29,7 @@ Monorepo con npm workspaces inicializado (issue #32). Requiere Node ≥ 22.13
 |---|---|
 | `packages/motor` (`@vuelto/motor`) | Motor de reglas: TS puro, sin `dependencies`, tests Vitest |
 | `apps/mobile` | Reservado — la app Expo la crea la issue #39 |
-| `supabase` | Reservado — migraciones, seed, Edge Functions |
+| `supabase` (`@vuelto/supabase`) | Edge Functions (`functions/`: `recomendar` y `_shared/`, tests Vitest); migraciones y seed llegan con la issue #34. Los `functions/*/index.ts` corren en Deno: los chequea `deno check` en el CI, no `tsc` |
 | `ingesta` | Reservado — script de ingesta de MODO |
 
 Comandos (desde la raíz; recorren todos los workspaces, los mismos que corre el CI):
@@ -41,6 +41,10 @@ npm run typecheck   # tsc --noEmit (strict, tsconfig.base.json)
 npm run test        # Vitest
 npm run build       # compilación TS a dist/ (no es build de Expo/EAS)
 ```
+
+El CI corre además `deno check` sobre cada `supabase/functions/*/index.ts`
+(job `deno-check`). A mano: `deno check --no-lock --config
+supabase/functions/recomendar/deno.json supabase/functions/recomendar/index.ts`.
 
 Un solo workspace: `npm run test -w @vuelto/motor`. Tests en modo watch:
 `npx vitest` dentro de `packages/motor`. Un workspace nuevo se suma a
@@ -64,6 +68,12 @@ Un solo workspace: `npm run test -w @vuelto/motor`. Tests en modo watch:
   (offline, batch, fuera del camino crítico). No proponer "preguntarle al
   modelo cuál medio de pago conviene": mata el determinismo, los tests y el
   argumento de innovación tecnológica de la materia.
+- **Núcleo funcional, capa imperativa** (ADR-009). El motor son funciones
+  puras sobre datos planos (`interface`/`type`, no clases). Las Edge
+  Functions se organizan en handler (rol de controller) → service →
+  repositorios detrás de interfaces, inyectados por constructor, con el
+  código común en `supabase/functions/_shared/`. Sin framework ni
+  contenedor de DI.
 - **Salida del extractor siempre estructurada contra un esquema.** Campos
   ausentes se devuelven `null` explícito — nunca inventados ni inferidos.
   Esquema: `{"type": ["string", "null"]}`, no campos opcionales.

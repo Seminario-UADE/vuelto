@@ -2,10 +2,13 @@
 node_modules/
 dist/
 *.tsbuildinfo
+.env
+.env.*
+!.env.example
+supabase/.temp/
+coverage/
 
 # Expo (apps/mobile)
-.env
-.env.local
 .expo/
 expo-env.d.ts
 apps/mobile/ios/

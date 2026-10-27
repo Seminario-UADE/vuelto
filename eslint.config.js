@@ -16,6 +16,8 @@ export default tseslint.config(
       "apps/mobile/ios/**",
       "apps/mobile/android/**",
       "apps/mobile/expo-env.d.ts",
+      // Entradas de las Edge Functions: usan el global `Deno` y no corren en Node.
+      "supabase/functions/*/index.ts",
     ],
   },
   js.configs.recommended,

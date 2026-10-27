@@ -45,6 +45,22 @@ jobs:
       - run: npm ci
       - run: npm run test
 
+  # Los `index.ts` de las Edge Functions usan el global `Deno` y quedan fuera
+  # de tsc, ESLint y la cobertura de Vitest: los chequea Deno, con el
+  # `deno.json` de cada función (import map del motor y de supabase-js).
+  deno-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: deno check de cada Edge Function
+        run: |
+          for entrada in supabase/functions/*/index.ts; do
+            deno check --no-lock --config "$(dirname "$entrada")/deno.json" "$entrada"
+          done
+
   # Compilación TypeScript (p.ej. el motor de reglas de
   # docs/decisions/001-motor-de-reglas-paquete-separado.md), NO el build de
   # Expo/EAS: eso consume el cupo gratuito de EAS Build y se dispara a mano,

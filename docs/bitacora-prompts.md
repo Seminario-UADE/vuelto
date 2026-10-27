@@ -356,6 +356,55 @@ funcionando con código real.
 
 ---
 
+
+## 2026-10-13 — Spec de perfil: bancos, tarjetas y redes (issue #41)
+
+**Herramienta:** Claude Code (Sonnet 5), con `gh` CLI, `/speckit-specify`, el subagente
+`spec-critic` y `curl` directo contra la API pública de MODO para verificar datos.
+
+**Objetivo:** regenerar `specs/001-perfil-billeteras/spec.md` (desactualizada desde el
+19/09, listaba 6 billeteras genéricas) para la issue #41, alineada al alcance vigente
+(una sola fuente, MODO, donde las promociones se definen por banco + tipo de tarjeta +
+red). Solo la spec — la implementación queda bloqueada por #34 y #40, ambas abiertas.
+
+**Prompts principales:**
+1. Traer la issue #41, leer la spec vieja y `alcance-mvp.md`/`requisitos.md`, con datos
+   ya verificados contra la API real de MODO que corrigen a la issue original: el
+   catálogo trae 82 bancos (no ~28), 32 marcados `on_hub_list`; tipo de tarjeta y red
+   no están en el catálogo de bancos sino en cada promoción; la red es un enum fijo de
+   9 marcas de tarjeta (no redes interbancarias).
+2. `/speckit-specify` con el cuerpo de la issue como entrada, reemplazando el spec.md
+   existente en la misma carpeta `001-perfil-billeteras` (no una carpeta nueva).
+3. `spec-critic` sobre la spec recién generada: encontró 3 huecos de modelado
+   bloqueantes (clave de join del banco sin definir, cardinalidad banco×tipo×red
+   contradictoria entre requisitos y ejemplos, y redes del enum sin emisor
+   catalogable) más 7 hallazgos altos (semántica de búsqueda, estado transitorio de
+   "banco sin tarjeta", edición offline y atomicidad del guardado, aislamiento por
+   usuario, mapeo valor↔etiqueta de redes, alcance real de las historias de usuario,
+   y una inconsistencia con `docs/product/fuentes-promos.md` sobre el conteo de
+   bancos).
+4. Verificación directa contra la API real (`GET /promos/api/rewards/banks`) para
+   resolver dos de los bloqueantes con datos en vez de supuestos: confirmó 82
+   bancos / 32 `on_hub_list`, y que de los 9 valores de red, `naranja` sí tiene banco
+   homónimo en el catálogo ("NaranjaX") pero `confiable` y `tarjeta_sol` no — se
+   documentó como limitación conocida del MVP, no como bug.
+5. Reescritura de la spec con las 3 correcciones bloqueantes y los 7 hallazgos altos
+   aplicados; checklist de calidad actualizado para no autoaprobarse en silencio.
+
+**Resultado:** `specs/001-perfil-billeteras/spec.md` reemplazada y
+`specs/001-perfil-billeteras/checklists/requirements.md` actualizado, en la rama
+`spec/issue-41-perfil-bancos-tarjetas`. Lista para `/speckit-plan` apenas cierren #34 y
+#40. Quedan como pendiente de otra sesión (fuera de alcance de esta): corregir
+`docs/product/fuentes-promos.md` (dice "~28 bancos", el dato real es 82) y revisar el
+uso de "billetera" en `docs/product/requisitos.md` y `docs/architecture/01-data-models.md`
+ahora que el perfil declara banco + tarjeta + red, no una billetera genérica. El
+subagente `spec-critic` también sumó 2 entradas a su memoria persistente del proyecto
+(`.claude/agent-memory/spec-critic/`): el patrón de "clave de join sin definir" y el
+de "checklist autoaprobada" (spec-kit marca todo en verde sin revisión real) — quedan
+para que la próxima corrida de `spec-critic` los busque de entrada en otras specs.
+
+---
+
 ## 2026-10-13 — Mover el motor de recomendación al backend (issues #43, #45, #36, #19, #39, #42)
 
 **Herramienta:** Claude Code (Sonnet 5 / Opus 5), con `gh` CLI.
@@ -465,6 +514,605 @@ funcionaba.
   `emil-design-eng`; el resto apunta a landings web.
 - La "estrategia semanal" quedó fuera del MVP por ahora, a pedido del
   usuario.
+
+
+---
+
+## 2026-10-18 — Contrato de tipos del dominio y arquitectura de la capa externa (issue #33, ADR-009)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI, `curl` contra la
+API pública de MODO para verificar datos, `/code-review` (ejes Standards y
+Spec en paralelo) y el subagente `rules-guardian`.
+
+**Objetivo:** retomar la implementación priorizando lo que destraba al
+resto del Sprint 1. La issue #33 (contrato de tipos) bloquea a #34, #35,
+#36 y #48. En el camino, revisar el PR #61 (spec de perfil, issue #41)
+porque define parte de esos tipos, y dejar documentada la arquitectura de
+las Edge Functions antes de que el equipo empiece a implementarlas.
+
+**Prompts principales:**
+1. Relevamiento del estado del proyecto: issues asignadas, dependencias
+   entre ellas y blockers, para definir por dónde arrancar.
+2. Revisión del PR #61 contra el contrato de tipos de la issue #33, con
+   verificación directa contra la API de MODO, y aviso a las issues #51 y
+   #35 de que el banco de cada promo se traduce de nombre a id del
+   catálogo con comparación normalizada.
+3. Revisión del diseño del contrato antes de escribir código: qué venía
+   definido por la issue, los RF y el PR #61, y qué se agregaba en esta
+   issue. Decisión de tratar las categorías como datos para que una
+   categoría nueva de MODO no descarte promos en silencio.
+4. Discusión de diseño sobre clases frente a interfaces y funciones, y
+   sobre cómo organizar el backend (controller, service, repositorio,
+   inyección de dependencias, SOLID), incluyendo cómo funciona la
+   autenticación de Supabase y cómo escalaría la arquitectura si el
+   producto crece.
+5. Decisión de documentar la arquitectura en un ADR referenciado desde
+   `CLAUDE.md`, en vez de comentar en cada issue, para que cualquier
+   integrante que tome una Edge Function con Claude la siga sin ruido extra.
+6. Triage de los hallazgos de la revisión: qué se corrige en esta issue y
+   qué se deriva a la issue que corresponde (#36, #38, #51), para no
+   adelantar diseño ajeno.
+
+**Resultado:**
+- PR #61 aprobado. Comentarios en las issues #51 y #35: las promos de MODO
+  solo traen `name_bank`, y hay que traducirlo al UUID del catálogo
+  comparando normalizado (minúsculas, sin acentos).
+- `packages/motor/src/tipos.ts`: contrato completo, sin campos opcionales.
+  Se aparta de la propuesta de la issue en: `Red` con los 9 valores de
+  MODO (del PR #61), `CategoriaId = number` (categorías como datos, con la
+  lista inicial en `categorias.ts`), `BorradorPromocion` para la salida de
+  la ingesta y `nombreParaMostrar` en `Perfil` (ADR-008).
+- `publicable.ts`: `CAMPOS_OBLIGATORIOS_PROMO`, `camposFaltantes()` (para
+  registrar por qué se descarta un borrador, útil para la issue #53) y
+  `esPromocionPublicable()` como guardia de tipo. 11 tests.
+- ADR-009 (núcleo funcional, capa imperativa): datos del dominio como
+  interfaces, Edge Functions con handler → service → repositorios
+  inyectados, sin framework ni contenedor de DI, y etapas de crecimiento
+  fuera del MVP. Referenciado desde `CLAUDE.md`.
+- `01-data-models.md`: qué es `bancoId`, campos obligatorios, categorías
+  como datos y lo que queda fuera de alcance (sucursales, tarjetas
+  excluidas). `pendientes.md`: RF-16 resuelto; nuevos pendientes para
+  distinguir "sin tope" de "tope no informado" y para validar rangos
+  (porcentaje, vigencia) en el esquema del extractor (issue #51).
+- Revisión: `rules-guardian` pasó todas las reglas duras. `/code-review`
+  cumplió los 5 criterios de aceptación. Se corrigieron una contradicción
+  en `01-data-models.md` y varios nombres de tipos. La base del tope
+  estimado queda para la issue #36 (reusando el tipo de la issue #38) y el
+  fragmento de origen de cada campo, para la issue #51. La jurisdicción de
+  la compra no hacía falta en el contrato: la issue #36 ya la fija como
+  constante del MVP (CABA/AMBA).
+- Se detectó que la definición del subagente `rules-guardian` está
+  desactualizada (todavía exige revisión humana antes de publicar promos,
+  contra ADR-005); queda para un PR aparte.
+- Error de la IA en el proceso: el primer commit incluyó un archivo que no
+  estaba en la lista aprobada (un borrado que había quedado en staging).
+  Se detectó al verificar el commit y se rehízo antes de subirlo.
+- Queda para la issue #34: sumar la tabla `categorias`.
+
+
+---
+
+## 2026-10-20 — Motor de recomendación: spec, plan e implementación (issue #36)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-specify`,
+`/speckit-plan`, `/speckit-tasks`, `/speckit-implement`), el subagente
+`spec-critic` (dos pasadas) y `gh` CLI para leer las issues #36, #37 y #38.
+
+**Objetivo:** implementar el núcleo del producto: dada una compra, decidir
+con qué medio de pago conviene pagar y por qué las demás promos no sirven.
+Antes de escribir código, cerrar las decisiones de producto que la issue
+dejaba abiertas y acordar la frontera con las issues #37 (topes
+compartidos) y #38 (estimación de topes).
+
+**Prompts principales:**
+1. "Antes de escribir la spec, leé completas las issues #36 y #37 y decime
+   dónde termina una y empieza la otra." Así quedó claro que los topes
+   semanales y "por compra" ya eran de la #37, y se respetó esa división.
+2. "Mostrame qué encontró el revisor de specs y qué proponés para cada
+   punto." Después, decisión por decisión:
+   - Si el usuario no tiene tarjetas cargadas, que la app se lo pida.
+   - Los montos, en centavos.
+   - Una compra grande nunca puede gastar más tope del que existe.
+   - Si la promo no informa tope, se aplica el porcentaje completo.
+3. "No entiendo para qué sirve marcar una compra como estimada: ¿es para
+   recomendar, es por si no cargan el ticket? ¿Cómo está pensado en la
+   UI?" Revisando las pantallas diseñadas vimos que hoy la app no tiene
+   dónde cargar el reintegro real, y se decidió mantener el dato como lo
+   proponía la issue #38.
+4. "Contá las promos de CABA, Provincia de Buenos Aires y las nacionales;
+   las de otras provincias, como Córdoba, no."
+5. "Implementalo por etapas y frená al terminar cada una para que revise el
+   código antes de seguir."
+6. "¿Cómo es eso de que el motor compilado no carga en Deno? ¿Qué es Deno y
+   dónde se usa? ¿No sirve importar con `.ts`?" Se eligió escribir los
+   imports con `.ts` y que TypeScript los pase a `.js` al compilar.
+7. "Corregí lo chico de la revisión de código; el texto del motivo de
+   jurisdicción tiene que ser más formal." Lo que la revisión marcó sobre
+   cómo se guarda el tope se deja para la issue #37, que va a rehacer esa
+   parte.
+
+**Resultado:**
+- Quedó documentada la funcionalidad completa en
+  `specs/002-motor-recomendar/`: qué tiene que hacer, el plan técnico y 25
+  tareas internas.
+- El motor ya recomienda. Recibe la compra, las tarjetas del usuario y las
+  promos, y devuelve con cuál conviene pagar, las alternativas ordenadas y,
+  para cada promo que no sirve, el motivo (por ejemplo, "Hoy no aplica: la
+  promo es los sábados").
+- Tiene en cuenta el tope que el usuario ya usó en el mes. Si está agotado,
+  la promo se descarta y se indica en cuántas compras se basa esa
+  estimación.
+- Se agregó al modelo de datos la opción de marcar una promo como "de otra
+  provincia". Sin eso, una promo válida solo en Córdoba se habría
+  recomendado en CABA.
+- Pasan 79 tests automáticos, incluido uno que verifica que con 2.000 promos
+  la respuesta tarda menos de un segundo.
+- Errores de la IA en el proceso:
+  - Marcó como completa la lista de control de la spec cuando no lo estaba;
+    el revisor encontró una regla que nunca podía fallar.
+  - Recomendó resolver los topes "por compra" en esta issue sin haber leído
+    antes la issue #37, y lo corrigió al leerla.
+  - Uno de los hallazgos del revisor era incorrecto y no se aplicó.
+- Se resolvió un pendiente que venía de la issue #32: el motor compilado no
+  cargaba fuera de los tests, porque sus archivos se importaban entre sí
+  sin extensión. Eso habría hecho fallar la Edge Function de la issue #43,
+  que corre en Deno. Ahora los imports llevan `.ts` y TypeScript rechaza
+  cualquier import sin extensión, así que el error no puede volver sin que
+  el typecheck lo marque.
+- La revisión de código (estándares y cumplimiento de la spec), los tests y
+  el control de reglas del proyecto no encontraron incumplimientos. Se
+  corrigieron cuatro detalles: el monto mínimo ahora también se compara en
+  centavos, se sumaron dos pruebas de punta a punta del tope, el motivo de
+  jurisdicción pasó a "La promo no es válida en tu jurisdicción" y el
+  ADR-009 aclara que las clases de error sí se permiten en el motor.
+- Queda para la issue #51: que el extractor marque las promos de otras
+  provincias.
+
+
+---
+
+## 2026-10-22 — Tabla de requisitos bloqueados (PR #69)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** dejar al día la tabla "Requisitos bloqueados por definiciones
+pendientes" de `docs/product/requisitos.md`.
+
+**Prompts principales:**
+1. "Arreglá el #69."
+2. "Verificá si está resuelto el #33; si está resuelto, sumalo."
+
+**Resultado:**
+- Al sacar la fila de la constitución (ya resuelta en la 2.0.0) había
+  quedado una línea vacía en el medio de la tabla, que la cortaba en dos y
+  dejaba afuera la fila de RNF-14. Se borró.
+- Se sacó la fila de RF-16: el umbral de campos obligatorios para publicar
+  una promo se resolvió en la issue #33 (PR #67, `CAMPOS_OBLIGATORIOS_PROMO`
+  en `packages/motor/src/publicable.ts`). La definición de RF-16 sigue en
+  la tabla de requisitos; solo dejó de estar bloqueado.
+
+---
+
+## 2026-10-24 — Edge Function de recomendación: spec, plan e implementación del servidor (issue #43)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-specify`,
+`/speckit-plan`, `/speckit-tasks`, `/speckit-implement`), los subagentes
+`spec-critic` y `rules-guardian`, la skill `/code-review` (ejes de
+estándares y de spec) y `gh` CLI para leer las issues.
+
+**Objetivo:** adelantar la issue #43 (pantalla «¿Con qué pago?») mientras
+siguen abiertas las issues de las que depende (#34 esquema de Supabase, #39
+app base, #40 login, #41 perfil): escribir la spec completa y construir y
+testear la parte del servidor que no necesita la base de datos.
+
+**Prompts principales:**
+1. "Escribí la spec de la issue #43 con el endpoint que recomienda del
+   lado del servidor, según ADR-001 y ADR-009. Marcá la frontera con las
+   issues #36, #37, #41, #44 y #46, y dejá bloqueado lo que depende de
+   #34, #39, #40 y #41."
+2. "Pasá la spec por `spec-critic` y corregí cada hallazgo. Ojo con
+   cualquier filtro que haga el servidor antes del motor: no puede
+   duplicar ni esconder reglas del motor."
+3. "Definí el contrato HTTP del endpoint, con un código y un cuerpo para
+   cada error, y que los registros del servidor no guarden datos del
+   usuario."
+4. "Implementá la capa del servidor escribiendo primero los tests y con
+   repositorios en memoria, sin depender de la base. Cubrí las fechas en
+   hora de Argentina, el cambio de mes y el aislamiento entre usuarios."
+5. "Revisá los cambios con `rules-guardian` y `/code-review`, y corregí
+   lo que encuentren."
+
+**Resultado:**
+- Quedó documentada la funcionalidad completa en
+  `specs/004-recomendar-pantalla/`: 4 historias de usuario, 30 requisitos,
+  el plan técnico, 10 decisiones técnicas, el contrato del endpoint y 42
+  tareas. Las tareas que dependen de otras issues quedaron marcadas como
+  bloqueadas, con la issue que las bloquea.
+- El revisor de specs (`spec-critic`) encontró 13 problemas en la primera
+  versión y se corrigieron todos. Los principales:
+  - El servidor iba a filtrar las promos "vigentes hoy" antes de pasarlas
+    al motor. Eso escondía las promos de otro día de la semana, y el
+    usuario no se enteraba de que existían. Ahora el servidor filtra solo
+    por rubro y fechas, y el día lo evalúa el motor.
+  - No estaba definido qué responde el servidor cuando algo falla. Ahora
+    cada caso tiene su código y su mensaje, y la app sabe qué mostrar en
+    cada uno.
+  - Entrar con la clave pública de la app, sin haber iniciado sesión, no
+    tiene que contar como usuario logueado.
+  - La pantalla no puede llegar a usuarios reales antes de la issue #37:
+    hasta entonces, los topes semanales y "por compra" se calculan como si
+    fueran mensuales.
+- Ya existe la primera Edge Function del proyecto (`recomendar`, en
+  `supabase/functions/`). Recibe la compra que carga el usuario, verifica
+  que haya iniciado sesión, valida los datos, junta sus tarjetas, las
+  promos del rubro y sus compras del mes, y llama al motor. No agrega
+  ninguna regla propia: la recomendación sigue saliendo solo del motor.
+- Las piezas comunes (sesión, mensajes de error, validación y acceso a
+  datos) quedaron en `supabase/functions/_shared/`, para reusarlas en las
+  próximas funciones (#45 topes, #48 tickets).
+- El motor ahora comparte su función de fecha con el servidor, para que
+  los dos calculen "hoy" con la hora de Argentina. No cambia ninguna regla
+  del motor.
+- Pasan 34 tests nuevos, que corren sin base de datos ni internet. Entre
+  otros, verifican que:
+  - el resultado es el mismo que llamar al motor directamente;
+  - una consulta a las 22:00 del último día del mes cuenta las compras de
+    ese mes y no del siguiente;
+  - nunca se mezclan datos de otro usuario;
+  - cada error responde lo que dice el contrato;
+  - los registros del servidor no guardan datos del usuario.
+- El CI ahora también revisa la carpeta `supabase` (lint, tipos y tests).
+  Se completó `docs/architecture/02-api-routes.md`, que estaba vacío.
+- El control de reglas del proyecto (`rules-guardian`) no encontró
+  incumplimientos. La revisión de código encontró dos problemas, ya
+  corregidos:
+  - Si el servicio de inicio de sesión de Supabase estaba caído, la app
+    iba a decir "sesión vencida" y mandar al usuario a loguearse de nuevo,
+    lo que no arreglaba nada. Ahora muestra "Probá de nuevo".
+  - Un emoji en el nombre del comercio contaba como 2 caracteres.
+- Errores de la IA en el proceso:
+  - Lanzó un comando de consola que quedó esperando una respuesta y lo
+    tuvo que cortar.
+  - Las dos primeras corridas de lint y typecheck fallaron por detalles de
+    configuración y de tests, y se corrigieron.
+  - El caso del inicio de sesión caído no lo previó al escribir el código;
+    lo detectó la revisión.
+- Queda pendiente:
+  - La conexión con la base de datos real y la lista de comercios, que
+    dependen de la issue #34.
+  - La pantalla en la app, que depende de #39, #40 y #41.
+  - Proponer al equipo dos ajustes al ADR-009, que hoy no coinciden con
+    cómo quedó el código: el handler vive en su propio archivo y la
+    verificación de sesión se inyecta como las demás dependencias
+    (motivos en el research, R3 y R4).
+
+---
+
+## 2026-10-25 — Plan y tareas del perfil de bancos y tarjetas (issue #41)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-plan`,
+`/speckit-tasks`) y `gh` CLI para leer las issues #34, #41 y #45.
+
+**Objetivo:** dejar lista la implementación de la issue #41 (perfil: bancos,
+tarjetas y redes) mientras siguen abiertas las issues de las que depende
+(#34 esquema de Supabase, #39 app base, #40 login). La spec era del 13/10,
+anterior a varias decisiones de arquitectura, así que había que cruzarla
+con lo decidido después.
+
+**Prompts principales:**
+1. "Generá el plan de la spec `specs/001-perfil-billeteras/` cruzándola con
+   lo decidido después del 13/10: constitución 2.0.0, ADR-001
+   §Actualización, RNF-02, ADR-009 y el contrato de tipos de la issue #33.
+   Indicá qué partes quedan bloqueadas por #34, #39 y #40."
+2. "Generá las tareas y marcá cada fase bloqueada con la issue que la
+   bloquea."
+3. "Revisá los artefactos del plan y uní en `plan.md` y `tasks.md` todo lo
+   que esté repetido entre archivos."
+4. "Releé el plan y las tareas como si tuvieras que implementar la issue sin
+   contexto, y completá lo que te haría dudar o perder tiempo."
+
+**Resultado:**
+- El plan confirma que la spec sigue vigente y no hubo que cambiarla. Lo
+  decidido después se resolvió así:
+  - El perfil no necesita Edge Function: la app lee y escribe directo en
+    Supabase, y el RLS garantiza que cada usuario vea solo lo suyo
+    (ADR-009).
+  - La app no puede importar el motor, ni siquiera sus tipos (RNF-02).
+    Declara los suyos con los mismos valores, y la base rechaza cualquier
+    otro.
+  - Se mantiene la lectura del perfil sin conexión. La actualización del
+    13/10 sacó del celular el motor y el cálculo, pero no el perfil, que
+    solo se muestra.
+- Ocho decisiones técnicas, entre ellas:
+  - Que no se repita la misma tarjeta lo controla la base, no la pantalla.
+    Así también se cubre el caso de dos celulares o un doble toque.
+  - Que el perfil no quede vacío lo controla la app. Una regla en la base
+    habría impedido borrar la cuenta, y si el perfil igual queda vacío, la
+    Edge Function de la issue #43 ya lo detecta.
+  - El onboarding se guarda en un solo pedido: entra todo o nada.
+  - El buscador filtra los 82 bancos en el celular, sin acentos ni
+    mayúsculas, con los bancos frecuentes primero y un orden que no depende
+    del idioma del teléfono.
+  - Los bancos nunca se borran del catálogo, para que una tarjeta ya
+    declarada siempre tenga su banco.
+- Quedó una lista de lo que la issue #34 tiene que garantizar en las tablas
+  `bancos` y `medios_de_pago`, para coordinarlo con quien la tiene asignada.
+- 13 tareas. Las funciones puras (reglas del perfil, buscador y clasificación
+  de errores) se pueden hacer con sus tests apenas cierre la #39. Las
+  pantallas necesitan además la #34 y la #40.
+- Errores de la IA en el proceso:
+  - La primera versión del plan repartía el mismo contenido en seis
+    archivos: la tabla de medios de pago aparecía descrita tres veces y los
+    escenarios de prueba copiaban los de la spec. Se unió todo en `plan.md`
+    y `tasks.md`.
+  - Al unirlos quedaron huecos para implementar, que se encontraron en una
+    segunda lectura:
+    - no se decía cómo detectar cada error;
+    - Perfil necesitaba bajar el catálogo solo para mostrar el nombre del
+      banco;
+    - el selector de tarjeta lo usaban dos pantallas y no tenía un archivo
+      propio.
+- Queda pendiente:
+  - Avisar en la issue #34 qué necesita esta feature de las tablas.
+  - El catálogo crudo de bancos de MODO que cita un comentario de la #34
+    (`docs/product/data/modo-bancos-raw.json`) no está en el repo.
+
+---
+
+## 2026-10-25 — Topes semanales, compartidos y promos acumulables (issue #37)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (`/speckit-specify`),
+el subagente `spec-critic`, `gh` CLI y consultas a la API pública de MODO y
+a la página de cada promo para leer su letra chica.
+
+**Objetivo:** completar el cálculo del tope en el motor: que se renueve en
+el período real de cada promo (mes, semana o compra), que varias promos
+puedan compartir un mismo tope y que las promos acumulables se sumen sobre
+la misma compra. Antes de especificar, cerrar las decisiones que la issue
+dejaba abiertas, con datos reales de MODO.
+
+**Prompts principales:**
+1. "Traete los últimos cambios y arrancá con la issue #37."
+2. "Si dos promos del mismo grupo informan montos distintos, dame un
+   ejemplo. Si dos promos aplican al mismo comercio, se tiene que aplicar
+   la que más da." Se aclaró que el motor compara pesos de ahorro y no
+   porcentaje (con tope, un 20% puede devolver más que un 30%), y se
+   confirmó ese criterio.
+3. "No entendí el escenario de las compras de promos vencidas: mostrame un
+   ejemplo. ¿Cuál sería el grupo de una compra?" Con el ejemplo de dos
+   promos que comparten tope, una ya vencida, se decidió que la Edge
+   Function le pase al motor también las promos de las compras del mes.
+4. "¿Hay promociones acumulables realmente en MODO?" Se revisó la letra
+   chica de 15 promos de supermercados: 9 se declaran acumulables, 2 no y
+   4 no lo dicen. También apareció que el tope más común es semanal y que
+   no hay topes compartidos explícitos.
+5. "Opción 1 en A y no en B": una promo que se queda sin tope dentro de
+   una combinación sigue en ella con $0, y las promos vencidas de un grupo
+   cuentan su consumo pero no su monto.
+6. "No entendí lo de 'el tope compartido se agota con el 20% en
+   supermercados'." Con el ejemplo de dos promos del mismo banco que se
+   reparten un tope, se eligió un texto más simple para la que queda en $0:
+   "sin tope disponible: lo usa otra promoción de este banco".
+
+**Resultado:**
+- Spec en `specs/003-motor-topes-acumulables/`: topes mensuales, semanales
+  (de lunes a domingo) y por compra; topes compartidos entre promos de un
+  mismo grupo; y promos acumulables sumadas en una sola opción, con el
+  detalle de cuánto aporta cada una.
+- Cambio de contrato acordado: cada opción de pago pasa a llevar una lista
+  de promos aplicadas, cada una con su ahorro, su tope restante y su base.
+- Se suma la medición de cobertura de tests al CI (mínimo 90%), como pide
+  la issue.
+- `spec-critic` no encontró nada bloqueante; se corrigieron 8 detalles,
+  entre ellos qué promos cuentan como parte de un grupo y que la Edge
+  Function mande las compras desde el lunes de la semana cuando la semana
+  empieza en el mes anterior.
+- Plan técnico: el cálculo pasa a "saldos" de tope, propios de una promo o
+  compartidos por un grupo, que se calculan una sola vez por consulta. Las
+  promos de una combinación se reparten el saldo en un orden fijo, así el
+  resultado es siempre el mismo. La cobertura se mide con la herramienta de
+  Vitest dentro del mismo paso de tests del CI.
+- 23 tareas internas en tres etapas con revisión entre cada una: topes
+  semanales y por compra; promos acumulables; topes compartidos y cierre.
+- Etapa 1: la opción de pago pasó al formato nuevo (lista de promos) sin
+  cambiar ningún resultado de la issue #36, y el motor ya distingue topes
+  mensuales, semanales (de lunes a domingo, aunque la semana cruce de mes)
+  y por compra. Se sumó la medición de cobertura a los tests: da 100% de
+  las líneas del motor.
+- Etapa 2: las promos acumulables de una misma tarjeta se suman en una sola
+  opción, que muestra cuánto aporta cada una y respeta el tope de cada
+  promo. Las no acumulables, o las que no lo informan, siguen compitiendo
+  por separado.
+- Etapa 3: las promos de un mismo grupo comparten un único tope. Lo que se
+  gasta con una se descuenta para las otras, aunque la promo con la que se
+  compró ya haya vencido. Si dos promos del grupo se suman en una misma
+  compra, entre las dos nunca pasan lo que le queda al grupo.
+- Cierre: 128 tests en verde y 100% de las líneas del motor cubiertas; lint,
+  typecheck y build limpios, y el motor sigue sin dependencias.
+- La revisión de código (estándares y cumplimiento de la spec), los tests y
+  el control de reglas del proyecto no encontraron incumplimientos. Se
+  corrigieron: el texto de la promo que queda en $0, que además ahora solo
+  aparece cuando otra promo de la misma opción usó el tope; el desempate
+  entre opciones, que compara la lista de promos una por una; un test que
+  faltaba (una promo vencida no aporta su período al grupo); y detalles de
+  nombres y código repetido. Unificar en un solo lugar la regla de qué promo
+  tiene tope queda para la issue #38. Quedan 131 tests en verde.
+- Errores de la IA en el proceso: en dos tests escritos antes del código
+  puso mal el resultado esperado (el orden de las promos dentro de una
+  opción y la causa de descarte de una promo vencida). Los detectó al
+  revisarlos contra la spec y los corrigió antes de escribir el código.
+
+---
+
+## 2026-10-26 — Edge Function de recomendación con los topes de la issue #37 (PR #71)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI y el subagente
+`rules-guardian`.
+
+**Objetivo:** resolver los conflictos del PR #71 (issue #43) con `main`
+después del merge del PR #73 (issue #37), sin romper ninguno de los dos, y
+revisar qué issues de la #41, #43, #45, #47 y #56 se pueden avanzar.
+
+**Prompts principales:**
+1. "Resolvé los conflictos del PR #71 con `main` en
+   `.claude/agent-memory/spec-critic/MEMORY.md`, `.gitignore` y
+   `docs/bitacora-prompts.md`, y revisá si alguna de las issues #41, #43,
+   #45, #47 y #56 se puede avanzar."
+2. "Compará los cambios del PR #73 y del PR #71, quedate con lo mejor de
+   cada uno y dejá todo funcionando con la solución más simple."
+
+**Resultado:**
+- Los tres conflictos eran de texto y se resolvieron conservando los dos
+  lados: las líneas de `.env` y la de `coverage/` en `.gitignore`, las dos
+  notas del revisor de specs y las entradas de la bitácora en orden de
+  fecha.
+- Había un conflicto más que git no marca. La #37 cambió la respuesta del
+  motor (cada opción de pago trae ahora una lista de promos) y le pide dos
+  cosas nuevas a quien lo llama. Por eso fallaban 4 tests y el typecheck de
+  la Edge Function. Se adaptó así:
+  - las compras se piden desde el lunes de la semana cuando la semana
+    empezó el mes anterior, con la función de fechas del motor, sin
+    duplicar el cálculo en el servidor;
+  - se le pasan al motor también las promos de las compras registradas
+    aunque hayan vencido, para que descuente bien los topes compartidos;
+  - se corrigieron los 4 tests y se sumaron 3: semana que cruza de mes,
+    tope compartido con una promo vencida y no pedir dos veces la misma
+    promo.
+- Del PR #73 se adoptó la medición de cobertura con un mínimo de 90%,
+  también para la Edge Function, que da 100% de las líneas. Del PR #71 se
+  mantuvieron la Edge Function, sus piezas comunes y las specs.
+- Se actualizaron la spec, el contrato del endpoint y
+  `docs/architecture/02-api-routes.md` con la respuesta nueva. Quedó
+  resuelto el requisito que impedía publicar la pantalla hasta que cerrara
+  la #37.
+- Había dos specs con el número `003`. La de la issue #43 pasó a
+  `specs/004-recomendar-pantalla/` y se actualizaron todas sus referencias.
+- Lint, typecheck y build limpios, con 131 tests del motor y 37 de la Edge
+  Function en verde. `rules-guardian` no encontró incumplimientos.
+- Errores de la IA en el proceso: dos scripts de edición fallaron, uno por
+  los finales de línea de Windows (CRLF) y otro por las comillas de la
+  consola. Se corrigieron con un script en archivo aparte.
+- Queda pendiente:
+  - Las issues #41, #43, #45, #47 y #56 siguen esperando a #34, #38, #39,
+    #40 y #44. La #43 ya no depende de la #37.
+
+---
+
+## 2026-10-26 — Revisión de la Edge Function de recomendación (PR #71) y estimación de topes (issue #38)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI, los subagentes
+`test-runner`, `rules-guardian` y `spec-critic`, la revisión de código en
+dos ejes (estándares y cumplimiento de la spec) y spec-kit
+(`/speckit-specify`).
+
+**Objetivo:** revisar antes de aprobar el PR #71 de jeqm0302, que conecta
+el motor con la Edge Function de «¿Con qué pago?», y arrancar la issue #38:
+que el motor estime cuánto tope le queda al usuario en cada uno, con su
+base, para la pantalla «Mis topes».
+
+**Prompts principales:**
+1. "¿El PR #71 está listo para aprobar y mergear? ¿No tiene conflictos?"
+   No tenía conflictos y el CI estaba en verde, pero faltaba revisarlo. Se
+   pidió revisarlo antes de aprobar.
+2. "Publicá el comentario y aprobá el PR, pero en vez de 'todo bien,
+   apruebo' poné 'aprobado'."
+3. "Arrancá con la issue #38." Al comparar la issue con el diseño de la
+   pantalla aparecieron diferencias, y se decidió seguir el diseño.
+4. "Para el filtro por tarjetas, ¿se puede hacer parametrizable, por si se
+   quiere usar sin la información del perfil?" Se hizo opcional, dejando
+   escrito para qué sirve.
+5. "1a, 2 y 3a": respetar la regla del 20% para "queda poco" aunque un
+   ejemplo del diseño no la cumpla, que cada pantalla ponga sus etiquetas y
+   mostrar "menos de $100" cuando queda casi nada.
+
+**Resultado:**
+- PR #71 revisado: 168 tests en verde, sin violaciones de las reglas del
+  proyecto y sin errores de lógica. Cumple las dos condiciones que el motor
+  le pide a la Edge Function. Se aprobó con un comentario de 7 pendientes
+  que no bloquean (documentación desactualizada, el código de error cuando
+  el usuario no tiene tarjetas, dos tests de casos borde y un chequeo de
+  Deno en el CI). La función todavía no lee la base de datos: eso queda para
+  la issue #34.
+- Spec de la issue #38 en `specs/005-motor-estimar-topes/`: una estimación
+  por cada tope que se va gastando, solo de promos vigentes que sirven para
+  las tarjetas del usuario, con su base y los textos del diseño
+  ("≈$6.500", "según 3 compras de octubre", "queda poco", "vuelve el
+  1/11", "Sin compras registradas este mes: todavía no podemos estimar
+  cuánto te queda.").
+- Se suma a la issue #38 lo que quedó pendiente de la revisión de la issue
+  #37: dejar en un solo lugar la regla de qué tipo de tope tiene cada promo.
+- `spec-critic` encontró dos bloqueantes: un criterio que pedía reproducir
+  textos del diseño que se contradicen entre sí, y etiquetas sin dueño
+  claro. Se corrigieron junto con los demás hallazgos.
+- Error del diseño detectado: un ejemplo de `DESIGN.md` marca "queda poco"
+  con el 29% de tope restante, contra su propia regla del 20%.
+- Plan técnico: la estimación reutiliza los saldos de la issue #37, una
+  función nueva deja en un solo lugar la regla de qué tipo de tope tiene
+  cada promo, y los textos se arman con los montos exactos para que el
+  redondeo de la cifra no cambie el estado del tope.
+- 13 tareas internas en dos etapas con revisión entre ellas: unificar la
+  regla del tope y estimar cada saldo; después, los textos y el cierre.
+- Etapa 1: la regla de qué tipo de tope tiene cada promo quedó en una sola
+  función que usa todo el motor, sin cambiar ningún resultado de las issues
+  anteriores. El motor ya devuelve, para cada tope que se va gastando, cuánto
+  es, cuánto se usó, cuánto queda, en qué compras se basa, hasta cuándo dura
+  y con qué tarjetas del usuario se usa.
+- Etapa 2: el motor arma los textos de cada tope como los pide el diseño:
+  la cifra con "≈" y redondeada hacia abajo, "según 3 compras de octubre",
+  "queda poco", "vuelve el 1/11" y el aviso de que sin compras todavía no se
+  puede estimar. Ningún texto muestra una cifra sin su base.
+- Cierre: 168 tests en verde, 99,5% de las líneas del motor cubiertas;
+  lint, typecheck y build limpios, y el motor sigue sin dependencias.
+- La revisión de código (estándares y cumplimiento de la spec), los tests y
+  el control de reglas del proyecto no encontraron incumplimientos. Se
+  corrigieron detalles: dos funciones de fecha con el mismo nombre y distinto
+  formato, código repetido, números sin nombre, un posible empate en el orden
+  de los topes y cuatro tests de casos borde que faltaban. Quedan 172 tests en
+  verde.
+- Error de la IA en el proceso: al unificar la regla del tope, el primer
+  diseño hacía que una promo de un grupo sin monto informado dejara de
+  aportar sus compras al grupo. Se detectó al leer el código antes de
+  escribirlo y se ajustó el diseño.
+
+---
+
+## 2026-10-26 — Pendientes de la revisión del PR #71 (issue #43)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI y Deno.
+
+**Objetivo:** resolver los 7 pendientes no bloqueantes que dejó el
+compañero al aprobar el PR #71.
+
+**Prompts principales:**
+1. "Mirá lo que aprobó mi compañero y lo que comentó. En base a eso,
+   resolvé todas las indicaciones del comentario. No subas nada ni hagas
+   un merge hasta que yo lo apruebe."
+2. "Velo bien y decime si cumple con todo esto."
+
+**Resultado:**
+- Perfil sin medios de pago responde 422 en vez de 409, el código acordado
+  en la issue #36. Se cambió en el código, los tests, la spec, el contrato
+  (también en lo que muestra la pantalla), el plan del perfil (#41) y
+  `docs/architecture/02-api-routes.md`.
+- `tasks.md`, `plan.md` y `research.md` de la spec 004 describen la versión
+  posterior a la #37: se exportan `fechaArgentina` e `inicioDelPeriodo`, las
+  compras se piden desde el día 1 del mes o el lunes de la semana y el
+  autenticador lanza un error propio si Supabase Auth no responde.
+- ADR-009 suma una sección «Actualización»: el handler vive en
+  `handler.ts`, separado de `index.ts`, y la autenticación es la interfaz
+  `Autenticador` con la clase `AutenticadorSupabase`.
+- `CLAUDE.md` ya no marca el workspace `supabase` como reservado.
+- El CI suma el job `deno-check`, que chequea los `index.ts` de las Edge
+  Functions (quedaban fuera de `tsc`, ESLint y la cobertura).
+- 3 tests nuevos: una compra registrada sin promo (`promocionId: null`) y
+  un pedido sin comercio, en el servicio y en el handler. 131 tests del
+  motor y 40 de la Edge Function en verde, 100% de líneas cubiertas.
+- Se corrigió la descripción del PR (la spec es la `004`, y son las compras
+  del período, no del mes).
+- Errores de la IA en el proceso: un test nuevo no compilaba porque la base
+  del tope puede ser `null`; lo detectó el typecheck y se corrigió.
+- Queda pendiente: la #43 sigue abierta hasta que existan las tablas (#34)
+  y la pantalla (#39, #40, #41).
 
 ---
 

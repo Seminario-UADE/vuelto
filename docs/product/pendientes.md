@@ -9,8 +9,22 @@
 - [ ] Auto-registro de una semana (cifra en pesos ahorrada)
 - [x] Relevar fuentes: HTML vs. SPA/JSON, términos de uso, robots.txt — ver
       `fuentes-promos.md`
-- [ ] Umbral de validación automática de la ingesta (qué campos son
-      obligatorios para publicar sin persona)
+- [x] Umbral de validación automática de la ingesta (qué campos son
+      obligatorios para publicar sin persona) — resuelto en la issue #33:
+      `bancoId`, `categoriaId`, `porcentaje`, `vigencia.desde`,
+      `vigencia.hasta` y `tarjetas`. Ver `CAMPOS_OBLIGATORIOS_PROMO` en
+      `packages/motor/src/publicable.ts` y
+      `../architecture/01-data-models.md`.
+- [ ] Distinguir "la promo no tiene tope" de "no se encontró el tope en la
+      letra chica": en el contrato de la issue #33 los dos son
+      `tope.monto = null`, y el motor (issue #36) deberá tratarlos igual
+      (porcentaje sin techo, avisado en el motivo). Si hace falta
+      distinguirlos, se suma un campo aparte (ej.
+      `tope.sinTope: boolean | null`).
+- [ ] Validar rangos antes de publicar (`porcentaje` entre 0 y 100,
+      `vigencia.desde ≤ vigencia.hasta`): `esPromocionPublicable` solo
+      chequea que los obligatorios no sean `null`. Propuesta: que el esquema
+      del extractor (issue #51) exija los rangos.
 - [ ] Experimento de precisión del extractor (entregable de research)
 - [ ] Proveedor/modelo del extractor, con salida estructurada
 - [ ] Dónde corre el cron de ingesta

@@ -2,5 +2,15 @@
  * Motor de reglas de Vuelto. Funciones puras, sin dependencias de runtime ni
  * acceso a red, reloj o almacenamiento (ADR-001, constitución §II).
  */
-
-export const VERSION_MOTOR = "0.0.0";
+export * from "./tipos.ts";
+export * from "./categorias.ts";
+export * from "./publicable.ts";
+export { recomendar } from "./recomendar.ts";
+export { estimarTopes, formatearEstimacion } from "./estimar.ts";
+export { PerfilSinMediosError } from "./errores.ts";
+export { JURISDICCIONES_VALIDAS } from "./elegibilidad.ts";
+/**
+ * La Edge Function calcula "hoy" y desde cuándo pedir compras con las mismas
+ * funciones que el motor (issues #43 y #37).
+ */
+export { fechaArgentina, inicioDelPeriodo } from "./fecha.ts";
