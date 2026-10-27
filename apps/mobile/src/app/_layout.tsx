@@ -76,7 +76,7 @@ export default function RootLayout() {
           <Stack.Screen name="revisa" options={pageSheet} />
           <Stack.Screen name="contactos/quitar" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
           <Stack.Screen name="(auth)/login" options={pageSheet} />
-          <Stack.Screen name="i/[token]" options={{ presentation: "modal", headerShown: false }} />
+          <Stack.Screen name="i/[token]" options={{ ...headerNativo, title: "Invitación" }} />
         </Stack>
         <Toast />
       </View>

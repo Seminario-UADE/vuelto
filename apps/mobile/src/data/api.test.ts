@@ -11,6 +11,7 @@ import { reiniciarSesion } from "./sesion";
 beforeEach(() => {
   api.setDemora(0);
   api.setEscenario("normal");
+  api.setPreferencias({ medios: [], comercios: [] });
   reiniciarSesion();
 });
 
@@ -138,6 +139,19 @@ describe("compras y ticket", () => {
     expect(c.reintegro).toBe(4900);
     const { compras } = await api.getCompras("excepcion");
     expect(compras[0]?.id).toBe(c.id);
+  });
+});
+
+describe("perfil del onboarding (FR-002)", () => {
+  it("los comercios frecuentes y los medios salen de lo que eligió el usuario", async () => {
+    api.setPreferencias({ medios: ["bbva-visa-credito"], comercios: ["ypf", "shell"] });
+    const p = await api.getPerfil();
+    expect(p.medios.map((m) => m.nombreCorto)).toEqual(["BBVA"]);
+    expect((await api.getComerciosFrecuentes()).map((c) => c.nombre)).toEqual(["YPF", "Shell"]);
+  });
+
+  it("sin elección, los de ejemplo", async () => {
+    expect((await api.getPerfil()).medios.length).toBe(4);
   });
 });
 

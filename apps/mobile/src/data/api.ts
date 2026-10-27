@@ -77,12 +77,27 @@ export function getHoy(): string {
   return HOY;
 }
 
+/**
+ * Lo que el usuario eligió en el onboarding (en el servidor vive en su perfil, con RLS).
+ * Lo actualiza `perfil-local.ts`; sin elección, se usan los de ejemplo.
+ */
+let preferencias: { medios: string[]; comercios: string[] } = { medios: [], comercios: [] };
+export function setPreferencias(p: { medios: string[]; comercios: string[] }): void {
+  preferencias = p;
+}
+
+function mediosDelUsuario(): MedioDePago[] {
+  const elegidos = catalogoMedios.filter((m) => preferencias.medios.includes(m.id));
+  return elegidos.length > 0 ? elegidos : mediosDeclarados;
+}
+
+function comerciosDelUsuario(): Comercio[] {
+  const elegidos = catalogoComercios.filter((c) => preferencias.comercios.includes(c.id));
+  return elegidos.length > 0 ? elegidos : catalogoComercios.filter((c) => c.frecuente);
+}
+
 export async function getPerfil(): Promise<Perfil> {
-  return red({
-    nombre: usuario.nombre,
-    medios: mediosDeclarados,
-    comercios: catalogoComercios.filter((c) => c.frecuente),
-  });
+  return red({ nombre: usuario.nombre, medios: mediosDelUsuario(), comercios: comerciosDelUsuario() });
 }
 
 /** Medios del perfil guardado en el servidor (para quien entra con una cuenta existente). */
@@ -95,7 +110,7 @@ export async function getMediosDisponibles(): Promise<MedioDePago[]> {
 }
 
 export async function getComerciosFrecuentes(): Promise<Comercio[]> {
-  return red(catalogoComercios.filter((c) => c.frecuente));
+  return red(comerciosDelUsuario());
 }
 
 export async function getCatalogoComercios(): Promise<Comercio[]> {

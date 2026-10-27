@@ -45,7 +45,7 @@ Regla: las pantallas (`src/app/`) componen componentes de `src/components/` con 
 | `contactos/index` | Contactos | Stack, header nativo |
 | `contactos/invitar` | Invitar contacto | Stack, header nativo |
 | `contactos/quitar` | Quitar contacto | Sheet que se ajusta al contenido |
-| `i/[token]` | Aceptar invitación | Modal; deep link `vuelto://i/<token>` (en Expo Go `exp://…/--/i/<token>`) |
+| `i/[token]` | Aceptar invitación | Stack, header nativo; deep link `vuelto://i/<token>` (en Expo Go `exp://…/--/i/<token>`) |
 | `grupo/armar` | Armar grupo | Stack, header nativo |
 | `grupo/resultado` | Gasto en grupo | Stack, header nativo |
 

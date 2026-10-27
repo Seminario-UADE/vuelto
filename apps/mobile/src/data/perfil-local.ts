@@ -4,6 +4,7 @@
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSyncExternalStore } from "react";
+import { setPreferencias } from "./api";
 
 export type PerfilLocal = {
   onboardingCompleto: boolean;
@@ -29,6 +30,7 @@ let cargado = false;
 const oyentes = new Set<() => void>();
 
 function emitir() {
+  setPreferencias({ medios: actual.medios, comercios: actual.comercios });
   oyentes.forEach((o) => o());
 }
 

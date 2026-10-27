@@ -51,8 +51,8 @@ Martín está en la fila de Coto un miércoles. Abre la app, toca "Coto" entre s
 2. **Given** la respuesta inline sin monto, **Then** no se muestra ninguna cifra de "Te devuelven"; se muestran el porcentaje y el tope disponible con ≈ y su base.
 3. **Given** la respuesta inline, **When** carga $24.500 en el campo de monto opcional, **Then** aparece "Te devuelven ≈$4.900 · te sale ≈$19.600" con un cruce de opacidad corto, sin contadores animados.
 4. **Given** la respuesta inline, **When** toca "Ver detalle", **Then** llega a "Con qué pagar" de Coto con la misma recomendación, el mismo monto (si lo cargó), y las alternativas descartadas con su motivo ("Provincia Visa débito · hoy no aplica, la promo es los sábados"; "Santander Mastercard · sin promo en supermercados"; "Macro Visa débito · tope agotado").
-5. **Given** "Con qué pagar" con $24.500, **Then** el tope después de la compra se muestra como "≈$1.600 después de esta compra" con estado "Queda poco".
-6. **Given** "Con qué pagar", **Then** hay un único botón primario de una línea ("Usar Galicia") fijo arriba de la tab bar; el contenido termina con espacio igual al footer, y "¿Pagan entre varios?" queda completo y tocable.
+5. **Given** "Con qué pagar" con $24.500, **Then** el tope después de la compra se muestra como "Te quedan ≈$1.600 de tope después de esta compra" con su base. *(Revisado el 27/10: la respuesta real de `recomendar` no trae el estado del tope después de la compra, así que no se muestra "Queda poco" ahí; el estado sí se ve en Topes.)*
+6. **Given** "Con qué pagar", **Then** hay un único botón primario de una línea ("Usar Galicia") en un pie fijo (la pantalla se apila sobre las tabs, sin tab bar: research R2); el contenido termina con espacio igual al footer, y "¿Pagan entre varios?" queda completo y tocable.
 7. **Given** "Con qué pagar", **When** toca "Usar Galicia", **Then** se abre el sheet "Revisá tu compra" en modo recomendación (ver US2 esc. 6).
 
 ---
@@ -92,7 +92,7 @@ Un usuario nuevo ve la bienvenida, declara sus medios de pago, opcionalmente sus
 2. **Given** Medios de pago, **When** no hay ningún medio con cobertura marcado, **Then** "Continuar" está deshabilitado con el motivo visible ("Elegí al menos un medio con promos"); Mercado Pago aparece con la nota "Todavía no tenemos promos de este medio" y sin topes ni reintegros, y marcarlo solo no habilita continuar.
 3. **Given** Comercios, **Then** "Continuar" es el único primario y "Saltar" es una acción de texto en el encabezado; ambos llevan a Primera respuesta (auditoría P2 #18).
 4. **Given** Medios de pago y Comercios, **Then** el indicador de progreso es solo una barra de 2 segmentos (los pasos de configuración), sin texto "Paso N de M" visible; su etiqueta accesible dice "Configuración, paso 1 de 2" (auditoría P2 #18).
-5. **Given** Primera respuesta, **Then** muestra la recomendación de ejemplo para Coto (tarjeta de decisión) con su base; los datos son fijos y no dependen de lo marcado en los pasos anteriores (la app no calcula, FR-012).
+5. **Given** Primera respuesta, **Then** muestra la recomendación de ejemplo para Coto (tarjeta de decisión) y el aviso "Tus topes arrancan sin base": un usuario nuevo no tiene compras, así que no hay cifra de tope (Principio V). Los datos son fijos y no dependen de lo marcado en los pasos anteriores (la app no calcula, FR-012).
 6. **Given** el sheet Guardar perfil, **Then** se ve sobre Primera respuesta; ofrece email sin contraseña y, en iOS, "Continuar con Apple"; en Android solo email. En Expo Go ambos son sustitutos que completan el onboarding.
 7. **Given** el sheet Guardar perfil, **When** toca "Ahora no", **Then** entra a Inicio sin cuenta; Perfil muestra la fila "Guardá tu perfil" que abre el mismo sheet.
 8. **Given** Bienvenida, **When** toca "Ya tengo cuenta", **Then** se abre el sheet Guardar perfil en modo "Entrar" y, al completarlo, va directo a Inicio.
@@ -113,7 +113,7 @@ Martín abre Topes y ve, por medio de pago, cuánto tope le queda estimado y en 
 2. **Given** Provincia sin compras esta semana, **Then** no se muestra cifra: "Sin compras registradas esta semana: todavía no podemos estimar cuánto te queda."
 3. **Given** Topes, **Then** no existe ningún total agregado de topes ("Te quedan ≈$X", "Tope total del mes"); el resumen, sobre superficie Lino, muestra "Te devolvieron ≈$15.200 · según 10 compras de octubre" y "2 medios con tope disponible" (auditoría P1 #2, #4).
 4. **Given** Topes, **Then** el reinicio se muestra por periodo: "Los mensuales se reinician en 18 días" en el resumen, y en Provincia (semanal) "se reinicia el lunes".
-5. **Given** Mis compras, **Then** cada compra lleva su origen (Ticket, Recomendación, Carga manual) en texto ≥12 pt, los filtros son un control segmentado que no corta texto, y todas las fechas son de octubre de 2026.
+5. **Given** Mis compras, **Then** cada compra lleva su origen (Ticket, Recomendación, Carga manual) en texto ≥12 pt, los filtros son chips con scroll horizontal que no cortan texto (una de las dos opciones de la auditoría P2 #16), y todas las fechas son de octubre de 2026.
 
 ---
 
@@ -132,10 +132,10 @@ Martín vincula a Lucía y Mateo por invitación desde Perfil, y en una cena de 
 3. **Given** Aceptar invitación, **When** toca "Ahora no", **Then** vuelve a Inicio sin crear vínculo; **When** toca "Aceptar", **Then** vuelve a Perfil con el contacto en la lista y el aviso "Ahora Lucía es tu contacto".
 4. **Given** una invitación vencida, ya usada, propia o de alguien que ya es contacto, **Then** Aceptar invitación explica el motivo y solo ofrece "Volver".
 5. **Given** el link abierto sin onboarding completo, **Then** primero pasa por el onboarding y al terminar vuelve a Aceptar invitación.
-6. **Given** un contacto en Perfil, **When** toca quitar, **Then** un sheet pide confirmación y dice que el vínculo se rompe para los dos; al confirmar, el contacto desaparece de Perfil y de Armar grupo durante la sesión.
+6. **Given** un contacto en la lista de Contactos (Perfil → Ver todos), **When** toca quitar, **Then** un sheet pide confirmación y dice que el vínculo se rompe para los dos; al confirmar, el contacto desaparece de Perfil y de Armar grupo durante la sesión.
 7. **Given** Perfil sin cuenta, **Then** la sección Contactos dice "Para vincular contactos, guardá tu perfil" con un botón al sheet Guardar perfil, en lugar de "Invitar contacto".
 8. **Given** Armar grupo, **Then** pide nombre del gasto (opcional), monto, y los integrantes: "Vos" fijo, contactos vinculados para marcar, y "Agregar alguien sin cuenta" (solo nombre). El primario "Ver quién conviene que pague" va en un footer fijo encima de la tab bar sin tapar la lista (auditoría P2 #7).
-9. **Given** Gasto en grupo, **Then** la tarjeta de decisión dice "Te conviene que pague Mateo con su Provincia Visa débito · les devuelven ≈$5.000 · según las compras que registró Mateo"; de Lucía "sin reintegro en esta compra · Lucía no tiene compras registradas: sin base"; de Sofía "Sin cuenta: no conocemos su tope"; de Vos, tu medio y "sin promo en gastronomía". Cada uno "pone ≈$9.000". Nunca topes, cantidad de compras ni otros medios de un contacto, ni estados de cobro.
+9. **Given** Gasto en grupo, **Then** la tarjeta de decisión dice "Te conviene que pague Mateo con su Provincia Visa débito · les devuelven ≈$5.000 · según las compras que registró Mateo"; de Lucía "sin reintegro en esta compra · Lucía no tiene compras registradas: sin base"; de Sofía "Sin cuenta: no conocemos su tope"; de Vos, tu medio con su estado ("Tu Provincia Visa débito: 25% los sábados, sin base esta semana"). Cada uno "pone ≈$9.000". Nunca topes, cantidad de compras ni otros medios de un contacto, ni estados de cobro.
 10. **Given** Armar grupo y Gasto en grupo, **Then** la fila propia dice "Vos" con un avatar sin inicial, los contactos usan dos letras cuando la inicial se repite ("Ma", "Mt" no aplica a Vos), y los encabezados están en sentence case (auditoría P2 #10, #11).
 11. **Given** las pantallas de contactos y grupo, **Then** tienen encabezado nativo con volver y gesto de swipe del sistema.
 
@@ -191,7 +191,7 @@ El equipo tiene la app dentro del monorepo, con tema de marca, navegación, clie
 - **FR-009**: Con qué pagar MUST mostrar, en orden: comercio → recomendación → razón → monto opcional → alternativas descartadas con su motivo → "¿Pagan entre varios?" → acción. En 390×844 pt con escala de texto 1,0, la primera alternativa MUST verse sin scroll.
 - **FR-010**: El botón primario de Con qué pagar MUST decir "Usar <banco>" en una sola línea; el reintegro va en la tarjeta, no dentro del botón. Tocarlo abre Revisá tu compra en modo recomendación (US2 esc. 6).
 - **FR-011**: Nueva compra (pestaña Comprar) MUST ofrecer, en este orden: elegir comercio (buscador + frecuentes, que lleva a Con qué pagar), "Escanear ticket", "Cargar a mano" y "Últimas compras" con acceso a Mis compras. El monto, cuando se pide, usa el teclado numérico del sistema sin letras.
-- **FR-012**: La app MUST NOT calcular recomendaciones, reintegros ni topes: toda cifra sale de la capa de datos, que en esta feature devuelve fixtures fijos con la forma de la respuesta del servidor. Cuando el monto refina la cifra, la capa de datos devuelve la cifra ya calculada para ese fixture.
+- **FR-012**: La app MUST NOT calcular recomendaciones, reintegros ni topes: toda cifra sale de la capa de datos, que consume la forma real de la Edge Function `recomendar` (hoy respondida por un mock). Única excepción: "te sale" es la resta `monto − ahorroEstimado`, porque la respuesta del servidor no trae ese campo.
 
 **Registro de compra**
 
@@ -276,6 +276,19 @@ El equipo tiene la app dentro del monorepo, con tema de marca, navegación, clie
 - **Datos de ejemplo**: los de DESIGN.md §9, con dos ajustes de coherencia: el 15/10/2026 es jueves, así que "hoy miércoles" es el 14/10 y los topes mensuales se reinician en 18 días; y "Te devolvieron ≈$15.200" se basa en 10 compras de octubre (9 con reintegro y una sin promo). Santander (≈$2.300 de $8.000, 29%) queda en "Queda poco" con el umbral de FR-022.
 - **Íconos de rubro**: el mismo símbolo para el mismo rubro en toda la app, con su par SF Symbol / Material.
 - **Plataforma de verificación**: iOS Simulator para capturas (claro y texto extra grande); Android se verifica que abra en Expo Go y que se vea claro con el sistema en oscuro.
+
+## Agregados durante la implementación
+
+Estos elementos no estaban en los FR pero vienen del diseño de Stitch o de la verificación, y se
+dejan documentados:
+
+- Perfil: "Cerrar sesión" (estaba en el diseño) y, solo en desarrollo, escenarios de prueba (mes
+  vacío, ticket ilegible) y un link a una invitación de ejemplo para verificar esos estados.
+- Pantalla Contactos (`contactos/index`), detrás del sheet Quitar contacto, como en el diseño.
+- "¿Pagan entre varios?" también en la pestaña Comprar, para llegar al grupo sin pasar por un
+  comercio.
+- Filtros por rubro en Topes ("Por rubro" del diseño).
+- `Contacto.vinculadoDesde`: es un dato del vínculo, no del contacto (ADR-008 §3 no lo prohíbe).
 
 ## Fuera de alcance
 

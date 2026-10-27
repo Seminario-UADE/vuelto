@@ -6,7 +6,6 @@ import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { Icon } from "@/components/icon";
 import { Screen } from "@/components/screen";
-import { SheetHeader } from "@/components/sheet-header";
 import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
@@ -64,7 +63,6 @@ export default function AceptarInvitacion() {
 
   return (
     <Screen
-      kind="tab"
       footer={
         d ? (
           valida ? (
@@ -83,7 +81,11 @@ export default function AceptarInvitacion() {
         ) : null
       }
     >
-      <SheetHeader title={valida ? `${quien} te invita a ser su contacto en Vuelto` : " "} onClose={ahoraNo} />
+      {valida ? (
+        <Text variant="titleLg" accessibilityRole="header">
+          {quien} te invita a ser su contacto en Vuelto
+        </Text>
+      ) : null}
       {!d ? (
         <SkeletonList rows={3} height={96} />
       ) : !valida ? (

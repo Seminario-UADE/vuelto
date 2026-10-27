@@ -1161,6 +1161,29 @@ pantallas de Stitch v5 conectadas entre sí, aplicando las correcciones de
   (tarjeta oscura en todas las pantallas, total de topes, fechas de 2024)
   venían del diseño, no de la implementación.
 
+**Continuación (2026-10-27):**
+1. "como hago lo de xcode?": se guió al usuario para aceptar la licencia y
+   seleccionar Xcode (`sudo` no lo puede correr la IA).
+2. Al traer `main` aparecieron la Edge Function `recomendar` (#43) y la spec
+   004 con botón "Simular" y monto obligatorio. El PO decidió mantener la
+   respuesta en un toque y adaptar la capa de datos al contrato real. Se abrió
+   la issue #75 (monto opcional en la Edge Function y alinear la spec 004).
+3. Verificación en el iOS Simulator (iPhone 17, iOS 27), con capturas de las
+   18 pantallas en `docs/design/capturas-app/` y una pasada con el texto más
+   grande de accesibilidad.
+
+**Resultado de la continuación:**
+- El simulador encontró cuatro bugs que la prueba en web no mostraba: el
+  onboarding abría el sheet de cuenta como primera pantalla, el formSheet con
+  detents no pintaba un ScrollView, el aviso de confirmación quedaba debajo del
+  stack nativo y, con el texto más grande, se cortaban palabras al medio.
+  Los cuatro se corrigieron y se volvieron a verificar.
+- `rules-guardian`: sin bloqueantes; 10 hallazgos corregidos (bases en el
+  grupo, rubro inventado, texto del ticket). `/code-review`: sin violaciones
+  duras; se unificaron textos de base y catálogo de rubros, y la spec quedó
+  alineada con lo que hace la app.
+- La spec se renumeró a 006 (002 ya era del motor en `main`).
+
 ---
 
 ## YYYY-MM-DD — Título de la sesión
