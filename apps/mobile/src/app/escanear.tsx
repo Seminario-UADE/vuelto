@@ -23,7 +23,7 @@ const LINEAS = [
 /**
  * Escanear ticket (modal a pantalla completa). En esta versión NO usa la cámara: el visor
  * muestra un ticket de ejemplo y el disparador simula la lectura. Ningún archivo de imagen
- * se crea (spec 002 FR-015, Principio IV).
+ * se crea (spec 006 FR-015, Principio IV).
  */
 export default function Escanear() {
   const insets = useSafeAreaInsets();

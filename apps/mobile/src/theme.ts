@@ -3,7 +3,7 @@
  *
  * Valores de docs/design/DESIGN.md §2–§4. Los nombres son roles (semánticos), no
  * colores: una apariencia oscura futura cambiaría solo este archivo. Hoy la app
- * declara apariencia solo clara (`userInterfaceStyle: "light"`, spec 002 FR-030).
+ * declara apariencia solo clara (`userInterfaceStyle: "light"`, spec 006 FR-030).
  */
 
 const palette = {

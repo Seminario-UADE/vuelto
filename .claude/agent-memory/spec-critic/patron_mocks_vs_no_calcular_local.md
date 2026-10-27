@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Detectado 2026-10-16 en `specs/002-app-mobile-pantallas/spec.md` (app Expo + 18 pantallas).
+Detectado 2026-10-16 en `specs/006-app-mobile-pantallas/spec.md` (app Expo + 18 pantallas).
 Una spec de frontend sin backend promete "respuesta real", "cuentas que cierran
 entre pantallas" y "la compra se refleja", pero el Principio II prohíbe que la app
 calcule recomendaciones/topes localmente. Resultado: o el mock es fijo (guardar

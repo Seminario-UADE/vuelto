@@ -126,7 +126,7 @@ export async function getCompras(origen: OrigenCompra | "todas" = "todas"): Prom
 }
 
 /**
- * Lee el ticket. En esta feature no recibe imagen: no hay captura real (spec 002 FR-015).
+ * Lee el ticket. En esta feature no recibe imagen: no hay captura real (spec 006 FR-015).
  * El endpoint real recibe la imagen, la manda a Gemini y la descarta (Principio IV).
  */
 export async function leerTicket(): Promise<LecturaTicket> {

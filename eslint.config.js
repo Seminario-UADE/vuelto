@@ -4,7 +4,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 // Colores escritos a mano: solo se permiten en el archivo de tema de la app
-// (auditoría v5 P1 #5, spec 002 SC-003).
+// (auditoría v5 P1 #5, spec 006 SC-003).
 const colorLiteral = "/^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$|^rgba?\\(/";
 
 export default tseslint.config(

@@ -4,7 +4,7 @@
  * Es la vista del cliente: lo que se le muestra al usuario, nunca el input del motor
  * (ADR-008 §4). Todo campo es requerido; lo ausente es `null` explícito (Principio III).
  * Dinero: enteros en pesos. Fechas: ISO `YYYY-MM-DD`.
- * Documentación: specs/002-app-mobile-pantallas/data-model.md y
+ * Documentación: specs/006-app-mobile-pantallas/data-model.md y
  * docs/architecture/02-api-routes.md.
  */
 
@@ -26,7 +26,7 @@ export type Base =
   | { tipo: "sin-compras"; texto: string }
   | { tipo: "contacto"; texto: string };
 
-/** Lo decide el servidor: `queda-poco` con ≤30% del tope nominal (spec 002 FR-022). */
+/** Lo decide el servidor: `queda-poco` con ≤30% del tope nominal (spec 006 FR-022). */
 export type EstadoTope = "disponible" | "queda-poco" | "agotado" | "sin-base";
 
 export type MedioDePago = {

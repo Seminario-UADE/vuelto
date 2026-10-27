@@ -1140,7 +1140,7 @@ pantallas de Stitch v5 conectadas entre sí, aplicando las correcciones de
 3. "Intentar nuevamente" tras una interrupción de la sesión.
 
 **Resultado:**
-- `specs/002-app-mobile-pantallas/`: spec, plan, research, data-model,
+- `specs/006-app-mobile-pantallas/`: spec, plan, research, data-model,
   contratos, quickstart y 56 tareas. `spec-critic` encontró 3 bloqueantes:
   el monto opcional chocaba con la letra del Principio I, la cámara estándar
   de Expo escribe la foto al cache (se sacó la cámara de esta versión) y el

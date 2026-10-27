@@ -3,7 +3,7 @@
  *
  * Arma, a partir de los fixtures, las mismas respuestas que van a devolver las Edge
  * Functions (`recomendar`, `topes`, `recomendar-grupo`) para que la app se pueda usar en
- * Expo Go antes de que existan. Excepción al Principio II aprobada por el PO (spec 002,
+ * Expo Go antes de que existan. Excepción al Principio II aprobada por el PO (spec 006,
  * plan §Complexity Tracking):
  *   - Lo importa SOLO `api.ts`. Ninguna pantalla ni componente calcula reintegros.
  *   - Se borra cuando existan los endpoints del motor (#43/#45) y del grupo (#56).

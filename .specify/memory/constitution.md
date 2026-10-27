@@ -6,9 +6,9 @@ Sync Impact Report
     momento dado; el monto es opcional y solo refina el estimado. Sin monto, la respuesta
     sigue siendo una decisión sobre esa compra, no un listado.
 - Decisión de origen: auditoría de pantallas v5, P1 #1 (docs/design/auditoria-pantallas-v5.md),
-  aprobada por el PO en la spec 002 (specs/002-app-mobile-pantallas).
+  aprobada por el PO en la spec 006 (specs/006-app-mobile-pantallas).
 - Archivos alineados:
-  ✅ specs/002-app-mobile-pantallas/spec.md (§Enmienda de constitución)
+  ✅ specs/006-app-mobile-pantallas/spec.md (§Enmienda de constitución)
   ✅ .specify/templates/*: sin referencias, no requieren cambios
 - Pendientes: ninguno.
 

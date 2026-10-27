@@ -1,7 +1,7 @@
 /**
  * Estado de la sesión que simula escrituras al servidor: compras guardadas, contactos
  * aceptados o quitados y el grupo en armado. Vive en memoria y se pierde al cerrar la app
- * (spec 002, Assumptions). Las pantallas lo leen con `useSesion`.
+ * (spec 006, Assumptions). Las pantallas lo leen con `useSesion`.
  */
 import { useSyncExternalStore } from "react";
 import type { Compra, PedidoGrupo } from "./contracts";

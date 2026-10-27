@@ -1,6 +1,6 @@
 # Tasks: App mobile base y las 18 pantallas de diseño
 
-**Input**: `specs/002-app-mobile-pantallas/` (plan, spec, research, data-model, contracts, quickstart)
+**Input**: `specs/006-app-mobile-pantallas/` (plan, spec, research, data-model, contracts, quickstart)
 
 **Tests**: la spec pide tests de la capa de datos y del tema (SC-003, SC-004, FR-023); no hay tests de
 render. Rutas relativas a la raíz del repo.

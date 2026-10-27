@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Detectado 2026-10-16 en spec 002: la spec declara "la auditoría reemplaza al
+Detectado 2026-10-16 en spec 006: la spec declara "la auditoría reemplaza al
 diseño donde choque" y no actualiza `docs/design/DESIGN.md`. Quedan vivas en
 DESIGN.md reglas que la spec invierte: §2 "una superficie oscura por pantalla,
 y casi todas la tienen" (spec FR-028 la restringe), §5 íconos Material (spec:

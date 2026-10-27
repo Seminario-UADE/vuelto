@@ -3,7 +3,7 @@
 App mobile en `apps/mobile` (`@vuelto/mobile`): Expo SDK 58, React Native 0.88, Expo Router y
 TypeScript strict. Se prueba en Expo Go (QR) y no importa `@vuelto/motor`: el motor corre solo en la
 Edge Function (ADR-001 §Actualización, RNF-02). Spec, plan y decisiones:
-`specs/002-app-mobile-pantallas/`.
+`specs/006-app-mobile-pantallas/`.
 
 ## Dónde vive cada cosa
 
@@ -50,7 +50,7 @@ Regla: las pantallas (`src/app/`) componen componentes de `src/components/` con 
 
 - **Tab bar**: Inicio · Comprar · Topes · Perfil (DESIGN.md §5). Son las tabs JS de Expo Router con
   el estilo de DESIGN.md: necesitamos el alto exacto de la barra para los pies fijos, y las tabs
-  nativas de iOS 26 usan vidrio (research R2 de la spec 002).
+  nativas de iOS 26 usan vidrio (research R2 de la spec 006).
 - **Conciliación con la issue #39**: `index` es Inicio ("¿Con qué pago?" vive ahí), `registrar` es
   `comprar`, y `(auth)/login` es el sheet Guardar perfil.
 - **Onboarding protegido**: el layout raíz usa `Stack.Protected` con el indicador
@@ -80,7 +80,7 @@ mientras recarga (la cifra no parpadea al tipear el monto).
   14/10).
 - `servidor-simulado.ts`: **reemplazo temporal** de las Edge Functions. Arma la recomendación para
   cualquier monto mientras no existe el endpoint. Lo importa solo `api.ts`, tiene tests y se borra
-  con #43/#45 y #56 (excepción al Principio II aprobada por el PO en la spec 002).
+  con #43/#45 y #56 (excepción al Principio II aprobada por el PO en la spec 006).
 - `api.ts`: las funciones que usan las pantallas, con la firma del cliente real
   (`02-api-routes.md`). Para conectar el backend se cambia solo el cuerpo de cada función.
 - Escenarios de prueba (solo desarrollo, en Perfil): mes sin compras y ticket ilegible, para ver los

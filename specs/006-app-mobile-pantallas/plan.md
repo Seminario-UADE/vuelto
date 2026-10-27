@@ -2,7 +2,7 @@
 
 **Branch**: `claude/vuelto-mobile-screens-9fdae7` | **Date**: 2026-10-16 | **Spec**: [spec.md](./spec.md)
 
-**Input**: Feature specification from `specs/002-app-mobile-pantallas/spec.md`
+**Input**: Feature specification from `specs/006-app-mobile-pantallas/spec.md`
 
 ## Summary
 
@@ -54,7 +54,7 @@ simulado (Principio II, ver Complexity Tracking).
 ### Documentation (this feature)
 
 ```text
-specs/002-app-mobile-pantallas/
+specs/006-app-mobile-pantallas/
 ├── spec.md
 ├── plan.md
 ├── research.md
