@@ -4,6 +4,7 @@ import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { DecisionCard } from "@/components/decision-card";
+import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { Skeleton, SkeletonList } from "@/components/skeleton";
@@ -13,7 +14,7 @@ import { setSesion, useSesion } from "@/data/sesion";
 import { useAsync } from "@/hooks/use-async";
 import { aprox, iniciales, pesos } from "@/lib/format";
 import { hapticoExito } from "@/lib/haptics";
-import { colors, radius, space } from "@/theme";
+import { radius, space } from "@/theme";
 
 /**
  * Gasto en grupo: quién conviene que pague y cuánto pone cada uno. De un contacto solo se
@@ -97,8 +98,7 @@ export default function GastoEnGrupo() {
                   alignItems: "center",
                   gap: space.md,
                   paddingVertical: space.md,
-                  borderTopWidth: k ? 1 : 0,
-                  borderColor: colors.divider,
+                  ...divisor(k),
                 }}
               >
                 {i.esVos ? <Avatar icon="perfil" /> : <Avatar letras={i.iniciales} />}

@@ -4,6 +4,7 @@ import { ActionRow } from "@/components/action-row";
 import { Card } from "@/components/card";
 import { ComercioSearch } from "@/components/comercio-search";
 import { CompraRow } from "@/components/compra-row";
+import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { SkeletonList } from "@/components/skeleton";
@@ -11,7 +12,7 @@ import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import { useSesion } from "@/data/sesion";
 import { useAsync } from "@/hooks/use-async";
-import { colors, space } from "@/theme";
+import { space } from "@/theme";
 
 /**
  * Nueva compra (= "registrar" de la issue #39). Primero el comercio, que lleva a Con qué
@@ -67,7 +68,7 @@ export default function Comprar() {
           ) : (
             <Card padding={space.lg} gap={0}>
               {compras.datos.compras.slice(0, 3).map((c, i) => (
-                <View key={c.id} style={{ borderTopWidth: i ? 1 : 0, borderColor: colors.divider }}>
+                <View key={c.id} style={divisor(i)}>
                   <CompraRow c={c} conFecha />
                 </View>
               ))}

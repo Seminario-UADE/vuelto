@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/empty-state";
 import { Icon } from "@/components/icon";
 import { MontoInput } from "@/components/monto-input";
 import { RecomendacionCard } from "@/components/recomendacion";
+import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { Skeleton, SkeletonList } from "@/components/skeleton";
@@ -170,7 +171,7 @@ export default function Inicio() {
             {compras.datos ? (
               <Card padding={space.lg} gap={0}>
                 {compras.datos.compras.slice(0, 3).map((c, i) => (
-                  <View key={c.id} style={{ borderTopWidth: i ? 1 : 0, borderColor: colors.divider }}>
+                  <View key={c.id} style={divisor(i)}>
                     <CompraRow c={c} />
                   </View>
                 ))}

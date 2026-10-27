@@ -7,6 +7,7 @@ import { Chip } from "@/components/chip";
 import { CompraRow, etiquetaOrigen } from "@/components/compra-row";
 import { EmptyState } from "@/components/empty-state";
 import { Icon } from "@/components/icon";
+import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
 import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
@@ -29,7 +30,7 @@ export default function MisCompras() {
   const todas = useAsync(() => api.getCompras("todas"), cambios);
   const datos = todas.datos;
   const compras = datos?.compras.filter((c) => filtro === "todas" || c.origen === filtro) ?? [];
-  const gastaste = datos?.compras.reduce((s, c) => s + c.monto, 0) ?? 0;
+  const gastaste = datos?.gastaste ?? 0;
 
   const porDia = new Map<string, Compra[]>();
   for (const c of compras) porDia.set(c.fecha, [...(porDia.get(c.fecha) ?? []), c]);
@@ -99,7 +100,7 @@ export default function MisCompras() {
               </Text>
               <Card padding={space.lg} gap={0}>
                 {lista.map((c, i) => (
-                  <View key={c.id} style={{ borderTopWidth: i ? 1 : 0, borderColor: colors.divider }}>
+                  <View key={c.id} style={divisor(i)}>
                     <CompraRow c={c} />
                   </View>
                 ))}

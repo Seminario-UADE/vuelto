@@ -15,14 +15,9 @@ import type { Rubro } from "@/data/contracts";
 import { useSesion } from "@/data/sesion";
 import { useAsync } from "@/hooks/use-async";
 import { aprox } from "@/lib/format";
+import { RUBROS } from "@/lib/rubros";
 import { colors, space } from "@/theme";
 
-const CORTO: Partial<Record<Rubro, string>> = {
-  supermercado: "Súper",
-  combustible: "Nafta",
-  gastronomia: "Gastronomía",
-  farmacia: "Farmacia",
-};
 
 /**
  * Tus topes: cuánto queda por medio, con ≈ y su base. Sin total agregado de topes
@@ -100,7 +95,7 @@ export default function Topes() {
             {datos.medios.map((m) => (
               <Chip
                 key={m.rubro}
-                label={CORTO[m.rubro] ?? m.rubro}
+                label={RUBROS[m.rubro].corto}
                 icon={iconoDeRubro[m.rubro]}
                 selected={rubro === m.rubro}
                 onPress={() => setRubro(rubro === m.rubro ? null : m.rubro)}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Comercio, MedioDePago, PedidoRecomendar, RespuestaRecomendar } from "./contracts";
-import { aVista, textoBase } from "./vista-recomendacion";
+import { aVista, baseDeMotor } from "./vista-recomendacion";
 
 // El adaptador recibe la respuesta tal como la devuelve la Edge Function (ejemplo 200 de
 // specs/004-recomendar-pantalla/contracts/recomendar.md) y no inventa cifras.
@@ -98,10 +98,10 @@ describe("aVista", () => {
     expect(v.proximaPromo).toBe("Galicia Visa crédito: la promo es los viernes");
   });
 
-  it("textoBase", () => {
-    expect(textoBase({ comprasRegistradas: 1, comprasSinDescuentoInformado: 0 }, "octubre")?.texto).toBe(
+  it("baseDeMotor", () => {
+    expect(baseDeMotor({ comprasRegistradas: 1, comprasSinDescuentoInformado: 0 }, "octubre")?.texto).toBe(
       "según 1 compra de octubre",
     );
-    expect(textoBase(null, "octubre")).toBeNull();
+    expect(baseDeMotor(null, "octubre")).toBeNull();
   });
 });

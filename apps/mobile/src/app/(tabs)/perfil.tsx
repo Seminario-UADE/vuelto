@@ -5,6 +5,7 @@ import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { Chip } from "@/components/chip";
+import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { SkeletonList } from "@/components/skeleton";
@@ -13,7 +14,7 @@ import * as api from "@/data/api";
 import { borrarPerfilLocal, usePerfilLocal } from "@/data/perfil-local";
 import { reiniciarSesion, useSesion } from "@/data/sesion";
 import { useAsync } from "@/hooks/use-async";
-import { colors, space } from "@/theme";
+import { space } from "@/theme";
 
 const ESCENARIOS: { id: api.Escenario; label: string }[] = [
   { id: "normal", label: "Normal" },
@@ -89,8 +90,7 @@ export default function Perfil() {
                   alignItems: "center",
                   gap: space.md,
                   paddingVertical: space.md,
-                  borderTopWidth: i ? 1 : 0,
-                  borderColor: colors.divider,
+                  ...divisor(i),
                 }}
               >
                 <Avatar letras={m.inicial} />
@@ -141,8 +141,7 @@ export default function Perfil() {
                       alignItems: "center",
                       gap: space.md,
                       paddingVertical: space.md,
-                      borderTopWidth: i ? 1 : 0,
-                      borderColor: colors.divider,
+                      ...divisor(i),
                     }}
                   >
                     <Avatar letras={c.iniciales} />

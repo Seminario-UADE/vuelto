@@ -5,6 +5,7 @@
  * Solo los leen `servidor-simulado.ts` y `api.ts`; las pantallas nunca importan
  * este archivo.
  */
+import { RUBROS } from "../lib/rubros";
 import type { Comercio, Compra, Contacto, MedioDePago, Periodo, Rubro } from "./contracts";
 
 /** Reloj fijo del mock: miércoles 14 de octubre de 2026 (FR-038). */
@@ -89,16 +90,10 @@ export const mediosDeclarados: MedioDePago[] = [
   medios.macro,
 ];
 
-/** Rubro de la app → id de categoría de MODO (packages/motor/src/categorias.ts). */
-export const CATEGORIA_DE_RUBRO: Record<Rubro, number | null> = {
-  supermercado: 1,
-  gastronomia: 2,
-  indumentaria: 3,
-  farmacia: 4,
-  combustible: 5,
-  hogar: 7,
-  otro: null,
-};
+/** Rubro de la app → id de categoría de MODO. */
+export const CATEGORIA_DE_RUBRO = Object.fromEntries(
+  Object.entries(RUBROS).map(([r, v]) => [r, v.categoriaId]),
+) as Record<Rubro, number | null>;
 
 /** Nombre en minúsculas, como lo usan las plantillas del motor (motivos.ts). */
 export const NOMBRE_CATEGORIA: Record<number, string> = {
@@ -136,15 +131,9 @@ export const comercios = {
 
 export const catalogoComercios: Comercio[] = Object.values(comercios);
 
-export const nombreRubro: Record<Rubro, string> = {
-  supermercado: "supermercados",
-  combustible: "combustibles",
-  gastronomia: "gastronomía",
-  farmacia: "farmacias",
-  indumentaria: "indumentaria",
-  hogar: "hogar",
-  otro: "este comercio",
-};
+export const nombreRubro = Object.fromEntries(
+  Object.entries(RUBROS).map(([r, v]) => [r, v.enFrase]),
+) as Record<Rubro, string>;
 
 /** Promo vigente de cada medio declarado (corpus de MODO simplificado). */
 export type PromoFixture = {

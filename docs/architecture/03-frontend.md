@@ -16,7 +16,8 @@ apps/mobile/
     ├── components/       piezas de UI reutilizables (sin datos propios)
     ├── data/             capa de datos: contratos, fixtures, servidor simulado, api, sesión
     ├── hooks/            useAsync (carga), useColumns (Dynamic Type)
-    ├── lib/              supabase.ts, format.ts, haptics.ts
+    ├── lib/              supabase.ts, format.ts, haptics.ts, rubros.ts (catálogo único de rubros),
+    │                     textos.ts (texto de la base de un estimado, en un solo lugar)
     ├── navigation/       opciones compartidas del header nativo
     └── theme.ts          el ÚNICO archivo con colores, tipografía, espacios y radios
 ```

@@ -12,17 +12,9 @@ import * as api from "@/data/api";
 import type { Comercio, Rubro } from "@/data/contracts";
 import { guardarPerfilLocal, usePerfilLocal } from "@/data/perfil-local";
 import { useAsync } from "@/hooks/use-async";
+import { RUBROS } from "@/lib/rubros";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 
-const TITULO_RUBRO: Record<Rubro, string> = {
-  supermercado: "Supermercados",
-  farmacia: "Farmacias",
-  combustible: "Combustible",
-  gastronomia: "Gastronomía",
-  indumentaria: "Indumentaria",
-  hogar: "Hogar",
-  otro: "Otros",
-};
 
 /** Comercios habituales (onboarding 3/5, configuración 2 de 2). Opcional. */
 export default function Comercios() {
@@ -117,7 +109,7 @@ export default function Comercios() {
             <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
               <Icon name={iconoDeRubro[rubro]} size={18} color={colors.inkSecondary} />
               <Text variant="bodyMd" weight="semibold" tone="inkSecondary">
-                {TITULO_RUBRO[rubro]}
+                {RUBROS[rubro].titulo}
               </Text>
             </View>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>

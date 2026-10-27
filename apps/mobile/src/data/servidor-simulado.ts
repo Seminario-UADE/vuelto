@@ -42,6 +42,7 @@ import {
   type PromoFixture,
 } from "./fixtures";
 import { aprox } from "../lib/format";
+import { textoBase } from "../lib/textos";
 
 const UMBRAL_QUEDA_POCO = 0.3;
 const NOMBRE_DIA = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
@@ -58,21 +59,7 @@ function disponible(p: PromoFixture): number | null {
 }
 
 function baseDe(p: PromoFixture): Base {
-  if (p.comprasEnPeriodo === 0 || p.consumido === null) {
-    const periodo = p.periodo === "semana" ? "esta semana" : "este mes";
-    return {
-      tipo: "sin-compras",
-      texto: `Sin compras registradas ${periodo}: todavía no podemos estimar cuánto te queda.`,
-    };
-  }
-  const n = p.comprasEnPeriodo;
-  const cuando = p.periodo === "mes" ? ` de ${MES}` : " esta semana";
-  return {
-    tipo: "compras",
-    cantidad: n,
-    periodo: p.periodo,
-    texto: `según ${n} ${n === 1 ? "compra" : "compras"}${cuando}`,
-  };
+  return textoBase(p.consumido === null ? 0 : p.comprasEnPeriodo, p.periodo, MES);
 }
 
 function baseSinCompras(p: PromoFixture): Base {
@@ -196,17 +183,12 @@ type Opcion = {
  */
 /** "Te devolvieron" y su base, sobre la misma lista de compras en todas las pantallas. */
 export function devolvieron(compras: Compra[]): { monto: number; base: Base } {
-  if (compras.length === 0) {
-    return {
-      monto: 0,
-      base: { tipo: "sin-compras", texto: "Sin compras registradas este mes: todavía no podemos estimar cuánto te queda." },
-    };
-  }
-  const n = compras.length;
-  return {
-    monto: compras.reduce((s, c) => s + (c.reintegro ?? 0), 0),
-    base: { tipo: "compras", cantidad: n, periodo: "mes", texto: `según ${n} ${n === 1 ? "compra" : "compras"} de ${MES}` },
-  };
+  return { monto: compras.reduce((s, c) => s + (c.reintegro ?? 0), 0), base: textoBase(compras.length, "mes", MES) };
+}
+
+/** Lo que gastó el usuario en el mes (Mis compras). */
+export function gastado(compras: Compra[]): number {
+  return compras.reduce((s, c) => s + c.monto, 0);
 }
 
 /** Reintegro estimado que el servidor le asigna a una compra registrada. */

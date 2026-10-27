@@ -203,6 +203,8 @@ export type Compra = {
 
 export type ResumenCompras = {
   mes: string;
+  /** Total gastado en el mes (lo suma el servidor). */
+  gastaste: number;
   devolvieron: { monto: number; base: Base };
   compras: Compra[];
 };

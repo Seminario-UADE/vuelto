@@ -4,6 +4,7 @@ import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { Icon } from "@/components/icon";
+import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
 import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
@@ -45,8 +46,7 @@ export default function Contactos() {
                 alignItems: "center",
                 gap: space.md,
                 paddingVertical: space.md,
-                borderTopWidth: i ? 1 : 0,
-                borderColor: colors.divider,
+                ...divisor(i),
               }}
             >
               <Avatar letras={c.iniciales} />

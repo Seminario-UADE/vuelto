@@ -7,6 +7,7 @@ import { Card } from "@/components/card";
 import { Icon, iconoDeRubro } from "@/components/icon";
 import { MontoInput } from "@/components/monto-input";
 import { AlternativaRow, RecomendacionCard } from "@/components/recomendacion";
+import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { Skeleton, SkeletonList } from "@/components/skeleton";
@@ -14,17 +15,9 @@ import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import { useAsync } from "@/hooks/use-async";
 import { parseMonto } from "@/lib/format";
+import { RUBROS } from "@/lib/rubros";
 import { colors, radius, space } from "@/theme";
 
-const RUBRO: Record<string, string> = {
-  supermercado: "Supermercado",
-  combustible: "Combustible",
-  gastronomia: "Gastronomía",
-  farmacia: "Farmacia",
-  indumentaria: "Indumentaria",
-  hogar: "Hogar",
-  otro: "Comercio",
-};
 
 /**
  * Con qué pagar: pregunta → respuesta → razón → monto → alternativas → grupo → acción
@@ -67,7 +60,7 @@ export default function ConQuePagar() {
           <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
             <Avatar icon={iconoDeRubro[r.comercio.rubro]} />
             <Text variant="bodyMd" tone="inkSecondary" style={{ flex: 1 }}>
-              {RUBRO[r.comercio.rubro]} · {r.dia}
+              {RUBROS[r.comercio.rubro].titulo} · {r.dia}
             </Text>
           </View>
         ) : null}
@@ -101,7 +94,7 @@ export default function ConQuePagar() {
               <SectionHeader title={r.medio ? "Otras opciones" : "Tus medios hoy"} />
               <Card padding={space.lg} gap={0}>
                 {r.alternativas.map((a, i) => (
-                  <View key={`${a.titulo}-${i}`} style={{ borderTopWidth: i ? 1 : 0, borderColor: colors.divider }}>
+                  <View key={`${a.titulo}-${i}`} style={divisor(i)}>
                     <AlternativaRow a={a} />
                   </View>
                 ))}

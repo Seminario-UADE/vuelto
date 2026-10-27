@@ -16,6 +16,7 @@ import type {
   Recomendacion,
   RespuestaRecomendar,
 } from "./contracts";
+import { textoBase } from "../lib/textos";
 
 export type Catalogos = {
   medios: MedioDePago[];
@@ -27,16 +28,8 @@ export type Catalogos = {
 };
 
 /** Base del motor → texto (Principio V). Con cero compras no hay cifra que sostener. */
-export function textoBase(base: BaseEstimacion | null, mes: string): Base | null {
-  if (!base) return null;
-  const n = base.comprasRegistradas;
-  if (n === 0) {
-    return {
-      tipo: "sin-compras",
-      texto: "Sin compras registradas este mes: todavía no podemos estimar cuánto te queda.",
-    };
-  }
-  return { tipo: "compras", cantidad: n, periodo: "mes", texto: `según ${n} ${n === 1 ? "compra" : "compras"} de ${mes}` };
+export function baseDeMotor(base: BaseEstimacion | null, mes: string): Base | null {
+  return base ? textoBase(base.comprasRegistradas, "mes", mes) : null;
 }
 
 function medioDe(id: string, c: Catalogos): MedioDePago | null {
@@ -71,7 +64,7 @@ export function aVista(
     ...r.descartadas.map((d): Alternativa => {
       const medio = medioDePromo(d.promocionId, c);
       const promo = c.promociones.find((p) => p.id === d.promocionId);
-      const base = d.causa === "tope_agotado" ? textoBase(d.base, c.mes) : null;
+      const base = d.causa === "tope_agotado" ? baseDeMotor(d.base, c.mes) : null;
       return {
         medioId: medio?.id ?? null,
         titulo: medio?.nombre ?? promo?.titulo ?? "Promoción",
@@ -102,7 +95,7 @@ export function aVista(
   }
 
   const principal = r.mejor.promociones[0] ?? null;
-  const base = textoBase(principal?.base ?? null, c.mes);
+  const base = baseDeMotor(principal?.base ?? null, c.mes);
   const conBase = base?.tipo === "compras";
   const tope = principal?.topeRestanteTrasCompra ?? null;
   const conMonto = pedido.monto !== null;

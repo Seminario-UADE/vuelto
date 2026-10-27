@@ -162,6 +162,7 @@ export async function getCompras(origen: OrigenCompra | "todas" = "todas"): Prom
   const todas = todasLasCompras();
   return red({
     mes: MES,
+    gastaste: servidor.gastado(todas),
     devolvieron: servidor.devolvieron(todas),
     compras: origen === "todas" ? todas : todas.filter((c) => c.origen === origen),
   });
