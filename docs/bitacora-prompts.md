@@ -468,6 +468,53 @@ funcionaba.
 
 ---
 
+## 2026-10-16/17 — App mobile base y las 18 pantallas (issue #39)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit, `spec-critic`,
+Stitch MCP y las skills `vercel-react-native-skills`, `expo-native-ui` e
+`impeccable` (piso de craft e `ios.md`).
+
+**Objetivo:** crear `apps/mobile` (issue #39) e implementar las 18
+pantallas de Stitch v5 conectadas entre sí, aplicando las correcciones de
+`docs/design/auditoria-pantallas-v5.md`.
+
+**Prompts principales:**
+1. Pedido completo: leer CLAUDE.md, DESIGN.md, la auditoría, la issue #39 y
+   los ADR 002, 007 y 008; seguir ADR-007 (specify → spec-critic → plan →
+   tasks → implement); traer las 18 pantallas de Stitch al scratchpad;
+   Expo Router con tab bar Inicio · Comprar · Topes · Perfil; tema en un
+   solo archivo; Hanken Grotesk; `<Icon>` por plataforma; datos de ejemplo
+   detrás de `src/data/`; correcciones P1 y P2 obligatorias.
+2. Cuatro decisiones del PO antes de implementar: un solo PR con un commit
+   por fase; PATCH 2.0.1 de la constitución (monto opcional); excepción al
+   Principio II para un servidor simulado aislado; instalar Xcode para el
+   simulador.
+3. "Intentar nuevamente" tras una interrupción de la sesión.
+
+**Resultado:**
+- `specs/002-app-mobile-pantallas/`: spec, plan, research, data-model,
+  contratos, quickstart y 56 tareas. `spec-critic` encontró 3 bloqueantes:
+  el monto opcional chocaba con la letra del Principio I, la cámara estándar
+  de Expo escribe la foto al cache (se sacó la cámara de esta versión) y el
+  botón "Usar Galicia" no tenía comportamiento definido (pasó a abrir
+  Revisá tu compra en modo recomendación).
+- Constitución 2.0.1: una compra concreta es el comercio elegido; el monto
+  refina el estimado.
+- `apps/mobile`: Expo SDK 58, tema de tokens con lint y test contra hex
+  sueltos, solo modo claro, capa de datos con 17 tests de reglas (≈ y
+  base, ADR-008, cuentas que cierran), y las 18 pantallas.
+- Ajustes de coherencia de datos: el 15/10/2026 es jueves, así que "hoy
+  miércoles" pasó al 14/10; el umbral de "Queda poco" pasó a 30% para que
+  Santander (29%) cierre con su estado; el ejemplo de grupo ya no nombra la
+  tarjeta de Lucía (ADR-008 §3).
+- Docs: `docs/architecture/03-frontend.md` completo, contrato en
+  `02-api-routes.md` y DESIGN.md actualizado con las reglas corregidas.
+- Lección: Stitch HTML sirvió para copy y estructura; varias correcciones
+  (tarjeta oscura en todas las pantallas, total de topes, fechas de 2024)
+  venían del diseño, no de la implementación.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

@@ -119,6 +119,10 @@ apps/mobile/
         └── *.test.ts
 ```
 
+**Desvíos durante la implementación**: las rutas viven en `src/app/` (convención de Expo SDK 58)
+y no en `app/`; se sumó `contactos/index` (la lista de Contactos que queda detrás del sheet Quitar
+contacto, como en el diseño de Stitch); los nombres de archivo de componentes van en kebab-case.
+
 **Structure Decision**: un workspace `apps/mobile` con Expo Router file-based. Las pantallas viven en
 `app/` y solo componen componentes de `src/components/` con datos de `src/data/api.ts`. Pantallas
 hijas en el stack raíz (research R2). Los nombres de ruta concilian la issue: `(auth)/login`,
