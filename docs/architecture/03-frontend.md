@@ -28,11 +28,11 @@ Regla: las pantallas (`src/app/`) componen componentes de `src/components/` con 
 
 | Ruta | Pantalla | Presentación |
 |---|---|---|
-| `(onboarding)/index` | Bienvenida | Stack, sin header |
+| `(onboarding)/bienvenida` | Bienvenida | Stack, sin header |
 | `(onboarding)/medios` | Tus medios de pago | Stack, header nativo con barra de 2 pasos |
 | `(onboarding)/comercios` | Comercios habituales | Stack, "Saltar" en el header |
 | `(onboarding)/primera-respuesta` | Primera respuesta | Stack |
-| `(auth)/login` | Guardar perfil / Entrar | Sheet (`formSheet`) |
+| `(auth)/login` | Guardar perfil / Entrar | Page sheet (`modal`) |
 | `(tabs)/index` | Inicio (respuesta inline) | Pestaña |
 | `(tabs)/comprar` | Nueva compra | Pestaña |
 | `(tabs)/topes` | Tus topes | Pestaña |
@@ -40,7 +40,7 @@ Regla: las pantallas (`src/app/`) componen componentes de `src/components/` con 
 | `comercio/[id]` | Con qué pagar | Stack, header nativo |
 | `mis-compras` | Mis compras | Stack, header nativo |
 | `escanear` | Escanear ticket | Modal a pantalla completa |
-| `revisa` | Revisá tu compra | Sheet |
+| `revisa` | Revisá tu compra | Page sheet (`modal`) |
 | `contactos/index` | Contactos | Stack, header nativo |
 | `contactos/invitar` | Invitar contacto | Stack, header nativo |
 | `contactos/quitar` | Quitar contacto | Sheet que se ajusta al contenido |
@@ -53,9 +53,13 @@ Regla: las pantallas (`src/app/`) componen componentes de `src/components/` con 
   nativas de iOS 26 usan vidrio (research R2 de la spec 006).
 - **Conciliación con la issue #39**: `index` es Inicio ("¿Con qué pago?" vive ahí), `registrar` es
   `comprar`, y `(auth)/login` es el sheet Guardar perfil.
-- **Onboarding protegido**: el layout raíz usa `Stack.Protected` con el indicador
-  `onboardingCompleto`. Sin onboarding, solo se ven las pantallas del onboarding, el sheet de
-  cuenta y la invitación (que guarda el token y vuelve al terminar).
+- **Onboarding**: el layout de las tabs redirige a `/bienvenida` si `onboardingCompleto` es falso,
+  y el del onboarding redirige a `/` si es verdadero. Se probó `Stack.Protected` y se descartó:
+  con la pestaña Inicio bloqueada, el router abría el sheet de cuenta como primera pantalla.
+- **Sheets**: Revisá tu compra y Guardar perfil tienen scroll, así que van como page sheet
+  (`presentation: "modal"`). En iOS 27 el `formSheet` con detents no pinta un `ScrollView`
+  (verificado en el simulador). Quitar contacto, que no scrollea, sí es `formSheet` ajustado al
+  contenido.
 - Las pantallas hijas van en el stack raíz, encima de las tabs: back y swipe del sistema, y el único
   primario queda pegado al área segura sin competir con la tab bar.
 
@@ -97,8 +101,11 @@ mientras recarga (la cifra no parpadea al tipear el monto).
   oscura futura cambia solo `theme.ts`.
 - **Hanken Grotesk** (400–700) con `@expo-google-fonts/hanken-grotesk`, cargada en el layout raíz
   con el splash retenido. `<Text>` mapea peso → familia y usa `tabular-nums` en montos.
-- **Dynamic Type**: nada bloquea `allowFontScaling`; `useColumns()` pasa la grilla de topes de Inicio
-  a una columna con `fontScale > 1.2`.
+- **Dynamic Type**: nada bloquea `allowFontScaling`; cada nivel tiene un tope de escala
+  (`maxFontScale` en `theme.ts`: display ×1,4, títulos ×1,6–1,8, cuerpo ×2) para que con el texto
+  más grande de accesibilidad no se corten palabras. Las etiquetas de la tab bar casi no escalan,
+  como las del sistema. `useColumns()` pasa la grilla de topes de Inicio a una columna con
+  `fontScale > 1.2`.
 - **Íconos**: `<Icon name>` con nombres semánticos. SF Symbols (`expo-symbols`) en iOS y Material
   (`@expo/vector-icons`) en Android y web.
 
@@ -111,7 +118,7 @@ mientras recarga (la cifra no parpadea al tipear el monto).
 | `TopeBar`, `TopeResumen`, `TopeDetalle` | Tope con ≈, base y tramo rayado final (SVG). Sin porcentajes |
 | `MontoInput` | Monto opcional con teclado numérico del sistema |
 | `OptionRow`, `Chip`, `Avatar`, `Badge` | Controles de DESIGN.md §5 |
-| `Toast` | Confirmación ("Compra guardada · la ves en Mis compras") anunciada al lector de pantalla |
+| `Toast` | Confirmación ("Compra guardada · la ves en Mis compras") anunciada al lector de pantalla. En iOS va en `FullWindowOverlay` para quedar encima del stack nativo |
 
 ## Privacidad en el cliente
 
