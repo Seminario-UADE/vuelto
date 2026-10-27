@@ -14,7 +14,9 @@ export type Rubro =
   | "gastronomia"
   | "farmacia"
   | "indumentaria"
-  | "hogar";
+  | "hogar"
+  /** Comercio fuera del catálogo: sin rubro conocido, no se estima reintegro. */
+  | "otro";
 
 export type Periodo = "mes" | "semana";
 
@@ -111,6 +113,8 @@ export type Compra = {
   medio: MedioDePago;
   reintegro: number | null;
   origen: OrigenCompra;
+  /** Texto que el extractor leyó del ticket (se guarda; la imagen no). `null` si no hubo ticket. */
+  textoExtraido: string | null;
 };
 
 export type ResumenCompras = {
@@ -138,6 +142,7 @@ export type BorradorCompra = {
   fecha: string;
   monto: number | null;
   medioId: string | null;
+  textoExtraido: string | null;
 };
 
 /** Contacto vinculado: solo lo que ADR-008 §3 deja ver. Sin topes, compras ni medios. */

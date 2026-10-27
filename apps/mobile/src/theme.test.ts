@@ -70,3 +70,29 @@ describe("sin colores escritos a mano fuera del tema (SC-003)", () => {
     expect(texto).not.toMatch(/["'`]#[0-9a-fA-F]{3,8}["'`]|rgba?\(/);
   });
 });
+
+describe("el servidor simulado lo importa solo api.ts (excepción al Principio II)", () => {
+  const raiz = dirname(fileURLToPath(import.meta.url));
+  const todos: string[] = [];
+  const recorrer = (dir: string) => {
+    for (const f of readdirSync(dir)) {
+      const p = join(dir, f);
+      if (statSync(p).isDirectory()) recorrer(p);
+      else if (/\.tsx?$/.test(f) && !/\.test\.ts$/.test(f)) todos.push(p);
+    }
+  };
+  recorrer(raiz);
+
+  it("ningún otro archivo importa servidor-simulado ni fixtures", () => {
+    const culpables = todos.filter((p) => {
+      if (/data\/(api|servidor-simulado|fixtures)\.ts$/.test(p)) return false;
+      return /from ["'][^"']*(servidor-simulado|\/fixtures)["']/.test(readFileSync(p, "utf8"));
+    });
+    expect(culpables).toEqual([]);
+  });
+
+  it("la app no depende del motor", () => {
+    const pkg = readFileSync(join(raiz, "..", "package.json"), "utf8");
+    expect(pkg).not.toContain("@vuelto/motor");
+  });
+});

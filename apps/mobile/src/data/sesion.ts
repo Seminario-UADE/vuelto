@@ -4,13 +4,13 @@
  * (spec 002, Assumptions). Las pantallas lo leen con `useSesion`.
  */
 import { useSyncExternalStore } from "react";
-import type { Compra, IntegranteGrupo } from "./contracts";
+import type { Compra, PedidoGrupo } from "./contracts";
 
 type Estado = {
   comprasNuevas: Compra[];
   contactosQuitados: string[];
   contactosAceptados: string[];
-  grupo: { nombre: string | null; monto: number | null; integrantes: IntegranteGrupo[] } | null;
+  grupo: PedidoGrupo | null;
   /** Mensaje de confirmación pendiente de mostrar ("Compra guardada · …"). */
   aviso: string | null;
 };

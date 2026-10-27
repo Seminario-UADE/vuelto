@@ -21,6 +21,7 @@ const TITULO_RUBRO: Record<Rubro, string> = {
   gastronomia: "Gastronomía",
   indumentaria: "Indumentaria",
   hogar: "Hogar",
+  otro: "Otros",
 };
 
 /** Comercios habituales (onboarding 3/5, configuración 2 de 2). Opcional. */

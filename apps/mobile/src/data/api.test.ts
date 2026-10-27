@@ -121,7 +121,14 @@ describe("compras y ticket", () => {
 
   it("guardar sin medio falla; con medio aparece primera en Mis compras", async () => {
     await expect(
-      api.guardarCompra({ modo: "ticket", comercio: "Coto", fecha: "2026-10-14", monto: 24500, medioId: null }),
+      api.guardarCompra({
+        modo: "ticket",
+        comercio: "Coto",
+        fecha: "2026-10-14",
+        monto: 24500,
+        medioId: null,
+        textoExtraido: null,
+      }),
     ).rejects.toThrow();
     const c = await api.guardarCompra({
       modo: "excepcion",
@@ -129,10 +136,85 @@ describe("compras y ticket", () => {
       fecha: "2026-10-14",
       monto: 24500,
       medioId: "galicia-visa-credito",
+      textoExtraido: null,
     });
     expect(c.reintegro).toBe(4900);
     const { compras } = await api.getCompras("excepcion");
     expect(compras[0]?.id).toBe(c.id);
+  });
+});
+
+describe("hallazgos de rules-guardian", () => {
+  it("un comercio fuera del catálogo no tiene rubro inventado ni reintegro", async () => {
+    const c = await api.guardarCompra({
+      modo: "manual",
+      comercio: "Almacén de Juan",
+      fecha: "2026-10-14",
+      monto: 5000,
+      medioId: "galicia-visa-credito",
+      textoExtraido: null,
+    });
+    expect(c.comercio.rubro).toBe("otro");
+    expect(c.reintegro).toBeNull();
+  });
+
+  it("la compra por ticket guarda el texto extraído, nunca la imagen", async () => {
+    const t = await api.leerTicket();
+    if (!t.ok) throw new Error("ticket");
+    const c = await api.guardarCompra({
+      modo: "ticket",
+      comercio: "Coto",
+      fecha: "2026-10-14",
+      monto: 24500,
+      medioId: "galicia-visa-credito",
+      textoExtraido: t.textoExtraido,
+    });
+    expect(c.textoExtraido).toContain("TOTAL");
+  });
+
+  it("'te devolvieron' tiene la misma base en Topes y en Mis compras", async () => {
+    await api.guardarCompra({
+      modo: "excepcion",
+      comercio: "Coto",
+      fecha: "2026-10-14",
+      monto: 24500,
+      medioId: "galicia-visa-credito",
+      textoExtraido: null,
+    });
+    const [t, c] = await Promise.all([api.getTopes(), api.getCompras()]);
+    expect(t.devolvieron).toEqual(c.devolvieron);
+    expect(t.devolvieron.base.texto).toBe("según 11 compras de octubre");
+  });
+
+  it("mes vacío: el reintegro no se recorta con un tope sin base", async () => {
+    api.setEscenario("mes-vacio");
+    const r = await api.recomendar("coto", 100000);
+    expect(r.topeDisponible).toBeNull();
+    expect(r.base?.tipo).toBe("sin-compras");
+    expect(r.reintegro).toBe(20000);
+    expect(r.topeDespues).toBeNull();
+  });
+
+  it("'tope agotado' dice su base", async () => {
+    const r = await api.recomendar("farmacity", null);
+    expect(r.alternativas.find((a) => a.estado === "agotado")?.motivo).toBe(
+      "tope agotado según 2 compras de octubre · vuelve el 1/11",
+    );
+  });
+
+  it("en el grupo, cada reintegro estimado lleva su base", async () => {
+    const g = await api.recomendarGrupo({
+      nombre: null,
+      comercioId: "coto",
+      monto: 24500,
+      fecha: "2026-10-14",
+      integrantes: [{ tipo: "vos" }, { tipo: "contacto", contactoId: "lucia" }],
+    });
+    // Vos y Lucía empatan en ≈$4.900; gana Vos porque su estimado tiene base.
+    expect(g.quienPaga).toEqual({ nombre: "Vos", esVos: true });
+    const lucia = g.integrantes.find((i) => i.nombre === "Lucía")?.detalle ?? "";
+    expect(lucia).toBe("≈$4.900 si paga Lucía · Lucía no tiene compras registradas: sin base");
+    expect(lucia).not.toMatch(/Galicia|Visa/);
   });
 });
 

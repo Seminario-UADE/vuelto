@@ -121,6 +121,7 @@ export const nombreRubro: Record<Rubro, string> = {
   farmacia: "farmacias",
   indumentaria: "indumentaria",
   hogar: "hogar",
+  otro: "este comercio",
 };
 
 /** Promo vigente de cada medio declarado (corpus de MODO simplificado). */
@@ -203,7 +204,7 @@ const compra = (
   medio: MedioDePago,
   reintegro: number | null,
   origen: Compra["origen"],
-): Compra => ({ id, comercio: c, fecha, monto, medio, reintegro, origen });
+): Compra => ({ id, comercio: c, fecha, monto, medio, reintegro, origen, textoExtraido: null });
 
 /**
  * Compras de octubre. Cuentas que cierran con los topes:

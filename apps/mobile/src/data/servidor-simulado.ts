@@ -11,6 +11,7 @@
  */
 import type {
   Alternativa,
+  Compra,
   Base,
   Comercio,
   EstadoTope,
@@ -27,7 +28,6 @@ import {
   HOY,
   DIAS_PARA_REINICIO,
   MES,
-  comprasOctubre,
   consejos,
   contactoServidor,
   contactos,
@@ -70,6 +70,10 @@ function baseDe(p: PromoFixture): Base {
   };
 }
 
+function baseSinCompras(p: PromoFixture): Base {
+  return baseDe({ ...p, consumido: null, comprasEnPeriodo: 0 });
+}
+
 function aplicaHoy(p: PromoFixture): boolean {
   return p.dias === null || p.dias.includes(DIA_HOY);
 }
@@ -82,7 +86,10 @@ function porcentajeTexto(p: PromoFixture): string {
   return `${p.porcentaje}% en ${nombreRubro[p.rubro]} ${p.diasTexto}`;
 }
 
-export function recomendar(comercio: Comercio, monto: number | null): Recomendacion {
+/** Escenario "mes sin compras": ningún tope tiene base. */
+export type Opciones = { sinCompras?: boolean };
+
+export function recomendar(comercio: Comercio, monto: number | null, op: Opciones = {}): Recomendacion {
   const montoValido = monto !== null && monto > 0 ? monto : null;
   const candidatos: { medio: MedioDePago; promo: PromoFixture; disp: number | null }[] = [];
   const alternativas: Alternativa[] = [];
@@ -98,7 +105,7 @@ export function recomendar(comercio: Comercio, monto: number | null): Recomendac
       });
       continue;
     }
-    const disp = disponible(promo);
+    const disp = op.sinCompras ? null : disponible(promo);
     if (!aplicaHoy(promo)) {
       alternativas.push({
         medio,
@@ -109,7 +116,11 @@ export function recomendar(comercio: Comercio, monto: number | null): Recomendac
       continue;
     }
     if (disp === 0) {
-      alternativas.push({ medio, motivo: `tope agotado · ${promo.reinicio}`, estado: "agotado" });
+      alternativas.push({
+        medio,
+        motivo: `tope agotado ${baseDe(promo).texto} · ${promo.reinicio}`,
+        estado: "agotado",
+      });
       continue;
     }
     candidatos.push({ medio, promo, disp });
@@ -168,7 +179,7 @@ export function recomendar(comercio: Comercio, monto: number | null): Recomendac
     razon: porcentajeTexto(promo),
     porcentaje: promo.porcentaje,
     topeDisponible: disp,
-    base: baseDe(promo),
+    base: op.sinCompras ? baseSinCompras(promo) : baseDe(promo),
     monto: montoValido,
     reintegro,
     teSale,
@@ -178,11 +189,11 @@ export function recomendar(comercio: Comercio, monto: number | null): Recomendac
   };
 }
 
-export function topes(): ResumenTopes {
+export function topes(compras: Compra[], op: Opciones = {}): ResumenTopes {
   const lista: TopeMedio[] = mediosDeclarados.flatMap((medio) => {
     const promo = promoDe(medio);
     if (!promo) return [];
-    const disp = disponible(promo);
+    const disp = op.sinCompras ? null : disponible(promo);
     return [
       {
         medio,
@@ -192,24 +203,15 @@ export function topes(): ResumenTopes {
         periodo: promo.periodo,
         disponible: disp,
         estado: estadoTope(disp, promo.nominal),
-        base: baseDe(promo),
+        base: op.sinCompras ? baseSinCompras(promo) : baseDe(promo),
         reinicio: promo.reinicio,
-        consejo: consejos[medio.id] ?? null,
+        consejo: op.sinCompras ? null : (consejos[medio.id] ?? null),
       },
     ];
   });
-  const devuelto = comprasOctubre.reduce((s, c) => s + (c.reintegro ?? 0), 0);
   return {
     mes: MES,
-    devolvieron: {
-      monto: devuelto,
-      base: {
-        tipo: "compras",
-        cantidad: comprasOctubre.length,
-        periodo: "mes",
-        texto: `según ${comprasOctubre.length} compras de ${MES}`,
-      },
-    },
+    devolvieron: devolvieron(compras),
     mediosConTope: lista.filter((t) => t.estado === "disponible" || t.estado === "queda-poco").length,
     reinicioMensualEnDias: DIAS_PARA_REINICIO,
     medios: lista,
@@ -242,6 +244,28 @@ type Opcion = {
  * que no tiene; después quien pide (ADR-008 §5) y el orden de los contactos. El desempate
  * real lo define el motor (#56).
  */
+/** "Te devolvieron" y su base, sobre la misma lista de compras en todas las pantallas. */
+export function devolvieron(compras: Compra[]): { monto: number; base: Base } {
+  if (compras.length === 0) {
+    return {
+      monto: 0,
+      base: { tipo: "sin-compras", texto: "Sin compras registradas este mes: todavía no podemos estimar cuánto te queda." },
+    };
+  }
+  const n = compras.length;
+  return {
+    monto: compras.reduce((s, c) => s + (c.reintegro ?? 0), 0),
+    base: { tipo: "compras", cantidad: n, periodo: "mes", texto: `según ${n} ${n === 1 ? "compra" : "compras"} de ${MES}` },
+  };
+}
+
+/** Reintegro estimado que el servidor le asigna a una compra registrada. */
+export function reintegroDeCompra(comercio: Comercio, monto: number, medioId: string): number | null {
+  if (comercio.rubro === "otro") return null;
+  const r = recomendar(comercio, monto);
+  return r.medio?.id === medioId ? r.reintegro : null;
+}
+
 export function recomendarGrupo(
   pedido: { nombre: string | null; comercio: Comercio; monto: number; fecha: string; integrantes: IntegranteGrupo[] },
 ): RecomendacionGrupo {
@@ -282,7 +306,7 @@ export function recomendarGrupo(
         detalle =
           disp === null
             ? `Tu ${medio.nombre}: ${promo.porcentaje}% ${promo.diasTexto}, sin base esta semana`
-            : `Tu ${medio.nombre}: ${aprox(reintegro)} de reintegro`;
+            : `Tu ${medio.nombre}: ${aprox(reintegro)} de reintegro, ${base.texto}`;
       }
       if (mejorPropia) opciones.push(mejorPropia);
       filas.push({ nombre: "Vos", iniciales: null, esVos: true, detalle });
@@ -325,7 +349,7 @@ export function recomendarGrupo(
       iniciales: c?.iniciales ?? null,
       esVos: false,
       detalle: mejor
-        ? `${aprox(mejor.reintegro)} si paga ${nombreC}`
+        ? `${aprox(mejor.reintegro)} si paga ${nombreC} · ${mejor.base.texto}`
         : s?.tieneCompras
           ? "Sin reintegro en esta compra"
           : `Sin reintegro en esta compra · ${nombreC} no tiene compras registradas: sin base`,

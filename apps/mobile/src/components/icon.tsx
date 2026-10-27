@@ -64,6 +64,7 @@ export const iconoDeRubro: Record<Rubro, IconName> = {
   farmacia: "farmacia",
   indumentaria: "indumentaria",
   hogar: "hogar",
+  otro: "comercio",
 };
 
 type Props = {

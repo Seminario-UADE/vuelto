@@ -58,11 +58,6 @@ function red<T>(valor: T): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(valor), demoraMs));
 }
 
-const SIN_COMPRAS_MES = {
-  tipo: "sin-compras" as const,
-  texto: "Sin compras registradas este mes: todavía no podemos estimar cuánto te queda.",
-};
-
 function comercioPorId(id: string): Comercio {
   const c = catalogoComercios.find((x) => x.id === id);
   if (!c) throw new Error(`Comercio desconocido: ${id}`);
@@ -109,54 +104,23 @@ export async function getComercio(id: string): Promise<Comercio> {
 }
 
 export async function recomendar(comercioId: string, monto: number | null): Promise<Recomendacion> {
-  const r = servidor.recomendar(comercioPorId(comercioId), monto);
-  if (escenario === "mes-vacio" && r.resultado === "recomendado") {
-    return red({ ...r, topeDisponible: null, base: SIN_COMPRAS_MES, topeDespues: null });
-  }
-  return red(r);
-}
-
-export async function getTopes(): Promise<ResumenTopes> {
-  const t = servidor.topes();
-  if (escenario === "mes-vacio") {
-    return red({
-      ...t,
-      devolvieron: { monto: 0, base: SIN_COMPRAS_MES },
-      mediosConTope: 0,
-      medios: t.medios.map((m) => ({
-        ...m,
-        disponible: null,
-        estado: "sin-base" as const,
-        base: SIN_COMPRAS_MES,
-        consejo: null,
-      })),
-    });
-  }
-  return red(t);
+  return red(servidor.recomendar(comercioPorId(comercioId), monto, { sinCompras: escenario === "mes-vacio" }));
 }
 
 function todasLasCompras(): Compra[] {
-  if (escenario === "mes-vacio") return getSesion().comprasNuevas;
-  return [...getSesion().comprasNuevas, ...comprasOctubre];
+  const nuevas = getSesion().comprasNuevas;
+  return escenario === "mes-vacio" ? nuevas : [...nuevas, ...comprasOctubre];
+}
+
+export async function getTopes(): Promise<ResumenTopes> {
+  return red(servidor.topes(todasLasCompras(), { sinCompras: escenario === "mes-vacio" }));
 }
 
 export async function getCompras(origen: OrigenCompra | "todas" = "todas"): Promise<ResumenCompras> {
   const todas = todasLasCompras();
-  const devuelto = todas.reduce((s, c) => s + (c.reintegro ?? 0), 0);
   return red({
     mes: MES,
-    devolvieron: {
-      monto: devuelto,
-      base:
-        todas.length === 0
-          ? SIN_COMPRAS_MES
-          : {
-              tipo: "compras",
-              cantidad: todas.length,
-              periodo: "mes",
-              texto: `según ${todas.length} ${todas.length === 1 ? "compra" : "compras"} de ${MES}`,
-            },
-    },
+    devolvieron: servidor.devolvieron(todas),
     compras: origen === "todas" ? todas : todas.filter((c) => c.origen === origen),
   });
 }
@@ -194,18 +158,19 @@ export async function guardarCompra(b: BorradorCompra): Promise<Compra> {
       id: `libre-${nombre.toLowerCase()}`,
       nombre,
       inicial: nombre.charAt(0).toUpperCase(),
-      rubro: "supermercado" as const,
+      // Fuera del catálogo no conocemos el rubro: no se inventa, y no se estima reintegro.
+      rubro: "otro" as const,
       frecuente: false,
     };
-  const r = servidor.recomendar(comercio, b.monto);
   const compra: Compra = {
     id: `n${Date.now()}`,
     comercio,
     fecha: b.fecha,
     monto: b.monto,
     medio,
-    reintegro: r.medio?.id === medio.id ? r.reintegro : null,
+    reintegro: servidor.reintegroDeCompra(comercio, b.monto, medio.id),
     origen: b.modo,
+    textoExtraido: b.textoExtraido,
   };
   setSesion({ comprasNuevas: [compra, ...getSesion().comprasNuevas] });
   return red(compra);
@@ -217,8 +182,13 @@ export async function getContactos(): Promise<Contacto[]> {
   return red([...contactos, ...aceptados].filter((c) => !contactosQuitados.includes(c.id)));
 }
 
+let generadas = 0;
+
+/** Cada llamada genera un link nuevo (el anterior deja de servir en el servidor). */
 export async function crearInvitacion(): Promise<Invitacion> {
-  return red({ link: invitacionPropia.link, venceEn: invitacionPropia.venceEn, usoUnico: true });
+  generadas += 1;
+  const link = generadas === 1 ? invitacionPropia.link : `${invitacionPropia.link.slice(0, -2)}${generadas}q`;
+  return red({ link, venceEn: invitacionPropia.venceEn, usoUnico: true });
 }
 
 /** Quién invita en cada token de ejemplo (en el servidor sale de `ver_invitacion`). */

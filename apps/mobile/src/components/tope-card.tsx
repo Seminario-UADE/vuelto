@@ -37,7 +37,7 @@ export function TopeResumen({ t }: { t: TopeMedio }) {
         </Text>
       </View>
       <EstadoBadge t={t} />
-      {t.disponible === null ? (
+      {t.disponible === null || t.base.tipo !== "compras" ? (
         <Text variant="label" tone="inkSecondary">
           Sin compras {t.periodo === "semana" ? "esta semana" : "este mes"}: todavía no podemos estimar
         </Text>
@@ -56,7 +56,9 @@ export function TopeResumen({ t }: { t: TopeMedio }) {
         </View>
       )}
       <View style={{ flex: 1 }} />
-      {t.disponible !== null ? <TopeBar disponible={t.disponible} nominal={t.nominal} estado={t.estado} /> : null}
+      {t.disponible !== null && t.base.tipo === "compras" ? (
+        <TopeBar disponible={t.disponible} nominal={t.nominal} estado={t.estado} />
+      ) : null}
       <Text variant="label" tone="inkSecondary">
         {t.base.tipo === "compras" ? t.base.texto : t.promo}
       </Text>
@@ -99,7 +101,7 @@ export function TopeDetalle({ t }: { t: TopeMedio }) {
           <EstadoBadge t={t} />
         </View>
         <View style={{ alignItems: "flex-end", maxWidth: "45%" }}>
-          {t.disponible !== null && t.estado !== "agotado" ? (
+          {t.disponible !== null && t.base.tipo === "compras" && t.estado !== "agotado" ? (
             <Text variant="titleMd" weight="bold" tabular>
               {aprox(t.disponible)}
             </Text>
@@ -110,7 +112,7 @@ export function TopeDetalle({ t }: { t: TopeMedio }) {
           </Text>
         </View>
       </View>
-      {t.disponible === null ? (
+      {t.disponible === null || t.base.tipo !== "compras" ? (
         <View style={{ padding: space.md, borderRadius: radius.row, backgroundColor: colors.canvas }}>
           <Text variant="bodyMd" tone="inkSecondary">
             {t.base.texto}

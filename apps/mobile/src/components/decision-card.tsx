@@ -3,7 +3,7 @@ import { View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { colors, radius, space } from "@/theme";
 import { Avatar } from "./avatar";
-import { Icon } from "./icon";
+import { Icon, type IconName } from "./icon";
 import { Text } from "./text";
 
 type Props = {
@@ -13,6 +13,8 @@ type Props = {
   inicial?: string | null;
   /** Una línea de razón ("20% en supermercados los miércoles"). */
   razon?: string | null;
+  /** Ícono de la razón: check cuando aplica una promo, info cuando no. */
+  razonIcon?: IconName;
   /** La cifra (display). `clave` cambia cuando cambia el valor, para el cruce de opacidad. */
   cifra?: { etiqueta: string; valor: string; clave: string } | null;
   /** Dato secundario junto a la cifra ("Te sale ≈$19.600"). */
@@ -29,7 +31,7 @@ type Props = {
  * La tarjeta de decisión: la única superficie oscura de la app y solo donde hay una
  * decisión (auditoría P1 #2). Orden fijo: respuesta → razón → cifra → tope → base.
  */
-export function DecisionCard({ titulo, inicial, razon, cifra, secundaria, tope, base, children, accessibilityLabel }: Props) {
+export function DecisionCard({ titulo, inicial, razon, razonIcon = "checkCirculo", cifra, secundaria, tope, base, children, accessibilityLabel }: Props) {
   return (
     <View
       style={{
@@ -55,7 +57,7 @@ export function DecisionCard({ titulo, inicial, razon, cifra, secundaria, tope, 
         </View>
         {razon ? (
           <View style={{ flexDirection: "row", alignItems: "flex-start", gap: space.sm }}>
-            <Icon name="checkCirculo" size={20} color={colors.onDecisionAccent} />
+            <Icon name={razonIcon} size={20} color={colors.onDecisionAccent} />
             <Text variant="bodyMd" style={{ flex: 1, color: colors.onDecision }}>
               {razon}
             </Text>

@@ -23,8 +23,10 @@ export function Toast() {
   return (
     <View pointerEvents="none" style={{ position: "absolute", top: insets.top + space.sm, left: space.gutter, right: space.gutter }}>
       <Animated.View
-        entering={FadeInUp.duration(200)}
-        exiting={FadeOutUp.duration(150)}
+        // En web las animaciones de layout dependen de requestAnimationFrame; el aviso no
+        // puede quedar invisible si la pestaña no pinta frames.
+        entering={process.env.EXPO_OS === "web" ? undefined : FadeInUp.duration(200)}
+        exiting={process.env.EXPO_OS === "web" ? undefined : FadeOutUp.duration(150)}
         accessibilityLiveRegion="polite"
         accessibilityRole="alert"
         style={{
