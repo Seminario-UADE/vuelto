@@ -14,6 +14,9 @@ import type {
   MedioDePago,
   OrigenCompra,
   PedidoGrupo,
+  PedidoRecomendar,
+  PromocionCatalogo,
+  RespuestaRecomendar,
   Perfil,
   Recomendacion,
   RecomendacionGrupo,
@@ -22,8 +25,11 @@ import type {
   VistaInvitacion,
 } from "./contracts";
 import {
+  CATEGORIA_DE_RUBRO,
+  DIA_HOY,
   HOY,
   MES,
+  promos,
   catalogoComercios,
   catalogoMedios,
   comprasOctubre,
@@ -35,6 +41,9 @@ import {
   usuario,
 } from "./fixtures";
 import * as servidor from "./servidor-simulado";
+import { aVista } from "./vista-recomendacion";
+
+const DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
 import { getSesion, setSesion } from "./sesion";
 
 /** Escenarios para probar estados vacíos y de error (solo desarrollo). */
@@ -103,8 +112,41 @@ export async function getComercio(id: string): Promise<Comercio> {
   return red(comercioPorId(id));
 }
 
+/** Catálogo de promociones (lectura con RLS) para nombrar lo que el motor devuelve por id. */
+function promocionesCatalogo(): PromocionCatalogo[] {
+  return promos.map((p) => ({
+    id: p.id,
+    titulo: p.titulo,
+    bancoId: catalogoMedios.find((m) => m.id === p.medioId)?.banco ?? "",
+    categoriaId: CATEGORIA_DE_RUBRO[p.rubro] ?? 0,
+  }));
+}
+
+/**
+ * Cliente de `POST /functions/v1/recomendar`. Hoy responde el mock con la forma exacta de la
+ * Edge Function; para conectarla, esta función pasa a ser
+ * `supabase.functions.invoke("recomendar", { body: pedido })` (y el mock se borra).
+ */
+async function invocarRecomendar(pedido: PedidoRecomendar): Promise<RespuestaRecomendar> {
+  return red(servidor.recomendar(pedido, { sinCompras: escenario === "mes-vacio" }));
+}
+
 export async function recomendar(comercioId: string, monto: number | null): Promise<Recomendacion> {
-  return red(servidor.recomendar(comercioPorId(comercioId), monto, { sinCompras: escenario === "mes-vacio" }));
+  const comercio = comercioPorId(comercioId);
+  if (comercio.categoriaId === null) throw new Error("No conocemos el rubro de este comercio");
+  const pedido: PedidoRecomendar = {
+    comercio: comercio.nombre,
+    categoriaId: comercio.categoriaId,
+    monto: monto !== null && monto > 0 ? monto : null,
+    canal: "presencial",
+  };
+  const respuesta = await invocarRecomendar(pedido);
+  return aVista(pedido, respuesta, comercio, {
+    medios: mediosDeclarados,
+    promociones: promocionesCatalogo(),
+    mes: MES,
+    dia: `hoy ${DIAS[DIA_HOY]}`,
+  });
 }
 
 function todasLasCompras(): Compra[] {
@@ -160,6 +202,7 @@ export async function guardarCompra(b: BorradorCompra): Promise<Compra> {
       inicial: nombre.charAt(0).toUpperCase(),
       // Fuera del catálogo no conocemos el rubro: no se inventa, y no se estima reintegro.
       rubro: "otro" as const,
+      categoriaId: null,
       frecuente: false,
     };
   const compra: Compra = {

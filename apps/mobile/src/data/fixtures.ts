@@ -89,11 +89,33 @@ export const mediosDeclarados: MedioDePago[] = [
   medios.macro,
 ];
 
+/** Rubro de la app → id de categoría de MODO (packages/motor/src/categorias.ts). */
+export const CATEGORIA_DE_RUBRO: Record<Rubro, number | null> = {
+  supermercado: 1,
+  gastronomia: 2,
+  indumentaria: 3,
+  farmacia: 4,
+  combustible: 5,
+  hogar: 7,
+  otro: null,
+};
+
+/** Nombre en minúsculas, como lo usan las plantillas del motor (motivos.ts). */
+export const NOMBRE_CATEGORIA: Record<number, string> = {
+  1: "supermercados",
+  2: "gastronomía",
+  3: "indumentaria",
+  4: "farmacias, perfumerías y peluquerías",
+  5: "combustibles",
+  7: "hogar",
+};
+
 const comercio = (id: string, nombre: string, rubro: Rubro, frecuente: boolean): Comercio => ({
   id,
   nombre,
   inicial: nombre.charAt(0),
   rubro,
+  categoriaId: CATEGORIA_DE_RUBRO[rubro],
   frecuente,
 });
 
@@ -126,6 +148,8 @@ export const nombreRubro: Record<Rubro, string> = {
 
 /** Promo vigente de cada medio declarado (corpus de MODO simplificado). */
 export type PromoFixture = {
+  id: string;
+  titulo: string;
   medioId: string;
   rubro: Rubro;
   porcentaje: number;
@@ -142,6 +166,8 @@ export type PromoFixture = {
 
 export const promos: PromoFixture[] = [
   {
+    id: "promo-galicia-super-mie",
+    titulo: "Galicia: 20% en supermercados los miércoles",
     medioId: medios.galicia.id,
     rubro: "supermercado",
     porcentaje: 20,
@@ -154,6 +180,8 @@ export const promos: PromoFixture[] = [
     reinicio: `se reinicia el ${REINICIO_MENSUAL}`,
   },
   {
+    id: "promo-santander-nafta-jue",
+    titulo: "Santander: 15% en combustibles los jueves",
     medioId: medios.santander.id,
     rubro: "combustible",
     porcentaje: 15,
@@ -166,6 +194,8 @@ export const promos: PromoFixture[] = [
     reinicio: `se reinicia el ${REINICIO_MENSUAL}`,
   },
   {
+    id: "promo-provincia-gastro-sab",
+    titulo: "Provincia: 25% en gastronomía los sábados",
     medioId: medios.provincia.id,
     rubro: "gastronomia",
     porcentaje: 25,
@@ -178,6 +208,8 @@ export const promos: PromoFixture[] = [
     reinicio: "se reinicia el lunes",
   },
   {
+    id: "promo-macro-farmacias",
+    titulo: "Macro: 15% en farmacias todos los días",
     medioId: medios.macro.id,
     rubro: "farmacia",
     porcentaje: 15,

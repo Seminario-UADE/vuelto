@@ -81,6 +81,9 @@ mientras recarga (la cifra no parpadea al tipear el monto).
 - `servidor-simulado.ts`: **reemplazo temporal** de las Edge Functions. Arma la recomendación para
   cualquier monto mientras no existe el endpoint. Lo importa solo `api.ts`, tiene tests y se borra
   con #43/#45 y #56 (excepción al Principio II aprobada por el PO en la spec 006).
+- `vista-recomendacion.ts`: traduce la respuesta real de la Edge Function `recomendar`
+  (forma del motor: ids, `motivo`, `base.comprasRegistradas`) a lo que pintan las pantallas.
+  No calcula: nombra ids con los catálogos y arma el texto de la base.
 - `api.ts`: las funciones que usan las pantallas, con la firma del cliente real
   (`02-api-routes.md`). Para conectar el backend se cambia solo el cuerpo de cada función.
 - Escenarios de prueba (solo desarrollo, en Perfil): mes sin compras y ticket ilegible, para ver los

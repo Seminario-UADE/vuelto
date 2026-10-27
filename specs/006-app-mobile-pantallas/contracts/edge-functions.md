@@ -1,4 +1,8 @@
-# Contratos cliente ↔ servidor (previstos)
+# Contratos cliente ↔ servidor
+
+> Actualizado el 27/10/2026: al traer `main`, `recomendar` ya tenía contrato real
+> (`specs/004-recomendar-pantalla/contracts/recomendar.md`). La app lo consume tal cual y
+> lo traduce a la vista; el resto sigue siendo previsto.
 
 La app llama a estas funciones de `src/data/api.ts`. Hoy devuelven fixtures; cuando existan las Edge
 Functions (#40, #43/#45, #56) cambia solo el cuerpo de cada función. Tipos en `../data-model.md`.
@@ -6,7 +10,7 @@ Todas usan el JWT del usuario (ADR-008 §4); ninguna usa la service role key.
 
 | Función del cliente | Endpoint previsto | Request | Response |
 |---|---|---|---|
-| `recomendar(comercioId, monto)` | `POST /functions/v1/recomendar` | `{ comercioId: string; monto: number \| null }` | `Recomendacion` |
+| `recomendar(comercioId, monto)` | `POST /functions/v1/recomendar` (**ya existe**, #43) | `{ comercio, categoriaId, monto, canal }`; `monto: null` es la extensión pendiente | `RespuestaRecomendar` (forma del motor), traducida a la vista por `vista-recomendacion.ts` |
 | `getComerciosFrecuentes()` | `GET` sobre `perfil_comercio` (RLS del dueño) | — | `Comercio[]` |
 | `buscarComercios(q)` | `GET` sobre `comercio` | `{ q: string }` | `Comercio[]` |
 | `getTopes()` | `POST /functions/v1/topes` | — | `ResumenTopes` |

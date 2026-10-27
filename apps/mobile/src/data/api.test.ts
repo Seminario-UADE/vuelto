@@ -32,13 +32,13 @@ describe("recomendar", () => {
     const r = await api.recomendar("coto", 24500);
     expect(r.reintegro).toBe(4900);
     expect(r.teSale).toBe(19600);
-    expect(r.topeDespues).toEqual({ disponible: 1600, estado: "queda-poco" });
+    expect(r.topeDespues).toEqual({ disponible: 1600 });
   });
 
   it("el reintegro nunca supera el tope disponible", async () => {
     const r = await api.recomendar("coto", 100000);
     expect(r.reintegro).toBe(6500);
-    expect(r.topeDespues).toEqual({ disponible: 0, estado: "agotado" });
+    expect(r.topeDespues).toEqual({ disponible: 0 });
   });
 
   it("monto cero o vacío no produce '≈$0'", async () => {
@@ -47,27 +47,24 @@ describe("recomendar", () => {
     expect(r.reintegro).toBeNull();
   });
 
-  it("alternativas con motivo, sin preseleccionar nada", async () => {
+  it("como la Edge Function, solo evalúa las promos del rubro: en Coto no hay otras opciones", async () => {
     const r = await api.recomendar("coto", null);
-    const motivos = Object.fromEntries(r.alternativas.map((a) => [a.medio.nombreCorto, a.motivo]));
-    expect(motivos.Santander).toBe("sin promo en supermercados");
-    expect(motivos.Provincia).toBe("sin promo en supermercados");
-    expect(motivos.Macro).toBe("sin promo en supermercados");
+    expect(r.alternativas).toEqual([]);
   });
 
   it("YPF un miércoles: sin promo hoy y dice cuándo sí", async () => {
     const r = await api.recomendar("ypf", null);
     expect(r.resultado).toBe("sin-promo");
     expect(r.medio).toBeNull();
-    expect(r.proximaPromo).toBe("Santander Mastercard crédito: 15% los jueves");
+    expect(r.proximaPromo).toBe("Santander Mastercard crédito: la promo es los jueves");
   });
 
   it("Farmacity: Macro tiene el tope agotado y no se recomienda", async () => {
     const r = await api.recomendar("farmacity", 8000);
     expect(r.resultado).toBe("sin-promo");
-    const macro = r.alternativas.find((a) => a.medio.nombreCorto === "Macro");
+    const macro = r.alternativas.find((a) => a.titulo === "Macro Visa débito");
     expect(macro?.estado).toBe("agotado");
-    expect(macro?.motivo).toContain("vuelve el 1/11");
+    expect(macro?.motivo).toBe("Tope agotado según 2 compras de octubre");
   });
 });
 
@@ -186,20 +183,19 @@ describe("hallazgos de rules-guardian", () => {
     expect(t.devolvieron.base.texto).toBe("según 11 compras de octubre");
   });
 
-  it("mes vacío: el reintegro no se recorta con un tope sin base", async () => {
+  it("mes vacío: el tope entero, sin cifra de tope a la vista", async () => {
     api.setEscenario("mes-vacio");
     const r = await api.recomendar("coto", 100000);
     expect(r.topeDisponible).toBeNull();
     expect(r.base?.tipo).toBe("sin-compras");
-    expect(r.reintegro).toBe(20000);
+    // Sin compras, el motor toma el tope nominal completo ($10.000).
+    expect(r.reintegro).toBe(10000);
     expect(r.topeDespues).toBeNull();
   });
 
   it("'tope agotado' dice su base", async () => {
     const r = await api.recomendar("farmacity", null);
-    expect(r.alternativas.find((a) => a.estado === "agotado")?.motivo).toBe(
-      "tope agotado según 2 compras de octubre · vuelve el 1/11",
-    );
+    expect(r.alternativas.find((a) => a.estado === "agotado")?.motivo).toBe("Tope agotado según 2 compras de octubre");
   });
 
   it("en el grupo, cada reintegro estimado lleva su base", async () => {

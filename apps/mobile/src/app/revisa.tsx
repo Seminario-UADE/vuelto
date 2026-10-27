@@ -62,8 +62,8 @@ export default function Revisa() {
     const r = rec.datos;
     if (!r) return null;
     if (r.medio?.id === id) return r.razon;
-    const a = r.alternativas.find((x) => x.medio.id === id);
-    return a ? (a.estado === "agotado" ? a.motivo.replace(/^t/, "T") : "Sin promo hoy") : null;
+    const a = r.alternativas.find((x) => x.medioId === id);
+    return a ? a.motivo : null;
   };
 
   const listo = medioId !== null && monto !== null && comercio.trim() !== "";

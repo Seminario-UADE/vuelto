@@ -1,6 +1,10 @@
 /**
  * Forma de las respuestas que la app espera del servidor (Edge Functions y tablas con RLS).
  *
+ * Dos capas: (1) el contrato real de la Edge Function `recomendar`, copiado de
+ * `packages/motor/src/tipos.ts` (la app no puede importar el motor, constitución §II), y
+ * (2) los tipos de vista que pintan las pantallas, que arma `vista-recomendacion.ts`.
+ *
  * Es la vista del cliente: lo que se le muestra al usuario, nunca el input del motor
  * (ADR-008 §4). Todo campo es requerido; lo ausente es `null` explícito (Principio III).
  * Dinero: enteros en pesos. Fechas: ISO `YYYY-MM-DD`.
@@ -47,13 +51,92 @@ export type Comercio = {
   nombre: string;
   inicial: string;
   rubro: Rubro;
+  /** Id de categoría de MODO (`categorias` en Supabase). `null` fuera del catálogo. */
+  categoriaId: number | null;
   frecuente: boolean;
 };
 
-export type Alternativa = {
-  medio: MedioDePago;
+// ─── Contrato real: POST /functions/v1/recomendar ──────────────────────────────
+// Fuente: specs/004-recomendar-pantalla/contracts/recomendar.md y
+// packages/motor/src/tipos.ts. Mantener idéntico.
+
+export type Canal = "presencial" | "online";
+
+/**
+ * Pedido a la Edge Function. `monto: null` es una EXTENSIÓN PROPUESTA (respuesta en un toque,
+ * auditoría v5 P1 #1): hoy la Edge Function exige `monto > 0`. Con `null`, el servidor
+ * devolvería `ahorroEstimado: 0` y en `topeRestanteTrasCompra` el tope disponible antes de la
+ * compra. Hasta que se acepte, la app usa el mock cuando no hay monto.
+ */
+export type PedidoRecomendar = {
+  comercio: string | null;
+  categoriaId: number;
+  monto: number | null;
+  canal: Canal;
+};
+
+export type BaseEstimacion = {
+  comprasRegistradas: number;
+  comprasSinDescuentoInformado: number;
+};
+
+export type PromocionAplicada = {
+  promocionId: string;
+  ahorroEstimado: number;
+  topeRestanteTrasCompra: number | null;
+  base: BaseEstimacion | null;
+};
+
+export type OpcionDePago = {
+  medioDePagoId: string;
+  ahorroEstimado: number;
+  promociones: PromocionAplicada[];
+  /** Plantilla del motor, nunca de un LLM. */
   motivo: string;
-  estado: "no-aplica" | "agotado" | "sin-promo";
+};
+
+export type CausaDescarte =
+  | "categoria"
+  | "comercio"
+  | "vigencia"
+  | "dia"
+  | "canal"
+  | "jurisdiccion"
+  | "monto_minimo"
+  | "medio_de_pago"
+  | "tope_agotado";
+
+export type Descarte = {
+  promocionId: string;
+  causa: CausaDescarte;
+  base: BaseEstimacion | null;
+  motivo: string;
+};
+
+export type RespuestaRecomendar = {
+  mejor: OpcionDePago | null;
+  alternativas: OpcionDePago[];
+  descartadas: Descarte[];
+};
+
+/** Promoción del catálogo (lectura con RLS), para nombrar lo que el motor devuelve por id. */
+export type PromocionCatalogo = {
+  id: string;
+  titulo: string;
+  bancoId: string;
+  categoriaId: number;
+};
+
+// ─── Vista: lo que pintan las pantallas ───────────────────────────────────────
+
+/** Otra opción de pago o una promo que no aplica, ya con nombre. */
+export type Alternativa = {
+  /** Medio del usuario al que corresponde, si se puede saber. */
+  medioId: string | null;
+  titulo: string;
+  inicial: string;
+  motivo: string;
+  estado: "otra-opcion" | "no-aplica" | "agotado";
 };
 
 export type Recomendacion = {
@@ -62,9 +145,9 @@ export type Recomendacion = {
   dia: string;
   resultado: "recomendado" | "sin-promo";
   medio: MedioDePago | null;
+  /** El `motivo` del motor. */
   razon: string | null;
-  porcentaje: number | null;
-  /** Tope disponible antes de la compra (estimado). */
+  /** Tope disponible antes de la compra (estimado). Solo sin monto y con base. */
   topeDisponible: number | null;
   base: Base | null;
   /** Eco del monto pedido. */
@@ -72,9 +155,10 @@ export type Recomendacion = {
   /** Solo con monto. */
   reintegro: number | null;
   teSale: number | null;
-  topeDespues: { disponible: number; estado: EstadoTope } | null;
+  /** Solo con monto y con base. */
+  topeDespues: { disponible: number } | null;
   alternativas: Alternativa[];
-  /** Para `sin-promo`: cuándo sí hay ("Santander Mastercard: 15% los jueves"). */
+  /** Para `sin-promo`: la promo que aplica otro día ("Santander Mastercard crédito: Hoy no aplica: …"). */
   proximaPromo: string | null;
 };
 

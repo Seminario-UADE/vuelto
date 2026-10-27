@@ -22,7 +22,7 @@ export function RecomendacionCard({ r, children }: { r: Recomendacion; children?
           r.proximaPromo
             ? `Cuándo sí: ${r.proximaPromo}`
             : agotado
-              ? `${agotado.medio.nombre}: ${agotado.motivo}`
+              ? `${agotado.titulo}: ${agotado.motivo}`
               : "Pagá con el medio que prefieras."
         }
       >
@@ -49,10 +49,10 @@ export function RecomendacionCard({ r, children }: { r: Recomendacion; children?
       tope={
         r.topeDespues
           ? {
-              texto: `Te quedan ${aprox(r.topeDespues.disponible)} de tope después de esta compra${
-                r.topeDespues.estado === "queda-poco" ? " · Queda poco" : r.topeDespues.estado === "agotado" ? " · Lo agotás" : ""
-              }`,
-              quedaPoco: r.topeDespues.estado !== "disponible",
+              texto:
+                r.topeDespues.disponible === 0
+                  ? "Con esta compra agotás el tope"
+                  : `Te quedan ${aprox(r.topeDespues.disponible)} de tope después de esta compra`,
             }
           : null
       }
@@ -68,13 +68,13 @@ export function AlternativaRow({ a }: { a: Alternativa }) {
   return (
     <View
       accessible
-      accessibilityLabel={`${a.medio.nombre}: ${a.motivo}`}
+      accessibilityLabel={`${a.titulo}: ${a.motivo}`}
       style={{ flexDirection: "row", alignItems: "center", gap: space.md, paddingVertical: space.sm }}
     >
-      <Avatar letras={a.medio.inicial} size={32} />
+      <Avatar letras={a.inicial} size={32} />
       <View style={{ flex: 1 }}>
         <Text variant="bodyMd" weight="semibold">
-          {a.medio.nombre}
+          {a.titulo}
         </Text>
         <Text variant="label" style={{ color: a.estado === "agotado" ? colors.error : colors.inkSecondary }}>
           {a.motivo}

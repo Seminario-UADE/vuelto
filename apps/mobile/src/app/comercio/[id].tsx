@@ -101,7 +101,7 @@ export default function ConQuePagar() {
               <SectionHeader title={r.medio ? "Otras opciones" : "Tus medios hoy"} />
               <Card padding={space.lg} gap={0}>
                 {r.alternativas.map((a, i) => (
-                  <View key={a.medio.id} style={{ borderTopWidth: i ? 1 : 0, borderColor: colors.divider }}>
+                  <View key={`${a.titulo}-${i}`} style={{ borderTopWidth: i ? 1 : 0, borderColor: colors.divider }}>
                     <AlternativaRow a={a} />
                   </View>
                 ))}

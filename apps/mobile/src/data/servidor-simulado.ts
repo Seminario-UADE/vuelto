@@ -10,15 +10,18 @@
  * La recomendación real sale de `@vuelto/motor`, que corre en el servidor.
  */
 import type {
-  Alternativa,
+  BaseEstimacion,
   Compra,
+  Descarte,
+  OpcionDePago,
+  PedidoRecomendar,
+  RespuestaRecomendar,
   Base,
   Comercio,
   EstadoTope,
   FilaIntegrante,
   IntegranteGrupo,
   MedioDePago,
-  Recomendacion,
   RecomendacionGrupo,
   ResumenTopes,
   TopeMedio,
@@ -33,6 +36,8 @@ import {
   contactos,
   mediosDeclarados,
   nombreRubro,
+  CATEGORIA_DE_RUBRO,
+  NOMBRE_CATEGORIA,
   promos,
   type PromoFixture,
 } from "./fixtures";
@@ -89,104 +94,49 @@ function porcentajeTexto(p: PromoFixture): string {
 /** Escenario "mes sin compras": ningún tope tiene base. */
 export type Opciones = { sinCompras?: boolean };
 
-export function recomendar(comercio: Comercio, monto: number | null, op: Opciones = {}): Recomendacion {
-  const montoValido = monto !== null && monto > 0 ? monto : null;
-  const candidatos: { medio: MedioDePago; promo: PromoFixture; disp: number | null }[] = [];
-  const alternativas: Alternativa[] = [];
-  let proximaPromo: string | null = null;
+/** Plantilla de `motivoOpcion` del motor: "20% en supermercados los miércoles". */
+function motivoOpcion(p: PromoFixture): string {
+  const categoria = NOMBRE_CATEGORIA[CATEGORIA_DE_RUBRO[p.rubro] ?? -1] ?? "esta categoría";
+  return `${p.porcentaje}% en ${categoria}${p.dias ? ` ${p.diasTexto}` : ""}`;
+}
 
+function baseMotor(p: PromoFixture, op: Opciones): BaseEstimacion {
+  return { comprasRegistradas: op.sinCompras ? 0 : p.comprasEnPeriodo, comprasSinDescuentoInformado: 0 };
+}
+
+/**
+ * Simula `POST /functions/v1/recomendar`: misma forma que `recomendar()` del motor
+ * (specs/004-recomendar-pantalla/contracts/recomendar.md). Como la Edge Function, solo evalúa
+ * las promos del rubro pedido. Sin compras en el período, el motor toma el tope entero.
+ */
+export function recomendar(pedido: PedidoRecomendar, op: Opciones = {}): RespuestaRecomendar {
+  const opciones: OpcionDePago[] = [];
+  const descartadas: Descarte[] = [];
   for (const medio of mediosDeclarados) {
     const promo = promoDe(medio);
-    if (!promo || promo.rubro !== comercio.rubro) {
-      alternativas.push({
-        medio,
-        motivo: `sin promo en ${nombreRubro[comercio.rubro]}`,
-        estado: "sin-promo",
-      });
-      continue;
-    }
-    const disp = op.sinCompras ? null : disponible(promo);
+    if (!promo || CATEGORIA_DE_RUBRO[promo.rubro] !== pedido.categoriaId) continue;
+    const base = baseMotor(promo, op);
+    const disp = op.sinCompras ? promo.nominal : (disponible(promo) ?? promo.nominal);
     if (!aplicaHoy(promo)) {
-      alternativas.push({
-        medio,
-        motivo: `hoy no aplica, la promo es ${promo.diasTexto}`,
-        estado: "no-aplica",
-      });
-      proximaPromo ??= `${medio.nombre}: ${promo.porcentaje}% ${promo.diasTexto}`;
+      descartadas.push({ promocionId: promo.id, causa: "dia", base: null, motivo: `Hoy no aplica: la promo es ${promo.diasTexto}` });
       continue;
     }
     if (disp === 0) {
-      alternativas.push({
-        medio,
-        motivo: `tope agotado ${baseDe(promo).texto} · ${promo.reinicio}`,
-        estado: "agotado",
-      });
+      descartadas.push({ promocionId: promo.id, causa: "tope_agotado", base, motivo: "Tope agotado" });
       continue;
     }
-    candidatos.push({ medio, promo, disp });
+    const ahorro = pedido.monto === null ? 0 : Math.min(Math.round((pedido.monto * promo.porcentaje) / 100), disp);
+    opciones.push({
+      medioDePagoId: medio.id,
+      ahorroEstimado: ahorro,
+      promociones: [{ promocionId: promo.id, ahorroEstimado: ahorro, topeRestanteTrasCompra: disp - ahorro, base }],
+      motivo: motivoOpcion(promo),
+    });
   }
-
-  // Mayor reintegro estimado; sin monto, mayor porcentaje y después mayor tope disponible.
-  const valor = (c: (typeof candidatos)[number]) =>
-    montoValido === null
-      ? c.promo.porcentaje * 1e6 + (c.disp ?? c.promo.nominal)
-      : Math.min((montoValido * c.promo.porcentaje) / 100, c.disp ?? c.promo.nominal);
-  candidatos.sort((a, b) => valor(b) - valor(a));
-  const [elegido, ...resto] = candidatos;
-  for (const c of resto) {
-    alternativas.unshift({ medio: c.medio, motivo: "te devuelve menos en esta compra", estado: "no-aplica" });
-  }
-
-  const dia = `hoy ${NOMBRE_DIA[DIA_HOY]}`;
-  if (!elegido) {
-    return {
-      comercio,
-      dia,
-      resultado: "sin-promo",
-      medio: null,
-      razon: null,
-      porcentaje: null,
-      topeDisponible: null,
-      base: null,
-      monto: montoValido,
-      reintegro: null,
-      teSale: null,
-      topeDespues: null,
-      alternativas,
-      proximaPromo,
-    };
-  }
-
-  const { medio, promo, disp } = elegido;
-  let reintegro: number | null = null;
-  let teSale: number | null = null;
-  let topeDespues: Recomendacion["topeDespues"] = null;
-  if (montoValido !== null) {
-    const bruto = Math.round((montoValido * promo.porcentaje) / 100);
-    reintegro = disp === null ? bruto : Math.min(bruto, disp);
-    teSale = montoValido - reintegro;
-    if (disp !== null) {
-      const queda = disp - reintegro;
-      topeDespues = { disponible: queda, estado: estadoTope(queda, promo.nominal) };
-    }
-  }
-
-  return {
-    comercio,
-    dia,
-    resultado: "recomendado",
-    medio,
-    razon: porcentajeTexto(promo),
-    porcentaje: promo.porcentaje,
-    topeDisponible: disp,
-    base: op.sinCompras ? baseSinCompras(promo) : baseDe(promo),
-    monto: montoValido,
-    reintegro,
-    teSale,
-    topeDespues,
-    alternativas,
-    proximaPromo: null,
-  };
+  const pct = (o: OpcionDePago) => promos.find((p) => p.id === o.promociones[0]?.promocionId)?.porcentaje ?? 0;
+  opciones.sort((x, y) => y.ahorroEstimado - x.ahorroEstimado || pct(y) - pct(x));
+  const [mejor = null, ...alternativas] = opciones;
+  return { mejor, alternativas, descartadas };
 }
 
 export function topes(compras: Compra[], op: Opciones = {}): ResumenTopes {
@@ -261,9 +211,9 @@ export function devolvieron(compras: Compra[]): { monto: number; base: Base } {
 
 /** Reintegro estimado que el servidor le asigna a una compra registrada. */
 export function reintegroDeCompra(comercio: Comercio, monto: number, medioId: string): number | null {
-  if (comercio.rubro === "otro") return null;
-  const r = recomendar(comercio, monto);
-  return r.medio?.id === medioId ? r.reintegro : null;
+  if (comercio.categoriaId === null) return null;
+  const r = recomendar({ comercio: comercio.nombre, categoriaId: comercio.categoriaId, monto, canal: "presencial" });
+  return r.mejor?.medioDePagoId === medioId ? r.mejor.ahorroEstimado : null;
 }
 
 export function recomendarGrupo(
