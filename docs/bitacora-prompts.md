@@ -1116,6 +1116,50 @@ compañero al aprobar el PR #71.
 
 ---
 
+## 2026-10-27 — Explicar por qué se recomienda cada medio de pago (issue #46)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** que cada recomendación y cada promo descartada digan con
+claridad por qué, con los textos del diseño, y dejarle a la pantalla los
+datos para armar el "¿por qué no X?". Es una issue chica: va sin spec-kit.
+
+**Prompts principales:**
+1. "Tenemos que trabajar en las issues #46, #48, #10 y #55. Fijate si hay
+   alguna que podamos ir tomando." Las issues #48, #10 y #55 están
+   bloqueadas por tareas de otros compañeros; se arrancó con la issue #46,
+   solo la parte del motor, porque la pantalla depende de las issues #43 y
+   #39.
+2. "Hacé las tres cosas como las proponés": que la recomendación diga
+   cuánto tope queda después de la compra y en qué se basa, en el mismo
+   texto; que los descartes usen el tono del diseño, sin el "Descartada:"
+   de la issue; y que cada descarte diga a qué medios de pago del usuario
+   le servía la promo.
+3. "¿Existe alguna promo con tope de $0?" No existe en la realidad: solo
+   puede venir de un error del extractor. "Arreglalo en el origen: si
+   aparece, es un error y no hay que tomarla como promoción."
+4. "Avanzá con los arreglos de la revisión y sumalos a la bitácora."
+
+**Resultado:**
+- La recomendación ahora dice, por ejemplo, "20% en supermercados los
+  miércoles · te quedan ≈$1.600 de tope, según 3 compras de octubre". Si no
+  hay compras registradas no da cifra, y si la compra usa todo el tope lo
+  avisa.
+- Los descartes dicen, por ejemplo, "Hoy no aplica, la promo es los
+  sábados" o "Tope agotado este mes, según 2 compras".
+- Cada descarte trae los medios de pago del usuario a los que aplicaba la
+  promo, así la pantalla muestra "¿por qué no X?" sin calcular nada.
+- Una promo con tope de $0 o negativo ya no se publica: la regla de
+  publicación la toma como un error de lectura.
+- Se actualizó el ejemplo del contrato de la Edge Function (spec 004).
+- La revisión de código no encontró incumplimientos de las reglas; se
+  ajustaron nombres, un comentario y un caso que faltaba testear. 192
+  tests del motor y 40 de la Edge Function en verde.
+- Queda pendiente: la pantalla del "¿por qué no X?" (issue #43) y avisar
+  en la issue #51 que el extractor no publique topes de $0.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

@@ -3,7 +3,7 @@
  * «Mis topes» (issue #45). Reutiliza los saldos de la issue #37. Contrato:
  * `specs/005-motor-estimar-topes/contracts/`.
  */
-import { aCentavos, aPesos, pesos } from "./dinero.ts";
+import { aCentavos, aPesos } from "./dinero.ts";
 import { mediosCompatibles, vigenteEn } from "./elegibilidad.ts";
 import {
   diaMesSinCeros,
@@ -11,8 +11,8 @@ import {
   fechaArgentina,
   finDelPeriodo,
   inicioDelPeriodo,
-  nombreDelMes,
 } from "./fecha.ts";
+import { cifraDeTope, estePeriodo, textoSegun } from "./motivos.ts";
 import { compararIds } from "./orden.ts";
 import { calcularSaldos, type Saldo } from "./tope.ts";
 import type { Compra, EstimacionTope, Perfil, Promocion, TextoEstimacion } from "./tipos.ts";
@@ -70,8 +70,6 @@ export function estimarTopes(
     .map((e) => e.estimacion);
 }
 
-/** Centavos de una centena de pesos: la cifra se redondea hacia abajo a la centena (FR-009). */
-const CENTAVOS_POR_CENTENA = 100 * 100;
 /** "Queda poco" con el 20% del tope o menos (DESIGN.md §5, FR-008). */
 const PORCENTAJE_QUEDA_POCO = 20;
 
@@ -85,28 +83,22 @@ export function formatearEstimacion(estimacion: EstimacionTope): TextoEstimacion
   const restante = aCentavos(estimacion.restante);
   const tope = aCentavos(estimacion.tope);
   const compras = estimacion.base.comprasRegistradas;
-  const semanal = estimacion.periodo.tipo === "semanal";
-  const segun = `según ${compras} ${compras === 1 ? "compra" : "compras"} ${
-    semanal ? "de esta semana" : `de ${nombreDelMes(estimacion.periodo.desde)}`
-  }`;
+  const segun = textoSegun(compras, estimacion.periodo.tipo, estimacion.periodo.desde);
 
   if (restante === 0) {
     const vuelve = diaMesSinCeros(diaSiguiente(estimacion.periodo.hasta));
     return { estado: "agotado", cifra: null, base: `${segun} · vuelve el ${vuelve}` };
   }
   if (compras === 0) {
-    const cuando = semanal ? "esta semana" : "este mes";
     return {
       estado: "sin_compras",
       cifra: null,
-      base: `Sin compras registradas ${cuando}: todavía no podemos estimar cuánto te queda.`,
+      base: `Sin compras registradas ${estePeriodo(estimacion.periodo.tipo)}: todavía no podemos estimar cuánto te queda.`,
     };
   }
-  // Hacia abajo a la centena: nunca mostrar más tope del que queda.
-  const centenas = Math.floor(restante / CENTAVOS_POR_CENTENA) * 100;
   return {
     estado: restante * 100 <= tope * PORCENTAJE_QUEDA_POCO ? "queda_poco" : "disponible",
-    cifra: centenas === 0 ? "menos de $100" : `≈${pesos(centenas)}`,
+    cifra: cifraDeTope(restante),
     base: segun,
   };
 }

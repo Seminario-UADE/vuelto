@@ -190,8 +190,9 @@ describe("recomendar: US3", () => {
       {
         promocionId: "promo-galicia",
         causa: "tope_agotado",
+        mediosDePagoIds: ["galicia-credito-visa"],
         base: { comprasRegistradas: 1, comprasSinDescuentoInformado: 0 },
-        motivo: "Tope agotado",
+        motivo: "Tope agotado este mes, según 1 compra",
       },
     ]);
   });
@@ -312,7 +313,13 @@ describe("recomendar: períodos del tope (issue #37, US1)", () => {
   it("tope por compra de $0: descarte por tope agotado sin base (FR-015)", () => {
     const r = recomendar(compra(), perfil(), [conTope(0, "por_compra")], [], AHORA);
     expect(r.descartadas).toEqual([
-      { promocionId: "promo-galicia", causa: "tope_agotado", base: null, motivo: "Tope agotado" },
+      {
+        promocionId: "promo-galicia",
+        causa: "tope_agotado",
+        mediosDePagoIds: ["galicia-credito-visa"],
+        base: null,
+        motivo: "Tope agotado",
+      },
     ]);
   });
 });
@@ -508,6 +515,45 @@ describe("recomendar: topes compartidos (issue #37, US3)", () => {
     const compras = [compraRegistrada({ promocionId: "coto", descuentoObtenido: 3000 })];
     const r = recomendar(enDia(50000), perfil(), [coto(5000, vencida), dia(10000)], compras, AHORA);
     expect(unica(r.mejor)).toMatchObject({ promocionId: "dia", ahorroEstimado: 7000, topeRestanteTrasCompra: 0 });
+  });
+});
+
+describe("recomendar: motivos (issue #46)", () => {
+  const conTope = promo({ tope: { monto: 5000, periodo: "mensual", alcance: null, grupoTopeId: null } });
+
+  it("el motivo dice cuánto tope queda tras la compra, con su base", () => {
+    const compras = [compraRegistrada({ descuentoObtenido: 1000 })];
+    const r = recomendar(compra(), perfil(), [conTope], compras, AHORA);
+    expect(r.mejor?.motivo).toBe("20% en supermercados · te quedan ≈$2.000 de tope, según 1 compra de octubre");
+  });
+
+  it("sin compras en el período, el motivo no da cifra de tope", () => {
+    const r = recomendar(compra(), perfil(), [conTope], [], AHORA);
+    expect(r.mejor?.motivo).toBe(
+      "20% en supermercados · sin compras registradas este mes, todavía no podemos estimar cuánto tope te queda",
+    );
+  });
+
+  it("cada descarte trae los medios del usuario a los que aplicaba la promo, ordenados", () => {
+    const debito = medio({ id: "galicia-debito-visa", tipo: "debito" });
+    const sabados = promo({
+      tarjetas: { debito: ["visa"], credito: ["visa"] },
+      vigencia: { desde: "2026-10-01", hasta: "2026-10-31", dias: ["sab"] },
+    });
+    const r = recomendar(compra(), perfil([debito, galicia]), [sabados, promoSantander], [], AHORA);
+    expect(r.descartadas.map((d) => [d.promocionId, d.mediosDePagoIds, d.motivo])).toEqual([
+      ["promo-galicia", ["galicia-credito-visa", "galicia-debito-visa"], "Hoy no aplica, la promo es los sábados"],
+      ["promo-santander", [], "La promo es para un banco o una tarjeta que no tenés en tu perfil"],
+    ]);
+  });
+
+  it("una promo de otro banco descartada por otra causa también trae la lista vacía", () => {
+    const santanderSabados = promo({
+      ...promoSantander,
+      vigencia: { desde: "2026-10-01", hasta: "2026-10-31", dias: ["sab"] },
+    });
+    const r = recomendar(compra(), perfil([galicia]), [santanderSabados], [], AHORA);
+    expect(r.descartadas.map((d) => [d.causa, d.mediosDePagoIds])).toEqual([["dia", []]]);
   });
 });
 

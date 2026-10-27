@@ -50,11 +50,17 @@ mensajes de la base ni trazas.
         "base": { "comprasRegistradas": 2, "comprasSinDescuentoInformado": 0 }
       }
     ],
-    "motivo": "…"
+    "motivo": "20% en Kansas · te quedan ≈$7.000 de tope, según 2 compras de octubre"
   },
   "alternativas": [],
   "descartadas": [
-    { "promocionId": "promo-viernes", "causa": "dia", "base": null, "motivo": "…" }
+    {
+      "promocionId": "promo-viernes",
+      "causa": "dia",
+      "mediosDePagoIds": ["mp-galicia-credito-visa"],
+      "base": null,
+      "motivo": "Hoy no aplica, la promo es los viernes"
+    }
   ]
 }
 ```
