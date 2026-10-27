@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
@@ -80,7 +80,10 @@ export default function Escanear() {
         <View style={{ width: size.hit }} />
       </View>
 
-      <View style={{ flex: 1, justifyContent: "center", paddingHorizontal: space.section, gap: space.lg }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center", paddingHorizontal: space.section, gap: space.lg }}
+      >
         <View
           accessible
           accessibilityLabel="Visor con un ticket de ejemplo de Coto por 24.500 pesos"
@@ -96,10 +99,10 @@ export default function Escanear() {
             <View style={{ height: 1, backgroundColor: colors.divider, marginVertical: space.xs }} />
             {LINEAS.map(([item, precio]) => (
               <View key={item} style={{ flexDirection: "row", justifyContent: "space-between", gap: space.sm }}>
-                <Text variant="caption" tone="inkSecondary" numberOfLines={1} style={{ flex: 1 }}>
+                <Text variant="caption" tone="inkSecondary" numberOfLines={1} maxFontSizeMultiplier={1.3} style={{ flex: 1 }}>
                   {item}
                 </Text>
-                <Text variant="caption" tabular>
+                <Text variant="caption" tabular maxFontSizeMultiplier={1.3}>
                   {pesos(precio)}
                 </Text>
               </View>
@@ -151,7 +154,7 @@ export default function Escanear() {
             </Text>
           </View>
         )}
-      </View>
+      </ScrollView>
 
       <View
         style={{

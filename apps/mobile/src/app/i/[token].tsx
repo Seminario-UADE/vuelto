@@ -39,7 +39,7 @@ export default function AceptarInvitacion() {
   // Quien abre el link sin perfil pasa primero por el onboarding y vuelve acá al terminar.
   useEffect(() => {
     if (!perfil.onboardingCompleto) {
-      void guardarPerfilLocal({ invitacionPendiente: token }).then(() => router.replace("/"));
+      void guardarPerfilLocal({ invitacionPendiente: token }).then(() => router.replace("/bienvenida"));
     }
   }, [perfil.onboardingCompleto, token]);
 

@@ -1,9 +1,20 @@
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
+import { Text } from "react-native";
 import { Icon, type IconName } from "@/components/icon";
+import { usePerfilLocal } from "@/data/perfil-local";
 import { colors, floatingShadow, fonts } from "@/theme";
 
 const tab = (title: string, icon: IconName) => ({
   title,
+  // Como la tab bar del sistema: la etiqueta casi no escala (se cortaría con texto grande).
+  tabBarLabel: ({ focused }: { focused: boolean }) => (
+    <Text
+      maxFontSizeMultiplier={1.15}
+      style={{ fontFamily: fonts.medium, fontSize: 12, lineHeight: 16, color: focused ? colors.ink : colors.inkSecondary }}
+    >
+      {title}
+    </Text>
+  ),
   tabBarIcon: ({ focused }: { focused: boolean }) => (
     <Icon name={icon} activo={focused} color={focused ? colors.ink : colors.inkSecondary} />
   ),
@@ -14,6 +25,9 @@ const tab = (title: string, icon: IconName) => ({
  * fondo Blanco Hueso con sombra flotante, activo en Verde Bosque (research R2).
  */
 export default function TabsLayout() {
+  const { perfil } = usePerfilLocal();
+  // Sin onboarding completo, la app arranca en Bienvenida (FR-002).
+  if (!perfil.onboardingCompleto) return <Redirect href="/bienvenida" />;
   return (
     <Tabs
       screenOptions={{

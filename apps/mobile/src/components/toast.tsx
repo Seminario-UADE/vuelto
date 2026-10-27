@@ -1,5 +1,7 @@
 import { useEffect } from "react";
+import type { ReactNode } from "react";
 import { View } from "react-native";
+import { FullWindowOverlay } from "react-native-screens";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { setSesion, useSesion } from "@/data/sesion";
@@ -21,6 +23,7 @@ export function Toast() {
   }, [aviso]);
   if (!aviso) return null;
   return (
+    <Capa>
     <View pointerEvents="none" style={{ position: "absolute", top: insets.top + space.sm, left: space.gutter, right: space.gutter }}>
       <Animated.View
         // En web las animaciones de layout dependen de requestAnimationFrame; el aviso no
@@ -45,5 +48,11 @@ export function Toast() {
         </Text>
       </Animated.View>
     </View>
+    </Capa>
   );
+}
+
+/** En iOS el stack nativo tapa las vistas hermanas: el aviso va en una capa de ventana completa. */
+function Capa({ children }: { children: ReactNode }) {
+  return process.env.EXPO_OS === "ios" ? <FullWindowOverlay>{children}</FullWindowOverlay> : <>{children}</>;
 }

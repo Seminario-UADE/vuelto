@@ -30,7 +30,8 @@ export function Screen({ children, footer, kind = "stack", aboveTabBar, gap = sp
   return (
     <View style={{ flex: 1, backgroundColor: colors.canvas }}>
       <ScrollView
-        contentInsetAdjustmentBehavior={kind === "stack" ? "automatic" : "never"}
+        style={{ flex: 1 }}
+        contentInsetAdjustmentBehavior={kind === "tab" ? "never" : "automatic"}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive"
         {...scrollProps}

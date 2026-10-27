@@ -57,6 +57,7 @@ export function Button({ label, onPress, variant = "primary", disabled, loading,
           variant="bodyLg"
           weight="semibold"
           align="center"
+          maxFontSizeMultiplier={1.6}
           style={{ color: inactivo && relleno ? colors.inkSecondary : tinta }}
         >
           {label}

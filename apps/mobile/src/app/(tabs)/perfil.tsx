@@ -42,7 +42,7 @@ export default function Perfil() {
   const cerrarSesion = async () => {
     reiniciarSesion();
     await borrarPerfilLocal();
-    router.replace("/");
+    router.replace("/bienvenida");
   };
 
   return (

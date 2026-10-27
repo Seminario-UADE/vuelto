@@ -103,6 +103,21 @@ export const type = {
 
 export type TypeVariant = keyof typeof type;
 
+/**
+ * Tope de escala por nivel con Dynamic Type. El texto escala siempre, pero a los tamaños
+ * de accesibilidad (hasta ×3,1 en iOS) los títulos y cifras grandes se frenan antes para
+ * no cortar palabras al medio (verificado en el simulador con el texto más grande).
+ */
+export const maxFontScale: Record<TypeVariant, number> = {
+  display: 1.4,
+  titleLg: 1.6,
+  titleMd: 1.8,
+  bodyLg: 2,
+  bodyMd: 2,
+  label: 2,
+  caption: 2,
+};
+
 /** Grilla de 4 pt. */
 export const space = {
   xs: 4,
