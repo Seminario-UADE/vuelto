@@ -1,21 +1,19 @@
 <!--
 Sync Impact Report
-- Versión: 1.0.0 → 2.0.0 (MAJOR: se redefine el Principio II)
+- Versión: 2.0.0 → 2.0.1 (PATCH: aclaración del Principio I)
 - Principios modificados:
-  - II. "Motor de reglas determinístico": "Corre en el dispositivo sin red" pasa a
-    "función pura sin llamadas de red propias, ejecutada exclusivamente por la Edge
-    Function; la app Expo no lo importa". El "Por qué" deja de citar el uso offline.
-- Secciones agregadas: ninguna. Secciones eliminadas: ninguna.
-- Decisión de origen: ADR-001 §Actualización (13/10/2026) y RNF-02 de
-  docs/product/requisitos.md (no hace falta un ADR nuevo: ya está actualizado).
+  - I. "Regla de oro": se aclara qué es una compra concreta. Es un comercio elegido en un
+    momento dado; el monto es opcional y solo refina el estimado. Sin monto, la respuesta
+    sigue siendo una decisión sobre esa compra, no un listado.
+- Decisión de origen: auditoría de pantallas v5, P1 #1 (docs/design/auditoria-pantallas-v5.md),
+  aprobada por el PO en la spec 006 (specs/006-app-mobile-pantallas).
 - Archivos alineados:
-  ✅ CLAUDE.md (tabla Stack)
-  ✅ docs/architecture/00-overview.md (§1, tabla Stack, flujo de datos)
-  ✅ docs/decisions/001-motor-de-reglas-paquete-separado.md (notas de "superado" en Rationale y Consequences)
-  ✅ docs/product/privacidad.md (ya no cita la issue #42, cerrada como obsoleta)
-  ✅ .specify/templates/*: sin referencias al principio, no requieren cambios
-  ✅ specs/001-perfil-billeteras: no depende del motor en el dispositivo
+  ✅ specs/006-app-mobile-pantallas/spec.md (§Enmienda de constitución)
+  ✅ .specify/templates/*: sin referencias, no requieren cambios
 - Pendientes: ninguno.
+
+Versión anterior (2.0.0): MAJOR que redefinió el Principio II (el motor corre solo en la Edge
+Function; la app Expo no lo importa). Ver ADR-001 §Actualización y RNF-02.
 -->
 
 # Constitución de Vuelto
@@ -31,8 +29,9 @@ Vuelto recomienda **qué medio de pago usar en una compra concreta** y controla 
 reintegro queda**.
 
 - Una funcionalidad que se pueda describir como "mostrar promociones" NO entra al producto.
-- Ninguna pantalla muestra promociones si no hay una compra concreta (dónde y cuánto) que
-  evaluar.
+- Ninguna pantalla muestra promociones si no hay una compra concreta que evaluar. Una compra
+  concreta es un comercio elegido en un momento dado (dónde y cuándo). El monto (cuánto) es
+  opcional: solo refina el estimado.
 - Toda spec DEBE explicar qué decisión del usuario resuelve.
 
 **Por qué:** el problema no es la falta de información sino la decisión (`docs/product/problema.md`).
@@ -146,4 +145,4 @@ tiempo.
 - La guía operativa del día a día está en `CLAUDE.md`. Si contradice a esta constitución, se
   corrige `CLAUDE.md`.
 
-**Version**: 2.0.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-10-15
+**Version**: 2.0.1 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-10-16

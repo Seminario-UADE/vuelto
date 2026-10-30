@@ -60,9 +60,14 @@ Reglas:
 - **El color nunca es la única señal.** Todo estado (agotado, hoy no aplica,
   pendiente) lleva texto o ícono además del color.
 - **Sin negro puro**, sin degradés, sin brillos, sin sombras oscuras.
-- **Una superficie oscura por pantalla, y casi todas la tienen**: la
-  tarjeta de decisión en Recomendación y Grupo, la acción rápida en Inicio,
-  el resumen del mes en Topes. Es el ancla visual de la pantalla.
+- **La superficie oscura marca la decisión, y solo la decisión** (auditoría
+  v5 P1 #2): la respuesta en Inicio cuando hay un comercio elegido, Con qué
+  pagar, Primera respuesta y Gasto en grupo. Topes, Mis compras, Perfil,
+  Invitar, Armar grupo, el onboarding y los sheets usan Lino con el número
+  en display. Si todo es hero, nada lo es.
+- **Solo modo claro.** La app declara `userInterfaceStyle: "light"`. En
+  código los colores se usan siempre como tokens semánticos
+  (`apps/mobile/src/theme.ts`), nunca como hex sueltos.
 
 ## 3. Tipografía
 
@@ -114,13 +119,21 @@ del estimado en label. Una por pantalla, nunca más.
   registradas este mes: todavía no podemos estimar cuánto te queda."
 - La barra de progreso termina en un **tramo rayado** (no sólido) para marcar
   que el valor es estimado. Nunca porcentajes sueltos ("74% libre").
-- Estados: disponible (Salvia), casi agotado ≤20% (Ocre + texto "Queda
-  poco"), agotado (Óxido + texto "Tope agotado").
+- Estados: disponible (Salvia), casi agotado ≤30% del tope (Ocre + texto
+  "Queda poco"), agotado (Óxido + texto "Tope agotado"). El estado lo decide
+  el servidor.
+- **Nunca un total agregado de topes** ("Te quedan ≈$8.800", "Tope total
+  del mes"): los topes son por medio y por promo, y no se pueden sumar
+  (auditoría v5 P1 #4). Como resumen sirve "2 medios con tope disponible".
+- La cuenta regresiva dice a qué periodo aplica: "Los mensuales se
+  reinician en 18 días"; los semanales, en su fila ("se reinicia el lunes").
 
 **Botón primario**
-Píldora Salvia `#4A6B53`, texto Blanco Hueso 17 px/600, alto 56 pt, ancho
-completo. **Uno solo por pantalla**, fijo encima de la tab bar o al pie del
-sheet. Al tocar: escala 0.98 y vuelve. Texto con verbo y resultado
+Píldora Salvia `#4A6B53`, texto Blanco Hueso 17 px/600, alto mínimo 56 pt
+(crece con el texto grande), ancho completo, **una sola línea** ("Usar
+Galicia", no "Usar Galicia Visa crédito" con un chip adentro). **Uno solo
+por pantalla**, en un pie fijo que reserva su alto al final del contenido:
+nada queda tapado. Al tocar: escala 0.98 y vuelve. Texto con verbo y resultado
 ("Confirmar compra", "Ver con qué pagar"). Nunca "Pagar": Vuelto no procesa
 pagos.
 
@@ -154,8 +167,8 @@ aplica", "Tope agotado"). Máximo uno por fila. Nada de badges decorativos
 - *El color comunica, no decora*: Salvia = recomendado/activo, Ocre =
   queda poco, Óxido = agotado/error, Champán = detalle sobre oscuro. Nada
   más lleva color.
-- *Píldora de ahorro*: "≈$4.900" dentro del botón primario o junto al
-  título, en Salvia clara con texto Verde Bosque.
+- *Píldora de ahorro*: "≈$4.900" junto al título o en la tarjeta, en
+  Salvia clara con texto Verde Bosque. Nunca dentro del botón primario.
 - *Cuenta regresiva*: "Se reinician en 17 días" como chip junto a los topes.
 - *Ticket dibujado*: miniatura ilustrada (líneas) del ticket escaneado.
 - *Consejo del día* (opcional, uno por pantalla): una frase que ayuda a
@@ -178,8 +191,14 @@ elevado. "Grupo" no es una pestaña: se entra desde Comprar ("¿Pagan entre
 varios?"). El contenido scrollea por **encima** de la tab bar: padding
 inferior = alto de la tab bar + safe area. Nada queda tapado.
 
-**Íconos**: Material Symbols Rounded, peso 400, 24 pt. Todo botón de solo
-ícono lleva etiqueta accesible.
+**Íconos**: SF Symbols en iOS y Material en Android, detrás de un único
+componente `<Icon>` con nombres semánticos (auditoría v5 P1 #6). 24 pt. Todo
+botón de solo ícono lleva etiqueta accesible. Las pantallas hijas usan el
+header nativo del stack: back y swipe del sistema.
+
+**Inicio**: sin campana de notificaciones hasta que exista la feature. Al
+tocar un comercio, la respuesta aparece en la misma pantalla; el monto es
+opcional y solo refina el estimado (auditoría v5 P1 #1).
 
 **Estados vacíos**: qué es + por qué está vacío + cómo empezar, con un
 botón. Ej. Inicio sin compras: "Todavía no registraste compras. Cuando
@@ -232,21 +251,29 @@ Glosario fijo:
 | **Revisá tu compra** | Confirmar ticket, Escaneo inteligente verificado |
 | **¿Con qué pagaste?** | Elegí el medio utilizado |
 
-- Toda cifra estimada lleva **≈** y su base.
+- Toda cifra estimada lleva **≈** y su base: reintegro, "te sale", tope
+  disponible, "te devolvieron" y la parte de cada uno en un grupo. No llevan
+  ≈ los montos de compra, los topes nominales ni lo que cargó el usuario.
+  Donde no hay reintegro se dice en texto ("sin promo", "sin reintegro"),
+  nunca "$0" ni "≈$0".
+- "Te devolvieron ≈$X" va en Topes y en Mis compras, no en todas las
+  pantallas.
 - Nunca porcentajes de confianza ("OCR 98%") ni promesas ("verificado",
   "óptimo garantizado", "+42% de retorno").
 - Sin emojis. Sin clichés ("inteligente", "potenciá", "maximizá").
 
 ## 9. Datos de ejemplo (únicos para todas las pantallas)
 
-Mes en curso: **octubre**. Usuario: **Martín**. Zona: CABA. Todas las promos
-vienen de MODO.
+Mes en curso: **octubre de 2026**; "hoy" es el **miércoles 14/10** (el 15
+es jueves) y los topes mensuales se reinician el 1/11, en 18 días.
+Usuario: **Martín**. Zona: CABA. Todas las promos vienen de MODO. "Te
+devolvieron ≈$15.200" se basa en 10 compras de octubre (9 con reintegro).
 
 Medios declarados:
 | Medio | Promo de ejemplo | Tope | Estado del tope |
 |---|---|---|---|
 | Galicia Visa crédito | 20% en supermercados, miércoles | $10.000 / mes | ≈$6.500 disponible, según 3 compras de octubre |
-| Santander Mastercard crédito | 15% en combustibles, jueves | $8.000 / mes | ≈$2.300 disponible, según 4 compras (queda poco) |
+| Santander Mastercard crédito | 15% en combustibles, jueves | $8.000 / mes | ≈$2.300 disponible, según 4 compras (queda poco: 29%) |
 | Provincia Visa débito | 25% en gastronomía, sábados | $5.000 / semana | Sin compras registradas esta semana |
 | Macro Visa débito | 15% en farmacias, todos los días | $6.000 / mes | Tope agotado, según 2 compras |
 
@@ -263,11 +290,13 @@ Gasto en grupo: **Cena del sábado, $41.000, 4 personas** (Martín, Lucía,
 Mateo, Sofía).
 - Que pague Mateo con su Provincia Visa débito → les devuelven ≈$5.000,
   "según las compras que registró Mateo" → cada uno pone ≈$9.000.
-- Lucía: "≈$0 · no tiene promo de gastronomía hoy" (sin nombrar sus medios)
-  y "Lucía no tiene compras registradas: sin base".
+- Lucía: "Sin reintegro en esta compra · Lucía no tiene compras
+  registradas: sin base" (sin nombrar sus medios ni su rubro).
 - Sofía: "Sin cuenta: no conocemos su tope".
-- Martín (vos): Santander Mastercard crédito, sin promo en gastronomía (los
-  medios propios sí se muestran).
+- Martín (vos): "Tu Provincia Visa débito: 25% los sábados, sin base esta
+  semana" (los medios propios sí se muestran). Pierde el desempate contra
+  Mateo porque el estimado de Mateo tiene base.
+- La fila propia dice "Vos", sin inicial (no se confunde con Mateo).
 
 Invitación de ejemplo: la genera Martín; link `vuelto.app/i/…` + QR,
 "Vence en 24 h · sirve una sola vez".
@@ -310,7 +339,9 @@ Medio sin cobertura (solo en onboarding): Mercado Pago, con la nota
   brillos, sombras oscuras, glassmorphism.
 - Cualquier color fuera de la tabla de la sección 2: colores de marca de
   bancos o comercios, azules, rojos, rosas, celestes, fondos pastel.
-- Emojis, Inter, serifas, fechas viejas ("Mayo 2024").
+- Emojis, Inter, serifas, fechas viejas ("Mayo 2024", "14/10/2024").
+- Campana de notificaciones; total agregado de topes; encabezados en
+  mayúsculas ("TE CONVIENE QUE PAGUE").
 - Medios sin promos en el corpus (Mercado Pago) mostrando topes o reintegros.
 - Badges decorativos y rótulos en mayúsculas encabezando cada bloque.
 - Teclado numérico con letras (ABC, DEF).
