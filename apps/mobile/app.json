@@ -53,6 +53,17 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "8e72b201-b23b-4e19-b4c9-5dccd886ad1e"
+      }
+    },
+    "owner": "joaconzs-team"
   }
 }
