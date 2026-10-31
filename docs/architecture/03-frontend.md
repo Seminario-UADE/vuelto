@@ -134,3 +134,21 @@ npm run start -w @vuelto/mobile        # Expo (QR para Expo Go)
 npm run web -w @vuelto/mobile          # verificación rápida en el navegador
 npm run lint && npm run typecheck && npm run test   # desde la raíz, como el CI
 ```
+
+## Publicación (sin computadora prendida)
+
+Proyecto de Expo: `joaconzs-team/vuelto` (`extra.eas.projectId` en `app.json`). Hace falta
+estar logueado (`npx eas-cli@latest login`) con una cuenta del equipo.
+
+| Qué | Para quién | Cómo se publica |
+|---|---|---|
+| **Web** en https://vuelto.expo.app (EAS Hosting) | Cualquier teléfono desde el navegador, incluido el jurado | `npx expo export --platform web` y después `npx eas-cli@latest deploy --prod` (desde `apps/mobile`) |
+| **APK de Android** (perfil `preview` de `eas.json`, distribución interna) | Android, app nativa | `npx eas-cli@latest build --platform android --profile preview`; el link de descarga queda en expo.dev |
+| Expo Go con el servidor local | Desarrollo, iPhone nativo | `npm run start -w @vuelto/mobile` (con `-- --tunnel` si no están en la misma red) |
+
+- En la web los íconos son Material (SF Symbols es solo iOS nativo) y los sheets se ven como
+  pantallas.
+- iPhone nativo sin computadora requiere una cuenta de Apple Developer (US$ 99/año), fuera del
+  costo $0 del proyecto.
+- Cada publicación sale de lo que haya en el directorio en ese momento: publicar desde `main`.
+
