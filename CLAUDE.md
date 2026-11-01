@@ -29,7 +29,7 @@ Monorepo con npm workspaces inicializado (issue #32). Requiere Node ≥ 22.13
 |---|---|
 | `packages/motor` (`@vuelto/motor`) | Motor de reglas: TS puro, sin `dependencies`, tests Vitest |
 | `apps/mobile` | Reservado — la app Expo la crea la issue #39 |
-| `supabase` (`@vuelto/supabase`) | Edge Functions (`functions/`: `recomendar` y `_shared/`, tests Vitest); migraciones y seed llegan con la issue #34. Los `functions/*/index.ts` corren en Deno: los chequea `deno check` en el CI, no `tsc` |
+| `supabase` (`@vuelto/supabase`) | Edge Functions (`functions/`: `recomendar` y `_shared/`, tests Vitest); `migrations/` (esquema con RLS), `seed.sql` y `tests/database/` (pgTAP, `supabase test db`). Los `functions/*/index.ts` corren en Deno: los chequea `deno check` en el CI, no `tsc` |
 | `ingesta` | Reservado — script de ingesta de MODO |
 
 Comandos (desde la raíz; recorren todos los workspaces, los mismos que corre el CI):
@@ -45,6 +45,10 @@ npm run build       # compilación TS a dist/ (no es build de Expo/EAS)
 El CI corre además `deno check` sobre cada `supabase/functions/*/index.ts`
 (job `deno-check`). A mano: `deno check --no-lock --config
 supabase/functions/recomendar/deno.json supabase/functions/recomendar/index.ts`.
+El job `supabase-rls` levanta Supabase local, hace `supabase db reset` dos
+veces y corre `supabase test db` (requiere Docker). A mano, lo mismo desde la
+raíz; si los puertos por defecto (54321-54329) están ocupados por otro
+proyecto de Supabase, hay que frenarlo o cambiarlos solo en tu copia local.
 
 Un solo workspace: `npm run test -w @vuelto/motor`. Tests en modo watch:
 `npx vitest` dentro de `packages/motor`. Un workspace nuevo se suma a
