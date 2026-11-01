@@ -1,22 +1,21 @@
 # API / routes
 
 Endpoints propios del backend: Edge Functions de Supabase en
-`supabase/functions/`. El resto del acceso a datos (perfil, registrar compra,
-historial, catálogos) lo hace la app directo con `supabase-js` y el RLS, sin
-código propio (ADR-009).
+`supabase/functions/`, **solo donde hay un secreto o datos de otros usuarios**
+(ADR-010). El resto del acceso a datos (perfil, registrar compra, historial,
+catálogos, corpus de promociones) lo hace la app directo con `supabase-js` y el
+RLS, sin código propio (ADR-009). La recomendación y los topes **no son
+endpoints**: los calcula la app con el motor (ADR-010, constitución §II).
 
 ## Endpoints
 
 | Endpoint | Issue | Qué hace | Contrato |
 |---|---|---|---|
-| `POST /functions/v1/recomendar` | #43 | Recomienda con qué medio pagar una compra concreta: junta medios, promos del rubro vigentes, compras del período (mes o semana, lo que empiece antes) y las promos de esas compras, y llama a `recomendar()` del motor | `specs/004-recomendar-pantalla/contracts/recomendar.md` |
-| `GET /functions/v1/topes` | #45 | Topes restantes del mes (pendiente) | — |
 | Extracción de ticket | #48 | Gemini sobre la imagen, sin guardarla (pendiente) | — |
-
-Estado de `recomendar`: handler, servicio, validación, autenticación y
-contrato de errores implementados y testeados con repositorios en memoria.
-Faltan los repositorios sobre Postgres, que dependen del esquema de la
-issue #34.
+| `POST /functions/v1/recomendar-grupo` | #54 | Gasto en grupo: lee datos de contactos vinculados (ADR-008 §4) y llama al motor (pendiente) | — |
+| Invitaciones | — | Edge Function y RPC `security definer` (ADR-008 §4) | — |
+| `POST /functions/v1/recomendar` | #43 | **Fuera del camino de la app (ADR-010 §5).** Implementada y testeada con repositorios en memoria (PR #71); no se sigue invirtiendo en ella y se borra o se reutiliza para el grupo | `specs/004-recomendar-pantalla/contracts/recomendar.md` |
+| `GET /functions/v1/topes` | #45 | **Descartado:** los topes los estima la app con el motor (`estimar…`) | — |
 
 ## Estructura de una Edge Function (ADR-009)
 
@@ -53,6 +52,13 @@ supabase/functions/
   importar `packages/motor`, fuera de `supabase/`).
 
 ## Qué consume la app (`apps/mobile/src/data/api.ts`)
+
+> **Estado objetivo (ADR-010).** La tabla de abajo describe la capa de datos
+> **de hoy**, que todavía llama a un mock con la forma de las Edge Functions
+> `recomendar` y `topes`. Con el plan de ADR-010, `recomendar` y `getTopes`
+> dejan de ser llamadas al servidor y pasan a ser selectores del store de
+> Redux que usan el motor; `api.ts` queda para lo que sí sale a la red
+> (Supabase directo, ticket, grupo, invitaciones).
 
 La app llama a cada endpoint desde una función de `api.ts`. Hoy responde un mock
 (`servidor-simulado.ts`) **con la misma forma** que el endpoint real; conectar un

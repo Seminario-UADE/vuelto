@@ -20,7 +20,7 @@ Atributos que necesita sí o sí (contexto §5):
 Campos ausentes en la fuente se guardan `null` explícito — nunca inferidos
 (ver regla en `CLAUDE.md`).
 
-El contrato de tipos que usan el motor, la ingesta y la Edge Function está
+El contrato de tipos que usan el motor, la app, la ingesta y las Edge Functions está
 en `packages/motor/src/tipos.ts` (issue #33). Decisiones que fija:
 
 - **Campos obligatorios para publicar** (RF-16): `bancoId`, `categoriaId`,

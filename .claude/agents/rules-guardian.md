@@ -32,9 +32,14 @@ narrowly focused on these seven rules, each with its failure mode:
 6. **RLS se escribe al crear la tabla, no después.** Any new Supabase
    migration or `CREATE TABLE` must have its `ENABLE ROW LEVEL SECURITY`
    and policies in the same migration file, not a follow-up one.
-7. **La app no importa el motor** (ADR-001 §Actualización, RNF-02).
-   `apps/mobile` must not list `@vuelto/motor` as a dependency nor import
-   it; the recommendation comes only from the Edge Function.
+7. **El motor corre en la app, y lo derivado no se guarda** (ADR-010,
+   constitución 3.0.0 §II). `apps/mobile` may import `@vuelto/motor`; the
+   recommendation and the topes are computed there, in memoized selectors over
+   the Redux state. Violations: a recommendation or tope stored in the Redux
+   store or in AsyncStorage instead of derived; a selector that reads the clock
+   (`new Date()`) instead of using the `ahora` in the store; anything that mixes
+   data of more than one user computed in the app (the group spend stays in an
+   Edge Function); a Gemini key or call in `apps/mobile`.
 
 ## Process
 

@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-16
 
-**Status**: Aprobada para implementar (revisada tras `spec-critic`)
+**Status**: Aprobada para implementar (revisada tras `spec-critic`). **Nota (01/11/2026):** FR-012 («la app NO calcula recomendaciones, reintegros ni topes») y la excepción del servidor simulado quedan superadas por el [ADR-010](../../docs/decisions/010-motor-en-la-app-y-redux.md): la app calcula con `@vuelto/motor` y guarda su estado en Redux. Las pantallas y el diseño no cambian.
 
 **Input**: Issue #39 ("App Expo base: navegación, tema de marca y cliente de Supabase") ampliada con las 18 pantallas de diseño de Vuelto (Stitch v5), conectadas entre sí y con las correcciones de `docs/design/auditoria-pantallas-v5.md` (P1 #1–#6, P2 #7–#18 y P3).
 

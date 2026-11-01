@@ -1,9 +1,9 @@
 # Frontend
 
 App mobile en `apps/mobile` (`@vuelto/mobile`): Expo SDK 58, React Native 0.88, Expo Router y
-TypeScript strict. Se prueba en Expo Go (QR) y no importa `@vuelto/motor`: el motor corre solo en la
-Edge Function (ADR-001 §Actualización, RNF-02). Spec, plan y decisiones:
-`specs/006-app-mobile-pantallas/`.
+TypeScript strict. Se prueba en Expo Go (QR). Por ADR-010 la app **importa `@vuelto/motor`** y calcula
+la recomendación y los topes en el dispositivo, sobre el estado de Redux (RNF-02); eso todavía no
+está implementado (ver «Estado»). Spec, plan y decisiones: `specs/006-app-mobile-pantallas/`.
 
 ## Dónde vive cada cosa
 
@@ -22,8 +22,10 @@ apps/mobile/
     └── theme.ts          el ÚNICO archivo con colores, tipografía, espacios y radios
 ```
 
-Regla: las pantallas (`src/app/`) componen componentes de `src/components/` con datos de
-`src/data/api.ts`. Ninguna pantalla ni componente calcula reintegros, topes ni recomendaciones.
+Regla: las pantallas (`src/app/`) componen componentes de `src/components/` con datos de los
+selectores del store (y de `src/data/api.ts` para lo que sale a la red). Ninguna pantalla ni
+componente calcula reintegros, topes ni recomendaciones por su cuenta: el cálculo vive en el motor,
+detrás de un selector.
 
 ## Navegación
 
@@ -73,8 +75,29 @@ Regla: las pantallas (`src/app/`) componen componentes de `src/components/` con 
 | Perfil del dispositivo (onboarding completo, medios, comercios, cuenta, invitación pendiente) | `src/data/perfil-local.ts` (AsyncStorage) | Persistente |
 | Sesión de Supabase | `src/lib/supabase.ts` (AsyncStorage) | Persistente (todavía sin uso) |
 
-No hay Redux ni React Query: con datos de ejemplo alcanza `useAsync`, que mantiene el dato anterior
-mientras recarga (la cifra no parpadea al tipear el monto).
+**Hoy** no hay Redux ni React Query: con datos de ejemplo alcanza `useAsync`, que mantiene el dato
+anterior mientras recarga (la cifra no parpadea al tipear el monto).
+
+### Estado objetivo: Redux Toolkit (ADR-010)
+
+Un solo store, con la recomendación y los topes **derivados** (nunca guardados):
+
+```
+slices:     sesion · perfil · corpus · compras · simulacion · contactos
+selectores: selectRecomendacion = createSelector(perfil, corpus, compras, simulacion, ahora)
+                                    → recomendar() del motor
+            selectTopes         = createSelector(corpus, compras, ahora) → estimar…() del motor
+```
+
+- Al tipear el monto cambia `simulacion.monto` y el selector vuelve a calcular en el dispositivo:
+  sin botón, sin debounce y sin red. El monto es opcional (`null`).
+- `ahora` es un valor del store (se actualiza al abrir la app y al cambiar de día), no
+  `new Date()` dentro del selector, para que el cálculo sea reproducible en los tests.
+- El corpus se sincroniza de forma incremental (`actualizada_en`) al abrir y al volver a primer
+  plano; la app muestra la fecha de la última sincronización. `perfil`, `corpus` y `compras` se
+  persisten en el dispositivo; `simulacion` no.
+- `sesion.ts` y `perfil-local.ts` se migran a los slices; mientras dure la migración, el slice
+  envuelve al módulo viejo (plan completo en ADR-010).
 
 ## Capa de datos
 
@@ -83,9 +106,10 @@ mientras recarga (la cifra no parpadea al tipear el monto).
   ver.
 - `fixtures.ts`: los datos de DESIGN.md §9 (Martín, octubre de 2026, reloj fijo en el miércoles
   14/10).
-- `servidor-simulado.ts`: **reemplazo temporal** de las Edge Functions. Arma la recomendación para
-  cualquier monto mientras no existe el endpoint. Lo importa solo `api.ts`, tiene tests y se borra
-  con #43/#45 y #56 (excepción al Principio II aprobada por el PO en la spec 006).
+- `servidor-simulado.ts`: **reemplazo temporal** del cálculo real. Arma la recomendación para
+  cualquier monto sobre los fixtures. Lo importa solo `api.ts`, tiene tests y se borra en el primer
+  paso del plan de ADR-010 (el motor real lo reemplaza; ya no hace falta la excepción al Principio II
+  de la spec 006).
 - `vista-recomendacion.ts`: traduce la respuesta real de la Edge Function `recomendar`
   (forma del motor: ids, `motivo`, `base.comprasRegistradas`) a lo que pintan las pantallas.
   No calcula: nombra ids con los catálogos y arma el texto de la base.

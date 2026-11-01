@@ -7,9 +7,10 @@ el tope de reintegro mensual consumido. No es un listado de promociones.
 
 1. **Motor de reglas** — paquete TypeScript propio, sin dependencias, con su
    propia suite de tests. Es una función pura sin llamadas de red propias y
-   lo ejecuta **exclusivamente una Edge Function** de Supabase; la app solo
-   manda la compra y pinta la respuesta (ADR-001 §Actualización, RNF-02).
-   Evalúa combinaciones válidas (medio de pago × compra
+   lo ejecuta **la app**, en el dispositivo y sin red, sobre el estado que
+   tiene en Redux: la recomendación se recalcula en vivo mientras se tipea el
+   monto. Lo que cruza datos de varios usuarios (gasto en grupo) lo ejecuta una
+   Edge Function (ADR-010, RNF-02). Evalúa combinaciones válidas (medio de pago × compra
    × tope ya consumido × jurisdicción × acumulabilidad) y devuelve la óptima.
    Es código **determinístico** — el LLM nunca entra acá.
 2. **Ingesta automática** — la letra chica de cada promoción viene en prosa
@@ -27,9 +28,9 @@ el tope de reintegro mensual consumido. No es un listado de promociones.
 
 | Pieza | Elección | Corre en |
 |---|---|---|
-| Motor de reglas | TypeScript, paquete propio | Servidor únicamente (Edge Function) |
-| Cliente mobile | Expo (React Native) | Dispositivo |
-| Backend / DB | Supabase (Postgres + Auth) | Servidor |
+| Motor de reglas | TypeScript, paquete propio | Dispositivo (app) y, para el grupo, Edge Function |
+| Cliente mobile | Expo (React Native) con Redux Toolkit | Dispositivo |
+| Backend / DB | Supabase (Postgres + Auth + RLS; Edge Functions solo para ticket, grupo e invitaciones) | Servidor |
 | Extractor | Gemini API | Servidor únicamente |
 | Ingesta / scraping | Playwright | Servidor (dónde exactamente: pendiente, ver `04-infrastructure.md`) |
 | Testing | Vitest (motor) + Expo Go (ejecución manual) | — |
@@ -42,9 +43,10 @@ Fuentes web (bancos/billeteras)
   → Supabase.capturas_crudas (contenido crudo)
   → Gemini extrae contra esquema (offline, batch)
   → validación automática de esquema (sin persona)
-  → base validada (Postgres)
-  → motor de reglas (Edge Function, server-side) ← perfil del usuario + tope consumido
-  → recomendación al usuario (la app la pinta)
+  → base validada (Postgres, corpus legible por los usuarios autenticados)
+  → sincronización incremental a la app (store de Redux)
+  → motor de reglas (en la app, selector memoizado) ← perfil + compras del período + monto que se tipea
+  → recomendación al usuario, recalculada en vivo
 
 Ticket fotografiado
   → Gemini extrae (Edge Function, server-side)
