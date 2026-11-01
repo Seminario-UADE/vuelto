@@ -1,5 +1,9 @@
 # ADR-001: Motor de reglas como paquete TypeScript separado
 
+> **Actualización del 13/10/2026 superada el 01/11/2026 por el
+> [ADR-010](010-motor-en-la-app-y-redux.md):** el motor vuelve a correr en la
+> app, con el estado en Redux. Lo demás de este ADR sigue vigente.
+
 ## Context
 
 La recomendación de medio de pago necesita ser instantánea y funcionar sin

@@ -104,6 +104,6 @@ Salen de la auditoría (spec-critic + rules-guardian, 15/10/2026).
 12. **Pago dividido** entre dos personas para aprovechar dos topes: ¿se
     recomienda?
 
-Prerrequisito independiente: la constitución (Principio II) dice que el
-motor corre en el dispositivo y RNF-02 / ADR-001 §Actualización dicen que
-corre solo en la Edge Function. `/speckit-plan` va a fallar hasta enmendarla.
+Prerrequisito independiente (resuelto): la constitución 3.0.0 (Principio II) y
+RNF-02, tras el ADR-010, dicen que la recomendación individual corre en la app y
+lo que cruza datos de varios usuarios, como el grupo, en una Edge Function.

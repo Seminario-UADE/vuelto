@@ -29,12 +29,20 @@
 - [ ] Proveedor/modelo del extractor, con salida estructurada
 - [ ] Dónde corre el cron de ingesta
 - [ ] Expo vs. Flutter formalmente (nivel real del equipo en TS/Dart)
-- [x] Estrategia de sincronización del corpus al dispositivo — **descartada**
-      (13/10/2026): el cálculo de recomendación/topes se movió a una Edge
-      Function del backend (issue #43, ADR-001 §Actualización), así que la
-      app ya no necesita el corpus de promociones ni las compras del usuario
-      sincronizados localmente. La issue #42, que originalmente diseñaba esta
-      sincronización, se cerró por eso.
+- [ ] Estrategia de sincronización del corpus al dispositivo — **reabierta**
+      (01/11/2026, ADR-010). El 13/10/2026 se había descartado porque el
+      cálculo se movió a una Edge Function (la issue #42 se cerró por eso);
+      ADR-010 devuelve el cálculo a la app, así que vuelve a hacer falta:
+      sincronización incremental por `actualizada_en`, al abrir y al volver a
+      primer plano (o descarga completa, ~2.000 filas, si la medición lo
+      permite). La issue #42 se reabrió y se reescribió; el store de Redux
+      es la #81.
+- [ ] Medir el tamaño real del corpus vigente de CABA/AMBA y decidir dónde
+      persistirlo en el dispositivo (AsyncStorage tiene un tope de 6 MB por
+      defecto en Android; alternativa: filtrar por los rubros y medios del
+      usuario, o `expo-sqlite`). Ver ADR-010 §Riesgos.
+- [ ] Verificar que Metro resuelve `@vuelto/motor` (paquete compilado a
+      `dist/`) dentro del monorepo, en Expo Go, en la web y en el APK de EAS.
 - [x] Retención de registros de compra en Supabase — ver `privacidad.md`:
       90 días desde la fecha de la compra, luego se eliminan. El borrado
       automático queda fuera de alcance del MVP (política declarada, sin job
