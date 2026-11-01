@@ -5,6 +5,8 @@
 -- La hora la pone la base: ignora lo que escriba el cliente. Si un update no
 -- cambia ningún valor (la ingesta reescribe lo mismo en cada corrida), la
 -- marca no se mueve y la app no vuelve a bajar el corpus.
+-- Ojo: compara toda la fila; si algún día se agrega una columna que cambia sola
+-- (contador, etc.), hay que excluirla de la comparación.
 create function public.set_actualizada_en()
 returns trigger
 language plpgsql
@@ -32,6 +34,13 @@ set search_path = ''
 as $$
   select cardinality(lista) = cardinality(array(select distinct e from unnest(lista) as e));
 $$;
+
+-- Las funciones auxiliares no son parte de la API: PostgREST las expondría como
+-- RPC a cualquier rol. Las evalúa el rol que escribe (service role / postgres).
+revoke execute on function public.sin_repetidos(text[]) from public, anon, authenticated;
+grant execute on function public.sin_repetidos(text[]) to service_role;
+revoke execute on function public.set_actualizada_en() from public, anon, authenticated;
+grant execute on function public.set_actualizada_en() to service_role;
 
 create table public.promociones (
   id uuid primary key default gen_random_uuid(),
@@ -67,6 +76,7 @@ create table public.promociones (
   -- así las compras conservan su referencia y la baja llega por sincronización.
   dada_de_baja_en timestamptz,
   creada_en timestamptz not null default now(),
+  -- clock_timestamp() y no now(): hora real de la escritura, no del inicio de la transacción.
   actualizada_en timestamptz not null default clock_timestamp(),
 
   unique (fuente, fuente_id),

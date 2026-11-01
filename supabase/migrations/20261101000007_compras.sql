@@ -32,7 +32,7 @@ create index compras_promocion_id_idx on public.compras (promocion_id);
 alter table public.compras enable row level security;
 
 revoke all on table public.compras from anon, authenticated;
--- La ingesta y el seed escriben con la service role (salta RLS, pero necesita el privilegio).
+-- La service role salta RLS pero necesita el privilegio (soporte, migraciones de datos).
 grant all on table public.compras to service_role;
 grant select, insert, update, delete on table public.compras to authenticated;
 

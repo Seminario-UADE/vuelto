@@ -15,7 +15,7 @@ create unique index comercios_habituales_usuario_nombre_idx
 alter table public.comercios_habituales enable row level security;
 
 revoke all on table public.comercios_habituales from anon, authenticated;
--- La ingesta y el seed escriben con la service role (salta RLS, pero necesita el privilegio).
+-- La service role salta RLS pero necesita el privilegio (soporte, migraciones de datos).
 grant all on table public.comercios_habituales to service_role;
 grant select, insert, update, delete on table public.comercios_habituales to authenticated;
 

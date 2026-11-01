@@ -62,8 +62,8 @@
 - [x] T023 [P] Actualizar `docs/architecture/01-data-models.md`: reemplazar «Sin migraciones definidas todavía» por el resumen del esquema real y un enlace a `supabase/migrations/` y a `specs/007-esquema-supabase-rls/data-model.md`; agregar `supabase/` al apartado de estado de `CLAUDE.md` (migraciones y seed ya existen) sin tocar el resto.
 - [x] T024 [P] Documentar en `specs/007-esquema-supabase-rls/quickstart.md` y en el README correspondiente cualquier ajuste surgido (servicios excluidos, nombres de comandos).
 - [x] T025 Correr `npm run lint`, `npm run typecheck` y `npm run test` desde la raíz para confirmar que nada del resto se rompió (y que `recomendar` está intacta: `git diff --stat main -- supabase/functions` vacío).
-- [ ] T026 Invocar `/code-review`, `test-runner` y `rules-guardian`; corregir lo que encuentren.
-- [ ] T027 Agregar la entrada de esta sesión a `docs/bitacora-prompts.md` (formato de las entradas existentes) y abrir el PR con `Closes #34`, listando las 5 decisiones adoptadas (medio con compras no se borra, captura referenciada no se borra, baja lógica de promos, normalización de comercios, forma de `capturas_crudas`) y la nota de que solo Galicia tiene id real sembrado.
+- [x] T026 Invocar `/code-review`, `test-runner` y `rules-guardian`; corregir lo que encuentren.
+- [x] T027 Agregar la entrada de esta sesión a `docs/bitacora-prompts.md` (formato de las entradas existentes) y abrir el PR con `Closes #34`, listando las 5 decisiones adoptadas (medio con compras no se borra, captura referenciada no se borra, baja lógica de promos, normalización de comercios, forma de `capturas_crudas`) y la nota de que solo Galicia tiene id real sembrado.
 
 ## Dependencias
 

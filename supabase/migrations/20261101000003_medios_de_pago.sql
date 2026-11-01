@@ -21,7 +21,7 @@ create index medios_de_pago_banco_id_idx on public.medios_de_pago (banco_id);
 alter table public.medios_de_pago enable row level security;
 
 revoke all on table public.medios_de_pago from anon, authenticated;
--- La ingesta y el seed escriben con la service role (salta RLS, pero necesita el privilegio).
+-- La service role salta RLS pero necesita el privilegio (soporte, migraciones de datos).
 grant all on table public.medios_de_pago to service_role;
 grant select, insert, update, delete on table public.medios_de_pago to authenticated;
 
