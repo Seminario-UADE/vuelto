@@ -1186,6 +1186,46 @@ pantallas de Stitch v5 conectadas entre sí, aplicando las correcciones de
 
 ---
 
+## 2026-11-01 — Estado de issues y versiones; motor en la app con Redux (ADR-010)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con la CLI `gh`.
+
+**Objetivo:** resumir el avance (issues, milestones, PRs) y repartir lo que
+falta; después, documentar el cambio de arquitectura para que la recomendación
+se recalcule en vivo en la app.
+
+**Prompts principales:**
+1. "Haceme un resumen de cómo venimos en cuanto a issues, versiones, y qué nos
+   falta por hacer, así nos dividimos"
+2. "ok dale, con prioridades primero (de última asignáme lo de supabase a mí
+   también…). Y recordá crear un issue que diga mejorar la UX, asignada a mí"
+3. "ah en alguna de las issues habría que poner uno de los detalles técnicos
+   que charlamos: […] implementar Redux […] mientras vamos cargando el monto va
+   a ir reloadeando el medio de pago más conveniente"
+4. "[…] la constitución lo veníamos hablando cuando no habíamos hecho un
+   análisis muy intensivo […] Lo que sí puedes hacer es, si querés un PR,
+   aclarando todo esto, poniendo unas nuevas decisiones de diseño […] la
+   lógica de negocio, o la mayoría de lo que se pueda, directamente en la app"
+
+**Resultado:**
+- Resumen y reparto por prioridad; las issues #9 y #34 (Supabase) pasaron a
+  Joaquín y se creó la #79 («Mejorar la UX»). El detalle técnico de Redux quedó
+  como comentario de la #43.
+- Se propuso al PO una opción 1 (debounce más llamada a `recomendar`) y una
+  opción 2 (motor en la app). El PO eligió la 2: es lo que hace posible el
+  cálculo en vivo y sin señal, y Redux resuelve el estado del cliente, que fue
+  la razón por la que el 13/10 se movió el cálculo al servidor.
+- ADR-010 (supera la Actualización del 13/10 de ADR-001), constitución 3.0.0
+  (MAJOR, Principio II), RNF-02, `CLAUDE.md`, `rules-guardian`, arquitectura,
+  privacidad y pendientes alineados; notas en las specs 004 y 006.
+- Alcance acordado del PR: **solo documentación y decisiones**. El código
+  (Redux, motor en la app, sincronización) llega con las issues del plan de
+  ADR-010.
+- Riesgos que quedaron anotados y sin resolver: el tamaño del corpus frente al
+  tope de AsyncStorage en Android y la resolución de `@vuelto/motor` en Metro.
+
+---
+
 ## 2026-11-01 — Esquema inicial de Supabase con RLS (issue #34)
 
 **Herramienta:** Claude Code (Sonnet 5.5) con spec-kit, `spec-critic`,
@@ -1223,7 +1263,6 @@ autenticados y escritura solo de la service role.
 - El seed solo trae a Galicia con id real de MODO; el resto del catálogo de
   bancos lo carga la ingesta. El job de CI `supabase-rls` no se corrió todavía
   en GitHub.
-- El ADR-010 no está en esta rama (vive en el commit `64226dd`).
 
 ---
 

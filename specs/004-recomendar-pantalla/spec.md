@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-24 · **Revisada**: 2026-10-24 (hallazgos de `spec-critic`: B1, I1–I6, M1–M6)
 
-**Status**: Draft
+**Status**: Draft — **superada en parte por el [ADR-010](../../docs/decisions/010-motor-en-la-app-y-redux.md) (01/11/2026)**: la recomendación ya no se calcula en una Edge Function disparada por un botón, sino en la app, en vivo y con Redux. Lo que esta spec dice del botón «Simular», del monto obligatorio y del endpoint `recomendar` ya no rige para la app; la Edge Function queda implementada (PR #71) pero fuera de su camino. El contrato (`contracts/recomendar.md`) sigue valiendo como referencia de la forma de la respuesta del motor. Se reescribe en la issue de implementación.
 
 **Input**: Issue [#43](https://github.com/Seminario-UADE/vuelto/issues/43) — "Pantalla «¿Con qué pago?»: cargar una compra y ver la recomendación", con el cambio de arquitectura del 13/10/2026 (ADR-001 §Actualización, RNF-02): la recomendación se calcula del lado del servidor, en una Edge Function, disparada por un botón explícito. Usa el motor de la issue #36 (`recomendar()`, `specs/002-motor-recomendar/`) y la estructura de capas de ADR-009.
 

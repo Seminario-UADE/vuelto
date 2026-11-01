@@ -21,9 +21,11 @@ puede leer el registro de otro" (`privacidad.md`) y "la service role key
 solo la usa el proceso de ingesta" (RNF-05). Este ADR define cómo hacerlo
 sin romper ninguna de las dos.
 
-Que el motor corra solo en la Edge Function (ADR-001 §Actualización,
-RNF-02) es lo que hace viable el cambio: los datos del contacto llegan al
-motor del lado del servidor y no hace falta mandarlos al celular de nadie.
+Que el gasto en grupo se calcule en una Edge Function (ADR-010 §3, RNF-02;
+antes, ADR-001 §Actualización) es lo que hace viable el cambio: los datos del
+contacto llegan al motor del lado del servidor y no hace falta mandarlos al
+celular de nadie. Eso sigue valiendo aunque la recomendación individual ahora
+se calcule en la app.
 
 ## Decision
 

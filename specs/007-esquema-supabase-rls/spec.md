@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: Issue [#34](https://github.com/Seminario-UADE/vuelto/issues/34) — "Esquema inicial de Supabase con RLS (perfiles, medios de pago, promociones, compras, capturas)", más los requisitos de ADR-010 §4 (en la rama `claude/issues-versions-pendientes-332b7b`, commit `64226dd`). Refleja el contrato de tipos de `packages/motor/src/tipos.ts` (issue #33).
+**Input**: Issue [#34](https://github.com/Seminario-UADE/vuelto/issues/34) — "Esquema inicial de Supabase con RLS (perfiles, medios de pago, promociones, compras, capturas)", más los requisitos de ADR-010 §4 (`docs/decisions/010-motor-en-la-app-y-redux.md`). Refleja el contrato de tipos de `packages/motor/src/tipos.ts` (issue #33).
 
 **Decisión que resuelve (constitución §I)**: es un habilitador. Sin estas tablas la app no puede guardar el perfil ni las compras del usuario, y por lo tanto no puede decidir con qué medio de pago conviene pagar ni cuánto tope de reintegro queda. No muestra promociones por sí mismo: guarda el corpus que el motor evalúa contra una compra concreta.
 
