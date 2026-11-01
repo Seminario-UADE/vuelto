@@ -34,7 +34,9 @@
       cálculo se movió a una Edge Function (la issue #42 se cerró por eso);
       ADR-010 devuelve el cálculo a la app, así que vuelve a hacer falta:
       sincronización incremental por `actualizada_en`, al abrir y al volver a
-      primer plano. Falta crear la issue (reemplaza a la #42).
+      primer plano (o descarga completa, ~2.000 filas, si la medición lo
+      permite). La issue #42 se reabrió y se reescribió; el store de Redux
+      es la #81.
 - [ ] Medir el tamaño real del corpus vigente de CABA/AMBA y decidir dónde
       persistirlo en el dispositivo (AsyncStorage tiene un tope de 6 MB por
       defecto en Android; alternativa: filtrar por los rubros y medios del
