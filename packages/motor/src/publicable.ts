@@ -32,6 +32,20 @@ export function camposFaltantes(borrador: BorradorPromocion): CampoObligatorioPr
   return CAMPOS_OBLIGATORIOS_PROMO.filter((campo) => ausente[campo]);
 }
 
+/** Valores que, si aparecen, son un error de lectura: la promo no se publica (issue #46). */
+export const CAMPOS_INVALIDOS_PROMO = ["tope.monto"] as const;
+
+export type CampoInvalidoPromo = (typeof CAMPOS_INVALIDOS_PROMO)[number];
+
+/** Campos con un valor imposible, para registrar por qué se descartó un borrador. */
+export function camposInvalidos(borrador: BorradorPromocion): CampoInvalidoPromo[] {
+  const invalido: Record<CampoInvalidoPromo, boolean> = {
+    // Una promo con tope de $0 no devuelve nada: es un error del extractor.
+    "tope.monto": borrador.tope.monto !== null && borrador.tope.monto <= 0,
+  };
+  return CAMPOS_INVALIDOS_PROMO.filter((campo) => invalido[campo]);
+}
+
 export function esPromocionPublicable(borrador: BorradorPromocion): borrador is Promocion {
-  return camposFaltantes(borrador).length === 0;
+  return camposFaltantes(borrador).length === 0 && camposInvalidos(borrador).length === 0;
 }

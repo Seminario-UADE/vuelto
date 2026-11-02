@@ -208,6 +208,12 @@ export type CausaDescarte =
 export interface Descarte {
   promocionId: string;
   causa: CausaDescarte;
+  /**
+   * Medios del usuario a los que aplicaba la promo, para el "¿por qué no X?"
+   * de la pantalla (issue #46). Vacía si no aplicaba a ninguno, sea cual
+   * sea la causa (por ejemplo, una promo de otro banco que además es de otro día).
+   */
+  mediosDePagoIds: string[];
   /** Solo con causa `tope_agotado`: un tope agotado también es un estimado. */
   base: BaseEstimacion | null;
   motivo: string;

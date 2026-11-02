@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   CAMPOS_OBLIGATORIOS_PROMO,
   camposFaltantes,
+  camposInvalidos,
   esPromocionPublicable,
 } from "./publicable.ts";
 import type { BorradorPromocion } from "./tipos.ts";
@@ -77,5 +78,24 @@ describe("esPromocionPublicable", () => {
     b.canal = null;
     b.acumulable = null;
     expect(esPromocionPublicable(b)).toBe(true);
+  });
+});
+
+describe("camposInvalidos", () => {
+  it("un borrador completo no tiene campos inválidos", () => {
+    expect(camposInvalidos(borradorCompleto())).toEqual([]);
+  });
+
+  it.each([0, -500])("rechaza un tope de $%d: es un error de lectura (issue #46)", (monto) => {
+    const b = borradorCompleto();
+    b.tope = { ...b.tope, monto };
+    expect(camposInvalidos(b)).toEqual(["tope.monto"]);
+    expect(esPromocionPublicable(b)).toBe(false);
+  });
+
+  it("rechaza también un tope por compra de $0", () => {
+    const b = borradorCompleto();
+    b.tope = { monto: 0, periodo: "por_compra", alcance: null, grupoTopeId: null };
+    expect(esPromocionPublicable(b)).toBe(false);
   });
 });
