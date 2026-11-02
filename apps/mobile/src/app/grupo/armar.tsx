@@ -4,7 +4,6 @@ import { Pressable, TextInput, View } from "react-native";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
-import { EmptyState } from "@/components/empty-state";
 import { Icon, iconoDeRubro } from "@/components/icon";
 import { MontoInput } from "@/components/monto-input";
 import { OptionRow } from "@/components/option-row";
@@ -28,7 +27,6 @@ export default function ArmarGrupo() {
   const p = useLocalSearchParams<{ comercio?: string; monto?: string }>();
   const dispatch = useAppDispatch();
   const hoy = useAppSelector(selectHoy);
-  const cuenta = useAppSelector((s) => s.sesion.cuenta);
   const contactos = useAppSelector((s) => s.contactos.lista);
   const ejemplo = api.getGrupoDeEjemplo();
   const desdeComercio = Boolean(p.comercio);
@@ -64,18 +62,6 @@ export default function ArmarGrupo() {
     dispatch(grupoArmado({ nombre, comercioId, monto, fecha, integrantes }));
     router.push("/grupo/resultado");
   };
-
-  if (!cuenta) {
-    return (
-      <Screen>
-        <EmptyState
-          title="Para armar un grupo, guardá tu perfil"
-          body="Los contactos se vinculan entre cuentas: así cada uno decide qué comparte."
-          action={{ label: "Guardar mi perfil", onPress: () => router.push("/login") }}
-        />
-      </Screen>
-    );
-  }
 
   return (
     <Screen

@@ -4,9 +4,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@/components/button";
 import { SheetHeader } from "@/components/sheet-header";
 import { Text } from "@/components/text";
-import { sesionCerrada } from "@/store/acciones";
+import { cerrarSesion as salir } from "@/data/auth";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectPendientesAlCerrarSesion } from "@/store/selectores";
+import { avisoMostrado } from "@/store/sesion";
 import { colors, space } from "@/theme";
 
 const plural = (n: number, uno: string, varios: string) => `${n} ${n === 1 ? uno : varios}`;
@@ -25,8 +26,12 @@ export default function CerrarSesion() {
     borrados > 0 ? plural(borrados, "borrado", "borrados") : null,
   ].filter(Boolean);
 
-  const cerrar = () => {
-    dispatch(sesionCerrada());
+  const cerrar = async () => {
+    const error = await dispatch(salir());
+    if (error) {
+      dispatch(avisoMostrado(error));
+      return;
+    }
     router.dismissAll();
     router.replace("/bienvenida");
   };

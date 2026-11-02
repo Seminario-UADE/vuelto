@@ -1,6 +1,6 @@
 /**
  * Persistencia del store en el dispositivo, sin `redux-persist` (ADR-010, research R6).
- * Se guardan `perfil`, `corpus`, `compras` y la cuenta: solo datos de entrada. Nada derivado
+ * Se guardan `perfil`, `corpus` y `compras`: solo datos de entrada. Nada derivado
  * (recomendación, topes) llega al almacenamiento (FR-010).
  */
 import type { ListenerMiddlewareInstance } from "@reduxjs/toolkit";
@@ -8,7 +8,6 @@ import { fechaArgentina } from "@vuelto/motor";
 import { comprasDelPeriodo } from "../data/calculo";
 import {
   rehidratado,
-  type Cuenta,
   type EstadoCompras,
   type EstadoCorpus,
   type EstadoPerfil,
@@ -32,7 +31,6 @@ export type Persistido = {
   perfil: EstadoPerfil;
   corpus: EstadoCorpus;
   compras: EstadoCompras;
-  cuenta: Cuenta;
 };
 
 /** Solo las compras del período en curso llegan al disco (privacidad.md, ADR-010). */
@@ -43,7 +41,6 @@ export function aPersistir(s: RootState): Persistido {
     perfil: s.perfil,
     corpus: s.corpus,
     compras: { lista: comprasDelPeriodo(s.compras.lista, hoy) },
-    cuenta: s.sesion.cuenta,
   };
 }
 
@@ -78,13 +75,7 @@ function comprasValidas(x: unknown): EstadoCompras | null {
   return ok ? (x as EstadoCompras) : null;
 }
 
-function cuentaValida(x: unknown): { valor: Cuenta } | null {
-  if (x === null) return { valor: null };
-  if (!esObjeto(x) || !textoONull(x.email) || (x.proveedor !== "email" && x.proveedor !== "apple")) return null;
-  return { valor: { email: x.email as string | null, proveedor: x.proveedor } };
-}
-
-const NADA: Rehidratado = { perfil: null, corpus: null, compras: null, cuenta: null };
+const NADA: Rehidratado = { perfil: null, corpus: null, compras: null };
 
 export function leerPersistido(raw: string | null): Rehidratado {
   if (raw === null) return NADA;
@@ -99,7 +90,6 @@ export function leerPersistido(raw: string | null): Rehidratado {
     perfil: perfilValido(x.perfil),
     corpus: corpusValido(x.corpus),
     compras: comprasValidas(x.compras),
-    cuenta: "cuenta" in x ? cuentaValida(x.cuenta) : null,
   };
 }
 
@@ -120,7 +110,7 @@ export function leerPerfilViejo(raw: string | null): Rehidratado {
     comercios: x.comercios ?? [],
     invitacionPendiente: x.invitacionPendiente ?? null,
   });
-  return { ...NADA, perfil, cuenta: cuentaValida(x.cuenta ?? null) };
+  return { ...NADA, perfil };
 }
 
 /** Lee lo guardado al abrir la app y lo carga en el store. Después de esto se empieza a escribir. */
@@ -154,7 +144,6 @@ export function escucharPersistencia(listener: ListenerMiddlewareInstance<RootSt
       (actual.perfil !== previo.perfil ||
         actual.corpus !== previo.corpus ||
         actual.compras !== previo.compras ||
-        actual.sesion.cuenta !== previo.sesion.cuenta ||
         actual.sesion.hidratado !== previo.sesion.hidratado),
     effect: async (_accion, api) => {
       try {

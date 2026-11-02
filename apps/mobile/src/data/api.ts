@@ -22,7 +22,6 @@ import {
   catalogoMedios,
   grupoDeEjemplo,
   invitacionPropia,
-  mediosDeclarados,
   ticketDeEjemplo,
   usuario,
 } from "./fixtures";
@@ -45,11 +44,6 @@ function comercioPorId(id: string): Comercio {
 
 /** "Hoy" para el servidor de ejemplo (el reloj de los fixtures). */
 const HOY_EN_EL_SERVIDOR = fechaArgentina(new Date(RELOJ_EJEMPLO));
-
-/** Medios del perfil guardado en el servidor (para quien entra con una cuenta existente). */
-export function mediosDeclaradosIds(): string[] {
-  return mediosDeclarados.map((m) => m.id);
-}
 
 export async function getMediosDisponibles(): Promise<MedioDePago[]> {
   return red(catalogoMedios);

@@ -10,7 +10,7 @@ import { vaciarCola } from "@/store/thunks";
  */
 export function useSubidaDeCompras() {
   const dispatch = useAppDispatch();
-  const cuenta = useAppSelector((s) => s.sesion.cuenta);
+  const usuario = useAppSelector((s) => s.sesion.usuario);
 
   useEffect(() => {
     const sub = AppState.addEventListener("change", (estado) => {
@@ -21,5 +21,5 @@ export function useSubidaDeCompras() {
 
   useEffect(() => {
     void dispatch(vaciarCola());
-  }, [cuenta, dispatch]);
+  }, [usuario, dispatch]);
 }
