@@ -15,16 +15,27 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
 import { Toast } from "@/components/toast";
 import { useReloj } from "@/hooks/use-reloj";
+import { useSincronizacion } from "@/hooks/use-sincronizacion";
+import { supabase } from "@/lib/supabase";
 import { headerNativo } from "@/navigation/opciones";
 import { crearStore } from "@/store";
 import { useAppSelector } from "@/store/hooks";
 import { rehidratar } from "@/store/persistencia";
+import { repositorioSupabase } from "@/sync/repositorio-supabase";
 import { colors } from "@/theme";
 
 void SplashScreen.preventAutoHideAsync();
 
-/** Un solo store para toda la app (ADR-010). Lo guardado se lee una vez, al abrir. */
-const store = crearStore({ almacenamiento: AsyncStorage, estadoInicial: null });
+/**
+ * Un solo store para toda la app (ADR-010). Lo guardado se lee una vez, al abrir. Sin variables de
+ * Supabase no hay repositorio y la app no sincroniza (spec 009 FR-003).
+ */
+const store = crearStore({
+  almacenamiento: AsyncStorage,
+  estadoInicial: null,
+  repositorio: supabase ? repositorioSupabase(supabase) : null,
+  reloj: () => new Date(),
+});
 void store.dispatch(rehidratar());
 
 export const unstable_settings = { anchor: "(tabs)" };
@@ -60,6 +71,7 @@ function Raiz() {
   });
   const hidratado = useAppSelector((s) => s.sesion.hidratado);
   useReloj();
+  useSincronizacion();
 
   const listo = fuentes && hidratado;
   useEffect(() => {

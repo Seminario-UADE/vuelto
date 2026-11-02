@@ -1,8 +1,9 @@
 # Contrato: consultas a PostgREST
 
 Verificadas el 02/11/2026 contra un Supabase local con las migraciones del repo y la sesión de un usuario `authenticated`
-(ver `research.md` R1). Con supabase-js los filtros se arman con `.or()`/`.and()`, `.order()`, `.limit()`; el `+` del
-offset de los timestamps lo codifica `URLSearchParams` como `%2B`.
+(ver `research.md` R1). `supabase-js` **no tiene `.and()`**: los filtros se arman con `.gte()`/`.gt()` y **dos `.or()`
+repetidos**, que llegan como dos parámetros `or=` y PostgREST combina con AND (verificado: devuelve lo mismo que
+`and=(or(…),or(…))`). El `+` del offset de los timestamps lo codifica `URLSearchParams` como `%2B`.
 
 ## Promociones (primera sincronización, `marca = null`)
 

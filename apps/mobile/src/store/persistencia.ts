@@ -1,7 +1,9 @@
 /**
  * Persistencia del store en el dispositivo, sin `redux-persist` (ADR-010, research R6).
- * Se guardan `perfil`, `corpus`, `compras` y la cuenta: solo datos de entrada. Nada derivado
- * (recomendación, topes) llega al almacenamiento (FR-010).
+ * Se guardan `perfil`, `compras` y la cuenta en `vuelto.store.v1`, y el corpus en su propia clave
+ * `vuelto.corpus.v1` (spec 009 FR-017): un corpus que no entra no se lleva el perfil ni las compras
+ * pendientes, y la marca viaja con las promos, así que nunca apunta a un corpus que no se guardó.
+ * Solo datos de entrada: nada derivado (recomendación, topes) llega al almacenamiento (FR-010).
  */
 import type { ListenerMiddlewareInstance } from "@reduxjs/toolkit";
 import { fechaArgentina } from "@vuelto/motor";
@@ -24,27 +26,47 @@ export type Almacenamiento = {
 };
 
 export const CLAVE = "vuelto.store.v1";
+/** El corpus sincronizado, aparte del resto. Solo existe después de una sincronización real. */
+export const CLAVE_CORPUS = "vuelto.corpus.v1";
 /** La clave de `perfil-local.ts`, antes del store. Se migra una vez y se borra. */
 export const CLAVE_VIEJA = "vuelto.perfil.v1";
 
 export type Persistido = {
   version: 1;
   perfil: EstadoPerfil;
-  corpus: EstadoCorpus;
   compras: EstadoCompras;
   cuenta: Cuenta;
 };
 
-/** Solo las compras del período en curso llegan al disco (privacidad.md, ADR-010). */
+export type CorpusPersistido = {
+  version: 1;
+  promociones: EstadoCorpus["promociones"];
+  marca: string | null;
+  sincronizadoEn: string | null;
+};
+
+/**
+ * Solo las compras del período en curso llegan al disco (privacidad.md, ADR-010), más las que
+ * todavía no se subieron, que se guardan siempre aunque sean de antes: si no, se perderían (FR-015).
+ */
 export function aPersistir(s: RootState): Persistido {
   const hoy = fechaArgentina(new Date(s.sesion.ahora));
+  const delPeriodo = new Set(comprasDelPeriodo(s.compras.lista, hoy).map((c) => c.id));
+  const pendientes = new Set(s.compras.pendientes);
   return {
     version: 1,
     perfil: s.perfil,
-    corpus: s.corpus,
-    compras: { lista: comprasDelPeriodo(s.compras.lista, hoy) },
+    compras: {
+      lista: s.compras.lista.filter((c) => delPeriodo.has(c.id) || pendientes.has(c.id)),
+      pendientes: s.compras.pendientes,
+      duenoId: s.compras.duenoId,
+    },
     cuenta: s.sesion.cuenta,
   };
+}
+
+export function corpusAPersistir(c: EstadoCorpus): CorpusPersistido {
+  return { version: 1, promociones: c.promociones, marca: c.marca, sincronizadoEn: c.sincronizadoEn };
 }
 
 // ─── Validación por parte: una parte inválida no tira abajo las otras (FR-011) ───
@@ -66,16 +88,33 @@ function perfilValido(x: unknown): EstadoPerfil | null {
   return ok ? (x as EstadoPerfil) : null;
 }
 
+/** El corpus de `vuelto.corpus.v1`. `null` = no es válido. */
 function corpusValido(x: unknown): EstadoCorpus | null {
-  if (!esObjeto(x) || !Array.isArray(x.promociones) || !textoONull(x.cargadoEn)) return null;
+  if (!esObjeto(x) || x.version !== 1 || !Array.isArray(x.promociones)) return null;
+  if (!textoONull(x.marca) || !textoONull(x.sincronizadoEn)) return null;
   const ok = x.promociones.every((p) => esObjeto(p) && esTexto(p.id) && esObjeto(p.tope) && esObjeto(p.vigencia));
-  return ok ? (x as EstadoCorpus) : null;
+  if (!ok) return null;
+  return {
+    promociones: x.promociones as EstadoCorpus["promociones"],
+    marca: x.marca as string | null,
+    sincronizadoEn: x.sincronizadoEn as string | null,
+    descartadas: 0,
+  };
 }
 
+/**
+ * Un guardado anterior a la spec 009 no trae `pendientes` ni `duenoId`: se completan con `[]` y
+ * `null` en vez de dejarlos `undefined` (M1 de la crítica). No se sube la `version`.
+ */
 function comprasValidas(x: unknown): EstadoCompras | null {
   if (!esObjeto(x) || !Array.isArray(x.lista)) return null;
   const ok = x.lista.every((c) => esObjeto(c) && esTexto(c.id) && esTexto(c.fecha) && typeof c.monto === "number");
-  return ok ? (x as EstadoCompras) : null;
+  if (!ok) return null;
+  const pendientes = x.pendientes === undefined ? [] : x.pendientes;
+  if (!listaDeTextos(pendientes)) return null;
+  const duenoId = x.duenoId === undefined ? null : x.duenoId;
+  if (!textoONull(duenoId)) return null;
+  return { lista: x.lista as EstadoCompras["lista"], pendientes, duenoId };
 }
 
 function cuentaValida(x: unknown): { valor: Cuenta } | null {
@@ -84,8 +123,12 @@ function cuentaValida(x: unknown): { valor: Cuenta } | null {
   return { valor: { email: x.email as string | null, proveedor: x.proveedor } };
 }
 
-const NADA: Rehidratado = { perfil: null, corpus: null, compras: null, cuenta: null };
+const NADA: Rehidratado = { perfil: null, corpus: null, compras: null, cuenta: null, ahora: null };
 
+/** Un corpus guardado que no se puede leer: el usuario ya había sincronizado, así que queda vacío (no el de ejemplo). */
+export const CORPUS_VACIO: EstadoCorpus = { promociones: [], marca: null, sincronizadoEn: null, descartadas: 0 };
+
+/** `vuelto.store.v1`. Un `corpus` adentro (de antes de la spec 009) se ignora. */
 export function leerPersistido(raw: string | null): Rehidratado {
   if (raw === null) return NADA;
   let x: unknown;
@@ -96,11 +139,21 @@ export function leerPersistido(raw: string | null): Rehidratado {
   }
   if (!esObjeto(x) || x.version !== 1) return NADA;
   return {
+    ...NADA,
     perfil: perfilValido(x.perfil),
-    corpus: corpusValido(x.corpus),
     compras: comprasValidas(x.compras),
     cuenta: "cuenta" in x ? cuentaValida(x.cuenta) : null,
   };
+}
+
+/** `vuelto.corpus.v1`. Si existe pero no se puede leer, el corpus queda vacío con la marca en `null`. */
+export function leerCorpus(raw: string | null): EstadoCorpus | null {
+  if (raw === null) return null;
+  try {
+    return corpusValido(JSON.parse(raw)) ?? CORPUS_VACIO;
+  } catch {
+    return CORPUS_VACIO;
+  }
 }
 
 /** `vuelto.perfil.v1` (perfil-local.ts): quien ya hizo el onboarding no lo repite. */
@@ -125,7 +178,7 @@ export function leerPerfilViejo(raw: string | null): Rehidratado {
 
 /** Lee lo guardado al abrir la app y lo carga en el store. Después de esto se empieza a escribir. */
 export function rehidratar(): AppThunk<Promise<void>> {
-  return async (dispatch, getState, { almacenamiento }) => {
+  return async (dispatch, getState, { almacenamiento, reloj }) => {
     let partes = NADA;
     let migrado = false;
     try {
@@ -134,9 +187,12 @@ export function rehidratar(): AppThunk<Promise<void>> {
         partes = leerPerfilViejo(await almacenamiento.getItem(CLAVE_VIEJA));
         migrado = partes.perfil !== null;
       }
+      partes = { ...partes, corpus: leerCorpus(await almacenamiento.getItem(CLAVE_CORPUS)) };
     } catch {
       // Sin almacenamiento la app funciona en memoria (spec 008, Edge Cases).
     }
+    // Con un corpus ya sincronizado el reloj es el real desde este mismo tick (spec 009 FR-016).
+    if (partes.corpus?.marca != null) partes = { ...partes, ahora: reloj().toISOString() };
     // El nombre no estaba en el perfil viejo: queda el del store.
     if (partes.perfil && partes.perfil.nombre === null) {
       partes = { ...partes, perfil: { ...partes.perfil, nombre: getState().perfil.nombre } };
@@ -152,7 +208,6 @@ export function escucharPersistencia(listener: ListenerMiddlewareInstance<RootSt
     predicate: (_accion, actual, previo) =>
       actual.sesion.hidratado &&
       (actual.perfil !== previo.perfil ||
-        actual.corpus !== previo.corpus ||
         actual.compras !== previo.compras ||
         actual.sesion.cuenta !== previo.sesion.cuenta ||
         actual.sesion.hidratado !== previo.sesion.hidratado),
@@ -161,6 +216,21 @@ export function escucharPersistencia(listener: ListenerMiddlewareInstance<RootSt
         await almacenamiento.setItem(CLAVE, JSON.stringify(aPersistir(api.getState())));
       } catch {
         // Almacenamiento lleno o no disponible: se pierde solo lo que no se pudo guardar.
+      }
+    },
+  });
+  // El corpus en su propia clave, y solo el que viene de una sincronización real: el de ejemplo no se guarda.
+  listener.startListening({
+    predicate: (accion, actual, previo) =>
+      actual.sesion.hidratado &&
+      !rehidratado.match(accion) &&
+      actual.corpus !== previo.corpus &&
+      actual.corpus.marca !== null,
+    effect: async (_accion, api) => {
+      try {
+        await almacenamiento.setItem(CLAVE_CORPUS, JSON.stringify(corpusAPersistir(api.getState().corpus)));
+      } catch {
+        // Si el corpus no entra, la marca guardada no avanza: la próxima apertura vuelve a bajarlo.
       }
     },
   });

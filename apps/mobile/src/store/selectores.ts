@@ -5,6 +5,7 @@
  */
 import { createSelector } from "@reduxjs/toolkit";
 import { fechaArgentina } from "@vuelto/motor";
+import { textoFrescura } from "../lib/frescura";
 import { comprasVista, perfilDelMotor, recomendacionVista, topesVista, type EntradasMotor } from "../data/calculo";
 import type { Comercio, MedioDePago, Perfil } from "../data/contracts";
 import { catalogoComercios, catalogoMedios } from "../data/fixtures";
@@ -46,6 +47,12 @@ export const selectRecomendacion = createSelector(
 );
 
 export const selectTopes = createSelector([selectEntradasMotor], topesVista);
+
+/** "Promos actualizadas hace 2 horas", o `null` con los datos de ejemplo (spec 009 FR-019). */
+export const selectFrescura = createSelector(
+  [selectAhora, (s: RootState) => s.corpus.sincronizadoEn],
+  textoFrescura,
+);
 
 export const selectResumenCompras = createSelector([(s: RootState) => s.compras.lista, selectAhora], comprasVista);
 

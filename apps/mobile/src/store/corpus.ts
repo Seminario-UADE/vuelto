@@ -1,24 +1,24 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { RELOJ_EJEMPLO, promociones } from "../data/fixtures";
-import { rehidratado, type EstadoCorpus } from "./acciones";
+import { createSlice } from "@reduxjs/toolkit";
+import { promociones } from "../data/fixtures";
+import { rehidratado, sincronizado, type EstadoCorpus } from "./acciones";
 
-/** Hasta la sincronización con Supabase (#42), el corpus son las promos de ejemplo. */
+/**
+ * Hasta la primera sincronización (spec 009), el corpus son las promos de ejemplo y `marca` es
+ * `null`: la app usa también el reloj de ejemplo (FR-016).
+ */
 export const corpusInicial: EstadoCorpus = {
   promociones,
-  cargadoEn: new Date(RELOJ_EJEMPLO).toISOString(),
+  marca: null,
+  sincronizadoEn: null,
+  descartadas: 0,
 };
 
 export const corpus = createSlice({
   name: "corpus",
   initialState: corpusInicial,
-  reducers: {
-    corpusCargado(_s, a: PayloadAction<EstadoCorpus>) {
-      return a.payload;
-    },
-  },
+  reducers: {},
   extraReducers: (b) => {
     b.addCase(rehidratado, (s, a) => a.payload.corpus ?? s);
+    b.addCase(sincronizado, (_s, a) => a.payload.corpus);
   },
 });
-
-export const { corpusCargado } = corpus.actions;

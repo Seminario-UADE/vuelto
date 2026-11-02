@@ -1,4 +1,5 @@
 /** Utilidades de los tests del store: un almacenamiento en memoria y un store recién creado. */
+import type { RepositorioSincronizacion } from "../sync/contratos";
 import { crearStore, type RootState } from "./index";
 import type { Almacenamiento } from "./persistencia";
 
@@ -19,8 +20,9 @@ export function memoria(inicial: Record<string, string> = {}): Almacenamiento & 
 export function storeDePrueba(
   estadoInicial: Partial<RootState> | null = null,
   almacenamiento: Almacenamiento = memoria(),
+  extra: { repositorio?: RepositorioSincronizacion | null; reloj?: () => Date } = {},
 ) {
-  return crearStore({ almacenamiento, estadoInicial });
+  return crearStore({ almacenamiento, estadoInicial, ...extra });
 }
 
 /** Deja correr los efectos asíncronos del listener de persistencia. */

@@ -2,7 +2,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import * as motor from "@vuelto/motor";
 import { mediosDeclarados } from "../data/fixtures";
 import { mediosElegidos } from "./perfil";
-import { selectEntradasMotor, selectRecomendacion, selectTopes } from "./selectores";
+import { sincronizado } from "./acciones";
+import { selectEntradasMotor, selectFrescura, selectRecomendacion, selectTopes } from "./selectores";
 import { ahoraCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
 import { guardarCompra } from "./thunks";
@@ -127,5 +128,27 @@ describe("guardarCompra (US3)", () => {
       ),
     ).toThrow("Falta el monto o el medio de pago");
     expect(s.getState().compras.lista).toHaveLength(10);
+  });
+});
+
+describe("selectFrescura (spec 009 FR-019)", () => {
+  it("con los datos de ejemplo no hay leyenda", () => {
+    expect(selectFrescura(storeDePrueba().getState())).toBeNull();
+  });
+
+  it("con un corpus sincronizado dice hace cuánto, con el reloj del store", () => {
+    const s = storeDePrueba();
+    s.dispatch(
+      sincronizado({
+        corpus: { promociones: [], marca: "2026-11-02T12:00:00+00:00", sincronizadoEn: "2026-11-02T12:00:00.000Z", descartadas: 0 },
+        compras: [],
+        desde: "2026-11-01",
+        usuarioId: "u",
+        ahora: "2026-11-02T12:00:00.000Z",
+      }),
+    );
+    expect(selectFrescura(s.getState())).toBe("Promos actualizadas hace unos minutos");
+    s.dispatch(ahoraCambio("2026-11-02T17:30:00.000Z"));
+    expect(selectFrescura(s.getState())).toBe("Promos actualizadas hace 5 horas");
   });
 });
