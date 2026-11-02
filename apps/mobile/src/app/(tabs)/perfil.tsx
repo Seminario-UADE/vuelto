@@ -11,12 +11,13 @@ import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import { cerrarSesion as salir } from "@/data/auth";
-import { usePerfilLocal } from "@/data/perfil-local";
-import { setSesion, useSesion } from "@/data/sesion";
 import { useAsync } from "@/hooks/use-async";
+import { escenarioElegido, type Escenario } from "@/store/acciones";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { avisoMostrado } from "@/store/sesion";
 import { space } from "@/theme";
 
-const ESCENARIOS: { id: api.Escenario; label: string }[] = [
+const ESCENARIOS: { id: Escenario; label: string }[] = [
   { id: "normal", label: "Normal" },
   { id: "mes-vacio", label: "Mes sin compras" },
   { id: "ticket-ilegible", label: "Ticket ilegible" },
@@ -27,24 +28,22 @@ const ESCENARIOS: { id: api.Escenario; label: string }[] = [
  * "Te devolvieron" (P2 #13).
  */
 export default function Perfil() {
-  const { perfil } = usePerfilLocal();
-  const usuario = useSesion((s) => s.usuario);
-  const contactosVersion = useSesion((s) => s.contactosQuitados.length + s.contactosAceptados.length);
-  const datos = useAsync(() => api.getPerfil());
+  const dispatch = useAppDispatch();
+  const perfil = useAppSelector((s) => s.perfil);
+  const usuario = useAppSelector((s) => s.sesion.usuario);
+  const contactos = useAppSelector((s) => s.contactos.lista);
+  const escenario = useAppSelector((s) => s.sesion.escenario);
   const catalogoMedios = useAsync(() => api.getMediosDisponibles());
   const catalogoComercios = useAsync(() => api.getCatalogoComercios());
-  const contactos = useAsync(() => api.getContactos(), contactosVersion);
-  // Para forzar recarga de las pantallas al cambiar de escenario.
-  const escenario = useSesion(() => api.getEscenario());
 
   const medios = (catalogoMedios.datos ?? []).filter((m) => perfil.medios.includes(m.id));
   const comercios = (catalogoComercios.datos ?? []).filter((c) => perfil.comercios.includes(c.id));
-  const nombre = datos.datos?.nombre ?? "Martín";
+  const nombre = perfil.nombre ?? "Martín";
 
   const cerrarSesion = async () => {
-    const error = await salir();
+    const error = await dispatch(salir());
     if (error) {
-      setSesion({ aviso: error });
+      dispatch(avisoMostrado(error));
       return;
     }
     router.replace("/bienvenida");
@@ -65,11 +64,11 @@ export default function Perfil() {
           </View>
         </View>
         {catalogoMedios.datos && catalogoComercios.datos ? (
-        <Text variant="bodyMd" tone="inkSecondary">
-          {medios.length} {medios.length === 1 ? "medio" : "medios"} · {comercios.length}{" "}
-          {comercios.length === 1 ? "comercio" : "comercios"}
-          {contactos.datos ? ` · ${contactos.datos.length} contactos` : ""}
-        </Text>
+          <Text variant="bodyMd" tone="inkSecondary">
+            {medios.length} {medios.length === 1 ? "medio" : "medios"} · {comercios.length}{" "}
+            {comercios.length === 1 ? "comercio" : "comercios"}
+            {` · ${contactos.length} contactos`}
+          </Text>
         ) : null}
       </Card>
 
@@ -124,9 +123,9 @@ export default function Perfil() {
         <Text variant="bodyMd" tone="inkSecondary">
           Con tus contactos, Vuelto decide quién de ustedes conviene que pague.
         </Text>
-        {(contactos.datos ?? []).length > 0 ? (
+        {contactos.length > 0 ? (
           <Card padding={space.lg} gap={0}>
-            {(contactos.datos ?? []).map((c, i) => (
+            {contactos.map((c, i) => (
               <View
                 key={c.id}
                 style={{
@@ -164,7 +163,7 @@ export default function Perfil() {
             Entraste como {usuario.email}
           </Text>
         ) : null}
-        <Button label="Cerrar sesión" variant="text" icon="salir" onPress={cerrarSesion} />
+        <Button label="Cerrar sesión" variant="text" icon="salir" onPress={() => void cerrarSesion()} />
       </View>
 
       {__DEV__ ? (
@@ -172,7 +171,12 @@ export default function Perfil() {
           <SectionHeader title="Datos de ejemplo (solo desarrollo)" />
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
             {ESCENARIOS.map((e) => (
-              <Chip key={e.id} label={e.label} selected={escenario === e.id} onPress={() => api.setEscenario(e.id)} />
+              <Chip
+                key={e.id}
+                label={e.label}
+                selected={escenario === e.id}
+                onPress={() => dispatch(escenarioElegido(e.id))}
+              />
             ))}
           </View>
           <Button

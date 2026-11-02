@@ -5,20 +5,28 @@ import {
   HankenGrotesk_700Bold,
   useFonts,
 } from "@expo-google-fonts/hanken-grotesk";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Provider } from "react-redux";
 import { Toast } from "@/components/toast";
 import { iniciarAuth } from "@/data/auth";
-import { cargarPerfilLocal, usePerfilLocal } from "@/data/perfil-local";
-import { useSesion } from "@/data/sesion";
+import { useReloj } from "@/hooks/use-reloj";
 import { headerNativo } from "@/navigation/opciones";
+import { crearStore } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { rehidratar } from "@/store/persistencia";
 import { colors } from "@/theme";
 
 void SplashScreen.preventAutoHideAsync();
+
+/** Un solo store para toda la app (ADR-010). Lo guardado se lee una vez, al abrir. */
+const store = crearStore({ almacenamiento: AsyncStorage, estadoInicial: null });
+void store.dispatch(rehidratar());
 
 export const unstable_settings = { anchor: "(tabs)" };
 
@@ -37,21 +45,29 @@ const sheet = {
 };
 
 export default function RootLayout() {
+  return (
+    <Provider store={store}>
+      <Raiz />
+    </Provider>
+  );
+}
+
+function Raiz() {
   const [fuentes] = useFonts({
     HankenGrotesk_400Regular,
     HankenGrotesk_500Medium,
     HankenGrotesk_600SemiBold,
     HankenGrotesk_700Bold,
   });
-  const { cargado } = usePerfilLocal();
-  const authLista = useSesion((s) => s.authLista);
+  const dispatch = useAppDispatch();
+  const hidratado = useAppSelector((s) => s.sesion.hidratado);
+  const authLista = useAppSelector((s) => s.sesion.authLista);
+  useReloj();
 
-  useEffect(() => {
-    void cargarPerfilLocal();
-    return iniciarAuth();
-  }, []);
+  // Lee la sesión guardada de Supabase y sigue sus cambios (issue #40).
+  useEffect(() => dispatch(iniciarAuth()), [dispatch]);
 
-  const listo = fuentes && cargado && authLista;
+  const listo = fuentes && hidratado && authLista;
   useEffect(() => {
     if (listo) void SplashScreen.hideAsync();
   }, [listo]);

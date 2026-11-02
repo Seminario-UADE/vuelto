@@ -75,3 +75,23 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+
+  # Migraciones y RLS de Supabase (issue #34): levanta la base local, la
+  # reinicia dos veces para comprobar que el esquema sale limpio y corre las
+  # pruebas pgTAP de supabase/tests/database. Sin servicios que no usamos
+  # (Studio, Storage, Realtime, etc.): solo base y auth.
+  supabase-rls:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.113.0
+      - name: Levantar Supabase local
+        run: supabase start -x studio,imgproxy,mailpit,realtime,storage-api,edge-runtime,logflare,vector,supavisor
+      - name: db reset (dos veces, tiene que ser idempotente)
+        run: |
+          supabase db reset
+          supabase db reset
+      - name: Pruebas de RLS y del esquema
+        run: supabase test db

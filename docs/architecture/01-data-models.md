@@ -1,8 +1,11 @@
 # Data models
 
-Modelo relacional (Postgres vía Supabase). Sin migraciones definidas todavía —
-esto es el resumen de entidades que ya está fijado por el research, no un
-schema final.
+Modelo relacional (Postgres vía Supabase). El esquema base (perfiles, bancos,
+categorías, medios de pago, comercios habituales, capturas crudas,
+promociones y compras, cada una con su RLS) está en `supabase/migrations/`
+(issue #34); el detalle de columnas, constraints y quién lee/escribe cada tabla
+está en `specs/007-esquema-supabase-rls/data-model.md`. Contactos, invitaciones
+y grupo (ADR-008) todavía no tienen migración.
 
 ## Promoción
 
@@ -62,6 +65,12 @@ para cuando se sumen fuentes que las informen.
 
 La imagen del ticket **no se persiste** (se manda a Gemini y se descarta).
 Sí se persiste el texto extraído, junto al registro.
+
+Decisiones del esquema (issue #34): una promoción que deja de estar en la
+fuente **se da de baja** (`dada_de_baja_en`), no se borra, para que las compras
+conserven su referencia y la baja llegue por sincronización; `actualizada_en` la
+fija un trigger y solo se mueve si cambia algún valor; la clave natural de una
+promo de MODO es `(fuente, fuente_id)`.
 
 ## `capturas_crudas` (tabla de ingesta)
 

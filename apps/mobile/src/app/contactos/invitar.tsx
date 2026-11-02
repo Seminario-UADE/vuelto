@@ -9,8 +9,9 @@ import { Screen } from "@/components/screen";
 import { Skeleton } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
-import { setSesion } from "@/data/sesion";
 import { useAsync } from "@/hooks/use-async";
+import { useAppDispatch } from "@/store/hooks";
+import { avisoMostrado } from "@/store/sesion";
 import { colors, radius, space } from "@/theme";
 
 const SI = ["Qué medio suyo conviene en cada compra del grupo", "El reintegro estimado de esa compra", "Su nombre para mostrar"];
@@ -30,6 +31,7 @@ function Item({ icon, texto, tono }: { icon: IconName; texto: string; tono: "ink
 /** Invitar contacto (ADR-008 §1): link + QR de un solo uso que vence en 24 h. Sin buscador. */
 export default function Invitar() {
   const [n, setN] = useState(0);
+  const dispatch = useAppDispatch();
   const inv = useAsync(() => api.crearInvitacion(), n);
   const link = inv.datos?.link;
 
@@ -40,7 +42,7 @@ export default function Invitar() {
   const copiar = async () => {
     if (!link) return;
     await Clipboard.setStringAsync(`https://${link}`);
-    setSesion({ aviso: "Link copiado" });
+    dispatch(avisoMostrado("Link copiado"));
   };
 
   return (

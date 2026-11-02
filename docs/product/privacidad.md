@@ -51,6 +51,12 @@ usuario vuelve a fotografiar el ticket.
     son del propio usuario; no descarga el historial de los 90 días. Las
     compras de un contacto nunca llegan al celular: el gasto en grupo se
     calcula en una Edge Function (ADR-008).
+  - En el dispositivo, el store se guarda en AsyncStorage (clave
+    `vuelto.store.v1`): el perfil (medios, comercios, nombre para mostrar,
+    invitación pendiente), la cuenta (email o Apple), el corpus de promociones
+    (público) y las compras del período en curso, con el texto extraído del
+    ticket si lo hubo. Nunca la imagen ni nada derivado (recomendaciones o
+    topes). Las compras de períodos anteriores no se escriben (issue #81).
 - **Perfil** (medios de pago, comercios): se guarda mientras la cuenta
   exista.
 - **Aislamiento entre usuarios**: cada tabla lleva row-level security desde

@@ -10,11 +10,13 @@ import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import type { EstadoInvitacion } from "@/data/contracts";
-import { guardarPerfilLocal, usePerfilLocal } from "@/data/perfil-local";
-import { setSesion, useSesion } from "@/data/sesion";
 import { useAsync } from "@/hooks/use-async";
 import { hapticoExito } from "@/lib/haptics";
 import { iniciales } from "@/lib/format";
+import { contactoAgregado } from "@/store/contactos";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { invitacionGuardada } from "@/store/perfil";
+import { avisoMostrado } from "@/store/sesion";
 import { colors, space } from "@/theme";
 
 const MOTIVO: Record<Exclude<EstadoInvitacion, "valida">, { titulo: string; texto: string }> = {
@@ -30,18 +32,28 @@ const MOTIVO: Record<Exclude<EstadoInvitacion, "valida">, { titulo: string; text
  */
 export default function AceptarInvitacion() {
   const { token = "" } = useLocalSearchParams<{ token: string }>();
-  const { perfil } = usePerfilLocal();
-  const v = useAsync(() => api.verInvitacion(token), token);
+  const dispatch = useAppDispatch();
+  const onboardingCompleto = useAppSelector((s) => s.perfil.onboardingCompleto);
+  const usuario = useAppSelector((s) => s.sesion.usuario);
+  const contactos = useAppSelector((s) => s.contactos.lista);
+  const v = useAsync(
+    () =>
+      api.verInvitacion(
+        token,
+        contactos.map((c) => c.id),
+      ),
+    token,
+  );
   const [aceptando, setAceptando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Quien abre el link sin cuenta ni perfil pasa primero por registro y onboarding, y vuelve acá al terminar.
-  const usuario = useSesion((s) => s.usuario);
   useEffect(() => {
-    if (!usuario || !perfil.onboardingCompleto) {
-      void guardarPerfilLocal({ invitacionPendiente: token }).then(() => router.replace("/bienvenida"));
+    if (!usuario || !onboardingCompleto) {
+      dispatch(invitacionGuardada(token));
+      router.replace("/bienvenida");
     }
-  }, [usuario, perfil.onboardingCompleto, token]);
+  }, [dispatch, usuario, onboardingCompleto, token]);
 
   const aceptar = async () => {
     setAceptando(true);
@@ -49,7 +61,8 @@ export default function AceptarInvitacion() {
     try {
       const { contacto } = await api.aceptarInvitacion(token);
       hapticoExito();
-      setSesion({ aviso: `Ahora ${contacto.nombre} es tu contacto` });
+      dispatch(contactoAgregado(contacto));
+      dispatch(avisoMostrado(`Ahora ${contacto.nombre} es tu contacto`));
       router.replace("/perfil");
     } catch (e) {
       setAceptando(false);

@@ -9,6 +9,8 @@ import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import { fechaCorta, pesos } from "@/lib/format";
 import { hapticoLeve } from "@/lib/haptics";
+import { useAppSelector } from "@/store/hooks";
+import { selectHoy } from "@/store/selectores";
 import { colors, radius, size, space } from "@/theme";
 
 const LINEAS = [
@@ -29,12 +31,14 @@ export default function Escanear() {
   const insets = useSafeAreaInsets();
   const [leyendo, setLeyendo] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const ilegible = useAppSelector((s) => s.sesion.escenario === "ticket-ilegible");
+  const hoy = useAppSelector(selectHoy);
 
   const disparar = async () => {
     hapticoLeve();
     setLeyendo(true);
     setError(null);
-    const t = await api.leerTicket();
+    const t = await api.leerTicket({ ilegible });
     setLeyendo(false);
     if (!t.ok) {
       setError(t.error);
@@ -117,7 +121,7 @@ export default function Escanear() {
               </Text>
             </View>
             <Text variant="caption" tone="inkSecondary" align="center">
-              {fechaCorta(api.getHoy())}/2026 · 18:42
+              {fechaCorta(hoy)}/2026 · 18:42
             </Text>
           </View>
         </View>

@@ -1186,6 +1186,50 @@ pantallas de Stitch v5 conectadas entre sí, aplicando las correcciones de
 
 ---
 
+## 2026-10-27 — Explicar por qué se recomienda cada medio de pago (issue #46)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** que cada recomendación y cada promo descartada digan con
+claridad por qué, con los textos del diseño, y dejarle a la pantalla los
+datos para armar el "¿por qué no X?". Es una issue chica: va sin spec-kit.
+
+**Prompts principales:**
+1. "Tenemos que trabajar en las issues #46, #48, #10 y #55. Fijate si hay
+   alguna que podamos ir tomando." Las issues #48, #10 y #55 están
+   bloqueadas por tareas de otros compañeros; se arrancó con la issue #46,
+   solo la parte del motor, porque la pantalla depende de las issues #43 y
+   #39.
+2. "Hacé las tres cosas como las proponés": que la recomendación diga
+   cuánto tope queda después de la compra y en qué se basa, en el mismo
+   texto; que los descartes usen el tono del diseño, sin el "Descartada:"
+   de la issue; y que cada descarte diga a qué medios de pago del usuario
+   le servía la promo.
+3. "¿Existe alguna promo con tope de $0?" No existe en la realidad: solo
+   puede venir de un error del extractor. "Arreglalo en el origen: si
+   aparece, es un error y no hay que tomarla como promoción."
+4. "Avanzá con los arreglos de la revisión y sumalos a la bitácora."
+
+**Resultado:**
+- La recomendación ahora dice, por ejemplo, "20% en supermercados los
+  miércoles · te quedan ≈$1.600 de tope, según 3 compras de octubre". Si no
+  hay compras registradas no da cifra, y si la compra usa todo el tope lo
+  avisa.
+- Los descartes dicen, por ejemplo, "Hoy no aplica, la promo es los
+  sábados" o "Tope agotado este mes, según 2 compras".
+- Cada descarte trae los medios de pago del usuario a los que aplicaba la
+  promo, así la pantalla muestra "¿por qué no X?" sin calcular nada.
+- Una promo con tope de $0 o negativo ya no se publica: la regla de
+  publicación la toma como un error de lectura.
+- Se actualizó el ejemplo del contrato de la Edge Function (spec 004).
+- La revisión de código no encontró incumplimientos de las reglas; se
+  ajustaron nombres, un comentario y un caso que faltaba testear. 192
+  tests del motor y 40 de la Edge Function en verde.
+- Queda pendiente: la pantalla del "¿por qué no X?" (issue #43) y avisar
+  en la issue #51 que el extractor no publique topes de $0.
+
+---
+
 ## 2026-11-01 — Estado de issues y versiones; motor en la app con Redux (ADR-010)
 
 **Herramienta:** Claude Code (Sonnet 5.5), con la CLI `gh`.
@@ -1226,13 +1270,118 @@ se recalcule en vivo en la app.
 
 ---
 
+## 2026-11-01 — Esquema inicial de Supabase con RLS (issue #34)
+
+**Herramienta:** Claude Code (Sonnet 5.5) con spec-kit, `spec-critic`,
+`rules-guardian`, `test-runner`, `/code-review` y la skill
+`supabase-postgres-best-practices`.
+
+**Objetivo:** las tablas base de Supabase, cada una con su RLS en la misma
+migración, más los requisitos del ADR-010 §4 que la issue no dice: promociones
+con `actualizada_en` (trigger) para sincronizar solo lo nuevo, lectura para
+autenticados y escritura solo de la service role.
+
+**Prompts principales:**
+1. Pedido con la issue #34, el ADR-010 §4, el modelo de datos y los tipos del
+   motor, y el flujo de la constitución para issues M: specify, `spec-critic`,
+   plan, tareas, implement, `/code-review`, `test-runner` y `rules-guardian`.
+2. Requisitos extra: `actualizada_en` con trigger, test de RLS (A no lee
+   compras de B; un autenticado no inserta en `promociones`), `db reset`
+   limpio, sin columna de imagen de ticket y sin borrar `recomendar`.
+
+**Resultado:**
+- Spec 007 con 25 requisitos. `spec-critic` encontró 5 decisiones abiertas;
+  se resolvieron con defaults que quedan para confirmar en el PR: un medio de
+  pago con compras no se borra; una captura referenciada no se borra; las
+  promociones se dan de baja (`dada_de_baja_en`), no se borran; los comercios
+  se comparan sin mayúsculas ni espacios de más; forma de `capturas_crudas`.
+- 7 migraciones, `seed.sql` y 4 suites pgTAP (129 pruebas). Una FK compuesta
+  `(user_id, medio_de_pago_id)` impide usar el medio de pago de otro usuario,
+  porque una FK simple no aplica RLS.
+- Las pruebas encontraron un error real: la service role no tenía privilegios
+  sobre las tablas nuevas; se agregó el `grant` explícito. Se comprobó además
+  que las pruebas fallan si se rompe una policy a propósito.
+- `/code-review` y `rules-guardian`: sin violaciones duras. Se aplicó el
+  `revoke execute` de las funciones auxiliares; el resto fueron decisiones de
+  juicio o columnas que el tipo `Compra` pide.
+- El seed solo trae a Galicia con id real de MODO; el resto del catálogo de
+  bancos lo carga la ingesta. El job de CI `supabase-rls` no se corrió todavía
+  en GitHub.
+
+---
+
+## 2026-11-01 — Motor en la app y store de Redux (issue #81)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit, `spec-critic`, `/code-review`,
+`test-runner`, `rules-guardian`, el simulador de iOS y el navegador integrado.
+
+**Objetivo:** pasos 1 y 2 del plan de ADR-010: que la app calcule la
+recomendación y los topes con `@vuelto/motor` sobre un store de Redux, para que
+la recomendación cambie mientras se tipea el monto, sin red.
+
+**Prompts principales:**
+1. "Issue #81, siguiendo docs/decisions/010-motor-en-la-app-y-redux.md (plan,
+   pasos 1 y 2) y la constitución 3.0.0 […] Empezá por lo que más riesgo tiene y
+   verificalo antes de seguir: que Metro resuelva @vuelto/motor (paquete
+   compilado a dist/) dentro del monorepo, en Expo Go, en la web y en el build
+   preview de EAS. Si no resuelve, proponeme la solución antes de elegirla."
+2. "Después: borrar servidor-simulado.ts y que api.recomendar use el motor real
+   sobre fixtures.ts; Redux Toolkit con los slices sesion, perfil, corpus,
+   compras, simulacion y contactos; selectRecomendacion y selectTopes con
+   createSelector; `ahora` como valor del store […] La recomendación NO se
+   guarda en el store ni en AsyncStorage."
+3. Elección del PO ante la propuesta: `prepare` en el motor (en vez de resolver
+   el código fuente con una condición de Metro) y un solo build de EAS al final.
+
+**Resultado:**
+- **Riesgo de Metro, medido primero**: con `dist/` el motor se empaqueta en iOS,
+  Android y web sin `metro.config.js`; sin `dist/` (checkout limpio, como EAS y
+  el CI) falla. Se propusieron dos salidas y el PO eligió `"prepare": "npm run
+  build"` en `packages/motor` (research R1 de la spec 008).
+- Spec 008 con `spec-critic`: las cifras de los escenarios coincidían con el
+  motor, pero faltaban el mapeo de los fixtures a la forma del motor, el
+  instante exacto del reloj (mediodía de Argentina, para que la zona no cambie
+  el día) y en qué slice vive `ahora` (`sesion`). Se corrigieron antes del plan.
+- Paso 1 (commit propio): `fixtures.ts` con la forma del motor, `calculo.ts`
+  (motor → vista) y el grupo evaluado con el motor por integrante; se borró
+  `servidor-simulado.ts`. Cambio de comportamiento aceptado: "queda poco" pasa
+  del 30% del mock al 20% del motor (Santander, $2.300 de $8.000, queda
+  "disponible").
+- Paso 2: seis slices con solo datos de entrada; `selectRecomendacion` y
+  `selectTopes` con `createSelector`; persistencia propia (listener) de perfil,
+  corpus, compras y cuenta, con validación por parte y migración de
+  `vuelto.perfil.v1`; `useReloj` escribe `ahora`. Se borraron `sesion.ts` y
+  `perfil-local.ts`.
+- Al mergear `main` (PR #77, issue #46) el motor pasó a incluir el tope y la
+  base en el `motivo` y los medios en cada `Descarte`: la vista muestra solo
+  "qué da" la promo en el título (la cifra y la base van aparte) y la spec se
+  renumeró a 008 (007 ya era el esquema de Supabase).
+- Tests: 136 en la app (cálculo, reducers, selectores con memoización y reloj,
+  persistencia sin nada derivado ni compras de otro período).
+- Verificado en la web: al tipear 1-0-0-0-0 la tarjeta cambia en cada tecla, sin
+  ningún pedido de red; guardar la compra baja el tope de Galicia a ≈$4.500
+  según 4 compras, y sigue ahí después de recargar. En lo guardado hay solo
+  datos de entrada.
+- Verificado en el simulador de iOS (Expo Go): el tipeo cambia la cifra en
+  cada tecla; guardar recalcula la misma pantalla y Topes; al reabrir la app
+  sigue la compra y la simulación arranca vacía. Capturas en el PR #86 y en
+  `specs/008-motor-app-redux/capturas/`. Build `preview` de EAS en verde.
+- `rules-guardian`: sin bloqueantes; se corrigió que al disco llegaran compras
+  de períodos anteriores (privacidad.md).
+- `/code-review`: sin violaciones duras. Se aplicaron las fechas del motor en vez
+  de duplicarlas (el motor solo suma exports), el desfase horario en un único
+  lugar, y la spec y el contrato quedaron alineados con el código.
+
+---
+
 ## 2026-11-01 — Login y registro con Supabase Auth (issue #40)
 
 **Herramienta:** Claude Code (Sonnet 5.5), con la CLI `gh`, el simulador de iOS y un
 Supabase local.
 
-**Objetivo:** email y contraseña en `apps/mobile` sin esperar al store de Redux
-(#81): el usuario vive en `sesion.ts`, fácil de pasar al slice `sesion`.
+**Objetivo:** email y contraseña en `apps/mobile`. Se empezó sobre `sesion.ts`
+porque el store de Redux (#81) no estaba mergeado; al llegar #81 a `main` el
+usuario pasó al slice `sesion`.
 
 **Prompts principales:**
 1. "Issue #40: login y registro con email y contraseña con Supabase Auth en
@@ -1243,16 +1392,21 @@ Supabase local.
 
 **Resultado:**
 - `lib/auth.ts` (validación, errores en español por `code`, con tests),
-  `data/auth.ts` (sesión persistida y `SIGNED_OUT`), pantallas `login` y
+  `data/auth.ts` (thunks: sesión persistida y `SIGNED_OUT`), pantallas `login` y
   `registro` y cierre de sesión en Perfil. Toda la app queda detrás de la sesión
   y el usuario nuevo sin medios va al onboarding.
+- Merge con #81: `sesion.usuario` y `sesion.authLista` (en memoria) reemplazan
+  a `sesion.cuenta`, que era el viejo «guardar perfil» y se persistía; los
+  tokens los guarda el cliente de Supabase. Cerrar sesión o una sesión vencida
+  despachan `sesionCerrada`.
 - Decisión que tomó el código y conviene revisar: la issue pide la app detrás
   de la sesión, así que desaparece el modo invitado de la spec 006 («Ahora no»,
   email sin contraseña, «Continuar con Apple»).
 - Probado contra un Supabase local con usuarios de prueba, en web y en el
   simulador de iOS (Expo Go): registro, onboarding, sesión que sobrevive a
   matar y reabrir la app, cerrar sesión (vuelve a Bienvenida y borra el perfil
-  del dispositivo), contraseña incorrecta y login. En el simulador hubo que
+  del dispositivo), contraseña incorrecta y login. Esa prueba fue antes del
+  merge con #81; después se repitió solo lo automático (tests, lint, typecheck). En el simulador hubo que
   tocar la tecla `@` a mano: el inyector de texto la deformaba.
 - Revisiones: `test-runner`, `rules-guardian` y `/code-review` sin hallazgos
   graves; se corrigieron un fragmento sobrante en Perfil y un helper duplicado.

@@ -2,7 +2,8 @@ import { router } from "expo-router";
 import { useRef, useState, type ComponentRef, type Ref } from "react";
 import { TextInput, View, type TextInputProps } from "react-native";
 import { entrarCuenta, registrarCuenta } from "@/data/auth";
-import { setSesion } from "@/data/sesion";
+import { useAppDispatch } from "@/store/hooks";
+import { avisoMostrado } from "@/store/sesion";
 import { hapticoExito } from "@/lib/haptics";
 import type { ErrorAuth } from "@/lib/auth";
 import { CLAVE_MINIMA } from "@/lib/auth";
@@ -73,6 +74,7 @@ function Campo({ label, error, ...props }: TextInputProps & { label: string; err
  */
 export function FormularioCuenta({ modo }: { modo: Modo }) {
   const t = TEXTOS[modo];
+  const dispatch = useAppDispatch();
   const claveRef = useRef<ComponentRef<typeof TextInput>>(null);
   const [email, setEmail] = useState("");
   const [clave, setClave] = useState("");
@@ -83,7 +85,7 @@ export function FormularioCuenta({ modo }: { modo: Modo }) {
     if (enviando) return;
     setEnviando(true);
     setError(null);
-    const r = await (modo === "registro" ? registrarCuenta : entrarCuenta)(email, clave);
+    const r = await dispatch((modo === "registro" ? registrarCuenta : entrarCuenta)(email, clave));
     setEnviando(false);
     if (!r.ok) {
       setError(r);
@@ -91,7 +93,7 @@ export function FormularioCuenta({ modo }: { modo: Modo }) {
     }
     if (r.cuenta === null) {
       // El proyecto pide confirmar el email: todavía no hay sesión.
-      setSesion({ aviso: "Te mandamos un email para confirmar tu cuenta" });
+      dispatch(avisoMostrado("Te mandamos un email para confirmar tu cuenta"));
       router.replace("/login");
       return;
     }
