@@ -1,24 +1,27 @@
 /**
- * La mezcla de las compras (spec 009 FR-015): lo que dice el servidor, más las compras locales que
- * todavía no confirmó. Núcleo funcional; la escritura y la cola de subida son de #44.
+ * La mezcla de las compras (spec 009 FR-015): lo que dice el servidor más lo guardado en el teléfono
+ * que el servidor todavía no devolvió. Núcleo funcional; la escritura y la cola de subida son de #44.
+ *
+ * ES LA ÚNICA COSTURA CON #44. Hoy conserva las compras locales que no son de ejemplo. Cuando la cola
+ * de #44 (spec 010, `aplicarPendientes`) llegue a `main`, el cuerpo pasa a ser
+ * `aplicarPendientes(servidor, cola.operaciones, usuarioId)`: la cola tiene dueño y persiste las
+ * pendientes aparte. Limitaciones de este cuerpo provisorio: no distingue dueños y una compra local de
+ * fuera del período no sobrevive a un reinicio (`aPersistir` filtra por período).
  */
 import type { Compra } from "@vuelto/motor";
-import type { EstadoCompras } from "../store/acciones";
+import { comprasOctubre } from "../data/fixtures";
+
+const IDS_DE_EJEMPLO: ReadonlySet<string> = new Set(comprasOctubre.map((c) => c.id));
 
 /**
- * `servidor ∪ (pendientes que el servidor no devolvió)`. `delServidor` llega de la más vieja a la
- * más nueva (orden `creada_en`); el resultado va de la más nueva a la más vieja, como el resto de
- * la app. Lo del servidor anterior a `desde` se descarta; una pendiente se conserva siempre.
+ * `servidor ∪ (compras locales que el servidor no devolvió)`, la más nueva primero. `delServidor` llega
+ * de la más vieja a la más nueva (orden `creada_en`). Lo del servidor anterior a `desde` se descarta;
+ * las compras de ejemplo se reemplazan por las del servidor.
  */
-export function mezclarCompras(actual: EstadoCompras, delServidor: readonly Compra[], desde: string): EstadoCompras {
+export function reconciliarCompras(delServidor: readonly Compra[], actuales: readonly Compra[], desde: string): Compra[] {
   const enServidor = new Set(delServidor.map((c) => c.id));
-  const pendientes = actual.pendientes.filter((id) => !enServidor.has(id));
-  const esPendiente = new Set(pendientes);
-
-  const locales = actual.lista.filter((c) => esPendiente.has(c.id));
+  const locales = actuales.filter((c) => !IDS_DE_EJEMPLO.has(c.id) && !enServidor.has(c.id));
   const remotas = delServidor.filter((c) => c.fecha >= desde).reverse();
-
   // Orden estable: más nueva primero; a igual fecha, las locales antes que las del servidor.
-  const lista = [...locales, ...remotas].sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0));
-  return { ...actual, lista, pendientes };
+  return [...locales, ...remotas].sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0));
 }

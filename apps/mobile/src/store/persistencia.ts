@@ -10,6 +10,7 @@ import { fechaArgentina } from "@vuelto/motor";
 import { comprasDelPeriodo } from "../data/calculo";
 import {
   rehidratado,
+  sesionCerrada,
   type Cuenta,
   type EstadoCompras,
   type EstadoCorpus,
@@ -45,22 +46,13 @@ export type CorpusPersistido = {
   sincronizadoEn: string | null;
 };
 
-/**
- * Solo las compras del período en curso llegan al disco (privacidad.md, ADR-010), más las que
- * todavía no se subieron, que se guardan siempre aunque sean de antes: si no, se perderían (FR-015).
- */
+/** Solo las compras del período en curso llegan al disco (privacidad.md, ADR-010). */
 export function aPersistir(s: RootState): Persistido {
   const hoy = fechaArgentina(new Date(s.sesion.ahora));
-  const delPeriodo = new Set(comprasDelPeriodo(s.compras.lista, hoy).map((c) => c.id));
-  const pendientes = new Set(s.compras.pendientes);
   return {
     version: 1,
     perfil: s.perfil,
-    compras: {
-      lista: s.compras.lista.filter((c) => delPeriodo.has(c.id) || pendientes.has(c.id)),
-      pendientes: s.compras.pendientes,
-      duenoId: s.compras.duenoId,
-    },
+    compras: { lista: comprasDelPeriodo(s.compras.lista, hoy) },
     cuenta: s.sesion.cuenta,
   };
 }
@@ -102,19 +94,10 @@ function corpusValido(x: unknown): EstadoCorpus | null {
   };
 }
 
-/**
- * Un guardado anterior a la spec 009 no trae `pendientes` ni `duenoId`: se completan con `[]` y
- * `null` en vez de dejarlos `undefined` (M1 de la crítica). No se sube la `version`.
- */
 function comprasValidas(x: unknown): EstadoCompras | null {
   if (!esObjeto(x) || !Array.isArray(x.lista)) return null;
   const ok = x.lista.every((c) => esObjeto(c) && esTexto(c.id) && esTexto(c.fecha) && typeof c.monto === "number");
-  if (!ok) return null;
-  const pendientes = x.pendientes === undefined ? [] : x.pendientes;
-  if (!listaDeTextos(pendientes)) return null;
-  const duenoId = x.duenoId === undefined ? null : x.duenoId;
-  if (!textoONull(duenoId)) return null;
-  return { lista: x.lista as EstadoCompras["lista"], pendientes, duenoId };
+  return ok ? { lista: x.lista as EstadoCompras["lista"] } : null;
 }
 
 function cuentaValida(x: unknown): { valor: Cuenta } | null {
@@ -217,6 +200,14 @@ export function escucharPersistencia(listener: ListenerMiddlewareInstance<RootSt
       } catch {
         // Almacenamiento lleno o no disponible: se pierde solo lo que no se pudo guardar.
       }
+    },
+  });
+  // Cerrar sesión vuelve al modo de ejemplo: el corpus guardado se borra, o al reabrir volvería el real
+  // junto a las compras de ejemplo.
+  listener.startListening({
+    actionCreator: sesionCerrada,
+    effect: async () => {
+      await almacenamiento.removeItem(CLAVE_CORPUS).catch(() => undefined);
     },
   });
   // El corpus en su propia clave, y solo el que viene de una sincronización real: el de ejemplo no se guarda.

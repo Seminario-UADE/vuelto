@@ -35,15 +35,8 @@ export type EstadoCorpus = {
 };
 
 export type EstadoCompras = {
-  /** Compras con la forma del motor, la más nueva primero. */
+  /** Compras con la forma del motor, la más nueva primero. Las pendientes de subir viven en la cola de #44. */
   lista: Compra[];
-  /**
-   * Ids de compras locales que el servidor todavía no confirmó. Las suma `compraAgregada`; las saca
-   * `compraSubida` (la despacha #44). La sincronización nunca las borra (spec 009 FR-015).
-   */
-  pendientes: string[];
-  /** `auth.uid()` dueño de `lista`. `null` = datos de ejemplo o nunca sincronizó. */
-  duenoId: string | null;
 };
 
 /**
@@ -67,20 +60,16 @@ export const rehidratado = createAction<Rehidratado>("store/rehidratado");
  */
 export type Sincronizado = {
   corpus: EstadoCorpus;
-  /** Las compras del período del servidor, de la más vieja a la más nueva (orden `creada_en`). */
+  /** La lista de compras ya reconciliada con lo local (`reconciliarCompras`), la más nueva primero. */
   compras: Compra[];
-  /** Inicio del período: lo anterior sale de `compras.lista`, salvo las pendientes. */
-  desde: string;
   usuarioId: string;
   /** El reloj real al terminar (ISO). */
   ahora: string;
 };
 export const sincronizado = createAction<Sincronizado>("store/sincronizado");
 
-/** El servidor confirmó una compra local: sale de `pendientes` (la despacha #44, spec 009). */
-export const compraSubida = createAction<string>("store/compraSubida");
 
-/** Cerrar sesión: todo vuelve al estado inicial salvo el reloj. */
+/** Cerrar sesión: todo vuelve al estado inicial (el de ejemplo: corpus, compras y reloj). */
 export const sesionCerrada = createAction("store/sesionCerrada");
 
 /** "Mes sin compras" vacía las compras; los otros vuelven a las de ejemplo. */

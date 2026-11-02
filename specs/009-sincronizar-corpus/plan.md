@@ -45,9 +45,9 @@ sesión del usuario; las compras solo del dueño y del período
 | Principio | Cumple | Cómo |
 |---|---|---|
 | I. Regla de oro | Sí | No agrega pantallas de promos. La leyenda es una línea discreta en Inicio; no lista promociones |
-| II. Motor determinístico | Sí | El motor no se toca. La recomendación y los topes siguen derivados por selectores; `marca`, `sincronizadoEn`, `pendientes` y `duenoId` son datos de entrada, no derivados. `ahora` entra como valor del store; los reducers no leen el reloj |
-| III. Null explícito | Sí | `marca: string \| null`, `sincronizadoEn: string \| null`, `duenoId: string \| null`; ningún campo opcional (`?:`). El mapeo de filas no inventa: lo ausente es `null` |
-| IV. Secretos y privacidad | Sí | Solo la anon key y la sesión del usuario (RLS). El script de medición usa un usuario de prueba, nunca la service role. Al dispositivo llegan el corpus (público) y las compras propias del período. No hay tablas nuevas |
+| II. Motor determinístico | Sí | El motor no se toca. La recomendación y los topes siguen derivados por selectores; `marca`, `sincronizadoEn` y `descartadas` son datos de entrada, no derivados. `ahora` entra como valor del store; los reducers no leen el reloj |
+| III. Null explícito | Sí | `marca: string \| null`, `sincronizadoEn: string \| null`; ningún campo opcional (`?:`). El mapeo de filas no inventa: lo ausente es `null` |
+| IV. Secretos y privacidad | Sí | Solo la anon key y la sesión del usuario (RLS). La medición usa un usuario de prueba, nunca la service role. **Una excepción acotada**: la prueba de integración usa la clave de servicio de DEMO de un Supabase local, solo para sembrar y limpiar promos (hace de ingesta), se salta si la URL no es localhost y no corre en el CI Al dispositivo llegan el corpus (público) y las compras propias del período. No hay tablas nuevas |
 | V. Topes estimados con su base | Sí | Las bajas se mapean a vencidas para que sus compras sigan descontando; el restante no sube (US4). Sin compras, la base lo dice como hoy |
 | VI. Test-first en el motor | N/A | No se toca el motor. La lógica nueva se escribe con tests Vitest antes o junto con el código, sin red |
 
@@ -99,9 +99,9 @@ apps/mobile/
     │   └── use-sincronizacion.ts   # NUEVO: apertura y AppState → dispatch(sincronizar)
     ├── lib/frescura.ts (+ test)    # textoFrescura (puro)
     ├── store/
-    │   ├── acciones.ts             # EstadoCorpus/EstadoCompras nuevos, `sincronizado`, `compraSubida`
+    │   ├── acciones.ts             # EstadoCorpus nuevo, `sincronizado`, `Rehidratado.ahora`
     │   ├── corpus.ts, compras.ts, sesion.ts   # campos y reducers nuevos
-    │   ├── persistencia.ts         # dos claves, normalización, pendientes sin filtrar
+    │   ├── persistencia.ts         # dos claves y normalización
     │   ├── index.ts                # Extra: repositorio, reloj, coordinación
     │   └── selectores.ts           # selectFrescura
     └── app/
@@ -123,4 +123,4 @@ Sin violaciones de la constitución. Dos puntos que merecen ojo del PO, no de la
 | Decisión | Por qué | Alternativa descartada |
 |---|---|---|
 | Ventana de compras = período (mes o semana, el más temprano), no "últimos N días del mes" | Coincide con `privacidad.md`, ADR-010 y `comprasDelPeriodo`; evita guardar un mes de más | N días: el store en línea y el reabierto tendrían ventanas distintas, y baja más de lo que la privacidad declara |
-| Corpus en una clave de AsyncStorage aparte | Un corpus que no entra no se lleva el perfil ni las compras pendientes; la marca viaja con las promos | Una sola clave: pierde datos del usuario sin avisar si el corpus supera 2 MB |
+| Corpus en una clave de AsyncStorage aparte | Un corpus que no entra no se lleva el perfil ni las compras; la marca viaja con las promos | Una sola clave: pierde datos del usuario sin avisar si el corpus supera 2 MB |

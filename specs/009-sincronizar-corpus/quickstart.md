@@ -17,7 +17,9 @@ para meses de 28/29/30/31 días y los bordes de las 00:00 y 23:59).
 ```bash
 supabase start        # o una copia con otro project_id/puertos si hay otro stack en 5432x
 supabase db reset
-npm run test:integracion -w @vuelto/mobile    # arranca contra API_URL/ANON_KEY de `supabase status`
+# Variables (de `supabase status -o env`; solo corre contra localhost): SUPABASE_URL=$API_URL SUPABASE_ANON_KEY=$ANON_KEY
+# SUPABASE_LOCAL_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY (la clave de DEMO local; solo siembra las promos de prueba)
+npm run test:integracion -w @vuelto/mobile
 ```
 
 Esperado: las consultas de `contracts/postgrest.md` devuelven lo mismo que en `research.md` R1 (cursor con empates,
@@ -27,7 +29,7 @@ Esperado: las consultas de `contracts/postgrest.md` devuelven lo mismo que en `r
 
 ```bash
 EXPO_PUBLIC_SUPABASE_URL=… EXPO_PUBLIC_SUPABASE_ANON_KEY=… MEDICION_EMAIL=… MEDICION_PASSWORD=… \
-  node --experimental-strip-types apps/mobile/scripts/medir-corpus.ts
+  npm run medir:corpus -w @vuelto/mobile
 ```
 
 Esperado: cantidad, bytes totales, promedio y máximo por promo, y qué fracción es de 6 MB y de 2 MB. Sin corpus real

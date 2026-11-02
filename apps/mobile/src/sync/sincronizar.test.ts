@@ -46,8 +46,6 @@ describe("sincronizar: primera vez y reloj (US1, FR-004, FR-016)", () => {
     expect(s.corpus.sincronizadoEn).toBe(AHORA.toISOString());
     expect(s.sesion.ahora).toBe(AHORA.toISOString());
     expect(s.compras.lista.map((c) => c.id)).toEqual([ID(1002), ID(1001)]);
-    expect(s.compras.duenoId).toBe("usuario-1");
-    expect(s.compras.pendientes).toEqual([]);
   });
 
   it("pide las compras desde el inicio del PERÍODO con el reloj real, no el de ejemplo", async () => {
@@ -245,16 +243,15 @@ describe("sincronizar: atomicidad y fallas (FR-005, SC-005)", () => {
   });
 });
 
-describe("sincronizar: cuentas y compras locales (US5)", () => {
+describe("sincronizar: compras locales y cuentas (US5)", () => {
   const compraLocal = { ...comprasOctubre[0]!, id: "n11", fecha: "2026-11-02" };
 
-  it("una compra local pendiente sobrevive a la sincronización", async () => {
+  it("una compra local que el servidor no devolvió sobrevive a la sincronización", async () => {
     const repo = repositorioEnMemoria({ promociones: [fila(1)], compras: [filaCompra(1)] });
     const { store } = armar(repo);
     store.dispatch(compraAgregada(compraLocal));
     await store.dispatch(sincronizar("apertura"));
     expect(store.getState().compras.lista.map((c) => c.id)).toEqual(expect.arrayContaining(["n11", ID(1001)]));
-    expect(store.getState().compras.pendientes).toEqual(["n11"]);
   });
 
   it("una compra guardada mientras hay una sincronización en vuelo no se pierde", async () => {
@@ -265,16 +262,21 @@ describe("sincronizar: cuentas y compras locales (US5)", () => {
     };
     await store.dispatch(sincronizar("apertura"));
     expect(store.getState().compras.lista.map((c) => c.id)).toContain("n11");
-    expect(store.getState().compras.pendientes).toEqual(["n11"]);
   });
 
-  it("si el servidor ya devuelve la compra con el mismo id, queda la del servidor y sale de pendientes", async () => {
+  it("si el servidor ya devuelve la compra con el mismo id, queda una sola", async () => {
     const repo = repositorioEnMemoria({ promociones: [fila(1)], compras: [filaCompra(1)] });
     const { store } = armar(repo);
     store.dispatch(compraAgregada({ ...compraLocal, id: ID(1001) }));
     await store.dispatch(sincronizar("apertura"));
     expect(store.getState().compras.lista.filter((c) => c.id === ID(1001))).toHaveLength(1);
-    expect(store.getState().compras.pendientes).toEqual([]);
+  });
+
+  it("las compras de ejemplo no sobreviven a la primera sincronización", async () => {
+    const repo = repositorioEnMemoria({ promociones: [fila(1)], compras: [] });
+    const { store } = armar(repo);
+    await store.dispatch(sincronizar("apertura"));
+    expect(store.getState().compras.lista).toEqual([]);
   });
 
   it("si se cierra la sesión mientras hay una sincronización en vuelo, el resultado se descarta", async () => {
@@ -285,11 +287,10 @@ describe("sincronizar: cuentas y compras locales (US5)", () => {
     };
     await store.dispatch(sincronizar("apertura"));
     expect(store.getState().corpus.marca).toBeNull();
-    expect(store.getState().compras.duenoId).toBeNull();
     expect(store.getState().compras.lista).toEqual(comprasOctubre);
   });
 
-  it("si la cuenta cambió sin pasar por el cierre de sesión, el resultado se descarta", async () => {
+  it("si el usuario cambió mientras volaba el pedido, el resultado se descarta", async () => {
     const repo = repositorioEnMemoria({ promociones: [fila(1)], compras: [filaCompra(1)] });
     const { store } = armar(repo);
     repo.alPedirPromociones = () => {
@@ -299,23 +300,20 @@ describe("sincronizar: cuentas y compras locales (US5)", () => {
     expect(store.getState().corpus.marca).toBeNull();
   });
 
-  it("con otra cuenta, las compras y las pendientes de la anterior no sobreviven", async () => {
-    const repo = repositorioEnMemoria({ promociones: [fila(1)], compras: [filaCompra(1)], usuario: "usuario-A" });
-    const { store, avanzar } = armar(repo);
+  it("cerrar sesión después de sincronizar vuelve TODO al modo de ejemplo: corpus, compras y reloj", async () => {
+    const repo = repositorioEnMemoria({ promociones: [fila(1)], compras: [filaCompra(1)] });
+    const { store } = armar(repo);
     await store.dispatch(sincronizar("apertura"));
-    store.dispatch(compraAgregada(compraLocal));
-    expect(store.getState().compras.pendientes).toEqual(["n11"]);
+    expect(store.getState().corpus.marca).not.toBeNull();
 
-    // Entra otra cuenta sin pasar por `sesionCerrada` (la sesión de A venció).
-    repo.usuario = "usuario-B";
-    repo.comprasFilas = [filaCompra(2)];
-    avanzar(ESPERA_MS);
-    await store.dispatch(sincronizar("primer-plano"));
+    store.dispatch(sesionCerrada());
 
-    const { compras } = store.getState();
-    expect(compras.duenoId).toBe("usuario-B");
-    expect(compras.lista.map((c) => c.id)).toEqual([ID(1002)]);
-    expect(compras.pendientes).toEqual([]);
+    const s = store.getState();
+    expect(s.corpus.marca).toBeNull();
+    expect(s.corpus.sincronizadoEn).toBeNull();
+    expect(s.corpus.promociones).toEqual(promosDeEjemplo);
+    expect(s.compras.lista).toEqual(comprasOctubre);
+    expect(s.sesion.ahora).toBe(new Date(RELOJ_EJEMPLO).toISOString());
   });
 });
 

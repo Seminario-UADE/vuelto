@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { comprasOctubre, promociones } from "../data/fixtures";
 import { compraAgregada } from "./compras";
 import { contactoQuitado } from "./contactos";
-import { compraSubida, sincronizado } from "./acciones";
+import { sesionCerrada, sincronizado } from "./acciones";
 import { CLAVE, CLAVE_CORPUS, CLAVE_VIEJA, CORPUS_VACIO, rehidratar } from "./persistencia";
 import { mediosElegidos, onboardingTerminado } from "./perfil";
 import { selectRecomendacion, selectTopes } from "./selectores";
@@ -34,7 +34,6 @@ describe("persistencia (US4)", () => {
     expect(b.getState().corpus.marca).toBeNull();
     expect(disco.datos.has(CLAVE_CORPUS)).toBe(false);
     expect(b.getState().compras.lista[0]?.id).toBe("n11");
-    expect(b.getState().compras.pendientes).toEqual(["n11"]);
   });
 
   it("simulación, reloj y contactos no se guardan", async () => {
@@ -77,22 +76,14 @@ describe("persistencia (US4)", () => {
     }
   });
 
-  it("al disco llegan solo las compras del período en curso, más las pendientes (privacidad.md, US5-6)", async () => {
+  it("al disco llegan solo las compras del período en curso (privacidad.md)", async () => {
     const disco = memoria();
     const a = await abrir(disco);
     a.dispatch(compraAgregada({ ...nueva, id: "sept", fecha: "2026-09-20" }));
     await esperar();
-    const guardado = JSON.parse(disco.datos.get(CLAVE) ?? "{}").compras as { lista: { id: string }[]; pendientes: string[] };
-    // La de septiembre es pendiente: se guarda aunque sea de antes del período, hasta que se suba.
-    expect(guardado.lista.map((c) => c.id)).toContain("sept");
-    expect(guardado.pendientes).toEqual(["sept"]);
-    // Una vez subida deja de ser pendiente y la próxima escritura la filtra por período.
-    a.dispatch(compraSubida("sept"));
-    await esperar();
-    const despues = JSON.parse(disco.datos.get(CLAVE) ?? "{}").compras as { lista: { id: string }[]; pendientes: string[] };
-    expect(despues.lista.map((c) => c.id)).not.toContain("sept");
-    expect(despues.lista).toHaveLength(10);
-    expect(despues.pendientes).toEqual([]);
+    const lista = JSON.parse(disco.datos.get(CLAVE) ?? "{}").compras.lista as { id: string }[];
+    expect(lista.map((c) => c.id)).not.toContain("sept");
+    expect(lista).toHaveLength(10);
   });
 
   it("no escribe antes de rehidratar (no pisa lo guardado)", async () => {
@@ -170,7 +161,7 @@ describe("persistencia del corpus en su propia clave (spec 009 FR-017)", () => {
     const s = storeDePrueba(null, falla);
     await s.dispatch(rehidratar());
     s.dispatch(onboardingTerminado());
-    s.dispatch(sincronizado({ corpus: { promociones: [], marca: "2026-11-02T12:00:00+00:00", sincronizadoEn: "2026-11-02T15:00:00.000Z", descartadas: 0 }, compras: [], desde: "2026-11-01", usuarioId: "u", ahora: "2026-11-02T15:00:00.000Z" }));
+    s.dispatch(sincronizado({ corpus: { promociones: [], marca: "2026-11-02T12:00:00+00:00", sincronizadoEn: "2026-11-02T15:00:00.000Z", descartadas: 0 }, compras: [], usuarioId: "u", ahora: "2026-11-02T15:00:00.000Z" }));
     await esperar();
     expect(JSON.parse(disco.datos.get(CLAVE) ?? "{}").perfil.onboardingCompleto).toBe(true);
     expect(disco.datos.has(CLAVE_CORPUS)).toBe(false);
@@ -190,8 +181,6 @@ describe("persistencia del corpus en su propia clave (spec 009 FR-017)", () => {
     expect(e.perfil.medios).toEqual(["galicia-visa-credito"]);
     expect(e.corpus.marca).toBeNull();
     expect(e.corpus.promociones).toHaveLength(promociones.length); // el de ejemplo, no el del guardado
-    expect(e.compras.pendientes).toEqual([]);
-    expect(e.compras.duenoId).toBeNull();
     expect(e.compras.lista.map((c) => c.id)).toEqual(["c1"]);
   });
 
@@ -208,4 +197,15 @@ describe("persistencia del corpus en su propia clave (spec 009 FR-017)", () => {
       expect(s.getState().corpus).toEqual(CORPUS_VACIO);
     },
   );
+
+  it("cerrar sesión borra el corpus guardado: al reabrir no vuelve el real junto a compras de ejemplo", async () => {
+    const disco = memoria({ [CLAVE_CORPUS]: corpusGuardado("2026-11-02T12:00:00+00:00") });
+    const a = await abrir(disco);
+    expect(a.getState().corpus.marca).not.toBeNull();
+    a.dispatch(sesionCerrada());
+    await esperar();
+    expect(disco.datos.has(CLAVE_CORPUS)).toBe(false);
+    const b = await abrir(disco);
+    expect(b.getState().corpus.marca).toBeNull();
+  });
 });

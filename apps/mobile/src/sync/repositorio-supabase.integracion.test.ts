@@ -1,9 +1,12 @@
 /**
  * Las consultas de `contracts/postgrest.md` contra un Supabase LOCAL (Docker), con la sesión de un
- * usuario de prueba. Se salta sola si faltan las variables; con la service role solo siembra las
- * promos (el seed del repo no las trae) y se niega a correr contra algo que no sea localhost.
+ * usuario de prueba. Se salta sola si faltan las variables o si la URL no es localhost: con una URL
+ * remota no hace ningún pedido. La clave de servicio (la de DEMO de `supabase status`, nunca una real)
+ * solo siembra y limpia las promos de prueba, en lugar de la ingesta: el seed del repo no las trae y
+ * la app no puede escribir en `promociones` (el propio test lo verifica con 42501). Excepción
+ * acotada a esta prueba local (constitución §IV).
  *
- *   SUPABASE_URL=… SUPABASE_ANON_KEY=… SUPABASE_SERVICE_ROLE_KEY=… npm run test:integracion -w @vuelto/mobile
+ *   SUPABASE_URL=… SUPABASE_ANON_KEY=… SUPABASE_LOCAL_SERVICE_ROLE_KEY=… npm run test:integracion -w @vuelto/mobile
  *   (los valores salen de `supabase status -o env`)
  */
 import { createClient } from "@supabase/supabase-js";
@@ -15,7 +18,7 @@ import { repositorioSupabase } from "./repositorio-supabase";
 
 const URL = process.env.SUPABASE_URL;
 const ANON = process.env.SUPABASE_ANON_KEY;
-const SERVICIO = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SERVICIO = process.env.SUPABASE_LOCAL_SERVICE_ROLE_KEY;
 const hayEntorno = Boolean(URL && ANON && SERVICIO);
 const esLocal = hayEntorno && /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(URL!);
 
@@ -39,14 +42,11 @@ const promo = (titulo: string, resto: Record<string, unknown> = {}) => ({
   ...resto,
 });
 
-describe.skipIf(!hayEntorno)("repositorioSupabase contra un Supabase local", () => {
-  it("se niega a correr contra algo que no es localhost", () => {
-    expect(esLocal).toBe(true);
-  });
+describe.skipIf(!esLocal)("repositorioSupabase contra un Supabase local", () => {
 
-  const admin = hayEntorno ? createClient(URL!, SERVICIO!, { auth: { persistSession: false } }) : null!;
-  const usuario = hayEntorno ? createClient(URL!, ANON!, { auth: { persistSession: false } }) : null!;
-  const otro = hayEntorno ? createClient(URL!, ANON!, { auth: { persistSession: false } }) : null!;
+  const admin = esLocal ? createClient(URL!, SERVICIO!, { auth: { persistSession: false } }) : null!;
+  const usuario = esLocal ? createClient(URL!, ANON!, { auth: { persistSession: false } }) : null!;
+  const otro = esLocal ? createClient(URL!, ANON!, { auth: { persistSession: false } }) : null!;
   const sembradas = {
     nula: promo("jurisdiccion nula", { jurisdiccion: null }),
     nacional: promo("nacional"),
@@ -58,7 +58,7 @@ describe.skipIf(!hayEntorno)("repositorioSupabase contra un Supabase local", () 
   let uid = "";
 
   beforeAll(async () => {
-    if (!esLocal) return;
+    
     // Siembra de a una, con una pausa mínima, para que `actualizada_en` (la fija el trigger) sea creciente.
     for (const p of Object.values(sembradas)) {
       const { error } = await admin.from("promociones").insert(p);
@@ -74,7 +74,7 @@ describe.skipIf(!hayEntorno)("repositorioSupabase contra un Supabase local", () 
   });
 
   afterAll(async () => {
-    if (!esLocal) return;
+    
     await admin.from("compras").delete().eq("user_id", uid);
     await admin.from("promociones").delete().in("id", ids);
   });

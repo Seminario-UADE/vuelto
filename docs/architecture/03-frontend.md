@@ -78,7 +78,7 @@ dispositivo (ADR-010, spec 008).
 | `sesion` | Cuenta, `ahora` (reloj del cálculo), aviso pendiente, escenario de desarrollo, `hidratado`, `epoca` (sube con cada cierre de sesión) | Solo la cuenta |
 | `perfil` | Nombre, onboarding completo, medios y comercios elegidos, invitación pendiente | Sí |
 | `corpus` | Promociones con la forma del motor, `marca` (la mayor `actualizada_en`, texto exacto del servidor), `sincronizadoEn` y `descartadas`. Sin sincronizar: las de ejemplo y `marca: null` | Sí, en su propia clave `vuelto.corpus.v1`, y solo el que viene de una sincronización |
-| `compras` | Compras con la forma del motor (`promocionId`, `descuentoObtenido`, `reintegroEsperado`), `pendientes` (ids que el servidor no confirmó) y `duenoId` | Sí |
+| `compras` | Compras con la forma del motor (`promocionId`, `descuentoObtenido`, `reintegroEsperado`) | Sí |
 | `simulacion` | Comercio elegido y monto opcional de «¿Con qué pago?» | No |
 | `contactos` | Contactos (solo lo de ADR-008 §3) y grupo en armado | No |
 
@@ -109,7 +109,7 @@ selectResumenCompras = compras + ahora → «Mis compras» del mes en curso
   `vuelto.corpus.v1`, ambos solo después de rehidratar (no pisan lo guardado). El corpus va aparte
   para que un corpus que no entra no se lleve el perfil ni las compras pendientes, y lleva la marca
   adentro: si no se pudo guardar, la marca guardada no avanza. Al disco llegan las compras del
-  período más las pendientes (aunque sean de antes). Al abrir, `rehidratar()` valida cada parte por
+  período. Al abrir, `rehidratar()` valida cada parte por
   separado (una corrupta vuelve sola a su inicio; un corpus guardado ilegible queda vacío con la
   marca en `null`) y migra `vuelto.perfil.v1`, la clave del viejo `perfil-local.ts`. `vuelto.store.v1`
   sigue en `version: 1`: un guardado anterior a la spec 009 se lee como «nunca sincronizó». El splash
@@ -122,8 +122,10 @@ selectResumenCompras = compras + ahora → «Mis compras» del mes en curso
   (`sincronizado`) o nada. La primera sincronización reemplaza el corpus de ejemplo; una que trae cero
   promos no cambia nada. Las bajas quedan en el corpus como promos vencidas (su consumo sigue contando en
   el tope compartido, Principio V). Descarta el resultado si se cerró la sesión (`sesion.epoca`) o
-  cambió el usuario mientras volaba. La leyenda «Promos actualizadas hace X» sale de `selectFrescura`.
-  La escritura de compras y la cola de subida son de #44.
+  cambió el usuario mientras volaba. Cerrar sesión vuelve **todo** al modo de ejemplo (corpus, compras y reloj)
+  y borra `vuelto.corpus.v1`. La leyenda «Promos actualizadas hace X» sale de `selectFrescura`. La mezcla de
+  las compras del servidor con las locales es `reconciliarCompras` (`sync/compras.ts`), la única costura con
+  #44: la escritura de compras y la cola de subida son de esa issue y `EstadoCompras` sigue siendo `{ lista }`.
 - **Lo asíncrono** (catálogos, ticket, invitaciones, grupo) sigue en `api.ts` con `useAsync`.
 - La sesión de Supabase (`src/lib/supabase.ts`, AsyncStorage) la usa la sincronización; sin variables
   de entorno o sin sesión no se sincroniza y la app sigue con lo guardado. El login es #40.

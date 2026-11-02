@@ -47,6 +47,11 @@ Reglas (RNF-04, RNF-05):
 - Si una key se filtró (commit, log, captura), se rota primero y se limpia
   después: el historial de git no se considera borrado.
 
+> **Excepción acotada**: la prueba de integración de la sincronización de la app
+> (`npm run test:integracion -w @vuelto/mobile`) usa la clave de servicio de **demo** de un Supabase **local**
+> (`supabase status`) para sembrar y limpiar promos de prueba, en lugar de la ingesta. Se salta si la URL no
+> es `localhost` y no corre en el CI. Nunca se usa una clave real ni se empaqueta en la app.
+
 ## Contrato de escritura de `promociones` con la sincronización de la app
 
 La app sincroniza el corpus por `actualizada_en` (spec 009). Ese campo lo pone el trigger con

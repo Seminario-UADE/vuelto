@@ -7,6 +7,7 @@
 import type { AppThunk } from "../store";
 import { sincronizado } from "../store/acciones";
 import type { Cursor, FilaCompra, FilaPromocion } from "./contratos";
+import { reconciliarCompras } from "./compras";
 import { aplicarPromociones } from "./corpus";
 import { filaACompra } from "./mapeo";
 import { leerTodo, TAMANO_PAGINA } from "./paginar";
@@ -103,12 +104,20 @@ export function sincronizar(motivo: Motivo): AppThunk<Promise<void>> {
         return c === null ? [] : [c];
       });
 
-      // El chequeo y el dispatch son sincrónicos entre sí: no hay hueco para otra acción (R3).
+      // El chequeo, la reconciliación y el dispatch son sincrónicos entre sí: no hay hueco para otra
+      // acción (R3), y una compra guardada mientras volaba el pedido entra en la reconciliación (FR-015).
       const usuarioAhora = await conTimeout(() => repositorio.usuarioId());
       const estado = getState();
       if (estado.sesion.epoca !== epoca || usuarioAhora !== usuario || estado.corpus.marca !== marca) return;
 
-      dispatch(sincronizado({ corpus, compras: delServidor, desde, usuarioId: usuario, ahora }));
+      dispatch(
+        sincronizado({
+          corpus,
+          compras: reconciliarCompras(delServidor, estado.compras.lista, desde),
+          usuarioId: usuario,
+          ahora,
+        }),
+      );
     } catch {
       // Sin red, página caída o timeout: el store queda como estaba.
     } finally {

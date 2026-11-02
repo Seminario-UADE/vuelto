@@ -16,30 +16,24 @@ type EstadoCorpus = {
   descartadas: number;
 };
 
-type EstadoCompras = {
-  lista: Compra[];                // forma del motor, la más nueva primero
-  /** Ids de compras locales que el servidor todavía no confirmó. Las escribe la compra local y las saca #44. */
-  pendientes: string[];
-  /** `auth.uid()` del dueño de `lista`. `null` = datos de ejemplo o nunca sincronizó. */
-  duenoId: string | null;
-};
+// EstadoCompras NO cambia: { lista: Compra[] } (la cola de pendientes es de #44, un slice aparte `cola`).
 ```
 
 - `corpus.marca === null` ⇔ la app usa los datos y el reloj de ejemplo (FR-016).
 - `cargadoEn` desaparece: con los datos de ejemplo era el instante del reloj fijo y no significa nada.
-- `sesionCerrada`: `compras` vuelve a `{ lista: comprasDeEjemplo, pendientes: [], duenoId: null }`. El `corpus` no se toca (es público).
+- `sesionCerrada`: `compras` vuelve a las de ejemplo (ya lo hace). El `corpus` no se toca (es público).
 
 ## Persistencia
 
 | Clave | Contenido | Se escribe |
 |---|---|---|
-| `vuelto.store.v1` | `{ version: 1, perfil, compras: { lista, pendientes, duenoId }, cuenta }` | Cuando cambia `perfil`, `compras` o `sesion.cuenta` |
+| `vuelto.store.v1` | `{ version: 1, perfil, compras: { lista }, cuenta }` | Cuando cambia `perfil`, `compras` o `sesion.cuenta` |
 | `vuelto.corpus.v1` | `{ version: 1, promociones, marca, sincronizadoEn }` | Cuando cambia `corpus`. Si falla, la marca guardada no avanza |
 
 - `vuelto.store.v1` **sigue en `version: 1`** (subirla borraría el perfil de todos). Un `corpus` dentro de
-  ese valor se ignora. El validador completa `pendientes: []` y `duenoId: null` si faltan.
-- `compras.lista` se guarda **filtrada al período**, pero las compras cuyo id está en `pendientes` se guardan
-  **siempre**, aunque sean de fuera del período, hasta que se suban.
+  ese valor se ignora.
+- `compras.lista` se guarda **filtrada al período** (como hoy). Las pendientes de subir viven en la cola de #44
+  (`vuelto.cola.v1`), que las persiste completas aparte.
 - Un guardado sin `vuelto.corpus.v1`, o inválido, se lee como "nunca sincronizó" (`marca: null`, corpus de ejemplo).
   Un `vuelto.corpus.v1` inválido de un usuario que ya tenía cuenta sincronizada deja el corpus vacío con `marca: null`.
 
@@ -87,18 +81,27 @@ interface RepositorioSincronizacion {
 
 ## Contrato con #44 (escritura de compras)
 
-La #44 es dueña de guardar una compra, la cola sin red y la subida. Esta spec define lo que la #44 puede dar por
-hecho y lo que esta spec le exige:
+Acordado el 02/11/2026 con la sesión de #44 (spec 010, rama `claude/elegant-hermann-7c2dcf`), que ya tiene su código:
 
-1. **La #44 genera el `id` de la compra como un UUID en el cliente y lo manda en el insert.** Así el id local y el del
-   servidor coinciden y la deduplicación al sincronizar es por `id` (hoy `guardarCompra` usa `n${n}`).
-2. `compraAgregada` agrega el id a `compras.pendientes` (lo hace el reducer de esta spec). La #44 despacha
-   `compraSubida(id)` cuando el servidor confirma; ese reducer saca el id de `pendientes`.
-3. La sincronización nunca borra una compra de `pendientes`. Si el servidor la devuelve, queda la versión del servidor y
-   el id sale de `pendientes` en el mismo reducer.
-4. `compras.duenoId` lo fija la sincronización. La #44 no lo toca. Si la cuenta cambia, `pendientes` se vacía (no se
-   suben compras de una cuenta con la sesión de otra).
-5. Cualquier cambio de la #44 a la forma de `EstadoCompras` se anota acá y en su spec.
+1. **`EstadoCompras` sigue siendo `{ lista }`.** No hay `pendientes`, `duenoId` ni `compraSubida`: la cola de #44 (slice
+   `cola`, clave `vuelto.cola.v1`) dice qué falta subir, de quién es y en qué estado está, y se escribe antes que `compras`.
+2. **UUID del cliente**: `guardarCompra` usa `Extra.generarId` y manda el id en el insert (ya está en #44). Así el id local
+   y el del servidor coinciden y la reconciliación deduplica por `id`.
+3. **La costura**: la sincronización mezcla con una sola función, `reconciliarCompras(servidor, actuales, desde)` en
+   `apps/mobile/src/sync/compras.ts`. Hoy: `servidor ∪ compras locales que no son de ejemplo y que el servidor no
+   devolvió`. Cuando #44 llegue a `main`, el cuerpo pasa a `aplicarPendientes(servidor, getState().cola.operaciones,
+   usuarioId)` (función pura de #44: una guardada pendiente que el servidor no tiene se agrega una vez; si ya llegó, gana la
+   copia local; un borrado pendiente oculta la fila del servidor; las operaciones de otro dueño se ignoran).
+4. El thunk llama a la costura **sincrónicamente justo antes de despachar `sincronizado`**, con el estado de ese momento:
+   una compra guardada mientras volaba el pedido no se pierde.
+5. **Se relee el período completo en cada sincronización** (la tabla `compras` no tiene `actualizada_en` ni borrado lógico:
+   un borrado hecho en otro dispositivo solo se ve así).
+6. `sincronizado` lleva la lista ya reconciliada y el reducer de `compras` hace `lista = payload.compras`.
+7. Archivos compartidos, de forma aditiva: `store/index.ts` (`Extra` suma `repositorio`, `reloj` y `coordinacion`),
+   `store/compras.ts` (solo el caso `sincronizado`) y `store/prueba.ts` (tercer parámetro `extra`). Si #44 también suma
+   parámetros a `crearStore` o `storeDePrueba`, el conflicto es de una línea: se suman los dos.
+8. Limitaciones **hasta que #44 esté en `main`** (las cierra `aplicarPendientes`): la costura no distingue dueños y una
+   compra local de fuera del período no sobrevive a un reinicio.
 
 ## Cambios en `Extra`, `sesion` y las acciones (plan)
 
@@ -117,16 +120,13 @@ type EstadoSesion = { /* …lo de la spec 008… */ epoca: number /* sube con se
 
 type Rehidratado = { /* …lo de la spec 008… */ ahora: string | null /* real si el corpus guardado tiene marca */ };
 
-// Nueva acción atendida por corpus, compras y sesion en el mismo tick.
-type Sincronizado = { corpus: EstadoCorpus; compras: Compra[]; desde: string; usuarioId: string; ahora: string };
-// Nueva acción para #44.
-type CompraSubida = string; // id
+// Nueva acción atendida por corpus, compras y sesion en el mismo tick. `compras` ya viene reconciliada.
+type Sincronizado = { corpus: EstadoCorpus; compras: Compra[]; usuarioId: string; ahora: string };
 ```
 
 - `sesion.ahora` lo fija `Sincronizado.ahora` y `Rehidratado.ahora`, así el reloj cambia en la misma acción que la
   marca, sin un render con el reloj equivocado.
-- `corpus` reduce `Sincronizado` a `payload.corpus`; `compras` aplica el merge (servidor ∪ pendientes no devueltas),
-  la poda a la ventana (`desde`) y el chequeo de `duenoId`; `sesion` sube `ahora`.
+- `corpus` reduce `Sincronizado` a `payload.corpus`; `compras` hace `lista = payload.compras`; `sesion` sube `ahora`.
 - **Implementado así** (spec 009, rama `claude/magical-knuth-39fc08`): `apps/mobile/src/store/acciones.ts`
-  (`Sincronizado`, `compraSubida`, `Rehidratado.ahora`), `store/{corpus,compras,sesion}.ts`, `store/index.ts` (`Extra`) y
+  (`Sincronizado`, `Rehidratado.ahora`), `store/{corpus,compras,sesion}.ts`, `store/index.ts` (`Extra`) y
   `store/persistencia.ts` (dos claves). `Extra.coordinacion` guarda `enVuelo` y `ultimoIntentoMs` fuera de Redux.

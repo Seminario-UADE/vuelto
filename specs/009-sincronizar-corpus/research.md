@@ -76,9 +76,8 @@ con el 14/10 y una pantalla de Inicio que sale con la fecha equivocada).
    valor actual justo antes de aplicar. Si cambió, descarta.
 2. `repositorio.usuarioId()` se llama al empezar y de nuevo antes de aplicar. Si cambió, o ahora es `null`, descarta.
 
-El reducer de `compras` agrega una tercera defensa: si `duenoId` no es `null` y difiere del `usuarioId` del resultado,
-vuelve a `{lista: [], pendientes: [], duenoId: null}` antes de aplicar (las pendientes de otra cuenta no se suben con la
-sesión de ésta).
+La pertenencia de las compras pendientes a una cuenta la resuelve la cola de #44 (cada operación tiene dueño y
+`aplicarPendientes` ignora las de otro). Esta spec no guarda `duenoId` en `compras`.
 
 **Rationale**: comparar `usuarioId` solo no detecta "cerró sesión y volvió a entrar con la misma cuenta mientras
 volaba el pedido" (válido: los datos siguen siendo de ese usuario). La época detecta el cierre; `usuarioId` detecta el
@@ -113,7 +112,7 @@ service role (la constitución §IV la reserva a la ingesta).
 ## R5. Persistencia en dos claves y compatibilidad con lo guardado
 
 **Decision**: `vuelto.corpus.v1` = `{ version: 1, promociones, marca, sincronizadoEn }`; `vuelto.store.v1` conserva
-`perfil`, `compras` (con `pendientes` y `duenoId`) y `cuenta`, y sigue en `version: 1`. Un `corpus` dentro de
+`perfil`, `compras` (`{ lista }`) y `cuenta`, y sigue en `version: 1`. Un `corpus` dentro de
 `vuelto.store.v1` se ignora. El listener escribe cada clave solo cuando cambió su parte, y la del corpus solo cuando
 cambia el corpus. Si `setItem` del corpus falla, no se reintenta con otra marca: la marca vive en el mismo valor.
 
@@ -121,7 +120,7 @@ cambia el corpus. Si `setItem` del corpus falla, no se reintenta con otra marca:
 así que se agrega la normalización explícita; `version !== 1` descarta todo (por eso no se sube la versión).
 
 **Rationale**: el límite de 2 MB por valor de AsyncStorage en Android aplica al valor; separar el corpus evita que un
-corpus grande se lleve el perfil y las compras pendientes. Que la marca viaje con las promos garantiza que nunca
+corpus grande se lleve el perfil y las compras. Que la marca viaje con las promos garantiza que nunca
 apunte a un corpus que no se guardó.
 
 ## R6. La leyenda "Promos actualizadas hace X"

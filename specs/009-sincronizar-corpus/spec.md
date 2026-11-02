@@ -13,7 +13,7 @@
 **Frontera con otras issues**:
 
 - **Esta spec es dueña de la lectura**: bajar el corpus y las compras del período a los slices `corpus` y `compras`, y guardar el corpus en el dispositivo.
-- **#44 (registrar una compra)** es dueña de la escritura: la compra nueva, la cola sin red y la subida. Esta spec no sube nada. El contrato que comparten está en [`data-model.md`](data-model.md) §Contrato con #44.
+- **#44 (registrar una compra)** es dueña de la escritura: la compra nueva, la cola sin red y la subida (spec 010, rama `claude/elegant-hermann-7c2dcf`). Esta spec no sube nada. **`EstadoCompras` sigue siendo `{ lista }`**: las compras pendientes viven en la cola de #44 (slice `cola`, clave `vuelto.cola.v1`, con dueño y estado) y se mezclan al sincronizar con su función pura `aplicarPendientes`. Como esa rama todavía no está en `main`, esta spec deja una sola costura, `reconciliarCompras` (FR-015). El contrato está en [`data-model.md`](data-model.md) §Contrato con #44.
 - **#35 (corpus sembrado)**: sin ella la base no tiene promos. Esta spec no siembra ni mide con datos inventados.
 - **#40 (login)**: la lectura exige una sesión de Supabase. Sin sesión no se sincroniza.
 - **#41 (perfil con medios en la base)**: hasta entonces el `medioDePagoId` de una compra de la base (UUID) no se traduce al medio de la app y los `bancoId` del perfil de ejemplo son slugs, no los UUID de MODO.
@@ -109,22 +109,24 @@ Un tope compartido tiene dos promos. Una se da de baja a mitad de mes. Martín y
 
 ---
 
-### User Story 5 - Compras y cuentas se mantienen separadas (Priority: P1)
+### User Story 5 - Las compras locales no se pierden al sincronizar (Priority: P1)
 
-Las compras que Martín guardó en el teléfono y todavía no subió no desaparecen al sincronizar, y las compras de una cuenta nunca llegan a otra.
+Las compras que Martín guardó en el teléfono y todavía no subió no desaparecen cuando la sincronización trae la lista del servidor.
 
-**Why this priority**: perder una compra local falsea los topes; mezclar cuentas viola la privacidad (§IV).
+**Why this priority**: perder una compra local falsea los topes (Principio V).
 
-**Independent Test**: con una compra agregada localmente (en `pendientes`) y una sincronización en vuelo, la compra sigue en `compras.lista` después de aplicar el resultado. Cambiar de cuenta deja `compras` y `pendientes` en el estado inicial antes de sincronizar.
+**Independent Test**: una compra guardada en el teléfono que el servidor no devolvió sigue en `compras.lista` después de sincronizar, también si se guardó mientras la sincronización estaba en vuelo.
 
 **Acceptance Scenarios**:
 
-1. **Given** una compra local en `pendientes` y el servidor sin ella, **When** se sincroniza, **Then** `compras.lista` = compras del servidor ∪ esa compra, sin duplicados.
-2. **Given** una compra local que el servidor ya devuelve con el mismo `id`, **When** se sincroniza, **Then** queda la versión del servidor y sale de `pendientes`.
-3. **Given** que el usuario guarda una compra mientras una sincronización está en vuelo, **When** se aplica el resultado, **Then** la compra nueva no se pierde (el merge se hace sobre el estado de ese momento).
+1. **Given** una compra local que el servidor no devolvió, **When** se sincroniza, **Then** `compras.lista` = compras del servidor ∪ esa compra, sin duplicados.
+2. **Given** una compra local que el servidor ya devuelve con el mismo `id`, **When** se sincroniza, **Then** queda una sola, la del servidor.
+3. **Given** que el usuario guarda una compra mientras una sincronización está en vuelo, **When** se aplica el resultado, **Then** la compra nueva no se pierde (la reconciliación usa el estado del momento de aplicar).
 4. **Given** que se cierra la sesión mientras una sincronización está en vuelo, **When** llega el resultado, **Then** se descarta y no se persiste nada del usuario anterior.
-5. **Given** que la cuenta cambió (dueño distinto del slice `compras`), **When** se sincroniza, **Then** `compras` y `pendientes` vuelven al estado inicial antes de aplicar, y las pendientes de la cuenta anterior no se suben con la nueva.
-6. **Given** una compra pendiente de ayer (de fuera del período) , **When** se persiste, **Then** se guarda igual, sin filtrar por período, hasta que se suba.
+5. **Given** que cambió el usuario de la sesión mientras volaba el pedido, **When** llega el resultado, **Then** se descarta.
+6. **Given** las compras de ejemplo (datos de demostración), **When** llega la primera sincronización, **Then** se reemplazan por las del servidor (no se confunden con compras locales).
+
+**Delegado a #44**: qué compras están pendientes de subir, de quién son y que sobrevivan a un reinicio o a un cambio de cuenta (la cola tiene dueño y se escribe antes que `compras`). Mientras #44 no esté en `main`, `reconciliarCompras` conserva las compras locales que no son de ejemplo y que el servidor no devolvió; no distingue dueños (el cierre de sesión ya vuelve `compras` a las de ejemplo) y las de fuera del período no sobreviven a un reinicio. Ambas limitaciones las cierra `aplicarPendientes` de #44.
 
 ---
 
@@ -140,7 +142,7 @@ Antes de fijar el tamaño del corpus en el dispositivo, el equipo tiene el instr
 
 1. **Given** un corpus de N promos, **When** corre el script, **Then** informa N, bytes totales, promedio, máximo y qué fracción del tope es.
 2. **Given** que no hay corpus real, **Then** la documentación dice "medición pendiente de #35" y muestra una **proyección** rotulada, calculada con promos de ejemplo.
-3. **Given** que el corpus no se puede escribir (almacenamiento lleno), **When** falla la escritura, **Then** el perfil, la cuenta y las compras pendientes siguen persistidos (claves separadas) y la marca guardada no avanza.
+3. **Given** que el corpus no se puede escribir (almacenamiento lleno), **When** falla la escritura, **Then** el perfil, la cuenta y las compras siguen persistidos (claves separadas) y la marca guardada no avanza.
 
 ---
 
@@ -153,9 +155,9 @@ Antes de fijar el tamaño del corpus en el dispositivo, el equipo tiene el instr
 - **Reloj**: los parámetros de la sincronización (hoy, ventana, poda) salen del reloj real en la capa imperativa, nunca de `sesion.ahora`. El reloj de los selectores sale del real si la marca guardada no es `null`; si no, del de ejemplo.
 - **Compra de la base con un medio desconocido** (hasta #41): `compraVista` la omite de la lista de «Mis compras» pero «Gastaste» la suma: los totales no coinciden con la lista hasta #41. Queda aceptado y documentado; no se cambia esa pantalla en esta spec.
 - **Borrado físico de una promo** en el servidor: no mueve ninguna marca; lo cubre la reconciliación de ids (FR-009).
-- **Fin de mes / lunes que cruza de mes**: la ventana de compras es el período en curso (el más temprano entre el inicio del mes y el de la semana); al cambiar, las compras que quedan fuera salen del store (salvo las pendientes).
+- **Fin de mes / lunes que cruza de mes**: la ventana de compras es el período en curso (el más temprano entre el inicio del mes y el de la semana); al cambiar, las compras del servidor que quedan fuera salen del store.
 - **Almacenamiento lleno o no disponible**: la app funciona en memoria; la escritura del corpus falla sin llevarse el resto.
-- **Cierre de sesión**: el corpus es público y no se borra; `compras`, `pendientes` y el dueño vuelven al estado inicial (`sesionCerrada` ya lo hace para compras).
+- **Cierre de sesión**: todo vuelve al modo de ejemplo: el corpus (y su clave guardada `vuelto.corpus.v1`, que se borra), las compras y el reloj. Dejar el corpus real con compras de ejemplo, o al revés, mostraría topes «según N compras» que nadie hizo (Principio V).
 
 ## Requirements *(mandatory)*
 
@@ -185,8 +187,8 @@ Antes de fijar el tamaño del corpus en el dispositivo, el equipo tiene el instr
 
 **Compras**
 
-- **FR-014**: La ventana de compras MUST ser `[inicioDelPeriodo, hoy]` (el más temprano entre el inicio del mes y el de la semana, la misma función que `comprasDelPeriodo`), con `hoy` la fecha de Argentina del reloj real. La resta de días MUST ser de calendario. Al sincronizar, `compras.lista` MUST podarse a esa ventana, salvo las pendientes. Este requisito reemplaza la ventana "los últimos N días del mes" del texto original de la issue: cubre lo mismo que la privacidad declara y no guarda un mes de más. La función `diasDelMes` se conserva solo si el plan encuentra un uso real.
-- **FR-015**: `compras.lista` MUST resultar de `servidor ∪ (pendientes que el servidor no devolvió)`, calculado en el reducer al aplicar, sobre el estado de ese momento. `pendientes` y las compras pendientes MUST persistirse sin filtrar por período. El slice `compras` MUST guardar el `duenoId`; si la cuenta de la sesión cambió, `compras` y `pendientes` vuelven al estado inicial antes de aplicar. Un resultado que llega después de cerrar sesión o de cambiar de cuenta MUST descartarse. El contrato con #44 está en `data-model.md`.
+- **FR-014**: La ventana de compras MUST ser `[inicioDelPeriodo, hoy]` (el más temprano entre el inicio del mes y el de la semana, la misma función que `comprasDelPeriodo`), con `hoy` la fecha de Argentina del reloj real. La resta de días MUST ser de calendario. Al sincronizar, lo que baja del servidor MUST estar dentro de esa ventana. Este requisito reemplaza la ventana "los últimos N días del mes" del texto original de la issue: cubre lo mismo que la privacidad declara y no guarda un mes de más. La función `diasDelMes` se conserva solo si el plan encuentra un uso real.
+- **FR-015**: la lista de compras MUST resultar de `reconciliarCompras(servidor, estado.compras.lista, desde)`: `servidor ∪ (compras locales que el servidor no devolvió)`, sin duplicados por `id`. El thunk MUST llamarla **sincrónicamente justo antes de despachar**, con el estado de ese momento, y MUST relear el período completo en cada sincronización (la tabla no tiene `actualizada_en` ni borrado lógico: un borrado hecho en otro dispositivo solo se ve así). `reconciliarCompras` es la única costura con #44: hoy conserva las compras locales que no son de ejemplo; cuando #44 llegue a `main`, su cuerpo pasa a ser `aplicarPendientes(servidor, cola.operaciones, usuarioId)`. Un resultado que llega después de cerrar sesión o de cambiar de usuario MUST descartarse.
 
 **Reloj**
 
@@ -194,7 +196,7 @@ Antes de fijar el tamaño del corpus en el dispositivo, el equipo tiene el instr
 
 **Estado y persistencia**
 
-- **FR-017**: El corpus MUST persistirse en una **clave propia** (`vuelto.corpus.v1`) con su marca y su fecha de sincronización dentro del mismo valor, de modo que si la escritura falla la marca guardada no avanza. `vuelto.store.v1` conserva `perfil`, `compras` (con `pendientes` y `duenoId`) y `cuenta`; sigue en `version: 1` y MUST ignorar un `corpus` viejo. El validador MUST completar `marca: null`, `sincronizadoEn: null`, `pendientes: []` y `duenoId: null` cuando faltan y MUST validar sus tipos.
+- **FR-017**: El corpus MUST persistirse en una **clave propia** (`vuelto.corpus.v1`) con su marca y su fecha de sincronización dentro del mismo valor, de modo que si la escritura falla la marca guardada no avanza. `vuelto.store.v1` conserva `perfil`, `compras` (`{ lista }`) y `cuenta`; sigue en `version: 1` y MUST ignorar un `corpus` viejo. El validador MUST completar `marca: null`, `sincronizadoEn: null` y `descartadas: 0` cuando faltan y MUST validar sus tipos.
 - **FR-018**: El acceso a Supabase MUST estar detrás de una interfaz inyectada (`Extra`), con una implementación en memoria para los tests. La implementación real usa `supabase-js` con la sesión del usuario: nunca la service role key. Nada derivado se guarda.
 
 **Interfaz**
@@ -214,7 +216,7 @@ Antes de fijar el tamaño del corpus en el dispositivo, el equipo tiene el instr
 - **Corpus sincronizado**: promos del período con su marca (texto exacto del servidor), la fecha de la última sincronización exitosa y el conteo de descartadas.
 - **Ventana de compras**: `[inicioDelPeriodo, hoy]`.
 - **Repositorio de sincronización**: interfaz que entrega promos por cursor, los `id` del período, las compras desde una fecha y el id del usuario de la sesión; una implementación en memoria y otra sobre Supabase.
-- **Compras pendientes**: ids de compras locales todavía no confirmadas por el servidor. Las agrega la compra local y las saca #44 al subirlas.
+- **Compras pendientes**: las que el teléfono guardó y el servidor todavía no confirmó. Las administra la cola de #44; esta spec solo las respeta al reconciliar.
 
 ## Success Criteria *(mandatory)*
 
@@ -232,7 +234,7 @@ Antes de fijar el tamaño del corpus en el dispositivo, el equipo tiene el instr
 
 - **Dónde se muestra la leyenda**: Inicio, bajo el contenido principal; el texto exacto se ajusta en el plan sin cambiar la spec.
 - **Valores por defecto** (ajustables en el plan): espera de 5 minutos, timeout de 15 segundos, página de 500, margen de relectura de 10 minutos, lote de la ingesta de menos de 5 minutos.
-- **Decisiones tomadas en esta revisión y revisables por el PO**: (1) las bajas se mapean a vencidas y quedan en el corpus; (2) ventana = período, no "los últimos N días"; (3) el corpus va en una clave aparte; (4) un corpus vacío del servidor no reemplaza el de ejemplo; (5) las compras locales no se pierden al sincronizar.
+- **Decisiones tomadas en esta revisión y revisables por el PO**: (1) las bajas se mapean a vencidas y quedan en el corpus; (2) ventana = período, no "los últimos N días"; (3) el corpus va en una clave aparte; (4) un corpus vacío del servidor no reemplaza el de ejemplo; (5) las compras locales no se pierden al sincronizar, con la cola de #44 cuando llegue a `main` y una costura (`reconciliarCompras`) mientras tanto.
 - **Los topes no dependen de `medioDePagoId`**: el motor usa `promocionId` y `descuentoObtenido`; solo «Mis compras» lo necesita para mostrar el medio.
 - **Corpus real**: no existe todavía (#35 abierta); `supabase/seed.sql` solo trae catálogos. Los tests de integración siembran sus propias filas en un Supabase local y nunca se usan para medir ni para la demo.
 - **Sin cambios en el motor ni en el esquema**: `recomendar`, `estimarTopes` y el filtro de vigencia no se tocan; la base ya tiene `actualizada_en`, `dada_de_baja_en` y el índice.

@@ -55,7 +55,8 @@ export const sesion = createSlice({
     b.addCase(sincronizado, (s, a) => {
       s.ahora = a.payload.ahora;
     });
-    b.addCase(sesionCerrada, (s) => ({ ...sesionInicial, ahora: s.ahora, hidratado: s.hidratado, epoca: s.epoca + 1 }));
+    // Vuelve al modo de ejemplo, reloj incluido: sin corpus sincronizado la fuente es el reloj de ejemplo.
+    b.addCase(sesionCerrada, (s) => ({ ...sesionInicial, hidratado: s.hidratado, epoca: s.epoca + 1 }));
     b.addCase(escenarioElegido, (s, a) => {
       s.escenario = a.payload;
     });
