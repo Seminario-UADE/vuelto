@@ -9,12 +9,13 @@ import { Screen } from "@/components/screen";
 import { Skeleton } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
-import { usePerfilLocal } from "@/data/perfil-local";
+import { guardarPerfilLocal, usePerfilLocal } from "@/data/perfil-local";
 import { useAsync } from "@/hooks/use-async";
 import { colors, radius, space } from "@/theme";
 
 /**
- * Primera respuesta (onboarding 4/5): una decisión de ejemplo antes de pedir la cuenta.
+ * Primera respuesta (onboarding 4/5): una decisión de ejemplo con los medios que eligió.
+ * Cierra el onboarding: de acá va a Inicio, o a la invitación que abrió antes de tener cuenta.
  * Un usuario nuevo no tiene compras, así que no se muestra ninguna cifra de tope (Principio V).
  */
 export default function PrimeraRespuesta() {
@@ -22,10 +23,16 @@ export default function PrimeraRespuesta() {
   const r = useAsync(() => api.recomendar("coto", null));
   const n = perfil.medios.length;
 
+  const empezar = async () => {
+    const pendiente = perfil.invitacionPendiente;
+    await guardarPerfilLocal({ onboardingCompleto: true, invitacionPendiente: null });
+    router.replace(pendiente ? `/i/${pendiente}` : "/");
+  };
+
   return (
     <>
       <Stack.Screen options={{ title: "" }} />
-      <Screen footer={<Button label="Guardar mi perfil" onPress={() => router.push("/login")} />}>
+      <Screen footer={<Button label="Empezar" onPress={() => void empezar()} />}>
         <View style={{ gap: space.sm }}>
           <Text variant="titleLg" accessibilityRole="header">
             Listo. Así funciona:

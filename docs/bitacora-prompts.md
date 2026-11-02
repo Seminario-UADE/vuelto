@@ -1226,6 +1226,34 @@ se recalcule en vivo en la app.
 
 ---
 
+## 2026-11-01 — Login y registro con Supabase Auth (issue #40)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con la CLI `gh`, el simulador de iOS y un
+Supabase local.
+
+**Objetivo:** email y contraseña en `apps/mobile` sin esperar al store de Redux
+(#81): el usuario vive en `sesion.ts`, fácil de pasar al slice `sesion`.
+
+**Prompts principales:**
+1. "Issue #40: login y registro con email y contraseña con Supabase Auth en
+   apps/mobile. Es chica: sin spec-kit, pero con /code-review, test-runner y
+   rules-guardian. Tiene que convivir con el store de Redux (#81) […] Probalo en
+   el simulador con un usuario de prueba que crees en el Supabase local o de dev
+   (nunca uses credenciales reales mías)."
+
+**Resultado:**
+- `lib/auth.ts` (validación, errores en español por `code`, con tests),
+  `data/auth.ts` (sesión persistida y `SIGNED_OUT`), pantallas `login` y
+  `registro` y cierre de sesión en Perfil. Toda la app queda detrás de la sesión
+  y el usuario nuevo sin medios va al onboarding.
+- Decisión que tomó el código y conviene revisar: la issue pide la app detrás
+  de la sesión, así que desaparece el modo invitado de la spec 006 («Ahora no»,
+  email sin contraseña, «Continuar con Apple»).
+- Probado contra un Supabase local con un usuario de prueba, en web. El
+  simulador de iOS necesita que el usuario le dé acceso a la IA; ver el PR.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

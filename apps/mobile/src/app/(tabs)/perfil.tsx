@@ -1,6 +1,5 @@
 import { router } from "expo-router";
 import { View } from "react-native";
-import { ActionRow } from "@/components/action-row";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
@@ -11,8 +10,9 @@ import { SectionHeader } from "@/components/section-header";
 import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
-import { borrarPerfilLocal, usePerfilLocal } from "@/data/perfil-local";
-import { reiniciarSesion, useSesion } from "@/data/sesion";
+import { cerrarSesion as salir } from "@/data/auth";
+import { usePerfilLocal } from "@/data/perfil-local";
+import { setSesion, useSesion } from "@/data/sesion";
 import { useAsync } from "@/hooks/use-async";
 import { space } from "@/theme";
 
@@ -28,6 +28,7 @@ const ESCENARIOS: { id: api.Escenario; label: string }[] = [
  */
 export default function Perfil() {
   const { perfil } = usePerfilLocal();
+  const usuario = useSesion((s) => s.usuario);
   const contactosVersion = useSesion((s) => s.contactosQuitados.length + s.contactosAceptados.length);
   const datos = useAsync(() => api.getPerfil());
   const catalogoMedios = useAsync(() => api.getMediosDisponibles());
@@ -41,8 +42,11 @@ export default function Perfil() {
   const nombre = datos.datos?.nombre ?? "Martín";
 
   const cerrarSesion = async () => {
-    reiniciarSesion();
-    await borrarPerfilLocal();
+    const error = await salir();
+    if (error) {
+      setSesion({ aviso: error });
+      return;
+    }
     router.replace("/bienvenida");
   };
 
@@ -56,7 +60,7 @@ export default function Perfil() {
               {nombre}
             </Text>
             <Text variant="label" tone="inkSecondary">
-              {perfil.cuenta ? "Nombre que ven tus contactos" : "Perfil sin guardar en este celular"}
+              Nombre que ven tus contactos
             </Text>
           </View>
         </View>
@@ -64,19 +68,10 @@ export default function Perfil() {
         <Text variant="bodyMd" tone="inkSecondary">
           {medios.length} {medios.length === 1 ? "medio" : "medios"} · {comercios.length}{" "}
           {comercios.length === 1 ? "comercio" : "comercios"}
-          {perfil.cuenta && contactos.datos ? ` · ${contactos.datos.length} contactos` : ""}
+          {contactos.datos ? ` · ${contactos.datos.length} contactos` : ""}
         </Text>
         ) : null}
       </Card>
-
-      {!perfil.cuenta ? (
-        <ActionRow
-          icon="candado"
-          title="Guardá tu perfil"
-          detail="Así no perdés tus medios si cambiás de celular"
-          onPress={() => router.push("/login")}
-        />
-      ) : null}
 
       <View style={{ gap: space.md }}>
         <SectionHeader title="Tus medios de pago" />
@@ -124,13 +119,12 @@ export default function Perfil() {
       <View style={{ gap: space.md }}>
         <SectionHeader
           title="Contactos"
-          action={perfil.cuenta ? { label: "Ver todos", onPress: () => router.push("/contactos") } : undefined}
+          action={{ label: "Ver todos", onPress: () => router.push("/contactos") }}
         />
         <Text variant="bodyMd" tone="inkSecondary">
           Con tus contactos, Vuelto decide quién de ustedes conviene que pague.
         </Text>
-        {perfil.cuenta ? (
-          <>
+        <>
             {(contactos.datos ?? []).length > 0 ? (
               <Card padding={space.lg} gap={0}>
                 {(contactos.datos ?? []).map((c, i) => (
@@ -156,13 +150,7 @@ export default function Perfil() {
               </Card>
             ) : null}
             <Button label="Invitar a alguien" variant="secondary" icon="invitar" onPress={() => router.push("/contactos/invitar")} />
-          </>
-        ) : (
-          <Card>
-            <Text variant="bodyMd">Para vincular contactos, guardá tu perfil.</Text>
-            <Button label="Guardar mi perfil" variant="secondary" onPress={() => router.push("/login")} />
-          </Card>
-        )}
+        </>
       </View>
 
       <View style={{ gap: space.md }}>
@@ -173,6 +161,11 @@ export default function Perfil() {
             topes son estimados con las compras que registrás.
           </Text>
         </Card>
+        {usuario?.email ? (
+          <Text variant="bodyMd" tone="inkSecondary">
+            Entraste como {usuario.email}
+          </Text>
+        ) : null}
         <Button label="Cerrar sesión" variant="text" icon="salir" onPress={cerrarSesion} />
       </View>
 

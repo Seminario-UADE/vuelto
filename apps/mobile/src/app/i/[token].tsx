@@ -11,7 +11,7 @@ import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import type { EstadoInvitacion } from "@/data/contracts";
 import { guardarPerfilLocal, usePerfilLocal } from "@/data/perfil-local";
-import { setSesion } from "@/data/sesion";
+import { setSesion, useSesion } from "@/data/sesion";
 import { useAsync } from "@/hooks/use-async";
 import { hapticoExito } from "@/lib/haptics";
 import { iniciales } from "@/lib/format";
@@ -35,12 +35,13 @@ export default function AceptarInvitacion() {
   const [aceptando, setAceptando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Quien abre el link sin perfil pasa primero por el onboarding y vuelve acá al terminar.
+  // Quien abre el link sin cuenta ni perfil pasa primero por registro y onboarding, y vuelve acá al terminar.
+  const usuario = useSesion((s) => s.usuario);
   useEffect(() => {
-    if (!perfil.onboardingCompleto) {
+    if (!usuario || !perfil.onboardingCompleto) {
       void guardarPerfilLocal({ invitacionPendiente: token }).then(() => router.replace("/bienvenida"));
     }
-  }, [perfil.onboardingCompleto, token]);
+  }, [usuario, perfil.onboardingCompleto, token]);
 
   const aceptar = async () => {
     setAceptando(true);

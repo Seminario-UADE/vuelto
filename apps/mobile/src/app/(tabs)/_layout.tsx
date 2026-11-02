@@ -2,6 +2,7 @@ import { Redirect, Tabs } from "expo-router";
 import { Text } from "react-native";
 import { Icon, type IconName } from "@/components/icon";
 import { usePerfilLocal } from "@/data/perfil-local";
+import { useSesion } from "@/data/sesion";
 import { colors, floatingShadow, fonts } from "@/theme";
 
 const tab = (title: string, icon: IconName) => ({
@@ -26,8 +27,11 @@ const tab = (title: string, icon: IconName) => ({
  */
 export default function TabsLayout() {
   const { perfil } = usePerfilLocal();
-  // Sin onboarding completo, la app arranca en Bienvenida (FR-002).
-  if (!perfil.onboardingCompleto) return <Redirect href="/bienvenida" />;
+  const usuario = useSesion((s) => s.usuario);
+  // Toda la app está detrás de la sesión: sin usuario, a Bienvenida (crear cuenta o entrar).
+  if (!usuario) return <Redirect href="/bienvenida" />;
+  // Usuario nuevo, sin medios: directo al onboarding de perfil.
+  if (!perfil.onboardingCompleto || perfil.medios.length === 0) return <Redirect href="/medios" />;
   return (
     <Tabs
       screenOptions={{

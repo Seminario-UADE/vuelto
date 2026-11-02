@@ -12,7 +12,9 @@ import { useEffect } from "react";
 import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Toast } from "@/components/toast";
+import { iniciarAuth } from "@/data/auth";
 import { cargarPerfilLocal, usePerfilLocal } from "@/data/perfil-local";
+import { useSesion } from "@/data/sesion";
 import { headerNativo } from "@/navigation/opciones";
 import { colors } from "@/theme";
 
@@ -42,12 +44,14 @@ export default function RootLayout() {
     HankenGrotesk_700Bold,
   });
   const { cargado } = usePerfilLocal();
+  const authLista = useSesion((s) => s.authLista);
 
   useEffect(() => {
     void cargarPerfilLocal();
+    return iniciarAuth();
   }, []);
 
-  const listo = fuentes && cargado;
+  const listo = fuentes && cargado && authLista;
   useEffect(() => {
     if (listo) void SplashScreen.hideAsync();
   }, [listo]);
@@ -76,6 +80,7 @@ export default function RootLayout() {
           <Stack.Screen name="revisa" options={pageSheet} />
           <Stack.Screen name="contactos/quitar" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
           <Stack.Screen name="(auth)/login" options={pageSheet} />
+          <Stack.Screen name="(auth)/registro" options={pageSheet} />
           <Stack.Screen name="i/[token]" options={{ ...headerNativo, title: "Invitación" }} />
         </Stack>
         <Toast />

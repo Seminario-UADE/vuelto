@@ -4,7 +4,6 @@ import { Pressable, TextInput, View } from "react-native";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
-import { EmptyState } from "@/components/empty-state";
 import { Icon, iconoDeRubro } from "@/components/icon";
 import { MontoInput } from "@/components/monto-input";
 import { OptionRow } from "@/components/option-row";
@@ -14,7 +13,6 @@ import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import type { IntegranteGrupo } from "@/data/contracts";
-import { usePerfilLocal } from "@/data/perfil-local";
 import { setSesion, useSesion } from "@/data/sesion";
 import { useAsync } from "@/hooks/use-async";
 import { fechaCorta, iniciales, parseMonto } from "@/lib/format";
@@ -32,7 +30,6 @@ export default function ArmarGrupo() {
   const fecha = desdeComercio ? api.getHoy() : ejemplo.fecha;
   const nombre = desdeComercio ? null : ejemplo.nombre;
 
-  const { perfil } = usePerfilLocal();
   const version = useSesion((s) => s.contactosQuitados.length + s.contactosAceptados.length);
   const comercio = useAsync(() => api.getComercio(comercioId), comercioId);
   const contactos = useAsync(() => api.getContactos(), version);
@@ -63,18 +60,6 @@ export default function ArmarGrupo() {
     setSesion({ grupo: { nombre, comercioId, monto, fecha, integrantes } });
     router.push("/grupo/resultado");
   };
-
-  if (!perfil.cuenta) {
-    return (
-      <Screen>
-        <EmptyState
-          title="Para armar un grupo, guardá tu perfil"
-          body="Los contactos se vinculan entre cuentas: así cada uno decide qué comparte."
-          action={{ label: "Guardar mi perfil", onPress: () => router.push("/login") }}
-        />
-      </Screen>
-    );
-  }
 
   return (
     <Screen

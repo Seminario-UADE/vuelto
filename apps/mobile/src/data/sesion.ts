@@ -1,12 +1,21 @@
 /**
- * Estado de la sesión que simula escrituras al servidor: compras guardadas, contactos
- * aceptados o quitados y el grupo en armado. Vive en memoria y se pierde al cerrar la app
- * (spec 006, Assumptions). Las pantallas lo leen con `useSesion`.
+ * Estado de la sesión: quién está autenticado (`usuario`, la fuente de verdad que leen las
+ * pantallas y los layouts; lo escribe `data/auth.ts` desde Supabase Auth) y las escrituras
+ * que simula al servidor: compras guardadas, contactos aceptados o quitados y el grupo en
+ * armado. Estas viven en memoria y se pierden al cerrar la app (spec 006, Assumptions).
+ * Las pantallas lo leen con `useSesion`.
+ *
+ * Con el store de Redux (#81), `usuario` y `authLista` pasan tal cual al slice `sesion`.
  */
 import { useSyncExternalStore } from "react";
+import type { Cuenta } from "../lib/auth";
 import type { Compra, PedidoGrupo } from "./contracts";
 
 type Estado = {
+  /** Usuario autenticado, o `null` sin sesión. Solo `data/auth.ts` lo cambia (`setUsuario`). */
+  usuario: Cuenta | null;
+  /** Falso hasta que se leyó la sesión guardada en el dispositivo: antes no se sabe si hay usuario. */
+  authLista: boolean;
   comprasNuevas: Compra[];
   contactosQuitados: string[];
   contactosAceptados: string[];
@@ -16,6 +25,8 @@ type Estado = {
 };
 
 let estado: Estado = {
+  usuario: null,
+  authLista: false,
   comprasNuevas: [],
   contactosQuitados: [],
   contactosAceptados: [],
@@ -34,6 +45,10 @@ export function setSesion(cambio: Partial<Estado>): void {
   oyentes.forEach((o) => o());
 }
 
+export function setUsuario(usuario: Cuenta | null): void {
+  setSesion({ usuario, authLista: true });
+}
+
 function suscribir(oyente: () => void): () => void {
   oyentes.add(oyente);
   return () => oyentes.delete(oyente);
@@ -47,7 +62,7 @@ export function useSesion<T>(selector: (e: Estado) => T): T {
   );
 }
 
-/** Solo para tests. */
+/** Vacía las escrituras simuladas. No toca `usuario`: eso es de `setUsuario`. */
 export function reiniciarSesion(): void {
   setSesion({
     comprasNuevas: [],

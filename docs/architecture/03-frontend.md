@@ -31,11 +31,12 @@ detrás de un selector.
 
 | Ruta | Pantalla | Presentación |
 |---|---|---|
-| `(onboarding)/bienvenida` | Bienvenida | Stack, sin header |
+| `(onboarding)/bienvenida` | Bienvenida: Crear cuenta / Ya tengo cuenta | Stack, sin header |
 | `(onboarding)/medios` | Tus medios de pago | Stack, header nativo con barra de 2 pasos |
 | `(onboarding)/comercios` | Comercios habituales | Stack, "Saltar" en el header |
-| `(onboarding)/primera-respuesta` | Primera respuesta | Stack |
-| `(auth)/login` | Guardar perfil / Entrar | Page sheet (`modal`) |
+| `(onboarding)/primera-respuesta` | Primera respuesta; "Empezar" cierra el onboarding | Stack |
+| `(auth)/registro` | Crear cuenta (email y contraseña) | Page sheet (`modal`) |
+| `(auth)/login` | Entrar (email y contraseña) | Page sheet (`modal`) |
 | `(tabs)/index` | Inicio (respuesta inline) | Pestaña |
 | `(tabs)/comprar` | Nueva compra | Pestaña |
 | `(tabs)/topes` | Tus topes | Pestaña |
@@ -55,11 +56,14 @@ detrás de un selector.
   el estilo de DESIGN.md: necesitamos el alto exacto de la barra para los pies fijos, y las tabs
   nativas de iOS 26 usan vidrio (research R2 de la spec 006).
 - **Conciliación con la issue #39**: `index` es Inicio ("¿Con qué pago?" vive ahí), `registrar` es
-  `comprar`, y `(auth)/login` es el sheet Guardar perfil.
-- **Onboarding**: el layout de las tabs redirige a `/bienvenida` si `onboardingCompleto` es falso,
-  y el del onboarding redirige a `/` si es verdadero. Se probó `Stack.Protected` y se descartó:
+  `comprar`, y `(auth)/login` y `(auth)/registro` son los sheets de cuenta (issue #40).
+- **Sesión y onboarding** (issue #40): toda la app está detrás de la sesión. El layout de las tabs
+  redirige a `/bienvenida` si no hay `sesion.usuario`, y a `/medios` si hay usuario pero el perfil
+  del dispositivo no tiene el onboarding completo o no tiene medios (usuario nuevo). El layout del
+  onboarding deja pasar solo `bienvenida` sin usuario y redirige a `/` cuando el onboarding ya
+  está completo. Ya no hay modo invitado: se crea la cuenta antes del onboarding. Se probó `Stack.Protected` y se descartó:
   con la pestaña Inicio bloqueada, el router abría el sheet de cuenta como primera pantalla.
-- **Sheets**: Revisá tu compra y Guardar perfil tienen scroll, así que van como page sheet
+- **Sheets**: Revisá tu compra, Entrar y Crear cuenta tienen scroll, así que van como page sheet
   (`presentation: "modal"`). En iOS 27 el `formSheet` con detents no pinta un `ScrollView`
   (verificado en el simulador). Quitar contacto, que no scrollea, sí es `formSheet` ajustado al
   contenido.
@@ -73,10 +77,26 @@ detrás de un selector.
 | Datos del servidor | `src/data/api.ts` + `useAsync` en cada pantalla | Lo que dura la pantalla |
 | Escrituras de la sesión (compras guardadas, contactos quitados o aceptados, grupo en armado, aviso) | `src/data/sesion.ts` (`useSyncExternalStore`, sin librería) | Hasta cerrar la app |
 | Perfil del dispositivo (onboarding completo, medios, comercios, cuenta, invitación pendiente) | `src/data/perfil-local.ts` (AsyncStorage) | Persistente |
-| Sesión de Supabase | `src/lib/supabase.ts` (AsyncStorage) | Persistente (todavía sin uso) |
+| Usuario autenticado (`usuario`, `authLista`) | `src/data/sesion.ts`, escrito por `src/data/auth.ts` desde Supabase Auth | La sesión de Supabase persiste (abajo); `usuario` se vuelve a leer al abrir |
+| Sesión de Supabase (tokens) | `src/lib/supabase.ts` (AsyncStorage, `autoRefreshToken`, refresco atado a `AppState` como en la guía de Supabase para Expo) | Persistente |
 
 **Hoy** no hay Redux ni React Query: con datos de ejemplo alcanza `useAsync`, que mantiene el dato
 anterior mientras recarga (la cifra no parpadea al tipear el monto).
+
+### Cuentas (issue #40)
+
+- `src/lib/auth.ts`: funciones sobre un cliente inyectado (validación, `registrar`, `entrar`, `salir` y
+  los errores de Supabase Auth traducidos por `code`). Sin React ni estado; con tests.
+- `src/data/auth.ts`: lo conecta con el cliente real y con `sesion.ts`. `iniciarAuth()` (en el layout
+  raíz) lee la sesión guardada y sigue `onAuthStateChange`; con `SIGNED_OUT` (cerrar sesión, o sesión
+  vencida o revocada) limpia las escrituras de la sesión y el perfil del dispositivo, así el próximo
+  usuario arranca de cero. Cerrar sesión es `scope: "local"`: no corta las sesiones de otros celulares.
+- Contraseña de al menos 8 caracteres (Supabase local exige 6). El mensaje de cada error está en
+  `lib/auth.ts`. Si el proyecto exige confirmar el email, el registro avisa y manda a Entrar.
+- **Pendiente hasta el esquema (#34) y el store (#81):** el perfil (medios y comercios) todavía vive
+  solo en el dispositivo, así que quien vuelve a entrar con una cuenta existente rehace el onboarding.
+  Cuando `perfil` se lea del servidor por RLS, entrar con medios guardados irá directo a Inicio.
+  Con #81, `usuario` y `authLista` pasan al slice `sesion` y `data/auth.ts` despacha sus acciones.
 
 ### Estado objetivo: Redux Toolkit (ADR-010)
 

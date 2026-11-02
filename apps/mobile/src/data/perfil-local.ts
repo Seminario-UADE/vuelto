@@ -1,6 +1,6 @@
 /**
- * Perfil guardado en el dispositivo: si el onboarding terminó, qué medios y comercios
- * declaró el usuario y si guardó el perfil con una cuenta. Nada sensible.
+ * Perfil guardado en el dispositivo: si el onboarding terminó y qué medios y comercios
+ * declaró el usuario. Nada sensible. Quién es el usuario vive en `sesion.ts`.
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSyncExternalStore } from "react";
@@ -10,7 +10,6 @@ export type PerfilLocal = {
   onboardingCompleto: boolean;
   medios: string[];
   comercios: string[];
-  cuenta: { email: string | null; proveedor: "email" | "apple" } | null;
   /** Invitación abierta antes de terminar el onboarding (ADR-008 §1). */
   invitacionPendiente: string | null;
 };
@@ -21,7 +20,6 @@ const vacio: PerfilLocal = {
   onboardingCompleto: false,
   medios: [],
   comercios: [],
-  cuenta: null,
   invitacionPendiente: null,
 };
 
@@ -37,6 +35,7 @@ function emitir() {
 export async function cargarPerfilLocal(): Promise<PerfilLocal> {
   try {
     const raw = await AsyncStorage.getItem(CLAVE);
+    // Un `cuenta` guardado por el esquema anterior al login se ignora: el usuario vive en `sesion.ts`.
     actual = raw ? { ...vacio, ...(JSON.parse(raw) as Partial<PerfilLocal>) } : vacio;
   } catch {
     actual = vacio;
