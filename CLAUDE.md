@@ -28,7 +28,7 @@ Monorepo con npm workspaces inicializado (issue #32). Requiere Node ≥ 22.13
 | Workspace | Contenido |
 |---|---|
 | `packages/motor` (`@vuelto/motor`) | Motor de reglas: TS puro, sin `dependencies`, tests Vitest |
-| `apps/mobile` | App Expo (issue #39). Pasa a importar `@vuelto/motor` y a guardar su estado en Redux (ADR-010, todavía sin implementar) |
+| `apps/mobile` | App Expo (issue #39). Importa `@vuelto/motor` y guarda su estado en Redux; la recomendación y los topes son selectores (ADR-010, issue #81). Tests Vitest de cálculo, store y persistencia |
 | `supabase` (`@vuelto/supabase`) | Edge Functions (`functions/`: `recomendar`, hoy fuera del camino de la app por ADR-010, y `_shared/`, tests Vitest); `migrations/` (esquema con RLS), `seed.sql` y `tests/database/` (pgTAP, `supabase test db`). Los `functions/*/index.ts` corren en Deno: los chequea `deno check` en el CI, no `tsc` |
 | `ingesta` | Reservado — script de ingesta de MODO |
 

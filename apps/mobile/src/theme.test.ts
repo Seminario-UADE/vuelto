@@ -71,7 +71,7 @@ describe("sin colores escritos a mano fuera del tema (SC-003)", () => {
   });
 });
 
-describe("el servidor simulado lo importa solo api.ts (excepción al Principio II)", () => {
+describe("el cálculo vive en el motor, detrás de la capa de datos (ADR-010)", () => {
   const raiz = dirname(fileURLToPath(import.meta.url));
   const todos: string[] = [];
   const recorrer = (dir: string) => {
@@ -83,16 +83,27 @@ describe("el servidor simulado lo importa solo api.ts (excepción al Principio I
   };
   recorrer(raiz);
 
-  it("ningún otro archivo importa servidor-simulado ni fixtures", () => {
-    const culpables = todos.filter((p) => {
-      if (/data\/(api|servidor-simulado|fixtures)\.ts$/.test(p)) return false;
-      return /from ["'][^"']*(servidor-simulado|\/fixtures)["']/.test(readFileSync(p, "utf8"));
-    });
+  it("ninguna pantalla ni componente importa el motor ni los fixtures", () => {
+    const culpables = todos.filter(
+      (p) => /\/(app|components)\//.test(p) && /from ["'](@vuelto\/motor|[^"']*\/fixtures)["']/.test(readFileSync(p, "utf8")),
+    );
     expect(culpables).toEqual([]);
   });
 
-  it("la app no depende del motor", () => {
+  it("el servidor simulado ya no existe", () => {
+    expect(todos.some((p) => p.endsWith("servidor-simulado.ts"))).toBe(false);
+  });
+
+  it("el cálculo no lee el reloj del sistema (FR-005)", () => {
+    const culpables = todos.filter(
+      (p) => /data\/(calculo|grupo-simulado)\.ts$|store\/selectores\.ts$/.test(p) &&
+        /new Date\(\)|Date\.now\(/.test(readFileSync(p, "utf8")),
+    );
+    expect(culpables).toEqual([]);
+  });
+
+  it("la app depende del motor", () => {
     const pkg = readFileSync(join(raiz, "..", "package.json"), "utf8");
-    expect(pkg).not.toContain("@vuelto/motor");
+    expect(pkg).toContain("@vuelto/motor");
   });
 });

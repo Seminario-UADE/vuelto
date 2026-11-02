@@ -6,8 +6,10 @@ import { Button } from "@/components/button";
 import { SheetHeader } from "@/components/sheet-header";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
-import { setSesion } from "@/data/sesion";
 import { hapticoLeve } from "@/lib/haptics";
+import { contactoQuitado } from "@/store/contactos";
+import { useAppDispatch } from "@/store/hooks";
+import { avisoMostrado } from "@/store/sesion";
 import { colors, space } from "@/theme";
 
 /** Quitar contacto (sheet): confirma y explica que el vínculo se rompe para los dos (ADR-008 §2). */
@@ -15,12 +17,14 @@ export default function Quitar() {
   const { id, nombre = "este contacto" } = useLocalSearchParams<{ id: string; nombre?: string }>();
   const insets = useSafeAreaInsets();
   const [quitando, setQuitando] = useState(false);
+  const dispatch = useAppDispatch();
 
   const quitar = async () => {
     setQuitando(true);
     await api.quitarContacto(id);
+    dispatch(contactoQuitado(id));
     hapticoLeve();
-    setSesion({ aviso: `Quitaste a ${nombre}. El vínculo se cortó para los dos.` });
+    dispatch(avisoMostrado(`Quitaste a ${nombre}. El vínculo se cortó para los dos.`));
     router.back();
   };
 

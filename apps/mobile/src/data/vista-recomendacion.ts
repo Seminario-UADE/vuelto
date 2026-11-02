@@ -1,14 +1,15 @@
 /**
- * Traduce la respuesta de la Edge Function `recomendar` (forma del motor) a lo que pintan
- * las pantallas. No calcula reintegros ni topes: nombra lo que llega por id con los
- * catálogos y elige qué texto mostrar. La única cuenta es "te sale" (monto − ahorro), que
- * resta dos cifras del servidor.
+ * Traduce la respuesta de `recomendar()` del motor a lo que pintan las pantallas. No
+ * calcula reintegros ni topes: nombra lo que llega por id con los catálogos y elige qué
+ * texto mostrar. La única cuenta es "te sale" (monto − ahorro), que resta dos cifras del
+ * motor.
  */
 import type {
   Alternativa,
   Base,
   BaseEstimacion,
   Comercio,
+  Descarte,
   MedioDePago,
   OpcionDePago,
   PedidoRecomendar,
@@ -36,10 +37,32 @@ function medioDe(id: string, c: Catalogos): MedioDePago | null {
   return c.medios.find((m) => m.id === id) ?? null;
 }
 
-/** El medio del usuario de una promo descartada: el de su mismo banco, si lo tiene. */
-function medioDePromo(promocionId: string, c: Catalogos): MedioDePago | null {
-  const promo = c.promociones.find((p) => p.id === promocionId);
+/**
+ * El medio del usuario de una promo descartada: el que informa el motor (issue #46) o, si la
+ * promo no aplicaba a ninguno, el de su mismo banco, si lo tiene.
+ */
+function medioDeDescarte(d: Descarte, c: Catalogos): MedioDePago | null {
+  const informado = d.mediosDePagoIds.map((id) => medioDe(id, c)).find((m) => m !== null);
+  if (informado) return informado;
+  const promo = c.promociones.find((p) => p.id === d.promocionId);
   return promo ? (c.medios.find((m) => m.banco === promo.bancoId) ?? null) : null;
+}
+
+/**
+ * Qué da la promo, sin el tope ni la base que el motor agrega al motivo (issue #46): la
+ * tarjeta los muestra aparte, con su cifra. "20% en supermercados los miércoles · te quedan
+ * ≈$6.500 de tope, según 3 compras de octubre" → "20% en supermercados los miércoles".
+ */
+export function queDa(motivo: string): string {
+  return motivo
+    .split(" + ")
+    .map((parte) => parte.split(" · ")[0] ?? parte)
+    .join(" + ");
+}
+
+/** "Hoy no aplica, la promo es los jueves" → "la promo es los jueves". */
+function sinHoyNoAplica(motivo: string): string {
+  return motivo.replace(/^Hoy no aplica[:,] /, "");
 }
 
 function alternativaDeOpcion(o: OpcionDePago, c: Catalogos): Alternativa {
@@ -62,14 +85,14 @@ export function aVista(
   const alternativas: Alternativa[] = [
     ...r.alternativas.map((o) => alternativaDeOpcion(o, c)),
     ...r.descartadas.map((d): Alternativa => {
-      const medio = medioDePromo(d.promocionId, c);
+      const medio = medioDeDescarte(d, c);
       const promo = c.promociones.find((p) => p.id === d.promocionId);
-      const base = d.causa === "tope_agotado" ? baseDeMotor(d.base, c.mes) : null;
       return {
         medioId: medio?.id ?? null,
         titulo: medio?.nombre ?? promo?.titulo ?? "Promoción",
         inicial: medio?.inicial ?? "?",
-        motivo: base ? `${d.motivo} ${base.texto}` : d.motivo,
+        // Agotado, el motivo del motor ya trae su base ("Tope agotado este mes, según 2 compras").
+        motivo: d.motivo,
         estado: d.causa === "tope_agotado" ? "agotado" : "no-aplica",
       };
     }),
@@ -79,7 +102,7 @@ export function aVista(
   const comun = { comercio, dia: c.dia, monto: pedido.monto, alternativas };
 
   if (!r.mejor) {
-    const medio = otroDia ? medioDePromo(otroDia.promocionId, c) : null;
+    const medio = otroDia ? medioDeDescarte(otroDia, c) : null;
     return {
       ...comun,
       resultado: "sin-promo",
@@ -90,7 +113,7 @@ export function aVista(
       reintegro: null,
       teSale: null,
       topeDespues: null,
-      proximaPromo: otroDia ? `${medio?.nombre ?? "Otro medio"}: ${otroDia.motivo.replace(/^Hoy no aplica: /, "")}` : null,
+      proximaPromo: otroDia ? `${medio?.nombre ?? "Otro medio"}: ${sinHoyNoAplica(otroDia.motivo)}` : null,
     };
   }
 
@@ -104,7 +127,7 @@ export function aVista(
     ...comun,
     resultado: "recomendado",
     medio: medioDe(r.mejor.medioDePagoId, c),
-    razon: r.mejor.motivo,
+    razon: queDa(r.mejor.motivo),
     // Sin base no hay cifra de tope (Principio V): se muestra el texto de la base.
     topeDisponible: !conMonto && conBase ? tope : null,
     base,

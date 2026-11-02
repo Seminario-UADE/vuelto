@@ -9,16 +9,18 @@ import { Screen } from "@/components/screen";
 import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
-import { guardarPerfilLocal, usePerfilLocal } from "@/data/perfil-local";
 import { useAsync } from "@/hooks/use-async";
 import { hapticoSeleccion } from "@/lib/haptics";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { mediosElegidos } from "@/store/perfil";
 import { space } from "@/theme";
 
 /** Medios de pago (onboarding 2/5, configuración 1 de 2). */
 export default function Medios() {
-  const { perfil } = usePerfilLocal();
+  const dispatch = useAppDispatch();
+  const guardados = useAppSelector((s) => s.perfil.medios);
   const catalogo = useAsync(() => api.getMediosDisponibles());
-  const [elegidos, setElegidos] = useState<string[]>(perfil.medios);
+  const [elegidos, setElegidos] = useState<string[]>(guardados);
 
   const medios = catalogo.datos ?? [];
   const conCobertura = medios.filter((m) => m.conCobertura && elegidos.includes(m.id)).length;
@@ -29,8 +31,8 @@ export default function Medios() {
     setElegidos((xs) => (xs.includes(id) ? xs.filter((x) => x !== id) : [...xs, id]));
   };
 
-  const continuar = async () => {
-    await guardarPerfilLocal({ medios: elegidos });
+  const continuar = () => {
+    dispatch(mediosElegidos(elegidos));
     router.push("/comercios");
   };
 

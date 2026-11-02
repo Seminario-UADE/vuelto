@@ -10,7 +10,15 @@ export { estimarTopes, formatearEstimacion } from "./estimar.ts";
 export { PerfilSinMediosError } from "./errores.ts";
 export { JURISDICCIONES_VALIDAS } from "./elegibilidad.ts";
 /**
- * La Edge Function calcula "hoy" y desde cuándo pedir compras con las mismas
- * funciones que el motor (issues #43 y #37).
+ * La Edge Function y la app calculan "hoy", los períodos y los textos de fecha
+ * con las mismas funciones que el motor (issues #43, #37 y #81).
  */
-export { fechaArgentina, inicioDelPeriodo } from "./fecha.ts";
+export {
+  diaArgentina,
+  diaMesSinCeros,
+  diaSiguiente,
+  fechaArgentina,
+  finDelPeriodo,
+  inicioDelPeriodo,
+  nombreDelMes,
+} from "./fecha.ts";
