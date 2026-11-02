@@ -1249,8 +1249,13 @@ Supabase local.
 - Decisión que tomó el código y conviene revisar: la issue pide la app detrás
   de la sesión, así que desaparece el modo invitado de la spec 006 («Ahora no»,
   email sin contraseña, «Continuar con Apple»).
-- Probado contra un Supabase local con un usuario de prueba, en web. El
-  simulador de iOS necesita que el usuario le dé acceso a la IA; ver el PR.
+- Probado contra un Supabase local con usuarios de prueba, en web y en el
+  simulador de iOS (Expo Go): registro, onboarding, sesión que sobrevive a
+  matar y reabrir la app, cerrar sesión (vuelve a Bienvenida y borra el perfil
+  del dispositivo), contraseña incorrecta y login. En el simulador hubo que
+  tocar la tecla `@` a mano: el inyector de texto la deformaba.
+- Revisiones: `test-runner`, `rules-guardian` y `/code-review` sin hallazgos
+  graves; se corrigieron un fragmento sobrante en Perfil y un helper duplicado.
 
 ---
 
