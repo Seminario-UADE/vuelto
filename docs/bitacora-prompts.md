@@ -1310,6 +1310,70 @@ autenticados y escritura solo de la service role.
 
 ---
 
+## 2026-11-01/02 — Integración de PRs, análisis de ADR-010 y monto opcional en el motor (issue #75)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** destrabar los PRs pendientes (#77, #83, #84), revisar qué
+issues propias se pueden cerrar o arrancar dentro de ADR-010 e implementar
+la que no tiene dependencias (#75). Es una issue chica: va sin spec-kit.
+
+**Prompts principales:**
+1. "El PR #77 tiene conflicto con `main` en `docs/bitacora-prompts.md`.
+   Resolvelo sin borrar ni reescribir ninguna entrada: dejá las de las dos
+   ramas en orden de fecha, con el separador de siempre. Mostrame la
+   solución antes de aplicarla y no mergees a `main`."
+2. "Mergeá el PR #77 y actualizá `main`. Después resumime los PRs #83 y #84:
+   qué hacen, si chocan con `main` o entre ellos y si cumplen las reglas de
+   `CLAUDE.md`. No los mergees hasta que lo apruebe."
+3. "Revisá criterio por criterio si las issues #41, #43 y #45 se pueden
+   cerrar con lo que hay en `main`, y qué las bloquea."
+4. "Leé completos el ADR-010 y el PR #80 y cruzalos con las issues
+   abiertas: qué se puede arrancar ya, qué está bloqueado y qué quedó
+   desactualizado."
+5. "Implementá la #75 en el motor (`monto: number | null`) con los criterios
+   de la issue y sus tests. Si la issue no define un caso, decidilo y
+   avisame. No subas nada hasta que lo apruebe."
+
+**Resultado:**
+- PR #77: el conflicto era de dos entradas agregadas en el mismo lugar. Se
+  dejaron las tres (#39, #46 y ADR-010) por fecha, sin perder ninguna línea.
+  Mergeado con el CI en verde.
+- PRs #83 (secrets, cierra #9) y #84 (esquema con RLS, cierra #34):
+  mergeados, sin conflictos y con el CI de `main` en verde, incluido el job
+  `supabase-rls`. Se aceptaron las 5 decisiones abiertas de la spec 007.
+- Ninguna de las issues #41, #43 y #45 se puede cerrar: las tres dependen de
+  la #81 (motor en la app y store de Redux). La #75 no depende de nada y la
+  #43 la necesita.
+- #75 implementada:
+  - Sin monto, el ahorro es $0 y se muestra el tope disponible antes de la
+    compra, con su base. Con cero compras registradas no hay cifra.
+  - Orden sin monto: mayor porcentaje (las acumulables suman los suyos) y
+    después mayor tope disponible; una promo sin tope informado va antes.
+  - Decisión propia, aprobada: una promo con compra mínima no se descarta
+    sin monto; el motivo avisa "pide una compra mínima de $X".
+  - Con monto, el motor no cambia. La Edge Function `recomendar` no se tocó
+    (ADR-010 §5).
+  - 13 tests nuevos; 205 del motor y 40 de la Edge Function en verde.
+    Contrato de la spec 002 y `01-data-models.md` actualizados.
+- Errores de la IA en el proceso:
+  - Dijo primero que a la #41 solo la bloqueaba el login (#40). Al leer
+    ADR-010 se corrigió: el perfil pasa a Redux, así que también depende de
+    la #81.
+  - El lint y el typecheck fallaron al principio por un `node_modules`
+    desactualizado, no por el cambio; se resolvió con `npm ci`.
+- Queda pendiente:
+  - `theme.test.ts` de la app falla solo en Windows: arma las rutas con `/`.
+    En el CI (Linux) pasa.
+  - El ADR-010 sigue en estado «propuesto» y nombra las tablas en singular;
+    en la base quedaron en plural.
+  - Sumar la #81 como dependencia en la #41 y la #44, y aclarar en la #45
+    que el comentario sobre la Edge Function de topes quedó superado.
+  - El plan de la #41 (`specs/001-perfil-billeteras/`) es anterior a
+    ADR-010: dice que la app no importa el motor y no usa Redux.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { PerfilSinMediosError } from "./errores.ts";
 import { recomendar } from "./recomendar.ts";
 import { AHORA, compra, compraRegistrada, medio, perfil, promo, SANTANDER } from "./test/fabricas.ts";
-import type { OpcionDePago, Promocion, Tope } from "./tipos.ts";
+import type { CompraPropuesta, OpcionDePago, Promocion, Tope } from "./tipos.ts";
 
 /** La única promo de una opción individual. */
 const unica = (o: OpcionDePago | null | undefined) => o?.promociones[0];
@@ -573,5 +573,135 @@ describe("recomendar: rendimiento", () => {
     const r = recomendar(compra(), perfil([galicia, santander]), promos, compras, AHORA);
     expect(Date.now() - inicio).toBeLessThan(1000);
     expect(r.alternativas.length + r.descartadas.length + 1).toBe(2000);
+  });
+});
+
+describe("recomendar: sin monto (issue #75)", () => {
+  const sinMonto = (datos: Partial<CompraPropuesta> = {}) => compra({ monto: null, ...datos });
+  const conTope = (id: string, porcentaje: number, monto: number | null, datos: Partial<Promocion> = {}) =>
+    promo({ id, porcentaje, tope: { monto, periodo: "mensual", alcance: null, grupoTopeId: null }, ...datos });
+  const orden = (r: ReturnType<typeof recomendar>) =>
+    [r.mejor, ...r.alternativas].map((o) => o?.promociones.map((p) => p.promocionId).join("+"));
+
+  it("devuelve una recomendación válida, sin lanzar, con ahorro $0", () => {
+    const r = recomendar(sinMonto(), perfil(), [promo()], [], AHORA);
+    expect(r.mejor).toMatchObject({ medioDePagoId: galicia.id, ahorroEstimado: 0 });
+    expect(unica(r.mejor)?.ahorroEstimado).toBe(0);
+    expect(r.descartadas).toEqual([]);
+  });
+
+  it("sin compras registradas: el tope es el disponible, con base cero y sin cifra en el motivo", () => {
+    const r = recomendar(sinMonto(), perfil(), [conTope("A", 20, 5000)], [], AHORA);
+    expect(unica(r.mejor)).toMatchObject({
+      ahorroEstimado: 0,
+      topeRestanteTrasCompra: 5000,
+      base: { comprasRegistradas: 0, comprasSinDescuentoInformado: 0 },
+    });
+    expect(r.mejor?.motivo).toContain("sin compras registradas este mes, todavía no podemos estimar");
+    expect(r.mejor?.motivo).not.toMatch(/\$/);
+  });
+
+  it("con compras registradas: el tope disponible antes de la compra, con su base", () => {
+    const compras = [compraRegistrada({ promocionId: "A", descuentoObtenido: 1500 })];
+    const r = recomendar(sinMonto(), perfil(), [conTope("A", 20, 5000)], compras, AHORA);
+    expect(unica(r.mejor)).toMatchObject({
+      ahorroEstimado: 0,
+      topeRestanteTrasCompra: 3500,
+      base: { comprasRegistradas: 1, comprasSinDescuentoInformado: 0 },
+    });
+    expect(r.mejor?.motivo).toContain("te quedan ≈$3.500 de tope, según 1 compra de octubre");
+  });
+
+  it("con el tope agotado la promo se sigue descartando", () => {
+    const compras = [compraRegistrada({ promocionId: "A", descuentoObtenido: 5000 })];
+    const r = recomendar(sinMonto(), perfil(), [conTope("A", 20, 5000)], compras, AHORA);
+    expect(r.mejor).toBeNull();
+    expect(r.descartadas[0]).toMatchObject({ causa: "tope_agotado", base: { comprasRegistradas: 1 } });
+  });
+
+  it("promo sin tope: sin restante ni base, y el motivo lo dice", () => {
+    const r = recomendar(sinMonto(), perfil(), [conTope("A", 20, null)], [compraRegistrada()], AHORA);
+    expect(unica(r.mejor)).toMatchObject({ ahorroEstimado: 0, topeRestanteTrasCompra: null, base: null });
+    expect(r.mejor?.motivo).toContain("no informa tope");
+  });
+
+  it("promo con tope por compra: el motivo dice el tope de la promo, no un ahorro", () => {
+    const p = promo({ tope: { monto: 3000, periodo: "por_compra", alcance: null, grupoTopeId: null } });
+    const r = recomendar(sinMonto(), perfil(), [p], [], AHORA);
+    expect(unica(r.mejor)).toMatchObject({ ahorroEstimado: 0, topeRestanteTrasCompra: null, base: null });
+    expect(r.mejor?.motivo).toContain("hasta $3.000 por compra");
+  });
+
+  it("tope compartido: lo consumido con otra promo del grupo achica el disponible", () => {
+    const grupo = { periodo: "mensual", alcance: "compartido", grupoTopeId: "galicia-super" } as const;
+    const coto = promo({ id: "coto", comercio: "Coto", tope: { monto: 10000, ...grupo } });
+    const dia = promo({ id: "dia", comercio: "Día", tope: { monto: 10000, ...grupo } });
+    const compras = [compraRegistrada({ promocionId: "coto", descuentoObtenido: 6000 })];
+    const r = recomendar(sinMonto({ comercio: "Día" }), perfil(), [coto, dia], compras, AHORA);
+    expect(unica(r.mejor)).toMatchObject({
+      promocionId: "dia",
+      ahorroEstimado: 0,
+      topeRestanteTrasCompra: 4000,
+      base: { comprasRegistradas: 1, comprasSinDescuentoInformado: 0 },
+    });
+  });
+
+  it("ordena por mayor porcentaje aunque el tope sea menor", () => {
+    const promos = [conTope("A", 10, 50000), conTope("B", 20, 1000)];
+    expect(orden(recomendar(sinMonto(), perfil(), promos, [], AHORA))).toEqual(["B", "A"]);
+  });
+
+  it("a igual porcentaje, va primero el de mayor tope disponible; sin tope informado va antes", () => {
+    const compras = [compraRegistrada({ promocionId: "grande", descuentoObtenido: 9500 })];
+    const promos = [
+      conTope("chico", 20, 1000),
+      conTope("grande", 20, 10000), // le quedan $500: menos que "chico"
+      conTope("sin-tope", 20, null),
+    ];
+    expect(orden(recomendar(sinMonto(), perfil(), promos, compras, AHORA))).toEqual([
+      "sin-tope",
+      "chico",
+      "grande",
+    ]);
+  });
+
+  it("las acumulables combinadas suman sus porcentajes para ordenar", () => {
+    const promos = [
+      conTope("A", 20, null, { acumulable: true }),
+      conTope("B", 10, null, { acumulable: true }),
+      conTope("C", 25, null, { acumulable: false }),
+    ];
+    const r = recomendar(sinMonto(), perfil(), promos, [], AHORA);
+    expect(orden(r)).toEqual(["A+B", "C"]);
+    expect(r.mejor?.motivo).not.toContain("sin tope disponible");
+  });
+
+  it("el orden es determinístico: no depende del orden de las listas", () => {
+    const debito = medio({ id: "galicia-debito-visa", tipo: "debito" });
+    const promos = [
+      conTope("A", 20, 5000, { tarjetas: { debito: ["visa"], credito: ["visa"] } }),
+      conTope("B", 20, 5000),
+      conTope("C", 15, null),
+    ];
+    const primero = recomendar(sinMonto(), perfil([galicia, debito]), promos, [], AHORA);
+    expect(recomendar(sinMonto(), perfil([debito, galicia]), [...promos].reverse(), [], AHORA)).toEqual(primero);
+    expect([primero.mejor, ...primero.alternativas].map((o) => `${o?.medioDePagoId}/${unica(o)?.promocionId}`)).toEqual([
+      "galicia-credito-visa/A",
+      "galicia-credito-visa/B",
+      "galicia-debito-visa/A",
+      "galicia-credito-visa/C",
+    ]);
+  });
+
+  it("una promo con compra mínima no se descarta: el motivo avisa el mínimo", () => {
+    const p = promo({ montoMinimo: 50000 });
+    const r = recomendar(sinMonto(), perfil(), [p], [], AHORA);
+    expect(r.descartadas).toEqual([]);
+    expect(r.mejor?.motivo).toContain("pide una compra mínima de $50.000");
+  });
+
+  it("con monto, el motivo no repite la compra mínima", () => {
+    const r = recomendar(compra({ monto: 60000 }), perfil(), [promo({ montoMinimo: 50000 })], [], AHORA);
+    expect(r.mejor?.motivo).not.toContain("compra mínima");
   });
 });
