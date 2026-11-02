@@ -1,10 +1,16 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { RELOJ_EJEMPLO } from "../data/fixtures";
-import { escenarioElegido, rehidratado, sesionCerrada, type Cuenta, type Escenario } from "./acciones";
+import type { Cuenta } from "../lib/auth";
+import { escenarioElegido, rehidratado, sesionCerrada, type Escenario } from "./acciones";
 
 export type EstadoSesion = {
-  /** Persistida: si guardó el perfil con una cuenta. */
-  cuenta: Cuenta;
+  /**
+   * El usuario autenticado en Supabase Auth: la fuente de verdad de quién usa la app (issue #40).
+   * No se persiste acá: la sesión la guarda el cliente de Supabase y `iniciarAuth` la lee al abrir.
+   */
+  usuario: Cuenta | null;
+  /** Ya se leyó la sesión guardada. Antes, no se sabe si hay usuario y no se decide a dónde ir. */
+  authLista: boolean;
   /**
    * El reloj del cálculo (ISO). Lo escribe `useReloj`; ningún selector lee el reloj del sistema
    * (spec 008 FR-005, FR-006). No se persiste.
@@ -18,7 +24,8 @@ export type EstadoSesion = {
 };
 
 export const sesionInicial: EstadoSesion = {
-  cuenta: null,
+  usuario: null,
+  authLista: false,
   ahora: new Date(RELOJ_EJEMPLO).toISOString(),
   aviso: null,
   escenario: "normal",
@@ -32,23 +39,28 @@ export const sesion = createSlice({
     ahoraCambio(s, a: PayloadAction<string>) {
       s.ahora = a.payload;
     },
-    cuentaGuardada(s, a: PayloadAction<Cuenta>) {
-      s.cuenta = a.payload;
+    usuarioCambio(s, a: PayloadAction<Cuenta | null>) {
+      s.usuario = a.payload;
+      s.authLista = true;
     },
     avisoMostrado(s, a: PayloadAction<string | null>) {
       s.aviso = a.payload;
     },
   },
   extraReducers: (b) => {
-    b.addCase(rehidratado, (s, a) => {
-      if (a.payload.cuenta) s.cuenta = a.payload.cuenta.valor;
+    b.addCase(rehidratado, (s) => {
       s.hidratado = true;
     });
-    b.addCase(sesionCerrada, (s) => ({ ...sesionInicial, ahora: s.ahora, hidratado: s.hidratado }));
+    b.addCase(sesionCerrada, (s) => ({
+      ...sesionInicial,
+      ahora: s.ahora,
+      hidratado: s.hidratado,
+      authLista: s.authLista,
+    }));
     b.addCase(escenarioElegido, (s, a) => {
       s.escenario = a.payload;
     });
   },
 });
 
-export const { ahoraCambio, cuentaGuardada, avisoMostrado } = sesion.actions;
+export const { ahoraCambio, usuarioCambio, avisoMostrado } = sesion.actions;

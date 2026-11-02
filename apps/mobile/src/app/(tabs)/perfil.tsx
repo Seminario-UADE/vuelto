@@ -1,6 +1,5 @@
 import { router } from "expo-router";
 import { View } from "react-native";
-import { ActionRow } from "@/components/action-row";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
@@ -11,9 +10,11 @@ import { SectionHeader } from "@/components/section-header";
 import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
+import { cerrarSesion as salir } from "@/data/auth";
 import { useAsync } from "@/hooks/use-async";
-import { escenarioElegido, sesionCerrada, type Escenario } from "@/store/acciones";
+import { escenarioElegido, type Escenario } from "@/store/acciones";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { avisoMostrado } from "@/store/sesion";
 import { space } from "@/theme";
 
 const ESCENARIOS: { id: Escenario; label: string }[] = [
@@ -29,7 +30,7 @@ const ESCENARIOS: { id: Escenario; label: string }[] = [
 export default function Perfil() {
   const dispatch = useAppDispatch();
   const perfil = useAppSelector((s) => s.perfil);
-  const cuenta = useAppSelector((s) => s.sesion.cuenta);
+  const usuario = useAppSelector((s) => s.sesion.usuario);
   const contactos = useAppSelector((s) => s.contactos.lista);
   const escenario = useAppSelector((s) => s.sesion.escenario);
   const catalogoMedios = useAsync(() => api.getMediosDisponibles());
@@ -39,8 +40,12 @@ export default function Perfil() {
   const comercios = (catalogoComercios.datos ?? []).filter((c) => perfil.comercios.includes(c.id));
   const nombre = perfil.nombre ?? "Martín";
 
-  const cerrarSesion = () => {
-    dispatch(sesionCerrada());
+  const cerrarSesion = async () => {
+    const error = await dispatch(salir());
+    if (error) {
+      dispatch(avisoMostrado(error));
+      return;
+    }
     router.replace("/bienvenida");
   };
 
@@ -54,7 +59,7 @@ export default function Perfil() {
               {nombre}
             </Text>
             <Text variant="label" tone="inkSecondary">
-              {cuenta ? "Nombre que ven tus contactos" : "Perfil sin guardar en este celular"}
+              Nombre que ven tus contactos
             </Text>
           </View>
         </View>
@@ -62,19 +67,10 @@ export default function Perfil() {
           <Text variant="bodyMd" tone="inkSecondary">
             {medios.length} {medios.length === 1 ? "medio" : "medios"} · {comercios.length}{" "}
             {comercios.length === 1 ? "comercio" : "comercios"}
-            {cuenta ? ` · ${contactos.length} contactos` : ""}
+            {` · ${contactos.length} contactos`}
           </Text>
         ) : null}
       </Card>
-
-      {!cuenta ? (
-        <ActionRow
-          icon="candado"
-          title="Guardá tu perfil"
-          detail="Así no perdés tus medios si cambiás de celular"
-          onPress={() => router.push("/login")}
-        />
-      ) : null}
 
       <View style={{ gap: space.md }}>
         <SectionHeader title="Tus medios de pago" />
@@ -122,45 +118,36 @@ export default function Perfil() {
       <View style={{ gap: space.md }}>
         <SectionHeader
           title="Contactos"
-          action={cuenta ? { label: "Ver todos", onPress: () => router.push("/contactos") } : undefined}
+          action={{ label: "Ver todos", onPress: () => router.push("/contactos") }}
         />
         <Text variant="bodyMd" tone="inkSecondary">
           Con tus contactos, Vuelto decide quién de ustedes conviene que pague.
         </Text>
-        {cuenta ? (
-          <>
-            {contactos.length > 0 ? (
-              <Card padding={space.lg} gap={0}>
-                {contactos.map((c, i) => (
-                  <View
-                    key={c.id}
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: space.md,
-                      paddingVertical: space.md,
-                      ...divisor(i),
-                    }}
-                  >
-                    <Avatar letras={c.iniciales} />
-                    <Text variant="bodyLg" weight="semibold" style={{ flex: 1 }}>
-                      {c.nombre}
-                    </Text>
-                    <Text variant="label" tone="inkSecondary">
-                      Vinculado
-                    </Text>
-                  </View>
-                ))}
-              </Card>
-            ) : null}
-            <Button label="Invitar a alguien" variant="secondary" icon="invitar" onPress={() => router.push("/contactos/invitar")} />
-          </>
-        ) : (
-          <Card>
-            <Text variant="bodyMd">Para vincular contactos, guardá tu perfil.</Text>
-            <Button label="Guardar mi perfil" variant="secondary" onPress={() => router.push("/login")} />
+        {contactos.length > 0 ? (
+          <Card padding={space.lg} gap={0}>
+            {contactos.map((c, i) => (
+              <View
+                key={c.id}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: space.md,
+                  paddingVertical: space.md,
+                  ...divisor(i),
+                }}
+              >
+                <Avatar letras={c.iniciales} />
+                <Text variant="bodyLg" weight="semibold" style={{ flex: 1 }}>
+                  {c.nombre}
+                </Text>
+                <Text variant="label" tone="inkSecondary">
+                  Vinculado
+                </Text>
+              </View>
+            ))}
           </Card>
-        )}
+        ) : null}
+        <Button label="Invitar a alguien" variant="secondary" icon="invitar" onPress={() => router.push("/contactos/invitar")} />
       </View>
 
       <View style={{ gap: space.md }}>
@@ -171,7 +158,12 @@ export default function Perfil() {
             topes son estimados con las compras que registrás.
           </Text>
         </Card>
-        <Button label="Cerrar sesión" variant="text" icon="salir" onPress={cerrarSesion} />
+        {usuario?.email ? (
+          <Text variant="bodyMd" tone="inkSecondary">
+            Entraste como {usuario.email}
+          </Text>
+        ) : null}
+        <Button label="Cerrar sesión" variant="text" icon="salir" onPress={() => void cerrarSesion()} />
       </View>
 
       {__DEV__ ? (
