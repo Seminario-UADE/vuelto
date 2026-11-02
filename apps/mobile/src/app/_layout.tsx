@@ -5,18 +5,27 @@ import {
   HankenGrotesk_700Bold,
   useFonts,
 } from "@expo-google-fonts/hanken-grotesk";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Provider } from "react-redux";
 import { Toast } from "@/components/toast";
-import { cargarPerfilLocal, usePerfilLocal } from "@/data/perfil-local";
+import { useReloj } from "@/hooks/use-reloj";
 import { headerNativo } from "@/navigation/opciones";
+import { crearStore } from "@/store";
+import { useAppSelector } from "@/store/hooks";
+import { rehidratar } from "@/store/persistencia";
 import { colors } from "@/theme";
 
 void SplashScreen.preventAutoHideAsync();
+
+/** Un solo store para toda la app (ADR-010). Lo guardado se lee una vez, al abrir. */
+const store = crearStore({ almacenamiento: AsyncStorage, estadoInicial: null });
+void store.dispatch(rehidratar());
 
 export const unstable_settings = { anchor: "(tabs)" };
 
@@ -35,19 +44,24 @@ const sheet = {
 };
 
 export default function RootLayout() {
+  return (
+    <Provider store={store}>
+      <Raiz />
+    </Provider>
+  );
+}
+
+function Raiz() {
   const [fuentes] = useFonts({
     HankenGrotesk_400Regular,
     HankenGrotesk_500Medium,
     HankenGrotesk_600SemiBold,
     HankenGrotesk_700Bold,
   });
-  const { cargado } = usePerfilLocal();
+  const hidratado = useAppSelector((s) => s.sesion.hidratado);
+  useReloj();
 
-  useEffect(() => {
-    void cargarPerfilLocal();
-  }, []);
-
-  const listo = fuentes && cargado;
+  const listo = fuentes && hidratado;
   useEffect(() => {
     if (listo) void SplashScreen.hideAsync();
   }, [listo]);
@@ -69,7 +83,11 @@ export default function RootLayout() {
           <Stack.Screen name="grupo/resultado" options={{ ...headerNativo, title: "Quién conviene que pague" }} />
           <Stack.Screen
             name="escanear"
-            options={{ presentation: "fullScreenModal", headerShown: false, contentStyle: { backgroundColor: colors.scrim } }}
+            options={{
+              presentation: "fullScreenModal",
+              headerShown: false,
+              contentStyle: { backgroundColor: colors.scrim },
+            }}
           />
           {/* Revisá tu compra y Guardar perfil tienen scroll: page sheet nativo (modal). El formSheet
               con detents no pinta un ScrollView en iOS 27 (verificado en el simulador). */}

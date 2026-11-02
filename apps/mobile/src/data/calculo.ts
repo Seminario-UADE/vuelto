@@ -150,10 +150,7 @@ function promocionesCatalogo(promociones: Promocion[]): PromocionCatalogo[] {
 }
 
 /** `recomendar()` sin excepción por perfil vacío: sin medios evaluables no hay promo. */
-function recomendarSeguro(
-  pedido: PedidoRecomendar & { categoriaId: number },
-  e: EntradasMotor,
-): RecomendacionMotor {
+function recomendarSeguro(pedido: PedidoRecomendar & { categoriaId: number }, e: EntradasMotor): RecomendacionMotor {
   try {
     // Hasta #43 el motor exige monto: "sin monto" se consulta con 0 (spec 007, Assumptions).
     return recomendar({ ...pedido, monto: pedido.monto ?? 0 }, e.perfil, e.promociones, e.compras, e.ahora);
@@ -355,4 +352,11 @@ export function compraParaGuardar(e: EntradasMotor, b: BorradorCompra, id: strin
     origen: b.modo,
     textoExtraido: b.textoExtraido,
   };
+}
+
+/** Cuánto falta para la próxima medianoche de Argentina (UTC−3, sin horario de verano). */
+export function msHastaLaMedianoche(ahora: Date): number {
+  const enArgentina = ahora.getTime() - 3 * 3_600_000;
+  const dia = 86_400_000;
+  return dia - (((enArgentina % dia) + dia) % dia);
 }

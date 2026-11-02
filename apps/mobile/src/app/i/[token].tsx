@@ -10,18 +10,29 @@ import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import type { EstadoInvitacion } from "@/data/contracts";
-import { guardarPerfilLocal, usePerfilLocal } from "@/data/perfil-local";
-import { setSesion } from "@/data/sesion";
 import { useAsync } from "@/hooks/use-async";
 import { hapticoExito } from "@/lib/haptics";
 import { iniciales } from "@/lib/format";
+import { contactoAgregado } from "@/store/contactos";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { invitacionGuardada } from "@/store/perfil";
+import { avisoMostrado } from "@/store/sesion";
 import { colors, space } from "@/theme";
 
 const MOTIVO: Record<Exclude<EstadoInvitacion, "valida">, { titulo: string; texto: string }> = {
-  vencida: { titulo: "Esta invitación venció", texto: "Las invitaciones duran 24 h. Pedile a quien te la mandó que genere otra." },
-  usada: { titulo: "Esta invitación ya se usó", texto: "Cada invitación sirve una sola vez. Pedile a quien te la mandó un link nuevo." },
+  vencida: {
+    titulo: "Esta invitación venció",
+    texto: "Las invitaciones duran 24 h. Pedile a quien te la mandó que genere otra.",
+  },
+  usada: {
+    titulo: "Esta invitación ya se usó",
+    texto: "Cada invitación sirve una sola vez. Pedile a quien te la mandó un link nuevo.",
+  },
   propia: { titulo: "Es tu propia invitación", texto: "Mandásela a la persona con la que querés vincularte." },
-  "ya-contacto": { titulo: "Ya son contactos", texto: "No hace falta aceptar de nuevo. Lo ves en Perfil, en Contactos." },
+  "ya-contacto": {
+    titulo: "Ya son contactos",
+    texto: "No hace falta aceptar de nuevo. Lo ves en Perfil, en Contactos.",
+  },
 };
 
 /**
@@ -30,17 +41,27 @@ const MOTIVO: Record<Exclude<EstadoInvitacion, "valida">, { titulo: string; text
  */
 export default function AceptarInvitacion() {
   const { token = "" } = useLocalSearchParams<{ token: string }>();
-  const { perfil } = usePerfilLocal();
-  const v = useAsync(() => api.verInvitacion(token), token);
+  const dispatch = useAppDispatch();
+  const onboardingCompleto = useAppSelector((s) => s.perfil.onboardingCompleto);
+  const contactos = useAppSelector((s) => s.contactos.lista);
+  const v = useAsync(
+    () =>
+      api.verInvitacion(
+        token,
+        contactos.map((c) => c.id),
+      ),
+    token,
+  );
   const [aceptando, setAceptando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Quien abre el link sin perfil pasa primero por el onboarding y vuelve acá al terminar.
   useEffect(() => {
-    if (!perfil.onboardingCompleto) {
-      void guardarPerfilLocal({ invitacionPendiente: token }).then(() => router.replace("/bienvenida"));
+    if (!onboardingCompleto) {
+      dispatch(invitacionGuardada(token));
+      router.replace("/bienvenida");
     }
-  }, [perfil.onboardingCompleto, token]);
+  }, [dispatch, onboardingCompleto, token]);
 
   const aceptar = async () => {
     setAceptando(true);
@@ -48,7 +69,8 @@ export default function AceptarInvitacion() {
     try {
       const { contacto } = await api.aceptarInvitacion(token);
       hapticoExito();
-      setSesion({ aviso: `Ahora ${contacto.nombre} es tu contacto` });
+      dispatch(contactoAgregado(contacto));
+      dispatch(avisoMostrado(`Ahora ${contacto.nombre} es tu contacto`));
       router.replace("/perfil");
     } catch (e) {
       setAceptando(false);

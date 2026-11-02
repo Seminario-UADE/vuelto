@@ -6,27 +6,21 @@ import { Card } from "@/components/card";
 import { Icon } from "@/components/icon";
 import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
-import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
-import * as api from "@/data/api";
-import { useSesion } from "@/data/sesion";
-import { useAsync } from "@/hooks/use-async";
 import { fechaCorta } from "@/lib/format";
+import { useAppSelector } from "@/store/hooks";
 import { colors, radius, size, space } from "@/theme";
 
 /** Contactos vinculados (ADR-008). Sin buscador: solo se vincula por invitación. */
 export default function Contactos() {
-  const version = useSesion((s) => s.contactosQuitados.length + s.contactosAceptados.length);
-  const contactos = useAsync(() => api.getContactos(), version);
+  const contactos = useAppSelector((s) => s.contactos.lista);
 
   return (
     <Screen>
       <Text variant="bodyMd" tone="inkSecondary">
         Solo ves su nombre y, en cada compra del grupo, qué medio suyo conviene.
       </Text>
-      {!contactos.datos ? (
-        <SkeletonList rows={2} />
-      ) : contactos.datos.length === 0 ? (
+      {contactos.length === 0 ? (
         <Card>
           <Text variant="bodyLg" weight="semibold">
             Todavía no tenés contactos
@@ -38,7 +32,7 @@ export default function Contactos() {
         </Card>
       ) : (
         <Card padding={space.lg} gap={0}>
-          {contactos.datos.map((c, i) => (
+          {contactos.map((c, i) => (
             <View
               key={c.id}
               style={{
@@ -76,7 +70,12 @@ export default function Contactos() {
           ))}
         </Card>
       )}
-      <Button label="Invitar a alguien" variant="secondary" icon="invitar" onPress={() => router.push("/contactos/invitar")} />
+      <Button
+        label="Invitar a alguien"
+        variant="secondary"
+        icon="invitar"
+        onPress={() => router.push("/contactos/invitar")}
+      />
     </Screen>
   );
 }

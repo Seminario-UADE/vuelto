@@ -7,11 +7,9 @@ import { CompraRow } from "@/components/compra-row";
 import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
-import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
-import * as api from "@/data/api";
-import { useSesion } from "@/data/sesion";
-import { useAsync } from "@/hooks/use-async";
+import { useAppSelector } from "@/store/hooks";
+import { selectResumenCompras } from "@/store/selectores";
 import { space } from "@/theme";
 
 /**
@@ -19,8 +17,7 @@ import { space } from "@/theme";
  * pagar; escanear y cargar a mano quedan como filas secundarias (auditoría P1 #1).
  */
 export default function Comprar() {
-  const cambios = useSesion((s) => s.comprasNuevas.length);
-  const compras = useAsync(() => api.getCompras(), cambios);
+  const compras = useAppSelector(selectResumenCompras);
 
   return (
     <Screen kind="tab" aboveTabBar>
@@ -59,23 +56,22 @@ export default function Comprar() {
       </View>
 
       <View style={{ gap: space.sm }}>
-        <SectionHeader title="Últimas compras" action={{ label: "Ver todas", onPress: () => router.push("/mis-compras") }} />
-        {compras.datos ? (
-          compras.datos.compras.length === 0 ? (
-            <Text variant="bodyMd" tone="inkSecondary">
-              Todavía no registraste compras este mes.
-            </Text>
-          ) : (
-            <Card padding={space.lg} gap={0}>
-              {compras.datos.compras.slice(0, 3).map((c, i) => (
-                <View key={c.id} style={divisor(i)}>
-                  <CompraRow c={c} conFecha />
-                </View>
-              ))}
-            </Card>
-          )
+        <SectionHeader
+          title="Últimas compras"
+          action={{ label: "Ver todas", onPress: () => router.push("/mis-compras") }}
+        />
+        {compras.compras.length === 0 ? (
+          <Text variant="bodyMd" tone="inkSecondary">
+            Todavía no registraste compras este mes.
+          </Text>
         ) : (
-          <SkeletonList rows={3} />
+          <Card padding={space.lg} gap={0}>
+            {compras.compras.slice(0, 3).map((c, i) => (
+              <View key={c.id} style={divisor(i)}>
+                <CompraRow c={c} conFecha />
+              </View>
+            ))}
+          </Card>
         )}
       </View>
     </Screen>

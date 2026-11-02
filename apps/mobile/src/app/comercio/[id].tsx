@@ -1,5 +1,5 @@
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useEffect } from "react";
 import { Pressable, View } from "react-native";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
@@ -12,12 +12,11 @@ import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { Skeleton, SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
-import * as api from "@/data/api";
-import { useAsync } from "@/hooks/use-async";
-import { parseMonto } from "@/lib/format";
 import { RUBROS } from "@/lib/rubros";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectRecomendacion } from "@/store/selectores";
+import { comercioElegido, montoCambiado } from "@/store/simulacion";
 import { colors, radius, space } from "@/theme";
-
 
 /**
  * Con qué pagar: pregunta → respuesta → razón → monto → alternativas → grupo → acción
@@ -25,10 +24,18 @@ import { colors, radius, space } from "@/theme";
  * fijo que no tapa contenido (P2 #7).
  */
 export default function ConQuePagar() {
-  const params = useLocalSearchParams<{ id: string; monto?: string }>();
-  const [monto, setMonto] = useState<number | null>(parseMonto(params.monto ?? ""));
-  const rec = useAsync(() => api.recomendar(params.id, monto), `${params.id}:${monto ?? "-"}`);
-  const r = rec.datos;
+  const params = useLocalSearchParams<{ id: string }>();
+  const dispatch = useAppDispatch();
+  // El mismo comercio que en Inicio conserva el monto; otro lo borra (simulacion.ts).
+  useEffect(() => {
+    dispatch(comercioElegido(params.id));
+  }, [dispatch, params.id]);
+  const monto = useAppSelector((s) => s.simulacion.monto);
+  const setMonto = (m: number | null) => dispatch(montoCambiado(m));
+  const elegido = useAppSelector((s) => s.simulacion.comercioId);
+  // Derivada con el motor en el dispositivo: cambia con cada tecla del monto, sin red (ADR-010).
+  const rec = useAppSelector(selectRecomendacion);
+  const r = elegido === params.id ? rec : null;
 
   const usar = () => {
     if (!r?.medio) return;
@@ -50,7 +57,9 @@ export default function ConQuePagar() {
               <Button
                 label="Cargar la compra a mano"
                 variant="secondary"
-                onPress={() => router.push({ pathname: "/revisa", params: { modo: "manual", comercio: r.comercio.nombre } })}
+                onPress={() =>
+                  router.push({ pathname: "/revisa", params: { modo: "manual", comercio: r.comercio.nombre } })
+                }
               />
             )
           ) : null
@@ -65,18 +74,7 @@ export default function ConQuePagar() {
           </View>
         ) : null}
 
-        {r ? (
-          <RecomendacionCard r={r} />
-        ) : rec.estado === "error" ? (
-          <Card>
-            <Text variant="bodyMd" tone="error">
-              {rec.error}
-            </Text>
-            <Button label="Probar de nuevo" variant="secondary" onPress={rec.recargar} />
-          </Card>
-        ) : (
-          <Skeleton height={220} r={radius.card} />
-        )}
+        {r ? <RecomendacionCard r={r} /> : <Skeleton height={220} r={radius.card} />}
 
         {r?.medio ? (
           <Card>
@@ -106,9 +104,7 @@ export default function ConQuePagar() {
         )}
 
         <Pressable
-          onPress={() =>
-            router.push({ pathname: "/grupo/armar", params: { comercio: params.id, monto: monto ?? "" } })
-          }
+          onPress={() => router.push({ pathname: "/grupo/armar", params: { comercio: params.id, monto: monto ?? "" } })}
           accessibilityRole="button"
           style={{
             flexDirection: "row",

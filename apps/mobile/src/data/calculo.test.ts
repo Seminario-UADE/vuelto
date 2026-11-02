@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { compraParaGuardar, comprasVista, perfilDelMotor, recomendacionVista, textoDias, topesVista, type EntradasMotor } from "./calculo";
+import {
+  compraParaGuardar,
+  comprasVista,
+  msHastaLaMedianoche,
+  perfilDelMotor,
+  recomendacionVista,
+  textoDias,
+  topesVista,
+  type EntradasMotor,
+} from "./calculo";
 import type { Comercio } from "./contracts";
 import { RELOJ_EJEMPLO, catalogoComercios, comprasOctubre, mediosDeclarados, promociones } from "./fixtures";
 
@@ -8,7 +17,10 @@ import { RELOJ_EJEMPLO, catalogoComercios, comprasOctubre, mediosDeclarados, pro
 
 const ahora = new Date(RELOJ_EJEMPLO);
 const entradas: EntradasMotor = {
-  perfil: perfilDelMotor(mediosDeclarados.map((m) => m.id), "Martín"),
+  perfil: perfilDelMotor(
+    mediosDeclarados.map((m) => m.id),
+    "Martín",
+  ),
   promociones,
   compras: comprasOctubre,
   ahora,
@@ -39,7 +51,11 @@ describe("recomendacionVista (US1)", () => {
     const r = recomendacionVista(entradas, comercio("farmacity"), 10000);
     expect(r?.resultado).toBe("sin-promo");
     expect(r?.alternativas).toEqual([
-      expect.objectContaining({ medioId: "macro-visa-debito", estado: "agotado", motivo: "Tope agotado según 2 compras de octubre" }),
+      expect.objectContaining({
+        medioId: "macro-visa-debito",
+        estado: "agotado",
+        motivo: "Tope agotado según 2 compras de octubre",
+      }),
     ]);
   });
 
@@ -58,7 +74,11 @@ describe("recomendacionVista (US1)", () => {
   });
 
   it("perfil sin medios evaluables (solo Mercado Pago): sin promo, sin error", () => {
-    const r = recomendacionVista({ ...entradas, perfil: perfilDelMotor(["mercado-pago"], null) }, comercio("coto"), 10000);
+    const r = recomendacionVista(
+      { ...entradas, perfil: perfilDelMotor(["mercado-pago"], null) },
+      comercio("coto"),
+      10000,
+    );
     expect(r?.resultado).toBe("sin-promo");
   });
 
@@ -67,7 +87,11 @@ describe("recomendacionVista (US1)", () => {
   });
 
   it("el jueves, la promo de Galicia de los miércoles no aplica", () => {
-    const r = recomendacionVista({ ...entradas, ahora: new Date("2026-10-15T12:00:00-03:00") }, comercio("coto"), 10000);
+    const r = recomendacionVista(
+      { ...entradas, ahora: new Date("2026-10-15T12:00:00-03:00") },
+      comercio("coto"),
+      10000,
+    );
     expect(r?.resultado).toBe("sin-promo");
     expect(r?.dia).toBe("hoy jueves");
   });
@@ -93,7 +117,11 @@ describe("topesVista", () => {
       base: { texto: "según 2 compras de octubre" },
       reinicio: "vuelve el 1/11",
     });
-    expect(de("provincia-visa-debito")).toMatchObject({ estado: "sin-base", disponible: null, base: { tipo: "sin-compras" } });
+    expect(de("provincia-visa-debito")).toMatchObject({
+      estado: "sin-base",
+      disponible: null,
+      base: { tipo: "sin-compras" },
+    });
   });
 
   it("un solo consejo, para la promo que aplica hoy", () => {
@@ -103,7 +131,10 @@ describe("topesVista", () => {
   });
 
   it("te devolvieron y días al reinicio mensual", () => {
-    expect(t.devolvieron).toEqual({ monto: 15200, base: expect.objectContaining({ texto: "según 10 compras de octubre" }) });
+    expect(t.devolvieron).toEqual({
+      monto: 15200,
+      base: expect.objectContaining({ texto: "según 10 compras de octubre" }),
+    });
     expect(t.reinicioMensualEnDias).toBe(18);
   });
 });
@@ -120,7 +151,12 @@ describe("compraParaGuardar (FR-008)", () => {
 
   it("con el medio recomendado: promo de Galicia, $1.000 esperados, sin descuento informado", () => {
     const c = compraParaGuardar(entradas, borrador, "n1");
-    expect(c).toMatchObject({ promocionId: "promo-galicia-super-mie", reintegroEsperado: 1000, descuentoObtenido: null, categoriaId: 1 });
+    expect(c).toMatchObject({
+      promocionId: "promo-galicia-super-mie",
+      reintegroEsperado: 1000,
+      descuentoObtenido: null,
+      categoriaId: 1,
+    });
     const t = topesVista({ ...entradas, compras: [c, ...comprasOctubre] });
     const galicia = t.medios.find((m) => m.medio.id === "galicia-visa-credito");
     expect(galicia).toMatchObject({ cifra: "≈$5.500", base: { texto: "según 4 compras de octubre" } });
@@ -159,5 +195,12 @@ describe("comprasVista y textoDias", () => {
     expect(textoDias(null)).toBe("todos los días");
     expect(textoDias(["sab"])).toBe("los sábados");
     expect(textoDias(["lun", "mie", "vie"])).toBe("los lunes, miércoles y viernes");
+  });
+});
+
+describe("msHastaLaMedianoche", () => {
+  it("cuenta en hora de Argentina", () => {
+    expect(msHastaLaMedianoche(new Date("2026-10-14T23:30:00-03:00"))).toBe(30 * 60_000);
+    expect(msHastaLaMedianoche(new Date("2026-10-14T00:00:00-03:00"))).toBe(86_400_000);
   });
 });

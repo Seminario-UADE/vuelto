@@ -8,9 +8,7 @@ import { Icon, iconoDeRubro } from "@/components/icon";
 import { Screen } from "@/components/screen";
 import { Skeleton } from "@/components/skeleton";
 import { Text } from "@/components/text";
-import * as api from "@/data/api";
-import { usePerfilLocal } from "@/data/perfil-local";
-import { useAsync } from "@/hooks/use-async";
+import { useAppSelector, useRecomendacionPara } from "@/store/hooks";
 import { colors, radius, space } from "@/theme";
 
 /**
@@ -18,9 +16,8 @@ import { colors, radius, space } from "@/theme";
  * Un usuario nuevo no tiene compras, así que no se muestra ninguna cifra de tope (Principio V).
  */
 export default function PrimeraRespuesta() {
-  const { perfil } = usePerfilLocal();
-  const r = useAsync(() => api.recomendar("coto", null));
-  const n = perfil.medios.length;
+  const n = useAppSelector((s) => s.perfil.medios.length);
+  const r = useRecomendacionPara("coto", null);
 
   return (
     <>
@@ -34,23 +31,23 @@ export default function PrimeraRespuesta() {
             Con {n === 1 ? "el medio" : `los ${n} medios`} que elegiste, si hoy comprás en Coto:
           </Text>
         </View>
-        {r.datos ? (
+        {r ? (
           <View style={{ gap: space.md }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
-              <Avatar icon={iconoDeRubro[r.datos.comercio.rubro]} />
+              <Avatar icon={iconoDeRubro[r.comercio.rubro]} />
               <View style={{ flex: 1 }}>
                 <Text variant="bodyLg" weight="semibold">
-                  {r.datos.comercio.nombre}
+                  {r.comercio.nombre}
                 </Text>
                 <Text variant="label" tone="inkSecondary">
-                  Supermercado · {r.datos.dia}
+                  Supermercado · {r.dia}
                 </Text>
               </View>
             </View>
             <DecisionCard
-              titulo={r.datos.medio ? `Te conviene ${r.datos.medio.nombre}` : "Hoy no hay promo"}
-              inicial={r.datos.medio?.inicial}
-              razon={r.datos.razon}
+              titulo={r.medio ? `Te conviene ${r.medio.nombre}` : "Hoy no hay promo"}
+              inicial={r.medio?.inicial}
+              razon={r.razon}
             />
           </View>
         ) : (

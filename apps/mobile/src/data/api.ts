@@ -1,56 +1,32 @@
 /**
- * Capa de datos de la app. Cada función tiene la firma del cliente de la Edge Function o
- * de la tabla que la va a reemplazar (docs/architecture/02-api-routes.md). La recomendación y
- * los topes salen de `@vuelto/motor` sobre los fixtures (`calculo.ts`, ADR-010); cuando exista
- * el backend cambia solo el cuerpo de cada función. Las pantallas importan solo este archivo
- * (y los tipos de `contracts.ts`).
+ * Lo que la app pide a la red: catálogos, lectura del ticket, invitaciones y el gasto en grupo.
+ * Cada función tiene la firma del cliente de la Edge Function o de la tabla que la va a
+ * reemplazar (docs/architecture/02-api-routes.md); hoy responde con fixtures. La
+ * recomendación, los topes, el perfil y las compras NO están acá: se derivan del store con
+ * `@vuelto/motor`, sin red (ADR-010, `src/store/selectores.ts`).
  */
-import { fechaArgentina, type Compra as CompraMotor } from "@vuelto/motor";
-import { compraParaGuardar, comprasVista, perfilDelMotor, recomendacionVista, topesVista, type EntradasMotor } from "./calculo";
+import { fechaArgentina } from "@vuelto/motor";
 import type {
-  BorradorCompra,
   Comercio,
-  Compra,
   Contacto,
   Invitacion,
   LecturaTicket,
   MedioDePago,
-  OrigenCompra,
   PedidoGrupo,
-  Perfil,
-  Recomendacion,
   RecomendacionGrupo,
-  ResumenCompras,
-  ResumenTopes,
   VistaInvitacion,
 } from "./contracts";
 import {
   RELOJ_EJEMPLO,
   catalogoComercios,
   catalogoMedios,
-  comprasOctubre,
-  contactos,
   grupoDeEjemplo,
   invitacionPropia,
   mediosDeclarados,
-  promociones,
   ticketDeEjemplo,
   usuario,
 } from "./fixtures";
 import { recomendarGrupo as grupoEnElServidor } from "./grupo-simulado";
-import { getSesion, setSesion } from "./sesion";
-
-/** Escenarios para probar estados vacíos y de error (solo desarrollo). */
-export type Escenario = "normal" | "mes-vacio" | "ticket-ilegible";
-
-let escenario: Escenario = "normal";
-export function setEscenario(e: Escenario): void {
-  escenario = e;
-  setSesion({});
-}
-export function getEscenario(): Escenario {
-  return escenario;
-}
 
 /** Demora simulada de red (0 en tests). */
 let demoraMs = 250;
@@ -67,34 +43,8 @@ function comercioPorId(id: string): Comercio {
   return c;
 }
 
-const AHORA = new Date(RELOJ_EJEMPLO);
-
-export function getHoy(): string {
-  return fechaArgentina(AHORA);
-}
-
-/**
- * Lo que el usuario eligió en el onboarding (en el servidor vive en su perfil, con RLS).
- * Lo actualiza `perfil-local.ts`; sin elección, se usan los de ejemplo.
- */
-let preferencias: { medios: string[]; comercios: string[] } = { medios: [], comercios: [] };
-export function setPreferencias(p: { medios: string[]; comercios: string[] }): void {
-  preferencias = p;
-}
-
-function mediosDelUsuario(): MedioDePago[] {
-  const elegidos = catalogoMedios.filter((m) => preferencias.medios.includes(m.id));
-  return elegidos.length > 0 ? elegidos : mediosDeclarados;
-}
-
-function comerciosDelUsuario(): Comercio[] {
-  const elegidos = catalogoComercios.filter((c) => preferencias.comercios.includes(c.id));
-  return elegidos.length > 0 ? elegidos : catalogoComercios.filter((c) => c.frecuente);
-}
-
-export async function getPerfil(): Promise<Perfil> {
-  return red({ nombre: usuario.nombre, medios: mediosDelUsuario(), comercios: comerciosDelUsuario() });
-}
+/** "Hoy" para el servidor de ejemplo (el reloj de los fixtures). */
+const HOY_EN_EL_SERVIDOR = fechaArgentina(new Date(RELOJ_EJEMPLO));
 
 /** Medios del perfil guardado en el servidor (para quien entra con una cuenta existente). */
 export function mediosDeclaradosIds(): string[] {
@@ -105,17 +55,17 @@ export async function getMediosDisponibles(): Promise<MedioDePago[]> {
   return red(catalogoMedios);
 }
 
-export async function getComerciosFrecuentes(): Promise<Comercio[]> {
-  return red(comerciosDelUsuario());
-}
-
 export async function getCatalogoComercios(): Promise<Comercio[]> {
   return red(catalogoComercios);
 }
 
 export async function buscarComercios(q: string): Promise<Comercio[]> {
   const t = q.trim().toLocaleLowerCase("es");
-  const normal = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+  const normal = (s: string) =>
+    s
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLowerCase();
   return red(t === "" ? [] : catalogoComercios.filter((c) => normal(c.nombre).includes(normal(t))));
 }
 
@@ -123,44 +73,12 @@ export async function getComercio(id: string): Promise<Comercio> {
   return red(comercioPorId(id));
 }
 
-function todasLasCompras(): CompraMotor[] {
-  const nuevas = getSesion().comprasNuevas;
-  return escenario === "mes-vacio" ? nuevas : [...nuevas, ...comprasOctubre];
-}
-
-function entradas(): EntradasMotor {
-  return {
-    perfil: perfilDelMotor(mediosDelUsuario().map((m) => m.id), usuario.nombre),
-    promociones,
-    compras: todasLasCompras(),
-    ahora: AHORA,
-  };
-}
-
-export async function recomendar(comercioId: string, monto: number | null): Promise<Recomendacion> {
-  const r = recomendacionVista(entradas(), comercioPorId(comercioId), monto);
-  if (!r) throw new Error("No conocemos el rubro de este comercio");
-  return red(r);
-}
-
-export async function getTopes(): Promise<ResumenTopes> {
-  return red(topesVista(entradas()));
-}
-
-export async function getCompras(origen: OrigenCompra | "todas" = "todas"): Promise<ResumenCompras> {
-  const resumen = comprasVista(todasLasCompras(), AHORA);
-  return red({
-    ...resumen,
-    compras: origen === "todas" ? resumen.compras : resumen.compras.filter((c) => c.origen === origen),
-  });
-}
-
 /**
  * Lee el ticket. En esta feature no recibe imagen: no hay captura real (spec 006 FR-015).
  * El endpoint real recibe la imagen, la manda a Gemini y la descarta (Principio IV).
  */
-export async function leerTicket(): Promise<LecturaTicket> {
-  if (escenario === "ticket-ilegible") {
+export async function leerTicket(opciones: { ilegible: boolean }): Promise<LecturaTicket> {
+  if (opciones.ilegible) {
     return red({
       ok: false,
       error: "No pudimos leer el ticket. Probá con más luz o cargá el monto a mano.",
@@ -176,20 +94,6 @@ export async function leerTicket(): Promise<LecturaTicket> {
   });
 }
 
-export async function guardarCompra(b: BorradorCompra): Promise<Compra> {
-  const compra = compraParaGuardar(entradas(), b, `n${getSesion().comprasNuevas.length + 1}`);
-  setSesion({ comprasNuevas: [compra, ...getSesion().comprasNuevas] });
-  const vista = comprasVista([compra], new Date(`${compra.fecha}T12:00:00-03:00`)).compras[0];
-  if (!vista) throw new Error("No pudimos guardar la compra");
-  return red(vista);
-}
-
-export async function getContactos(): Promise<Contacto[]> {
-  const { contactosQuitados, contactosAceptados } = getSesion();
-  const aceptados = contactosAceptados.map((id) => invitantes[id]).filter((c): c is Contacto => Boolean(c));
-  return red([...contactos, ...aceptados].filter((c) => !contactosQuitados.includes(c.id)));
-}
-
 let generadas = 0;
 
 /** Cada llamada genera un link nuevo (el anterior deja de servir en el servidor). */
@@ -201,7 +105,7 @@ export async function crearInvitacion(): Promise<Invitacion> {
 
 /** Quién invita en cada token de ejemplo (en el servidor sale de `ver_invitacion`). */
 const invitantes: Record<string, Contacto> = {
-  tomas: { id: "tomas", nombre: "Tomás", iniciales: "T", vinculadoDesde: getHoy() },
+  tomas: { id: "tomas", nombre: "Tomás", iniciales: "T", vinculadoDesde: HOY_EN_EL_SERVIDOR },
 };
 
 const TOKENS: Record<string, { estado: VistaInvitacion["estado"]; quien: string | null; contactoId: string | null }> = {
@@ -209,13 +113,14 @@ const TOKENS: Record<string, { estado: VistaInvitacion["estado"]; quien: string 
   "demo-vencida": { estado: "vencida", quien: "Tomás", contactoId: null },
   "demo-usada": { estado: "usada", quien: "Tomás", contactoId: null },
   "demo-propia": { estado: "propia", quien: usuario.nombre, contactoId: null },
-  "k7Qm2x": { estado: "propia", quien: usuario.nombre, contactoId: null },
+  k7Qm2x: { estado: "propia", quien: usuario.nombre, contactoId: null },
   "demo-contacto": { estado: "ya-contacto", quien: "Lucía", contactoId: "lucia" },
 };
 
-export async function verInvitacion(token: string): Promise<VistaInvitacion> {
+/** `contactos`: los ids que ya son contacto (en el servidor lo sabe `ver_invitacion`). */
+export async function verInvitacion(token: string, contactos: string[]): Promise<VistaInvitacion> {
   const t = TOKENS[token] ?? { estado: "vencida" as const, quien: null, contactoId: null };
-  const yaAceptada = t.contactoId !== null && getSesion().contactosAceptados.includes(t.contactoId);
+  const yaAceptada = t.estado === "valida" && t.contactoId !== null && contactos.includes(t.contactoId);
   return red({
     estado: yaAceptada ? "ya-contacto" : t.estado,
     quienInvita: t.quien,
@@ -238,17 +143,12 @@ export async function aceptarInvitacion(token: string): Promise<{ contacto: Cont
   const t = TOKENS[token];
   const contacto = t?.contactoId ? invitantes[t.contactoId] : undefined;
   if (!t || t.estado !== "valida" || !contacto) throw new Error("La invitación ya no es válida");
-  const { contactosAceptados, contactosQuitados } = getSesion();
-  setSesion({
-    contactosAceptados: [...contactosAceptados.filter((x) => x !== contacto.id), contacto.id],
-    contactosQuitados: contactosQuitados.filter((x) => x !== contacto.id),
-  });
   return red({ contacto });
 }
 
-export async function quitarContacto(id: string): Promise<{ ok: true }> {
-  setSesion({ contactosQuitados: [...getSesion().contactosQuitados, id] });
-  return red({ ok: true as const });
+/** En el servidor corta el vínculo para los dos; la pantalla lo saca del store. */
+export async function quitarContacto(id: string): Promise<{ ok: true; id: string }> {
+  return red({ ok: true as const, id });
 }
 
 export function getGrupoDeEjemplo(): Omit<PedidoGrupo, "integrantes"> {
@@ -265,7 +165,7 @@ export async function recomendarGrupo(pedido: PedidoGrupo): Promise<Recomendacio
         fecha: pedido.fecha,
         integrantes: pedido.integrantes,
       },
-      getHoy(),
+      HOY_EN_EL_SERVIDOR,
     ),
   );
 }

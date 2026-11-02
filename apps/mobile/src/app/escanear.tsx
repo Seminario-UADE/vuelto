@@ -9,6 +9,8 @@ import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import { fechaCorta, pesos } from "@/lib/format";
 import { hapticoLeve } from "@/lib/haptics";
+import { useAppSelector } from "@/store/hooks";
+import { selectHoy } from "@/store/selectores";
 import { colors, radius, size, space } from "@/theme";
 
 const LINEAS = [
@@ -29,12 +31,14 @@ export default function Escanear() {
   const insets = useSafeAreaInsets();
   const [leyendo, setLeyendo] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const ilegible = useAppSelector((s) => s.sesion.escenario === "ticket-ilegible");
+  const hoy = useAppSelector(selectHoy);
 
   const disparar = async () => {
     hapticoLeve();
     setLeyendo(true);
     setError(null);
-    const t = await api.leerTicket();
+    const t = await api.leerTicket({ ilegible });
     setLeyendo(false);
     if (!t.ok) {
       setError(t.error);
@@ -82,14 +86,21 @@ export default function Escanear() {
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ flexGrow: 1, justifyContent: "center", paddingHorizontal: space.section, gap: space.lg }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          paddingHorizontal: space.section,
+          gap: space.lg,
+        }}
       >
         <View
           accessible
           accessibilityLabel="Visor con un ticket de ejemplo de Coto por 24.500 pesos"
           style={{ padding: space.lg, borderRadius: radius.row, borderWidth: 2, borderColor: colors.onDecisionAccent }}
         >
-          <View style={{ backgroundColor: colors.canvas, borderRadius: radius.badge, padding: space.lg, gap: space.xs }}>
+          <View
+            style={{ backgroundColor: colors.canvas, borderRadius: radius.badge, padding: space.lg, gap: space.xs }}
+          >
             <Text variant="bodyMd" weight="bold" align="center">
               COTO C.I.C.S.A.
             </Text>
@@ -99,7 +110,13 @@ export default function Escanear() {
             <View style={{ height: 1, backgroundColor: colors.divider, marginVertical: space.xs }} />
             {LINEAS.map(([item, precio]) => (
               <View key={item} style={{ flexDirection: "row", justifyContent: "space-between", gap: space.sm }}>
-                <Text variant="caption" tone="inkSecondary" numberOfLines={1} maxFontSizeMultiplier={1.3} style={{ flex: 1 }}>
+                <Text
+                  variant="caption"
+                  tone="inkSecondary"
+                  numberOfLines={1}
+                  maxFontSizeMultiplier={1.3}
+                  style={{ flex: 1 }}
+                >
                   {item}
                 </Text>
                 <Text variant="caption" tabular maxFontSizeMultiplier={1.3}>
@@ -117,7 +134,7 @@ export default function Escanear() {
               </Text>
             </View>
             <Text variant="caption" tone="inkSecondary" align="center">
-              {fechaCorta(api.getHoy())}/2026 · 18:42
+              {fechaCorta(hoy)}/2026 · 18:42
             </Text>
           </View>
         </View>

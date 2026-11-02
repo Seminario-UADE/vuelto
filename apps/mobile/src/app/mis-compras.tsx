@@ -9,13 +9,11 @@ import { EmptyState } from "@/components/empty-state";
 import { Icon } from "@/components/icon";
 import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
-import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
-import * as api from "@/data/api";
 import type { Compra, OrigenCompra } from "@/data/contracts";
-import { useSesion } from "@/data/sesion";
-import { useAsync } from "@/hooks/use-async";
 import { aprox, diaDelMes, pesos } from "@/lib/format";
+import { useAppSelector } from "@/store/hooks";
+import { selectResumenCompras } from "@/store/selectores";
 import { colors, space } from "@/theme";
 
 const FILTROS: (OrigenCompra | "todas")[] = ["todas", "ticket", "excepcion", "manual"];
@@ -26,20 +24,16 @@ const FILTROS: (OrigenCompra | "todas")[] = ["todas", "ticket", "excepcion", "ma
  */
 export default function MisCompras() {
   const [filtro, setFiltro] = useState<OrigenCompra | "todas">("todas");
-  const cambios = useSesion((s) => s.comprasNuevas.length);
-  const todas = useAsync(() => api.getCompras("todas"), cambios);
-  const datos = todas.datos;
-  const compras = datos?.compras.filter((c) => filtro === "todas" || c.origen === filtro) ?? [];
-  const gastaste = datos?.gastaste ?? 0;
+  const datos = useAppSelector(selectResumenCompras);
+  const compras = datos.compras.filter((c) => filtro === "todas" || c.origen === filtro);
+  const gastaste = datos.gastaste;
 
   const porDia = new Map<string, Compra[]>();
   for (const c of compras) porDia.set(c.fecha, [...(porDia.get(c.fecha) ?? []), c]);
 
   return (
     <Screen>
-      {!datos ? (
-        <SkeletonList rows={4} />
-      ) : datos.compras.length === 0 ? (
+      {datos.compras.length === 0 ? (
         <EmptyState
           title="Todavía no registraste compras"
           body="Escaneá un ticket o aceptá una recomendación y la compra aparece acá."
@@ -114,7 +108,12 @@ export default function MisCompras() {
               Las compras sin confirmar no cuentan para tus topes.
             </Text>
           </View>
-          <Button label="Registrar compra" variant="secondary" icon="agregar" onPress={() => router.navigate("/comprar")} />
+          <Button
+            label="Registrar compra"
+            variant="secondary"
+            icon="agregar"
+            onPress={() => router.navigate("/comprar")}
+          />
         </>
       )}
     </Screen>

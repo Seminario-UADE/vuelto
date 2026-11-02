@@ -7,44 +7,38 @@ import { Chip } from "@/components/chip";
 import { EmptyState } from "@/components/empty-state";
 import { Icon, iconoDeRubro } from "@/components/icon";
 import { Screen } from "@/components/screen";
-import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import { TopeDetalle } from "@/components/tope-card";
-import * as api from "@/data/api";
 import type { Rubro } from "@/data/contracts";
-import { useSesion } from "@/data/sesion";
-import { useAsync } from "@/hooks/use-async";
 import { aprox } from "@/lib/format";
 import { RUBROS } from "@/lib/rubros";
+import { useAppSelector } from "@/store/hooks";
+import { selectTopes } from "@/store/selectores";
 import { colors, space } from "@/theme";
-
 
 /**
  * Tus topes: cuánto queda por medio, con ≈ y su base. Sin total agregado de topes
  * (auditoría P1 #4) y sin tarjeta oscura: no hay una decisión acá (P1 #2).
  */
 export default function Topes() {
-  const cambios = useSesion((s) => s.comprasNuevas.length);
-  const t = useAsync(() => api.getTopes(), cambios);
+  // Derivados con el motor sobre las compras del store: una compra guardada los cambia al instante.
+  const datos = useAppSelector(selectTopes);
   const [rubro, setRubro] = useState<Rubro | null>(null);
-  const datos = t.datos;
-  const lista = datos?.medios.filter((m) => rubro === null || m.rubro === rubro) ?? [];
-  const vacio = datos !== null && datos.devolvieron.monto === 0 && datos.medios.every((m) => m.disponible === null);
+  const lista = datos.medios.filter((m) => rubro === null || m.rubro === rubro);
+  const vacio = datos.devolvieron.monto === 0 && datos.medios.every((m) => m.disponible === null);
 
   return (
     <Screen kind="tab" aboveTabBar>
       <View style={{ gap: space.xs }}>
         <Text variant="label" tone="inkSecondary">
-          {datos ? datos.mes.replace(/^./, (c) => c.toUpperCase()) : " "}
+          {datos.mes.replace(/^./, (c) => c.toUpperCase())}
         </Text>
         <Text variant="titleLg" accessibilityRole="header">
           Tus topes
         </Text>
       </View>
 
-      {!datos ? (
-        <SkeletonList rows={4} height={140} />
-      ) : vacio ? (
+      {vacio ? (
         <EmptyState
           title="Todavía no registraste compras"
           body="Cuando registres la primera, vas a ver cuánto tope te queda en cada medio."
@@ -74,7 +68,8 @@ export default function Topes() {
             <View style={{ height: 1, backgroundColor: colors.divider }} />
             <View style={{ gap: space.sm }}>
               <Text variant="bodyMd" weight="semibold">
-                {datos.mediosConTope} {datos.mediosConTope === 1 ? "medio con tope disponible" : "medios con tope disponible"}
+                {datos.mediosConTope}{" "}
+                {datos.mediosConTope === 1 ? "medio con tope disponible" : "medios con tope disponible"}
               </Text>
               <View style={{ flexDirection: "row", alignItems: "center", gap: space.xs }}>
                 <Icon name="calendario" size={16} color={colors.inkSecondary} />

@@ -10,29 +10,34 @@ import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import type { Comercio, Rubro } from "@/data/contracts";
-import { guardarPerfilLocal, usePerfilLocal } from "@/data/perfil-local";
 import { useAsync } from "@/hooks/use-async";
 import { RUBROS } from "@/lib/rubros";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { comerciosElegidos } from "@/store/perfil";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
-
 
 /** Comercios habituales (onboarding 3/5, configuración 2 de 2). Opcional. */
 export default function Comercios() {
-  const { perfil } = usePerfilLocal();
+  const dispatch = useAppDispatch();
+  const guardados = useAppSelector((s) => s.perfil.comercios);
   const catalogo = useAsync(() => api.getCatalogoComercios());
-  const [elegidos, setElegidos] = useState<string[]>(perfil.comercios);
+  const [elegidos, setElegidos] = useState<string[]>(guardados);
   const [q, setQ] = useState("");
 
   const grupos = useMemo(() => {
-    const norm = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+    const norm = (s: string) =>
+      s
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "")
+        .toLowerCase();
     const lista = (catalogo.datos ?? []).filter((c) => norm(c.nombre).includes(norm(q.trim())));
     const por = new Map<Rubro, Comercio[]>();
     for (const c of lista) por.set(c.rubro, [...(por.get(c.rubro) ?? []), c]);
     return [...por.entries()];
   }, [catalogo.datos, q]);
 
-  const seguir = async (guardar: boolean) => {
-    if (guardar) await guardarPerfilLocal({ comercios: elegidos });
+  const seguir = (guardar: boolean) => {
+    if (guardar) dispatch(comerciosElegidos(elegidos));
     router.push("/primera-respuesta");
   };
 
@@ -46,7 +51,13 @@ export default function Comercios() {
               onPress={() => seguir(false)}
               accessibilityRole="button"
               hitSlop={8}
-              style={{ minHeight: 44, minWidth: 44, paddingHorizontal: space.sm, justifyContent: "center", alignItems: "center" }}
+              style={{
+                minHeight: 44,
+                minWidth: 44,
+                paddingHorizontal: space.sm,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
             >
               <Text variant="bodyMd" weight="semibold" tone="accent">
                 Saltar
@@ -95,7 +106,13 @@ export default function Comercios() {
             accessibilityLabel="Buscar comercio"
             returnKeyType="search"
             selectionColor={colors.accent}
-            style={{ flex: 1, minHeight: 44, fontFamily: fonts.regular, fontSize: escala.bodyLg.fontSize, color: colors.ink }}
+            style={{
+              flex: 1,
+              minHeight: 44,
+              fontFamily: fonts.regular,
+              fontSize: escala.bodyLg.fontSize,
+              color: colors.ink,
+            }}
           />
         </View>
         {catalogo.estado === "cargando" && !catalogo.datos ? <SkeletonList rows={4} height={48} /> : null}

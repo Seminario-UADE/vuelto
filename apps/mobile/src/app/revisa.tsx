@@ -10,14 +10,16 @@ import { OptionRow } from "@/components/option-row";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { SheetHeader } from "@/components/sheet-header";
-import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import type { OrigenCompra } from "@/data/contracts";
-import { setSesion } from "@/data/sesion";
 import { useAsync } from "@/hooks/use-async";
 import { aprox, fechaLarga, montoEditable, parseMonto } from "@/lib/format";
 import { hapticoExito, hapticoSeleccion } from "@/lib/haptics";
+import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
+import { selectHoy, selectPerfilVista } from "@/store/selectores";
+import { avisoMostrado } from "@/store/sesion";
+import { guardarCompra } from "@/store/thunks";
 import { colors, space } from "@/theme";
 
 const SUBTITULO: Record<OrigenCompra, string> = {
@@ -49,17 +51,20 @@ export default function Revisa() {
   const [medioId, setMedioId] = useState<string | null>(modo === "excepcion" ? p.medio || null : medioDelTicket);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const fecha = p.fecha || api.getHoy();
+  const dispatch = useAppDispatch();
+  const hoy = useAppSelector(selectHoy);
+  const fecha = p.fecha || hoy;
 
-  const perfil = useAsync(() => api.getPerfil());
-  const comercioConocido = perfil.datos?.comercios.find((c) => c.nombre.toLowerCase() === comercio.trim().toLowerCase());
+  const perfil = useAppSelector(selectPerfilVista);
+  const comercioConocido = perfil.comercios.find((c) => c.nombre.toLowerCase() === comercio.trim().toLowerCase());
   const busqueda = useAsync(() => api.buscarComercios(comercio), comercio);
-  const conocido = comercioConocido ?? busqueda.datos?.find((c) => c.nombre.toLowerCase() === comercio.trim().toLowerCase());
-  // Qué dice el servidor de cada medio para este comercio (solo para orientar; no preselecciona).
-  const rec = useAsync(() => (conocido ? api.recomendar(conocido.id, monto) : Promise.resolve(null)), `${conocido?.id ?? "-"}:${monto ?? "-"}`);
+  const conocido =
+    comercioConocido ?? busqueda.datos?.find((c) => c.nombre.toLowerCase() === comercio.trim().toLowerCase());
+  // Qué dice el motor de cada medio para este comercio (solo para orientar; no preselecciona).
+  const rec = useRecomendacionPara(conocido?.id ?? null, monto);
 
   const detalleDe = (id: string): string | null => {
-    const r = rec.datos;
+    const r = rec;
     if (!r) return null;
     if (r.medio?.id === id) return r.razon;
     const a = r.alternativas.find((x) => x.medioId === id);
@@ -73,25 +78,27 @@ export default function Revisa() {
       ? "Falta el monto"
       : medioId === null
         ? "Elegí con qué pagaste para continuar"
-        : rec.datos?.medio?.id === medioId && rec.datos.reintegro !== null
-          ? `Te devuelven ${aprox(rec.datos.reintegro)}${rec.datos.base ? `, ${rec.datos.base.texto}` : ""}. Hasta que guardes, tus topes no cambian.`
+        : rec?.medio?.id === medioId && rec.reintegro !== null
+          ? `Te devuelven ${aprox(rec.reintegro)}${rec.base ? `, ${rec.base.texto}` : ""}. Hasta que guardes, tus topes no cambian.`
           : "Hasta que guardes, tus topes no cambian.";
 
-  const guardar = async () => {
+  const guardar = () => {
     if (!listo) return;
     setGuardando(true);
     setError(null);
     try {
-      await api.guardarCompra({
-        modo,
-        comercio: comercio.trim(),
-        fecha,
-        monto,
-        medioId,
-        textoExtraido: modo === "ticket" ? (p.texto ?? null) : null,
-      });
+      dispatch(
+        guardarCompra({
+          modo,
+          comercio: comercio.trim(),
+          fecha,
+          monto,
+          medioId,
+          textoExtraido: modo === "ticket" ? (p.texto ?? null) : null,
+        }),
+      );
       hapticoExito();
-      setSesion({ aviso: "Compra guardada · la ves en Mis compras" });
+      dispatch(avisoMostrado("Compra guardada · la ves en Mis compras"));
       router.back();
     } catch (e) {
       setGuardando(false);
@@ -107,7 +114,13 @@ export default function Revisa() {
           <Text variant="label" tone={error ? "error" : "inkSecondary"} align="center" accessibilityLiveRegion="polite">
             {error ?? pista}
           </Text>
-          <Button label="Guardar compra" onPress={guardar} disabled={!listo} loading={guardando} hint={listo ? undefined : pista} />
+          <Button
+            label="Guardar compra"
+            onPress={guardar}
+            disabled={!listo}
+            loading={guardando}
+            hint={listo ? undefined : pista}
+          />
         </>
       }
     >
@@ -150,25 +163,21 @@ export default function Revisa() {
             </View>
           </Card>
         ) : null}
-        {perfil.datos ? (
-          <View accessibilityRole="radiogroup" style={{ gap: space.md }}>
-            {perfil.datos.medios.map((m) => (
-              <OptionRow
-                key={m.id}
-                title={m.nombre}
-                detail={detalleDe(m.id)}
-                selected={medioId === m.id}
-                onPress={() => {
-                  hapticoSeleccion();
-                  setMedioId(m.id);
-                }}
-                leading={<Avatar letras={m.inicial} tone={medioId === m.id ? "activo" : "neutral"} />}
-              />
-            ))}
-          </View>
-        ) : (
-          <SkeletonList rows={4} height={64} />
-        )}
+        <View accessibilityRole="radiogroup" style={{ gap: space.md }}>
+          {perfil.medios.map((m) => (
+            <OptionRow
+              key={m.id}
+              title={m.nombre}
+              detail={detalleDe(m.id)}
+              selected={medioId === m.id}
+              onPress={() => {
+                hapticoSeleccion();
+                setMedioId(m.id);
+              }}
+              leading={<Avatar letras={m.inicial} tone={medioId === m.id ? "activo" : "neutral"} />}
+            />
+          ))}
+        </View>
       </View>
     </Screen>
   );

@@ -3,6 +3,8 @@ import { TextInput, View } from "react-native";
 import * as api from "@/data/api";
 import type { Comercio } from "@/data/contracts";
 import { useAsync } from "@/hooks/use-async";
+import { useAppSelector } from "@/store/hooks";
+import { selectComerciosFrecuentes } from "@/store/selectores";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 import { Chip } from "./chip";
 import { Icon } from "./icon";
@@ -18,9 +20,9 @@ type Props = {
 /** Buscador de comercios + chips de frecuentes. Tocar uno ya es la pregunta "¿dónde?". */
 export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Props) {
   const [q, setQ] = useState("");
-  const frecuentes = useAsync(() => api.getComerciosFrecuentes());
+  const frecuentes = useAppSelector(selectComerciosFrecuentes);
   const resultados = useAsync(() => api.buscarComercios(q), q);
-  const lista = q.trim() ? (resultados.datos ?? []) : (frecuentes.datos ?? []);
+  const lista = q.trim() ? (resultados.datos ?? []) : frecuentes;
   return (
     <View style={{ gap: space.md }}>
       <View
@@ -44,7 +46,13 @@ export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Pr
           returnKeyType="search"
           autoCorrect={false}
           selectionColor={colors.accent}
-          style={{ flex: 1, minHeight: 44, fontFamily: fonts.regular, fontSize: escala.bodyLg.fontSize, color: colors.ink }}
+          style={{
+            flex: 1,
+            minHeight: 44,
+            fontFamily: fonts.regular,
+            fontSize: escala.bodyLg.fontSize,
+            color: colors.ink,
+          }}
         />
       </View>
       {q.trim() && resultados.estado === "listo" && lista.length === 0 ? (
