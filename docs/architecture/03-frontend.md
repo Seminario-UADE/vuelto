@@ -80,7 +80,7 @@ dispositivo (ADR-010, spec 008).
 | Slice | Qué guarda | Se persiste |
 |---|---|---|
 | `sesion` | `usuario` (Supabase Auth) y `authLista`, `ahora` (reloj del cálculo), aviso pendiente, escenario de desarrollo, `hidratado`, `epoca` (sube con cada cierre de sesión) | No: la sesión la guarda el cliente de Supabase |
-| `perfil` | Nombre, onboarding completo, medios de pago tal como los devuelve `medios_de_pago` (issue #41), comercios elegidos, invitación pendiente y `carga` (cómo quedó la última lectura en Supabase) | Sí, salvo `carga` |
+| `perfil` | Nombre, onboarding completo, medios de pago tal como los devuelve `medios_de_pago` (issue #41), comercios habituales de `comercios_habituales` (issue #47), invitación pendiente y `carga` (cómo quedó la última lectura en Supabase) | Sí, salvo `carga` |
 | `corpus` | Promociones con la forma del motor, `marca` (la mayor `actualizada_en`, texto exacto del servidor), `sincronizadoEn` y `descartadas`. Sin sincronizar: las de ejemplo y `marca: null` | Sí, en su propia clave `vuelto.corpus.v1`, y solo el que viene de una sincronización |
 | `compras` | Compras con la forma del motor (`promocionId`, `descuentoObtenido`, `reintegroEsperado`) | Sí |
 | `cola` | Operaciones de guardar y borrar compras que la cuenta todavía no tiene, con dueño y estado (spec 010) | Sí, en su propia clave (`vuelto.cola.v1`) |
@@ -162,7 +162,7 @@ selectMarcasDeSubida = cola → qué compras están «Sin subir» o «Solo en es
   `lib/auth.ts`. Si el proyecto exige confirmar el email, el registro avisa y manda a Entrar.
 - **Perfil desde el servidor (#41):** al entrar, la app lee los medios de `medios_de_pago` por RLS.
   Sin medios guardados en el celular, las pestañas esperan esa lectura: con medios, va directo a
-  Inicio; sin medios, al onboarding. Los comercios todavía viven solo en el dispositivo (#47).
+  Inicio; sin medios, al onboarding. Los comercios habituales se leen igual, de `comercios_habituales` (#47).
 
 ## Capa de datos
 

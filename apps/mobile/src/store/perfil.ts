@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { usuario } from "../data/fixtures";
-import { rehidratado, sesionCerrada, type EstadoPerfil, type MedioGuardado } from "./acciones";
+import { rehidratado, sesionCerrada, type ComercioHabitual, type EstadoPerfil, type MedioGuardado } from "./acciones";
 
 /**
  * Cómo quedó la última lectura de los medios en Supabase (issue #41). No se persiste: al abrir la
@@ -43,8 +43,15 @@ export const perfil = createSlice({
     cargaCambio(s, a: PayloadAction<CargaPerfil>) {
       s.carga = a.payload;
     },
-    comerciosElegidos(s, a: PayloadAction<string[]>) {
+    /** Lo que hay en Supabase (o lo que confirmó el onboarding) reemplaza lo local (issue #47). */
+    comerciosLeidos(s, a: PayloadAction<ComercioHabitual[]>) {
       s.comercios = a.payload;
+    },
+    comercioAgregado(s, a: PayloadAction<ComercioHabitual>) {
+      s.comercios.push(a.payload);
+    },
+    comercioSacado(s, a: PayloadAction<string>) {
+      s.comercios = s.comercios.filter((c) => c.id !== a.payload);
     },
     onboardingTerminado(s) {
       s.onboardingCompleto = true;
@@ -65,7 +72,9 @@ export const {
   medioAgregado,
   medioSacado,
   cargaCambio,
-  comerciosElegidos,
+  comerciosLeidos,
+  comercioAgregado,
+  comercioSacado,
   onboardingTerminado,
   invitacionGuardada,
 } = perfil.actions;

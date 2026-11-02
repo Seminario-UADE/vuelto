@@ -6,7 +6,14 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { fechaArgentina } from "@vuelto/motor";
 import { textoFrescura } from "../lib/frescura";
-import { comprasVista, perfilDelMotor, recomendacionVista, topesVista, type EntradasMotor } from "../data/calculo";
+import {
+  comercioPorNombre,
+  comprasVista,
+  perfilDelMotor,
+  recomendacionVista,
+  topesVista,
+  type EntradasMotor,
+} from "../data/calculo";
 import { contarPendientes } from "../data/compras/operaciones";
 import type { Comercio, MedioDePago, Perfil } from "../data/contracts";
 import { catalogoComercios } from "../data/fixtures";
@@ -68,8 +75,9 @@ export const selectMediosDelUsuario = createSelector([(s: RootState) => s.perfil
 );
 
 /** Los comercios que eligió el usuario; si saltó ese paso, los frecuentes de ejemplo. */
-export const selectComerciosFrecuentes = createSelector([(s: RootState) => s.perfil.comercios], (ids): Comercio[] => {
-  const elegidos = catalogoComercios.filter((c) => ids.includes(c.id));
+export const selectComerciosFrecuentes = createSelector([(s: RootState) => s.perfil.comercios], (habituales): Comercio[] => {
+  // Del catálogo si lo conoce (con su rubro); si no, el comercio por su nombre, sin rubro inventado.
+  const elegidos = habituales.map((c) => comercioPorNombre(c.nombre));
   return elegidos.length > 0 ? elegidos : catalogoComercios.filter((c) => c.frecuente);
 });
 

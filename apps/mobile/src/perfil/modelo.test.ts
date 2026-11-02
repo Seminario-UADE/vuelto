@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   clasificarError,
+  comercioRepetido,
   esDuplicado,
   ETIQUETAS_RED,
   puedeConfirmar,
@@ -89,5 +90,16 @@ describe("valores de red y tipo (decisión 2 del plan)", () => {
   it("cada red tiene su etiqueta visible", () => {
     expect(ETIQUETAS_RED).toMatchObject({ master: "Mastercard", dinners_club: "Diners Club", tarjeta_sol: "Tarjeta Sol" });
     expect(Object.keys(ETIQUETAS_RED).sort()).toEqual([...REDES].sort());
+  });
+});
+
+describe("comercioRepetido (issue #47)", () => {
+  it("ignora mayúsculas y espacios de más, como el índice único de la base", () => {
+    expect(comercioRepetido([{ nombre: "Coto" }], "  coto ")).toBe(true);
+    expect(comercioRepetido([{ nombre: "Café  Martínez" }], "café martínez")).toBe(true);
+  });
+
+  it("los acentos cuentan: «Dia» y «Día» son distintos", () => {
+    expect(comercioRepetido([{ nombre: "Día" }], "Dia")).toBe(false);
   });
 });

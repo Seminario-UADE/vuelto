@@ -5,16 +5,27 @@
  */
 import type { Resultado } from "../perfil/datos";
 import {
+  comercioRepetido,
   esDuplicado,
   MENSAJES_ERROR,
   puedeConfirmar,
   puedeSacar,
   type Banco,
+  type ComercioHabitual,
   type MedioDePago,
   type MedioNuevo,
 } from "../perfil/modelo";
 import type { AppThunk } from "./index";
-import { cargaCambio, medioAgregado, medioSacado, mediosConfirmados, mediosLeidos } from "./perfil";
+import {
+  cargaCambio,
+  comercioAgregado,
+  comercioSacado,
+  comerciosLeidos,
+  medioAgregado,
+  medioSacado,
+  mediosConfirmados,
+  mediosLeidos,
+} from "./perfil";
 
 const SIN_CONEXION = { ok: false, error: "sin_conexion" } as const;
 
@@ -74,5 +85,53 @@ export function leerBancos(): AppThunk<Promise<Banco[]>> {
     const r = await perfilRemoto.leerBancos();
     if (!r.ok) throw new Error(r.error === "sin_conexion" ? "Necesitás conexión para elegir tu banco" : MENSAJES_ERROR.otro);
     return r.datos;
+  };
+}
+
+// ─── Comercios habituales (issue #47) ───
+
+/**
+ * Lee los comercios del usuario y reemplaza los locales. Son opcionales: si falla, queda lo
+ * guardado y no se avisa nada (el motor funciona igual sin ellos, RF-02).
+ */
+export function leerComercios(): AppThunk<Promise<void>> {
+  return async (dispatch, getState, { perfilRemoto }) => {
+    const usuarioId = getState().sesion.usuario?.id ?? null;
+    if (!perfilRemoto || usuarioId === null) return;
+    const r = await perfilRemoto.leerMisComercios();
+    if ((getState().sesion.usuario?.id ?? null) !== usuarioId) return;
+    if (r.ok) dispatch(comerciosLeidos(r.datos));
+  };
+}
+
+/** Los del onboarding, en un solo pedido. Sin comercios no pide nada: se puede seguir sin ellos. */
+export function confirmarComercios(nombres: readonly string[]): AppThunk<Promise<Resultado<ComercioHabitual[]>>> {
+  return async (dispatch, getState, { perfilRemoto }) => {
+    const nuevos = nombres.filter((n, i) => n.trim() !== "" && !comercioRepetido(nombres.slice(0, i).map((x) => ({ nombre: x })), n));
+    if (nuevos.length === 0) return { ok: true, datos: getState().perfil.comercios };
+    if (!perfilRemoto) return SIN_CONEXION;
+    const r = await perfilRemoto.confirmarComercios(nuevos);
+    if (r.ok) dispatch(comerciosLeidos([...getState().perfil.comercios, ...r.datos]));
+    return r;
+  };
+}
+
+export function agregarComercio(nombre: string): AppThunk<Promise<Resultado<ComercioHabitual>>> {
+  return async (dispatch, getState, { perfilRemoto }) => {
+    if (nombre.trim() === "") return { ok: false, error: "otro" };
+    if (comercioRepetido(getState().perfil.comercios, nombre)) return { ok: false, error: "duplicado" };
+    if (!perfilRemoto) return SIN_CONEXION;
+    const r = await perfilRemoto.agregarComercio(nombre);
+    if (r.ok) dispatch(comercioAgregado(r.datos));
+    return r;
+  };
+}
+
+export function sacarComercio(id: string): AppThunk<Promise<Resultado<null>>> {
+  return async (dispatch, _getState, { perfilRemoto }) => {
+    if (!perfilRemoto) return SIN_CONEXION;
+    const r = await perfilRemoto.sacarComercio(id);
+    if (r.ok) dispatch(comercioSacado(id));
+    return r;
   };
 }

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { mediosDeEjemplo } from "../data/fixtures";
 import { mediosDeclarados, ticketDeEjemplo } from "../data/fixtures";
 import { escenarioElegido } from "./acciones";
-import { comerciosElegidos, mediosConfirmados } from "./perfil";
+import { comerciosLeidos, mediosConfirmados } from "./perfil";
 import {
   selectComerciosFrecuentes,
   selectPerfilVista,
@@ -37,7 +37,12 @@ describe("perfil del onboarding (FR-002 de la spec 006)", () => {
   it("medios y comercios frecuentes salen de lo que eligió el usuario", () => {
     const s = storeDePrueba();
     s.dispatch(mediosConfirmados(mediosDeEjemplo(["bbva-visa-credito"])));
-    s.dispatch(comerciosElegidos(["ypf", "shell"]));
+    s.dispatch(
+      comerciosLeidos([
+        { id: "c1", nombre: "YPF" },
+        { id: "c2", nombre: "Shell" },
+      ]),
+    );
     expect(selectPerfilVista(s.getState()).medios.map((m) => m.nombreCorto)).toEqual(["BBVA"]);
     expect(selectComerciosFrecuentes(s.getState()).map((c) => c.nombre)).toEqual(["YPF", "Shell"]);
   });

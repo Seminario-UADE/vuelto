@@ -1577,6 +1577,39 @@ la #40 (sesión) están en `main`, y antes revisar que nada contradiga ADR-010.
 
 ---
 
+## 2026-11-02 — Perfil: comercios habituales (issue #47)
+
+**Herramienta:** Claude Code (Opus 5.5).
+
+**Objetivo:** que el usuario marque los comercios donde compra seguido y los
+elija con un toque en «¿Con qué pago?». Issue chica: sin spec-kit.
+
+**Prompts principales:**
+1. "Adelantá mis tickets" → se propuso #47 porque #41 la destrabó.
+2. "#47, terminalo y subilo."
+
+**Resultado:**
+- `perfil.comercios` pasa de ids del catálogo de ejemplo a las filas de
+  `comercios_habituales` (`{ id, nombre }`). Lo guardado con ids viejos se migra
+  con el nombre del catálogo.
+- `perfil/datos.ts` suma leer, confirmar (un solo insert), agregar y sacar, sin
+  mandar `user_id`. Thunks en `store/perfil-remoto.ts`; se leen al entrar, junto
+  con los medios. Si falla la lectura no se avisa: son opcionales (RF-02).
+- Repetidos: mismo criterio que el índice único de la base (sin mayúsculas ni
+  espacios de más; los acentos cuentan). Un repetido no llega a Supabase.
+- Onboarding: «Continuar» guarda los elegidos en un pedido; «Saltar» no guarda
+  nada; si falla, se puede saltear.
+- Perfil: lista con quitar, y agregar con autocompletar del catálogo o el nombre
+  escrito a mano. Uno del catálogo abre su pantalla; uno escrito a mano no
+  (no tiene rubro).
+- «¿Con qué pago?»: `selectComerciosFrecuentes` ya los ponía primero; ahora los
+  arma por nombre.
+- Verificación: lint, typecheck, build y tests en verde (app 450, motor 192,
+  supabase 40). No se probó en Expo Go.
+- Depende de #41: el PR va después del de #41.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

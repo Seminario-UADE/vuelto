@@ -5,13 +5,12 @@ import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { Chip } from "@/components/chip";
 import { divisor } from "@/components/lista";
+import { ComerciosDelPerfil } from "@/components/comercios-del-perfil";
 import { MediosDelPerfil } from "@/components/medios-del-perfil";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { Text } from "@/components/text";
-import * as api from "@/data/api";
 import { cerrarSesion as salir } from "@/data/auth";
-import { useAsync } from "@/hooks/use-async";
 import { escenarioElegido, type Escenario } from "@/store/acciones";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectPendientesAlCerrarSesion } from "@/store/selectores";
@@ -34,10 +33,9 @@ export default function Perfil() {
   const usuario = useAppSelector((s) => s.sesion.usuario);
   const contactos = useAppSelector((s) => s.contactos.lista);
   const escenario = useAppSelector((s) => s.sesion.escenario);
-  const catalogoComercios = useAsync(() => api.getCatalogoComercios());
 
   const medios = perfil.medios;
-  const comercios = (catalogoComercios.datos ?? []).filter((c) => perfil.comercios.includes(c.id));
+  const comercios = perfil.comercios;
   const nombre = perfil.nombre ?? "Martín";
 
   const pendientes = useAppSelector(selectPendientesAlCerrarSesion);
@@ -69,7 +67,7 @@ export default function Perfil() {
             </Text>
           </View>
         </View>
-        {catalogoComercios.datos ? (
+        {perfil.carga !== "leyendo" ? (
           <Text variant="bodyMd" tone="inkSecondary">
             {medios.length} {medios.length === 1 ? "medio" : "medios"} · {comercios.length}{" "}
             {comercios.length === 1 ? "comercio" : "comercios"}
@@ -80,16 +78,7 @@ export default function Perfil() {
 
       <MediosDelPerfil />
 
-      {comercios.length > 0 ? (
-        <View style={{ gap: space.md }}>
-          <SectionHeader title="Comercios donde comprás" />
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
-            {comercios.map((c) => (
-              <Chip key={c.id} label={c.nombre} onPress={() => router.push({ pathname: "/comercio/[id]", params: { id: c.id } })} />
-            ))}
-          </View>
-        </View>
-      ) : null}
+      <ComerciosDelPerfil />
 
       <View style={{ gap: space.md }}>
         <SectionHeader

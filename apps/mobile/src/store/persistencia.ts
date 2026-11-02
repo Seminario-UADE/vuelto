@@ -9,13 +9,14 @@
 import type { ListenerMiddlewareInstance } from "@reduxjs/toolkit";
 import { fechaArgentina } from "@vuelto/motor";
 import { comprasDelPeriodo } from "../data/calculo";
-import { mediosDeEjemplo } from "../data/fixtures";
+import { catalogoComercios, mediosDeEjemplo } from "../data/fixtures";
 import { REDES, TIPOS_TARJETA } from "../perfil/modelo";
 import {
   rehidratado,
   sesionCerrada,
   type EstadoCompras,
   type EstadoCorpus,
+  type ComercioHabitual,
   type EstadoPerfil,
   type MedioGuardado,
   type Rehidratado,
@@ -101,13 +102,28 @@ function mediosValidos(x: unknown): MedioGuardado[] | null {
   return null;
 }
 
+/**
+ * Los comercios habituales (issue #47). Antes eran ids del catálogo de ejemplo ("coto"): se migran a
+ * `{ id, nombre }` con el nombre del catálogo. Al entrar, lo que diga Supabase reemplaza lo local.
+ */
+function comerciosValidos(x: unknown): ComercioHabitual[] | null {
+  if (listaDeTextos(x)) {
+    return x.flatMap((id) => catalogoComercios.filter((c) => c.id === id).map((c) => ({ id, nombre: c.nombre })));
+  }
+  if (Array.isArray(x) && x.every((c) => esObjeto(c) && esTexto(c.id) && esTexto(c.nombre))) {
+    return x as ComercioHabitual[];
+  }
+  return null;
+}
+
 function perfilValido(x: unknown): EstadoPerfil | null {
   if (!esObjeto(x)) return null;
   const medios = mediosValidos(x.medios);
+  const comercios = comerciosValidos(x.comercios);
   const ok =
     medios !== null &&
+    comercios !== null &&
     typeof x.onboardingCompleto === "boolean" &&
-    listaDeTextos(x.comercios) &&
     textoONull(x.nombre) &&
     textoONull(x.invitacionPendiente);
   if (!ok) return null;
@@ -115,7 +131,7 @@ function perfilValido(x: unknown): EstadoPerfil | null {
     nombre: x.nombre as string | null,
     onboardingCompleto: x.onboardingCompleto as boolean,
     medios,
-    comercios: x.comercios as string[],
+    comercios,
     invitacionPendiente: x.invitacionPendiente as string | null,
   };
 }
