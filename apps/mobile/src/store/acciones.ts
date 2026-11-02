@@ -2,8 +2,7 @@
  * Acciones que atienden varios slices. Viven acá para que los slices no se importen entre sí.
  */
 import { createAction } from "@reduxjs/toolkit";
-import type { Compra } from "@vuelto/motor";
-import type { Promocion } from "@vuelto/motor";
+import type { Compra, Promocion } from "@vuelto/motor";
 
 export type Cuenta = { email: string | null; proveedor: "email" | "apple" } | null;
 

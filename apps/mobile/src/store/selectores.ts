@@ -22,13 +22,12 @@ export const selectHoy = createSelector([selectAhora], fechaArgentina);
 export const selectEntradasMotor = createSelector(
   [
     (s: RootState) => s.perfil.medios,
-    (s: RootState) => s.perfil.nombre,
     (s: RootState) => s.corpus.promociones,
     (s: RootState) => s.compras.lista,
     selectAhora,
   ],
-  (medios, nombre, promociones, compras, ahora): EntradasMotor => ({
-    perfil: perfilDelMotor(medios, nombre),
+  (medios, promociones, compras, ahora): EntradasMotor => ({
+    perfil: perfilDelMotor(medios, null),
     promociones,
     compras,
     ahora,

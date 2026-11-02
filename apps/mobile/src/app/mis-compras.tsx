@@ -108,12 +108,7 @@ export default function MisCompras() {
               Las compras sin confirmar no cuentan para tus topes.
             </Text>
           </View>
-          <Button
-            label="Registrar compra"
-            variant="secondary"
-            icon="agregar"
-            onPress={() => router.navigate("/comprar")}
-          />
+          <Button label="Registrar compra" variant="secondary" icon="agregar" onPress={() => router.navigate("/comprar")} />
         </>
       )}
     </Screen>

@@ -46,13 +46,7 @@ export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Pr
           returnKeyType="search"
           autoCorrect={false}
           selectionColor={colors.accent}
-          style={{
-            flex: 1,
-            minHeight: 44,
-            fontFamily: fonts.regular,
-            fontSize: escala.bodyLg.fontSize,
-            color: colors.ink,
-          }}
+          style={{ flex: 1, minHeight: 44, fontFamily: fonts.regular, fontSize: escala.bodyLg.fontSize, color: colors.ink }}
         />
       </View>
       {q.trim() && resultados.estado === "listo" && lista.length === 0 ? (

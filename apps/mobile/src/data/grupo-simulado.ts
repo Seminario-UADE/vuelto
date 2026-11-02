@@ -5,11 +5,20 @@
  * `recomendar()` del motor sobre sus datos (los de `fixtures.ts`, no el store: el servidor
  * lee la base). Lo importa solo `api.ts`.
  */
-import { PerfilSinMediosError, recomendar, type Compra as CompraMotor, type MedioDePago as MedioMotor } from "@vuelto/motor";
+import { nombreDelMes, type Compra as CompraMotor, type MedioDePago as MedioMotor } from "@vuelto/motor";
 import type { Base, Comercio, FilaIntegrante, IntegranteGrupo, MedioDePago, RecomendacionGrupo } from "./contracts";
-import { catalogoMedios, comprasOctubre, contactos, datosDeContactos, mediosDeclarados, mediosDelMotor, promociones } from "./fixtures";
-import { mediodia, nombreDelMes, textoDia } from "./calculo";
+import {
+  catalogoMedios,
+  comprasOctubre,
+  contactos,
+  datosDeContactos,
+  mediosDeclarados,
+  mediosDelMotor,
+  promociones,
+} from "./fixtures";
+import { pedidoPresencial, recomendarSeguro, textoDia } from "./calculo";
 import { aprox, fechaCorta } from "../lib/format";
+import { mediodia } from "../lib/reloj";
 import { RUBROS } from "../lib/rubros";
 import { textoBase } from "../lib/textos";
 
@@ -33,18 +42,12 @@ const usuarioEnElServidor = {
 
 function evaluar(medios: MedioMotor[], compras: CompraMotor[], comercio: Comercio, monto: number, fecha: string) {
   if (comercio.categoriaId === null) return null;
-  try {
-    return recomendar(
-      { comercio: comercio.nombre, categoriaId: comercio.categoriaId, monto, canal: "presencial" },
-      { nombreParaMostrar: null, mediosDePago: medios, comerciosHabituales: [] },
-      promociones,
-      compras,
-      mediodia(fecha),
-    );
-  } catch (e) {
-    if (e instanceof PerfilSinMediosError) return null;
-    throw e;
-  }
+  return recomendarSeguro(pedidoPresencial({ ...comercio, categoriaId: comercio.categoriaId }, monto), {
+    perfil: { nombreParaMostrar: null, mediosDePago: medios, comerciosHabituales: [] },
+    promociones,
+    compras,
+    ahora: mediodia(fecha),
+  });
 }
 
 function medioDeLaApp(id: string): MedioDePago | undefined {

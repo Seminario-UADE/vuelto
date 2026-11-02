@@ -15,6 +15,7 @@ type EstadoSesion = {
 };
 
 type EstadoPerfil = {     // persistido
+  nombre: string | null;  // nombre para mostrar (ADR-008); con los datos de ejemplo, "Martín"
   onboardingCompleto: boolean;
   medios: string[];       // ids del catálogo de medios de la app
   comercios: string[];    // ids del catálogo de comercios
@@ -54,8 +55,8 @@ type Persistido = {
 
 - Se escribe después de cada acción que cambia `perfil`, `corpus`, `compras` o `sesion.cuenta`
   (listener de RTK, solo si cambió alguna de esas referencias).
-- Al rehidratar, cada parte se valida por separado (forma mínima: tipos de los campos). Una parte
-  inválida o una `version` distinta deja esa parte en su estado inicial.
+- Al rehidratar, cada parte se valida por separado (forma mínima: tipos de los campos): una parte
+  inválida deja solo esa en su estado inicial. Una `version` distinta no se lee.
 - No contiene nada derivado (FR-010): un test lo verifica serializando lo que se escribe.
 - `perfil-local.ts` usaba `vuelto.perfil.v1`. Al rehidratar, si no existe `vuelto.store.v1` y sí
   la clave vieja, se toman de ella `onboardingCompleto`, `medios`, `comercios`,

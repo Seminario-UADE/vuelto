@@ -8,7 +8,7 @@ crearStore(opciones: {
   estadoInicial: Partial<RootState> | null; // tests
 }): AppStore
 
-rehidratar(): thunk                   // lee `vuelto.store.v1` (o `vuelto.perfil.v1`) y despacha `sesion/rehidratado`
+rehidratar(): thunk                   // lee `vuelto.store.v1` (o `vuelto.perfil.v1`) y despacha `store/rehidratado`
 useReloj(fuente: () => Date): void    // despacha `sesion/ahoraCambio` al montar, al volver a primer plano y a medianoche
 ```
 
@@ -19,12 +19,12 @@ useReloj(fuente: () => Date): void    // despacha `sesion/ahoraCambio` al montar
 | sesion | `ahoraCambio` | ISO string |
 | sesion | `cuentaGuardada` | `{ email, proveedor } \| null` |
 | sesion | `avisoMostrado` | `string \| null` |
-| sesion | `escenarioElegido` | `"normal" \| "mes-vacio" \| "ticket-ilegible"` (también reemplaza `compras`) |
-| sesion | `rehidratado` | partes válidas de `Persistido` (las atienden todos los slices) |
-| sesion | `sesionCerrada` | — (vuelve todo al estado inicial salvo `ahora` e `hidratado`) |
+| store (`acciones.ts`) | `escenarioElegido` | `"normal" \| "mes-vacio" \| "ticket-ilegible"` (también reemplaza `compras`) |
+| store (`acciones.ts`) | `rehidratado` | partes válidas de `Persistido` (las atienden los slices persistidos y `sesion`) |
+| store (`acciones.ts`) | `sesionCerrada` | — (vuelve todo al estado inicial salvo `ahora`, `hidratado` y el corpus, que es público) |
 | perfil | `mediosElegidos`, `comerciosElegidos` | `string[]` |
 | perfil | `onboardingTerminado` | — |
-| perfil | `invitacionPendiente` | `string \| null` |
+| perfil | `invitacionGuardada` | `string \| null` |
 | corpus | `corpusCargado` | `{ promociones, cargadoEn }` |
 | compras | `compraAgregada` | `CompraRegistrada` (la arma el thunk `guardarCompra`) |
 | simulacion | `comercioElegido` | `string \| null` (borra el monto si cambia el comercio) |

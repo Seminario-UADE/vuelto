@@ -18,6 +18,7 @@ import { colors, space } from "@/theme";
 
 /**
  * Tus topes: cuánto queda por medio, con ≈ y su base. Sin total agregado de topes
+
  * (auditoría P1 #4) y sin tarjeta oscura: no hay una decisión acá (P1 #2).
  */
 export default function Topes() {

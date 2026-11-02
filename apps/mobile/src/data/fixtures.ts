@@ -121,7 +121,6 @@ export const comercios = {
 
 export const catalogoComercios: Comercio[] = Object.values(comercios);
 
-
 /**
  * Medios del catálogo con la forma del motor (data-model.md §Medios). Mercado Pago no está:
  * es una billetera sin banco ni red, y el motor no puede evaluarla sin inventarlos.
@@ -163,14 +162,50 @@ const promo = (
 
 /** Corpus de ejemplo (MODO simplificado): una promo por banco de Martín. */
 export const promociones: Promocion[] = [
-  promo("promo-galicia-super-mie", "Galicia: 20% en supermercados los miércoles", "galicia", "supermercado", 20,
-    { debito: [], credito: ["visa"] }, ["mie"], 10000, "mensual"),
-  promo("promo-santander-nafta-jue", "Santander: 15% en combustibles los jueves", "santander", "combustible", 15,
-    { debito: [], credito: ["master"] }, ["jue"], 8000, "mensual"),
-  promo("promo-provincia-gastro-sab", "Provincia: 25% en gastronomía los sábados", "provincia", "gastronomia", 25,
-    { debito: ["visa"], credito: [] }, ["sab"], 5000, "semanal"),
-  promo("promo-macro-farmacias", "Macro: 15% en farmacias todos los días", "macro", "farmacia", 15,
-    { debito: ["visa"], credito: [] }, null, 6000, "mensual"),
+  promo(
+    "promo-galicia-super-mie",
+    "Galicia: 20% en supermercados los miércoles",
+    "galicia",
+    "supermercado",
+    20,
+    { debito: [], credito: ["visa"] },
+    ["mie"],
+    10000,
+    "mensual",
+  ),
+  promo(
+    "promo-santander-nafta-jue",
+    "Santander: 15% en combustibles los jueves",
+    "santander",
+    "combustible",
+    15,
+    { debito: [], credito: ["master"] },
+    ["jue"],
+    8000,
+    "mensual",
+  ),
+  promo(
+    "promo-provincia-gastro-sab",
+    "Provincia: 25% en gastronomía los sábados",
+    "provincia",
+    "gastronomia",
+    25,
+    { debito: ["visa"], credito: [] },
+    ["sab"],
+    5000,
+    "semanal",
+  ),
+  promo(
+    "promo-macro-farmacias",
+    "Macro: 15% en farmacias todos los días",
+    "macro",
+    "farmacia",
+    15,
+    { debito: ["visa"], credito: [] },
+    null,
+    6000,
+    "mensual",
+  ),
 ];
 
 const compra = (

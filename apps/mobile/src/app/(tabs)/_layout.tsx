@@ -10,12 +10,7 @@ const tab = (title: string, icon: IconName) => ({
   tabBarLabel: ({ focused }: { focused: boolean }) => (
     <Text
       maxFontSizeMultiplier={1.15}
-      style={{
-        fontFamily: fonts.medium,
-        fontSize: 12,
-        lineHeight: 16,
-        color: focused ? colors.ink : colors.inkSecondary,
-      }}
+      style={{ fontFamily: fonts.medium, fontSize: 12, lineHeight: 16, color: focused ? colors.ink : colors.inkSecondary }}
     >
       {title}
     </Text>

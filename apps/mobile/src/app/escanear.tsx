@@ -86,21 +86,14 @@ export default function Escanear() {
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: "center",
-          paddingHorizontal: space.section,
-          gap: space.lg,
-        }}
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center", paddingHorizontal: space.section, gap: space.lg }}
       >
         <View
           accessible
           accessibilityLabel="Visor con un ticket de ejemplo de Coto por 24.500 pesos"
           style={{ padding: space.lg, borderRadius: radius.row, borderWidth: 2, borderColor: colors.onDecisionAccent }}
         >
-          <View
-            style={{ backgroundColor: colors.canvas, borderRadius: radius.badge, padding: space.lg, gap: space.xs }}
-          >
+          <View style={{ backgroundColor: colors.canvas, borderRadius: radius.badge, padding: space.lg, gap: space.xs }}>
             <Text variant="bodyMd" weight="bold" align="center">
               COTO C.I.C.S.A.
             </Text>
@@ -110,13 +103,7 @@ export default function Escanear() {
             <View style={{ height: 1, backgroundColor: colors.divider, marginVertical: space.xs }} />
             {LINEAS.map(([item, precio]) => (
               <View key={item} style={{ flexDirection: "row", justifyContent: "space-between", gap: space.sm }}>
-                <Text
-                  variant="caption"
-                  tone="inkSecondary"
-                  numberOfLines={1}
-                  maxFontSizeMultiplier={1.3}
-                  style={{ flex: 1 }}
-                >
+                <Text variant="caption" tone="inkSecondary" numberOfLines={1} maxFontSizeMultiplier={1.3} style={{ flex: 1 }}>
                   {item}
                 </Text>
                 <Text variant="caption" tabular maxFontSizeMultiplier={1.3}>

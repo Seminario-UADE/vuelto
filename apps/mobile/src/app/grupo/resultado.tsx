@@ -89,11 +89,7 @@ export default function GastoEnGrupo() {
               ? { etiqueta: "Les devuelven", valor: aprox(g.reintegro), clave: `g${g.reintegro}` }
               : null
           }
-          secundaria={
-            g.reintegro !== null
-              ? `Cada uno pone ${aprox(g.partePorPersona)}`
-              : `Cada uno pone ${pesos(g.partePorPersona)}`
-          }
+          secundaria={g.reintegro !== null ? `Cada uno pone ${aprox(g.partePorPersona)}` : `Cada uno pone ${pesos(g.partePorPersona)}`}
           base={g.base?.texto ?? null}
         />
       ) : (

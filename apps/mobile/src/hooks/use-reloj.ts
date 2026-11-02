@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { AppState } from "react-native";
 import { RELOJ_EJEMPLO } from "@/data/fixtures";
-import { msHastaLaMedianoche } from "@/data/calculo";
+import { msHastaLaMedianoche } from "@/lib/reloj";
 import { useAppDispatch } from "@/store/hooks";
 import { ahoraCambio } from "@/store/sesion";
 

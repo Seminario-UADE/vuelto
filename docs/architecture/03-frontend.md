@@ -2,8 +2,8 @@
 
 App mobile en `apps/mobile` (`@vuelto/mobile`): Expo SDK 58, React Native 0.88, Expo Router y
 TypeScript strict. Se prueba en Expo Go (QR). Por ADR-010 la app **importa `@vuelto/motor`** y calcula
-la recomendación y los topes en el dispositivo, sobre el estado de Redux (RNF-02); eso todavía no
-está implementado (ver «Estado»). Spec, plan y decisiones: `specs/006-app-mobile-pantallas/`.
+la recomendación y los topes en el dispositivo, sobre el estado de Redux (RNF-02). Specs:
+`specs/006-app-mobile-pantallas/` (pantallas) y `specs/007-motor-app-redux/` (motor y store, issue #81).
 
 ## Dónde vive cada cosa
 
@@ -14,8 +14,9 @@ apps/mobile/
 └── src/
     ├── app/              rutas (Expo Router). Cada archivo es una pantalla
     ├── components/       piezas de UI reutilizables (sin datos propios)
-    ├── data/             capa de datos: contratos, fixtures, servidor simulado, api, sesión
-    ├── hooks/            useAsync (carga), useColumns (Dynamic Type)
+    ├── data/             contratos, fixtures, cálculo con el motor, api (lo que sale a la red)
+    ├── store/            Redux Toolkit: slices, selectores, thunks y persistencia
+    ├── hooks/            useReloj (escribe `ahora`), useAsync (lo asíncrono), useColumns (Dynamic Type)
     ├── lib/              supabase.ts, format.ts, haptics.ts, rubros.ts (catálogo único de rubros),
     │                     textos.ts (texto de la base de un estimado, en un solo lugar)
     ├── navigation/       opciones compartidas del header nativo
@@ -68,53 +69,67 @@ detrás de un selector.
 
 ## Estado
 
-| Qué | Dónde | Dura |
+Un solo store de Redux Toolkit (`src/store/`), con **solo datos de entrada**. La recomendación y
+los topes se **derivan** con selectores memoizados; nunca se guardan en el store ni en el
+dispositivo (ADR-010, spec 007).
+
+| Slice | Qué guarda | Se persiste |
 |---|---|---|
-| Datos del servidor | `src/data/api.ts` + `useAsync` en cada pantalla | Lo que dura la pantalla |
-| Escrituras de la sesión (compras guardadas, contactos quitados o aceptados, grupo en armado, aviso) | `src/data/sesion.ts` (`useSyncExternalStore`, sin librería) | Hasta cerrar la app |
-| Perfil del dispositivo (onboarding completo, medios, comercios, cuenta, invitación pendiente) | `src/data/perfil-local.ts` (AsyncStorage) | Persistente |
-| Sesión de Supabase | `src/lib/supabase.ts` (AsyncStorage) | Persistente (todavía sin uso) |
-
-**Hoy** no hay Redux ni React Query: con datos de ejemplo alcanza `useAsync`, que mantiene el dato
-anterior mientras recarga (la cifra no parpadea al tipear el monto).
-
-### Estado objetivo: Redux Toolkit (ADR-010)
-
-Un solo store, con la recomendación y los topes **derivados** (nunca guardados):
+| `sesion` | Cuenta, `ahora` (reloj del cálculo), aviso pendiente, escenario de desarrollo, `hidratado` | Solo la cuenta |
+| `perfil` | Nombre, onboarding completo, medios y comercios elegidos, invitación pendiente | Sí |
+| `corpus` | Promociones con la forma del motor y cuándo se cargaron (hoy, las de ejemplo) | Sí |
+| `compras` | Compras con la forma del motor (`promocionId`, `descuentoObtenido`, `reintegroEsperado`) | Sí |
+| `simulacion` | Comercio elegido y monto opcional de «¿Con qué pago?» | No |
+| `contactos` | Contactos (solo lo de ADR-008 §3) y grupo en armado | No |
 
 ```
-slices:     sesion · perfil · corpus · compras · simulacion · contactos
-selectores: selectRecomendacion = createSelector(perfil, corpus, compras, simulacion, ahora)
-                                    → recomendar() del motor
-            selectTopes         = createSelector(corpus, compras, ahora) → estimar…() del motor
+selectEntradasMotor  = perfil.medios + corpus + compras + sesion.ahora → { perfil, promociones, compras, ahora }
+selectRecomendacion  = entradas + simulacion → recomendar() del motor → vista
+selectTopes          = entradas → estimarTopes() + formatearEstimacion() → vista
+selectResumenCompras = compras + ahora → «Mis compras» del mes en curso
 ```
 
-- Al tipear el monto cambia `simulacion.monto` y el selector vuelve a calcular en el dispositivo:
-  sin botón, sin debounce y sin red. El monto es opcional (`null`).
-- `ahora` es un valor del store (se actualiza al abrir la app y al cambiar de día), no
-  `new Date()` dentro del selector, para que el cálculo sea reproducible en los tests.
-- El corpus se sincroniza de forma incremental (`actualizada_en`) al abrir y al volver a primer
-  plano; la app muestra la fecha de la última sincronización. `perfil`, `corpus` y `compras` se
-  persisten en el dispositivo; `simulacion` no.
-- `sesion.ts` y `perfil-local.ts` se migran a los slices; mientras dure la migración, el slice
-  envuelve al módulo viejo (plan completo en ADR-010).
+- **En vivo**: tipear el monto cambia `simulacion.monto`; las entradas del motor no se
+  reconstruyen (misma referencia) y solo corre `recomendar()`. Sin botón, sin debounce, sin red y
+  sin estado de carga. Un estado idéntico devuelve el mismo objeto sin correr el motor.
+- **Otro comercio sin tocar la simulación** (Revisá tu compra, Primera respuesta):
+  `useRecomendacionPara(comercioId, monto)`, la misma función con `useMemo`.
+- **Reloj**: ningún selector lee el reloj del sistema. `useReloj` escribe `sesion.ahora` al abrir,
+  al volver a primer plano y a cada medianoche de Argentina. Con los datos de ejemplo (octubre de
+  2026) la fuente es fija, `2026-10-14T12:00:00-03:00`; pasa a `new Date()` con el corpus real
+  (#42).
+- **Guardar una compra**: el thunk `guardarCompra` la evalúa con el motor al mediodía de su fecha;
+  si el medio elegido tiene opción, guarda `promocionId` y `reintegroEsperado`, con
+  `descuentoObtenido: null` (el usuario no informó el descuento). Topes, Mis compras y la próxima
+  recomendación la ven al instante.
+- **Persistencia** (`store/persistencia.ts`, sin `redux-persist`): un listener escribe
+  `vuelto.store.v1` en AsyncStorage cada vez que cambian `perfil`, `corpus`, `compras` o la cuenta,
+  y solo después de rehidratar (no pisa lo guardado). Al abrir, `rehidratar()` valida cada parte por
+  separado (una corrupta vuelve sola a su inicio) y migra `vuelto.perfil.v1`, la clave del viejo
+  `perfil-local.ts`. El splash espera a `sesion.hidratado`.
+- **Lo asíncrono** (catálogos, ticket, invitaciones, grupo) sigue en `api.ts` con `useAsync`.
+- La sesión de Supabase (`src/lib/supabase.ts`, AsyncStorage) sigue sin uso.
 
 ## Capa de datos
 
 - `contracts.ts`: la forma de las respuestas del servidor. Todos los campos son requeridos y lo
   ausente es `null` (Principio III). Los tipos de contacto y grupo solo tienen lo que ADR-008 §3 deja
   ver.
-- `fixtures.ts`: los datos de DESIGN.md §9 (Martín, octubre de 2026, reloj fijo en el miércoles
-  14/10).
-- `servidor-simulado.ts`: **reemplazo temporal** del cálculo real. Arma la recomendación para
-  cualquier monto sobre los fixtures. Lo importa solo `api.ts`, tiene tests y se borra en el primer
-  paso del plan de ADR-010 (el motor real lo reemplaza; ya no hace falta la excepción al Principio II
-  de la spec 006).
-- `vista-recomendacion.ts`: traduce la respuesta real de la Edge Function `recomendar`
-  (forma del motor: ids, `motivo`, `base.comprasRegistradas`) a lo que pintan las pantallas.
-  No calcula: nombra ids con los catálogos y arma el texto de la base.
-- `api.ts`: las funciones que usan las pantallas, con la firma del cliente real
-  (`02-api-routes.md`). Para conectar el backend se cambia solo el cuerpo de cada función.
+- `fixtures.ts`: los datos de DESIGN.md §9 (Martín, octubre de 2026) con la **forma del motor**:
+  medios con banco, tipo y red, promociones como `Promocion` y compras con su promo y descuento
+  (tabla en `specs/007-motor-app-redux/data-model.md`). Son el estado inicial del store hasta #42.
+  Mercado Pago no entra al motor: es una billetera sin banco ni red (Principio III).
+- `calculo.ts`: núcleo funcional de la app. Llama a `recomendar()` y `estimarTopes()` y arma lo
+  que pintan las pantallas. Funciones puras, con `ahora` por parámetro. Sin monto, consulta con
+  monto 0 hasta que #43 agregue `monto: null` al motor. Las promos de otra categoría no se muestran
+  como alternativa (se filtra en la vista, no el corpus, para no romper un tope compartido).
+- `vista-recomendacion.ts`: traduce la respuesta del motor (ids, `motivo`,
+  `base.comprasRegistradas`) a lo que pintan las pantallas. No calcula.
+- `grupo-simulado.ts`: **reemplazo local de la Edge Function de grupo** (#54/#56). Evalúa a cada
+  integrante con el motor sobre sus datos de ejemplo, con el reloj en la fecha del grupo; la app
+  recibe solo lo de ADR-008 §3. Lo importa solo `api.ts`.
+- `api.ts`: lo que sale a la red, con la firma del cliente real (`02-api-routes.md`): catálogos,
+  ticket, invitaciones y grupo.
 - Escenarios de prueba (solo desarrollo, en Perfil): mes sin compras y ticket ilegible, para ver los
   estados vacíos y de error.
 
@@ -157,7 +172,14 @@ selectores: selectRecomendacion = createSelector(perfil, corpus, compras, simula
 npm run start -w @vuelto/mobile        # Expo (QR para Expo Go)
 npm run web -w @vuelto/mobile          # verificación rápida en el navegador
 npm run lint && npm run typecheck && npm run test   # desde la raíz, como el CI
+npm run build -w @vuelto/motor         # después de cambiar el motor, para verlo en la app
 ```
+
+**Cómo resuelve Metro el motor.** `@vuelto/motor` se consume compilado (`dist/`, en `.gitignore`).
+El motor tiene `"prepare": "npm run build"`, así que `npm ci` lo compila en local, en el CI y en
+EAS (que instala desde la raíz del monorepo). Expo SDK 58 detecta el monorepo de npm workspaces y
+no hace falta `metro.config.js`. Sin `dist/`, Metro falla con *Unable to resolve "@vuelto/motor"*
+(research R1 de la spec 007).
 
 ## Publicación (sin computadora prendida)
 

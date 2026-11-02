@@ -1,14 +1,20 @@
 /**
  * Núcleo funcional de la app (ADR-009, ADR-010): llama a `@vuelto/motor` y traduce su
- * resultado a lo que pintan las pantallas. Funciones puras: todo entra por parámetro,
- * incluido `ahora`, y nada lee el reloj del sistema (spec 007 FR-005). Los selectores del
- * store las envuelven con `createSelector`.
+ * resultado a lo que pintan las pantallas. Funciones puras: el estado entra por parámetro,
+ * incluido `ahora`, y nada lee el reloj del sistema (spec 007 FR-005). Los catálogos de medios y
+ * comercios son datos estáticos de `fixtures.ts`, no estado. Los selectores del store las
+ * envuelven con `createSelector`.
  */
 import {
+  diaArgentina,
+  diaMesSinCeros,
+  diaSiguiente,
   estimarTopes,
   fechaArgentina,
+  finDelPeriodo,
   formatearEstimacion,
   inicioDelPeriodo,
+  nombreDelMes,
   PerfilSinMediosError,
   recomendar,
   type Compra as CompraMotor,
@@ -34,6 +40,7 @@ import type {
 } from "./contracts";
 import { catalogoComercios, catalogoMedios, mediosDelMotor } from "./fixtures";
 import { aVista } from "./vista-recomendacion";
+import { mediodia } from "../lib/reloj";
 import { RUBROS } from "../lib/rubros";
 import { textoBase } from "../lib/textos";
 
@@ -45,22 +52,15 @@ export type EntradasMotor = {
   ahora: Date;
 };
 
-const MESES = [
-  "enero",
-  "febrero",
-  "marzo",
-  "abril",
-  "mayo",
-  "junio",
-  "julio",
-  "agosto",
-  "septiembre",
-  "octubre",
-  "noviembre",
-  "diciembre",
-];
-const NOMBRE_DIA = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
-const DIA_SEMANA: Dia[] = ["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
+const NOMBRE_DIA: Record<Dia, string> = {
+  lun: "lunes",
+  mar: "martes",
+  mie: "miércoles",
+  jue: "jueves",
+  vie: "viernes",
+  sab: "sábado",
+  dom: "domingo",
+};
 const PLURAL_DIA: Record<Dia, string> = {
   lun: "lunes",
   mar: "martes",
@@ -71,32 +71,14 @@ const PLURAL_DIA: Record<Dia, string> = {
   dom: "domingos",
 };
 
-/** "2026-10-14" → 3 (miércoles). Calendario puro, sin zona horaria. */
-function diaDeSemana(fecha: string): number {
-  return new Date(`${fecha}T00:00:00Z`).getUTCDay();
-}
-
-function sumarDias(fecha: string, dias: number): string {
-  return new Date(Date.parse(`${fecha}T00:00:00Z`) + dias * 86_400_000).toISOString().slice(0, 10);
-}
-
-function diaMes(fecha: string): string {
-  const [, m, d] = fecha.split("-").map(Number);
-  return `${d}/${m}`;
-}
-
-export function nombreDelMes(fecha: string): string {
-  return MESES[Number(fecha.slice(5, 7)) - 1] ?? "";
+/** "miércoles" para una fecha calendario. */
+function nombreDelDia(fecha: string): string {
+  return NOMBRE_DIA[diaArgentina(mediodia(fecha))];
 }
 
 /** "hoy miércoles" */
 export function textoDia(fecha: string): string {
-  return `hoy ${NOMBRE_DIA[diaDeSemana(fecha)]}`;
-}
-
-/** El mediodía de una fecha en Argentina: el instante con que se evalúa una compra de ese día. */
-export function mediodia(fecha: string): Date {
-  return new Date(`${fecha}T12:00:00-03:00`);
+  return `hoy ${nombreDelDia(fecha)}`;
 }
 
 /** `["mie"]` → "los miércoles"; `null` → "todos los días". */
@@ -149,11 +131,22 @@ function promocionesCatalogo(promociones: Promocion[]): PromocionCatalogo[] {
   }));
 }
 
+/** La compra que se evalúa en un comercio del catálogo. La app siempre pregunta por presencial. */
+export function pedidoPresencial(comercio: Comercio & { categoriaId: number }, monto: number | null): PedidoRecomendar {
+  return {
+    comercio: comercio.nombre,
+    categoriaId: comercio.categoriaId,
+    monto: monto !== null && monto > 0 ? monto : null,
+    canal: "presencial",
+  };
+}
+
 /** `recomendar()` sin excepción por perfil vacío: sin medios evaluables no hay promo. */
-function recomendarSeguro(pedido: PedidoRecomendar & { categoriaId: number }, e: EntradasMotor): RecomendacionMotor {
+export function recomendarSeguro(pedido: PedidoRecomendar, entradas: EntradasMotor): RecomendacionMotor {
+  const { perfil, promociones, compras, ahora } = entradas;
   try {
     // Hasta #43 el motor exige monto: "sin monto" se consulta con 0 (spec 007, Assumptions).
-    return recomendar({ ...pedido, monto: pedido.monto ?? 0 }, e.perfil, e.promociones, e.compras, e.ahora);
+    return recomendar({ ...pedido, monto: pedido.monto ?? 0 }, perfil, promociones, compras, ahora);
   } catch (error) {
     if (error instanceof PerfilSinMediosError) return { mejor: null, alternativas: [], descartadas: [] };
     throw error;
@@ -164,21 +157,20 @@ function recomendarSeguro(pedido: PedidoRecomendar & { categoriaId: number }, e:
  * La recomendación para un comercio y un monto opcional, con la forma de la pantalla.
  * `null` si el comercio no tiene categoría (fuera del catálogo): no se le pregunta al motor.
  */
-export function recomendacionVista(e: EntradasMotor, comercio: Comercio, monto: number | null): Recomendacion | null {
+export function recomendacionVista(
+  entradas: EntradasMotor,
+  comercio: Comercio,
+  monto: number | null,
+): Recomendacion | null {
   if (comercio.categoriaId === null) return null;
-  const pedido = {
-    comercio: comercio.nombre,
-    categoriaId: comercio.categoriaId,
-    monto: monto !== null && monto > 0 ? monto : null,
-    canal: "presencial" as const,
-  };
-  const r = recomendarSeguro(pedido, e);
+  const pedido = pedidoPresencial({ ...comercio, categoriaId: comercio.categoriaId }, monto);
+  const r = recomendarSeguro(pedido, entradas);
   // Las promos de otro rubro no son una alternativa para esta compra (research R4).
   const respuesta = { ...r, descartadas: r.descartadas.filter((d) => d.causa !== "categoria") };
-  const hoy = fechaArgentina(e.ahora);
+  const hoy = fechaArgentina(entradas.ahora);
   return aVista(pedido, respuesta, comercio, {
-    medios: mediosDeLaApp(e.perfil),
-    promociones: promocionesCatalogo(e.promociones),
+    medios: mediosDeLaApp(entradas.perfil),
+    promociones: promocionesCatalogo(entradas.promociones),
     mes: nombreDelMes(hoy),
     dia: textoDia(hoy),
   });
@@ -193,18 +185,18 @@ const ESTADO: Record<ReturnType<typeof formatearEstimacion>["estado"], EstadoTop
 
 function aplicaElDia(promo: Promocion, fecha: string): boolean {
   const dias = promo.vigencia.dias;
-  return dias === null || dias.includes(DIA_SEMANA[diaDeSemana(fecha)] ?? "dom");
+  return dias === null || dias.includes(diaArgentina(mediodia(fecha)));
 }
 
-function topeMedio(est: EstimacionTope, e: EntradasMotor, hoy: string): TopeMedio | null {
+function topeMedio(est: EstimacionTope, entradas: EntradasMotor, hoy: string): TopeMedio | null {
   const medio = catalogoMedios.find((m) => m.id === est.mediosDePagoIds[0]);
-  const promo = e.promociones.find((p) => p.id === est.promocionIds[0]);
+  const promo = entradas.promociones.find((p) => p.id === est.promocionIds[0]);
   if (!medio || !promo) return null;
   const texto = formatearEstimacion(est);
   const estado = ESTADO[texto.estado];
   const periodo = est.periodo.tipo === "semanal" ? "semana" : "mes";
   const rubro = rubroDeCategoria(promo.categoriaId);
-  const vuelve = diaMes(sumarDias(est.periodo.hasta, 1));
+  const vuelve = diaMesSinCeros(diaSiguiente(est.periodo.hasta));
   // Agotado, la base del motor trae el reinicio pegado ("según 2 compras de octubre · vuelve
   // el 1/11"); la tarjeta los muestra por separado.
   const [segun = texto.base] = texto.base.split(" · ");
@@ -229,7 +221,7 @@ function topeMedio(est: EstimacionTope, e: EntradasMotor, hoy: string): TopeMedi
           : `se reinicia el ${vuelve}`,
     consejo:
       (estado === "disponible" || estado === "queda-poco") && aplicaElDia(promo, hoy) && texto.cifra
-        ? `Hoy es ${NOMBRE_DIA[diaDeSemana(hoy)]}: en ${RUBROS[rubro].enFrase}, con ${medio.nombreCorto} te quedan ${texto.cifra} de tope.`
+        ? `Hoy es ${nombreDelDia(hoy)}: en ${RUBROS[rubro].enFrase}, con ${medio.nombreCorto} te quedan ${texto.cifra} de tope.`
         : null,
   };
 }
@@ -253,25 +245,24 @@ function devolvieron(compras: CompraMotor[], mes: string): ResumenTopes["devolvi
 }
 
 /** «Tus topes»: una tarjeta por saldo, con la cifra, el estado y la base del motor (FR-007). */
-export function topesVista(e: EntradasMotor): ResumenTopes {
-  const hoy = fechaArgentina(e.ahora);
+export function topesVista(entradas: EntradasMotor): ResumenTopes {
+  const hoy = fechaArgentina(entradas.ahora);
   const mes = nombreDelMes(hoy);
-  const medios = estimarTopes(e.promociones, e.compras, e.perfil, e.ahora).flatMap((est) => {
-    const t = topeMedio(est, e, hoy);
-    return t ? [t] : [];
-  });
-  // Un solo consejo por pantalla (DESIGN.md §5).
-  let conConsejo = false;
-  for (const t of medios) {
-    if (t.consejo && !conConsejo) conConsejo = true;
-    else t.consejo = null;
-  }
-  const finDeMes = sumarDias(`${hoy.slice(0, 7)}-01`, 31).slice(0, 7);
+  const tarjetas = estimarTopes(entradas.promociones, entradas.compras, entradas.perfil, entradas.ahora).flatMap(
+    (est) => {
+      const t = topeMedio(est, entradas, hoy);
+      return t ? [t] : [];
+    },
+  );
+  // Un solo consejo por pantalla (DESIGN.md §5): el del primer tope que lo tenga.
+  const conConsejo = tarjetas.findIndex((t) => t.consejo !== null);
+  const medios = tarjetas.map((t, i) => (i === conConsejo ? t : { ...t, consejo: null }));
+  const reinicio = diaSiguiente(finDelPeriodo("mensual", hoy));
   return {
     mes,
-    devolvieron: devolvieron(comprasDelMes(e.compras, hoy), mes),
+    devolvieron: devolvieron(comprasDelMes(entradas.compras, hoy), mes),
     mediosConTope: medios.filter((t) => t.estado === "disponible" || t.estado === "queda-poco").length,
-    reinicioMensualEnDias: Math.round((Date.parse(`${finDeMes}-01`) - Date.parse(hoy)) / 86_400_000),
+    reinicioMensualEnDias: Math.round((Date.parse(reinicio) - Date.parse(hoy)) / 86_400_000),
     medios,
   };
 }
@@ -326,16 +317,16 @@ export function comprasVista(compras: CompraMotor[], ahora: Date): ResumenCompra
  * medio elegido tiene una opción, queda asociada a su promo con el ahorro como reintegro
  * esperado. `descuentoObtenido` queda `null`: el usuario no informó cuánto le devolvieron.
  */
-export function compraParaGuardar(e: EntradasMotor, b: BorradorCompra, id: string): CompraMotor {
+export function compraParaGuardar(entradas: EntradasMotor, b: BorradorCompra, id: string): CompraMotor {
   if (b.monto === null || b.medioId === null) throw new Error("Falta el monto o el medio de pago");
   if (!catalogoMedios.some((m) => m.id === b.medioId)) throw new Error(`Medio desconocido: ${b.medioId}`);
   const comercio = comercioPorNombre((b.comercio ?? "").trim() || "Compra");
   let opcion: RecomendacionMotor["mejor"] = null;
   if (comercio.categoriaId !== null) {
-    const r = recomendarSeguro(
-      { comercio: comercio.nombre, categoriaId: comercio.categoriaId, monto: b.monto, canal: "presencial" },
-      { ...e, ahora: mediodia(b.fecha) },
-    );
+    const r = recomendarSeguro(pedidoPresencial({ ...comercio, categoriaId: comercio.categoriaId }, b.monto), {
+      ...entradas,
+      ahora: mediodia(b.fecha),
+    });
     opcion = [r.mejor, ...r.alternativas].find((o) => o?.medioDePagoId === b.medioId) ?? null;
   }
   return {
@@ -352,11 +343,4 @@ export function compraParaGuardar(e: EntradasMotor, b: BorradorCompra, id: strin
     origen: b.modo,
     textoExtraido: b.textoExtraido,
   };
-}
-
-/** Cuánto falta para la próxima medianoche de Argentina (UTC−3, sin horario de verano). */
-export function msHastaLaMedianoche(ahora: Date): number {
-  const enArgentina = ahora.getTime() - 3 * 3_600_000;
-  const dia = 86_400_000;
-  return dia - (((enArgentina % dia) + dia) % dia);
 }

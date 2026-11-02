@@ -81,7 +81,8 @@ Martín termina el onboarding, guarda una compra y cierra la app. Al abrirla, si
 1. **Given** el onboarding completo y una compra guardada, **When** la app se reabre, **Then** el perfil (onboarding, medios, comercios, invitación pendiente), la cuenta, el corpus y las compras se recuperan.
 2. **Given** un comercio y un monto en la simulación, **When** la app se reabre, **Then** la simulación está vacía.
 3. **Given** cualquier estado, **When** se inspecciona lo guardado en el dispositivo, **Then** no hay ninguna recomendación ni estimación de tope.
-4. **Given** lo guardado está corrupto o en un formato viejo, **When** la app abre, **Then** arranca con el estado inicial (y repite el onboarding) sin romperse.
+4. **Given** lo guardado está corrupto o con otra versión, **When** la app abre, **Then** arranca con el estado inicial de lo que no se pudo leer, sin romperse.
+5. **Given** el perfil guardado por la versión anterior de la app (`vuelto.perfil.v1`), **When** la app abre por primera vez con el store, **Then** recupera el onboarding, los medios, los comercios, la invitación pendiente y la cuenta, y no repite el onboarding.
 
 ---
 
@@ -117,10 +118,10 @@ Martín termina el onboarding, guarda una compra y cierra la app. Al abrirla, si
 
 **Estado**
 
-- **FR-009**: La app DEBE tener un solo store con estos slices: `sesion` (cuenta, `ahora`, aviso pendiente, escenario de desarrollo y si ya se rehidrató), `perfil` (onboarding, medios, comercios, invitación pendiente), `corpus` (promociones y marca de la última carga), `compras` (compras del período), `simulacion` (comercio y monto) y `contactos` (contactos y grupo en armado).
+- **FR-009**: La app DEBE tener un solo store con estos slices: `sesion` (cuenta, `ahora`, aviso pendiente, escenario de desarrollo y si ya se rehidrató), `perfil` (nombre para mostrar, onboarding, medios, comercios, invitación pendiente), `corpus` (promociones y marca de la última carga), `compras` (compras del período), `simulacion` (comercio y monto) y `contactos` (contactos y grupo en armado).
 - **FR-010**: La recomendación y los topes NO DEBEN guardarse en el store ni en el almacenamiento del dispositivo.
-- **FR-011**: `perfil`, `corpus`, `compras` y la cuenta de `sesion` DEBEN persistirse en el dispositivo y rehidratarse al abrir. `simulacion`, `contactos`, `ahora`, el aviso y el escenario no se persisten. Cada parte se valida por separado: si una está corrupta o con otra versión, solo esa vuelve a su estado inicial (corpus y compras: los de ejemplo).
-- **FR-012**: El gasto en grupo sigue detrás de `api.recomendarGrupo` (asíncrona: en producción es la Edge Function de #54/#56), con un reemplazo local que DEBE evaluar a cada integrante con cuenta usando `recomendar()` del motor sobre su perfil y sus compras de ejemplo (forma del motor, `data-model.md`), con el reloj en el mediodía de la fecha del grupo. Un integrante sin medios con promos (`PerfilSinMediosError`) queda sin opción. La app no recibe medios ni topes de un contacto salvo el medio recomendado (ADR-008 §3).
+- **FR-011**: `perfil`, `corpus`, `compras` y la cuenta de `sesion` DEBEN persistirse en el dispositivo y rehidratarse al abrir. `simulacion`, `contactos`, `ahora`, el aviso y el escenario no se persisten. Cada parte se valida por separado: si una está corrupta, solo esa vuelve a su estado inicial (corpus y compras: los de ejemplo). Si lo guardado es de otra versión del formato, no se lee nada.
+- **FR-012**: El gasto en grupo sigue detrás de `api.recomendarGrupo` (asíncrona: en producción es la Edge Function de #54/#56), con un reemplazo local que DEBE evaluar a cada integrante con cuenta usando `recomendar()` del motor sobre su perfil y sus compras en el servidor, que hoy son los datos de ejemplo (forma del motor, `data-model.md`), también para quien pide: como en producción, el grupo no lee el store, con el reloj en el mediodía de la fecha del grupo. Un integrante sin medios con promos (`PerfilSinMediosError`) queda sin opción. La app no recibe medios ni topes de un contacto salvo el medio recomendado (ADR-008 §3).
 - **FR-013**: `sesion.ts` y `perfil-local.ts` DEBEN dejar de existir; todas las pantallas leen y escriben el store.
 - **FR-014**: Los escenarios de desarrollo DEBEN seguir funcionando sobre el store: "mes sin compras" vacía `compras` (y lo persistido), "normal" vuelve a las compras de ejemplo (se pierden las guardadas), "ticket ilegible" hace fallar la lectura del ticket.
 - **FR-016**: `api.ts` DEBE conservar solo lo que en producción sale a la red (catálogos, búsqueda, ticket, invitaciones, grupo); la recomendación, los topes, el perfil y las compras se leen de selectores, sin demora simulada ni estado de carga.

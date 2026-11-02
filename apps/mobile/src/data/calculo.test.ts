@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   compraParaGuardar,
   comprasVista,
-  msHastaLaMedianoche,
   perfilDelMotor,
   recomendacionVista,
   textoDias,
@@ -195,12 +194,5 @@ describe("comprasVista y textoDias", () => {
     expect(textoDias(null)).toBe("todos los días");
     expect(textoDias(["sab"])).toBe("los sábados");
     expect(textoDias(["lun", "mie", "vie"])).toBe("los lunes, miércoles y viernes");
-  });
-});
-
-describe("msHastaLaMedianoche", () => {
-  it("cuenta en hora de Argentina", () => {
-    expect(msHastaLaMedianoche(new Date("2026-10-14T23:30:00-03:00"))).toBe(30 * 60_000);
-    expect(msHastaLaMedianoche(new Date("2026-10-14T00:00:00-03:00"))).toBe(86_400_000);
   });
 });

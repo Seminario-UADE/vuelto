@@ -53,28 +53,24 @@ supabase/functions/
 
 ## Qué consume la app (`apps/mobile/src/data/api.ts`)
 
-> **Estado objetivo (ADR-010).** La tabla de abajo describe la capa de datos
-> **de hoy**, que todavía llama a un mock con la forma de las Edge Functions
-> `recomendar` y `topes`. Con el plan de ADR-010, `recomendar` y `getTopes`
-> dejan de ser llamadas al servidor y pasan a ser selectores del store de
-> Redux que usan el motor; `api.ts` queda para lo que sí sale a la red
-> (Supabase directo, ticket, grupo, invitaciones).
+> **ADR-010, implementado en la issue #81.** La recomendación, los topes, el
+> perfil y las compras ya no son llamadas: los calcula el motor en la app, en
+> selectores del store de Redux (`docs/architecture/03-frontend.md` §Estado).
+> `api.ts` queda para lo que sí sale a la red.
 
-La app llama a cada endpoint desde una función de `api.ts`. Hoy responde un mock
-(`servidor-simulado.ts`) **con la misma forma** que el endpoint real; conectar un
-endpoint es cambiar el cuerpo de esa función. Las pantallas no ven la forma del
-servidor: `vista-recomendacion.ts` la traduce, nombrando los ids con los
-catálogos y sin calcular reintegros ni topes (constitución §II).
+La app llama a cada endpoint desde una función de `api.ts`. Hoy responde con
+fixtures **con la misma forma** que el endpoint real; conectar un endpoint es
+cambiar el cuerpo de esa función.
 
 | Función | Endpoint | Estado |
 |---|---|---|
-| `recomendar(comercioId, monto)` | `POST /functions/v1/recomendar` | Contrato real (`specs/004-recomendar-pantalla/contracts/recomendar.md`), con mock. **Extensión pendiente**: `monto: null` para responder en un toque (auditoría v5 P1 #1, constitución 2.0.1); hoy la Edge Function exige `monto > 0` |
-| `getTopes()` | `GET /functions/v1/topes` (#45) | Mock con forma propia (`ResumenTopes`); se alinea a `EstimacionTope`/`TextoEstimacion` del motor cuando exista el endpoint |
-| `leerTicket()` | Extracción de ticket (#48) | Mock; en esta versión no hay captura real |
-| `recomendarGrupo(pedido)` | `POST /functions/v1/recomendar-grupo` (#56) | Mock; de los contactos solo viaja lo de ADR-008 §3 |
-| `getCompras`, `guardarCompra`, `getPerfil`, `getContactos`, `quitarContacto`, catálogos | Supabase directo con RLS (ADR-009) | Mock |
+| `leerTicket({ ilegible })` | Extracción de ticket (#48) | Mock; en esta versión no hay captura real. `ilegible` es el escenario de desarrollo |
+| `recomendarGrupo(pedido)` | `POST /functions/v1/recomendar-grupo` (#56) | Reemplazo local (`grupo-simulado.ts`) que evalúa a cada integrante con el motor; de los contactos solo viaja lo de ADR-008 §3 |
+| `verInvitacion`, `aceptarInvitacion`, `quitarContacto`, `crearInvitacion` | Edge Function y RPC `security definer` (ADR-008 §4) | Mock |
+| Catálogos (`getMediosDisponibles`, `getCatalogoComercios`, `buscarComercios`, `getComercio`) | Supabase directo con RLS (ADR-009) | Fixtures |
+| `recomendar`, `getTopes`, `getCompras`, `guardarCompra`, `getPerfil` | — | **Salieron de `api.ts`**: selectores y el thunk `guardarCompra` del store. La Edge Function `recomendar` queda fuera del camino de la app (ADR-010 §5); la sincronización de compras y corpus es #42 |
 | `crearInvitacion`, `verInvitacion`, `aceptarInvitacion` | Edge Function y RPC `security definer` (ADR-008 §4) | Mock |
 
-Tipos: `apps/mobile/src/data/contracts.ts` (el bloque de `recomendar` es copia de
-`packages/motor/src/tipos.ts`; la app no importa el motor).
+Tipos: `apps/mobile/src/data/contracts.ts` (la respuesta de `recomendar()` se
+importa de `@vuelto/motor`; el resto son tipos de vista).
 

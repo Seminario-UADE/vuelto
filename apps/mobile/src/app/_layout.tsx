@@ -83,11 +83,7 @@ function Raiz() {
           <Stack.Screen name="grupo/resultado" options={{ ...headerNativo, title: "Quién conviene que pague" }} />
           <Stack.Screen
             name="escanear"
-            options={{
-              presentation: "fullScreenModal",
-              headerShown: false,
-              contentStyle: { backgroundColor: colors.scrim },
-            }}
+            options={{ presentation: "fullScreenModal", headerShown: false, contentStyle: { backgroundColor: colors.scrim } }}
           />
           {/* Revisá tu compra y Guardar perfil tienen scroll: page sheet nativo (modal). El formSheet
               con detents no pinta un ScrollView en iOS 27 (verificado en el simulador). */}

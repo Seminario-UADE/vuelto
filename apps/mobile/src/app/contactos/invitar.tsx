@@ -14,11 +14,7 @@ import { useAppDispatch } from "@/store/hooks";
 import { avisoMostrado } from "@/store/sesion";
 import { colors, radius, space } from "@/theme";
 
-const SI = [
-  "Qué medio suyo conviene en cada compra del grupo",
-  "El reintegro estimado de esa compra",
-  "Su nombre para mostrar",
-];
+const SI = ["Qué medio suyo conviene en cada compra del grupo", "El reintegro estimado de esa compra", "Su nombre para mostrar"];
 const NO = ["Nunca sus compras, montos ni comercios", "Nunca cuánto tope le queda", "Nunca sus otros medios de pago"];
 
 function Item({ icon, texto, tono }: { icon: IconName; texto: string; tono: "ink" | "inkSecondary" }) {

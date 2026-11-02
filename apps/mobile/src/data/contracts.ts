@@ -219,9 +219,7 @@ export type VistaInvitacion = {
 };
 
 export type IntegranteGrupo =
-  | { tipo: "vos" }
-  | { tipo: "contacto"; contactoId: string }
-  | { tipo: "sin-cuenta"; nombre: string };
+  { tipo: "vos" } | { tipo: "contacto"; contactoId: string } | { tipo: "sin-cuenta"; nombre: string };
 
 export type FilaIntegrante = {
   nombre: string;

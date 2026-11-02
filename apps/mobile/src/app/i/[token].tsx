@@ -20,19 +20,10 @@ import { avisoMostrado } from "@/store/sesion";
 import { colors, space } from "@/theme";
 
 const MOTIVO: Record<Exclude<EstadoInvitacion, "valida">, { titulo: string; texto: string }> = {
-  vencida: {
-    titulo: "Esta invitación venció",
-    texto: "Las invitaciones duran 24 h. Pedile a quien te la mandó que genere otra.",
-  },
-  usada: {
-    titulo: "Esta invitación ya se usó",
-    texto: "Cada invitación sirve una sola vez. Pedile a quien te la mandó un link nuevo.",
-  },
+  vencida: { titulo: "Esta invitación venció", texto: "Las invitaciones duran 24 h. Pedile a quien te la mandó que genere otra." },
+  usada: { titulo: "Esta invitación ya se usó", texto: "Cada invitación sirve una sola vez. Pedile a quien te la mandó un link nuevo." },
   propia: { titulo: "Es tu propia invitación", texto: "Mandásela a la persona con la que querés vincularte." },
-  "ya-contacto": {
-    titulo: "Ya son contactos",
-    texto: "No hace falta aceptar de nuevo. Lo ves en Perfil, en Contactos.",
-  },
+  "ya-contacto": { titulo: "Ya son contactos", texto: "No hace falta aceptar de nuevo. Lo ves en Perfil, en Contactos." },
 };
 
 /**

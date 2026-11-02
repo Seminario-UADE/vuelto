@@ -70,12 +70,7 @@ export default function Contactos() {
           ))}
         </Card>
       )}
-      <Button
-        label="Invitar a alguien"
-        variant="secondary"
-        icon="invitar"
-        onPress={() => router.push("/contactos/invitar")}
-      />
+      <Button label="Invitar a alguien" variant="secondary" icon="invitar" onPress={() => router.push("/contactos/invitar")} />
     </Screen>
   );
 }

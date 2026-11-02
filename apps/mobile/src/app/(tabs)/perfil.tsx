@@ -113,11 +113,7 @@ export default function Perfil() {
           <SectionHeader title="Comercios donde comprás" />
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
             {comercios.map((c) => (
-              <Chip
-                key={c.id}
-                label={c.nombre}
-                onPress={() => router.push({ pathname: "/comercio/[id]", params: { id: c.id } })}
-              />
+              <Chip key={c.id} label={c.nombre} onPress={() => router.push({ pathname: "/comercio/[id]", params: { id: c.id } })} />
             ))}
           </View>
         </View>
@@ -157,12 +153,7 @@ export default function Perfil() {
                 ))}
               </Card>
             ) : null}
-            <Button
-              label="Invitar a alguien"
-              variant="secondary"
-              icon="invitar"
-              onPress={() => router.push("/contactos/invitar")}
-            />
+            <Button label="Invitar a alguien" variant="secondary" icon="invitar" onPress={() => router.push("/contactos/invitar")} />
           </>
         ) : (
           <Card>

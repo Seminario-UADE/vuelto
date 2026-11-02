@@ -61,11 +61,7 @@ export async function getCatalogoComercios(): Promise<Comercio[]> {
 
 export async function buscarComercios(q: string): Promise<Comercio[]> {
   const t = q.trim().toLocaleLowerCase("es");
-  const normal = (s: string) =>
-    s
-      .normalize("NFD")
-      .replace(/\p{Diacritic}/gu, "")
-      .toLowerCase();
+  const normal = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
   return red(t === "" ? [] : catalogoComercios.filter((c) => normal(c.nombre).includes(normal(t))));
 }
 

@@ -224,12 +224,7 @@ export default function ArmarGrupo() {
         </View>
       </View>
 
-      <Button
-        label="¿Falta alguien con Vuelto? Invitalo"
-        variant="text"
-        icon="invitar"
-        onPress={() => router.push("/contactos/invitar")}
-      />
+      <Button label="¿Falta alguien con Vuelto? Invitalo" variant="text" icon="invitar" onPress={() => router.push("/contactos/invitar")} />
     </Screen>
   );
 }

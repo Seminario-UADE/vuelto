@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { comerciosElegidos } from "@/store/perfil";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 
+
 /** Comercios habituales (onboarding 3/5, configuración 2 de 2). Opcional. */
 export default function Comercios() {
   const dispatch = useAppDispatch();
@@ -25,11 +26,7 @@ export default function Comercios() {
   const [q, setQ] = useState("");
 
   const grupos = useMemo(() => {
-    const norm = (s: string) =>
-      s
-        .normalize("NFD")
-        .replace(/\p{Diacritic}/gu, "")
-        .toLowerCase();
+    const norm = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
     const lista = (catalogo.datos ?? []).filter((c) => norm(c.nombre).includes(norm(q.trim())));
     const por = new Map<Rubro, Comercio[]>();
     for (const c of lista) por.set(c.rubro, [...(por.get(c.rubro) ?? []), c]);
@@ -51,13 +48,7 @@ export default function Comercios() {
               onPress={() => seguir(false)}
               accessibilityRole="button"
               hitSlop={8}
-              style={{
-                minHeight: 44,
-                minWidth: 44,
-                paddingHorizontal: space.sm,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
+              style={{ minHeight: 44, minWidth: 44, paddingHorizontal: space.sm, justifyContent: "center", alignItems: "center" }}
             >
               <Text variant="bodyMd" weight="semibold" tone="accent">
                 Saltar
@@ -106,13 +97,7 @@ export default function Comercios() {
             accessibilityLabel="Buscar comercio"
             returnKeyType="search"
             selectionColor={colors.accent}
-            style={{
-              flex: 1,
-              minHeight: 44,
-              fontFamily: fonts.regular,
-              fontSize: escala.bodyLg.fontSize,
-              color: colors.ink,
-            }}
+            style={{ flex: 1, minHeight: 44, fontFamily: fonts.regular, fontSize: escala.bodyLg.fontSize, color: colors.ink }}
           />
         </View>
         {catalogo.estado === "cargando" && !catalogo.datos ? <SkeletonList rows={4} height={48} /> : null}

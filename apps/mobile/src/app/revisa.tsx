@@ -114,13 +114,7 @@ export default function Revisa() {
           <Text variant="label" tone={error ? "error" : "inkSecondary"} align="center" accessibilityLiveRegion="polite">
             {error ?? pista}
           </Text>
-          <Button
-            label="Guardar compra"
-            onPress={guardar}
-            disabled={!listo}
-            loading={guardando}
-            hint={listo ? undefined : pista}
-          />
+          <Button label="Guardar compra" onPress={guardar} disabled={!listo} loading={guardando} hint={listo ? undefined : pista} />
         </>
       }
     >

@@ -18,6 +18,7 @@ import { selectRecomendacion } from "@/store/selectores";
 import { comercioElegido, montoCambiado } from "@/store/simulacion";
 import { colors, radius, space } from "@/theme";
 
+
 /**
  * Con qué pagar: pregunta → respuesta → razón → monto → alternativas → grupo → acción
  * (DESIGN.md §6). Un solo primario de una línea ("Usar Galicia", auditoría P2 #8) en un pie
@@ -57,9 +58,7 @@ export default function ConQuePagar() {
               <Button
                 label="Cargar la compra a mano"
                 variant="secondary"
-                onPress={() =>
-                  router.push({ pathname: "/revisa", params: { modo: "manual", comercio: r.comercio.nombre } })
-                }
+                onPress={() => router.push({ pathname: "/revisa", params: { modo: "manual", comercio: r.comercio.nombre } })}
               />
             )
           ) : null
@@ -104,7 +103,9 @@ export default function ConQuePagar() {
         )}
 
         <Pressable
-          onPress={() => router.push({ pathname: "/grupo/armar", params: { comercio: params.id, monto: monto ?? "" } })}
+          onPress={() =>
+            router.push({ pathname: "/grupo/armar", params: { comercio: params.id, monto: monto ?? "" } })
+          }
           accessibilityRole="button"
           style={{
             flexDirection: "row",
