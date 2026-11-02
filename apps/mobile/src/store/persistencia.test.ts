@@ -74,6 +74,16 @@ describe("persistencia (US4)", () => {
     }
   });
 
+  it("al disco llegan solo las compras del período en curso (privacidad.md)", async () => {
+    const disco = memoria();
+    const a = await abrir(disco);
+    a.dispatch(compraAgregada({ ...nueva, id: "sept", fecha: "2026-09-20" }));
+    await esperar();
+    const lista = JSON.parse(disco.datos.get(CLAVE) ?? "{}").compras.lista as { id: string }[];
+    expect(lista.map((c) => c.id)).not.toContain("sept");
+    expect(lista).toHaveLength(10);
+  });
+
   it("no escribe antes de rehidratar (no pisa lo guardado)", async () => {
     const disco = memoria({ [CLAVE]: "guardado" });
     const s = storeDePrueba(null, disco);

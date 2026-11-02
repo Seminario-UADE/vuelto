@@ -3,7 +3,9 @@
  * de varios usuarios y se calcula en el servidor (constitución §II, ADR-008 §4); la app recibe
  * solo lo que ADR-008 §3 deja ver. Acá, como en el servidor, cada integrante se evalúa con
  * `recomendar()` del motor sobre sus datos (los de `fixtures.ts`, no el store: el servidor
- * lee la base). Lo importa solo `api.ts`.
+ * lee la base). Lo importa solo `api.ts`. Se borra, junto con `datosDeContactos` de
+ * `fixtures.ts`, cuando la app llame a la Edge Function de grupo (#56): las compras de un
+ * contacto no pueden quedar en el bundle de la app.
  */
 import { nombreDelMes, type Compra as CompraMotor, type MedioDePago as MedioMotor } from "@vuelto/motor";
 import type { Base, Comercio, FilaIntegrante, IntegranteGrupo, MedioDePago, RecomendacionGrupo } from "./contracts";

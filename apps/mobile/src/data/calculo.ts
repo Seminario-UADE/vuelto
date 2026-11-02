@@ -232,6 +232,17 @@ function comprasDelMes(compras: CompraMotor[], hoy: string): CompraMotor[] {
   return compras.filter((c) => c.fecha >= desde && c.fecha <= hoy);
 }
 
+/**
+ * Las compras del período de tope en curso: desde el inicio del mes o de la semana, lo que
+ * empiece antes (ADR-010). Es lo único que el celular guarda (`docs/product/privacidad.md`).
+ */
+export function comprasDelPeriodo(compras: CompraMotor[], hoy: string): CompraMotor[] {
+  const mes = inicioDelPeriodo("mensual", hoy);
+  const semana = inicioDelPeriodo("semanal", hoy);
+  const desde = mes < semana ? mes : semana;
+  return compras.filter((c) => c.fecha >= desde);
+}
+
 /** Lo que el banco devolvió, o lo que esperamos que devuelva si no lo informó. */
 function reintegroDe(c: CompraMotor): number | null {
   return c.descuentoObtenido ?? c.reintegroEsperado;

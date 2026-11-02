@@ -4,6 +4,8 @@
  * (recomendación, topes) llega al almacenamiento (FR-010).
  */
 import type { ListenerMiddlewareInstance } from "@reduxjs/toolkit";
+import { fechaArgentina } from "@vuelto/motor";
+import { comprasDelPeriodo } from "../data/calculo";
 import {
   rehidratado,
   type Cuenta,
@@ -33,8 +35,16 @@ export type Persistido = {
   cuenta: Cuenta;
 };
 
+/** Solo las compras del período en curso llegan al disco (privacidad.md, ADR-010). */
 export function aPersistir(s: RootState): Persistido {
-  return { version: 1, perfil: s.perfil, corpus: s.corpus, compras: s.compras, cuenta: s.sesion.cuenta };
+  const hoy = fechaArgentina(new Date(s.sesion.ahora));
+  return {
+    version: 1,
+    perfil: s.perfil,
+    corpus: s.corpus,
+    compras: { lista: comprasDelPeriodo(s.compras.lista, hoy) },
+    cuenta: s.sesion.cuenta,
+  };
 }
 
 // ─── Validación por parte: una parte inválida no tira abajo las otras (FR-011) ───
