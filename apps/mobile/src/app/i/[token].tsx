@@ -34,6 +34,7 @@ export default function AceptarInvitacion() {
   const { token = "" } = useLocalSearchParams<{ token: string }>();
   const dispatch = useAppDispatch();
   const onboardingCompleto = useAppSelector((s) => s.perfil.onboardingCompleto);
+  const usuario = useAppSelector((s) => s.sesion.usuario);
   const contactos = useAppSelector((s) => s.contactos.lista);
   const v = useAsync(
     () =>
@@ -46,13 +47,13 @@ export default function AceptarInvitacion() {
   const [aceptando, setAceptando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Quien abre el link sin perfil pasa primero por el onboarding y vuelve acá al terminar.
+  // Quien abre el link sin cuenta ni perfil pasa primero por registro y onboarding, y vuelve acá al terminar.
   useEffect(() => {
-    if (!onboardingCompleto) {
+    if (!usuario || !onboardingCompleto) {
       dispatch(invitacionGuardada(token));
       router.replace("/bienvenida");
     }
-  }, [dispatch, onboardingCompleto, token]);
+  }, [dispatch, usuario, onboardingCompleto, token]);
 
   const aceptar = async () => {
     setAceptando(true);

@@ -4,8 +4,6 @@
 import { createAction } from "@reduxjs/toolkit";
 import type { Compra, Promocion } from "@vuelto/motor";
 
-export type Cuenta = { email: string | null; proveedor: "email" | "apple" } | null;
-
 /** Escenarios para probar estados vacíos y de error (solo desarrollo, en Perfil). */
 export type Escenario = "normal" | "mes-vacio" | "ticket-ilegible";
 
@@ -47,7 +45,6 @@ export type Rehidratado = {
   perfil: EstadoPerfil | null;
   corpus: EstadoCorpus | null;
   compras: EstadoCompras | null;
-  cuenta: { valor: Cuenta } | null;
   /** El reloj real (ISO), cuando el corpus guardado ya viene de una sincronización (FR-016). */
   ahora: string | null;
 };
@@ -67,7 +64,10 @@ export type Sincronizado = {
 };
 export const sincronizado = createAction<Sincronizado>("store/sincronizado");
 
-/** Cerrar sesión: todo vuelve al estado inicial (el de ejemplo: corpus, compras y reloj). */
+/**
+ * Cerrar sesión (o sesión vencida): todo vuelve al estado inicial, el de ejemplo (perfil, corpus,
+ * compras y reloj), salvo lo ya leído del dispositivo (`hidratado`, `authLista`).
+ */
 export const sesionCerrada = createAction("store/sesionCerrada");
 
 /** "Mes sin compras" vacía las compras; los otros vuelven a las de ejemplo. */

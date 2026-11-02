@@ -27,7 +27,7 @@ type EstadoCorpus = {
 
 | Clave | Contenido | Se escribe |
 |---|---|---|
-| `vuelto.store.v1` | `{ version: 1, perfil, compras: { lista }, cuenta }` | Cuando cambia `perfil`, `compras` o `sesion.cuenta` |
+| `vuelto.store.v1` | `{ version: 1, perfil, compras: { lista } }` | Cuando cambia `perfil` o `compras` (la sesión no se guarda acá: la guarda el cliente de Supabase, #40) |
 | `vuelto.corpus.v1` | `{ version: 1, promociones, marca, sincronizadoEn }` | Cuando cambia `corpus`. Si falla, la marca guardada no avanza |
 
 - `vuelto.store.v1` **sigue en `version: 1`** (subirla borraría el perfil de todos). Un `corpus` dentro de

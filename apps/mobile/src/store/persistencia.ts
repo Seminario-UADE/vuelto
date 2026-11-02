@@ -1,9 +1,10 @@
 /**
  * Persistencia del store en el dispositivo, sin `redux-persist` (ADR-010, research R6).
- * Se guardan `perfil`, `compras` y la cuenta en `vuelto.store.v1`, y el corpus en su propia clave
- * `vuelto.corpus.v1` (spec 009 FR-017): un corpus que no entra no se lleva el perfil ni las compras
- * pendientes, y la marca viaja con las promos, así que nunca apunta a un corpus que no se guardó.
- * Solo datos de entrada: nada derivado (recomendación, topes) llega al almacenamiento (FR-010).
+ * Se guardan `perfil` y `compras` en `vuelto.store.v1`, y el corpus en su propia clave
+ * `vuelto.corpus.v1` (spec 009 FR-017): un corpus que no entra no se lleva el perfil ni las compras,
+ * y la marca viaja con las promos, así que nunca apunta a un corpus que no se guardó. La sesión no se
+ * guarda acá: la guarda el cliente de Supabase (issue #40). Solo datos de entrada: nada derivado
+ * (recomendación, topes) llega al almacenamiento (FR-010).
  */
 import type { ListenerMiddlewareInstance } from "@reduxjs/toolkit";
 import { fechaArgentina } from "@vuelto/motor";
@@ -11,7 +12,6 @@ import { comprasDelPeriodo } from "../data/calculo";
 import {
   rehidratado,
   sesionCerrada,
-  type Cuenta,
   type EstadoCompras,
   type EstadoCorpus,
   type EstadoPerfil,
@@ -36,7 +36,6 @@ export type Persistido = {
   version: 1;
   perfil: EstadoPerfil;
   compras: EstadoCompras;
-  cuenta: Cuenta;
 };
 
 export type CorpusPersistido = {
@@ -53,7 +52,6 @@ export function aPersistir(s: RootState): Persistido {
     version: 1,
     perfil: s.perfil,
     compras: { lista: comprasDelPeriodo(s.compras.lista, hoy) },
-    cuenta: s.sesion.cuenta,
   };
 }
 
@@ -119,13 +117,7 @@ function comprasValidas(x: unknown): EstadoCompras | null {
   return ok ? { lista: x.lista as EstadoCompras["lista"] } : null;
 }
 
-function cuentaValida(x: unknown): { valor: Cuenta } | null {
-  if (x === null) return { valor: null };
-  if (!esObjeto(x) || !textoONull(x.email) || (x.proveedor !== "email" && x.proveedor !== "apple")) return null;
-  return { valor: { email: x.email as string | null, proveedor: x.proveedor } };
-}
-
-const NADA: Rehidratado = { perfil: null, corpus: null, compras: null, cuenta: null, ahora: null };
+const NADA: Rehidratado = { perfil: null, corpus: null, compras: null, ahora: null };
 
 /** Un corpus guardado que no se puede leer: el usuario ya había sincronizado, así que queda vacío (no el de ejemplo). */
 export const CORPUS_VACIO: EstadoCorpus = { promociones: [], marca: null, sincronizadoEn: null, descartadas: 0 };
@@ -144,7 +136,6 @@ export function leerPersistido(raw: string | null): Rehidratado {
     ...NADA,
     perfil: perfilValido(x.perfil),
     compras: comprasValidas(x.compras),
-    cuenta: "cuenta" in x ? cuentaValida(x.cuenta) : null,
   };
 }
 
@@ -175,7 +166,7 @@ export function leerPerfilViejo(raw: string | null): Rehidratado {
     comercios: x.comercios ?? [],
     invitacionPendiente: x.invitacionPendiente ?? null,
   });
-  return { ...NADA, perfil, cuenta: cuentaValida(x.cuenta ?? null) };
+  return { ...NADA, perfil };
 }
 
 /** Lee lo guardado al abrir la app y lo carga en el store. Después de esto se empieza a escribir. */
@@ -211,7 +202,6 @@ export function escucharPersistencia(listener: ListenerMiddlewareInstance<RootSt
       actual.sesion.hidratado &&
       (actual.perfil !== previo.perfil ||
         actual.compras !== previo.compras ||
-        actual.sesion.cuenta !== previo.sesion.cuenta ||
         actual.sesion.hidratado !== previo.sesion.hidratado),
     effect: async (_accion, api) => {
       try {

@@ -6,7 +6,7 @@ import { sesionCerrada, sincronizado } from "./acciones";
 import { CLAVE, CLAVE_CORPUS, CLAVE_VIEJA, CORPUS_VACIO, rehidratar } from "./persistencia";
 import { mediosElegidos, onboardingTerminado } from "./perfil";
 import { selectRecomendacion, selectTopes } from "./selectores";
-import { ahoraCambio, cuentaGuardada } from "./sesion";
+import { ahoraCambio, usuarioCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
 import { esperar, memoria, storeDePrueba } from "./prueba";
 
@@ -19,21 +19,30 @@ async function abrir(almacenamiento = memoria()) {
 }
 
 describe("persistencia (US4)", () => {
-  it("perfil, cuenta y compras sobreviven a cerrar y abrir (el corpus de ejemplo no se guarda)", async () => {
+  it("perfil y compras sobreviven a cerrar y abrir (el corpus de ejemplo no se guarda)", async () => {
     const disco = memoria();
     const a = await abrir(disco);
     a.dispatch(mediosElegidos(["galicia-visa-credito"]));
     a.dispatch(onboardingTerminado());
-    a.dispatch(cuentaGuardada({ email: null, proveedor: "apple" }));
     a.dispatch(compraAgregada(nueva));
     await esperar();
 
     const b = await abrir(disco);
     expect(b.getState().perfil).toEqual(a.getState().perfil);
-    expect(b.getState().sesion.cuenta).toEqual({ email: null, proveedor: "apple" });
     expect(b.getState().corpus.marca).toBeNull();
     expect(disco.datos.has(CLAVE_CORPUS)).toBe(false);
     expect(b.getState().compras.lista[0]?.id).toBe("n11");
+  });
+
+  it("el usuario autenticado no se guarda: la sesión la guarda el cliente de Supabase", async () => {
+    const disco = memoria();
+    const a = await abrir(disco);
+    a.dispatch(usuarioCambio({ id: "u1", email: "ana@mail.com" }));
+    a.dispatch(mediosElegidos(["galicia-visa-credito"]));
+    await esperar();
+    expect(disco.datos.get(CLAVE)).not.toContain("ana@mail.com");
+    const b = await abrir(disco);
+    expect(b.getState().sesion.usuario).toBeNull();
   });
 
   it("simulación, reloj y contactos no se guardan", async () => {
@@ -62,7 +71,7 @@ describe("persistencia (US4)", () => {
     expect(selectTopes(a.getState()).medios.length).toBeGreaterThan(0);
     await esperar();
     const guardado = disco.datos.get(CLAVE) ?? "";
-    expect(Object.keys(JSON.parse(guardado))).toEqual(["version", "perfil", "compras", "cuenta"]);
+    expect(Object.keys(JSON.parse(guardado))).toEqual(["version", "perfil", "compras"]);
     for (const derivado of [
       '"mejor"',
       '"alternativas"',
@@ -131,7 +140,7 @@ describe("persistencia (US4)", () => {
       medios: ["galicia-visa-credito"],
       nombre: "Martín",
     });
-    expect(b.getState().sesion.cuenta).toEqual({ email: "martin@ejemplo.com", proveedor: "email" });
+    expect(b.getState().sesion.usuario).toBeNull();
     await esperar();
     expect(disco.datos.has(CLAVE_VIEJA)).toBe(false);
     expect(disco.datos.has(CLAVE)).toBe(true);
@@ -155,7 +164,7 @@ describe("persistencia del corpus en su propia clave (spec 009 FR-017)", () => {
   const corpusGuardado = (marca: string | null) =>
     JSON.stringify({ version: 1, promociones: [], marca, sincronizadoEn: marca === null ? null : "2026-11-02T15:00:00.000Z" });
 
-  it("si la escritura del corpus falla, perfil, cuenta y compras igual se guardan", async () => {
+  it("si la escritura del corpus falla, perfil y compras igual se guardan", async () => {
     const disco = memoria();
     const falla = { ...disco, setItem: async (k: string, v: string) => (k === CLAVE_CORPUS ? Promise.reject(new Error("lleno")) : disco.setItem(k, v)) };
     const s = storeDePrueba(null, falla);
@@ -174,7 +183,6 @@ describe("persistencia del corpus en su propia clave (spec 009 FR-017)", () => {
       // El corpus de ejemplo que guardaban las versiones anteriores (con `cargadoEn`): ahora se ignora.
       corpus: { promociones: [{ id: "promo-galicia-super-mie", tope: {}, vigencia: {} }], cargadoEn: "2026-10-14T15:00:00.000Z" },
       compras: { lista: [{ id: "c1", fecha: "2026-10-09", monto: 1 }] },
-      cuenta: null,
     });
     const s = await abrir(memoria({ [CLAVE]: viejo }));
     const e = s.getState();

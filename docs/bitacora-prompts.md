@@ -1374,6 +1374,45 @@ la recomendación cambie mientras se tipea el monto, sin red.
 
 ---
 
+## 2026-11-01 — Login y registro con Supabase Auth (issue #40)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con la CLI `gh`, el simulador de iOS y un
+Supabase local.
+
+**Objetivo:** email y contraseña en `apps/mobile`. Se empezó sobre `sesion.ts`
+porque el store de Redux (#81) no estaba mergeado; al llegar #81 a `main` el
+usuario pasó al slice `sesion`.
+
+**Prompts principales:**
+1. "Issue #40: login y registro con email y contraseña con Supabase Auth en
+   apps/mobile. Es chica: sin spec-kit, pero con /code-review, test-runner y
+   rules-guardian. Tiene que convivir con el store de Redux (#81) […] Probalo en
+   el simulador con un usuario de prueba que crees en el Supabase local o de dev
+   (nunca uses credenciales reales mías)."
+
+**Resultado:**
+- `lib/auth.ts` (validación, errores en español por `code`, con tests),
+  `data/auth.ts` (thunks: sesión persistida y `SIGNED_OUT`), pantallas `login` y
+  `registro` y cierre de sesión en Perfil. Toda la app queda detrás de la sesión
+  y el usuario nuevo sin medios va al onboarding.
+- Merge con #81: `sesion.usuario` y `sesion.authLista` (en memoria) reemplazan
+  a `sesion.cuenta`, que era el viejo «guardar perfil» y se persistía; los
+  tokens los guarda el cliente de Supabase. Cerrar sesión o una sesión vencida
+  despachan `sesionCerrada`.
+- Decisión que tomó el código y conviene revisar: la issue pide la app detrás
+  de la sesión, así que desaparece el modo invitado de la spec 006 («Ahora no»,
+  email sin contraseña, «Continuar con Apple»).
+- Probado contra un Supabase local con usuarios de prueba, en web y en el
+  simulador de iOS (Expo Go): registro, onboarding, sesión que sobrevive a
+  matar y reabrir la app, cerrar sesión (vuelve a Bienvenida y borra el perfil
+  del dispositivo), contraseña incorrecta y login. Esa prueba fue antes del
+  merge con #81; después se repitió solo lo automático (tests, lint, typecheck). En el simulador hubo que
+  tocar la tecla `@` a mano: el inyector de texto la deformaba.
+- Revisiones: `test-runner`, `rules-guardian` y `/code-review` sin hallazgos
+  graves; se corrigieron un fragmento sobrante en Perfil y un helper duplicado.
+
+---
+
 ## 2026-11-02 — Sincronizar el corpus y las compras del período (issue #42)
 
 **Herramienta:** Claude Code (Sonnet 5.5), con spec-kit, `spec-critic`, `rules-guardian` y un Supabase local

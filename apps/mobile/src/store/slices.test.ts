@@ -4,7 +4,7 @@ import { escenarioElegido, sesionCerrada } from "./acciones";
 import { compraAgregada } from "./compras";
 import { contactoAgregado, contactoQuitado } from "./contactos";
 import { mediosElegidos, onboardingTerminado } from "./perfil";
-import { avisoMostrado, cuentaGuardada } from "./sesion";
+import { avisoMostrado, usuarioCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
 import { storeDePrueba } from "./prueba";
 
@@ -52,12 +52,30 @@ describe("contactos", () => {
   });
 });
 
+describe("usuario autenticado", () => {
+  it("arranca sin usuario y sin saber si hay sesión guardada", () => {
+    const e = storeDePrueba().getState().sesion;
+    expect(e.usuario).toBeNull();
+    expect(e.authLista).toBe(false);
+  });
+
+  it("al leer la sesión guardada queda lista, con o sin usuario", () => {
+    const con = storeDePrueba();
+    con.dispatch(usuarioCambio({ id: "u1", email: "ana@mail.com" }));
+    expect(con.getState().sesion).toMatchObject({ usuario: { id: "u1", email: "ana@mail.com" }, authLista: true });
+
+    const sin = storeDePrueba();
+    sin.dispatch(usuarioCambio(null));
+    expect(sin.getState().sesion).toMatchObject({ usuario: null, authLista: true });
+  });
+});
+
 describe("cerrar sesión", () => {
   it("vuelve todo al inicio salvo el reloj", () => {
     const s = storeDePrueba();
     s.dispatch(mediosElegidos(["galicia-visa-credito"]));
     s.dispatch(onboardingTerminado());
-    s.dispatch(cuentaGuardada({ email: "martin@ejemplo.com", proveedor: "email" }));
+    s.dispatch(usuarioCambio({ id: "u1", email: "martin@ejemplo.com" }));
     s.dispatch(avisoMostrado("hola"));
     s.dispatch(compraAgregada({ ...comprasOctubre[0]!, id: "n11" }));
     s.dispatch(comercioElegido("coto"));
@@ -66,7 +84,8 @@ describe("cerrar sesión", () => {
     const e = s.getState();
     expect(e.perfil.onboardingCompleto).toBe(false);
     expect(e.perfil.medios).toEqual([]);
-    expect(e.sesion.cuenta).toBeNull();
+    expect(e.sesion.usuario).toBeNull();
+    expect(e.sesion.authLista).toBe(true);
     expect(e.sesion.aviso).toBeNull();
     expect(e.compras.lista).toEqual(comprasOctubre);
     expect(e.simulacion.comercioId).toBeNull();

@@ -8,21 +8,31 @@ import { Icon, iconoDeRubro } from "@/components/icon";
 import { Screen } from "@/components/screen";
 import { Skeleton } from "@/components/skeleton";
 import { Text } from "@/components/text";
-import { useAppSelector, useRecomendacionPara } from "@/store/hooks";
+import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
+import { invitacionGuardada, onboardingTerminado } from "@/store/perfil";
 import { colors, radius, space } from "@/theme";
 
 /**
- * Primera respuesta (onboarding 4/5): una decisión de ejemplo antes de pedir la cuenta.
+ * Primera respuesta (onboarding 4/5): una decisión de ejemplo con los medios que eligió.
+ * Cierra el onboarding: de acá va a Inicio, o a la invitación que abrió antes de tener cuenta.
  * Un usuario nuevo no tiene compras, así que no se muestra ninguna cifra de tope (Principio V).
  */
 export default function PrimeraRespuesta() {
+  const dispatch = useAppDispatch();
   const n = useAppSelector((s) => s.perfil.medios.length);
+  const pendiente = useAppSelector((s) => s.perfil.invitacionPendiente);
   const r = useRecomendacionPara("coto", null);
+
+  const empezar = () => {
+    dispatch(onboardingTerminado());
+    dispatch(invitacionGuardada(null));
+    router.replace(pendiente ? `/i/${pendiente}` : "/");
+  };
 
   return (
     <>
       <Stack.Screen options={{ title: "" }} />
-      <Screen footer={<Button label="Guardar mi perfil" onPress={() => router.push("/login")} />}>
+      <Screen footer={<Button label="Empezar" onPress={empezar} />}>
         <View style={{ gap: space.sm }}>
           <Text variant="titleLg" accessibilityRole="header">
             Listo. Así funciona:

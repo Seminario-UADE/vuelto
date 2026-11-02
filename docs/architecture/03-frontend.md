@@ -32,11 +32,12 @@ detrás de un selector.
 
 | Ruta | Pantalla | Presentación |
 |---|---|---|
-| `(onboarding)/bienvenida` | Bienvenida | Stack, sin header |
+| `(onboarding)/bienvenida` | Bienvenida: Crear cuenta / Ya tengo cuenta | Stack, sin header |
 | `(onboarding)/medios` | Tus medios de pago | Stack, header nativo con barra de 2 pasos |
 | `(onboarding)/comercios` | Comercios habituales | Stack, "Saltar" en el header |
-| `(onboarding)/primera-respuesta` | Primera respuesta | Stack |
-| `(auth)/login` | Guardar perfil / Entrar | Page sheet (`modal`) |
+| `(onboarding)/primera-respuesta` | Primera respuesta; "Empezar" cierra el onboarding | Stack |
+| `(auth)/registro` | Crear cuenta (email y contraseña) | Page sheet (`modal`) |
+| `(auth)/login` | Entrar (email y contraseña) | Page sheet (`modal`) |
 | `(tabs)/index` | Inicio (respuesta inline) | Pestaña |
 | `(tabs)/comprar` | Nueva compra | Pestaña |
 | `(tabs)/topes` | Tus topes | Pestaña |
@@ -56,11 +57,14 @@ detrás de un selector.
   el estilo de DESIGN.md: necesitamos el alto exacto de la barra para los pies fijos, y las tabs
   nativas de iOS 26 usan vidrio (research R2 de la spec 006).
 - **Conciliación con la issue #39**: `index` es Inicio ("¿Con qué pago?" vive ahí), `registrar` es
-  `comprar`, y `(auth)/login` es el sheet Guardar perfil.
-- **Onboarding**: el layout de las tabs redirige a `/bienvenida` si `onboardingCompleto` es falso,
-  y el del onboarding redirige a `/` si es verdadero. Se probó `Stack.Protected` y se descartó:
+  `comprar`, y `(auth)/login` y `(auth)/registro` son los sheets de cuenta (issue #40).
+- **Sesión y onboarding** (issue #40): toda la app está detrás de la sesión. El layout de las tabs
+  redirige a `/bienvenida` si no hay `sesion.usuario`, y a `/medios` si hay usuario pero el perfil
+  del dispositivo no tiene el onboarding completo o no tiene medios (usuario nuevo). El layout del
+  onboarding deja pasar solo `bienvenida` sin usuario y redirige a `/` cuando el onboarding ya
+  está completo. Ya no hay modo invitado: se crea la cuenta antes del onboarding. Se probó `Stack.Protected` y se descartó:
   con la pestaña Inicio bloqueada, el router abría el sheet de cuenta como primera pantalla.
-- **Sheets**: Revisá tu compra y Guardar perfil tienen scroll, así que van como page sheet
+- **Sheets**: Revisá tu compra, Entrar y Crear cuenta tienen scroll, así que van como page sheet
   (`presentation: "modal"`). En iOS 27 el `formSheet` con detents no pinta un `ScrollView`
   (verificado en el simulador). Quitar contacto, que no scrollea, sí es `formSheet` ajustado al
   contenido.
@@ -75,7 +79,7 @@ dispositivo (ADR-010, spec 008).
 
 | Slice | Qué guarda | Se persiste |
 |---|---|---|
-| `sesion` | Cuenta, `ahora` (reloj del cálculo), aviso pendiente, escenario de desarrollo, `hidratado`, `epoca` (sube con cada cierre de sesión) | Solo la cuenta |
+| `sesion` | `usuario` (Supabase Auth) y `authLista`, `ahora` (reloj del cálculo), aviso pendiente, escenario de desarrollo, `hidratado`, `epoca` (sube con cada cierre de sesión) | No: la sesión la guarda el cliente de Supabase |
 | `perfil` | Nombre, onboarding completo, medios y comercios elegidos, invitación pendiente | Sí |
 | `corpus` | Promociones con la forma del motor, `marca` (la mayor `actualizada_en`, texto exacto del servidor), `sincronizadoEn` y `descartadas`. Sin sincronizar: las de ejemplo y `marca: null` | Sí, en su propia clave `vuelto.corpus.v1`, y solo el que viene de una sincronización |
 | `compras` | Compras con la forma del motor (`promocionId`, `descuentoObtenido`, `reintegroEsperado`) | Sí |
@@ -105,7 +109,7 @@ selectResumenCompras = compras + ahora → «Mis compras» del mes en curso
   `descuentoObtenido: null` (el usuario no informó el descuento). Topes, Mis compras y la próxima
   recomendación la ven al instante.
 - **Persistencia** (`store/persistencia.ts`, sin `redux-persist`): un listener escribe
-  `vuelto.store.v1` (perfil, compras y cuenta) cada vez que cambian, y otro escribe el corpus en
+  `vuelto.store.v1` (perfil y compras) cada vez que cambian, y otro escribe el corpus en
   `vuelto.corpus.v1`, ambos solo después de rehidratar (no pisan lo guardado). El corpus va aparte
   para que un corpus que no entra no se lleve el perfil ni las compras pendientes, y lleva la marca
   adentro: si no se pudo guardar, la marca guardada no avanza. Al disco llegan las compras del
@@ -129,6 +133,25 @@ selectResumenCompras = compras + ahora → «Mis compras» del mes en curso
 - **Lo asíncrono** (catálogos, ticket, invitaciones, grupo) sigue en `api.ts` con `useAsync`.
 - La sesión de Supabase (`src/lib/supabase.ts`, AsyncStorage) la usa la sincronización; sin variables
   de entorno o sin sesión no se sincroniza y la app sigue con lo guardado. El login es #40.
+
+### Cuentas (issue #40)
+
+- `src/lib/auth.ts`: funciones sobre un cliente inyectado (validación, `registrar`, `entrar`, `salir` y
+  los errores de Supabase Auth traducidos por `code`). Sin React ni estado; con tests.
+- `src/data/auth.ts`: los thunks que lo conectan con el cliente real y con el slice `sesion`.
+  `iniciarAuth()` (en el layout raíz) lee la sesión guardada y sigue `onAuthStateChange`;
+  con `SIGNED_OUT` (cerrar sesión, o sesión vencida o revocada) despacha `sesionCerrada` y todo lo
+  del usuario que salió (perfil, compras, aviso) vuelve al inicio, así el próximo arranca de cero.
+  Cerrar sesión es `scope: "local"`: no corta las sesiones de otros celulares.
+- `sesion.usuario` es la fuente de verdad de quién usa la app, y `authLista` evita decidir a dónde
+  ir antes de leer la sesión guardada (el splash espera a `hidratado` y a `authLista`). Ninguno
+  de los dos se persiste con el store: los tokens los guarda `src/lib/supabase.ts` (AsyncStorage,
+  `autoRefreshToken`, refresco atado a `AppState`, como en la guía de Supabase para Expo).
+- Contraseña de al menos 8 caracteres (Supabase local exige 6). El mensaje de cada error está en
+  `lib/auth.ts`. Si el proyecto exige confirmar el email, el registro avisa y manda a Entrar.
+- **Pendiente hasta que el perfil se lea del servidor (#34/#42):** `perfil` (medios y comercios) vive
+  solo en el dispositivo, así que quien vuelve a entrar con una cuenta existente rehace el
+  onboarding. Cuando se lea por RLS, entrar con medios guardados irá directo a Inicio.
 
 ## Capa de datos
 

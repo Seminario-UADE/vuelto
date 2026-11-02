@@ -14,12 +14,13 @@ import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
 import { Toast } from "@/components/toast";
+import { iniciarAuth } from "@/data/auth";
 import { useReloj } from "@/hooks/use-reloj";
 import { useSincronizacion } from "@/hooks/use-sincronizacion";
 import { supabase } from "@/lib/supabase";
 import { headerNativo } from "@/navigation/opciones";
 import { crearStore } from "@/store";
-import { useAppSelector } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { rehidratar } from "@/store/persistencia";
 import { repositorioSupabase } from "@/sync/repositorio-supabase";
 import { colors } from "@/theme";
@@ -69,11 +70,16 @@ function Raiz() {
     HankenGrotesk_600SemiBold,
     HankenGrotesk_700Bold,
   });
+  const dispatch = useAppDispatch();
   const hidratado = useAppSelector((s) => s.sesion.hidratado);
+  const authLista = useAppSelector((s) => s.sesion.authLista);
   useReloj();
   useSincronizacion();
 
-  const listo = fuentes && hidratado;
+  // Lee la sesión guardada de Supabase y sigue sus cambios (issue #40).
+  useEffect(() => dispatch(iniciarAuth()), [dispatch]);
+
+  const listo = fuentes && hidratado && authLista;
   useEffect(() => {
     if (listo) void SplashScreen.hideAsync();
   }, [listo]);
@@ -102,6 +108,7 @@ function Raiz() {
           <Stack.Screen name="revisa" options={pageSheet} />
           <Stack.Screen name="contactos/quitar" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
           <Stack.Screen name="(auth)/login" options={pageSheet} />
+          <Stack.Screen name="(auth)/registro" options={pageSheet} />
           <Stack.Screen name="i/[token]" options={{ ...headerNativo, title: "Invitación" }} />
         </Stack>
         <Toast />

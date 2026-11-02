@@ -1,10 +1,16 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { RELOJ_EJEMPLO } from "../data/fixtures";
-import { escenarioElegido, rehidratado, sesionCerrada, sincronizado, type Cuenta, type Escenario } from "./acciones";
+import type { Cuenta } from "../lib/auth";
+import { escenarioElegido, rehidratado, sesionCerrada, sincronizado, type Escenario } from "./acciones";
 
 export type EstadoSesion = {
-  /** Persistida: si guardó el perfil con una cuenta. */
-  cuenta: Cuenta;
+  /**
+   * El usuario autenticado en Supabase Auth: la fuente de verdad de quién usa la app (issue #40).
+   * No se persiste acá: la sesión la guarda el cliente de Supabase y `iniciarAuth` la lee al abrir.
+   */
+  usuario: Cuenta | null;
+  /** Ya se leyó la sesión guardada. Antes, no se sabe si hay usuario y no se decide a dónde ir. */
+  authLista: boolean;
   /**
    * El reloj del cálculo (ISO). Lo escribe `useReloj`; ningún selector lee el reloj del sistema
    * (spec 008 FR-005, FR-006). No se persiste.
@@ -23,7 +29,8 @@ export type EstadoSesion = {
 };
 
 export const sesionInicial: EstadoSesion = {
-  cuenta: null,
+  usuario: null,
+  authLista: false,
   ahora: new Date(RELOJ_EJEMPLO).toISOString(),
   aviso: null,
   escenario: "normal",
@@ -38,8 +45,9 @@ export const sesion = createSlice({
     ahoraCambio(s, a: PayloadAction<string>) {
       s.ahora = a.payload;
     },
-    cuentaGuardada(s, a: PayloadAction<Cuenta>) {
-      s.cuenta = a.payload;
+    usuarioCambio(s, a: PayloadAction<Cuenta | null>) {
+      s.usuario = a.payload;
+      s.authLista = true;
     },
     avisoMostrado(s, a: PayloadAction<string | null>) {
       s.aviso = a.payload;
@@ -47,7 +55,6 @@ export const sesion = createSlice({
   },
   extraReducers: (b) => {
     b.addCase(rehidratado, (s, a) => {
-      if (a.payload.cuenta) s.cuenta = a.payload.cuenta.valor;
       // Con un corpus ya sincronizado el reloj es el real desde este mismo tick (spec 009 FR-016).
       if (a.payload.ahora !== null) s.ahora = a.payload.ahora;
       s.hidratado = true;
@@ -55,12 +62,18 @@ export const sesion = createSlice({
     b.addCase(sincronizado, (s, a) => {
       s.ahora = a.payload.ahora;
     });
-    // Vuelve al modo de ejemplo, reloj incluido: sin corpus sincronizado la fuente es el reloj de ejemplo.
-    b.addCase(sesionCerrada, (s) => ({ ...sesionInicial, hidratado: s.hidratado, epoca: s.epoca + 1 }));
+    // Vuelve al modo de ejemplo, reloj incluido (sin corpus sincronizado la fuente es el reloj de ejemplo),
+    // y sube la época para que una sincronización en vuelo descarte su resultado.
+    b.addCase(sesionCerrada, (s) => ({
+      ...sesionInicial,
+      hidratado: s.hidratado,
+      authLista: s.authLista,
+      epoca: s.epoca + 1,
+    }));
     b.addCase(escenarioElegido, (s, a) => {
       s.escenario = a.payload;
     });
   },
 });
 
-export const { ahoraCambio, cuentaGuardada, avisoMostrado } = sesion.actions;
+export const { ahoraCambio, usuarioCambio, avisoMostrado } = sesion.actions;
