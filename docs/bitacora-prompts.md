@@ -1116,6 +1116,76 @@ compañero al aprobar el PR #71.
 
 ---
 
+## 2026-10-16/17 — App mobile base y las 18 pantallas (issue #39)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit, `spec-critic`,
+Stitch MCP y las skills `vercel-react-native-skills`, `expo-native-ui` e
+`impeccable` (piso de craft e `ios.md`).
+
+**Objetivo:** crear `apps/mobile` (issue #39) e implementar las 18
+pantallas de Stitch v5 conectadas entre sí, aplicando las correcciones de
+`docs/design/auditoria-pantallas-v5.md`.
+
+**Prompts principales:**
+1. Pedido completo: leer CLAUDE.md, DESIGN.md, la auditoría, la issue #39 y
+   los ADR 002, 007 y 008; seguir ADR-007 (specify → spec-critic → plan →
+   tasks → implement); traer las 18 pantallas de Stitch al scratchpad;
+   Expo Router con tab bar Inicio · Comprar · Topes · Perfil; tema en un
+   solo archivo; Hanken Grotesk; `<Icon>` por plataforma; datos de ejemplo
+   detrás de `src/data/`; correcciones P1 y P2 obligatorias.
+2. Cuatro decisiones del PO antes de implementar: un solo PR con un commit
+   por fase; PATCH 2.0.1 de la constitución (monto opcional); excepción al
+   Principio II para un servidor simulado aislado; instalar Xcode para el
+   simulador.
+3. "Intentar nuevamente" tras una interrupción de la sesión.
+
+**Resultado:**
+- `specs/006-app-mobile-pantallas/`: spec, plan, research, data-model,
+  contratos, quickstart y 56 tareas. `spec-critic` encontró 3 bloqueantes:
+  el monto opcional chocaba con la letra del Principio I, la cámara estándar
+  de Expo escribe la foto al cache (se sacó la cámara de esta versión) y el
+  botón "Usar Galicia" no tenía comportamiento definido (pasó a abrir
+  Revisá tu compra en modo recomendación).
+- Constitución 2.0.1: una compra concreta es el comercio elegido; el monto
+  refina el estimado.
+- `apps/mobile`: Expo SDK 58, tema de tokens con lint y test contra hex
+  sueltos, solo modo claro, capa de datos con 17 tests de reglas (≈ y
+  base, ADR-008, cuentas que cierran), y las 18 pantallas.
+- Ajustes de coherencia de datos: el 15/10/2026 es jueves, así que "hoy
+  miércoles" pasó al 14/10; el umbral de "Queda poco" pasó a 30% para que
+  Santander (29%) cierre con su estado; el ejemplo de grupo ya no nombra la
+  tarjeta de Lucía (ADR-008 §3).
+- Docs: `docs/architecture/03-frontend.md` completo, contrato en
+  `02-api-routes.md` y DESIGN.md actualizado con las reglas corregidas.
+- Lección: Stitch HTML sirvió para copy y estructura; varias correcciones
+  (tarjeta oscura en todas las pantallas, total de topes, fechas de 2024)
+  venían del diseño, no de la implementación.
+
+**Continuación (2026-10-27):**
+1. "como hago lo de xcode?": se guió al usuario para aceptar la licencia y
+   seleccionar Xcode (`sudo` no lo puede correr la IA).
+2. Al traer `main` aparecieron la Edge Function `recomendar` (#43) y la spec
+   004 con botón "Simular" y monto obligatorio. El PO decidió mantener la
+   respuesta en un toque y adaptar la capa de datos al contrato real. Se abrió
+   la issue #75 (monto opcional en la Edge Function y alinear la spec 004).
+3. Verificación en el iOS Simulator (iPhone 17, iOS 27), con capturas de las
+   18 pantallas en `docs/design/capturas-app/` y una pasada con el texto más
+   grande de accesibilidad.
+
+**Resultado de la continuación:**
+- El simulador encontró cuatro bugs que la prueba en web no mostraba: el
+  onboarding abría el sheet de cuenta como primera pantalla, el formSheet con
+  detents no pintaba un ScrollView, el aviso de confirmación quedaba debajo del
+  stack nativo y, con el texto más grande, se cortaban palabras al medio.
+  Los cuatro se corrigieron y se volvieron a verificar.
+- `rules-guardian`: sin bloqueantes; 10 hallazgos corregidos (bases en el
+  grupo, rubro inventado, texto del ticket). `/code-review`: sin violaciones
+  duras; se unificaron textos de base y catálogo de rubros, y la spec quedó
+  alineada con lo que hace la app.
+- La spec se renumeró a 006 (002 ya era del motor en `main`).
+
+---
+
 ## 2026-10-27 — Explicar por qué se recomienda cada medio de pago (issue #46)
 
 **Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
@@ -1157,6 +1227,46 @@ datos para armar el "¿por qué no X?". Es una issue chica: va sin spec-kit.
   tests del motor y 40 de la Edge Function en verde.
 - Queda pendiente: la pantalla del "¿por qué no X?" (issue #43) y avisar
   en la issue #51 que el extractor no publique topes de $0.
+
+---
+
+## 2026-11-01 — Estado de issues y versiones; motor en la app con Redux (ADR-010)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con la CLI `gh`.
+
+**Objetivo:** resumir el avance (issues, milestones, PRs) y repartir lo que
+falta; después, documentar el cambio de arquitectura para que la recomendación
+se recalcule en vivo en la app.
+
+**Prompts principales:**
+1. "Haceme un resumen de cómo venimos en cuanto a issues, versiones, y qué nos
+   falta por hacer, así nos dividimos"
+2. "ok dale, con prioridades primero (de última asignáme lo de supabase a mí
+   también…). Y recordá crear un issue que diga mejorar la UX, asignada a mí"
+3. "ah en alguna de las issues habría que poner uno de los detalles técnicos
+   que charlamos: […] implementar Redux […] mientras vamos cargando el monto va
+   a ir reloadeando el medio de pago más conveniente"
+4. "[…] la constitución lo veníamos hablando cuando no habíamos hecho un
+   análisis muy intensivo […] Lo que sí puedes hacer es, si querés un PR,
+   aclarando todo esto, poniendo unas nuevas decisiones de diseño […] la
+   lógica de negocio, o la mayoría de lo que se pueda, directamente en la app"
+
+**Resultado:**
+- Resumen y reparto por prioridad; las issues #9 y #34 (Supabase) pasaron a
+  Joaquín y se creó la #79 («Mejorar la UX»). El detalle técnico de Redux quedó
+  como comentario de la #43.
+- Se propuso al PO una opción 1 (debounce más llamada a `recomendar`) y una
+  opción 2 (motor en la app). El PO eligió la 2: es lo que hace posible el
+  cálculo en vivo y sin señal, y Redux resuelve el estado del cliente, que fue
+  la razón por la que el 13/10 se movió el cálculo al servidor.
+- ADR-010 (supera la Actualización del 13/10 de ADR-001), constitución 3.0.0
+  (MAJOR, Principio II), RNF-02, `CLAUDE.md`, `rules-guardian`, arquitectura,
+  privacidad y pendientes alineados; notas en las specs 004 y 006.
+- Alcance acordado del PR: **solo documentación y decisiones**. El código
+  (Redux, motor en la app, sincronización) llega con las issues del plan de
+  ADR-010.
+- Riesgos que quedaron anotados y sin resolver: el tamaño del corpus frente al
+  tope de AsyncStorage en Android y la resolución de `@vuelto/motor` en Metro.
 
 ---
 

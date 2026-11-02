@@ -28,8 +28,8 @@ Monorepo con npm workspaces inicializado (issue #32). Requiere Node ≥ 22.13
 | Workspace | Contenido |
 |---|---|
 | `packages/motor` (`@vuelto/motor`) | Motor de reglas: TS puro, sin `dependencies`, tests Vitest |
-| `apps/mobile` | Reservado — la app Expo la crea la issue #39 |
-| `supabase` (`@vuelto/supabase`) | Edge Functions (`functions/`: `recomendar` y `_shared/`, tests Vitest); migraciones y seed llegan con la issue #34. Los `functions/*/index.ts` corren en Deno: los chequea `deno check` en el CI, no `tsc` |
+| `apps/mobile` | App Expo (issue #39). Pasa a importar `@vuelto/motor` y a guardar su estado en Redux (ADR-010, todavía sin implementar) |
+| `supabase` (`@vuelto/supabase`) | Edge Functions (`functions/`: `recomendar`, hoy fuera del camino de la app por ADR-010, y `_shared/`, tests Vitest); migraciones y seed llegan con la issue #34. Los `functions/*/index.ts` corren en Deno: los chequea `deno check` en el CI, no `tsc` |
 | `ingesta` | Reservado — script de ingesta de MODO |
 
 Comandos (desde la raíz; recorren todos los workspaces, los mismos que corre el CI):
@@ -54,9 +54,9 @@ Un solo workspace: `npm run test -w @vuelto/motor`. Tests en modo watch:
 
 | Pieza | Elección |
 |---|---|
-| Motor de reglas | Paquete TypeScript propio, sin dependencias, con su suite de tests. Corre **solo en la Edge Function** de Supabase; la app no lo importa |
-| Cliente mobile | Expo (React Native) |
-| Backend / DB | Supabase (Postgres + Auth) |
+| Motor de reglas | Paquete TypeScript propio, sin dependencias, con su suite de tests. Corre **en la app** (recomendación y topes en vivo, sin red) y, para el gasto en grupo, en una Edge Function (ADR-010) |
+| Cliente mobile | Expo (React Native) con Redux Toolkit como estado: perfil, corpus de promociones y compras del período; la recomendación y los topes se derivan con selectores, no se guardan |
+| Backend / DB | Supabase (Postgres + Auth + RLS). Edge Functions solo donde hay un secreto o datos de otros usuarios (ticket, grupo, invitaciones) |
 | Extractor | Gemini API — **siempre del lado del servidor**, nunca en el cliente |
 | Ingesta / scraping | Playwright (dónde corre el cron: pendiente) |
 | Testing | Vitest sobre el motor + Expo Go para ejecución manual |
@@ -70,10 +70,15 @@ Un solo workspace: `npm run test -w @vuelto/motor`. Tests en modo watch:
   argumento de innovación tecnológica de la materia.
 - **Núcleo funcional, capa imperativa** (ADR-009). El motor son funciones
   puras sobre datos planos (`interface`/`type`, no clases). Las Edge
-  Functions se organizan en handler (rol de controller) → service →
-  repositorios detrás de interfaces, inyectados por constructor, con el
-  código común en `supabase/functions/_shared/`. Sin framework ni
+  Functions que quedan se organizan en handler (rol de controller) →
+  service → repositorios detrás de interfaces, inyectados por constructor,
+  con el código común en `supabase/functions/_shared/`. Sin framework ni
   contenedor de DI.
+- **La recomendación y los topes se derivan, no se guardan** (ADR-010). La
+  app los calcula con el motor en selectores memoizados sobre el estado de
+  Redux; el reloj entra como valor del store (`ahora`), nunca con `new Date()`
+  adentro. Lo que cruza datos de varios usuarios (grupo) queda en una Edge
+  Function.
 - **Salida del extractor siempre estructurada contra un esquema.** Campos
   ausentes se devuelven `null` explícito — nunca inventados ni inferidos.
   Esquema: `{"type": ["string", "null"]}`, no campos opcionales.

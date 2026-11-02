@@ -1,21 +1,36 @@
 <!--
 Sync Impact Report
-- Versión: 1.0.0 → 2.0.0 (MAJOR: se redefine el Principio II)
+- Versión: 2.0.1 → 3.0.0 (MAJOR: redefine el Principio II)
 - Principios modificados:
-  - II. "Motor de reglas determinístico": "Corre en el dispositivo sin red" pasa a
-    "función pura sin llamadas de red propias, ejecutada exclusivamente por la Edge
-    Function; la app Expo no lo importa". El "Por qué" deja de citar el uso offline.
-- Secciones agregadas: ninguna. Secciones eliminadas: ninguna.
-- Decisión de origen: ADR-001 §Actualización (13/10/2026) y RNF-02 de
-  docs/product/requisitos.md (no hace falta un ADR nuevo: ya está actualizado).
+  - II. "Motor de reglas determinístico": el motor deja de correr solo en la Edge Function. Lo
+    importa y ejecuta la app Expo para recomendar y estimar topes en vivo, con el estado en
+    Redux. La Edge Function conserva lo que necesita un secreto o datos de otros usuarios (ticket,
+    grupo, invitaciones). El motor y su determinismo no cambian.
+- Decisión de origen: ADR-010 (docs/decisions/010-motor-en-la-app-y-redux.md), que supera la
+  Actualización del 13/10/2026 de ADR-001. Requiere la aprobación del PO en el PR que la introduce.
 - Archivos alineados:
-  ✅ CLAUDE.md (tabla Stack)
-  ✅ docs/architecture/00-overview.md (§1, tabla Stack, flujo de datos)
-  ✅ docs/decisions/001-motor-de-reglas-paquete-separado.md (notas de "superado" en Rationale y Consequences)
-  ✅ docs/product/privacidad.md (ya no cita la issue #42, cerrada como obsoleta)
-  ✅ .specify/templates/*: sin referencias al principio, no requieren cambios
-  ✅ specs/001-perfil-billeteras: no depende del motor en el dispositivo
+  ✅ CLAUDE.md, docs/product/requisitos.md (RNF-02), docs/product/privacidad.md,
+     docs/architecture/*, .claude/agents/rules-guardian.md y .agents/agents/rules-guardian.md
+  ⚠ specs/004-recomendar-pantalla y specs/006-app-mobile-pantallas: con nota de que fueron
+     superadas en este punto; se reescriben en las issues de implementación.
+- Pendientes: ninguno en la constitución. El código que la cumple llega con las issues del plan de
+  ADR-010.
+
+Versión anterior (2.0.1):
+- Versión: 2.0.0 → 2.0.1 (PATCH: aclaración del Principio I)
+- Principios modificados:
+  - I. "Regla de oro": se aclara qué es una compra concreta. Es un comercio elegido en un
+    momento dado; el monto es opcional y solo refina el estimado. Sin monto, la respuesta
+    sigue siendo una decisión sobre esa compra, no un listado.
+- Decisión de origen: auditoría de pantallas v5, P1 #1 (docs/design/auditoria-pantallas-v5.md),
+  aprobada por el PO en la spec 006 (specs/006-app-mobile-pantallas).
+- Archivos alineados:
+  ✅ specs/006-app-mobile-pantallas/spec.md (§Enmienda de constitución)
+  ✅ .specify/templates/*: sin referencias, no requieren cambios
 - Pendientes: ninguno.
+
+Versión anterior (2.0.0): MAJOR que redefinió el Principio II (el motor corre solo en la Edge
+Function; la app Expo no lo importa). Ver ADR-001 §Actualización y RNF-02.
 -->
 
 # Constitución de Vuelto
@@ -31,8 +46,9 @@ Vuelto recomienda **qué medio de pago usar en una compra concreta** y controla 
 reintegro queda**.
 
 - Una funcionalidad que se pueda describir como "mostrar promociones" NO entra al producto.
-- Ninguna pantalla muestra promociones si no hay una compra concreta (dónde y cuánto) que
-  evaluar.
+- Ninguna pantalla muestra promociones si no hay una compra concreta que evaluar. Una compra
+  concreta es un comercio elegido en un momento dado (dónde y cuándo). El monto (cuánto) es
+  opcional: solo refina el estimado.
 - Toda spec DEBE explicar qué decisión del usuario resuelve.
 
 **Por qué:** el problema no es la falta de información sino la decisión (`docs/product/problema.md`).
@@ -43,15 +59,21 @@ reintegro queda**.
   runtime y expone funciones puras.
 - El paquete no hace llamadas de red propias ni lee estado externo: la hora actual se recibe
   como parámetro, nunca se lee adentro.
-- Lo importa y ejecuta exclusivamente la Edge Function de recomendación. La app Expo NO lo
-  importa (`apps/mobile/package.json` no lo tiene como dependencia) ni calcula recomendaciones
-  localmente, ni siquiera como fallback: junta el input, llama al endpoint y pinta la respuesta.
-- Con el mismo perfil, la misma compra y el mismo corpus, el resultado DEBE ser idéntico.
+- La recomendación y la estimación de topes de una persona las calcula la app Expo con este
+  paquete, en el dispositivo y sin red, a partir del estado que tiene en Redux (perfil, corpus de
+  promociones, compras del período y la compra simulada). El resultado es un valor **derivado**
+  (selectores memoizados), nunca guardado ni escrito a mano en el store.
+- Todo lo que cruza datos de más de un usuario (el gasto en grupo) se calcula en una Edge Function
+  que llama al mismo paquete. La app no lee datos de otros usuarios.
+- Con el mismo perfil, la misma compra y el mismo corpus, el resultado DEBE ser idéntico, corra
+  donde corra.
 - Un modelo de lenguaje NUNCA participa de la recomendación, ni directa ni indirectamente.
   Tampoco genera los textos de explicación (son plantillas determinísticas).
 
-**Por qué:** ADR-001 (§Actualización 13/10/2026), ADR-004 y RNF-02. Sin esto se pierden los tests,
-la reproducibilidad de la recomendación y el argumento de innovación de la materia.
+**Por qué:** ADR-010 (que supera ADR-001 §Actualización 13/10/2026), ADR-004 y RNF-02. La
+recomendación tiene que ser instantánea, actualizarse al tipear el monto y funcionar sin señal. Sin
+determinismo se pierden los tests, la reproducibilidad de la recomendación y el argumento de
+innovación de la materia.
 
 ### III. Extracción con esquema y null explícito
 
@@ -105,8 +127,8 @@ tiempo.
 
 ## Stack y restricciones
 
-- **Stack:** app en Expo (React Native) con Expo Router; Supabase (Postgres + Auth + Edge
-  Functions); Gemini Flash solo del lado del servidor; motor en TypeScript con Vitest; monorepo
+- **Stack:** app en Expo (React Native) con Expo Router y Redux Toolkit como estado del cliente;
+  Supabase (Postgres + Auth + Edge Functions, solo donde hay un secreto o datos de otros usuarios); Gemini Flash solo del lado del servidor; motor en TypeScript con Vitest; monorepo
   con npm workspaces (`packages/motor`, `apps/mobile`, `supabase/`, `ingesta/`).
 - **Costo:** $0 durante el cuatrimestre. Todo servicio DEBE entrar en su tier gratuito.
 - **Alcance:** CABA/AMBA. Hay una sola fuente de ingesta, MODO, a través de su API pública, y se
@@ -146,4 +168,4 @@ tiempo.
 - La guía operativa del día a día está en `CLAUDE.md`. Si contradice a esta constitución, se
   corrige `CLAUDE.md`.
 
-**Version**: 2.0.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-10-15
+**Version**: 3.0.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-11-01

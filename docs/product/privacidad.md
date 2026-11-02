@@ -45,9 +45,12 @@ usuario vuelve a fotografiar el ticket.
     **versión paga** (fuera de alcance del MVP, mencionada en el pitch como
     camino de crecimiento) que retiene las capturas para siempre.
   - Esto es independiente de cuánto historial usa el motor para calcular:
-    solo necesita la ventana del mes en curso (≤31 días), y la lee la Edge
-    Function del lado del servidor. El celular no descarga ni cachea el
-    historial de compras (ADR-001 §Actualización).
+    solo necesita la ventana del período en curso (≤31 días), y la lee la
+    propia app, con el RLS, para calcular en el dispositivo (ADR-010). El
+    celular guarda en el store de Redux solo esas compras del período, que
+    son del propio usuario; no descarga el historial de los 90 días. Las
+    compras de un contacto nunca llegan al celular: el gasto en grupo se
+    calcula en una Edge Function (ADR-008).
 - **Perfil** (medios de pago, comercios): se guarda mientras la cuenta
   exista.
 - **Aislamiento entre usuarios**: cada tabla lleva row-level security desde
