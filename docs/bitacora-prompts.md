@@ -1186,6 +1186,50 @@ pantallas de Stitch v5 conectadas entre sí, aplicando las correcciones de
 
 ---
 
+## 2026-10-27 — Explicar por qué se recomienda cada medio de pago (issue #46)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** que cada recomendación y cada promo descartada digan con
+claridad por qué, con los textos del diseño, y dejarle a la pantalla los
+datos para armar el "¿por qué no X?". Es una issue chica: va sin spec-kit.
+
+**Prompts principales:**
+1. "Tenemos que trabajar en las issues #46, #48, #10 y #55. Fijate si hay
+   alguna que podamos ir tomando." Las issues #48, #10 y #55 están
+   bloqueadas por tareas de otros compañeros; se arrancó con la issue #46,
+   solo la parte del motor, porque la pantalla depende de las issues #43 y
+   #39.
+2. "Hacé las tres cosas como las proponés": que la recomendación diga
+   cuánto tope queda después de la compra y en qué se basa, en el mismo
+   texto; que los descartes usen el tono del diseño, sin el "Descartada:"
+   de la issue; y que cada descarte diga a qué medios de pago del usuario
+   le servía la promo.
+3. "¿Existe alguna promo con tope de $0?" No existe en la realidad: solo
+   puede venir de un error del extractor. "Arreglalo en el origen: si
+   aparece, es un error y no hay que tomarla como promoción."
+4. "Avanzá con los arreglos de la revisión y sumalos a la bitácora."
+
+**Resultado:**
+- La recomendación ahora dice, por ejemplo, "20% en supermercados los
+  miércoles · te quedan ≈$1.600 de tope, según 3 compras de octubre". Si no
+  hay compras registradas no da cifra, y si la compra usa todo el tope lo
+  avisa.
+- Los descartes dicen, por ejemplo, "Hoy no aplica, la promo es los
+  sábados" o "Tope agotado este mes, según 2 compras".
+- Cada descarte trae los medios de pago del usuario a los que aplicaba la
+  promo, así la pantalla muestra "¿por qué no X?" sin calcular nada.
+- Una promo con tope de $0 o negativo ya no se publica: la regla de
+  publicación la toma como un error de lectura.
+- Se actualizó el ejemplo del contrato de la Edge Function (spec 004).
+- La revisión de código no encontró incumplimientos de las reglas; se
+  ajustaron nombres, un comentario y un caso que faltaba testear. 192
+  tests del motor y 40 de la Edge Function en verde.
+- Queda pendiente: la pantalla del "¿por qué no X?" (issue #43) y avisar
+  en la issue #51 que el extractor no publique topes de $0.
+
+---
+
 ## 2026-11-01 — Estado de issues y versiones; motor en la app con Redux (ADR-010)
 
 **Herramienta:** Claude Code (Sonnet 5.5), con la CLI `gh`.
@@ -1223,6 +1267,46 @@ se recalcule en vivo en la app.
   ADR-010.
 - Riesgos que quedaron anotados y sin resolver: el tamaño del corpus frente al
   tope de AsyncStorage en Android y la resolución de `@vuelto/motor` en Metro.
+
+---
+
+## 2026-11-01 — Esquema inicial de Supabase con RLS (issue #34)
+
+**Herramienta:** Claude Code (Sonnet 5.5) con spec-kit, `spec-critic`,
+`rules-guardian`, `test-runner`, `/code-review` y la skill
+`supabase-postgres-best-practices`.
+
+**Objetivo:** las tablas base de Supabase, cada una con su RLS en la misma
+migración, más los requisitos del ADR-010 §4 que la issue no dice: promociones
+con `actualizada_en` (trigger) para sincronizar solo lo nuevo, lectura para
+autenticados y escritura solo de la service role.
+
+**Prompts principales:**
+1. Pedido con la issue #34, el ADR-010 §4, el modelo de datos y los tipos del
+   motor, y el flujo de la constitución para issues M: specify, `spec-critic`,
+   plan, tareas, implement, `/code-review`, `test-runner` y `rules-guardian`.
+2. Requisitos extra: `actualizada_en` con trigger, test de RLS (A no lee
+   compras de B; un autenticado no inserta en `promociones`), `db reset`
+   limpio, sin columna de imagen de ticket y sin borrar `recomendar`.
+
+**Resultado:**
+- Spec 007 con 25 requisitos. `spec-critic` encontró 5 decisiones abiertas;
+  se resolvieron con defaults que quedan para confirmar en el PR: un medio de
+  pago con compras no se borra; una captura referenciada no se borra; las
+  promociones se dan de baja (`dada_de_baja_en`), no se borran; los comercios
+  se comparan sin mayúsculas ni espacios de más; forma de `capturas_crudas`.
+- 7 migraciones, `seed.sql` y 4 suites pgTAP (129 pruebas). Una FK compuesta
+  `(user_id, medio_de_pago_id)` impide usar el medio de pago de otro usuario,
+  porque una FK simple no aplica RLS.
+- Las pruebas encontraron un error real: la service role no tenía privilegios
+  sobre las tablas nuevas; se agregó el `grant` explícito. Se comprobó además
+  que las pruebas fallan si se rompe una policy a propósito.
+- `/code-review` y `rules-guardian`: sin violaciones duras. Se aplicó el
+  `revoke execute` de las funciones auxiliares; el resto fueron decisiones de
+  juicio o columnas que el tipo `Compra` pide.
+- El seed solo trae a Galicia con id real de MODO; el resto del catálogo de
+  bancos lo carga la ingesta. El job de CI `supabase-rls` no se corrió todavía
+  en GitHub.
 
 ---
 

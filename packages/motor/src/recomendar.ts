@@ -7,15 +7,15 @@ import { aCentavos, aCentesimosDePunto, aPesos, aplicarPorcentaje } from "./dine
 import { mediosCompatibles, primeraReglaQueFalla, type ContextoDeCompra } from "./elegibilidad.ts";
 import { PerfilSinMediosError } from "./errores.ts";
 import { diaArgentina, fechaArgentina } from "./fecha.ts";
-import { motivoCombinado, motivoDescarte, motivoOpcion } from "./motivos.ts";
+import { motivoCombinado, motivoDescarte, motivoOpcion, type TopeTrasCompra } from "./motivos.ts";
 import { compararIds } from "./orden.ts";
 import { calcularSaldos, clasificarTope, type Saldo } from "./tope.ts";
 import type {
-  BaseEstimacion,
   CausaDescarte,
   Compra,
   CompraPropuesta,
   Descarte,
+  FechaISO,
   MedioDePago,
   OpcionDePago,
   Perfil,
@@ -61,7 +61,7 @@ interface PromoAplicable {
  * reparten el saldo en orden de ahorro sin tope y luego por id, así ninguna
  * combinación supera el restante de un saldo (FR-010).
  */
-function armarOpcion(medio: MedioDePago, grupo: PromoAplicable[]): OpcionDePago {
+function armarOpcion(medio: MedioDePago, grupo: PromoAplicable[], fecha: FechaISO): OpcionDePago {
   const ordenadas = [...grupo].sort(
     (a, b) => b.ahorroSinTope - a.ahorroSinTope || compararIds(a.promo.id, b.promo.id),
   );
@@ -77,23 +77,28 @@ function armarOpcion(medio: MedioDePago, grupo: PromoAplicable[]): OpcionDePago 
     }
     return ahorro;
   });
-  const promociones = ordenadas.map((a, i) => ({
-    promocionId: a.promo.id,
-    ahorroEstimado: aPesos(ahorros[i] ?? 0),
-    // Las que comparten saldo informan el mismo restante final (FR-012).
-    topeRestanteTrasCompra: a.saldo ? aPesos(restantes.get(a.saldo) ?? a.saldo.restante) : null,
-    base: a.saldo ? a.saldo.base : null,
-  }));
+  // Las que comparten saldo informan el mismo restante final (FR-012).
+  const topes = ordenadas.map((a): TopeTrasCompra | null =>
+    a.saldo ? { restante: restantes.get(a.saldo) ?? a.saldo.restante, saldo: a.saldo, fecha } : null,
+  );
+  const promociones = ordenadas.map((a, i) => {
+    const tope = topes[i] ?? null;
+    return {
+      promocionId: a.promo.id,
+      ahorroEstimado: aPesos(ahorros[i] ?? 0),
+      topeRestanteTrasCompra: tope ? aPesos(tope.restante) : null,
+      base: a.saldo ? a.saldo.base : null,
+    };
+  });
   return {
     medioDePagoId: medio.id,
     ahorroEstimado: aPesos(ahorros.reduce((t, x) => t + x, 0)),
     promociones,
     motivo:
       ordenadas.length === 1 && ordenadas[0]
-        ? motivoOpcion(ordenadas[0].promo)
+        ? motivoOpcion(ordenadas[0].promo, topes[0] ?? null)
         : motivoCombinado(
-            ordenadas.map((a) => a.promo),
-            sinSaldo,
+            ordenadas.map((a, i) => ({ promo: a.promo, tope: topes[i] ?? null, sinSaldo: sinSaldo.has(a.promo.id) })),
           ),
   };
 }
@@ -115,8 +120,16 @@ export function recomendar(
 
   for (const promo of promociones) {
     const medios = mediosCompatibles(promo, perfil.mediosDePago);
-    const descartar = (causa: CausaDescarte, base: BaseEstimacion | null) =>
-      descartadas.push({ promocionId: promo.id, causa, base, motivo: motivoDescarte(causa, promo, ctx) });
+    // Los medios del usuario a los que aplicaba, para el "¿por qué no X?" de la pantalla.
+    const mediosDePagoIds = medios.map((m) => m.id).sort(compararIds);
+    const descartar = (causa: CausaDescarte, saldo: Saldo | null) =>
+      descartadas.push({
+        promocionId: promo.id,
+        causa,
+        mediosDePagoIds,
+        base: saldo ? saldo.base : null,
+        motivo: motivoDescarte(causa, promo, ctx, saldo),
+      });
 
     const causa = primeraReglaQueFalla(promo, ctx) ?? (medios.length === 0 ? "medio_de_pago" : null);
     if (causa !== null) {
@@ -129,7 +142,7 @@ export function recomendar(
     const topePorCompra = clase.tipo === "por_compra" ? clase.monto : null;
     if (saldo?.restante === 0) {
       // Un tope agotado también es un estimado: lleva su base (constitución §V).
-      descartar("tope_agotado", saldo.base);
+      descartar("tope_agotado", saldo);
       continue;
     }
     if (topePorCompra === 0) {
@@ -152,10 +165,10 @@ export function recomendar(
     const delMedio = aplicables.filter((a) => a.medios.includes(medio));
     const acumulables = delMedio.filter((a) => a.promo.acumulable === true);
     if (acumulables.length >= 2) {
-      opciones.push(armarOpcion(medio, acumulables));
-      for (const a of delMedio) if (a.promo.acumulable !== true) opciones.push(armarOpcion(medio, [a]));
+      opciones.push(armarOpcion(medio, acumulables, ctx.fecha));
+      for (const a of delMedio) if (a.promo.acumulable !== true) opciones.push(armarOpcion(medio, [a], ctx.fecha));
     } else {
-      for (const a of delMedio) opciones.push(armarOpcion(medio, [a]));
+      for (const a of delMedio) opciones.push(armarOpcion(medio, [a], ctx.fecha));
     }
   }
 
