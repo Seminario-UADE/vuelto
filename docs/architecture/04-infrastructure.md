@@ -20,6 +20,33 @@ Costo total durante el cuatrimestre: **$0**.
   escribir en `capturas_crudas`, saltea row-level security por completo —
   tratarla como llave maestra.
 
+### Tabla de secrets
+
+Los nombres están en `apps/mobile/.env.example` y `supabase/.env.example`
+(sin valores). Los `.env` reales están ignorados por git.
+
+| Secret | Quién la usa | Dónde vive | Cómo se rota |
+|---|---|---|---|
+| `EXPO_PUBLIC_SUPABASE_URL` | App mobile | `apps/mobile/.env` (local); variable de entorno del perfil en EAS | No es secreta (URL pública del proyecto). Cambia solo si se crea otro proyecto |
+| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | App mobile | `apps/mobile/.env` (local); variable del perfil en EAS (`eas env:create`) | Es pública por diseño: la protege RLS, no el secreto. Rotar en Supabase (Settings → API Keys) y reconstruir la app con la nueva |
+| `GEMINI_API_KEY` | Edge Functions (ticket); script de ingesta (letra chica) | Edge Functions: `supabase secrets set`; local: `supabase/.env`; ingesta: donde corra el cron (¹) | Generar key nueva en Google AI Studio → `supabase secrets set` + redeploy de la función → actualizar la ingesta → revocar la vieja |
+| `SUPABASE_SERVICE_ROLE_KEY` | Solo el proceso de ingesta (RNF-05) | Donde corra el cron (¹); local: `supabase/.env`. Nunca en EAS ni en la app. En las Edge Functions Supabase ya inyecta la suya: no se setea a mano | Crear una key nueva en Supabase (Settings → API Keys) y actualizar el lugar donde corre la ingesta en el mismo momento; revocar la vieja. Con las keys JWT legacy, rotar el JWT secret invalida también la anon key y obliga a reconstruir la app |
+
+¹ Dónde corre el cron está pendiente (ver «Pendiente: dónde corre el cron»).
+Si termina siendo GitHub Actions, ambos secrets viven como secret de repo. La
+ingesta también necesita `SUPABASE_URL` (no secreta) junto con la service role
+key.
+
+Reglas (RNF-04, RNF-05):
+
+- Nada con prefijo `EXPO_PUBLIC_` puede ser secreto: termina en el bundle.
+  Solo van la URL y la anon key.
+- La Gemini key y la service role key no aparecen en el cliente ni en el repo.
+  Verificación: búsqueda de ambas en el bundle exportado y en
+  `git grep` / historial, 0 resultados.
+- Si una key se filtró (commit, log, captura), se rota primero y se limpia
+  después: el historial de git no se considera borrado.
+
 ## CI
 
 `.github/workflows/ci.yml` corre lint, typecheck, test y build (compilación
