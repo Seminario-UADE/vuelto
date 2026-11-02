@@ -1,5 +1,30 @@
 {
   "name": "@vuelto/ingesta",
   "version": "0.0.0",
-  "private": true
+  "private": true,
+  "description": "Proceso de ingesta de Vuelto: arma, valida y carga el corpus de promociones de MODO (issue #35; luego #50 y #51).",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage",
+    "corpus:relevar": "node src/corpus/relevar.ts",
+    "corpus:borrador": "node src/corpus/borrador.ts",
+    "corpus:generar": "node src/corpus/generar.ts",
+    "corpus:cargar": "node src/corpus/cargar.ts",
+    "corpus:cobertura": "node src/corpus/cobertura.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
+    "@vuelto/motor": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@vitest/coverage-v8": "~5.0.4",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.4"
+  }
 }

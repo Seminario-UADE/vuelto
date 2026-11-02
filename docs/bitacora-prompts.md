@@ -1413,6 +1413,83 @@ usuario pasó al slice `sesion`.
 
 ---
 
+## 2026-11-02 — Corpus de promociones sembrado a mano desde MODO (issue #35, parte de Supermercados y Farmacias)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con spec-kit, el agente `spec-critic`, la CLI `gh`,
+el navegador integrado, Docker (Postgres y PostgREST de Supabase) y la API pública de MODO.
+
+**Objetivo:** dejar listo el corpus real de las categorías 1 y 4 para la demo con la ingesta
+apagada, y las herramientas para armarlo, validarlo y cargarlo. Spec `specs/011-corpus-promociones-seed/`.
+
+**Prompts principales:**
+1. "Mi parte es la de spazos32, ¿con qué podemos avanzar?" (con la tabla de reparto por prioridad).
+2. "Fijate que hubo un par de PR, decime si la parte que tengo que hacer yo está bloqueada por algo
+   que falte." → #9 y #34 ya estaban mergeadas; quedaban cuatro huecos del esquema.
+3. "Sí, pull y #35", con tres decisiones: resolver `skills-lock.json` con la versión de `main`;
+   las promos sembradas llevan `fuente = 'manual'`; el corpus incluye solo CABA/AMBA.
+4. Dos decisiones más en el camino: una promo que no aclara dónde rige se guarda con
+   `jurisdiccion = null` (se trata como global); un tope que ni el detalle ni la letra chica
+   informan queda `monto = null`.
+5. "Avanzá con eso pero no hagas ningún PR todavía" y, por tandas, "Sí, Phase 4", "Sí, Phase 6" y
+   "Sí, documentos".
+
+**Resultado:**
+- Spec, plan, investigación, modelo de datos, contrato, quickstart y 56 tareas. `spec-critic` encontró
+  2 bloqueantes (de dónde sale la letra chica y la regla de jurisdicción) y 9 hallazgos altos; todos
+  se resolvieron o quedaron como decisión escrita.
+- **Hallazgo clave:** MODO sí tiene un endpoint de detalle por promo
+  (`GET /promos/api/rewards/v2/benefit/<slug>`) con los legales, el tope estructurado, el monto
+  mínimo, el canal y los bancos por id. Una lectura anterior («no existe») era un error de búsqueda.
+- Workspace `ingesta/` con el cliente de MODO (User-Agent `VueltoBot (UADE)`, pausa de al menos 1 s,
+  reintentos), el mapeo del detalle a borrador por código (sin ningún modelo de lenguaje), el validador,
+  los ids UUID v5, la traducción de banco con alias, `resaltar` (marca frases de la letra chica sin
+  interpretarlas), el generador de SQL y fixtures, la carga remota idempotente y el reporte de cobertura.
+  El motor solo suma el export de `normalizar`.
+- Relevamiento real (2026-11-02): 171 promos vigentes (117 y 54). Los datos reales corrigieron el
+  diseño varias veces: `physical-card`, `all`, `reset_by: promo`, `limits: null`, la red
+  `patagonia_365`, la categoría 15 y que «Exclusivo con» es exclusividad de banco y no el alcance del
+  tope. 12 promos multibanco generan 258 de las 408 entradas candidatas.
+- Hallazgos para el pitch (`docs/product/corpus-semilla.md`, `alcance-mvp.md`): Coto, Carrefour,
+  Jumbo, Disco, Vea, Día y La Anónima tienen 0 promos vigentes; 21 promos que MODO lista como
+  vigentes tienen una fecha de fin ya pasada en su letra chica; 121 de las 171 exigen pagar con MODO.
+- Verificado con la imagen de Postgres de Supabase y PostgREST locales: las 7 migraciones, el seed,
+  82 bancos y 408 promos reales de prueba cargan sin violar ningún `check`; la carga remota con el
+  cliente real de `supabase-js` es idempotente (segunda carga sin cambios, `actualizada_en` quieto),
+  da de baja y reactiva. La versión original de `rls.test.sql` falla justo las 2 aserciones que se
+  ajustaron cuando hay corpus cargado.
+- Lo que hizo el código y conviene revisar: un tope diario no se aproxima (se propone
+  excluir como `tope_no_representable`, ver abajo); las redes que el contrato no tiene se ignoran con una nota; se partieron las
+  promos multibanco en una entrada por banco; `montoMinimo` y `canal` no exigen fragmento de la letra
+  chica porque salen de campos estructurados.
+- **Errores propios corregidos con los tests:** el relevamiento abortaba entero ante un 500
+  transitorio de MODO; el parser de argumentos tomaba el valor de una bandera suelta; el `dist/` del
+  motor estaba desactualizado y Node no veía `normalizar`; dos mensajes ambiguos y una regex al revés.
+- **Revisiones (`/code-review` con sus dos ejes, `test-runner` y `rules-guardian`).** No hubo violaciones
+  duras de las reglas del proyecto. Encontraron defectos reales que se corrigieron con tests primero:
+  `corpus:relevar` y `corpus:borrador` resolvían la carpeta de crudos contra el directorio actual y
+  rompían con `npm run … -w ingesta` (el comando que documenté); las claves de `Object.prototype`
+  (`constructor`, `toString`) pasaban como día o período válido; el validador lanzaba con un
+  `exclusiones.json` malformado; la convivencia con la ingesta comparaba el `fuente_id` exacto y no el
+  slug; `mapear.ts` leía la letra chica contra lo que decía la spec (la nota de fecha pasó a
+  `corpus:borrador`); la alarma «transversal» se disparaba antes del filtro por dueño; `nivel_de_cliente`
+  y el contraste del nombre de banco estaban en la spec pero no en el pipeline; y la verificación de
+  desfase del generador no estaba en ningún gate (ahora es un test sobre los archivos reales). También
+  se unificó la lista de columnas de `promociones` (estaba repetida en 8 lugares), se movieron los
+  helpers duplicados a `crudo.ts` y `args.ts` y se quitó un ciclo de tipos.
+- **Errores propios de esta etapa:** afirmé que los comandos documentados andaban cuando solo había
+  probado `node ingesta/src/corpus/…` desde la raíz; y los scripts de edición que pasé por shell
+  perdieron un nivel de barras invertidas (una regex quedó con caracteres de control y otra sin
+  escapar), lo que se detectó con los propios tests y se corrigió con las herramientas de edición.
+- **Decisión del equipo (tope diario):** `rules-guardian` señaló que cargar el tope diario (`reset_by =
+  day`, 4 promos) como «por compra» puede sobrestimar el tope restante. El equipo decidió excluirlo: se
+  propone como `tope_no_representable`, igual que el tope «para toda la promo». Con los crudos reales
+  quedan 159 promos con 399 entradas candidatas y 12 exclusiones propuestas.
+- **No verificado:** `supabase db reset` con la CLI (lo corre el job `supabase-rls` del CI; se probó el
+  equivalente con la imagen de Postgres de Supabase, incluidas las cinco pruebas pgTAP), Node 22 (solo
+  Node 24.14) y la revisión humana de las promos, que es lo que falta.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

@@ -30,7 +30,7 @@ Monorepo con npm workspaces inicializado (issue #32). Requiere Node ≥ 22.13
 | `packages/motor` (`@vuelto/motor`) | Motor de reglas: TS puro, sin `dependencies`, tests Vitest |
 | `apps/mobile` | App Expo (issue #39). Importa `@vuelto/motor` y guarda su estado en Redux; la recomendación y los topes son selectores (ADR-010, issue #81). Tests Vitest de cálculo, store y persistencia |
 | `supabase` (`@vuelto/supabase`) | Edge Functions (`functions/`: `recomendar`, hoy fuera del camino de la app por ADR-010, y `_shared/`, tests Vitest); `migrations/` (esquema con RLS), `seed.sql` y `tests/database/` (pgTAP, `supabase test db`). Los `functions/*/index.ts` corren en Deno: los chequea `deno check` en el CI, no `tsc` |
-| `ingesta` | Reservado — script de ingesta de MODO |
+| `ingesta` | Corpus de promociones sembrado a mano desde MODO (issue #35): `src/corpus/` con el relevamiento, el mapeo del detalle de MODO, la validación, el generador de SQL y de fixtures, la carga remota y el reporte de cobertura. Tests Vitest sin red. El extractor con Gemini (#50, #51) se suma acá |
 
 Comandos (desde la raíz; recorren todos los workspaces, los mismos que corre el CI):
 
@@ -53,6 +53,19 @@ proyecto de Supabase, hay que frenarlo o cambiarlos solo en tu copia local.
 Un solo workspace: `npm run test -w @vuelto/motor`. Tests en modo watch:
 `npx vitest` dentro de `packages/motor`. Un workspace nuevo se suma a
 `workspaces` del `package.json` raíz y define los scripts que le apliquen.
+
+Corpus de promociones sembrado a mano (issue #35, `specs/011-corpus-promociones-seed/`), desde la raíz:
+
+```bash
+npm run corpus:relevar -w ingesta -- --categorias 1,4   # baja el listado y el detalle de MODO a supabase/seed/crudo/ (red, pausa >= 1 s)
+npm run corpus:cobertura -w ingesta -- --lista          # qué promos faltan revisar, por comercio (--casos: candidatas por caso)
+npm run corpus:borrador -w ingesta -- <slug>            # borrador de una promo y frases de su letra chica
+npm run corpus:generar -w ingesta                       # valida promociones.json y regenera SQL y fixtures (--verificar: no escribe)
+node --env-file=supabase/.env ingesta/src/corpus/cargar.ts [--aplicar]   # carga remota; por defecto no escribe
+```
+
+Si cambia `packages/motor/src`, recompilarlo (`npm run build -w @vuelto/motor`) antes de correr un script
+`corpus:*`: usan el motor compilado, mientras que los tests de Vitest usan su código fuente.
 
 ## Stack decidido (costo $0 durante el cuatrimestre)
 
@@ -96,7 +109,8 @@ Un solo workspace: `npm run test -w @vuelto/motor`. Tests en modo watch:
 - **La ingesta de promociones es 100% automática, sin revisión humana.** El
   extractor publica el borrador directo si completa el esquema (todos los
   campos obligatorios no `null`); si no lo completa, se descarta solo, sin
-  cola de aprobación.
+  cola de aprobación. (El corpus sembrado a mano de la issue #35 no es
+  ingesta: ver ADR-005 §Consecuencias.)
 - **Topes de reintegro siempre se muestran como estimados, con su base**
   (ej. "≈$18.000, según 4 compras registradas"). Nunca una cifra falsamente
   precisa.

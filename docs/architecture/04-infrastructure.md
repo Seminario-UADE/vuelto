@@ -37,6 +37,12 @@ Si termina siendo GitHub Actions, ambos secrets viven como secret de repo. La
 ingesta también necesita `SUPABASE_URL` (no secreta) junto con la service role
 key.
 
+La carga del corpus de promociones sembrado a mano (issue #35) las lee del
+entorno de quien la corre, no de un archivo versionado:
+`node --env-file=supabase/.env ingesta/src/corpus/cargar.ts` (por defecto no
+escribe: muestra qué haría; `--aplicar` escribe). La corre a mano quien tenga la
+service role; no corre en el CI.
+
 Reglas (RNF-04, RNF-05):
 
 - Nada con prefijo `EXPO_PUBLIC_` puede ser secreto: termina en el bundle.

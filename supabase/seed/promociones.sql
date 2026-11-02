@@ -1,0 +1,2 @@
+-- GENERADO por `npm run corpus:generar -w ingesta` desde supabase/seed/promociones.json. No editar a mano.
+-- Corpus de promociones sembrado a mano (fuente = 'manual'). Idempotente por (fuente, fuente_id).
