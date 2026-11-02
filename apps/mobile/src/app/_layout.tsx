@@ -15,8 +15,11 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
 import { Toast } from "@/components/toast";
 import { iniciarAuth } from "@/data/auth";
+import { usePerfilRemoto } from "@/hooks/use-perfil-remoto";
 import { useReloj } from "@/hooks/use-reloj";
+import { supabase } from "@/lib/supabase";
 import { headerNativo } from "@/navigation/opciones";
+import { crearDatosPerfil } from "@/perfil/datos";
 import { crearStore } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { rehidratar } from "@/store/persistencia";
@@ -25,7 +28,11 @@ import { colors } from "@/theme";
 void SplashScreen.preventAutoHideAsync();
 
 /** Un solo store para toda la app (ADR-010). Lo guardado se lee una vez, al abrir. */
-const store = crearStore({ almacenamiento: AsyncStorage, estadoInicial: null });
+const store = crearStore({
+  almacenamiento: AsyncStorage,
+  estadoInicial: null,
+  perfilRemoto: supabase ? crearDatosPerfil(supabase) : null,
+});
 void store.dispatch(rehidratar());
 
 export const unstable_settings = { anchor: "(tabs)" };
@@ -63,6 +70,7 @@ function Raiz() {
   const hidratado = useAppSelector((s) => s.sesion.hidratado);
   const authLista = useAppSelector((s) => s.sesion.authLista);
   useReloj();
+  usePerfilRemoto();
 
   // Lee la sesión guardada de Supabase y sigue sus cambios (issue #40).
   useEffect(() => dispatch(iniciarAuth()), [dispatch]);

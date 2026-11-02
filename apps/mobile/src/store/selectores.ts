@@ -7,7 +7,8 @@ import { createSelector } from "@reduxjs/toolkit";
 import { fechaArgentina } from "@vuelto/motor";
 import { comprasVista, perfilDelMotor, recomendacionVista, topesVista, type EntradasMotor } from "../data/calculo";
 import type { Comercio, MedioDePago, Perfil } from "../data/contracts";
-import { catalogoComercios, catalogoMedios } from "../data/fixtures";
+import { catalogoComercios } from "../data/fixtures";
+import { medioVista } from "../perfil/vista";
 import type { RootState } from "./index";
 
 export const selectAhora = createSelector([(s: RootState) => s.sesion.ahora], (iso) => new Date(iso));
@@ -28,6 +29,7 @@ export const selectEntradasMotor = createSelector(
   ],
   (medios, promociones, compras, ahora): EntradasMotor => ({
     perfil: perfilDelMotor(medios, null),
+    medios,
     promociones,
     compras,
     ahora,
@@ -47,10 +49,14 @@ export const selectRecomendacion = createSelector(
 
 export const selectTopes = createSelector([selectEntradasMotor], topesVista);
 
-export const selectResumenCompras = createSelector([(s: RootState) => s.compras.lista, selectAhora], comprasVista);
+export const selectResumenCompras = createSelector(
+  [(s: RootState) => s.compras.lista, selectAhora, (s: RootState) => s.perfil.medios],
+  comprasVista,
+);
 
-export const selectMediosDelUsuario = createSelector([(s: RootState) => s.perfil.medios], (ids): MedioDePago[] =>
-  catalogoMedios.filter((m) => ids.includes(m.id)),
+/** Los medios del perfil con el nombre que muestran las pantallas. */
+export const selectMediosDelUsuario = createSelector([(s: RootState) => s.perfil.medios], (medios): MedioDePago[] =>
+  medios.map(medioVista),
 );
 
 /** Los comercios que eligió el usuario; si saltó ese paso, los frecuentes de ejemplo. */

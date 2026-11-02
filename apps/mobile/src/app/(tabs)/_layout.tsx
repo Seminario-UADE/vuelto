@@ -1,5 +1,5 @@
 import { Redirect, Tabs } from "expo-router";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 import { Icon, type IconName } from "@/components/icon";
 import { useAppSelector } from "@/store/hooks";
 import { colors, floatingShadow, fonts } from "@/theme";
@@ -29,8 +29,14 @@ export default function TabsLayout() {
   const perfil = useAppSelector((s) => s.perfil);
   // Toda la app está detrás de la sesión: sin usuario, a Bienvenida (crear cuenta o entrar).
   if (!usuario) return <Redirect href="/bienvenida" />;
-  // Usuario nuevo, sin medios: directo al onboarding de perfil.
-  if (!perfil.onboardingCompleto || perfil.medios.length === 0) return <Redirect href="/medios" />;
+  const sinMedios = !perfil.onboardingCompleto || perfil.medios.length === 0;
+  // Entra en un celular sin nada guardado: hasta saber si ya tiene medios en Supabase no se decide
+  // (si los tiene, no repite el onboarding).
+  if (sinMedios && (perfil.carga === "sin-leer" || perfil.carga === "leyendo")) {
+    return <View style={{ flex: 1, backgroundColor: colors.canvas }} />;
+  }
+  // Sin medios en el perfil: al onboarding, sin salida hasta confirmar (issue #41, T009).
+  if (sinMedios) return <Redirect href="/medios" />;
   return (
     <Tabs
       screenOptions={{

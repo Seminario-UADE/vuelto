@@ -5,9 +5,9 @@ import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { Chip } from "@/components/chip";
 import { divisor } from "@/components/lista";
+import { MediosDelPerfil } from "@/components/medios-del-perfil";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
-import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import { cerrarSesion as salir } from "@/data/auth";
@@ -33,10 +33,9 @@ export default function Perfil() {
   const usuario = useAppSelector((s) => s.sesion.usuario);
   const contactos = useAppSelector((s) => s.contactos.lista);
   const escenario = useAppSelector((s) => s.sesion.escenario);
-  const catalogoMedios = useAsync(() => api.getMediosDisponibles());
   const catalogoComercios = useAsync(() => api.getCatalogoComercios());
 
-  const medios = (catalogoMedios.datos ?? []).filter((m) => perfil.medios.includes(m.id));
+  const medios = perfil.medios;
   const comercios = (catalogoComercios.datos ?? []).filter((c) => perfil.comercios.includes(c.id));
   const nombre = perfil.nombre ?? "Martín";
 
@@ -63,7 +62,7 @@ export default function Perfil() {
             </Text>
           </View>
         </View>
-        {catalogoMedios.datos && catalogoComercios.datos ? (
+        {catalogoComercios.datos ? (
           <Text variant="bodyMd" tone="inkSecondary">
             {medios.length} {medios.length === 1 ? "medio" : "medios"} · {comercios.length}{" "}
             {comercios.length === 1 ? "comercio" : "comercios"}
@@ -72,37 +71,7 @@ export default function Perfil() {
         ) : null}
       </Card>
 
-      <View style={{ gap: space.md }}>
-        <SectionHeader title="Tus medios de pago" />
-        {catalogoMedios.datos ? (
-          <Card padding={space.lg} gap={0}>
-            {medios.map((m, i) => (
-              <View
-                key={m.id}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: space.md,
-                  paddingVertical: space.md,
-                  ...divisor(i),
-                }}
-              >
-                <Avatar letras={m.inicial} />
-                <View style={{ flex: 1 }}>
-                  <Text variant="bodyLg" weight="semibold">
-                    {m.nombre}
-                  </Text>
-                  <Text variant="label" tone="inkSecondary">
-                    {m.conCobertura ? m.detalle : "Todavía no tenemos promos de este medio"}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </Card>
-        ) : (
-          <SkeletonList rows={3} height={56} />
-        )}
-      </View>
+      <MediosDelPerfil />
 
       {comercios.length > 0 ? (
         <View style={{ gap: space.md }}>

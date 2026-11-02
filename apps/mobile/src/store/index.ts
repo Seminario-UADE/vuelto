@@ -9,6 +9,7 @@ import {
   type ThunkAction,
   type UnknownAction,
 } from "@reduxjs/toolkit";
+import type { DatosPerfil } from "../perfil/datos";
 import { compras } from "./compras";
 import { contactos } from "./contactos";
 import { corpus } from "./corpus";
@@ -27,17 +28,24 @@ const reducer = combineReducers({
 });
 
 export type RootState = ReturnType<typeof reducer>;
-export type Extra = { almacenamiento: Almacenamiento };
+/**
+ * Lo que los thunks reciben además del estado. `perfilRemoto` lee y escribe los medios en Supabase
+ * (issue #41); `null` si no hay cliente de Supabase (variables faltantes).
+ */
+export type Extra = { almacenamiento: Almacenamiento; perfilRemoto: DatosPerfil | null };
 
-export function crearStore(opciones: { almacenamiento: Almacenamiento; estadoInicial: Partial<RootState> | null }) {
+export function crearStore(opciones: {
+  almacenamiento: Almacenamiento;
+  estadoInicial: Partial<RootState> | null;
+  perfilRemoto?: DatosPerfil | null;
+}) {
+  const extra: Extra = { almacenamiento: opciones.almacenamiento, perfilRemoto: opciones.perfilRemoto ?? null };
   const listener = createListenerMiddleware<RootState>();
   const store = configureStore({
     reducer,
     preloadedState: opciones.estadoInicial ?? undefined,
     middleware: (porDefecto) =>
-      porDefecto({ thunk: { extraArgument: { almacenamiento: opciones.almacenamiento } satisfies Extra } }).prepend(
-        listener.middleware,
-      ),
+      porDefecto({ thunk: { extraArgument: extra } }).prepend(listener.middleware),
   });
   escucharPersistencia(listener, opciones.almacenamiento);
   return store;

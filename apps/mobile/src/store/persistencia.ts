@@ -6,11 +6,14 @@
 import type { ListenerMiddlewareInstance } from "@reduxjs/toolkit";
 import { fechaArgentina } from "@vuelto/motor";
 import { comprasDelPeriodo } from "../data/calculo";
+import { mediosDeEjemplo } from "../data/fixtures";
+import { REDES, TIPOS_TARJETA } from "../perfil/modelo";
 import {
   rehidratado,
   type EstadoCompras,
   type EstadoCorpus,
   type EstadoPerfil,
+  type MedioGuardado,
   type Rehidratado,
 } from "./acciones";
 import type { AppThunk, RootState } from "./index";
@@ -38,7 +41,14 @@ export function aPersistir(s: RootState): Persistido {
   const hoy = fechaArgentina(new Date(s.sesion.ahora));
   return {
     version: 1,
-    perfil: s.perfil,
+    // El estado de la lectura en Supabase no se guarda: al abrir se vuelve a leer.
+    perfil: {
+      nombre: s.perfil.nombre,
+      onboardingCompleto: s.perfil.onboardingCompleto,
+      medios: s.perfil.medios,
+      comercios: s.perfil.comercios,
+      invitacionPendiente: s.perfil.invitacionPendiente,
+    },
     corpus: s.corpus,
     compras: { lista: comprasDelPeriodo(s.compras.lista, hoy) },
   };
@@ -52,15 +62,47 @@ const esTexto = (x: unknown): x is string => typeof x === "string";
 const textoONull = (x: unknown) => x === null || esTexto(x);
 const listaDeTextos = (x: unknown): x is string[] => Array.isArray(x) && x.every(esTexto);
 
+const esUno = <T extends string>(valores: readonly T[], x: unknown): x is T => valores.includes(x as T);
+
+function medioValido(x: unknown): x is MedioGuardado {
+  return (
+    esObjeto(x) &&
+    esTexto(x.id) &&
+    esTexto(x.bancoId) &&
+    textoONull(x.nombreBanco) &&
+    esUno(TIPOS_TARJETA, x.tipo) &&
+    esUno(REDES, x.red)
+  );
+}
+
+/**
+ * Los medios guardados (issue #41). Antes eran ids del catálogo de ejemplo: se migran a la forma
+ * nueva con los datos de ejemplo y los que no se reconocen se descartan. Al entrar, lo que diga
+ * Supabase reemplaza lo local.
+ */
+function mediosValidos(x: unknown): MedioGuardado[] | null {
+  if (listaDeTextos(x)) return mediosDeEjemplo(x);
+  if (Array.isArray(x) && x.every(medioValido)) return x;
+  return null;
+}
+
 function perfilValido(x: unknown): EstadoPerfil | null {
   if (!esObjeto(x)) return null;
+  const medios = mediosValidos(x.medios);
   const ok =
+    medios !== null &&
     typeof x.onboardingCompleto === "boolean" &&
-    listaDeTextos(x.medios) &&
     listaDeTextos(x.comercios) &&
     textoONull(x.nombre) &&
     textoONull(x.invitacionPendiente);
-  return ok ? (x as EstadoPerfil) : null;
+  if (!ok) return null;
+  return {
+    nombre: x.nombre as string | null,
+    onboardingCompleto: x.onboardingCompleto as boolean,
+    medios,
+    comercios: x.comercios as string[],
+    invitacionPendiente: x.invitacionPendiente as string | null,
+  };
 }
 
 function corpusValido(x: unknown): EstadoCorpus | null {

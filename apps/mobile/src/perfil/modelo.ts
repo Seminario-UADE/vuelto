@@ -4,10 +4,13 @@
  * Plan: `specs/001-perfil-billeteras/plan.md`.
  */
 
+import type { Red, TipoTarjeta } from "@vuelto/motor";
+
+export type { Red, TipoTarjeta };
+
 /**
- * Los mismos valores que `Red` y `TipoTarjeta` de `@vuelto/motor` (un test lo
- * comprueba). Cuando la #81 sume el motor a la app, se reemplazan por
- * `import type` (decisión 2 del plan).
+ * Los valores de `Red` y `TipoTarjeta` del motor, para recorrerlos en la UI. `satisfies` y las
+ * etiquetas (`Record<Red, …>`) hacen que un valor nuevo en el motor no compile sin sumarlo acá.
  */
 export const REDES = [
   "visa",
@@ -19,11 +22,9 @@ export const REDES = [
   "naranja",
   "confiable",
   "tarjeta_sol",
-] as const;
-export type Red = (typeof REDES)[number];
+] as const satisfies readonly Red[];
 
-export const TIPOS_TARJETA = ["debito", "credito"] as const;
-export type TipoTarjeta = (typeof TIPOS_TARJETA)[number];
+export const TIPOS_TARJETA = ["debito", "credito"] as const satisfies readonly TipoTarjeta[];
 
 /** Etiqueta visible de cada red (tabla de la spec). */
 export const ETIQUETAS_RED: Record<Red, string> = {
@@ -51,7 +52,11 @@ export type Banco = {
   onHubList: boolean | null;
 };
 
-/** Un medio ya guardado, con el nombre del banco que viene en el mismo pedido. */
+/**
+ * Un medio ya guardado en `medios_de_pago`, con el nombre del banco que viene en el mismo pedido.
+ * Es lo que guarda el slice `perfil`: el motor lo usa tal cual (id, banco, tipo y red) y las
+ * pantallas arman su nombre con `medioVista`.
+ */
 export type MedioDePago = {
   id: string;
   bancoId: string;

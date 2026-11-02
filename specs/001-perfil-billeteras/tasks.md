@@ -52,28 +52,28 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
   - sin resultados: "Ese banco o emisor no está disponible en esta versión. Podés seguir con otro medio de pago." (US1-7);
   - devuelve el `MedioNuevo` por un callback y no guarda nada.
 
-## Phase 2b: User Story 1 — conectar el onboarding (P1) 🎯 MVP — **BLOQUEADA por #81 y #40**
+## Phase 2b: User Story 1 — conectar el onboarding (P1) 🎯 MVP
 
-- [ ] T008 [US1] En `apps/mobile/src/app/(onboarding)/medios.tsx`:
+- [x] T008 [US1] En `apps/mobile/src/app/(onboarding)/medios.tsx`:
   - reemplazar la lista fija de medios por `SelectorMedio` y mostrar la lista de agregados, que se pueden quitar antes de confirmar;
   - "Confirmar" deshabilitado si `!puedeConfirmar` (FR-007);
   - "Confirmar" llama `confirmarOnboarding` en un solo pedido (FR-011) y guarda el resultado en el slice `perfil`;
   - hasta confirmar, nada se guarda (FR-006);
   - errores según `clasificarError`.
-- [ ] T009 [US1] En el control de sesión que deja la #40, si `leerMisMedios()` devuelve `[]`, llevar al onboarding sin salida hasta confirmar. La ruta tiene que ser la misma a la que lleva la #43 cuando el motor lanza `PerfilSinMediosError`.
+- [x] T009 [US1] En el control de sesión que deja la #40, si `leerMisMedios()` devuelve `[]`, llevar al onboarding sin salida hasta confirmar. La ruta tiene que ser la misma a la que lleva la #43 cuando el motor lanza `PerfilSinMediosError`.
 
 **Checkpoint**: escenarios US1-1 a US1-7 de la spec OK en Expo Go.
 
 ---
 
-## Phase 3: User Story 2 — Editar desde Perfil (P2) — **BLOQUEADA por #81 y #40**
+## Phase 3: User Story 2 — Editar desde Perfil (P2)
 
-- [ ] T010 [US2] En `apps/mobile/src/app/(tabs)/perfil.tsx`:
+- [x] T010 [US2] En `apps/mobile/src/app/(tabs)/perfil.tsx`:
   - lista de medios del slice `perfil` con `nombreBanco`, tipo y etiqueta de red;
   - "Agregar" abre `SelectorMedio` y llama `agregarMedio`;
   - "Sacar" llama `sacarMedio` y queda deshabilitado si `!puedeSacar` (FR-009);
   - cada cambio exitoso actualiza el slice.
-- [ ] T011 [US2] Sin conexión (FR-010, FR-012, SC-003):
+- [x] T011 [US2] Sin conexión (FR-010, FR-012, SC-003):
   - si `leerMisMedios()` da `sin_conexion`, mostrar lo que tiene el slice con el aviso "Sin conexión: tu perfil se muestra como estaba la última vez. Para editarlo necesitás conexión." y deshabilitar agregar y sacar;
   - si el slice tampoco tiene nada, mostrar el error de conexión, nunca una carga infinita;
   - al cerrar sesión se vacía el slice (FR-013).
@@ -86,7 +86,7 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
 
 ## Phase 4: Cierre
 
-- [ ] T012 Cuando la #81 sume `@vuelto/motor` a la app, reemplazar `Red` y `TipoTarjeta` de `pf/modelo.ts` por `import type` del motor (decisión 2).
+- [x] T012 Cuando la #81 sume `@vuelto/motor` a la app, reemplazar `Red` y `TipoTarjeta` de `pf/modelo.ts` por `import type` del motor (decisión 2).
 - [ ] T013 Correr `rules-guardian`, `/code-review` y `test-runner`, y corregir lo que encuentren. Agregar la entrada en `docs/bitacora-prompts.md`. El PR cierra la issue (`Closes #41`).
 
 ---

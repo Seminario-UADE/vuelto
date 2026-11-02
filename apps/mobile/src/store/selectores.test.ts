@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { mediosDeEjemplo } from "../data/fixtures";
 import * as motor from "@vuelto/motor";
 import { mediosDeclarados } from "../data/fixtures";
-import { mediosElegidos } from "./perfil";
+import { mediosConfirmados } from "./perfil";
 import { selectEntradasMotor, selectRecomendacion, selectTopes } from "./selectores";
 import { ahoraCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
@@ -17,7 +18,7 @@ afterEach(() => {
 
 function conMartin() {
   const s = storeDePrueba();
-  s.dispatch(mediosElegidos(mediosDeclarados.map((m) => m.id)));
+  s.dispatch(mediosConfirmados(mediosDeEjemplo(mediosDeclarados.map((m) => m.id))));
   return s;
 }
 

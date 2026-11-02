@@ -80,7 +80,7 @@ dispositivo (ADR-010, spec 008).
 | Slice | Qué guarda | Se persiste |
 |---|---|---|
 | `sesion` | `usuario` (Supabase Auth) y `authLista`, `ahora` (reloj del cálculo), aviso pendiente, escenario de desarrollo, `hidratado` | No: la sesión la guarda el cliente de Supabase |
-| `perfil` | Nombre, onboarding completo, medios y comercios elegidos, invitación pendiente | Sí |
+| `perfil` | Nombre, onboarding completo, medios de pago tal como los devuelve `medios_de_pago` (issue #41), comercios elegidos, invitación pendiente y `carga` (cómo quedó la última lectura en Supabase) | Sí, salvo `carga` |
 | `corpus` | Promociones con la forma del motor y cuándo se cargaron (hoy, las de ejemplo) | Sí |
 | `compras` | Compras con la forma del motor (`promocionId`, `descuentoObtenido`, `reintegroEsperado`) | Sí |
 | `simulacion` | Comercio elegido y monto opcional de «¿Con qué pago?» | No |

@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { mediosDeEjemplo } from "../data/fixtures";
 import { comprasOctubre } from "../data/fixtures";
 import { compraAgregada } from "./compras";
 import { contactoQuitado } from "./contactos";
 import { CLAVE, CLAVE_VIEJA, rehidratar } from "./persistencia";
-import { mediosElegidos, onboardingTerminado } from "./perfil";
+import { cargaCambio, mediosConfirmados, onboardingTerminado } from "./perfil";
 import { selectRecomendacion, selectTopes } from "./selectores";
 import { ahoraCambio, usuarioCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
@@ -21,7 +22,7 @@ describe("persistencia (US4)", () => {
   it("perfil, corpus y compras sobreviven a cerrar y abrir", async () => {
     const disco = memoria();
     const a = await abrir(disco);
-    a.dispatch(mediosElegidos(["galicia-visa-credito"]));
+    a.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
     a.dispatch(onboardingTerminado());
     a.dispatch(compraAgregada(nueva));
     await esperar();
@@ -36,7 +37,7 @@ describe("persistencia (US4)", () => {
     const disco = memoria();
     const a = await abrir(disco);
     a.dispatch(usuarioCambio({ id: "u1", email: "ana@mail.com" }));
-    a.dispatch(mediosElegidos(["galicia-visa-credito"]));
+    a.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
     await esperar();
     expect(disco.datos.get(CLAVE)).not.toContain("ana@mail.com");
     const b = await abrir(disco);
@@ -62,7 +63,7 @@ describe("persistencia (US4)", () => {
   it("lo guardado no tiene nada derivado (FR-010)", async () => {
     const disco = memoria();
     const a = await abrir(disco);
-    a.dispatch(mediosElegidos(["galicia-visa-credito"]));
+    a.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
     a.dispatch(comercioElegido("coto"));
     a.dispatch(montoCambiado(10000));
     expect(selectRecomendacion(a.getState())).not.toBeNull();
@@ -123,6 +124,30 @@ describe("persistencia (US4)", () => {
     }
   });
 
+  it("los medios se guardan completos y el estado de la lectura en Supabase no (issue #41)", async () => {
+    const disco = memoria();
+    const a = await abrir(disco);
+    a.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
+    a.dispatch(cargaCambio("sin-conexion"));
+    await esperar();
+    const guardado = JSON.parse(disco.datos.get(CLAVE)!);
+    expect(guardado.perfil.medios).toEqual(mediosDeEjemplo(["galicia-visa-credito"]));
+    expect(guardado.perfil).not.toHaveProperty("carga");
+    const b = await abrir(disco);
+    expect(b.getState().perfil.medios).toEqual(mediosDeEjemplo(["galicia-visa-credito"]));
+    expect(b.getState().perfil.carga).toBe("sin-leer");
+  });
+
+  it("un perfil guardado con ids del catálogo viejo se migra; un medio con forma rota invalida el perfil", async () => {
+    const perfil = { nombre: null, onboardingCompleto: true, comercios: [], invitacionPendiente: null };
+    const viejo = JSON.stringify({ version: 1, perfil: { ...perfil, medios: ["macro-visa-debito", "no-existe"] } });
+    expect((await abrir(memoria({ [CLAVE]: viejo }))).getState().perfil.medios).toEqual(
+      mediosDeEjemplo(["macro-visa-debito"]),
+    );
+    const roto = JSON.stringify({ version: 1, perfil: { ...perfil, medios: [{ id: "m1", red: "visa" }] } });
+    expect((await abrir(memoria({ [CLAVE]: roto }))).getState().perfil.medios).toEqual([]);
+  });
+
   it("migra el perfil de perfil-local.ts y borra la clave vieja", async () => {
     const viejo = {
       onboardingCompleto: true,
@@ -135,7 +160,7 @@ describe("persistencia (US4)", () => {
     const b = await abrir(disco);
     expect(b.getState().perfil).toMatchObject({
       onboardingCompleto: true,
-      medios: ["galicia-visa-credito"],
+      medios: mediosDeEjemplo(["galicia-visa-credito"]),
       nombre: "Martín",
     });
     expect(b.getState().sesion.usuario).toBeNull();

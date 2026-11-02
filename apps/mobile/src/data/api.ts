@@ -11,7 +11,6 @@ import type {
   Contacto,
   Invitacion,
   LecturaTicket,
-  MedioDePago,
   PedidoGrupo,
   RecomendacionGrupo,
   VistaInvitacion,
@@ -19,7 +18,6 @@ import type {
 import {
   RELOJ_EJEMPLO,
   catalogoComercios,
-  catalogoMedios,
   grupoDeEjemplo,
   invitacionPropia,
   ticketDeEjemplo,
@@ -44,10 +42,6 @@ function comercioPorId(id: string): Comercio {
 
 /** "Hoy" para el servidor de ejemplo (el reloj de los fixtures). */
 const HOY_EN_EL_SERVIDOR = fechaArgentina(new Date(RELOJ_EJEMPLO));
-
-export async function getMediosDisponibles(): Promise<MedioDePago[]> {
-  return red(catalogoMedios);
-}
 
 export async function getCatalogoComercios(): Promise<Comercio[]> {
   return red(catalogoComercios);
