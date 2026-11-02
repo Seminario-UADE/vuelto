@@ -1268,12 +1268,18 @@ la recomendación cambie mientras se tipea el monto, sin red.
   corpus, compras y cuenta, con validación por parte y migración de
   `vuelto.perfil.v1`; `useReloj` escribe `ahora`. Se borraron `sesion.ts` y
   `perfil-local.ts`.
-- Tests: 134 en la app (cálculo, reducers, selectores con memoización y reloj,
-  persistencia sin nada derivado).
+- Tests: 135 en la app (cálculo, reducers, selectores con memoización y reloj,
+  persistencia sin nada derivado ni compras de otro período).
 - Verificado en la web: al tipear 1-0-0-0-0 la tarjeta cambia en cada tecla, sin
   ningún pedido de red; guardar la compra baja el tope de Galicia a ≈$4.500
   según 4 compras, y sigue ahí después de recargar. En lo guardado hay solo
   datos de entrada.
+- Verificado en el simulador de iOS (Expo Go): el tipeo cambia la cifra en
+  cada tecla; guardar recalcula la misma pantalla y Topes; al reabrir la app
+  sigue la compra y la simulación arranca vacía. Capturas en el PR #86 y en
+  `specs/007-motor-app-redux/capturas/`. Build `preview` de EAS en verde.
+- `rules-guardian`: sin bloqueantes; se corrigió que al disco llegaran compras
+  de períodos anteriores (privacidad.md).
 - `/code-review`: sin violaciones duras. Se aplicaron las fechas del motor en vez
   de duplicarlas (el motor solo suma exports), el desfase horario en un único
   lugar, y la spec y el contrato quedaron alineados con el código.
