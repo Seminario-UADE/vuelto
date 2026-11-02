@@ -17,9 +17,18 @@ describe("clasificarError", () => {
   });
 
   it("un dato inválido o una restricción rota se rechazan, con el código como causa", () => {
-    for (const codigo of ["22P02", "23514", "23503", "23502", "42501"]) {
+    for (const codigo of ["22P02", "23514", "23503", "23502"]) {
       expect(clasificarError({ codigo, estado: 400 })).toEqual({ tipo: "rechazada", causa: codigo });
     }
+  });
+
+  it("una fila que ya existe con ese id (23505) es éxito: el reintento de un envío que sí llegó", () => {
+    expect(clasificarError({ codigo: "23505", estado: 409 })).toEqual({ tipo: "exito" });
+  });
+
+  it("permiso denegado (42501) es transitorio: puede ser la sesión vencida llegando como anon", () => {
+    expect(clasificarError({ codigo: "42501", estado: 401 })).toEqual({ tipo: "transitorio" });
+    expect(clasificarError({ codigo: "42501", estado: 403 })).toEqual({ tipo: "transitorio" });
   });
 
   it("un código desconocido se reintenta", () => {

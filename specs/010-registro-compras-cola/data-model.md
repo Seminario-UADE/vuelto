@@ -81,7 +81,7 @@ Ver [contracts/fila-compras.md](contracts/fila-compras.md). Resumen de la conver
 | `medioDePagoId` (app) | `medio_de_pago_id` | **uuid de `medios_de_pago` del usuario** (entrada del mapeo, #41); sin mapeo → bloqueada(medio) |
 | `promocionId` (app) | `promocion_id` | **uuid de `promociones` del corpus del servidor** (mapeo, #42); sin mapeo → bloqueada(promo); `null` si no hay promo |
 | `descuentoObtenido` | `descuento_obtenido` | tal cual |
-| `reintegroEsperado` | `reintegro_esperado` | tal cual |
+| `reintegroEsperado` | `reintegro_esperado` | tal cual. Es el estimado que se mostró **al guardar**, un dato del registro de la compra (ya existía en `Compra` y en la tabla): nunca un tope ni un valor que se recalcule. El comentario «No se usa en el MVP» de la migración 7 ya no es cierto: `comprasVista` lo usa como respaldo de «Te devolvieron» cuando no hay `descuentoObtenido` |
 | `fechaAcreditacionEstimada` | `fecha_acreditacion_estimada` | tal cual |
 | `origen` | `origen` | `ticket \| excepcion \| manual` |
 | `textoExtraido` | `texto_extraido` | tal cual; nunca una imagen |

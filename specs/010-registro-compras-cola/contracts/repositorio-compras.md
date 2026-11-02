@@ -32,11 +32,12 @@ El vaciado crea un `AbortController` por envío y lo aborta a los **10 s**; un a
 | `fetch` falla, sin red, aborto por plazo | `transitorio` |
 | HTTP 5xx, 429, 408 | `transitorio` |
 | HTTP 401 / JWT vencido (la sesión se refresca sola) | `transitorio` |
+| `23505` (ya existe una fila con ese id: el reintento de un envío que sí llegó) | `exito` |
 | `22P02` (uuid o texto inválido) | `rechazada` |
 | `23514` (check: monto, origen, descuento) | `rechazada` |
 | `23503` (medio o promo inexistentes, o de otro usuario) | `rechazada` |
 | `23502` (null en columna obligatoria) | `rechazada` |
-| `42501` (RLS: otra cuenta) | `rechazada` |
+| `42501` (permiso denegado) | `transitorio`: una sesión vencida o perdida llega como el rol `anon`, que no tiene permiso sobre `compras`; al refrescar la sesión se reintenta sola. `user_id` sale de `auth.uid()`, así que una violación genuina de la policy no debería darse desde la app |
 | cualquier otro código desconocido | `transitorio` (se reintenta; si persiste, se ve en el recuento «Sin subir») |
 
 `causa` es el código de Postgres o el estado HTTP, nunca el cuerpo de la compra ni datos del usuario (`privacidad.md`).

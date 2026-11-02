@@ -126,9 +126,9 @@
 
 - [x] T044 [P] Correr `npm run lint && npm run typecheck && npm run test` desde la raíz; todo en verde. Si hay Docker, `supabase db reset && supabase test db`
 - [ ] T045 Verificación manual en el simulador de iOS con el modo avión (guion de `quickstart.md`, pasos 1 a 7); guardar capturas en `specs/010-registro-compras-cola/capturas/`
-- [ ] T046 Pasar `rules-guardian` sobre el diff y corregir los hallazgos; luego `/code-review` y `test-runner`
+- [x] T046 Pasar `rules-guardian` sobre el diff y corregir los hallazgos; luego `/code-review` y `test-runner`
 - [x] T047 Actualizar `plan.md` («Archivos compartidos»: `store/compras.ts` recibe un reducer aditivo) y marcar el `checklists/requirements.md`
-- [ ] T048 Dejar la nota de traspaso a la sesión de #42 en la carpeta de notas compartida (cómo usar `aplicarPendientes`, qué archivos comparten, qué falta para conectar la subida: `userId`, `medioRemoto`, `promoRemota`)
+- [x] T048 Dejar la nota de traspaso a la sesión de #42 en la carpeta de notas compartida (cómo usar `aplicarPendientes`, qué archivos comparten, qué falta para conectar la subida: `userId`, `medioRemoto`, `promoRemota`)
 - [ ] T049 Agregar la entrada de esta sesión a `docs/bitacora-prompts.md` y abrir el PR que cierra #44 (aclarando en la descripción que la subida real queda desconectada hasta #40, #41 y #42)
 
 ---
@@ -167,3 +167,4 @@
 - **T038**: `promoPropuesta` vive en `src/data/calculo.ts` junto a `compraParaGuardar` (evita un import circular) y sus tests están en `calculo.test.ts`.
 - **T040**: el reinicio de «quitar la promo» al cambiar de medio es estado local de la hoja; no hay un test de componente en el proyecto. Se verificó a mano en el navegador que «No usé esta promo» deja la compra sin promo ni reintegro y sin cambiar «Te devolvieron», y que «Usar esta promo» la vuelve a proponer. El reinicio al cambiar de medio es una línea (`setQuitoLaPromo(false)` al elegir un medio) y no tiene test.
 - **FR-016 / adopción (R5)**: el aviso de cierre de sesión y el thunk `adoptarOperaciones` están hechos y probados; el aviso de adopción al iniciar sesión (UI) se hace cuando #40 entregue un `userId`, porque hoy no hay forma de disparar ni de probar ese flujo.
+- **Hallazgos de la revisión** (`spec-critic` sobre el código con `rules-guardian`, `/code-review` y `test-runner`): (1) un guardado `enviando` interrumpido por un cierre y con su borrado detrás se anulaba al reabrir porque `leerCola` lo pasaba a `pendiente` antes de compactar; ahora la cola lo deja `enviando` hasta después de reconciliar (`enviosInterrumpidos`) y se prueba en `thunks.cola.test.ts`; (2) `23505` es éxito en `clasificarError`; (3) `42501` pasó de «rechazada» a «transitorio» (una sesión vencida llega como `anon`); (4) el techo de 90 días también rige en `vaciarCola`, no solo al abrir; (5) `leerCola` valida los campos que `compraAFila` necesita. **T045** (simulador de iOS) no se hizo: se verificó en el navegador.

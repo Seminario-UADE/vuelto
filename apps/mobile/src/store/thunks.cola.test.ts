@@ -5,7 +5,8 @@ import type { Subida } from "../data/compras/repositorio";
 import { comprasOctubre, mediosDeclarados } from "../data/fixtures";
 import { adoptarOperaciones, eliminarCompra, guardarCompra, iniciarCompras, reintentarOperacion, vaciarCola } from "./thunks";
 import { compraAgregada } from "./compras";
-import { guardadoEncolado } from "./cola";
+import { CLAVE_COLA, guardadoEncolado } from "./cola";
+import type { Operacion } from "../data/compras/operaciones";
 import { mediosElegidos } from "./perfil";
 import { rehidratar } from "./persistencia";
 import { esperar, memoria, storeDePrueba } from "./prueba";
@@ -27,7 +28,9 @@ const borrador = {
 
 type Contexto = { userId: string | null; medioRemoto: (id: string) => string | null; promoRemota: (id: string) => string | null };
 
-async function escenario(opciones: { guion?: Guion; contexto?: Partial<Contexto>; plazoMs?: number; conSubida?: boolean } = {}) {
+async function escenario(
+  opciones: { guion?: Guion; contexto?: Partial<Contexto>; plazoMs?: number; conSubida?: boolean; colaEnDisco?: Operacion[] } = {},
+) {
   const repo = repositorioDeMemoria(opciones.guion);
   const ctx: Contexto = {
     userId: "u-ana",
@@ -37,7 +40,9 @@ async function escenario(opciones: { guion?: Guion; contexto?: Partial<Contexto>
   };
   const subida: Subida | null =
     opciones.conSubida === false ? null : { repositorio: repo, contexto: () => ctx, plazoMs: opciones.plazoMs ?? 1000 };
-  const disco = memoria();
+  const disco = memoria(
+    opciones.colaEnDisco ? { [CLAVE_COLA]: JSON.stringify({ version: 1, operaciones: opciones.colaEnDisco }) } : {},
+  );
   const s = storeDePrueba(null, disco, undefined, subida);
   await s.dispatch(rehidratar());
   s.dispatch(mediosElegidos(mediosDeclarados.map((m) => m.id)));
@@ -307,5 +312,40 @@ describe("dueño y bloqueos (FR-008, FR-009, FR-017)", () => {
     expect(s.getState().cola.operaciones).toEqual([]);
     expect(s.getState().compras.lista.some((c) => c.id === compra.id)).toBe(false);
     expect(repo.llamadas).toHaveLength(llamadas);
+  });
+});
+
+describe("cierre con envíos en vuelo y techo de 90 días (FR-007, FR-019)", () => {
+  const base = { dueno: "u-ana", fecha: "2026-10-14", encoladaEn: "2026-10-14T15:00:00.000Z" };
+
+  it("un guardado que estaba en vuelo con su borrado detrás no se anula al reabrir: se mandan los dos", async () => {
+    const compra = compraDePrueba({ id: "a2000000-0000-4000-8000-0000000000f1" });
+    const { s, repo, reposo } = await escenario({
+      colaEnDisco: [
+        { ...base, id: "g1", tipo: "guardar", estado: { tipo: "enviando" }, compra },
+        { ...base, id: "b1", tipo: "borrar", estado: { tipo: "pendiente" }, compraId: compra.id },
+      ],
+    });
+    await reposo();
+    await s.dispatch(vaciarCola());
+    expect(repo.llamadas.map((l) => l.tipo)).toEqual(["guardar", "borrar"]);
+    expect(repo.filas.size).toBe(0);
+    expect(s.getState().cola.operaciones).toEqual([]);
+  });
+
+  it("una operación que se vuelve vieja en una sesión larga se descarta al vaciar, sin llamar al servidor", async () => {
+    const { s, repo } = await escenario();
+    s.dispatch(
+      guardadoEncolado({
+        idOp: "vieja",
+        compra: compraDePrueba({ id: "a2000000-0000-4000-8000-0000000000f2", fecha: "2026-01-01" }),
+        dueno: "u-ana",
+        ahora: s.getState().sesion.ahora,
+        intento: null,
+      }),
+    );
+    await s.dispatch(vaciarCola());
+    expect(s.getState().cola.operaciones).toEqual([]);
+    expect(repo.llamadas).toEqual([]);
   });
 });

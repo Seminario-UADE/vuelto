@@ -3,7 +3,7 @@ import { fechaArgentina, type Compra } from "@vuelto/motor";
 import { compraParaGuardar } from "../data/calculo";
 import { esDeEjemplo, esUuid } from "../data/compras/ejemplo";
 import { compraAFila } from "../data/compras/fila";
-import { reconciliar, siguienteLote, type Operacion } from "../data/compras/operaciones";
+import { descartarViejas, reconciliar, siguienteLote, type Operacion } from "../data/compras/operaciones";
 import { PLAZO_DE_ENVIO_MS, type ResultadoEnvio, type Subida } from "../data/compras/repositorio";
 import type { BorradorCompra } from "../data/contracts";
 import {
@@ -12,6 +12,7 @@ import {
   colaCargada,
   colaCompactada,
   colaReconciliada,
+  enviosInterrumpidos,
   envioResuelto,
   guardadoEncolado,
   leerCola,
@@ -19,6 +20,7 @@ import {
   operacionEnviando,
   operacionReintentada,
   operacionesAdoptadas,
+  operacionesDescartadas,
   operacionesDeclinadas,
   subidaConectada,
   vaciadoIniciado,
@@ -26,7 +28,7 @@ import {
   vaciadoTerminado,
 } from "./cola";
 import { compraAgregada, compraEliminada, comprasReconciliadas } from "./compras";
-import type { AppThunk } from "./index";
+import type { AppDispatch, AppThunk, RootState } from "./index";
 import { selectEntradasMotor } from "./selectores";
 
 /** El usuario de la sesión de Supabase, o `null` si no hay (o la subida no está conectada). */
@@ -50,11 +52,9 @@ export function guardarCompra(b: BorradorCompra, intento: string | null = null):
     }
     const estado = getState();
     const compra = compraParaGuardar(selectEntradasMotor(estado), b, generarId());
-    if (!esDeEjemplo(compra.id)) {
-      dispatch(
-        guardadoEncolado({ idOp: generarId(), compra, dueno: duenoDe(subida), ahora: estado.sesion.ahora, intento }),
-      );
-    }
+    dispatch(
+      guardadoEncolado({ idOp: generarId(), compra, dueno: duenoDe(subida), ahora: estado.sesion.ahora, intento }),
+    );
     dispatch(compraAgregada(compra));
     void dispatch(vaciarCola());
     return compra;
@@ -111,11 +111,7 @@ async function enviar(plazoMs: number, f: (signal: AbortSignal) => Promise<Resul
 }
 
 /** Una pasada por la cola: cada operación elegible una vez, las que dependen de otra después. */
-async function pasada(
-  dispatch: Parameters<ReturnType<typeof vaciarCola>>[0],
-  getState: Parameters<ReturnType<typeof vaciarCola>>[1],
-  subida: Subida,
-): Promise<void> {
+async function pasada(dispatch: AppDispatch, getState: () => RootState, subida: Subida): Promise<void> {
   const contexto = subida.contexto();
   dispatch(subidaConectada(contexto.userId !== null));
   if (contexto.userId === null) return;
@@ -163,8 +159,14 @@ async function pasada(
  */
 export function vaciarCola(): AppThunk<Promise<void>> {
   return async (dispatch, getState, { subida }) => {
-    if (subida === null) return;
     if (!getState().cola.hidratada) return;
+    // El techo de 90 días también rige en una sesión larga, no solo al abrir (FR-019).
+    const vigentes = descartarViejas(
+      getState().cola.operaciones,
+      fechaArgentina(new Date(getState().sesion.ahora)),
+    );
+    if (vigentes.length !== getState().cola.operaciones.length) dispatch(operacionesDescartadas(vigentes));
+    if (subida === null) return;
     if (getState().cola.vaciando) {
       dispatch(vaciadoPedido());
       return;
@@ -211,6 +213,9 @@ export function iniciarCompras(): AppThunk<Promise<void>> {
     if (colaCambio) dispatch(colaReconciliada(r.operaciones));
     const listaCambio = r.lista.length !== estado.compras.lista.length || r.lista.some((c, i) => c !== estado.compras.lista[i]);
     if (listaCambio) dispatch(comprasReconciliadas(r.lista));
+
+    // Recién ahora: un guardado en vuelo con su borrado detrás no se anula (compactar lo respeta).
+    dispatch(enviosInterrumpidos());
 
     dispatch(subidaConectada(duenoDe(subida) !== null));
     void dispatch(vaciarCola());

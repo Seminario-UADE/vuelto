@@ -356,15 +356,15 @@ export function promoPropuesta(
   const r = recomendarSeguro(pedido, { ...entradas, ahora: mediodia(fecha) });
   const opcion = [r.mejor, ...r.alternativas].find((o) => o?.medioDePagoId === medioId) ?? null;
   if (opcion === null || opcion.promociones.length === 0) return vacia;
+  const catalogo = new Map(entradas.promociones.map((p) => [p.id, p]));
   const conBase = opcion.promociones.find((p) => p.base !== null);
-  const promo = entradas.promociones.find((p) => p.id === conBase?.promocionId);
-  const periodo = promo?.tope.periodo === "semanal" ? "semana" : "mes";
+  const periodo = catalogo.get(conBase?.promocionId ?? "")?.tope.periodo === "semanal" ? "semana" : "mes";
   return {
     medioId,
     fecha,
     promociones: opcion.promociones.map((p) => ({
       promocionId: p.promocionId,
-      nombre: entradas.promociones.find((x) => x.id === p.promocionId)?.titulo ?? p.promocionId,
+      nombre: catalogo.get(p.promocionId)?.titulo ?? p.promocionId,
     })),
     reintegro: monto === null ? null : opcion.ahorroEstimado,
     base: conBase?.base ? textoBase(conBase.base.comprasRegistradas, periodo, nombreDelMes(fecha)).texto : null,

@@ -21,12 +21,15 @@ const RECHAZADOS = new Set([
   "23514", // check: monto, origen, descuento
   "23503", // medio o promo inexistentes, o de otro usuario
   "23502", // null en una columna obligatoria
-  "42501", // RLS: otra cuenta
 ]);
+// `42501` (permiso denegado) NO está acá: una sesión vencida o perdida llega como el rol `anon`,
+// que no tiene permiso sobre `compras`. Es transitorio: al refrescar la sesión se reintenta solo.
 
 export function clasificarError(error: ErrorDeEnvio | null): ResultadoEnvio {
   if (error === null) return { tipo: "exito" };
   if (error.red || error.aborto) return { tipo: "transitorio" };
+  // Ya existe una fila con ese id: el reintento de un envío que sí llegó (FR-012).
+  if (error.codigo === "23505") return { tipo: "exito" };
   if (error.codigo && RECHAZADOS.has(error.codigo)) return { tipo: "rechazada", causa: error.codigo };
   return { tipo: "transitorio" };
 }

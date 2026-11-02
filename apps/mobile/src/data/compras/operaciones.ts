@@ -53,7 +53,11 @@ export const DIAS_MAXIMOS_EN_COLA = 90;
 
 const claveDeCompra = (o: Operacion): string => (o.tipo === "guardar" ? o.compra.id : o.compraId);
 const reemplazar = (ops: Operacion[], id: string, f: (o: Operacion) => Operacion | null): Operacion[] =>
-  ops.flatMap((o) => (o.id === id ? (f(o) ? [f(o) as Operacion] : []) : [o]));
+  ops.flatMap((o) => {
+    if (o.id !== id) return [o];
+    const nueva = f(o);
+    return nueva === null ? [] : [nueva];
+  });
 const conEstado = (o: Operacion, estado: EstadoOperacion): Operacion => ({ ...o, estado });
 
 export function encolarGuardado(

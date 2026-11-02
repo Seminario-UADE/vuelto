@@ -66,6 +66,10 @@ export const cola = createSlice({
     colaCompactada(s) {
       s.operaciones = compactar(s.operaciones);
     },
+    /** Un envío no sobrevive a un cierre de la app: tras reconciliar, lo que quedó `enviando` se reintenta. */
+    enviosInterrumpidos(s) {
+      s.operaciones = enviandoAPendiente(s.operaciones);
+    },
     operacionEnviando(s, a: PayloadAction<string>) {
       s.operaciones = marcarEnviando(s.operaciones, a.payload);
     },
@@ -113,6 +117,7 @@ export const {
   guardadoEncolado,
   borradoEncolado,
   colaCompactada,
+  enviosInterrumpidos,
   operacionEnviando,
   envioResuelto,
   operacionBloqueada,
@@ -147,6 +152,23 @@ function estadoValido(x: unknown): boolean {
   }
 }
 
+const ORIGENES = ["ticket", "excepcion", "manual"];
+
+/** Lo que `compraAFila` necesita: si falta o no es del tipo esperado, la cola entera se descarta. */
+function compraValida(x: unknown): boolean {
+  return (
+    esObjeto(x) &&
+    esTexto(x.id) &&
+    esTexto(x.fecha) &&
+    typeof x.monto === "number" &&
+    esTexto(x.comercio) &&
+    esTexto(x.medioDePagoId) &&
+    (x.promocionId === null || esTexto(x.promocionId)) &&
+    esTexto(x.origen) &&
+    ORIGENES.includes(x.origen)
+  );
+}
+
 function operacionValida(x: unknown): x is Operacion {
   if (!esObjeto(x)) return false;
   const base =
@@ -156,11 +178,16 @@ function operacionValida(x: unknown): x is Operacion {
     esTexto(x.encoladaEn) &&
     estadoValido(x.estado);
   if (!base) return false;
-  if (x.tipo === "guardar") return esObjeto(x.compra) && esTexto(x.compra.id) && typeof x.compra.monto === "number";
+  if (x.tipo === "guardar") return compraValida(x.compra);
   return x.tipo === "borrar" && esTexto(x.compraId);
 }
 
-/** Lee la cola guardada. Una cola inválida se descarta entera; un envío interrumpido vuelve a pendiente. */
+/**
+ * Lee la cola guardada. Una cola inválida se descarta entera. Los envíos interrumpidos por un
+ * cierre se **dejan** como `enviando` hasta después de reconciliar: un guardado que pudo haber
+ * llegado al servidor no se anula con su borrado (`compactar` respeta `enviando`); recién
+ * después `enviosInterrumpidos` los vuelve a pendiente.
+ */
 export function leerCola(raw: string | null): Operacion[] | null {
   if (raw === null) return null;
   let x: unknown;
@@ -171,7 +198,7 @@ export function leerCola(raw: string | null): Operacion[] | null {
   }
   if (!esObjeto(x) || x.version !== 1 || !Array.isArray(x.operaciones)) return null;
   if (!x.operaciones.every(operacionValida)) return null;
-  return enviandoAPendiente(x.operaciones as Operacion[]);
+  return x.operaciones as Operacion[];
 }
 
 /**

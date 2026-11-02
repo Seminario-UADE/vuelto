@@ -183,6 +183,8 @@ describe("reconciliar (FR-007, FR-013)", () => {
     const enviando = marcarEnviando(guardado([], 1), "g1");
     const r = reconciliar([], borrado(enviando, 1), contexto());
     expect(r.lista).toEqual([]);
+    // El guardado pudo haber llegado al servidor: se conserva con su borrado detrás.
+    expect(estados(r.operaciones)).toEqual(["guardar:enviando", "borrar:pendiente"]);
   });
 
   it("migra una compra con id nN: recibe un UUID nuevo y se encola una vez", () => {
