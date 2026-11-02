@@ -49,17 +49,18 @@ type EstadoCompras = {
 type FilaPromocion = { /* columnas de public.promociones, snake_case */ };
 type FilaCompra = { /* columnas de public.compras */ };
 
-type Cursor = { actualizadaEn: string; id: string } | null;
+/** `valor` = el texto exacto de la columna de orden (`actualizada_en` o `creada_en`) de la última fila. */
+type Cursor = { valor: string; id: string } | null;
 
 interface RepositorioSincronizacion {
   /** `auth.uid()` de la sesión, o `null` si no hay. */
   usuarioId(): Promise<string | null>;
   /** Hasta `limite` promos, ordenadas por (actualizada_en, id), posteriores al cursor y a `desde`. Excluye `otra_provincia`. */
-  promociones(f: { desde: string | null; vigenteDesde: string | null; cursor: Cursor; limite: number }): Promise<FilaPromocion[]>;
+  promociones(f: { desde: string | null; vigenteDesde: string | null; cursor: Cursor; limite: number; signal: AbortSignal }): Promise<FilaPromocion[]>;
   /** Ids de las promos con `vigencia_hasta >= vigenteDesde`, excluida `otra_provincia`. */
-  idsDePromociones(vigenteDesde: string): Promise<string[]>;
+  idsDePromociones(vigenteDesde: string, signal: AbortSignal): Promise<string[]>;
   /** Compras del usuario con `fecha >= desde`, por cursor (`creada_en`, `id`). */
-  compras(f: { desde: string; cursor: Cursor; limite: number }): Promise<FilaCompra[]>;
+  compras(f: { desde: string; cursor: Cursor; limite: number; signal: AbortSignal }): Promise<FilaCompra[]>;
 }
 ```
 
@@ -117,7 +118,7 @@ type EstadoSesion = { /* …lo de la spec 008… */ epoca: number /* sube con se
 type Rehidratado = { /* …lo de la spec 008… */ ahora: string | null /* real si el corpus guardado tiene marca */ };
 
 // Nueva acción atendida por corpus, compras y sesion en el mismo tick.
-type Sincronizado = { corpus: EstadoCorpus; compras: Compra[]; usuarioId: string; ahora: string };
+type Sincronizado = { corpus: EstadoCorpus; compras: Compra[]; desde: string; usuarioId: string; ahora: string };
 // Nueva acción para #44.
 type CompraSubida = string; // id
 ```
@@ -125,4 +126,7 @@ type CompraSubida = string; // id
 - `sesion.ahora` lo fija `Sincronizado.ahora` y `Rehidratado.ahora`, así el reloj cambia en la misma acción que la
   marca, sin un render con el reloj equivocado.
 - `corpus` reduce `Sincronizado` a `payload.corpus`; `compras` aplica el merge (servidor ∪ pendientes no devueltas),
-  la poda a la ventana y el chequeo de `duenoId`; `sesion` sube `ahora`.
+  la poda a la ventana (`desde`) y el chequeo de `duenoId`; `sesion` sube `ahora`.
+- **Implementado así** (spec 009, rama `claude/magical-knuth-39fc08`): `apps/mobile/src/store/acciones.ts`
+  (`Sincronizado`, `compraSubida`, `Rehidratado.ahora`), `store/{corpus,compras,sesion}.ts`, `store/index.ts` (`Extra`) y
+  `store/persistencia.ts` (dos claves). `Extra.coordinacion` guarda `enVuelo` y `ultimoIntentoMs` fuera de Redux.

@@ -1374,6 +1374,37 @@ la recomendación cambie mientras se tipea el monto, sin red.
 
 ---
 
+## 2026-11-02 — Sincronizar el corpus y las compras del período (issue #42)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con spec-kit, `spec-critic`, `rules-guardian` y un Supabase local
+en Docker para verificar las consultas.
+
+**Objetivo:** implementar la issue #42 (reabierta tras ADR-010): que la app baje el corpus de promos y las
+compras del período al store de Redux y siga funcionando sin señal.
+
+**Prompts principales:**
+1. "Implementá la issue #42 […] Primero medí […] y decidime con números si va en AsyncStorage […] Implementá la
+   sincronización al store […] No inventes un store ni una base de mentira para destrabarte, y no midas el corpus
+   con datos inventados"
+2. (`/speckit-specify` → `spec-critic` → `/speckit-plan` → `/speckit-tasks` con la issue y las restricciones)
+
+**Resultado:**
+- `spec-critic` encontró 4 bloqueantes: marca sin margen de relectura, bajas que borraban el consumo de los topes
+  compartidos, mezcla con el corpus de ejemplo (vigente hasta el 31/12) y reloj de ejemplo en la primera
+  sincronización. Se reescribió la spec antes de planificar.
+- Verificado contra un Supabase local aislado (puertos 563xx): el cursor `(actualizada_en, id)` no pierde los
+  empates; `neq.otra_provincia` solo excluye las filas con jurisdicción `null` (hay que usar `or(is.null, neq)`);
+  `supabase-js` no tiene `.and()` y dos `.or()` repetidos se combinan con AND.
+- Decisiones que se apartan del texto de la issue, para que las apruebe el PO: la ventana de compras es el período
+  (el más temprano entre mes y semana), no "los últimos N días del mes"; el corpus va en su propia clave de
+  AsyncStorage.
+- La medición del tamaño del corpus **no se hizo con datos reales** (#35 está abierta): queda el instrumento
+  (`npm run medir:corpus`) y una proyección rotulada con promos de ejemplo (2.000 promos ≈ 880 KB).
+- Sin `tsx` instalado, el medidor se corre con Vitest (sin dependencias nuevas).
+- La prueba manual en modo avión queda bloqueada por #40 (login), #35 (corpus) y #41 (medios en la base).
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
