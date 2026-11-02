@@ -20,6 +20,7 @@ import { hapticoSeleccion } from "@/lib/haptics";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   selectComercioSimulado,
+  selectFrescura,
   selectHoy,
   selectRecomendacion,
   selectResumenCompras,
@@ -42,6 +43,8 @@ export default function Inicio() {
   const hoy = useAppSelector(selectHoy);
   const topes = useAppSelector(selectTopes);
   const compras = useAppSelector(selectResumenCompras);
+  // "Promos actualizadas hace X": solo con un corpus sincronizado (spec 009 FR-019).
+  const frescura = useAppSelector(selectFrescura);
   const columnas = useColumns();
 
   const elegir = (c: Comercio) => {
@@ -173,6 +176,12 @@ export default function Inicio() {
           </View>
         </>
       )}
+
+      {frescura ? (
+        <Text variant="label" tone="inkSecondary" style={{ textAlign: "center" }}>
+          {frescura}
+        </Text>
+      ) : null}
     </Screen>
   );
 }

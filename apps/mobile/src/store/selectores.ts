@@ -5,7 +5,9 @@
  */
 import { createSelector } from "@reduxjs/toolkit";
 import { fechaArgentina } from "@vuelto/motor";
+import { textoFrescura } from "../lib/frescura";
 import { comprasVista, perfilDelMotor, recomendacionVista, topesVista, type EntradasMotor } from "../data/calculo";
+import { contarPendientes } from "../data/compras/operaciones";
 import type { Comercio, MedioDePago, Perfil } from "../data/contracts";
 import { catalogoComercios } from "../data/fixtures";
 import { medioVista } from "../perfil/vista";
@@ -49,6 +51,12 @@ export const selectRecomendacion = createSelector(
 
 export const selectTopes = createSelector([selectEntradasMotor], topesVista);
 
+/** "Promos actualizadas hace 2 horas", o `null` con los datos de ejemplo (spec 009 FR-019). */
+export const selectFrescura = createSelector(
+  [selectAhora, (s: RootState) => s.corpus.sincronizadoEn],
+  textoFrescura,
+);
+
 export const selectResumenCompras = createSelector(
   [(s: RootState) => s.compras.lista, selectAhora, (s: RootState) => s.perfil.medios],
   comprasVista,
@@ -68,4 +76,35 @@ export const selectComerciosFrecuentes = createSelector([(s: RootState) => s.per
 export const selectPerfilVista = createSelector(
   [(s: RootState) => s.perfil.nombre, selectMediosDelUsuario, selectComerciosFrecuentes],
   (nombre, medios, comercios): Perfil => ({ nombre: nombre ?? "", medios, comercios }),
+);
+
+export type MarcaDeSubida = "sin-subir" | "no-se-pudo" | "solo-celular";
+
+/**
+ * Qué compras todavía no están en la cuenta y por qué (spec 010, FR-014). Con la subida
+ * desconectada no hay marcas ni recuentos: no hay nada que prometerle al usuario (FR-020).
+ */
+export const selectMarcasDeSubida = createSelector(
+  [(s: RootState) => s.cola.operaciones, (s: RootState) => s.cola.subidaConectada],
+  (operaciones, conectada) => {
+    const marcas: Record<string, MarcaDeSubida> = {};
+    const total = { sinSubir: 0, noSePudo: 0, soloCelular: 0 };
+    if (!conectada) return { marcas, ...total };
+    for (const o of operaciones) {
+      if (o.tipo !== "guardar") continue;
+      const e = o.estado.tipo;
+      const marca: MarcaDeSubida = e === "rechazada" ? "no-se-pudo" : e === "bloqueada" ? "solo-celular" : "sin-subir";
+      marcas[o.compra.id] = marca;
+      if (marca === "sin-subir") total.sinSubir += 1;
+      else if (marca === "no-se-pudo") total.noSePudo += 1;
+      else total.soloCelular += 1;
+    }
+    return { marcas, ...total };
+  },
+);
+
+/** Lo que se pierde al cerrar sesión: guardados y borrados que el servidor todavía no tiene (FR-016). */
+export const selectPendientesAlCerrarSesion = createSelector(
+  [(s: RootState) => s.cola.operaciones, (s: RootState) => s.cola.subidaConectada],
+  (operaciones, conectada) => (conectada ? contarPendientes(operaciones) : { guardados: 0, borrados: 0 }),
 );

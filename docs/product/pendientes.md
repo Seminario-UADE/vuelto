@@ -29,18 +29,25 @@
 - [ ] Proveedor/modelo del extractor, con salida estructurada
 - [ ] Dónde corre el cron de ingesta
 - [ ] Expo vs. Flutter formalmente (nivel real del equipo en TS/Dart)
-- [ ] Estrategia de sincronización del corpus al dispositivo — **reabierta**
-      (01/11/2026, ADR-010). El 13/10/2026 se había descartado porque el
-      cálculo se movió a una Edge Function (la issue #42 se cerró por eso);
-      ADR-010 devuelve el cálculo a la app, así que vuelve a hacer falta:
-      sincronización incremental por `actualizada_en`, al abrir y al volver a
-      primer plano (o descarga completa, ~2.000 filas, si la medición lo
-      permite). La issue #42 se reabrió y se reescribió; el store de Redux
-      es la #81.
-- [ ] Medir el tamaño real del corpus vigente de CABA/AMBA y decidir dónde
-      persistirlo en el dispositivo (AsyncStorage tiene un tope de 6 MB por
-      defecto en Android; alternativa: filtrar por los rubros y medios del
-      usuario, o `expo-sqlite`). Ver ADR-010 §Riesgos.
+- [x] Estrategia de sincronización del corpus al dispositivo — **resuelta** (02/11/2026, issue #42,
+      spec 009): primera sincronización con todo lo del período, después incremental por
+      `actualizada_en` con un margen de 10 minutos, al abrir y al volver a primer plano. Falta probarla
+      en el teléfono con un usuario real: bloqueada por #40 (login), #35 (corpus) y #41 (medios en la
+      base).
+- [ ] Medir el tamaño real del corpus vigente de CABA/AMBA y confirmar dónde persistirlo. Decisión
+      provisoria: AsyncStorage en `vuelto.corpus.v1`. **Pendiente de #35**: `npm run medir:corpus`. La
+      proyección con promos de ejemplo (2.000 promos ≈ 880 KB) está en
+      `docs/architecture/03-frontend.md` §Dónde se guarda el corpus. Verificar además el límite de ~2 MB
+      por valor de AsyncStorage en un Android real.
+- [x] Cuando la cola de #44 (spec 010, `aplicarPendientes`) llegue a `main`, reemplazar el cuerpo de
+      `reconciliarCompras` (`apps/mobile/src/sync/compras.ts`) por `aplicarPendientes(servidor,
+      getState().cola.operaciones, usuarioId)`; con eso se cierran sus dos limitaciones provisorias (no
+      distingue dueños y una compra local de fuera del período no sobrevive a un reinicio). Responsable: quien
+      mergee segundo entre #42 y #44. Hecho al resolver el merge de #42 sobre #44.
+- [ ] Sincronizar el perfil (medios de pago y comercios) desde `medios_de_pago`: es de #41; la #42 no lo hace.
+- [ ] Contrato con la ingesta y la siembra (#35, #50, #51): cada lote de escrituras de `promociones` se
+      confirma en menos de 5 minutos (el margen de relectura de la app es de 10). Ver
+      `docs/architecture/04-infrastructure.md`.
 - [ ] Verificar que Metro resuelve `@vuelto/motor` (paquete compilado a
       `dist/`) dentro del monorepo, en Expo Go, en la web y en el APK de EAS.
 - [x] Retención de registros de compra en Supabase — ver `privacidad.md`:

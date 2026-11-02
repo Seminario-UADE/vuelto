@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { View } from "react-native";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
@@ -12,12 +12,13 @@ import { SectionHeader } from "@/components/section-header";
 import { SheetHeader } from "@/components/sheet-header";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
+import { comercioPorNombre, promoPropuesta } from "@/data/calculo";
 import type { OrigenCompra } from "@/data/contracts";
 import { useAsync } from "@/hooks/use-async";
 import { aprox, fechaLarga, montoEditable, parseMonto } from "@/lib/format";
 import { hapticoExito, hapticoSeleccion } from "@/lib/haptics";
 import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
-import { selectHoy, selectPerfilVista } from "@/store/selectores";
+import { selectEntradasMotor, selectHoy, selectPerfilVista } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { guardarCompra } from "@/store/thunks";
 import { colors, space } from "@/theme";
@@ -50,6 +51,10 @@ export default function Revisa() {
   const medioDelTicket = modo === "ticket" && p.medio ? p.medio : null;
   const [medioId, setMedioId] = useState<string | null>(modo === "excepcion" ? p.medio || null : medioDelTicket);
   const [guardando, setGuardando] = useState(false);
+  /** El usuario quitó la promo propuesta (spec 010, FR-023). Cambiar de medio la vuelve a proponer. */
+  const [quitoLaPromo, setQuitoLaPromo] = useState(false);
+  /** Identifica esta apertura de la hoja: un segundo toque en «Guardar» no duplica la compra (FR-005). */
+  const intento = useId();
   const [error, setError] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const hoy = useAppSelector(selectHoy);
@@ -62,6 +67,14 @@ export default function Revisa() {
     comercioConocido ?? busqueda.datos?.find((c) => c.nombre.toLowerCase() === comercio.trim().toLowerCase());
   // Qué dice el motor de cada medio para este comercio (solo para orientar; no preselecciona).
   const rec = useRecomendacionPara(conocido?.id ?? null, monto);
+  // La promo que se propone y se guarda es la misma función, evaluada en la fecha de la compra
+  // (FR-022): no la del día de hoy, que con un ticket de otro día mostraría otra cosa.
+  const entradas = useAppSelector(selectEntradasMotor);
+  const propuesta = useMemo(
+    () => (medioId && comercio.trim() ? promoPropuesta(entradas, comercioPorNombre(comercio.trim()), medioId, fecha, monto) : null),
+    [entradas, medioId, comercio, fecha, monto],
+  );
+  const hayPromo = propuesta !== null && propuesta.promociones.length > 0;
 
   const detalleDe = (id: string): string | null => {
     const r = rec;
@@ -78,8 +91,8 @@ export default function Revisa() {
       ? "Falta el monto"
       : medioId === null
         ? "Elegí con qué pagaste para continuar"
-        : rec?.medio?.id === medioId && rec.reintegro !== null
-          ? `Te devuelven ${aprox(rec.reintegro)}${rec.base ? `, ${rec.base.texto}` : ""}. Hasta que guardes, tus topes no cambian.`
+        : hayPromo && !quitoLaPromo && propuesta.reintegro !== null
+          ? `Te devuelven ${aprox(propuesta.reintegro)}${propuesta.base ? `, ${propuesta.base}` : ""}. Hasta que guardes, tus topes no cambian.`
           : "Hasta que guardes, tus topes no cambian.";
 
   const guardar = () => {
@@ -95,7 +108,8 @@ export default function Revisa() {
           monto,
           medioId,
           textoExtraido: modo === "ticket" ? (p.texto ?? null) : null,
-        }),
+          usarPromo: !quitoLaPromo,
+        }, intento),
       );
       hapticoExito();
       dispatch(avisoMostrado("Compra guardada · la ves en Mis compras"));
@@ -167,12 +181,44 @@ export default function Revisa() {
               onPress={() => {
                 hapticoSeleccion();
                 setMedioId(m.id);
+                setQuitoLaPromo(false);
               }}
               leading={<Avatar letras={m.inicial} tone={medioId === m.id ? "activo" : "neutral"} />}
             />
           ))}
         </View>
       </View>
+
+      {hayPromo && propuesta ? (
+        <View style={{ gap: space.md }}>
+          <SectionHeader title="Promo aplicada" />
+          <Card padding={space.lg} gap={space.sm}>
+            {quitoLaPromo ? (
+              <Text variant="bodyMd" tone="inkSecondary">
+                Sin promo: esta compra no va a consumir ningún tope.
+              </Text>
+            ) : (
+              <>
+                {propuesta.promociones.map((x) => (
+                  <Text key={x.promocionId} variant="bodyLg" weight="semibold">
+                    {x.nombre}
+                  </Text>
+                ))}
+                <Text variant="bodyMd" tone="inkSecondary">
+                  {propuesta.reintegro !== null
+                    ? `Te devuelven ${aprox(propuesta.reintegro)}${propuesta.base ? `, ${propuesta.base}` : ""}.`
+                    : "Cargá el monto para estimar cuánto te devuelven."}
+                </Text>
+              </>
+            )}
+            <Button
+              label={quitoLaPromo ? "Usar esta promo" : "No usé esta promo"}
+              variant="text"
+              onPress={() => setQuitoLaPromo((v) => !v)}
+            />
+          </Card>
+        </View>
+      ) : null}
     </Screen>
   );
 }

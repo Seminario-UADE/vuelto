@@ -1,5 +1,8 @@
 /** Utilidades de los tests del store: un almacenamiento en memoria y un store recién creado. */
+import { generadorDeIds } from "../data/compras/prueba";
+import type { Subida } from "../data/compras/repositorio";
 import type { DatosPerfil } from "../perfil/datos";
+import type { RepositorioSincronizacion } from "../sync/contratos";
 import { crearStore, type RootState } from "./index";
 import type { Almacenamiento } from "./persistencia";
 
@@ -20,9 +23,15 @@ export function memoria(inicial: Record<string, string> = {}): Almacenamiento & 
 export function storeDePrueba(
   estadoInicial: Partial<RootState> | null = null,
   almacenamiento: Almacenamiento = memoria(),
-  extra: { perfilRemoto?: DatosPerfil | null } = {},
+  extra: {
+    generarId?: () => string;
+    subida?: Subida | null;
+    repositorio?: RepositorioSincronizacion | null;
+    perfilRemoto?: DatosPerfil | null;
+    reloj?: () => Date;
+  } = {},
 ) {
-  return crearStore({ almacenamiento, estadoInicial, ...extra });
+  return crearStore({ almacenamiento, estadoInicial, generarId: generadorDeIds(), ...extra });
 }
 
 /** Deja correr los efectos asíncronos del listener de persistencia. */

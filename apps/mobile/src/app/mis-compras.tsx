@@ -12,8 +12,9 @@ import { Screen } from "@/components/screen";
 import { Text } from "@/components/text";
 import type { Compra, OrigenCompra } from "@/data/contracts";
 import { aprox, diaDelMes, pesos } from "@/lib/format";
-import { useAppSelector } from "@/store/hooks";
-import { selectResumenCompras } from "@/store/selectores";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectMarcasDeSubida, selectResumenCompras } from "@/store/selectores";
+import { reintentarRechazadas } from "@/store/thunks";
 import { colors, space } from "@/theme";
 
 const FILTROS: (OrigenCompra | "todas")[] = ["todas", "ticket", "excepcion", "manual"];
@@ -25,6 +26,8 @@ const FILTROS: (OrigenCompra | "todas")[] = ["todas", "ticket", "excepcion", "ma
 export default function MisCompras() {
   const [filtro, setFiltro] = useState<OrigenCompra | "todas">("todas");
   const datos = useAppSelector(selectResumenCompras);
+  const subida = useAppSelector(selectMarcasDeSubida);
+  const dispatch = useAppDispatch();
   const compras = datos.compras.filter((c) => filtro === "todas" || c.origen === filtro);
   const gastaste = datos.gastaste;
 
@@ -95,12 +98,36 @@ export default function MisCompras() {
               <Card padding={space.lg} gap={0}>
                 {lista.map((c, i) => (
                   <View key={c.id} style={divisor(i)}>
-                    <CompraRow c={c} />
+                    <CompraRow
+                      c={c}
+                      marca={subida.marcas[c.id]}
+                      onBorrar={() =>
+                        router.push({ pathname: "/borrar-compra", params: { id: c.id, comercio: c.comercio.nombre } })
+                      }
+                    />
                   </View>
                 ))}
               </Card>
             </View>
           ))}
+
+          {subida.sinSubir + subida.noSePudo + subida.soloCelular > 0 ? (
+            <Card padding={space.lg} gap={space.sm}>
+              <Text variant="label" tone="inkSecondary" accessibilityLiveRegion="polite">
+                {[
+                  subida.sinSubir > 0 ? `${subida.sinSubir} sin subir` : null,
+                  subida.noSePudo > 0 ? `${subida.noSePudo} que no se pudo subir` : null,
+                  subida.soloCelular > 0 ? `${subida.soloCelular} solo en este celular` : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+                . Cuentan para tus topes igual.
+              </Text>
+              {subida.noSePudo > 0 ? (
+                <Button label="Reintentar" variant="secondary" icon="recargar" onPress={() => void dispatch(reintentarRechazadas())} />
+              ) : null}
+            </Card>
+          ) : null}
 
           <View style={{ flexDirection: "row", gap: space.sm }}>
             <Icon name="info" size={18} color={colors.inkSecondary} />

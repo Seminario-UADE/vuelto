@@ -47,6 +47,24 @@ Reglas (RNF-04, RNF-05):
 - Si una key se filtró (commit, log, captura), se rota primero y se limpia
   después: el historial de git no se considera borrado.
 
+> **Excepción acotada**: la prueba de integración de la sincronización de la app
+> (`npm run test:integracion -w @vuelto/mobile`) usa la clave de servicio de **demo** de un Supabase **local**
+> (`supabase status`) para sembrar y limpiar promos de prueba, en lugar de la ingesta. Se salta si la URL no
+> es `localhost` y no corre en el CI. Nunca se usa una clave real ni se empaqueta en la app.
+
+## Contrato de escritura de `promociones` con la sincronización de la app
+
+La app sincroniza el corpus por `actualizada_en` (spec 009). Ese campo lo pone el trigger con
+`clock_timestamp()`: es la hora en que se escribe la fila, no la de la confirmación. Para que una
+transacción larga no deje filas atrás, la app relee con un **margen de 10 minutos** sobre su marca.
+Contrato para la ingesta y la siembra (#35, #50, #51):
+
+- **Cada lote de escrituras se confirma en menos de 5 minutos.** Un commit por promo, o lotes chicos; nunca
+  una sola transacción que escriba el corpus entero durante más tiempo.
+- El borrado físico y la re-siembra con ids nuevos no mueven ninguna marca: la app los detecta pidiendo
+  los ids del período en cada sincronización y sacando los que el servidor ya no tiene. Una promo que deja
+  de estar vigente se da de baja (`dada_de_baja_en`), no se borra: sus compras siguen contando en el tope.
+
 ## CI
 
 `.github/workflows/ci.yml` corre lint, typecheck, test y build (compilación
