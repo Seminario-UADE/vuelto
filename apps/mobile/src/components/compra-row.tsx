@@ -1,6 +1,7 @@
 import { View } from "react-native";
 import type { Compra } from "@/data/contracts";
 import { aprox, fechaCorta, pesos } from "@/lib/format";
+import type { MarcaDeSubida } from "@/store/selectores";
 import { colors, size, space } from "@/theme";
 import { Avatar } from "./avatar";
 import { Badge } from "./badge";
@@ -15,17 +16,25 @@ type Props = {
   conFecha?: boolean;
   /** Si viene, la fila tiene un botón para borrar la compra (spec 010, FR-001). */
   onBorrar?: () => void;
+  /** Qué falta para que esté en la cuenta (spec 010, FR-014); sin marca, no se dice nada. */
+  marca?: MarcaDeSubida;
+};
+
+const TEXTO_MARCA: Record<MarcaDeSubida, string> = {
+  "sin-subir": "Sin subir",
+  "no-se-pudo": "No se pudo subir",
+  "solo-celular": "Solo en este celular",
 };
 
 /** Fila de compra registrada: comercio, medio, origen, monto y reintegro estimado. */
-export function CompraRow({ c, conFecha, onBorrar }: Props) {
+export function CompraRow({ c, conFecha, onBorrar, marca }: Props) {
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
       <View
         accessible
         accessibilityLabel={`${c.comercio.nombre}, ${pesos(c.monto)} con ${c.medio.nombre}, ${etiquetaOrigen[c.origen]}. ${
           c.reintegro === null ? "Sin reintegro" : `Te devuelven aproximadamente ${pesos(c.reintegro)}`
-        }`}
+        }${marca ? `. ${TEXTO_MARCA[marca]}` : ""}`}
         style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: space.md, paddingVertical: space.md }}
       >
         <Avatar icon={iconoDeRubro[c.comercio.rubro]} />
@@ -38,6 +47,11 @@ export function CompraRow({ c, conFecha, onBorrar }: Props) {
             {c.medio.nombre}
           </Text>
           <Badge label={etiquetaOrigen[c.origen]} />
+          {marca ? (
+            <Text variant="label" tone={marca === "no-se-pudo" ? "error" : "inkSecondary"}>
+              {TEXTO_MARCA[marca]}
+            </Text>
+          ) : null}
         </View>
         <View style={{ alignItems: "flex-end", gap: 2 }}>
           <Text variant="bodyLg" weight="semibold" tabular>

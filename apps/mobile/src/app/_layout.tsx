@@ -16,17 +16,19 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
 import { Toast } from "@/components/toast";
 import { useReloj } from "@/hooks/use-reloj";
+import { useSubidaDeCompras } from "@/hooks/use-subida-de-compras";
 import { headerNativo } from "@/navigation/opciones";
 import { crearStore } from "@/store";
 import { useAppSelector } from "@/store/hooks";
 import { rehidratar } from "@/store/persistencia";
+import { iniciarCompras } from "@/store/thunks";
 import { colors } from "@/theme";
 
 void SplashScreen.preventAutoHideAsync();
 
 /** Un solo store para toda la app (ADR-010). Lo guardado se lee una vez, al abrir. */
 const store = crearStore({ almacenamiento: AsyncStorage, estadoInicial: null, generarId: randomUUID });
-void store.dispatch(rehidratar());
+void store.dispatch(rehidratar()).then(() => store.dispatch(iniciarCompras()));
 
 export const unstable_settings = { anchor: "(tabs)" };
 
@@ -61,6 +63,7 @@ function Raiz() {
   });
   const hidratado = useAppSelector((s) => s.sesion.hidratado);
   useReloj();
+  useSubidaDeCompras();
 
   const listo = fuentes && hidratado;
   useEffect(() => {
@@ -90,6 +93,7 @@ function Raiz() {
               con detents no pinta un ScrollView en iOS 27 (verificado en el simulador). */}
           <Stack.Screen name="revisa" options={pageSheet} />
           <Stack.Screen name="contactos/quitar" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
+          <Stack.Screen name="cerrar-sesion" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
           <Stack.Screen name="borrar-compra" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
           <Stack.Screen name="(auth)/login" options={pageSheet} />
           <Stack.Screen name="i/[token]" options={{ ...headerNativo, title: "Invitación" }} />

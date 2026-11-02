@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { View } from "react-native";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
@@ -50,6 +50,8 @@ export default function Revisa() {
   const medioDelTicket = modo === "ticket" && p.medio ? p.medio : null;
   const [medioId, setMedioId] = useState<string | null>(modo === "excepcion" ? p.medio || null : medioDelTicket);
   const [guardando, setGuardando] = useState(false);
+  /** Identifica esta apertura de la hoja: un segundo toque en «Guardar» no duplica la compra (FR-005). */
+  const intento = useId();
   const [error, setError] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const hoy = useAppSelector(selectHoy);
@@ -95,7 +97,7 @@ export default function Revisa() {
           monto,
           medioId,
           textoExtraido: modo === "ticket" ? (p.texto ?? null) : null,
-        }),
+        }, intento),
       );
       hapticoExito();
       dispatch(avisoMostrado("Compra guardada · la ves en Mis compras"));
