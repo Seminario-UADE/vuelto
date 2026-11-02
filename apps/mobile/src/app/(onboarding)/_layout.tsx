@@ -1,12 +1,12 @@
 import { Redirect, Stack } from "expo-router";
-import { usePerfilLocal } from "@/data/perfil-local";
+import { useAppSelector } from "@/store/hooks";
 import { headerNativo } from "@/navigation/opciones";
 
 export const unstable_settings = { anchor: "bienvenida" };
 
 export default function OnboardingLayout() {
-  const { perfil } = usePerfilLocal();
-  if (perfil.onboardingCompleto) return <Redirect href="/" />;
+  const onboardingCompleto = useAppSelector((s) => s.perfil.onboardingCompleto);
+  if (onboardingCompleto) return <Redirect href="/" />;
   return (
     <Stack screenOptions={{ ...headerNativo, title: "" }}>
       <Stack.Screen name="bienvenida" options={{ headerShown: false }} />

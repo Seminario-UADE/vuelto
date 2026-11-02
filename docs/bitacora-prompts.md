@@ -1310,6 +1310,70 @@ autenticados y escritura solo de la service role.
 
 ---
 
+## 2026-11-01 — Motor en la app y store de Redux (issue #81)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit, `spec-critic`, `/code-review`,
+`test-runner`, `rules-guardian`, el simulador de iOS y el navegador integrado.
+
+**Objetivo:** pasos 1 y 2 del plan de ADR-010: que la app calcule la
+recomendación y los topes con `@vuelto/motor` sobre un store de Redux, para que
+la recomendación cambie mientras se tipea el monto, sin red.
+
+**Prompts principales:**
+1. "Issue #81, siguiendo docs/decisions/010-motor-en-la-app-y-redux.md (plan,
+   pasos 1 y 2) y la constitución 3.0.0 […] Empezá por lo que más riesgo tiene y
+   verificalo antes de seguir: que Metro resuelva @vuelto/motor (paquete
+   compilado a dist/) dentro del monorepo, en Expo Go, en la web y en el build
+   preview de EAS. Si no resuelve, proponeme la solución antes de elegirla."
+2. "Después: borrar servidor-simulado.ts y que api.recomendar use el motor real
+   sobre fixtures.ts; Redux Toolkit con los slices sesion, perfil, corpus,
+   compras, simulacion y contactos; selectRecomendacion y selectTopes con
+   createSelector; `ahora` como valor del store […] La recomendación NO se
+   guarda en el store ni en AsyncStorage."
+3. Elección del PO ante la propuesta: `prepare` en el motor (en vez de resolver
+   el código fuente con una condición de Metro) y un solo build de EAS al final.
+
+**Resultado:**
+- **Riesgo de Metro, medido primero**: con `dist/` el motor se empaqueta en iOS,
+  Android y web sin `metro.config.js`; sin `dist/` (checkout limpio, como EAS y
+  el CI) falla. Se propusieron dos salidas y el PO eligió `"prepare": "npm run
+  build"` en `packages/motor` (research R1 de la spec 008).
+- Spec 008 con `spec-critic`: las cifras de los escenarios coincidían con el
+  motor, pero faltaban el mapeo de los fixtures a la forma del motor, el
+  instante exacto del reloj (mediodía de Argentina, para que la zona no cambie
+  el día) y en qué slice vive `ahora` (`sesion`). Se corrigieron antes del plan.
+- Paso 1 (commit propio): `fixtures.ts` con la forma del motor, `calculo.ts`
+  (motor → vista) y el grupo evaluado con el motor por integrante; se borró
+  `servidor-simulado.ts`. Cambio de comportamiento aceptado: "queda poco" pasa
+  del 30% del mock al 20% del motor (Santander, $2.300 de $8.000, queda
+  "disponible").
+- Paso 2: seis slices con solo datos de entrada; `selectRecomendacion` y
+  `selectTopes` con `createSelector`; persistencia propia (listener) de perfil,
+  corpus, compras y cuenta, con validación por parte y migración de
+  `vuelto.perfil.v1`; `useReloj` escribe `ahora`. Se borraron `sesion.ts` y
+  `perfil-local.ts`.
+- Al mergear `main` (PR #77, issue #46) el motor pasó a incluir el tope y la
+  base en el `motivo` y los medios en cada `Descarte`: la vista muestra solo
+  "qué da" la promo en el título (la cifra y la base van aparte) y la spec se
+  renumeró a 008 (007 ya era el esquema de Supabase).
+- Tests: 136 en la app (cálculo, reducers, selectores con memoización y reloj,
+  persistencia sin nada derivado ni compras de otro período).
+- Verificado en la web: al tipear 1-0-0-0-0 la tarjeta cambia en cada tecla, sin
+  ningún pedido de red; guardar la compra baja el tope de Galicia a ≈$4.500
+  según 4 compras, y sigue ahí después de recargar. En lo guardado hay solo
+  datos de entrada.
+- Verificado en el simulador de iOS (Expo Go): el tipeo cambia la cifra en
+  cada tecla; guardar recalcula la misma pantalla y Topes; al reabrir la app
+  sigue la compra y la simulación arranca vacía. Capturas en el PR #86 y en
+  `specs/008-motor-app-redux/capturas/`. Build `preview` de EAS en verde.
+- `rules-guardian`: sin bloqueantes; se corrigió que al disco llegaran compras
+  de períodos anteriores (privacidad.md).
+- `/code-review`: sin violaciones duras. Se aplicaron las fechas del motor en vez
+  de duplicarlas (el motor solo suma exports), el desfase horario en un único
+  lugar, y la spec y el contrato quedaron alineados con el código.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

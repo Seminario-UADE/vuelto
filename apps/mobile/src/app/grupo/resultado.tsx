@@ -10,10 +10,11 @@ import { SectionHeader } from "@/components/section-header";
 import { Skeleton, SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
-import { setSesion, useSesion } from "@/data/sesion";
 import { useAsync } from "@/hooks/use-async";
 import { aprox, iniciales, pesos } from "@/lib/format";
 import { hapticoExito } from "@/lib/haptics";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { avisoMostrado } from "@/store/sesion";
 import { radius, space } from "@/theme";
 
 /**
@@ -21,7 +22,8 @@ import { radius, space } from "@/theme";
  * muestra lo de ADR-008 §3; sin estados de cobro (DESIGN.md §10).
  */
 export default function GastoEnGrupo() {
-  const pedido = useSesion((s) => s.grupo);
+  const dispatch = useAppDispatch();
+  const pedido = useAppSelector((s) => s.contactos.grupo);
   const r = useAsync(
     () => (pedido ? api.recomendarGrupo(pedido) : Promise.resolve(null)),
     pedido ? JSON.stringify(pedido) : null,
@@ -31,9 +33,11 @@ export default function GastoEnGrupo() {
   const confirmar = () => {
     if (!g?.quienPaga) return router.dismissAll();
     hapticoExito();
-    setSesion({
-      aviso: g.quienPaga.esVos ? `Listo: pagás vos con ${g.medio}` : `Listo: paga ${g.quienPaga.nombre} con ${g.medio}`,
-    });
+    dispatch(
+      avisoMostrado(
+        g.quienPaga.esVos ? `Listo: pagás vos con ${g.medio}` : `Listo: paga ${g.quienPaga.nombre} con ${g.medio}`,
+      ),
+    );
     router.dismissAll();
   };
 
@@ -58,7 +62,13 @@ export default function GastoEnGrupo() {
       footer={
         g ? (
           <Button
-            label={g.quienPaga ? (g.quienPaga.esVos ? "Confirmar que pago yo" : `Confirmar que paga ${g.quienPaga.nombre}`) : "Listo"}
+            label={
+              g.quienPaga
+                ? g.quienPaga.esVos
+                  ? "Confirmar que pago yo"
+                  : `Confirmar que paga ${g.quienPaga.nombre}`
+                : "Listo"
+            }
             onPress={confirmar}
           />
         ) : null

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Comercio, MedioDePago, PedidoRecomendar, RespuestaRecomendar } from "./contracts";
-import { aVista, baseDeMotor } from "./vista-recomendacion";
+import { aVista, baseDeMotor, queDa } from "./vista-recomendacion";
 
 // El adaptador recibe la respuesta tal como la devuelve la Edge Function (ejemplo 200 de
 // specs/004-recomendar-pantalla/contracts/recomendar.md) y no inventa cifras.
@@ -39,7 +39,15 @@ const ejemplo: RespuestaRecomendar = {
     motivo: "20% en Kansas",
   },
   alternativas: [],
-  descartadas: [{ promocionId: "promo-viernes", causa: "dia", base: null, motivo: "Hoy no aplica: la promo es los viernes" }],
+  descartadas: [
+    {
+      promocionId: "promo-viernes",
+      causa: "dia",
+      mediosDePagoIds: ["mp-galicia-credito-visa"],
+      base: null,
+      motivo: "Hoy no aplica, la promo es los viernes",
+    },
+  ],
 };
 const pedido: PedidoRecomendar = { comercio: "Kansas", categoriaId: 2, monto: 15000, canal: "presencial" };
 
@@ -58,7 +66,7 @@ describe("aVista", () => {
         medioId: "mp-galicia-credito-visa",
         titulo: "Galicia Visa crédito",
         inicial: "G",
-        motivo: "Hoy no aplica: la promo es los viernes",
+        motivo: "Hoy no aplica, la promo es los viernes",
         estado: "no-aplica",
       },
     ]);
@@ -103,5 +111,17 @@ describe("aVista", () => {
       "según 1 compra de octubre",
     );
     expect(baseDeMotor(null, "octubre")).toBeNull();
+  });
+});
+
+describe("queDa", () => {
+  it("saca el tope y la base que el motor agrega al motivo (la tarjeta los muestra aparte)", () => {
+    expect(queDa("20% en supermercados los miércoles · te quedan ≈$6.500 de tope, según 3 compras de octubre")).toBe(
+      "20% en supermercados los miércoles",
+    );
+    expect(queDa("10% en Coto · la promo no informa tope + 5% en supermercados · te quedan ≈$900 de tope, según 1 compra de octubre")).toBe(
+      "10% en Coto + 5% en supermercados",
+    );
+    expect(queDa("20% en Kansas")).toBe("20% en Kansas");
   });
 });

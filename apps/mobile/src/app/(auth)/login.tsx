@@ -7,8 +7,11 @@ import { Screen } from "@/components/screen";
 import { SheetHeader } from "@/components/sheet-header";
 import { Text } from "@/components/text";
 import { mediosDeclaradosIds } from "@/data/api";
-import { guardarPerfilLocal, usePerfilLocal, type PerfilLocal } from "@/data/perfil-local";
 import { hapticoExito } from "@/lib/haptics";
+import type { Cuenta } from "@/store/acciones";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { invitacionGuardada, mediosElegidos, onboardingTerminado } from "@/store/perfil";
+import { cuentaGuardada } from "@/store/sesion";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -20,22 +23,21 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 export default function Login() {
   const { modo } = useLocalSearchParams<{ modo?: string }>();
   const entrar = modo === "entrar";
-  const { perfil } = usePerfilLocal();
+  const dispatch = useAppDispatch();
+  const perfil = useAppSelector((s) => s.perfil);
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
 
-  const terminar = async (cuenta: PerfilLocal["cuenta"]) => {
+  const terminar = (cuenta: Cuenta) => {
     setEnviando(true);
     hapticoExito();
     const pendiente = perfil.invitacionPendiente;
-    await guardarPerfilLocal({
-      onboardingCompleto: true,
-      cuenta,
-      // Quien entra con una cuenta existente recupera sus medios (en el servidor, su perfil).
-      medios: entrar && perfil.medios.length === 0 ? mediosDeclaradosIds() : perfil.medios,
-      invitacionPendiente: null,
-    });
+    // Quien entra con una cuenta existente recupera sus medios (en el servidor, su perfil).
+    if (entrar && perfil.medios.length === 0) dispatch(mediosElegidos(mediosDeclaradosIds()));
+    dispatch(cuentaGuardada(cuenta));
+    dispatch(invitacionGuardada(null));
+    dispatch(onboardingTerminado());
     if (router.canDismiss()) router.dismissAll();
     router.replace(pendiente ? `/i/${pendiente}` : "/");
   };
@@ -45,16 +47,14 @@ export default function Login() {
       setError("Revisá el email: falta algo antes o después de la @.");
       return;
     }
-    void terminar({ email: email.trim(), proveedor: "email" });
+    terminar({ email: email.trim(), proveedor: "email" });
   };
 
   return (
     <Screen
       kind="sheet"
       footer={
-        entrar ? null : (
-          <Button label="Ahora no" variant="text" onPress={() => void terminar(null)} disabled={enviando} />
-        )
+        entrar ? null : <Button label="Ahora no" variant="text" onPress={() => terminar(null)} disabled={enviando} />
       }
     >
       <SheetHeader
@@ -68,7 +68,7 @@ export default function Login() {
       <View style={{ gap: space.md }}>
         {process.env.EXPO_OS === "ios" ? (
           <Pressable
-            onPress={() => void terminar({ email: null, proveedor: "apple" })}
+            onPress={() => terminar({ email: null, proveedor: "apple" })}
             disabled={enviando}
             accessibilityRole="button"
             accessibilityLabel="Continuar con Apple"

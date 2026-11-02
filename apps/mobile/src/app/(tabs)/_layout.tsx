@@ -1,7 +1,7 @@
 import { Redirect, Tabs } from "expo-router";
 import { Text } from "react-native";
 import { Icon, type IconName } from "@/components/icon";
-import { usePerfilLocal } from "@/data/perfil-local";
+import { useAppSelector } from "@/store/hooks";
 import { colors, floatingShadow, fonts } from "@/theme";
 
 const tab = (title: string, icon: IconName) => ({
@@ -25,9 +25,9 @@ const tab = (title: string, icon: IconName) => ({
  * fondo Blanco Hueso con sombra flotante, activo en Verde Bosque (research R2).
  */
 export default function TabsLayout() {
-  const { perfil } = usePerfilLocal();
+  const onboardingCompleto = useAppSelector((s) => s.perfil.onboardingCompleto);
   // Sin onboarding completo, la app arranca en Bienvenida (FR-002).
-  if (!perfil.onboardingCompleto) return <Redirect href="/bienvenida" />;
+  if (!onboardingCompleto) return <Redirect href="/bienvenida" />;
   return (
     <Tabs
       screenOptions={{
