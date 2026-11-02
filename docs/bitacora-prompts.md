@@ -1270,6 +1270,46 @@ se recalcule en vivo en la app.
 
 ---
 
+## 2026-11-01 — Esquema inicial de Supabase con RLS (issue #34)
+
+**Herramienta:** Claude Code (Sonnet 5.5) con spec-kit, `spec-critic`,
+`rules-guardian`, `test-runner`, `/code-review` y la skill
+`supabase-postgres-best-practices`.
+
+**Objetivo:** las tablas base de Supabase, cada una con su RLS en la misma
+migración, más los requisitos del ADR-010 §4 que la issue no dice: promociones
+con `actualizada_en` (trigger) para sincronizar solo lo nuevo, lectura para
+autenticados y escritura solo de la service role.
+
+**Prompts principales:**
+1. Pedido con la issue #34, el ADR-010 §4, el modelo de datos y los tipos del
+   motor, y el flujo de la constitución para issues M: specify, `spec-critic`,
+   plan, tareas, implement, `/code-review`, `test-runner` y `rules-guardian`.
+2. Requisitos extra: `actualizada_en` con trigger, test de RLS (A no lee
+   compras de B; un autenticado no inserta en `promociones`), `db reset`
+   limpio, sin columna de imagen de ticket y sin borrar `recomendar`.
+
+**Resultado:**
+- Spec 007 con 25 requisitos. `spec-critic` encontró 5 decisiones abiertas;
+  se resolvieron con defaults que quedan para confirmar en el PR: un medio de
+  pago con compras no se borra; una captura referenciada no se borra; las
+  promociones se dan de baja (`dada_de_baja_en`), no se borran; los comercios
+  se comparan sin mayúsculas ni espacios de más; forma de `capturas_crudas`.
+- 7 migraciones, `seed.sql` y 4 suites pgTAP (129 pruebas). Una FK compuesta
+  `(user_id, medio_de_pago_id)` impide usar el medio de pago de otro usuario,
+  porque una FK simple no aplica RLS.
+- Las pruebas encontraron un error real: la service role no tenía privilegios
+  sobre las tablas nuevas; se agregó el `grant` explícito. Se comprobó además
+  que las pruebas fallan si se rompe una policy a propósito.
+- `/code-review` y `rules-guardian`: sin violaciones duras. Se aplicó el
+  `revoke execute` de las funciones auxiliares; el resto fueron decisiones de
+  juicio o columnas que el tipo `Compra` pide.
+- El seed solo trae a Galicia con id real de MODO; el resto del catálogo de
+  bancos lo carga la ingesta. El job de CI `supabase-rls` no se corrió todavía
+  en GitHub.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
