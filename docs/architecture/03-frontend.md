@@ -79,9 +79,9 @@ dispositivo (ADR-010, spec 008).
 
 | Slice | Qué guarda | Se persiste |
 |---|---|---|
-| `sesion` | `usuario` (Supabase Auth) y `authLista`, `ahora` (reloj del cálculo), aviso pendiente, escenario de desarrollo, `hidratado` | No: la sesión la guarda el cliente de Supabase |
+| `sesion` | `usuario` (Supabase Auth) y `authLista`, `ahora` (reloj del cálculo), aviso pendiente, escenario de desarrollo, `hidratado`, `epoca` (sube con cada cierre de sesión) | No: la sesión la guarda el cliente de Supabase |
 | `perfil` | Nombre, onboarding completo, medios y comercios elegidos, invitación pendiente | Sí |
-| `corpus` | Promociones con la forma del motor y cuándo se cargaron (hoy, las de ejemplo) | Sí |
+| `corpus` | Promociones con la forma del motor, `marca` (la mayor `actualizada_en`, texto exacto del servidor), `sincronizadoEn` y `descartadas`. Sin sincronizar: las de ejemplo y `marca: null` | Sí, en su propia clave `vuelto.corpus.v1`, y solo el que viene de una sincronización |
 | `compras` | Compras con la forma del motor (`promocionId`, `descuentoObtenido`, `reintegroEsperado`) | Sí |
 | `cola` | Operaciones de guardar y borrar compras que la cuenta todavía no tiene, con dueño y estado (spec 010) | Sí, en su propia clave (`vuelto.cola.v1`) |
 | `simulacion` | Comercio elegido y monto opcional de «¿Con qué pago?» | No |
@@ -101,9 +101,11 @@ selectMarcasDeSubida = cola → qué compras están «Sin subir» o «Solo en es
 - **Otro comercio sin tocar la simulación** (Revisá tu compra, Primera respuesta):
   `useRecomendacionPara(comercioId, monto)`, la misma función con `useMemo`.
 - **Reloj**: ningún selector lee el reloj del sistema. `useReloj` escribe `sesion.ahora` al abrir,
-  al volver a primer plano y a cada medianoche de Argentina. Con los datos de ejemplo (octubre de
-  2026) la fuente es fija, `2026-10-14T12:00:00-03:00`; pasa a `new Date()` con el corpus real
-  (#42).
+  al volver a primer plano y a cada medianoche de Argentina. Mientras `corpus.marca` es `null` (datos
+  de ejemplo, compras de octubre de 2026) la fuente es fija, `2026-10-14T12:00:00-03:00`; con un
+  corpus sincronizado es `new Date()`. El cambio ocurre en la misma acción que fija la marca
+  (`rehidratado` o `sincronizado` llevan `ahora`), así no hay un render con el reloj equivocado. Los
+  parámetros de la sincronización salen siempre del reloj real, nunca de `sesion.ahora`.
 - **Guardar una compra**: el thunk `guardarCompra` la evalúa con el motor al mediodía de su fecha;
   si el medio elegido tiene opción, guarda `promocionId` y `reintegroEsperado`, con
   `descuentoObtenido: null` (el usuario no informó el descuento). Topes, Mis compras y la próxima
@@ -118,12 +120,30 @@ selectMarcasDeSubida = cola → qué compras están «Sin subir» o «Solo en es
   (faltan #40, #41 y #42) la cola solo acumula y no se muestra ninguna marca. `aplicarPendientes` es el
   contrato con la sincronización de #42. Detalle: `specs/010-registro-compras-cola/`.
 - **Persistencia** (`store/persistencia.ts`, sin `redux-persist`): un listener escribe
-  `vuelto.store.v1` en AsyncStorage cada vez que cambian `perfil`, `corpus`, `compras` o la cuenta,
-  y solo después de rehidratar (no pisa lo guardado). Al abrir, `rehidratar()` valida cada parte por
-  separado (una corrupta vuelve sola a su inicio) y migra `vuelto.perfil.v1`, la clave del viejo
-  `perfil-local.ts`. El splash espera a `sesion.hidratado`.
+  `vuelto.store.v1` (perfil y compras) cada vez que cambian, y otro escribe el corpus en
+  `vuelto.corpus.v1`, ambos solo después de rehidratar (no pisan lo guardado). El corpus va aparte
+  para que un corpus que no entra no se lleve el perfil ni las compras pendientes, y lleva la marca
+  adentro: si no se pudo guardar, la marca guardada no avanza. Al disco llegan las compras del
+  período. Al abrir, `rehidratar()` valida cada parte por
+  separado (una corrupta vuelve sola a su inicio; un corpus guardado ilegible queda vacío con la
+  marca en `null`) y migra `vuelto.perfil.v1`, la clave del viejo `perfil-local.ts`. `vuelto.store.v1`
+  sigue en `version: 1`: un guardado anterior a la spec 009 se lee como «nunca sincronizó». El splash
+  espera a `sesion.hidratado`.
+- **Sincronización** (`src/sync/`, spec 009, issue #42): `useSincronizacion` despacha
+  `sincronizar("apertura")` al abrir (ya rehidratado) y `sincronizar("primer-plano")` al volver a primer
+  plano. El thunk lee del `RepositorioSincronizacion` inyectado en `Extra` (supabase-js con la sesión
+  del usuario; en los tests, uno en memoria), páginas de 500 por cursor `(actualizada_en, id)`, con
+  un margen de relectura de 10 minutos y un timeout de 15 s por pedido; aplica todo con **una** acción
+  (`sincronizado`) o nada. La primera sincronización reemplaza el corpus de ejemplo; una que trae cero
+  promos no cambia nada. Las bajas quedan en el corpus como promos vencidas (su consumo sigue contando en
+  el tope compartido, Principio V). Descarta el resultado si se cerró la sesión (`sesion.epoca`) o
+  cambió el usuario mientras volaba. Cerrar sesión vuelve **todo** al modo de ejemplo (corpus, compras y reloj)
+  y borra `vuelto.corpus.v1`. La leyenda «Promos actualizadas hace X» sale de `selectFrescura`. La mezcla de
+  las compras del servidor con las locales es `reconciliarCompras` (`sync/compras.ts`), la única costura con
+  #44: la escritura de compras y la cola de subida son de esa issue y `EstadoCompras` sigue siendo `{ lista }`.
 - **Lo asíncrono** (catálogos, ticket, invitaciones, grupo) sigue en `api.ts` con `useAsync`.
-- La sesión de Supabase (`src/lib/supabase.ts`, AsyncStorage) sigue sin uso.
+- La sesión de Supabase (`src/lib/supabase.ts`, AsyncStorage) la usa la sincronización; sin variables
+  de entorno o sin sesión no se sincroniza y la app sigue con lo guardado. El login es #40.
 
 ### Cuentas (issue #40)
 
@@ -151,7 +171,7 @@ selectMarcasDeSubida = cola → qué compras están «Sin subir» o «Solo en es
   ver.
 - `fixtures.ts`: los datos de DESIGN.md §9 (Martín, octubre de 2026) con la **forma del motor**:
   medios con banco, tipo y red, promociones como `Promocion` y compras con su promo y descuento
-  (tabla en `specs/008-motor-app-redux/data-model.md`). Son el estado inicial del store hasta #42.
+  (tabla en `specs/008-motor-app-redux/data-model.md`). Son el estado inicial del store hasta la primera sincronización.
   Mercado Pago no entra al motor: es una billetera sin banco ni red (Principio III).
 - `calculo.ts`: núcleo funcional de la app. Llama a `recomendar()` y `estimarTopes()` y arma lo
   que pintan las pantallas. Funciones puras, con `ahora` por parámetro. Sin monto, consulta con
@@ -232,3 +252,22 @@ estar logueado (`npx eas-cli@latest login`) con una cuenta del equipo.
   costo $0 del proyecto.
 - Cada publicación sale de lo que haya en el directorio en ese momento: publicar desde `main`.
 
+## Dónde se guarda el corpus (decisión de la issue #42)
+
+**Decisión**: AsyncStorage, en una clave propia (`vuelto.corpus.v1`), sin filtrar por rubros ni medios del
+usuario. `expo-sqlite` solo si la medición real lo pide.
+
+> **PROYECCIÓN con promos de ejemplo, no una medición.** Las 4 promos de `fixtures.ts` pesan ~450 bytes
+> cada una serializadas (máximo 455). Extrapolado a 2.000 promos (la estimación de la issue): ~880 KB, o
+> sea ~14 % del tope de ~6 MB de AsyncStorage en Android y ~43 % de los ~2 MB que se asumen como límite
+> de un solo valor (el corpus es un valor). A 4.000 promos: ~1,7 MB, ~86 % de ese límite.
+
+- **La medición real está pendiente de #35** (el corpus sembrado). `npm run medir:corpus -w @vuelto/mobile`
+  la hace con la misma lectura que usa la app, con la anon key y un usuario de prueba (nunca la
+  service role). Criterio: si el corpus real supera ~1,5 MB (75 % de los 2 MB), pasar a filtrar por los
+  rubros y medios del usuario o a `expo-sqlite`; la clave aparte hace que ese cambio no toque el perfil
+  ni las compras.
+- El límite de ~2 MB por valor en Android es una suposición prudente que **falta verificar en un
+  dispositivo**; el de ~6 MB sale de la documentación de AsyncStorage.
+- Las promos reales pueden pesar más que las de ejemplo (títulos largos); por eso la proyección es solo
+  un orden de magnitud.

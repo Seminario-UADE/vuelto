@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { comprasOctubre } from "../data/fixtures";
+import { comprasOctubre, promociones } from "../data/fixtures";
 import { compraAgregada } from "./compras";
 import { contactoQuitado } from "./contactos";
-import { CLAVE, CLAVE_VIEJA, rehidratar } from "./persistencia";
+import { sesionCerrada, sincronizado } from "./acciones";
+import { CLAVE, CLAVE_CORPUS, CLAVE_VIEJA, CORPUS_VACIO, rehidratar } from "./persistencia";
 import { mediosElegidos, onboardingTerminado } from "./perfil";
 import { selectRecomendacion, selectTopes } from "./selectores";
 import { ahoraCambio, usuarioCambio } from "./sesion";
@@ -19,7 +20,7 @@ async function abrir(almacenamiento = memoria()) {
 }
 
 describe("persistencia (US4)", () => {
-  it("perfil, corpus y compras sobreviven a cerrar y abrir", async () => {
+  it("perfil y compras sobreviven a cerrar y abrir (el corpus de ejemplo no se guarda)", async () => {
     const disco = memoria();
     const a = await abrir(disco);
     a.dispatch(mediosElegidos(["galicia-visa-credito"]));
@@ -29,7 +30,8 @@ describe("persistencia (US4)", () => {
 
     const b = await abrir(disco);
     expect(b.getState().perfil).toEqual(a.getState().perfil);
-    expect(b.getState().corpus).toEqual(a.getState().corpus);
+    expect(b.getState().corpus.marca).toBeNull();
+    expect(disco.datos.has(CLAVE_CORPUS)).toBe(false);
     expect(b.getState().compras.lista[0]?.id).toBe("n11");
   });
 
@@ -84,7 +86,7 @@ describe("persistencia (US4)", () => {
     expect(selectTopes(a.getState()).medios.length).toBeGreaterThan(0);
     await esperar();
     const guardado = disco.datos.get(CLAVE) ?? "";
-    expect(Object.keys(JSON.parse(guardado))).toEqual(["version", "perfil", "corpus", "compras"]);
+    expect(Object.keys(JSON.parse(guardado))).toEqual(["version", "perfil", "compras"]);
     for (const derivado of [
       '"mejor"',
       '"alternativas"',
@@ -170,5 +172,75 @@ describe("persistencia (US4)", () => {
     s.dispatch(onboardingTerminado());
     await esperar();
     expect(s.getState().perfil.onboardingCompleto).toBe(true);
+  });
+});
+
+describe("persistencia del corpus en su propia clave (spec 009 FR-017)", () => {
+  const corpusGuardado = (marca: string | null) =>
+    JSON.stringify({ version: 1, promociones: [], marca, sincronizadoEn: marca === null ? null : "2026-11-02T15:00:00.000Z" });
+
+  it("si la escritura del corpus falla, perfil y compras igual se guardan", async () => {
+    const disco = memoria();
+    const falla = { ...disco, setItem: async (k: string, v: string) => (k === CLAVE_CORPUS ? Promise.reject(new Error("lleno")) : disco.setItem(k, v)) };
+    const s = storeDePrueba(null, falla);
+    await s.dispatch(rehidratar());
+    s.dispatch(onboardingTerminado());
+    s.dispatch(sincronizado({ corpus: { promociones: [], marca: "2026-11-02T12:00:00+00:00", sincronizadoEn: "2026-11-02T15:00:00.000Z", descartadas: 0 }, compras: [], ahora: "2026-11-02T15:00:00.000Z" }));
+    await esperar();
+    expect(JSON.parse(disco.datos.get(CLAVE) ?? "{}").perfil.onboardingCompleto).toBe(true);
+    expect(disco.datos.has(CLAVE_CORPUS)).toBe(false);
+  });
+
+  it("un guardado v1 anterior a la spec 009 (con corpus de ejemplo adentro y sin los campos nuevos) se lee como nunca sincronizado", async () => {
+    const viejo = JSON.stringify({
+      version: 1,
+      perfil: { nombre: "Martín", onboardingCompleto: true, medios: ["galicia-visa-credito"], comercios: [], invitacionPendiente: null },
+      // El corpus de ejemplo que guardaban las versiones anteriores (con `cargadoEn`): ahora se ignora.
+      corpus: { promociones: [{ id: "promo-galicia-super-mie", tope: {}, vigencia: {} }], cargadoEn: "2026-10-14T15:00:00.000Z" },
+      compras: { lista: [{ id: "c1", fecha: "2026-10-09", monto: 1 }] },
+    });
+    const s = await abrir(memoria({ [CLAVE]: viejo }));
+    const e = s.getState();
+    expect(e.perfil.onboardingCompleto).toBe(true);
+    expect(e.perfil.medios).toEqual(["galicia-visa-credito"]);
+    expect(e.corpus.marca).toBeNull();
+    expect(e.corpus.promociones).toHaveLength(promociones.length); // el de ejemplo, no el del guardado
+    expect(e.compras.lista.map((c) => c.id)).toEqual(["c1"]);
+  });
+
+  it("un corpus guardado con promos a las que les faltan campos del motor queda vacío, no roto", async () => {
+    const roto = JSON.stringify({
+      version: 1,
+      promociones: [{ id: "p1", tope: {}, vigencia: {} }],
+      marca: "2026-11-02T12:00:00+00:00",
+      sincronizadoEn: "2026-11-02T15:00:00.000Z",
+    });
+    const s = await abrir(memoria({ [CLAVE_CORPUS]: roto }));
+    expect(s.getState().corpus).toEqual(CORPUS_VACIO);
+  });
+
+  it("un corpus guardado y válido se carga con su marca", async () => {
+    const s = await abrir(memoria({ [CLAVE_CORPUS]: corpusGuardado("2026-11-02T12:00:00+00:00") }));
+    expect(s.getState().corpus.marca).toBe("2026-11-02T12:00:00+00:00");
+    expect(s.getState().corpus.sincronizadoEn).toBe("2026-11-02T15:00:00.000Z");
+  });
+
+  it.each([["JSON inválido", "{no es json"], ["otra versión", JSON.stringify({ version: 2 })], ["promociones que no son lista", JSON.stringify({ version: 1, promociones: "x", marca: null, sincronizadoEn: null })]])(
+    "un corpus guardado inválido (%s) deja el corpus vacío con la marca en null, no el de ejemplo",
+    async (_n, raw) => {
+      const s = await abrir(memoria({ [CLAVE_CORPUS]: raw }));
+      expect(s.getState().corpus).toEqual(CORPUS_VACIO);
+    },
+  );
+
+  it("cerrar sesión borra el corpus guardado: al reabrir no vuelve el real junto a compras de ejemplo", async () => {
+    const disco = memoria({ [CLAVE_CORPUS]: corpusGuardado("2026-11-02T12:00:00+00:00") });
+    const a = await abrir(disco);
+    expect(a.getState().corpus.marca).not.toBeNull();
+    a.dispatch(sesionCerrada());
+    await esperar();
+    expect(disco.datos.has(CLAVE_CORPUS)).toBe(false);
+    const b = await abrir(disco);
+    expect(b.getState().corpus.marca).toBeNull();
   });
 });

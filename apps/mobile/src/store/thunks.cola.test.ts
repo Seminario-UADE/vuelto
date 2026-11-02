@@ -43,7 +43,7 @@ async function escenario(
   const disco = memoria(
     opciones.colaEnDisco ? { [CLAVE_COLA]: JSON.stringify({ version: 1, operaciones: opciones.colaEnDisco }) } : {},
   );
-  const s = storeDePrueba(null, disco, undefined, subida);
+  const s = storeDePrueba(null, disco, { subida });
   await s.dispatch(rehidratar());
   s.dispatch(mediosElegidos(mediosDeclarados.map((m) => m.id)));
   await s.dispatch(iniciarCompras());

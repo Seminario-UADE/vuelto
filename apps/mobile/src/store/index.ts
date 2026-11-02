@@ -10,6 +10,7 @@ import {
   type UnknownAction,
 } from "@reduxjs/toolkit";
 import type { Subida } from "../data/compras/repositorio";
+import type { RepositorioSincronizacion } from "../sync/contratos";
 import { cola, escucharPersistenciaCola } from "./cola";
 import { compras } from "./compras";
 import { contactos } from "./contactos";
@@ -30,24 +31,41 @@ const reducer = combineReducers({
 });
 
 export type RootState = ReturnType<typeof reducer>;
+/** Estado de coordinación de la sincronización: no es serializable ni de la UI, así que no va en Redux. */
+export type Coordinacion = { enVuelo: boolean; ultimoIntentoMs: number | null };
+
 /**
  * Lo que los thunks reciben además del estado. `generarId` da el UUID de cada compra nueva
  * (`expo-crypto` en la app, uno determinista en los tests, spec 010 R1). `subida` es el
- * repositorio de la cuenta con su contexto; `null` mientras no estén #40, #41 y #42 (FR-020).
+ * repositorio de la cuenta con su contexto; `null` mientras no estén #41 y #42 (FR-020).
  */
-export type Extra = { almacenamiento: Almacenamiento; generarId: () => string; subida: Subida | null };
+export type Extra = {
+  almacenamiento: Almacenamiento;
+  generarId: () => string;
+  subida: Subida | null;
+  /** `null` = no hay cliente de Supabase (variables faltantes): no se sincroniza. */
+  repositorio: RepositorioSincronizacion | null;
+  /** El reloj real. La app: `() => new Date()`. Los tests lo controlan (spec 009 R2). */
+  reloj: () => Date;
+  coordinacion: Coordinacion;
+};
 
 export function crearStore(opciones: {
   almacenamiento: Almacenamiento;
   estadoInicial: Partial<RootState> | null;
   generarId: () => string;
   subida?: Subida | null;
+  repositorio?: RepositorioSincronizacion | null;
+  reloj?: () => Date;
 }) {
   const listener = createListenerMiddleware<RootState>();
   const extra: Extra = {
     almacenamiento: opciones.almacenamiento,
     generarId: opciones.generarId,
     subida: opciones.subida ?? null,
+    repositorio: opciones.repositorio ?? null,
+    reloj: opciones.reloj ?? (() => new Date()),
+    coordinacion: { enVuelo: false, ultimoIntentoMs: null },
   };
   const store = configureStore({
     reducer,

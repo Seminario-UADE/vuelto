@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { promosConTopeCompartido } from "../data/compras/prueba";
 import { mediosDeclarados } from "../data/fixtures";
 import { escenarioElegido } from "./acciones";
-import { corpusCargado } from "./corpus";
+import { corpusInicial } from "./corpus";
 import { mediosElegidos } from "./perfil";
 import { storeDePrueba } from "./prueba";
 import { selectResumenCompras, selectTopes } from "./selectores";
@@ -10,8 +10,8 @@ import { eliminarCompra, guardarCompra } from "./thunks";
 
 // Spec 010, historia 1: borrar una compra corrige los topes al instante y sin red.
 
-function conMartin() {
-  const s = storeDePrueba();
+function conMartin(estadoInicial: Parameters<typeof storeDePrueba>[0] = null) {
+  const s = storeDePrueba(estadoInicial);
   s.dispatch(mediosElegidos(mediosDeclarados.map((m) => m.id)));
   return s;
 }
@@ -41,8 +41,8 @@ describe("eliminarCompra (FR-001, FR-002)", () => {
   });
 
   it("con un tope compartido, la base baja en uno y sin compras dice que no hay base", () => {
-    const s = conMartin();
-    s.dispatch(corpusCargado({ promociones: promosConTopeCompartido(), cargadoEn: null }));
+    // El corpus ya no se carga con una acción suelta (spec 009): entra como estado inicial.
+    const s = conMartin({ corpus: { ...corpusInicial, promociones: promosConTopeCompartido() } });
     s.dispatch(escenarioElegido("mes-vacio"));
     const sinCompras = selectTopes(s.getState());
     expect(sinCompras.medios.every((m) => m.base.tipo === "sin-compras")).toBe(true);
