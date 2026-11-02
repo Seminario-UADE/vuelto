@@ -4,20 +4,19 @@ import { Pressable, TextInput, View } from "react-native";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
-import { EmptyState } from "@/components/empty-state";
 import { Icon, iconoDeRubro } from "@/components/icon";
 import { MontoInput } from "@/components/monto-input";
 import { OptionRow } from "@/components/option-row";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
-import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import type { IntegranteGrupo } from "@/data/contracts";
-import { usePerfilLocal } from "@/data/perfil-local";
-import { setSesion, useSesion } from "@/data/sesion";
 import { useAsync } from "@/hooks/use-async";
 import { fechaCorta, iniciales, parseMonto } from "@/lib/format";
+import { grupoArmado } from "@/store/contactos";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectHoy } from "@/store/selectores";
 import { colors, fonts, radius, size, space, type as escala } from "@/theme";
 
 /**
@@ -26,23 +25,23 @@ import { colors, fonts, radius, size, space, type as escala } from "@/theme";
  */
 export default function ArmarGrupo() {
   const p = useLocalSearchParams<{ comercio?: string; monto?: string }>();
+  const dispatch = useAppDispatch();
+  const hoy = useAppSelector(selectHoy);
+  const contactos = useAppSelector((s) => s.contactos.lista);
   const ejemplo = api.getGrupoDeEjemplo();
   const desdeComercio = Boolean(p.comercio);
   const comercioId = p.comercio || ejemplo.comercioId;
-  const fecha = desdeComercio ? api.getHoy() : ejemplo.fecha;
+  const fecha = desdeComercio ? hoy : ejemplo.fecha;
   const nombre = desdeComercio ? null : ejemplo.nombre;
 
-  const { perfil } = usePerfilLocal();
-  const version = useSesion((s) => s.contactosQuitados.length + s.contactosAceptados.length);
   const comercio = useAsync(() => api.getComercio(comercioId), comercioId);
-  const contactos = useAsync(() => api.getContactos(), version);
 
   const [monto, setMonto] = useState<number | null>(desdeComercio ? parseMonto(p.monto ?? "") : ejemplo.monto);
   const [excluidos, setExcluidos] = useState<string[]>([]);
   const [sinCuenta, setSinCuenta] = useState<string[]>(desdeComercio ? [] : ["Sofía"]);
   const [nuevo, setNuevo] = useState("");
 
-  const elegidos = (contactos.datos ?? []).filter((c) => !excluidos.includes(c.id));
+  const elegidos = contactos.filter((c) => !excluidos.includes(c.id));
   const cantidad = 1 + elegidos.length + sinCuenta.length;
   const listo = monto !== null && cantidad >= 2;
 
@@ -60,21 +59,9 @@ export default function ArmarGrupo() {
       ...elegidos.map((c) => ({ tipo: "contacto" as const, contactoId: c.id })),
       ...sinCuenta.map((n) => ({ tipo: "sin-cuenta" as const, nombre: n })),
     ];
-    setSesion({ grupo: { nombre, comercioId, monto, fecha, integrantes } });
+    dispatch(grupoArmado({ nombre, comercioId, monto, fecha, integrantes }));
     router.push("/grupo/resultado");
   };
-
-  if (!perfil.cuenta) {
-    return (
-      <Screen>
-        <EmptyState
-          title="Para armar un grupo, guardá tu perfil"
-          body="Los contactos se vinculan entre cuentas: así cada uno decide qué comparte."
-          action={{ label: "Guardar mi perfil", onPress: () => router.push("/login") }}
-        />
-      </Screen>
-    );
-  }
 
   return (
     <Screen
@@ -97,7 +84,7 @@ export default function ArmarGrupo() {
             </Text>
             <Text variant="label" tone="inkSecondary">
               {nombre ? `${comercio.datos.nombre} · ` : ""}
-              {fecha === api.getHoy() ? "hoy" : `sábado ${fechaCorta(fecha)}`}
+              {fecha === hoy ? "hoy" : `sábado ${fechaCorta(fecha)}`}
             </Text>
           </View>
         </View>
@@ -130,24 +117,20 @@ export default function ArmarGrupo() {
             </Text>
           </View>
         </View>
-        {contactos.datos ? (
-          contactos.datos.map((c) => {
-            const sel = !excluidos.includes(c.id);
-            return (
-              <OptionRow
-                key={c.id}
-                kind="check"
-                title={c.nombre}
-                detail="Contacto vinculado · usamos su tope"
-                selected={sel}
-                onPress={() => setExcluidos((xs) => (sel ? [...xs, c.id] : xs.filter((x) => x !== c.id)))}
-                leading={<Avatar letras={c.iniciales} tone={sel ? "activo" : "neutral"} />}
-              />
-            );
-          })
-        ) : (
-          <SkeletonList rows={2} height={64} />
-        )}
+        {contactos.map((c) => {
+          const sel = !excluidos.includes(c.id);
+          return (
+            <OptionRow
+              key={c.id}
+              kind="check"
+              title={c.nombre}
+              detail="Contacto vinculado · usamos su tope"
+              selected={sel}
+              onPress={() => setExcluidos((xs) => (sel ? [...xs, c.id] : xs.filter((x) => x !== c.id)))}
+              leading={<Avatar letras={c.iniciales} tone={sel ? "activo" : "neutral"} />}
+            />
+          );
+        })}
       </View>
 
       <View style={{ gap: space.md }}>

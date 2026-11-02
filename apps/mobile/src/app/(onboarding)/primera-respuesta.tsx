@@ -8,24 +8,31 @@ import { Icon, iconoDeRubro } from "@/components/icon";
 import { Screen } from "@/components/screen";
 import { Skeleton } from "@/components/skeleton";
 import { Text } from "@/components/text";
-import * as api from "@/data/api";
-import { usePerfilLocal } from "@/data/perfil-local";
-import { useAsync } from "@/hooks/use-async";
+import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
+import { invitacionGuardada, onboardingTerminado } from "@/store/perfil";
 import { colors, radius, space } from "@/theme";
 
 /**
- * Primera respuesta (onboarding 4/5): una decisión de ejemplo antes de pedir la cuenta.
+ * Primera respuesta (onboarding 4/5): una decisión de ejemplo con los medios que eligió.
+ * Cierra el onboarding: de acá va a Inicio, o a la invitación que abrió antes de tener cuenta.
  * Un usuario nuevo no tiene compras, así que no se muestra ninguna cifra de tope (Principio V).
  */
 export default function PrimeraRespuesta() {
-  const { perfil } = usePerfilLocal();
-  const r = useAsync(() => api.recomendar("coto", null));
-  const n = perfil.medios.length;
+  const dispatch = useAppDispatch();
+  const n = useAppSelector((s) => s.perfil.medios.length);
+  const pendiente = useAppSelector((s) => s.perfil.invitacionPendiente);
+  const r = useRecomendacionPara("coto", null);
+
+  const empezar = () => {
+    dispatch(onboardingTerminado());
+    dispatch(invitacionGuardada(null));
+    router.replace(pendiente ? `/i/${pendiente}` : "/");
+  };
 
   return (
     <>
       <Stack.Screen options={{ title: "" }} />
-      <Screen footer={<Button label="Guardar mi perfil" onPress={() => router.push("/login")} />}>
+      <Screen footer={<Button label="Empezar" onPress={empezar} />}>
         <View style={{ gap: space.sm }}>
           <Text variant="titleLg" accessibilityRole="header">
             Listo. Así funciona:
@@ -34,23 +41,23 @@ export default function PrimeraRespuesta() {
             Con {n === 1 ? "el medio" : `los ${n} medios`} que elegiste, si hoy comprás en Coto:
           </Text>
         </View>
-        {r.datos ? (
+        {r ? (
           <View style={{ gap: space.md }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
-              <Avatar icon={iconoDeRubro[r.datos.comercio.rubro]} />
+              <Avatar icon={iconoDeRubro[r.comercio.rubro]} />
               <View style={{ flex: 1 }}>
                 <Text variant="bodyLg" weight="semibold">
-                  {r.datos.comercio.nombre}
+                  {r.comercio.nombre}
                 </Text>
                 <Text variant="label" tone="inkSecondary">
-                  Supermercado · {r.datos.dia}
+                  Supermercado · {r.dia}
                 </Text>
               </View>
             </View>
             <DecisionCard
-              titulo={r.datos.medio ? `Te conviene ${r.datos.medio.nombre}` : "Hoy no hay promo"}
-              inicial={r.datos.medio?.inicial}
-              razon={r.datos.razon}
+              titulo={r.medio ? `Te conviene ${r.medio.nombre}` : "Hoy no hay promo"}
+              inicial={r.medio?.inicial}
+              razon={r.razon}
             />
           </View>
         ) : (

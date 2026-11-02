@@ -1,19 +1,19 @@
 /**
  * Datos de ejemplo de docs/design/DESIGN.md §9 (Martín, octubre de 2026).
  *
- * Hacen de "base de datos" del servidor mientras no existen las Edge Functions.
- * Solo los leen `servidor-simulado.ts` y `api.ts`; las pantallas nunca importan
+ * Hacen de "base de datos" mientras no existe Supabase (#34): el estado inicial del store
+ * y los datos del reemplazo de la Edge Function de grupo. Las pantallas nunca importan
  * este archivo.
  */
 import { RUBROS } from "../lib/rubros";
-import type { Comercio, Compra, Contacto, MedioDePago, Periodo, Rubro } from "./contracts";
+import type { Compra as CompraMotor, Dia, MedioDePago as MedioMotor, Promocion } from "@vuelto/motor";
+import type { Comercio, Contacto, MedioDePago, Rubro } from "./contracts";
 
-/** Reloj fijo del mock: miércoles 14 de octubre de 2026 (FR-038). */
-export const HOY = "2026-10-14";
-export const DIA_HOY = 3; // 0 = domingo … 3 = miércoles
-export const MES = "octubre";
-export const REINICIO_MENSUAL = "1/11";
-export const DIAS_PARA_REINICIO = 18;
+/**
+ * Reloj de los datos de ejemplo: miércoles 14 de octubre de 2026 al mediodía de Argentina
+ * (spec 006 FR-038, spec 008 FR-006). El mediodía evita que la zona horaria cambie el día.
+ */
+export const RELOJ_EJEMPLO = "2026-10-14T12:00:00-03:00";
 
 export const medios = {
   galicia: {
@@ -95,16 +95,6 @@ export const CATEGORIA_DE_RUBRO = Object.fromEntries(
   Object.entries(RUBROS).map(([r, v]) => [r, v.categoriaId]),
 ) as Record<Rubro, number | null>;
 
-/** Nombre en minúsculas, como lo usan las plantillas del motor (motivos.ts). */
-export const NOMBRE_CATEGORIA: Record<number, string> = {
-  1: "supermercados",
-  2: "gastronomía",
-  3: "indumentaria",
-  4: "farmacias, perfumerías y peluquerías",
-  5: "combustibles",
-  7: "hogar",
-};
-
 const comercio = (id: string, nombre: string, rubro: Rubro, frecuente: boolean): Comercio => ({
   id,
   nombre,
@@ -131,91 +121,92 @@ export const comercios = {
 
 export const catalogoComercios: Comercio[] = Object.values(comercios);
 
-export const nombreRubro = Object.fromEntries(
-  Object.entries(RUBROS).map(([r, v]) => [r, v.enFrase]),
-) as Record<Rubro, string>;
-
-/** Promo vigente de cada medio declarado (corpus de MODO simplificado). */
-export type PromoFixture = {
-  id: string;
-  titulo: string;
-  medioId: string;
-  rubro: Rubro;
-  porcentaje: number;
-  /** Días de la semana en que aplica (0 = domingo). `null` = todos los días. */
-  dias: number[] | null;
-  diasTexto: string;
-  nominal: number;
-  periodo: Periodo;
-  /** Tope consumido según las compras registradas; `null` si no hay compras en el periodo. */
-  consumido: number | null;
-  comprasEnPeriodo: number;
-  reinicio: string;
+/**
+ * Medios del catálogo con la forma del motor (data-model.md §Medios). Mercado Pago no está:
+ * es una billetera sin banco ni red, y el motor no puede evaluarla sin inventarlos.
+ */
+export const mediosDelMotor: Record<string, MedioMotor> = {
+  [medios.galicia.id]: { id: medios.galicia.id, bancoId: "galicia", tipo: "credito", red: "visa" },
+  [medios.santander.id]: { id: medios.santander.id, bancoId: "santander", tipo: "credito", red: "master" },
+  [medios.provincia.id]: { id: medios.provincia.id, bancoId: "provincia", tipo: "debito", red: "visa" },
+  [medios.macro.id]: { id: medios.macro.id, bancoId: "macro", tipo: "debito", red: "visa" },
+  [medios.bbva.id]: { id: medios.bbva.id, bancoId: "bbva", tipo: "credito", red: "visa" },
 };
 
-export const promos: PromoFixture[] = [
-  {
-    id: "promo-galicia-super-mie",
-    titulo: "Galicia: 20% en supermercados los miércoles",
-    medioId: medios.galicia.id,
-    rubro: "supermercado",
-    porcentaje: 20,
-    dias: [3],
-    diasTexto: "los miércoles",
-    nominal: 10000,
-    periodo: "mes",
-    consumido: 3500,
-    comprasEnPeriodo: 3,
-    reinicio: `se reinicia el ${REINICIO_MENSUAL}`,
-  },
-  {
-    id: "promo-santander-nafta-jue",
-    titulo: "Santander: 15% en combustibles los jueves",
-    medioId: medios.santander.id,
-    rubro: "combustible",
-    porcentaje: 15,
-    dias: [4],
-    diasTexto: "los jueves",
-    nominal: 8000,
-    periodo: "mes",
-    consumido: 5700,
-    comprasEnPeriodo: 4,
-    reinicio: `se reinicia el ${REINICIO_MENSUAL}`,
-  },
-  {
-    id: "promo-provincia-gastro-sab",
-    titulo: "Provincia: 25% en gastronomía los sábados",
-    medioId: medios.provincia.id,
-    rubro: "gastronomia",
-    porcentaje: 25,
-    dias: [6],
-    diasTexto: "los sábados",
-    nominal: 5000,
-    periodo: "semana",
-    consumido: null,
-    comprasEnPeriodo: 0,
-    reinicio: "se reinicia el lunes",
-  },
-  {
-    id: "promo-macro-farmacias",
-    titulo: "Macro: 15% en farmacias todos los días",
-    medioId: medios.macro.id,
-    rubro: "farmacia",
-    porcentaje: 15,
-    dias: null,
-    diasTexto: "todos los días",
-    nominal: 6000,
-    periodo: "mes",
-    consumido: 6000,
-    comprasEnPeriodo: 2,
-    reinicio: `vuelve el ${REINICIO_MENSUAL}`,
-  },
+const promo = (
+  id: string,
+  titulo: string,
+  bancoId: string,
+  rubro: Rubro,
+  porcentaje: number,
+  tarjetas: Promocion["tarjetas"],
+  dias: Dia[] | null,
+  tope: number,
+  periodo: "mensual" | "semanal",
+): Promocion => ({
+  id,
+  fuente: "manual",
+  titulo,
+  bancoId,
+  categoriaId: CATEGORIA_DE_RUBRO[rubro] ?? 0,
+  comercio: null,
+  porcentaje,
+  tarjetas,
+  vigencia: { desde: "2026-10-01", hasta: "2026-12-31", dias },
+  tope: { monto: tope, periodo, alcance: "exclusivo", grupoTopeId: null },
+  montoMinimo: null,
+  jurisdiccion: "nacional",
+  canal: "ambos",
+  acumulable: false,
+});
+
+/** Corpus de ejemplo (MODO simplificado): una promo por banco de Martín. */
+export const promociones: Promocion[] = [
+  promo(
+    "promo-galicia-super-mie",
+    "Galicia: 20% en supermercados los miércoles",
+    "galicia",
+    "supermercado",
+    20,
+    { debito: [], credito: ["visa"] },
+    ["mie"],
+    10000,
+    "mensual",
+  ),
+  promo(
+    "promo-santander-nafta-jue",
+    "Santander: 15% en combustibles los jueves",
+    "santander",
+    "combustible",
+    15,
+    { debito: [], credito: ["master"] },
+    ["jue"],
+    8000,
+    "mensual",
+  ),
+  promo(
+    "promo-provincia-gastro-sab",
+    "Provincia: 25% en gastronomía los sábados",
+    "provincia",
+    "gastronomia",
+    25,
+    { debito: ["visa"], credito: [] },
+    ["sab"],
+    5000,
+    "semanal",
+  ),
+  promo(
+    "promo-macro-farmacias",
+    "Macro: 15% en farmacias todos los días",
+    "macro",
+    "farmacia",
+    15,
+    { debito: ["visa"], credito: [] },
+    null,
+    6000,
+    "mensual",
+  ),
 ];
-
-/** Consejo del día, armado con datos del usuario (DESIGN.md §5). Uno solo. */
-export const consejos: Record<string, string> = {
-  [medios.galicia.id]: "Hoy es miércoles: en el súper, con Galicia te quedan ≈$6.500 de tope.",
-};
 
 const compra = (
   id: string,
@@ -223,26 +214,44 @@ const compra = (
   fecha: string,
   monto: number,
   medio: MedioDePago,
-  reintegro: number | null,
-  origen: Compra["origen"],
-): Compra => ({ id, comercio: c, fecha, monto, medio, reintegro, origen, textoExtraido: null });
+  promocionId: string | null,
+  descuentoObtenido: number | null,
+  origen: CompraMotor["origen"],
+): CompraMotor => ({
+  id,
+  fecha,
+  monto,
+  comercio: c.nombre,
+  categoriaId: c.categoriaId,
+  medioDePagoId: medio.id,
+  promocionId,
+  descuentoObtenido,
+  reintegroEsperado: null,
+  fechaAcreditacionEstimada: null,
+  origen,
+  textoExtraido: null,
+});
+
+const GALICIA = "promo-galicia-super-mie";
+const SANTANDER = "promo-santander-nafta-jue";
+const MACRO = "promo-macro-farmacias";
 
 /**
- * Compras de octubre. Cuentas que cierran con los topes:
+ * Compras de octubre, con el descuento que informó el banco. Cuentas que cierran con los topes:
  * Galicia 1.800 + 1.000 + 700 = 3.500 · Santander 3.000 + 1.200 + 900 + 600 = 5.700 ·
  * Macro 3.600 + 2.400 = 6.000 · total devuelto 15.200 en 10 compras.
  */
-export const comprasOctubre: Compra[] = [
-  compra("c10", comercios.farmacity, "2026-10-09", 16000, medios.macro, 2400, "ticket"),
-  compra("c9", comercios.ypf, "2026-10-08", 20000, medios.santander, 3000, "excepcion"),
-  compra("c8", comercios.shell, "2026-10-08", 4000, medios.santander, 600, "manual"),
-  compra("c7", comercios.jumbo, "2026-10-07", 9000, medios.galicia, 1800, "ticket"),
-  compra("c6", comercios.carrefour, "2026-10-07", 5000, medios.galicia, 1000, "excepcion"),
-  compra("c5", comercios.coto, "2026-10-07", 3500, medios.galicia, 700, "ticket"),
-  compra("c4", comercios.coto, "2026-10-06", 6000, medios.provincia, null, "manual"),
-  compra("c3", comercios.farmacity, "2026-10-03", 24000, medios.macro, 3600, "ticket"),
-  compra("c2", comercios.ypf, "2026-10-01", 8000, medios.santander, 1200, "ticket"),
-  compra("c1", comercios.shell, "2026-10-01", 6000, medios.santander, 900, "excepcion"),
+export const comprasOctubre: CompraMotor[] = [
+  compra("c10", comercios.farmacity, "2026-10-09", 16000, medios.macro, MACRO, 2400, "ticket"),
+  compra("c9", comercios.ypf, "2026-10-08", 20000, medios.santander, SANTANDER, 3000, "excepcion"),
+  compra("c8", comercios.shell, "2026-10-08", 4000, medios.santander, SANTANDER, 600, "manual"),
+  compra("c7", comercios.jumbo, "2026-10-07", 9000, medios.galicia, GALICIA, 1800, "ticket"),
+  compra("c6", comercios.carrefour, "2026-10-07", 5000, medios.galicia, GALICIA, 1000, "excepcion"),
+  compra("c5", comercios.coto, "2026-10-07", 3500, medios.galicia, GALICIA, 700, "ticket"),
+  compra("c4", comercios.coto, "2026-10-06", 6000, medios.provincia, null, null, "manual"),
+  compra("c3", comercios.farmacity, "2026-10-03", 24000, medios.macro, MACRO, 3600, "ticket"),
+  compra("c2", comercios.ypf, "2026-10-01", 8000, medios.santander, SANTANDER, 1200, "ticket"),
+  compra("c1", comercios.shell, "2026-10-01", 6000, medios.santander, SANTANDER, 900, "excepcion"),
 ];
 
 export const usuario = { nombre: "Martín", email: "martin@ejemplo.com" };
@@ -253,48 +262,15 @@ export const contactos: Contacto[] = [
 ];
 
 /**
- * Lo que el servidor sabe de cada contacto para evaluar un grupo (ADR-008 §3, columna
- * "¿Llega al motor?"). Nunca viaja a la app: `api.ts` solo devuelve lo que arma
- * `servidor-simulado.ts` con la columna "¿Lo ve el usuario?".
+ * Lo que el servidor sabe de cada integrante de un grupo, con la forma del motor (ADR-008 §3,
+ * columna "¿Llega al motor?"). Solo lo lee `grupo-simulado.ts`, el reemplazo de la Edge
+ * Function: nunca llega a una pantalla.
  */
-export type MedioContacto = {
-  nombre: string;
-  rubro: Rubro;
-  porcentaje: number;
-  dias: number[] | null;
-  diasTexto: string;
-  nominal: number;
-  disponible: number | null;
-};
-
-export const contactoServidor: Record<string, { tieneCompras: boolean; medios: MedioContacto[] }> = {
-  lucia: {
-    tieneCompras: false,
-    medios: [
-      {
-        nombre: "Galicia Visa crédito",
-        rubro: "supermercado",
-        porcentaje: 20,
-        dias: [3],
-        diasTexto: "los miércoles",
-        nominal: 10000,
-        disponible: null,
-      },
-    ],
-  },
+export const datosDeContactos: Record<string, { medios: MedioMotor[]; compras: CompraMotor[] }> = {
+  lucia: { medios: [mediosDelMotor[medios.galicia.id]!], compras: [] },
   mateo: {
-    tieneCompras: true,
-    medios: [
-      {
-        nombre: "Provincia Visa débito",
-        rubro: "gastronomia",
-        porcentaje: 25,
-        dias: [6],
-        diasTexto: "los sábados",
-        nominal: 5000,
-        disponible: 5000,
-      },
-    ],
+    medios: [mediosDelMotor[medios.provincia.id]!],
+    compras: [compra("m1", comercios.coto, "2026-10-12", 8000, medios.provincia, null, null, "manual")],
   },
 };
 
@@ -308,7 +284,7 @@ export const grupoDeEjemplo = {
 
 export const ticketDeEjemplo = {
   comercio: "Coto",
-  fecha: HOY,
+  fecha: "2026-10-14",
   monto: 24500,
   textoExtraido:
     "COTO C.I.C.S.A. · SUC. 112 ALMAGRO\n14/10/2026 18:42\nVARIOS SUPERMERCADO\nTOTAL $ 24.500,00\nGRACIAS POR SU COMPRA",

@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import type { TopeMedio } from "@/data/contracts";
-import { aprox, pesos } from "@/lib/format";
+import { pesos } from "@/lib/format";
 import { colors, radius, space } from "@/theme";
 import { Avatar } from "./avatar";
 import { Badge } from "./badge";
@@ -48,7 +48,7 @@ export function TopeResumen({ t }: { t: TopeMedio }) {
       ) : (
         <View>
           <Text variant="titleMd" weight="bold" tabular>
-            {aprox(t.disponible)}
+            {t.cifra}
           </Text>
           <Text variant="label" tone="inkSecondary" tabular>
             de {pesos(t.nominal)}
@@ -103,7 +103,7 @@ export function TopeDetalle({ t }: { t: TopeMedio }) {
         <View style={{ alignItems: "flex-end", maxWidth: "45%" }}>
           {t.disponible !== null && t.base.tipo === "compras" && t.estado !== "agotado" ? (
             <Text variant="titleMd" weight="bold" tabular>
-              {aprox(t.disponible)}
+              {t.cifra}
             </Text>
           ) : null}
           <Text variant="label" tone="inkSecondary" tabular align="right">
@@ -150,5 +150,5 @@ function etiqueta(t: TopeMedio): string {
   if (t.disponible === null) return `${t.medio.nombre}. ${t.base.texto}`;
   if (t.estado === "agotado") return `${t.medio.nombre}. Tope agotado, ${t.base.texto}. ${t.reinicio}.`;
   const estado = t.estado === "queda-poco" ? "Queda poco. " : "";
-  return `${t.medio.nombre}. ${estado}Quedan aproximadamente ${pesos(t.disponible)} de ${pesos(t.nominal)}, ${t.base.texto}.`;
+  return `${t.medio.nombre}. ${estado}Quedan ${(t.cifra ?? "").replace("≈", "aproximadamente ")} de ${pesos(t.nominal)}, ${t.base.texto}.`;
 }
