@@ -8,6 +8,7 @@ import { selectRecomendacion, selectTopes } from "./selectores";
 import { ahoraCambio, usuarioCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
 import { esperar, memoria, storeDePrueba } from "./prueba";
+import { eliminarCompra } from "./thunks";
 
 const nueva = { ...comprasOctubre[0]!, id: "n11", fecha: "2026-10-14" };
 
@@ -30,6 +31,20 @@ describe("persistencia (US4)", () => {
     expect(b.getState().perfil).toEqual(a.getState().perfil);
     expect(b.getState().corpus).toEqual(a.getState().corpus);
     expect(b.getState().compras.lista[0]?.id).toBe("n11");
+  });
+
+  it("una compra eliminada tampoco queda en el disco (spec 010, FR-002)", async () => {
+    const disco = memoria();
+    const a = await abrir(disco);
+    a.dispatch(compraAgregada(nueva));
+    await esperar();
+    expect(disco.datos.get(CLAVE)).toContain('"n11"');
+
+    a.dispatch(eliminarCompra("n11"));
+    await esperar();
+    expect(disco.datos.get(CLAVE)).not.toContain('"n11"');
+    const b = await abrir(disco);
+    expect(b.getState().compras.lista.some((c) => c.id === "n11")).toBe(false);
   });
 
   it("el usuario autenticado no se guarda: la sesión la guarda el cliente de Supabase", async () => {

@@ -83,6 +83,7 @@ dispositivo (ADR-010, spec 008).
 | `perfil` | Nombre, onboarding completo, medios y comercios elegidos, invitación pendiente | Sí |
 | `corpus` | Promociones con la forma del motor y cuándo se cargaron (hoy, las de ejemplo) | Sí |
 | `compras` | Compras con la forma del motor (`promocionId`, `descuentoObtenido`, `reintegroEsperado`) | Sí |
+| `cola` | Operaciones de guardar y borrar compras que la cuenta todavía no tiene, con dueño y estado (spec 010) | Sí, en su propia clave (`vuelto.cola.v1`) |
 | `simulacion` | Comercio elegido y monto opcional de «¿Con qué pago?» | No |
 | `contactos` | Contactos (solo lo de ADR-008 §3) y grupo en armado | No |
 
@@ -90,7 +91,8 @@ dispositivo (ADR-010, spec 008).
 selectEntradasMotor  = perfil.medios + corpus + compras + sesion.ahora → { perfil, promociones, compras, ahora }
 selectRecomendacion  = entradas + simulacion → recomendar() del motor → vista
 selectTopes          = entradas → estimarTopes() + formatearEstimacion() → vista
-selectResumenCompras = compras + ahora → «Mis compras» del mes en curso
+selectResumenCompras = compras + ahora → «Mis compras»: todo el período de topes; los totales, del mes
+selectMarcasDeSubida = cola → qué compras están «Sin subir» o «Solo en este celular» (vacío si la subida no está conectada)
 ```
 
 - **En vivo**: tipear el monto cambia `simulacion.monto`; las entradas del motor no se
@@ -106,6 +108,15 @@ selectResumenCompras = compras + ahora → «Mis compras» del mes en curso
   si el medio elegido tiene opción, guarda `promocionId` y `reintegroEsperado`, con
   `descuentoObtenido: null` (el usuario no informó el descuento). Topes, Mis compras y la próxima
   recomendación la ven al instante.
+- **Borrar una compra**: `eliminarCompra` la saca de `compras`; los topes y totales se corrigen solos
+  porque se derivan. La confirmación es una hoja (`borrar-compra`), no un `Alert`, que no funciona en la web.
+- **Cola de subida de compras** (spec 010, issue #44): cada guardar o borrar deja una operación en el slice
+  `cola`, que se escribe en `vuelto.cola.v1` **antes** que `compras` para que nunca quede una compra nueva sin
+  su operación; al abrir, `iniciarCompras()` reconcilia ambas, migra las compras con id `nN` y descarta lo de
+  más de 90 días. Un único vaciado a la vez (`vaciarCola`) las sube a `public.compras` con un repositorio
+  inyectado (`Extra.subida`), con plazo de 10 s por envío e idempotencia por id. Mientras `subida` es `null`
+  (faltan #40, #41 y #42) la cola solo acumula y no se muestra ninguna marca. `aplicarPendientes` es el
+  contrato con la sincronización de #42. Detalle: `specs/010-registro-compras-cola/`.
 - **Persistencia** (`store/persistencia.ts`, sin `redux-persist`): un listener escribe
   `vuelto.store.v1` en AsyncStorage cada vez que cambian `perfil`, `corpus`, `compras` o la cuenta,
   y solo después de rehidratar (no pisa lo guardado). Al abrir, `rehidratar()` valida cada parte por

@@ -9,6 +9,8 @@ import {
   type ThunkAction,
   type UnknownAction,
 } from "@reduxjs/toolkit";
+import type { Subida } from "../data/compras/repositorio";
+import { cola, escucharPersistenciaCola } from "./cola";
 import { compras } from "./compras";
 import { contactos } from "./contactos";
 import { corpus } from "./corpus";
@@ -22,23 +24,38 @@ const reducer = combineReducers({
   perfil: perfil.reducer,
   corpus: corpus.reducer,
   compras: compras.reducer,
+  cola: cola.reducer,
   simulacion: simulacion.reducer,
   contactos: contactos.reducer,
 });
 
 export type RootState = ReturnType<typeof reducer>;
-export type Extra = { almacenamiento: Almacenamiento };
+/**
+ * Lo que los thunks reciben además del estado. `generarId` da el UUID de cada compra nueva
+ * (`expo-crypto` en la app, uno determinista en los tests, spec 010 R1). `subida` es el
+ * repositorio de la cuenta con su contexto; `null` mientras no estén #40, #41 y #42 (FR-020).
+ */
+export type Extra = { almacenamiento: Almacenamiento; generarId: () => string; subida: Subida | null };
 
-export function crearStore(opciones: { almacenamiento: Almacenamiento; estadoInicial: Partial<RootState> | null }) {
+export function crearStore(opciones: {
+  almacenamiento: Almacenamiento;
+  estadoInicial: Partial<RootState> | null;
+  generarId: () => string;
+  subida?: Subida | null;
+}) {
   const listener = createListenerMiddleware<RootState>();
+  const extra: Extra = {
+    almacenamiento: opciones.almacenamiento,
+    generarId: opciones.generarId,
+    subida: opciones.subida ?? null,
+  };
   const store = configureStore({
     reducer,
     preloadedState: opciones.estadoInicial ?? undefined,
-    middleware: (porDefecto) =>
-      porDefecto({ thunk: { extraArgument: { almacenamiento: opciones.almacenamiento } satisfies Extra } }).prepend(
-        listener.middleware,
-      ),
+    middleware: (porDefecto) => porDefecto({ thunk: { extraArgument: extra } }).prepend(listener.middleware),
   });
+  // La cola va primero: su setItem tiene que salir antes que el de `compras` (spec 010, R2).
+  escucharPersistenciaCola(listener, opciones.almacenamiento);
   escucharPersistencia(listener, opciones.almacenamiento);
   return store;
 }

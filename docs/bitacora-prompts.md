@@ -1374,6 +1374,42 @@ la recomendación cambie mientras se tipea el monto, sin red.
 
 ---
 
+## 2026-11-02 — Registrar una compra: borrar, promo quitable y cola de subida (issue #44, spec 010)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con spec-kit, `spec-critic`, `rules-guardian` y
+`test-runner`; Supabase local con Docker para probar el esquema.
+
+**Objetivo:** cerrar lo que faltaba de la issue #44 sobre el store de Redux (#81) y el esquema
+de Supabase (#34) ya mergeados. La captura local de la compra ya existía; faltaban borrar,
+la promo aplicada visible y quitable, y subir lo registrado a la cuenta aunque no haya señal.
+
+**Prompts principales:**
+1. «Issue #44: registrar una compra aceptando la recomendación ("Pagué con esto", origen
+   excepcion) o cargándola a mano (origen manual). […] se sube a Supabase cuando hay red y
+   queda en cola si no. Una compra sin confirmar no modifica ningún tope. Flujo spec-kit para
+   issues M y rules-guardian antes del PR.» (con la nota de que #43, #40, #41 y #42 no estaban)
+2. Mensaje de la sesión coordinadora: renumerar la spec de 009 a 010 para no chocar con la de #42.
+
+**Resultado:**
+- `spec-critic` encontró 5 bloqueantes en la primera spec (la promo del corpus de ejemplo y el
+  medio Mercado Pago no se pueden subir nunca; a quién pertenece la cola; borrar durante un
+  envío; qué error es transitorio). Todos se resolvieron en la spec antes de planificar.
+- Borrar una compra (hoja de confirmación, no `Alert`, que no anda en la web); «Mis compras» lista
+  todo el período de topes.
+- Cola de operaciones en un slice aparte (`vuelto.cola.v1`), escrita antes que `compras`, con
+  estados, dueño, compactación y un solo vaciado a la vez. La subida real queda **desconectada**
+  (`Extra.subida = null`) hasta #40, #41 y #42.
+- Un hallazgo al probar el cierre de la app entre escrituras: anular un guardado con su borrado
+  dentro del mismo paso dejaba una compra sin operación; se separó `compactar` de `encolarBorrado`.
+- Probado contra un Supabase local con el cliente real: `upsert` con `ignoreDuplicates` no duplica,
+  borrar dos veces es éxito y los inválidos dan `23514` y `23503`. Se sumó un pgTAP con esos casos.
+- Verificado a mano en el navegador: borrar, quitar la promo y que «Te devolvieron» no cambie.
+  **No** se probó en el simulador de iOS.
+- Coordinación con la sesión de #42, que proponía `pendientes` dentro de `EstadoCompras`: se le
+  respondió con una nota (cola aparte + `aplicarPendientes`) y un mensaje.
+
+---
+
 ## 2026-11-01 — Login y registro con Supabase Auth (issue #40)
 
 **Herramienta:** Claude Code (Sonnet 5.5), con la CLI `gh`, el simulador de iOS y un

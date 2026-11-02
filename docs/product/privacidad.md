@@ -57,6 +57,14 @@ usuario vuelve a fotografiar el ticket.
     (público) y las compras del período en curso, con el texto extraído del
     ticket si lo hubo. Nunca la imagen ni nada derivado (recomendaciones o
     topes). Las compras de períodos anteriores no se escriben (issue #81).
+  - **La cola de subida** (spec 010, issue #44) usa otra clave,
+    `vuelto.cola.v1`: las operaciones de guardar y borrar compras que la cuenta
+    todavía no tiene. Una operación de guardar lleva la compra completa
+    (incluido el texto extraído del ticket, nunca la imagen); una de borrar,
+    solo el id. Se guarda con el id de la cuenta que la generó y no se sube con
+    otra sesión. Se descartan las de compras de más de 90 días y se vacía al
+    cerrar sesión (la app avisa antes cuántas compras quedarían sin subir). Con
+    la subida desconectada, la cola solo acumula en el teléfono.
 - **Perfil** (medios de pago, comercios): se guarda mientras la cuenta
   exista.
 - **Aislamiento entre usuarios**: cada tabla lleva row-level security desde
