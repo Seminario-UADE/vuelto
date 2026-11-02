@@ -53,7 +53,7 @@ export function errorEnEspanol(error: Pick<AuthError, "name" | "status"> & { cod
     case "email_exists":
       return YA_REGISTRADO;
     case "weak_password":
-      return { campo: "clave", mensaje: `La contraseña es muy débil: usá al menos ${CLAVE_MINIMA} caracteres.` };
+      return { campo: "clave", mensaje: "La contraseña es muy débil. Probá con una más larga, mezclando letras y números." };
     case "email_not_confirmed":
       return { campo: null, mensaje: "Todavía no confirmaste tu email. Abrí el link que te mandamos y volvé a entrar." };
     case "email_address_invalid":
@@ -69,7 +69,7 @@ export function errorEnEspanol(error: Pick<AuthError, "name" | "status"> & { cod
   return { campo: null, mensaje: "Algo salió mal de nuestro lado. Probá de nuevo en un rato." };
 }
 
-const aCuenta = (u: User): Cuenta => ({ id: u.id, email: u.email ?? null });
+export const aCuenta = (u: Pick<User, "id" | "email">): Cuenta => ({ id: u.id, email: u.email ?? null });
 
 async function conRed<T>(pedido: () => Promise<T>): Promise<T | ErrorAuth> {
   try {

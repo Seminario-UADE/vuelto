@@ -76,7 +76,7 @@ detrás de un selector.
 |---|---|---|
 | Datos del servidor | `src/data/api.ts` + `useAsync` en cada pantalla | Lo que dura la pantalla |
 | Escrituras de la sesión (compras guardadas, contactos quitados o aceptados, grupo en armado, aviso) | `src/data/sesion.ts` (`useSyncExternalStore`, sin librería) | Hasta cerrar la app |
-| Perfil del dispositivo (onboarding completo, medios, comercios, cuenta, invitación pendiente) | `src/data/perfil-local.ts` (AsyncStorage) | Persistente |
+| Perfil del dispositivo (onboarding completo, medios, comercios, invitación pendiente) | `src/data/perfil-local.ts` (AsyncStorage) | Persistente |
 | Usuario autenticado (`usuario`, `authLista`) | `src/data/sesion.ts`, escrito por `src/data/auth.ts` desde Supabase Auth | La sesión de Supabase persiste (abajo); `usuario` se vuelve a leer al abrir |
 | Sesión de Supabase (tokens) | `src/lib/supabase.ts` (AsyncStorage, `autoRefreshToken`, refresco atado a `AppState` como en la guía de Supabase para Expo) | Persistente |
 

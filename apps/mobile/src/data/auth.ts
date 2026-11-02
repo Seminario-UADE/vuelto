@@ -5,7 +5,8 @@
  */
 import { supabase } from "../lib/supabase";
 import * as auth from "../lib/auth";
-import type { Cuenta, ResultadoAuth } from "../lib/auth";
+import { aCuenta } from "../lib/auth";
+import type { ResultadoAuth } from "../lib/auth";
 import { borrarPerfilLocal } from "./perfil-local";
 import { reiniciarSesion, setUsuario } from "./sesion";
 
@@ -14,9 +15,6 @@ const SIN_SUPABASE: ResultadoAuth = {
   campo: null,
   mensaje: "La app no está conectada a un servidor de cuentas. Avisale al equipo.",
 };
-
-const aCuenta = (u: { id: string; email?: string } | null | undefined): Cuenta | null =>
-  u ? { id: u.id, email: u.email ?? null } : null;
 
 /** Lo del dispositivo pertenece al usuario que salió: el próximo que entre arranca limpio. */
 async function limpiarDispositivo(): Promise<void> {
@@ -50,7 +48,7 @@ export function iniciarAuth(): () => void {
   // vuelve la conexión el cliente refresca y el listener de arriba deja entrar al usuario.
   cliente.auth
     .getSession()
-    .then(({ data: { session } }) => activo && setUsuario(aCuenta(session?.user)))
+    .then(({ data: { session } }) => activo && setUsuario(session ? aCuenta(session.user) : null))
     .catch(() => activo && setUsuario(null));
 
   return () => {

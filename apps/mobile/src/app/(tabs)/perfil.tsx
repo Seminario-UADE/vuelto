@@ -124,33 +124,31 @@ export default function Perfil() {
         <Text variant="bodyMd" tone="inkSecondary">
           Con tus contactos, Vuelto decide quién de ustedes conviene que pague.
         </Text>
-        <>
-            {(contactos.datos ?? []).length > 0 ? (
-              <Card padding={space.lg} gap={0}>
-                {(contactos.datos ?? []).map((c, i) => (
-                  <View
-                    key={c.id}
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: space.md,
-                      paddingVertical: space.md,
-                      ...divisor(i),
-                    }}
-                  >
-                    <Avatar letras={c.iniciales} />
-                    <Text variant="bodyLg" weight="semibold" style={{ flex: 1 }}>
-                      {c.nombre}
-                    </Text>
-                    <Text variant="label" tone="inkSecondary">
-                      Vinculado
-                    </Text>
-                  </View>
-                ))}
-              </Card>
-            ) : null}
-            <Button label="Invitar a alguien" variant="secondary" icon="invitar" onPress={() => router.push("/contactos/invitar")} />
-        </>
+        {(contactos.datos ?? []).length > 0 ? (
+          <Card padding={space.lg} gap={0}>
+            {(contactos.datos ?? []).map((c, i) => (
+              <View
+                key={c.id}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: space.md,
+                  paddingVertical: space.md,
+                  ...divisor(i),
+                }}
+              >
+                <Avatar letras={c.iniciales} />
+                <Text variant="bodyLg" weight="semibold" style={{ flex: 1 }}>
+                  {c.nombre}
+                </Text>
+                <Text variant="label" tone="inkSecondary">
+                  Vinculado
+                </Text>
+              </View>
+            ))}
+          </Card>
+        ) : null}
+        <Button label="Invitar a alguien" variant="secondary" icon="invitar" onPress={() => router.push("/contactos/invitar")} />
       </View>
 
       <View style={{ gap: space.md }}>

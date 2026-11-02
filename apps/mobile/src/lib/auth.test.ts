@@ -32,7 +32,7 @@ describe("errorEnEspanol", () => {
     ["invalid_credentials", null, "El email o la contraseña no coinciden. Revisalos e intentá de nuevo."],
     ["user_already_exists", "email", "Ya hay una cuenta con ese email. Entrá con tu contraseña."],
     ["email_exists", "email", "Ya hay una cuenta con ese email. Entrá con tu contraseña."],
-    ["weak_password", "clave", `La contraseña es muy débil: usá al menos ${CLAVE_MINIMA} caracteres.`],
+    ["weak_password", "clave", "La contraseña es muy débil. Probá con una más larga, mezclando letras y números."],
     ["email_not_confirmed", null, "Todavía no confirmaste tu email. Abrí el link que te mandamos y volvé a entrar."],
     ["over_request_rate_limit", null, "Hiciste muchos intentos seguidos. Esperá unos minutos y probá de nuevo."],
     ["signup_disabled", null, "Por ahora no se pueden crear cuentas nuevas."],
