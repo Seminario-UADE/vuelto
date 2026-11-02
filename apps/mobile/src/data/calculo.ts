@@ -307,7 +307,11 @@ function compraVista(c: CompraMotor): Compra | null {
   };
 }
 
-/** «Mis compras»: las del mes en curso, con lo gastado y lo devuelto. */
+/**
+ * «Mis compras»: lista todas las del período de topes (mes o semana, lo que empiece antes), así
+ * ninguna compra que consume un tope queda sin poder verse o borrarse (spec 010, FR-003).
+ * Lo gastado y lo devuelto siguen siendo los del mes en curso.
+ */
 export function comprasVista(compras: CompraMotor[], ahora: Date): ResumenCompras {
   const hoy = fechaArgentina(ahora);
   const mes = nombreDelMes(hoy);
@@ -316,7 +320,7 @@ export function comprasVista(compras: CompraMotor[], ahora: Date): ResumenCompra
     mes,
     gastaste: delMes.reduce((s, c) => s + c.monto, 0),
     devolvieron: devolvieron(delMes, mes),
-    compras: delMes.flatMap((c) => {
+    compras: comprasDelPeriodo(compras, hoy).flatMap((c) => {
       const v = compraVista(c);
       return v ? [v] : [];
     }),
@@ -324,22 +328,61 @@ export function comprasVista(compras: CompraMotor[], ahora: Date): ResumenCompra
 }
 
 /**
+ * La promo que el motor asocia a un comercio, un medio y **la fecha de la compra** (spec 010,
+ * FR-022). La hoja «Revisá tu compra» la muestra y `compraParaGuardar` la guarda: una sola
+ * función, así un ticket de otro día no muestra una cosa y guarda otra.
+ */
+export type PromoPropuesta = {
+  medioId: string;
+  fecha: string;
+  /** Todas las acumulables de la opción; vacío si no hay ninguna. */
+  promociones: { promocionId: string; nombre: string }[];
+  /** El estimado del motor; `null` sin monto o sin promo. Nunca presentado como cobrado. */
+  reintegro: number | null;
+  /** «según N compras de octubre»; `null` sin promo. */
+  base: string | null;
+};
+
+export function promoPropuesta(
+  entradas: EntradasMotor,
+  comercio: Comercio,
+  medioId: string,
+  fecha: string,
+  monto: number | null,
+): PromoPropuesta {
+  const vacia: PromoPropuesta = { medioId, fecha, promociones: [], reintegro: null, base: null };
+  if (comercio.categoriaId === null) return vacia;
+  const pedido = pedidoPresencial({ ...comercio, categoriaId: comercio.categoriaId }, monto);
+  const r = recomendarSeguro(pedido, { ...entradas, ahora: mediodia(fecha) });
+  const opcion = [r.mejor, ...r.alternativas].find((o) => o?.medioDePagoId === medioId) ?? null;
+  if (opcion === null || opcion.promociones.length === 0) return vacia;
+  const catalogo = new Map(entradas.promociones.map((p) => [p.id, p]));
+  const conBase = opcion.promociones.find((p) => p.base !== null);
+  const periodo = catalogo.get(conBase?.promocionId ?? "")?.tope.periodo === "semanal" ? "semana" : "mes";
+  return {
+    medioId,
+    fecha,
+    promociones: opcion.promociones.map((p) => ({
+      promocionId: p.promocionId,
+      nombre: catalogo.get(p.promocionId)?.titulo ?? p.promocionId,
+    })),
+    reintegro: monto === null ? null : opcion.ahorroEstimado,
+    base: conBase?.base ? textoBase(conBase.base.comprasRegistradas, periodo, nombreDelMes(fecha)).texto : null,
+  };
+}
+
+/**
  * La compra que se guarda (FR-008): se evalúa con el motor al mediodía de su fecha y, si el
- * medio elegido tiene una opción, queda asociada a su promo con el ahorro como reintegro
- * esperado. `descuentoObtenido` queda `null`: el usuario no informó cuánto le devolvieron.
+ * medio elegido tiene una promo y el usuario no la quitó, queda asociada a ella con el ahorro
+ * como reintegro esperado. `descuentoObtenido` queda `null`: el usuario no informó cuánto le
+ * devolvieron.
  */
 export function compraParaGuardar(entradas: EntradasMotor, b: BorradorCompra, id: string): CompraMotor {
   if (b.monto === null || b.medioId === null) throw new Error("Falta el monto o el medio de pago");
   if (!catalogoMedios.some((m) => m.id === b.medioId)) throw new Error(`Medio desconocido: ${b.medioId}`);
   const comercio = comercioPorNombre((b.comercio ?? "").trim() || "Compra");
-  let opcion: RecomendacionMotor["mejor"] = null;
-  if (comercio.categoriaId !== null) {
-    const r = recomendarSeguro(pedidoPresencial({ ...comercio, categoriaId: comercio.categoriaId }, b.monto), {
-      ...entradas,
-      ahora: mediodia(b.fecha),
-    });
-    opcion = [r.mejor, ...r.alternativas].find((o) => o?.medioDePagoId === b.medioId) ?? null;
-  }
+  const propuesta = b.usarPromo ? promoPropuesta(entradas, comercio, b.medioId, b.fecha, b.monto) : null;
+  const tienePromo = propuesta !== null && propuesta.promociones.length > 0;
   return {
     id,
     fecha: b.fecha,
@@ -347,9 +390,9 @@ export function compraParaGuardar(entradas: EntradasMotor, b: BorradorCompra, id
     comercio: comercio.nombre,
     categoriaId: comercio.categoriaId,
     medioDePagoId: b.medioId,
-    promocionId: opcion?.promociones[0]?.promocionId ?? null,
+    promocionId: tienePromo ? (propuesta.promociones[0]?.promocionId ?? null) : null,
     descuentoObtenido: null,
-    reintegroEsperado: opcion ? opcion.ahorroEstimado : null,
+    reintegroEsperado: tienePromo ? propuesta.reintegro : null,
     fechaAcreditacionEstimada: null,
     origen: b.modo,
     textoExtraido: b.textoExtraido,

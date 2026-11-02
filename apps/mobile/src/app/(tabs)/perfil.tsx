@@ -14,6 +14,7 @@ import { cerrarSesion as salir } from "@/data/auth";
 import { useAsync } from "@/hooks/use-async";
 import { escenarioElegido, type Escenario } from "@/store/acciones";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectPendientesAlCerrarSesion } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { space } from "@/theme";
 
@@ -40,7 +41,13 @@ export default function Perfil() {
   const comercios = (catalogoComercios.datos ?? []).filter((c) => perfil.comercios.includes(c.id));
   const nombre = perfil.nombre ?? "Martín";
 
+  const pendientes = useAppSelector(selectPendientesAlCerrarSesion);
   const cerrarSesion = async () => {
+    // Con compras sin subir, primero se avisa cuántas se pierden (spec 010, FR-016).
+    if (pendientes.guardados + pendientes.borrados > 0) {
+      router.push("/cerrar-sesion");
+      return;
+    }
     const error = await dispatch(salir());
     if (error) {
       dispatch(avisoMostrado(error));

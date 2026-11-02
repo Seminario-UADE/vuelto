@@ -1374,6 +1374,42 @@ la recomendación cambie mientras se tipea el monto, sin red.
 
 ---
 
+## 2026-11-02 — Registrar una compra: borrar, promo quitable y cola de subida (issue #44, spec 010)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con spec-kit, `spec-critic`, `rules-guardian` y
+`test-runner`; Supabase local con Docker para probar el esquema.
+
+**Objetivo:** cerrar lo que faltaba de la issue #44 sobre el store de Redux (#81) y el esquema
+de Supabase (#34) ya mergeados. La captura local de la compra ya existía; faltaban borrar,
+la promo aplicada visible y quitable, y subir lo registrado a la cuenta aunque no haya señal.
+
+**Prompts principales:**
+1. «Issue #44: registrar una compra aceptando la recomendación ("Pagué con esto", origen
+   excepcion) o cargándola a mano (origen manual). […] se sube a Supabase cuando hay red y
+   queda en cola si no. Una compra sin confirmar no modifica ningún tope. Flujo spec-kit para
+   issues M y rules-guardian antes del PR.» (con la nota de que #43, #40, #41 y #42 no estaban)
+2. Mensaje de la sesión coordinadora: renumerar la spec de 009 a 010 para no chocar con la de #42.
+
+**Resultado:**
+- `spec-critic` encontró 5 bloqueantes en la primera spec (la promo del corpus de ejemplo y el
+  medio Mercado Pago no se pueden subir nunca; a quién pertenece la cola; borrar durante un
+  envío; qué error es transitorio). Todos se resolvieron en la spec antes de planificar.
+- Borrar una compra (hoja de confirmación, no `Alert`, que no anda en la web); «Mis compras» lista
+  todo el período de topes.
+- Cola de operaciones en un slice aparte (`vuelto.cola.v1`), escrita antes que `compras`, con
+  estados, dueño, compactación y un solo vaciado a la vez. La subida real queda **desconectada**
+  (`Extra.subida = null`) hasta #40, #41 y #42.
+- Un hallazgo al probar el cierre de la app entre escrituras: anular un guardado con su borrado
+  dentro del mismo paso dejaba una compra sin operación; se separó `compactar` de `encolarBorrado`.
+- Probado contra un Supabase local con el cliente real: `upsert` con `ignoreDuplicates` no duplica,
+  borrar dos veces es éxito y los inválidos dan `23514` y `23503`. Se sumó un pgTAP con esos casos.
+- Verificado a mano en el navegador: borrar, quitar la promo y que «Te devolvieron» no cambie.
+  **No** se probó en el simulador de iOS.
+- Coordinación con la sesión de #42, que proponía `pendientes` dentro de `EstadoCompras`: se le
+  respondió con una nota (cola aparte + `aplicarPendientes`) y un mensaje.
+
+---
+
 ## 2026-11-01 — Login y registro con Supabase Auth (issue #40)
 
 **Herramienta:** Claude Code (Sonnet 5.5), con la CLI `gh`, el simulador de iOS y un
@@ -1410,6 +1446,37 @@ usuario pasó al slice `sesion`.
   tocar la tecla `@` a mano: el inyector de texto la deformaba.
 - Revisiones: `test-runner`, `rules-guardian` y `/code-review` sin hallazgos
   graves; se corrigieron un fragmento sobrante en Perfil y un helper duplicado.
+
+---
+
+## 2026-11-02 — Sincronizar el corpus y las compras del período (issue #42)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con spec-kit, `spec-critic`, `rules-guardian` y un Supabase local
+en Docker para verificar las consultas.
+
+**Objetivo:** implementar la issue #42 (reabierta tras ADR-010): que la app baje el corpus de promos y las
+compras del período al store de Redux y siga funcionando sin señal.
+
+**Prompts principales:**
+1. "Implementá la issue #42 […] Primero medí […] y decidime con números si va en AsyncStorage […] Implementá la
+   sincronización al store […] No inventes un store ni una base de mentira para destrabarte, y no midas el corpus
+   con datos inventados"
+2. (`/speckit-specify` → `spec-critic` → `/speckit-plan` → `/speckit-tasks` con la issue y las restricciones)
+
+**Resultado:**
+- `spec-critic` encontró 4 bloqueantes: marca sin margen de relectura, bajas que borraban el consumo de los topes
+  compartidos, mezcla con el corpus de ejemplo (vigente hasta el 31/12) y reloj de ejemplo en la primera
+  sincronización. Se reescribió la spec antes de planificar.
+- Verificado contra un Supabase local aislado (puertos 563xx): el cursor `(actualizada_en, id)` no pierde los
+  empates; `neq.otra_provincia` solo excluye las filas con jurisdicción `null` (hay que usar `or(is.null, neq)`);
+  `supabase-js` no tiene `.and()` y dos `.or()` repetidos se combinan con AND.
+- Decisiones que se apartan del texto de la issue, para que las apruebe el PO: la ventana de compras es el período
+  (el más temprano entre mes y semana), no "los últimos N días del mes"; el corpus va en su propia clave de
+  AsyncStorage.
+- La medición del tamaño del corpus **no se hizo con datos reales** (#35 está abierta): queda el instrumento
+  (`npm run medir:corpus`) y una proyección rotulada con promos de ejemplo (2.000 promos ≈ 880 KB).
+- Sin `tsx` instalado, el medidor se corre con Vitest (sin dependencias nuevas).
+- La prueba manual en modo avión queda bloqueada por #40 (login), #35 (corpus) y #41 (medios en la base).
 
 ---
 

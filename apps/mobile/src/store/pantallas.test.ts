@@ -29,6 +29,7 @@ const borrador = {
   monto: 24500,
   medioId: "galicia-visa-credito",
   textoExtraido: null,
+  usarPromo: true,
 };
 
 describe("perfil del onboarding (FR-002 de la spec 006)", () => {
