@@ -36,7 +36,8 @@ type EstadoCola = {
   hidratada: boolean;              // no persistido: antes de leer, no se escribe
   vaciando: boolean;               // no persistido: exclusión mutua del vaciado
   volver: boolean;                 // no persistido: se pidió vaciar durante un vaciado
-  subidaConectada: boolean;        // no persistido: hay repositorio, sesión y mapeos
+  subidaConectada: boolean;        // no persistido: hay repositorio y sesión
+  intentos: Record<string, string>; // no persistido: intento de guardado → id de la compra (doble toque, FR-005)
 };
 ```
 
@@ -60,7 +61,7 @@ guardar:  pendiente ──envío──▶ enviando ──éxito──▶ (se qui
                          └─ sin medio/promo del servidor ──▶ bloqueada(medio|promo) ──llega el mapeo──▶ pendiente
           (usuario no adopta las de dueno=null) ──▶ bloqueada(decision)   [no se reevalúa]
 
-guardar pendiente + borrar de la misma compra ─▶ ambas se quitan, sin servidor
+guardar pendiente + borrar de la misma compra ─▶ `compactar` quita ambas, sin servidor (paso aparte de encolar el borrado)
 guardar enviando + borrar                    ─▶ el borrar queda detrás; se envía tras el guardar
 borrar:   pendiente ─▶ enviando ─▶ éxito (cero filas incluido) ─▶ se quita
 ```

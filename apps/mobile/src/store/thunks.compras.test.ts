@@ -23,6 +23,7 @@ const borrador = {
   monto: 24500,
   medioId: "galicia-visa-credito",
   textoExtraido: null,
+  usarPromo: true,
 };
 
 describe("eliminarCompra (FR-001, FR-002)", () => {

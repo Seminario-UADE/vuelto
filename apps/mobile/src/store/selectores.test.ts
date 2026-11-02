@@ -99,6 +99,7 @@ describe("guardarCompra (US3)", () => {
         monto: 5000,
         medioId: "galicia-visa-credito",
         textoExtraido: null,
+        usarPromo: true,
       }),
     );
     const galicia = selectTopes(s.getState()).medios.find((m) => m.medio.id === "galicia-visa-credito");
@@ -123,6 +124,7 @@ describe("guardarCompra (US3)", () => {
           monto: 5000,
           medioId: null,
           textoExtraido: null,
+          usarPromo: true,
         }),
       ),
     ).toThrow("Falta el monto o el medio de pago");

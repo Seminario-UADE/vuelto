@@ -32,6 +32,7 @@ const borrador = {
   monto: 24500,
   medioId: "galicia-visa-credito",
   textoExtraido: null,
+  usarPromo: true,
 };
 
 describe("slice cola", () => {

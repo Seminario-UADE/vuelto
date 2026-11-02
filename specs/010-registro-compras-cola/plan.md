@@ -101,7 +101,7 @@ supabase/tests/database/compras_cliente.test.sql   # FR-021
 docs/product/privacidad.md                          # FR-019
 ```
 
-**Structure Decision**: núcleo puro en `src/data/compras/` (importable desde los tests sin React), slice y thunks en `src/store/` junto a los demás, y el cableado a pantallas mínimo. Archivos compartidos con la sesión de #42 (`store/index.ts`, `store/selectores.ts`): cambios chicos y aditivos; `store/persistencia.ts`, `store/compras.ts` y `store/acciones.ts` no se modifican.
+**Structure Decision**: núcleo puro en `src/data/compras/` (importable desde los tests sin React), slice y thunks en `src/store/` junto a los demás, y el cableado a pantallas mínimo. Archivos compartidos con la sesión de #42 (`store/index.ts`, `store/selectores.ts`): cambios chicos y aditivos; `store/persistencia.ts` y `store/acciones.ts` no se modifican; `store/compras.ts` solo recibe dos reducers aditivos (`compraEliminada`, `comprasReconciliadas`) sin cambiar la forma `{ lista }`.
 
 ## Complexity Tracking
 

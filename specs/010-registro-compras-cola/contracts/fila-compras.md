@@ -11,9 +11,9 @@ function compraAFila(
 
 ## Reglas
 
-1. `mapeo.medioRemoto === null` → `{ ok: false, motivo: "medio" }`. La operación queda `bloqueada(medio)`.
-2. `compra.promocionId !== null` y `mapeo.promoRemota === null` → `{ ok: false, motivo: "promo" }`. Queda `bloqueada(promo)`. **No** se sube sin promo (cambiaría los topes de otro dispositivo).
-3. `compra.id` no es un UUID, `monto <= 0` o `comercio` vacío tras recortar → `{ ok: false, motivo: "invalida" }`. Queda `rechazada`.
+1. `compra.id` no es un UUID, `monto <= 0`, `comercio` vacío tras recortar u `origen` fuera de la lista → `{ ok: false, motivo: "invalida" }`. Queda `rechazada`. Se evalúa primero: lo inválido nunca va a servir, no se espera un mapeo.
+2. `mapeo.medioRemoto === null` → `{ ok: false, motivo: "medio" }`. La operación queda `bloqueada(medio)`.
+3. `compra.promocionId !== null` y `mapeo.promoRemota === null` → `{ ok: false, motivo: "promo" }`. Queda `bloqueada(promo)`. **No** se sube sin promo (cambiaría los topes de otro dispositivo).
 4. En cualquier otro caso → `{ ok: true, fila }`, donde `fila` es:
 
 ```ts

@@ -22,6 +22,7 @@ const borrador = {
   monto: 24500,
   medioId: "galicia-visa-credito",
   textoExtraido: null,
+  usarPromo: true,
 };
 
 type Contexto = { userId: string | null; medioRemoto: (id: string) => string | null; promoRemota: (id: string) => string | null };
