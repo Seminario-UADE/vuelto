@@ -63,18 +63,17 @@ function todasConocidas(valores: string[], lista: readonly string[]): boolean {
   return valores.every((v) => lista.includes(v));
 }
 
-/** Una promo dada de baja queda vencida el día anterior a la baja (Argentina): FR-010, spec 009 US4. */
-function conBaja(p: Promocion, dadaDeBajaEn: string | null): Promocion {
+/**
+ * Una promo dada de baja queda vencida el día anterior a la baja (Argentina): FR-010, spec 009 US4.
+ * Sin baja (`null`) la devuelve igual. También se usa sobre la versión que ya estaba en el corpus
+ * cuando la fila nueva con la baja no se pudo mapear.
+ */
+export function aplicarBaja(p: Promocion, dadaDeBajaEn: string | null): Promocion {
   if (dadaDeBajaEn === null) return p;
   const instante = Date.parse(dadaDeBajaEn);
   if (Number.isNaN(instante)) return p;
   const vencida = diaAnterior(fechaArgentina(new Date(instante)));
   return { ...p, vigencia: { ...p.vigencia, hasta: vencida < p.vigencia.hasta ? vencida : p.vigencia.hasta } };
-}
-
-/** Aplica la baja a una promo que ya estaba en el corpus (cuando la fila nueva no se pudo mapear). */
-export function aplicarBaja(p: Promocion, dadaDeBajaEn: string): Promocion {
-  return conBaja(p, dadaDeBajaEn);
 }
 
 /** `null` si la fila no cumple el contrato del motor. */
@@ -104,7 +103,7 @@ export function filaAPromocion(f: FilaPromocion): Promocion | null {
     (f.dias === null || todasConocidas(f.dias, DIAS));
   if (!ok) return null;
 
-  return conBaja(
+  return aplicarBaja(
     {
       id: f.id,
       fuente: f.fuente === "modo" ? "modo" : "manual",

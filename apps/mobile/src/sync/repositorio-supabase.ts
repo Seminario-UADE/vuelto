@@ -6,7 +6,7 @@
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FilaCompra, FilaPromocion, FiltroCompras, FiltroPromociones, RepositorioSincronizacion } from "./contratos";
-import { TAMANO_PAGINA } from "./paginar";
+import { leerTodo, TAMANO_PAGINA } from "./paginar";
 
 const COLUMNAS_PROMOCION = [
   "id",
@@ -81,26 +81,18 @@ export function repositorioSupabase(cliente: SupabaseClient): RepositorioSincron
     },
 
     async idsDePromociones(vigenteDesde: string, signal: AbortSignal) {
-      const ids: string[] = [];
-      let ultimo: string | null = null;
-      for (;;) {
-        let consulta = cliente
-          .from("promociones")
-          .select("id")
-          .or(SIN_OTRA_PROVINCIA)
-          .gte("vigencia_hasta", vigenteDesde);
-        if (ultimo !== null) consulta = consulta.gt("id", ultimo);
-        const { data, error } = await consulta
-          .order("id", { ascending: true })
-          .limit(TAMANO_PAGINA)
-          .abortSignal(signal);
-        if (error) throw error;
-        const pagina = (data ?? []) as unknown as { id: string }[];
-        ids.push(...pagina.map((p) => p.id));
-        const siguiente = pagina[pagina.length - 1]?.id;
-        if (pagina.length < TAMANO_PAGINA || siguiente === undefined) return ids;
-        ultimo = siguiente;
-      }
+      // Mismo cursor que el resto, solo por `id`: reusa la paginación en vez de repetirla a mano.
+      const filas = await leerTodo<{ id: string }>(
+        async (cursor) => {
+          let consulta = cliente.from("promociones").select("id").or(SIN_OTRA_PROVINCIA).gte("vigencia_hasta", vigenteDesde);
+          if (cursor !== null) consulta = consulta.gt("id", cursor.id);
+          const { data, error } = await consulta.order("id", { ascending: true }).limit(TAMANO_PAGINA).abortSignal(signal);
+          if (error) throw error;
+          return (data ?? []) as unknown as { id: string }[];
+        },
+        (f) => ({ valor: f.id, id: f.id }),
+      );
+      return filas.map((f) => f.id);
     },
 
     async compras(f: FiltroCompras) {

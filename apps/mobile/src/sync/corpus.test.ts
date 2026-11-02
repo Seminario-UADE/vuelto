@@ -126,3 +126,14 @@ describe("masReciente", () => {
     expect(masReciente(null, null)).toBeNull();
   });
 });
+
+describe("aplicarPromociones: la primera sincronización con filas inválidas", () => {
+  it("si ninguna fila sirve, no reemplaza el corpus de ejemplo ni mueve la marca (FR-013)", () => {
+    const r = aplicarPromociones(ejemplo, [fila(1, { canal: "telepatia" }), fila(2, { jurisdiccion: "marte" })], {
+      inicioPeriodo: INICIO,
+      idsDelServidor: new Set([ID(1), ID(2)]),
+      ahora: AHORA,
+    });
+    expect(r).toBeNull();
+  });
+});

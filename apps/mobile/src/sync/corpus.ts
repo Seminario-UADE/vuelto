@@ -5,6 +5,7 @@
 import type { Promocion } from "@vuelto/motor";
 import type { EstadoCorpus } from "../store/acciones";
 import type { FilaPromocion } from "./contratos";
+import { compararMarcas } from "./marcas";
 import { aplicarBaja, filaAPromocion } from "./mapeo";
 
 export interface OpcionesCorpus {
@@ -16,18 +17,11 @@ export interface OpcionesCorpus {
   ahora: string;
 }
 
-/**
- * La más reciente de dos marcas. Compara instantes (los ceros finales que recorta PostgREST hacen
- * que el texto no se pueda comparar), y con el mismo milisegundo desempata por el texto, que ya
- * trae los microsegundos.
- */
+/** La más reciente de dos marcas (ver `compararMarcas`). */
 export function masReciente(a: string | null, b: string | null): string | null {
   if (a === null) return b;
   if (b === null) return a;
-  const ta = Date.parse(a);
-  const tb = Date.parse(b);
-  if (ta !== tb) return ta > tb ? a : b;
-  return a >= b ? a : b;
+  return compararMarcas(a, b) >= 0 ? a : b;
 }
 
 /**
@@ -60,6 +54,10 @@ export function aplicarPromociones(
     // Una actualización inválida saca la versión anterior: más vale no recomendar que recomendar con datos viejos.
     else mapa.delete(f.id);
   }
+
+  // La primera sincronización no reemplaza el corpus de ejemplo si ninguna fila sirvió (FR-013): no hay
+  // nada mejor que ofrecer, y la marca y el reloj no se mueven.
+  if (primera && mapa.size === 0) return null;
 
   const promociones = [...mapa.values()].filter(
     (p) => o.idsDelServidor.has(p.id) && p.vigencia.hasta >= o.inicioPeriodo,

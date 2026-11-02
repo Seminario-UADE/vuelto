@@ -62,12 +62,10 @@ export type Sincronizado = {
   corpus: EstadoCorpus;
   /** La lista de compras ya reconciliada con lo local (`reconciliarCompras`), la más nueva primero. */
   compras: Compra[];
-  usuarioId: string;
   /** El reloj real al terminar (ISO). */
   ahora: string;
 };
 export const sincronizado = createAction<Sincronizado>("store/sincronizado");
-
 
 /** Cerrar sesión: todo vuelve al estado inicial (el de ejemplo: corpus, compras y reloj). */
 export const sesionCerrada = createAction("store/sesionCerrada");

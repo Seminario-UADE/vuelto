@@ -161,7 +161,7 @@ describe("persistencia del corpus en su propia clave (spec 009 FR-017)", () => {
     const s = storeDePrueba(null, falla);
     await s.dispatch(rehidratar());
     s.dispatch(onboardingTerminado());
-    s.dispatch(sincronizado({ corpus: { promociones: [], marca: "2026-11-02T12:00:00+00:00", sincronizadoEn: "2026-11-02T15:00:00.000Z", descartadas: 0 }, compras: [], usuarioId: "u", ahora: "2026-11-02T15:00:00.000Z" }));
+    s.dispatch(sincronizado({ corpus: { promociones: [], marca: "2026-11-02T12:00:00+00:00", sincronizadoEn: "2026-11-02T15:00:00.000Z", descartadas: 0 }, compras: [], ahora: "2026-11-02T15:00:00.000Z" }));
     await esperar();
     expect(JSON.parse(disco.datos.get(CLAVE) ?? "{}").perfil.onboardingCompleto).toBe(true);
     expect(disco.datos.has(CLAVE_CORPUS)).toBe(false);
@@ -171,6 +171,7 @@ describe("persistencia del corpus en su propia clave (spec 009 FR-017)", () => {
     const viejo = JSON.stringify({
       version: 1,
       perfil: { nombre: "Martín", onboardingCompleto: true, medios: ["galicia-visa-credito"], comercios: [], invitacionPendiente: null },
+      // El corpus de ejemplo que guardaban las versiones anteriores (con `cargadoEn`): ahora se ignora.
       corpus: { promociones: [{ id: "promo-galicia-super-mie", tope: {}, vigencia: {} }], cargadoEn: "2026-10-14T15:00:00.000Z" },
       compras: { lista: [{ id: "c1", fecha: "2026-10-09", monto: 1 }] },
       cuenta: null,
@@ -182,6 +183,17 @@ describe("persistencia del corpus en su propia clave (spec 009 FR-017)", () => {
     expect(e.corpus.marca).toBeNull();
     expect(e.corpus.promociones).toHaveLength(promociones.length); // el de ejemplo, no el del guardado
     expect(e.compras.lista.map((c) => c.id)).toEqual(["c1"]);
+  });
+
+  it("un corpus guardado con promos a las que les faltan campos del motor queda vacío, no roto", async () => {
+    const roto = JSON.stringify({
+      version: 1,
+      promociones: [{ id: "p1", tope: {}, vigencia: {} }],
+      marca: "2026-11-02T12:00:00+00:00",
+      sincronizadoEn: "2026-11-02T15:00:00.000Z",
+    });
+    const s = await abrir(memoria({ [CLAVE_CORPUS]: roto }));
+    expect(s.getState().corpus).toEqual(CORPUS_VACIO);
   });
 
   it("un corpus guardado y válido se carga con su marca", async () => {

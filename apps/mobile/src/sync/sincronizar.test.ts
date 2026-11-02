@@ -418,6 +418,18 @@ describe("sincronizar con el motor real (US4, SC-002)", () => {
   });
 });
 
+describe("la ventana de compras es [inicio del período, hoy] (FR-014)", () => {
+  it("una compra con fecha futura no entra", async () => {
+    const repo = repositorioEnMemoria({
+      promociones: [fila(1)],
+      compras: [filaCompra(1, { fecha: "2026-11-02" }), filaCompra(2, { fecha: "2026-11-03" })],
+    });
+    const { store } = armar(repo);
+    await store.dispatch(sincronizar("apertura"));
+    expect(store.getState().compras.lista.map((c) => c.id)).toEqual([ID(1001)]);
+  });
+});
+
 describe("filaACompra en la sincronización", () => {
   it("una compra con una fila inválida se omite sin romper la sincronización", async () => {
     const repo = repositorioEnMemoria({

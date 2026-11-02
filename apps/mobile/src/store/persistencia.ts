@@ -80,12 +80,31 @@ function perfilValido(x: unknown): EstadoPerfil | null {
   return ok ? (x as EstadoPerfil) : null;
 }
 
+/** La forma mínima que el motor necesita de una promo: lo que falte lo rompería al evaluar (spec 009 FR-017). */
+function promocionValida(p: unknown): boolean {
+  if (!esObjeto(p)) return false;
+  const { tarjetas, vigencia, tope } = p;
+  return (
+    esTexto(p.id) &&
+    esTexto(p.titulo) &&
+    esTexto(p.bancoId) &&
+    typeof p.categoriaId === "number" &&
+    typeof p.porcentaje === "number" &&
+    esObjeto(tarjetas) &&
+    listaDeTextos(tarjetas.debito) &&
+    listaDeTextos(tarjetas.credito) &&
+    esObjeto(vigencia) &&
+    esTexto(vigencia.desde) &&
+    esTexto(vigencia.hasta) &&
+    esObjeto(tope)
+  );
+}
+
 /** El corpus de `vuelto.corpus.v1`. `null` = no es válido. */
 function corpusValido(x: unknown): EstadoCorpus | null {
   if (!esObjeto(x) || x.version !== 1 || !Array.isArray(x.promociones)) return null;
   if (!textoONull(x.marca) || !textoONull(x.sincronizadoEn)) return null;
-  const ok = x.promociones.every((p) => esObjeto(p) && esTexto(p.id) && esObjeto(p.tope) && esObjeto(p.vigencia));
-  if (!ok) return null;
+  if (!x.promociones.every(promocionValida)) return null;
   return {
     promociones: x.promociones as EstadoCorpus["promociones"],
     marca: x.marca as string | null,

@@ -17,6 +17,7 @@
 - **#35 (corpus sembrado)**: sin ella la base no tiene promos. Esta spec no siembra ni mide con datos inventados.
 - **#40 (login)**: la lectura exige una sesión de Supabase. Sin sesión no se sincroniza.
 - **#41 (perfil con medios en la base)**: hasta entonces el `medioDePagoId` de una compra de la base (UUID) no se traduce al medio de la app y los `bancoId` del perfil de ejemplo son slugs, no los UUID de MODO.
+- **El perfil** (medios de pago y comercios del usuario) también se menciona en el contexto de la issue, pero **no se sincroniza acá**: depende de #41 (perfil en `medios_de_pago`) y no tiene FR en esta spec.
 - **#43 / #45**: consumen el store; no se tocan.
 
 **Qué se puede verificar y qué no hasta que lleguen #40, #35 y #41**:
@@ -183,12 +184,12 @@ Antes de fijar el tamaño del corpus en el dispositivo, el equipo tiene el instr
 
 **Primera vez y corpus vacío**
 
-- **FR-013**: Una sincronización completa que devuelve **cero promos** MUST NOT reemplazar el corpus de ejemplo, MUST NOT mover la marca ni el reloj, y MUST NOT mostrar la leyenda.
+- **FR-013**: Una primera sincronización que no deja **ninguna promo válida** (el servidor devolvió cero, o todas las filas eran inválidas) MUST NOT reemplazar el corpus de ejemplo, MUST NOT mover la marca ni el reloj, y MUST NOT mostrar la leyenda. En ese caso tampoco se aplican las compras (la unidad atómica es corpus + compras, FR-005).
 
 **Compras**
 
 - **FR-014**: La ventana de compras MUST ser `[inicioDelPeriodo, hoy]` (el más temprano entre el inicio del mes y el de la semana, la misma función que `comprasDelPeriodo`), con `hoy` la fecha de Argentina del reloj real. La resta de días MUST ser de calendario. Al sincronizar, lo que baja del servidor MUST estar dentro de esa ventana. Este requisito reemplaza la ventana "los últimos N días del mes" del texto original de la issue: cubre lo mismo que la privacidad declara y no guarda un mes de más. La función `diasDelMes` se conserva solo si el plan encuentra un uso real.
-- **FR-015**: la lista de compras MUST resultar de `reconciliarCompras(servidor, estado.compras.lista, desde)`: `servidor ∪ (compras locales que el servidor no devolvió)`, sin duplicados por `id`. El thunk MUST llamarla **sincrónicamente justo antes de despachar**, con el estado de ese momento, y MUST relear el período completo en cada sincronización (la tabla no tiene `actualizada_en` ni borrado lógico: un borrado hecho en otro dispositivo solo se ve así). `reconciliarCompras` es la única costura con #44: hoy conserva las compras locales que no son de ejemplo; cuando #44 llegue a `main`, su cuerpo pasa a ser `aplicarPendientes(servidor, cola.operaciones, usuarioId)`. Un resultado que llega después de cerrar sesión o de cambiar de usuario MUST descartarse.
+- **FR-015**: la lista de compras MUST resultar de `reconciliarCompras(servidor, estado.compras.lista, desde)`: `servidor ∪ (compras locales que el servidor no devolvió)`, sin duplicados por `id`; una compra con UUID que ya no está en el servidor vino de él (borrada en otro dispositivo, o fuera del período) y no se conserva; local es la que no es de ejemplo ni tiene UUID (`n<número>`). El thunk MUST llamarla **sincrónicamente justo antes de despachar**, con el estado de ese momento, y MUST relear el período completo en cada sincronización (la tabla no tiene `actualizada_en` ni borrado lógico: un borrado hecho en otro dispositivo solo se ve así). `reconciliarCompras` es la única costura con #44: hoy conserva las compras locales que no son de ejemplo; cuando #44 llegue a `main`, su cuerpo pasa a ser `aplicarPendientes(servidor, cola.operaciones, usuarioId)`. Un resultado que llega después de cerrar sesión o de cambiar de usuario MUST descartarse.
 
 **Reloj**
 

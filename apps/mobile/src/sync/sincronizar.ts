@@ -67,7 +67,7 @@ export function sincronizar(motivo: Motivo): AppThunk<Promise<void>> {
 
       // Los parámetros salen del reloj real, nunca de `sesion.ahora` (FR-016): con los datos de
       // ejemplo ese reloj está fijo en el 14/10.
-      const { desde } = ventanaDeCompras(reloj());
+      const { hoy, desde } = ventanaDeCompras(reloj());
       const marca = getState().corpus.marca;
       const piso = marca === null ? null : pisoDeRelectura(marca);
 
@@ -99,9 +99,10 @@ export function sincronizar(motivo: Motivo): AppThunk<Promise<void>> {
       // La primera sincronización sin promos no cambia nada: ni el corpus de ejemplo, ni las compras, ni el reloj.
       if (corpus === null) return;
 
+      // La ventana es [inicio del período, hoy] (FR-014): una compra con fecha futura no es del período.
       const delServidor = compras.flatMap((f) => {
         const c = filaACompra(f);
-        return c === null ? [] : [c];
+        return c === null || c.fecha > hoy ? [] : [c];
       });
 
       // El chequeo, la reconciliación y el dispatch son sincrónicos entre sí: no hay hueco para otra
@@ -114,7 +115,6 @@ export function sincronizar(motivo: Motivo): AppThunk<Promise<void>> {
         sincronizado({
           corpus,
           compras: reconciliarCompras(delServidor, estado.compras.lista, desde),
-          usuarioId: usuario,
           ahora,
         }),
       );

@@ -11,13 +11,7 @@ import type {
   FilaPromocion,
   RepositorioSincronizacion,
 } from "./contratos";
-
-/** Instantes primero (los ceros finales de PostgREST no se pueden comparar como texto), después el texto. */
-function compararMarcas(a: string, b: string): number {
-  const d = Date.parse(a) - Date.parse(b);
-  if (d !== 0) return d;
-  return a < b ? -1 : a > b ? 1 : 0;
-}
+import { compararMarcas } from "./marcas";
 
 function despuesDelCursor(valor: string, id: string, cursor: Cursor): boolean {
   if (cursor === null) return true;

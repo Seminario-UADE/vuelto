@@ -142,7 +142,6 @@ describe("selectFrescura (spec 009 FR-019)", () => {
       sincronizado({
         corpus: { promociones: [], marca: "2026-11-02T12:00:00+00:00", sincronizadoEn: "2026-11-02T12:00:00.000Z", descartadas: 0 },
         compras: [],
-        usuarioId: "u",
         ahora: "2026-11-02T12:00:00.000Z",
       }),
     );

@@ -121,7 +121,7 @@ type EstadoSesion = { /* …lo de la spec 008… */ epoca: number /* sube con se
 type Rehidratado = { /* …lo de la spec 008… */ ahora: string | null /* real si el corpus guardado tiene marca */ };
 
 // Nueva acción atendida por corpus, compras y sesion en el mismo tick. `compras` ya viene reconciliada.
-type Sincronizado = { corpus: EstadoCorpus; compras: Compra[]; usuarioId: string; ahora: string };
+type Sincronizado = { corpus: EstadoCorpus; compras: Compra[]; ahora: string };
 ```
 
 - `sesion.ahora` lo fija `Sincronizado.ahora` y `Rehidratado.ahora`, así el reloj cambia en la misma acción que la

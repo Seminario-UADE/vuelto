@@ -46,4 +46,13 @@ describe("reconciliarCompras (FR-015, la costura con #44)", () => {
     const r = reconciliarCompras([c(1)], [local("n1")], DESDE);
     expect(ids(r)).toEqual(["n1", ID(1001)]);
   });
+
+  it("una compra con UUID que ya no está en el servidor vino de él (borrada en otro dispositivo): no se conserva", () => {
+    const r = reconciliarCompras([], [local(ID(1001))], DESDE);
+    expect(r).toEqual([]);
+  });
+
+  it("una compra guardada en el teléfono (id n<número>) sí se conserva", () => {
+    expect(ids(reconciliarCompras([], [local("n7")], DESDE))).toEqual(["n7"]);
+  });
 });
