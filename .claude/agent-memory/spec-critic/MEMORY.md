@@ -10,4 +10,5 @@
 - [DESIGN.md desactualizado por precedencia](patron_diseno_desactualizado_por_precedencia.md) — la spec "gana" por orden pero DESIGN.md/constitución quedan contradichos.
 - [Regla infalsable y aritmética](patron_regla_infalsable_y_aritmetica.md) — lista válida igual al enum, floats con igualdad exacta, orden locale, error sin tipo, estimación sin techo; en la 2da pasada, revisar los huecos que deja cada corrección; en specs que extienden otra, defaults perdidos y SC viejos sin enmendar; hacer la cuenta de los ejemplos del diseño contra el umbral.
 - [Esquema RLS: borrados y sync](patron_esquema_rls_borrados_y_sync.md) — FK salta RLS, ON DELETE que borra base del tope, sync sin bajas/no-ops, seed con ids inventados.
+- [Sync al store: obligaciones heredadas](patron_sync_cliente_obligaciones_heredadas.md) — margen delegado por 007 y perdido, fixtures que sobreviven, reloj de ejemplo, poda que borra base del tope.
 - [Capa servidor sobre el motor](patron_capa_servidor_sobre_motor.md) — prefiltro que duplica reglas, test de equivalencia tautológico, errores HTTP sin forma, anon key como sesión.
