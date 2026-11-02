@@ -14,6 +14,14 @@ export const compras = createSlice({
     compraAgregada(s, a: PayloadAction<Compra>) {
       s.lista.unshift(a.payload);
     },
+    /** La lista que dejó la reconciliación con la cola al abrir la app (spec 010, FR-013). */
+    comprasReconciliadas(s, a: PayloadAction<Compra[]>) {
+      s.lista = a.payload;
+    },
+    /** Una compra borrada por el usuario: los topes se corrigen solos porque se derivan (spec 010). */
+    compraEliminada(s, a: PayloadAction<string>) {
+      s.lista = s.lista.filter((c) => c.id !== a.payload);
+    },
   },
   extraReducers: (b) => {
     b.addCase(rehidratado, (s, a) => a.payload.compras ?? s);
@@ -24,4 +32,4 @@ export const compras = createSlice({
   },
 });
 
-export const { compraAgregada } = compras.actions;
+export const { compraAgregada, compraEliminada, comprasReconciliadas } = compras.actions;

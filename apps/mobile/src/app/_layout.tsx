@@ -6,6 +6,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/hanken-grotesk";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { randomUUID } from "expo-crypto";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -17,11 +18,13 @@ import { Toast } from "@/components/toast";
 import { iniciarAuth } from "@/data/auth";
 import { useReloj } from "@/hooks/use-reloj";
 import { useSincronizacion } from "@/hooks/use-sincronizacion";
+import { useSubidaDeCompras } from "@/hooks/use-subida-de-compras";
 import { supabase } from "@/lib/supabase";
 import { headerNativo } from "@/navigation/opciones";
 import { crearStore } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { rehidratar } from "@/store/persistencia";
+import { iniciarCompras } from "@/store/thunks";
 import { repositorioSupabase } from "@/sync/repositorio-supabase";
 import { colors } from "@/theme";
 
@@ -34,10 +37,11 @@ void SplashScreen.preventAutoHideAsync();
 const store = crearStore({
   almacenamiento: AsyncStorage,
   estadoInicial: null,
+  generarId: randomUUID,
   repositorio: supabase ? repositorioSupabase(supabase) : null,
   reloj: () => new Date(),
 });
-void store.dispatch(rehidratar());
+void store.dispatch(rehidratar()).then(() => store.dispatch(iniciarCompras()));
 
 export const unstable_settings = { anchor: "(tabs)" };
 
@@ -75,6 +79,7 @@ function Raiz() {
   const authLista = useAppSelector((s) => s.sesion.authLista);
   useReloj();
   useSincronizacion();
+  useSubidaDeCompras();
 
   // Lee la sesión guardada de Supabase y sigue sus cambios (issue #40).
   useEffect(() => dispatch(iniciarAuth()), [dispatch]);
@@ -107,6 +112,8 @@ function Raiz() {
               con detents no pinta un ScrollView en iOS 27 (verificado en el simulador). */}
           <Stack.Screen name="revisa" options={pageSheet} />
           <Stack.Screen name="contactos/quitar" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
+          <Stack.Screen name="cerrar-sesion" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
+          <Stack.Screen name="borrar-compra" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
           <Stack.Screen name="(auth)/login" options={pageSheet} />
           <Stack.Screen name="(auth)/registro" options={pageSheet} />
           <Stack.Screen name="i/[token]" options={{ ...headerNativo, title: "Invitación" }} />

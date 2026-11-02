@@ -2,6 +2,7 @@ import { estimarTopes, fechaArgentina } from "@vuelto/motor";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { comprasOctubre, promociones as promosDeEjemplo } from "../data/fixtures";
 import { RELOJ_EJEMPLO } from "../data/fixtures";
+import { guardadoEncolado } from "../store/cola";
 import { compraAgregada } from "../store/compras";
 import { sesionCerrada } from "../store/acciones";
 import { mediosElegidos } from "../store/perfil";
@@ -245,11 +246,18 @@ describe("sincronizar: atomicidad y fallas (FR-005, SC-005)", () => {
 
 describe("sincronizar: compras locales y cuentas (US5)", () => {
   const compraLocal = { ...comprasOctubre[0]!, id: "n11", fecha: "2026-11-02" };
+  /** Como `guardarCompra`: la operación entra a la cola de #44 y la compra a la lista. */
+  const guardarLocal = (store: ReturnType<typeof armar>["store"], compra: typeof compraLocal) => {
+    store.dispatch(
+      guardadoEncolado({ idOp: `op-${compra.id}`, compra, dueno: null, ahora: AHORA.toISOString(), intento: null }),
+    );
+    store.dispatch(compraAgregada(compra));
+  };
 
   it("una compra local que el servidor no devolvió sobrevive a la sincronización", async () => {
     const repo = repositorioEnMemoria({ promociones: [fila(1)], compras: [filaCompra(1)] });
     const { store } = armar(repo);
-    store.dispatch(compraAgregada(compraLocal));
+    guardarLocal(store, compraLocal);
     await store.dispatch(sincronizar("apertura"));
     expect(store.getState().compras.lista.map((c) => c.id)).toEqual(expect.arrayContaining(["n11", ID(1001)]));
   });
@@ -258,7 +266,7 @@ describe("sincronizar: compras locales y cuentas (US5)", () => {
     const repo = repositorioEnMemoria({ promociones: [fila(1)], compras: [filaCompra(1)] });
     const { store } = armar(repo);
     repo.alPedirPromociones = () => {
-      store.dispatch(compraAgregada(compraLocal));
+      guardarLocal(store, compraLocal);
     };
     await store.dispatch(sincronizar("apertura"));
     expect(store.getState().compras.lista.map((c) => c.id)).toContain("n11");
@@ -267,7 +275,7 @@ describe("sincronizar: compras locales y cuentas (US5)", () => {
   it("si el servidor ya devuelve la compra con el mismo id, queda una sola", async () => {
     const repo = repositorioEnMemoria({ promociones: [fila(1)], compras: [filaCompra(1)] });
     const { store } = armar(repo);
-    store.dispatch(compraAgregada({ ...compraLocal, id: ID(1001) }));
+    guardarLocal(store, { ...compraLocal, id: ID(1001) });
     await store.dispatch(sincronizar("apertura"));
     expect(store.getState().compras.lista.filter((c) => c.id === ID(1001))).toHaveLength(1);
   });

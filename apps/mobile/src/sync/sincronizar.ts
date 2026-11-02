@@ -114,7 +114,7 @@ export function sincronizar(motivo: Motivo): AppThunk<Promise<void>> {
       dispatch(
         sincronizado({
           corpus,
-          compras: reconciliarCompras(delServidor, estado.compras.lista, desde),
+          compras: reconciliarCompras(delServidor, estado.cola.operaciones, usuario, desde),
           ahora,
         }),
       );

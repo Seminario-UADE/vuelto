@@ -39,11 +39,11 @@
       proyección con promos de ejemplo (2.000 promos ≈ 880 KB) está en
       `docs/architecture/03-frontend.md` §Dónde se guarda el corpus. Verificar además el límite de ~2 MB
       por valor de AsyncStorage en un Android real.
-- [ ] Cuando la cola de #44 (spec 010, `aplicarPendientes`) llegue a `main`, reemplazar el cuerpo de
+- [x] Cuando la cola de #44 (spec 010, `aplicarPendientes`) llegue a `main`, reemplazar el cuerpo de
       `reconciliarCompras` (`apps/mobile/src/sync/compras.ts`) por `aplicarPendientes(servidor,
       getState().cola.operaciones, usuarioId)`; con eso se cierran sus dos limitaciones provisorias (no
       distingue dueños y una compra local de fuera del período no sobrevive a un reinicio). Responsable: quien
-      mergee segundo entre #42 y #44.
+      mergee segundo entre #42 y #44. Hecho al resolver el merge de #42 sobre #44.
 - [ ] Sincronizar el perfil (medios de pago y comercios) desde `medios_de_pago`: es de #41; la #42 no lo hace.
 - [ ] Contrato con la ingesta y la siembra (#35, #50, #51): cada lote de escrituras de `promociones` se
       confirma en menos de 5 minutos (el margen de relectura de la app es de 10). Ver

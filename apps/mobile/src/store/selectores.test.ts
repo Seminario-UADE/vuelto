@@ -100,6 +100,7 @@ describe("guardarCompra (US3)", () => {
         monto: 5000,
         medioId: "galicia-visa-credito",
         textoExtraido: null,
+        usarPromo: true,
       }),
     );
     const galicia = selectTopes(s.getState()).medios.find((m) => m.medio.id === "galicia-visa-credito");
@@ -107,7 +108,7 @@ describe("guardarCompra (US3)", () => {
     s.dispatch(comercioElegido("coto"));
     expect(selectRecomendacion(s.getState())?.topeDisponible).toBe(5500);
     expect(s.getState().compras.lista[0]).toMatchObject({
-      id: "n11",
+      id: "00000000-0000-4000-8000-000000000001",
       reintegroEsperado: 1000,
       descuentoObtenido: null,
     });
@@ -124,6 +125,7 @@ describe("guardarCompra (US3)", () => {
           monto: 5000,
           medioId: null,
           textoExtraido: null,
+          usarPromo: true,
         }),
       ),
     ).toThrow("Falta el monto o el medio de pago");
