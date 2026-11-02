@@ -1,9 +1,9 @@
 /**
  * Forma de las respuestas que la app espera del servidor (Edge Functions y tablas con RLS).
  *
- * Dos capas: (1) el contrato real de la Edge Function `recomendar`, copiado de
- * `packages/motor/src/tipos.ts` (la app no puede importar el motor, constitución §II), y
- * (2) los tipos de vista que pintan las pantallas, que arma `vista-recomendacion.ts`.
+ * Dos capas: (1) la respuesta de `recomendar()`, importada de `@vuelto/motor` (la app lo
+ * corre en el dispositivo, ADR-010), y (2) los tipos de vista que pintan las pantallas, que
+ * arma `vista-recomendacion.ts`.
  *
  * Es la vista del cliente: lo que se le muestra al usuario, nunca el input del motor
  * (ADR-008 §4). Todo campo es requerido; lo ausente es `null` explícito (Principio III).
@@ -30,7 +30,7 @@ export type Base =
   | { tipo: "sin-compras"; texto: string }
   | { tipo: "contacto"; texto: string };
 
-/** Lo decide el servidor: `queda-poco` con ≤30% del tope nominal (spec 006 FR-022). */
+/** Lo decide el motor (`formatearEstimacion`): `queda-poco` con ≤20% del tope (DESIGN.md §5). */
 export type EstadoTope = "disponible" | "queda-poco" | "agotado" | "sin-base";
 
 export type MedioDePago = {
@@ -56,67 +56,27 @@ export type Comercio = {
   frecuente: boolean;
 };
 
-// ─── Contrato real: POST /functions/v1/recomendar ──────────────────────────────
-// Fuente: specs/004-recomendar-pantalla/contracts/recomendar.md y
-// packages/motor/src/tipos.ts. Mantener idéntico.
+// ─── Respuesta del motor ──────────────────────────────────────────────────────
 
-export type Canal = "presencial" | "online";
+export type {
+  BaseEstimacion,
+  Canal,
+  CausaDescarte,
+  Descarte,
+  OpcionDePago,
+  PromocionAplicada,
+  Recomendacion as RespuestaRecomendar,
+} from "@vuelto/motor";
 
 /**
- * Pedido a la Edge Function. `monto: null` es una EXTENSIÓN PROPUESTA (respuesta en un toque,
- * auditoría v5 P1 #1): hoy la Edge Function exige `monto > 0`. Con `null`, el servidor
- * devolvería `ahorroEstimado: 0` y en `topeRestanteTrasCompra` el tope disponible antes de la
- * compra. Hasta que se acepte, la app usa el mock cuando no hay monto.
+ * La compra que se evalúa, con el monto opcional (constitución §I). Hasta que #43 agregue
+ * `monto: null` al motor, `calculo.ts` lo consulta como 0.
  */
 export type PedidoRecomendar = {
   comercio: string | null;
   categoriaId: number;
   monto: number | null;
-  canal: Canal;
-};
-
-export type BaseEstimacion = {
-  comprasRegistradas: number;
-  comprasSinDescuentoInformado: number;
-};
-
-export type PromocionAplicada = {
-  promocionId: string;
-  ahorroEstimado: number;
-  topeRestanteTrasCompra: number | null;
-  base: BaseEstimacion | null;
-};
-
-export type OpcionDePago = {
-  medioDePagoId: string;
-  ahorroEstimado: number;
-  promociones: PromocionAplicada[];
-  /** Plantilla del motor, nunca de un LLM. */
-  motivo: string;
-};
-
-export type CausaDescarte =
-  | "categoria"
-  | "comercio"
-  | "vigencia"
-  | "dia"
-  | "canal"
-  | "jurisdiccion"
-  | "monto_minimo"
-  | "medio_de_pago"
-  | "tope_agotado";
-
-export type Descarte = {
-  promocionId: string;
-  causa: CausaDescarte;
-  base: BaseEstimacion | null;
-  motivo: string;
-};
-
-export type RespuestaRecomendar = {
-  mejor: OpcionDePago | null;
-  alternativas: OpcionDePago[];
-  descartadas: Descarte[];
+  canal: "presencial" | "online";
 };
 
 /** Promoción del catálogo (lectura con RLS), para nombrar lo que el motor devuelve por id. */
@@ -170,6 +130,8 @@ export type TopeMedio = {
   nominal: number;
   periodo: Periodo;
   disponible: number | null;
+  /** Cifra del motor, redondeada hacia abajo a la centena ("≈$6.500", "menos de $100"); `null` sin compras o agotado. */
+  cifra: string | null;
   estado: EstadoTope;
   base: Base;
   /** "vuelve el 1/11", "se reinicia el lunes" */

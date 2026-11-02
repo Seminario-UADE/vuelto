@@ -1,9 +1,12 @@
 /**
  * Capa de datos de la app. Cada función tiene la firma del cliente de la Edge Function o
- * de la tabla que la va a reemplazar (docs/architecture/02-api-routes.md). Hoy responde con
- * fixtures y `servidor-simulado.ts`; cuando exista el backend cambia solo el cuerpo de
- * cada función. Las pantallas importan solo este archivo (y los tipos de `contracts.ts`).
+ * de la tabla que la va a reemplazar (docs/architecture/02-api-routes.md). La recomendación y
+ * los topes salen de `@vuelto/motor` sobre los fixtures (`calculo.ts`, ADR-010); cuando exista
+ * el backend cambia solo el cuerpo de cada función. Las pantallas importan solo este archivo
+ * (y los tipos de `contracts.ts`).
  */
+import { fechaArgentina, type Compra as CompraMotor } from "@vuelto/motor";
+import { compraParaGuardar, comprasVista, perfilDelMotor, recomendacionVista, topesVista, type EntradasMotor } from "./calculo";
 import type {
   BorradorCompra,
   Comercio,
@@ -14,9 +17,6 @@ import type {
   MedioDePago,
   OrigenCompra,
   PedidoGrupo,
-  PedidoRecomendar,
-  PromocionCatalogo,
-  RespuestaRecomendar,
   Perfil,
   Recomendacion,
   RecomendacionGrupo,
@@ -25,11 +25,7 @@ import type {
   VistaInvitacion,
 } from "./contracts";
 import {
-  CATEGORIA_DE_RUBRO,
-  DIA_HOY,
-  HOY,
-  MES,
-  promos,
+  RELOJ_EJEMPLO,
   catalogoComercios,
   catalogoMedios,
   comprasOctubre,
@@ -37,13 +33,11 @@ import {
   grupoDeEjemplo,
   invitacionPropia,
   mediosDeclarados,
+  promociones,
   ticketDeEjemplo,
   usuario,
 } from "./fixtures";
-import * as servidor from "./servidor-simulado";
-import { aVista } from "./vista-recomendacion";
-
-const DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+import { recomendarGrupo as grupoEnElServidor } from "./grupo-simulado";
 import { getSesion, setSesion } from "./sesion";
 
 /** Escenarios para probar estados vacíos y de error (solo desarrollo). */
@@ -73,8 +67,10 @@ function comercioPorId(id: string): Comercio {
   return c;
 }
 
+const AHORA = new Date(RELOJ_EJEMPLO);
+
 export function getHoy(): string {
-  return HOY;
+  return fechaArgentina(AHORA);
 }
 
 /**
@@ -127,59 +123,35 @@ export async function getComercio(id: string): Promise<Comercio> {
   return red(comercioPorId(id));
 }
 
-/** Catálogo de promociones (lectura con RLS) para nombrar lo que el motor devuelve por id. */
-function promocionesCatalogo(): PromocionCatalogo[] {
-  return promos.map((p) => ({
-    id: p.id,
-    titulo: p.titulo,
-    bancoId: catalogoMedios.find((m) => m.id === p.medioId)?.banco ?? "",
-    categoriaId: CATEGORIA_DE_RUBRO[p.rubro] ?? 0,
-  }));
-}
-
-/**
- * Cliente de `POST /functions/v1/recomendar`. Hoy responde el mock con la forma exacta de la
- * Edge Function; para conectarla, esta función pasa a ser
- * `supabase.functions.invoke("recomendar", { body: pedido })` (y el mock se borra).
- */
-async function invocarRecomendar(pedido: PedidoRecomendar): Promise<RespuestaRecomendar> {
-  return red(servidor.recomendar(pedido, { sinCompras: escenario === "mes-vacio" }));
-}
-
-export async function recomendar(comercioId: string, monto: number | null): Promise<Recomendacion> {
-  const comercio = comercioPorId(comercioId);
-  if (comercio.categoriaId === null) throw new Error("No conocemos el rubro de este comercio");
-  const pedido: PedidoRecomendar = {
-    comercio: comercio.nombre,
-    categoriaId: comercio.categoriaId,
-    monto: monto !== null && monto > 0 ? monto : null,
-    canal: "presencial",
-  };
-  const respuesta = await invocarRecomendar(pedido);
-  return aVista(pedido, respuesta, comercio, {
-    medios: mediosDeclarados,
-    promociones: promocionesCatalogo(),
-    mes: MES,
-    dia: `hoy ${DIAS[DIA_HOY]}`,
-  });
-}
-
-function todasLasCompras(): Compra[] {
+function todasLasCompras(): CompraMotor[] {
   const nuevas = getSesion().comprasNuevas;
   return escenario === "mes-vacio" ? nuevas : [...nuevas, ...comprasOctubre];
 }
 
+function entradas(): EntradasMotor {
+  return {
+    perfil: perfilDelMotor(mediosDelUsuario().map((m) => m.id), usuario.nombre),
+    promociones,
+    compras: todasLasCompras(),
+    ahora: AHORA,
+  };
+}
+
+export async function recomendar(comercioId: string, monto: number | null): Promise<Recomendacion> {
+  const r = recomendacionVista(entradas(), comercioPorId(comercioId), monto);
+  if (!r) throw new Error("No conocemos el rubro de este comercio");
+  return red(r);
+}
+
 export async function getTopes(): Promise<ResumenTopes> {
-  return red(servidor.topes(todasLasCompras(), { sinCompras: escenario === "mes-vacio" }));
+  return red(topesVista(entradas()));
 }
 
 export async function getCompras(origen: OrigenCompra | "todas" = "todas"): Promise<ResumenCompras> {
-  const todas = todasLasCompras();
+  const resumen = comprasVista(todasLasCompras(), AHORA);
   return red({
-    mes: MES,
-    gastaste: servidor.gastado(todas),
-    devolvieron: servidor.devolvieron(todas),
-    compras: origen === "todas" ? todas : todas.filter((c) => c.origen === origen),
+    ...resumen,
+    compras: origen === "todas" ? resumen.compras : resumen.compras.filter((c) => c.origen === origen),
   });
 }
 
@@ -205,34 +177,11 @@ export async function leerTicket(): Promise<LecturaTicket> {
 }
 
 export async function guardarCompra(b: BorradorCompra): Promise<Compra> {
-  if (b.monto === null || b.medioId === null) {
-    throw new Error("Falta el monto o el medio de pago");
-  }
-  const medio = catalogoMedios.find((m) => m.id === b.medioId);
-  if (!medio) throw new Error(`Medio desconocido: ${b.medioId}`);
-  const nombre = (b.comercio ?? "").trim() || "Compra";
-  const comercio =
-    catalogoComercios.find((c) => c.nombre.toLowerCase() === nombre.toLowerCase()) ?? {
-      id: `libre-${nombre.toLowerCase()}`,
-      nombre,
-      inicial: nombre.charAt(0).toUpperCase(),
-      // Fuera del catálogo no conocemos el rubro: no se inventa, y no se estima reintegro.
-      rubro: "otro" as const,
-      categoriaId: null,
-      frecuente: false,
-    };
-  const compra: Compra = {
-    id: `n${Date.now()}`,
-    comercio,
-    fecha: b.fecha,
-    monto: b.monto,
-    medio,
-    reintegro: servidor.reintegroDeCompra(comercio, b.monto, medio.id),
-    origen: b.modo,
-    textoExtraido: b.textoExtraido,
-  };
+  const compra = compraParaGuardar(entradas(), b, `n${getSesion().comprasNuevas.length + 1}`);
   setSesion({ comprasNuevas: [compra, ...getSesion().comprasNuevas] });
-  return red(compra);
+  const vista = comprasVista([compra], new Date(`${compra.fecha}T12:00:00-03:00`)).compras[0];
+  if (!vista) throw new Error("No pudimos guardar la compra");
+  return red(vista);
 }
 
 export async function getContactos(): Promise<Contacto[]> {
@@ -252,7 +201,7 @@ export async function crearInvitacion(): Promise<Invitacion> {
 
 /** Quién invita en cada token de ejemplo (en el servidor sale de `ver_invitacion`). */
 const invitantes: Record<string, Contacto> = {
-  tomas: { id: "tomas", nombre: "Tomás", iniciales: "T", vinculadoDesde: HOY },
+  tomas: { id: "tomas", nombre: "Tomás", iniciales: "T", vinculadoDesde: getHoy() },
 };
 
 const TOKENS: Record<string, { estado: VistaInvitacion["estado"]; quien: string | null; contactoId: string | null }> = {
@@ -308,12 +257,15 @@ export function getGrupoDeEjemplo(): Omit<PedidoGrupo, "integrantes"> {
 
 export async function recomendarGrupo(pedido: PedidoGrupo): Promise<RecomendacionGrupo> {
   return red(
-    servidor.recomendarGrupo({
-      nombre: pedido.nombre,
-      comercio: comercioPorId(pedido.comercioId),
-      monto: pedido.monto,
-      fecha: pedido.fecha,
-      integrantes: pedido.integrantes,
-    }),
+    grupoEnElServidor(
+      {
+        nombre: pedido.nombre,
+        comercio: comercioPorId(pedido.comercioId),
+        monto: pedido.monto,
+        fecha: pedido.fecha,
+        integrantes: pedido.integrantes,
+      },
+      getHoy(),
+    ),
   );
 }

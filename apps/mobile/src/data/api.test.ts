@@ -70,12 +70,13 @@ describe("recomendar", () => {
 });
 
 describe("topes", () => {
-  it("cuatro estados, todos con base y sin total agregado", async () => {
+  it("estados del motor, todos con base y sin total agregado", async () => {
     const t = await api.getTopes();
     const estados = Object.fromEntries(t.medios.map((m) => [m.medio.nombreCorto, m.estado]));
     expect(estados).toEqual({
       Galicia: "disponible",
-      Santander: "queda-poco",
+      // $2.300 de $8.000 es el 28,75%: "queda poco" es con el 20% o menos (DESIGN.md §5, spec 005).
+      Santander: "disponible",
       Provincia: "sin-base",
       Macro: "agotado",
     });
@@ -90,7 +91,7 @@ describe("topes", () => {
 
   it("te devolvieron ≈$15.200 cierra con las compras de octubre", async () => {
     const t = await api.getTopes();
-    const suma = comprasOctubre.reduce((s, c) => s + (c.reintegro ?? 0), 0);
+    const suma = comprasOctubre.reduce((s, c) => s + (c.descuentoObtenido ?? 0), 0);
     expect(t.devolvieron.monto).toBe(15200);
     expect(suma).toBe(15200);
     expect(t.devolvieron.base.texto).toBe("según 10 compras de octubre");

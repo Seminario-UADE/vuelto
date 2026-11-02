@@ -26,4 +26,16 @@ pasa con el estado después de una acción del usuario, (2) si el mock depende d
 input y quién hace ese cálculo, (3) contra qué contrato se tipan, (4) si los
 números de ejemplo cumplen los umbrales declarados. Además chequear límites de
 Expo Go (cámara escribe al cache, deep links con esquema propio no andan).
+
+**(specs/007, issue #81, 2026-11-01) Cuando el mock se reemplaza por el motor real**
+las cifras de ejemplo cierran (Galicia 10.000−3.500=6.500, etc.), pero fallan los
+bordes: (a) los fixtures no tienen la forma del motor (bancoId, tipo, red, vigencia
+desde/hasta, canal, jurisdicción, grupoTopeId, promocionId en compras) y la spec no
+fija los valores; (b) "reloj fijo el miércoles 14/10" sin instante ni zona (medianoche
+UTC es martes en Argentina); (c) `ahora` exigido "en el estado" sin slice que lo
+contenga; (d) monto 0 como "sin monto" hace que el motor ordene por id de medio, no
+por porcentaje; (e) la fecha del grupo/ticket distinta de `ahora`; (f) estimado
+guardado en `descuentoObtenido` falsea la base; (g) "en vivo al tipear" se pisa
+con la issue siguiente (#43). Revisar siempre a)–g) cuando una spec diga "sale del
+motor real sobre fixtures".
 Relacionado: [[patron-pendientes-como-tapadero]], [[patron-diseno-desactualizado-por-precedencia]].

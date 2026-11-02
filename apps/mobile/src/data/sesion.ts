@@ -4,7 +4,8 @@
  * (spec 006, Assumptions). Las pantallas lo leen con `useSesion`.
  */
 import { useSyncExternalStore } from "react";
-import type { Compra, PedidoGrupo } from "./contracts";
+import type { Compra } from "@vuelto/motor";
+import type { PedidoGrupo } from "./contracts";
 
 type Estado = {
   comprasNuevas: Compra[];
