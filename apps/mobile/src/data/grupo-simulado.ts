@@ -19,6 +19,7 @@ import {
   promociones,
 } from "./fixtures";
 import { pedidoPresencial, recomendarSeguro, textoDia } from "./calculo";
+import { queDa } from "./vista-recomendacion";
 import { aprox, fechaCorta } from "../lib/format";
 import { mediodia } from "../lib/reloj";
 import { RUBROS } from "../lib/rubros";
@@ -89,7 +90,7 @@ export function recomendarGrupo(
         opciones.push({
           quien: { nombre: "Vos", esVos: true, orden: -1 },
           medio: `tu ${medio.nombre}`,
-          razon: mejor.motivo,
+          razon: queDa(mejor.motivo),
           reintegro: mejor.ahorroEstimado,
           conBase: base.tipo === "compras",
           base,
@@ -101,7 +102,7 @@ export function recomendarGrupo(
           detalle:
             base.tipo === "compras"
               ? `Tu ${medio.nombre}: ${aprox(mejor.ahorroEstimado)} de reintegro, ${base.texto}`
-              : `Tu ${medio.nombre}: ${mejor.motivo}, sin base ${base.texto.includes("semana") ? "esta semana" : "este mes"}`,
+              : `Tu ${medio.nombre}: ${queDa(mejor.motivo)}, sin base ${base.texto.includes("semana") ? "esta semana" : "este mes"}`,
         });
         return;
       }
@@ -116,7 +117,7 @@ export function recomendarGrupo(
         esVos: true,
         detalle:
           descarte && suyo
-            ? `Tu ${suyo.nombre}: ${descarte.causa === "tope_agotado" ? "tope agotado" : descarte.motivo.replace(/^Hoy no aplica: /, "")}`
+            ? `Tu ${suyo.nombre}: ${descarte.causa === "tope_agotado" ? "tope agotado" : descarte.motivo.replace(/^Hoy no aplica[:,] /, "")}`
             : `Tus medios no tienen promo en ${rubro} ese día`,
       });
       return;
@@ -144,7 +145,7 @@ export function recomendarGrupo(
       opciones.push({
         quien: { nombre: nombreC, esVos: false, orden },
         medio: `su ${nombreMedio}`,
-        razon: mejor.motivo,
+        razon: queDa(mejor.motivo),
         reintegro: mejor.ahorroEstimado,
         conBase: tieneCompras && mejor.promociones[0]?.topeRestanteTrasCompra !== null,
         base,

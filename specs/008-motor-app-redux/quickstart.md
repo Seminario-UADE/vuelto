@@ -1,4 +1,4 @@
-# Quickstart: verificar la spec 007
+# Quickstart: verificar la spec 008
 
 ```bash
 npm ci                                  # compila el motor (prepare) y deja dist/

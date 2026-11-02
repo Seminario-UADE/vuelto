@@ -2,7 +2,7 @@
 
 **Branch**: `claude/motor-app-redux-95593e` | **Date**: 2026-11-01 | **Spec**: [spec.md](spec.md)
 
-**Input**: Feature specification from `specs/007-motor-app-redux/spec.md` (issue #81, ADR-010 pasos 1 y 2)
+**Input**: Feature specification from `specs/008-motor-app-redux/spec.md` (issue #81, ADR-010 pasos 1 y 2)
 
 ## Summary
 
@@ -55,7 +55,7 @@ y la migración de las pantallas, que reemplaza a `api.recomendar`, `sesion.ts` 
 ### Documentation (this feature)
 
 ```text
-specs/007-motor-app-redux/
+specs/008-motor-app-redux/
 ├── plan.md
 ├── research.md
 ├── data-model.md

@@ -3,7 +3,7 @@
 App mobile en `apps/mobile` (`@vuelto/mobile`): Expo SDK 58, React Native 0.88, Expo Router y
 TypeScript strict. Se prueba en Expo Go (QR). Por ADR-010 la app **importa `@vuelto/motor`** y calcula
 la recomendación y los topes en el dispositivo, sobre el estado de Redux (RNF-02). Specs:
-`specs/006-app-mobile-pantallas/` (pantallas) y `specs/007-motor-app-redux/` (motor y store, issue #81).
+`specs/006-app-mobile-pantallas/` (pantallas) y `specs/008-motor-app-redux/` (motor y store, issue #81).
 
 ## Dónde vive cada cosa
 
@@ -71,7 +71,7 @@ detrás de un selector.
 
 Un solo store de Redux Toolkit (`src/store/`), con **solo datos de entrada**. La recomendación y
 los topes se **derivan** con selectores memoizados; nunca se guardan en el store ni en el
-dispositivo (ADR-010, spec 007).
+dispositivo (ADR-010, spec 008).
 
 | Slice | Qué guarda | Se persiste |
 |---|---|---|
@@ -117,7 +117,7 @@ selectResumenCompras = compras + ahora → «Mis compras» del mes en curso
   ver.
 - `fixtures.ts`: los datos de DESIGN.md §9 (Martín, octubre de 2026) con la **forma del motor**:
   medios con banco, tipo y red, promociones como `Promocion` y compras con su promo y descuento
-  (tabla en `specs/007-motor-app-redux/data-model.md`). Son el estado inicial del store hasta #42.
+  (tabla en `specs/008-motor-app-redux/data-model.md`). Son el estado inicial del store hasta #42.
   Mercado Pago no entra al motor: es una billetera sin banco ni red (Principio III).
 - `calculo.ts`: núcleo funcional de la app. Llama a `recomendar()` y `estimarTopes()` y arma lo
   que pintan las pantallas. Funciones puras, con `ahora` por parámetro. Sin monto, consulta con
@@ -179,7 +179,7 @@ npm run build -w @vuelto/motor         # después de cambiar el motor, para verl
 El motor tiene `"prepare": "npm run build"`, así que `npm ci` lo compila en local, en el CI y en
 EAS (que instala desde la raíz del monorepo). Expo SDK 58 detecta el monorepo de npm workspaces y
 no hace falta `metro.config.js`. Sin `dist/`, Metro falla con *Unable to resolve "@vuelto/motor"*
-(research R1 de la spec 007).
+(research R1 de la spec 008).
 
 ## Publicación (sin computadora prendida)
 

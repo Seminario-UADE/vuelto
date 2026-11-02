@@ -11,7 +11,7 @@ import type { Comercio, Contacto, MedioDePago, Rubro } from "./contracts";
 
 /**
  * Reloj de los datos de ejemplo: miércoles 14 de octubre de 2026 al mediodía de Argentina
- * (spec 006 FR-038, spec 007 FR-006). El mediodía evita que la zona horaria cambie el día.
+ * (spec 006 FR-038, spec 008 FR-006). El mediodía evita que la zona horaria cambie el día.
  */
 export const RELOJ_EJEMPLO = "2026-10-14T12:00:00-03:00";
 

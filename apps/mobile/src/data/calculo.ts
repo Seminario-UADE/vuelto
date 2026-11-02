@@ -1,7 +1,7 @@
 /**
  * Núcleo funcional de la app (ADR-009, ADR-010): llama a `@vuelto/motor` y traduce su
  * resultado a lo que pintan las pantallas. Funciones puras: el estado entra por parámetro,
- * incluido `ahora`, y nada lee el reloj del sistema (spec 007 FR-005). Los catálogos de medios y
+ * incluido `ahora`, y nada lee el reloj del sistema (spec 008 FR-005). Los catálogos de medios y
  * comercios son datos estáticos de `fixtures.ts`, no estado. Los selectores del store las
  * envuelven con `createSelector`.
  */
@@ -145,7 +145,7 @@ export function pedidoPresencial(comercio: Comercio & { categoriaId: number }, m
 export function recomendarSeguro(pedido: PedidoRecomendar, entradas: EntradasMotor): RecomendacionMotor {
   const { perfil, promociones, compras, ahora } = entradas;
   try {
-    // Hasta #43 el motor exige monto: "sin monto" se consulta con 0 (spec 007, Assumptions).
+    // Hasta #43 el motor exige monto: "sin monto" se consulta con 0 (spec 008, Assumptions).
     return recomendar({ ...pedido, monto: pedido.monto ?? 0 }, perfil, promociones, compras, ahora);
   } catch (error) {
     if (error instanceof PerfilSinMediosError) return { mejor: null, alternativas: [], descartadas: [] };

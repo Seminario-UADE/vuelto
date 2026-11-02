@@ -118,7 +118,7 @@ export type Recomendacion = {
   /** Solo con monto y con base. */
   topeDespues: { disponible: number } | null;
   alternativas: Alternativa[];
-  /** Para `sin-promo`: la promo que aplica otro día ("Santander Mastercard crédito: Hoy no aplica: …"). */
+  /** Para `sin-promo`: la promo que aplica otro día ("Santander Mastercard crédito: la promo es los jueves"). */
   proximaPromo: string | null;
 };
 

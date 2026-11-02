@@ -1337,8 +1337,8 @@ la recomendación cambie mientras se tipea el monto, sin red.
 - **Riesgo de Metro, medido primero**: con `dist/` el motor se empaqueta en iOS,
   Android y web sin `metro.config.js`; sin `dist/` (checkout limpio, como EAS y
   el CI) falla. Se propusieron dos salidas y el PO eligió `"prepare": "npm run
-  build"` en `packages/motor` (research R1 de la spec 007).
-- Spec 007 con `spec-critic`: las cifras de los escenarios coincidían con el
+  build"` en `packages/motor` (research R1 de la spec 008).
+- Spec 008 con `spec-critic`: las cifras de los escenarios coincidían con el
   motor, pero faltaban el mapeo de los fixtures a la forma del motor, el
   instante exacto del reloj (mediodía de Argentina, para que la zona no cambie
   el día) y en qué slice vive `ahora` (`sesion`). Se corrigieron antes del plan.
@@ -1352,7 +1352,11 @@ la recomendación cambie mientras se tipea el monto, sin red.
   corpus, compras y cuenta, con validación por parte y migración de
   `vuelto.perfil.v1`; `useReloj` escribe `ahora`. Se borraron `sesion.ts` y
   `perfil-local.ts`.
-- Tests: 135 en la app (cálculo, reducers, selectores con memoización y reloj,
+- Al mergear `main` (PR #77, issue #46) el motor pasó a incluir el tope y la
+  base en el `motivo` y los medios en cada `Descarte`: la vista muestra solo
+  "qué da" la promo en el título (la cifra y la base van aparte) y la spec se
+  renumeró a 008 (007 ya era el esquema de Supabase).
+- Tests: 136 en la app (cálculo, reducers, selectores con memoización y reloj,
   persistencia sin nada derivado ni compras de otro período).
 - Verificado en la web: al tipear 1-0-0-0-0 la tarjeta cambia en cada tecla, sin
   ningún pedido de red; guardar la compra baja el tope de Galicia a ≈$4.500
@@ -1361,7 +1365,7 @@ la recomendación cambie mientras se tipea el monto, sin red.
 - Verificado en el simulador de iOS (Expo Go): el tipeo cambia la cifra en
   cada tecla; guardar recalcula la misma pantalla y Topes; al reabrir la app
   sigue la compra y la simulación arranca vacía. Capturas en el PR #86 y en
-  `specs/007-motor-app-redux/capturas/`. Build `preview` de EAS en verde.
+  `specs/008-motor-app-redux/capturas/`. Build `preview` de EAS en verde.
 - `rules-guardian`: sin bloqueantes; se corrigió que al disco llegaran compras
   de períodos anteriores (privacidad.md).
 - `/code-review`: sin violaciones duras. Se aplicaron las fechas del motor en vez

@@ -12,7 +12,7 @@ import { ahoraCambio } from "@/store/sesion";
 const relojDeEjemplo = () => new Date(RELOJ_EJEMPLO);
 
 /**
- * Capa imperativa del reloj (spec 007 FR-006): escribe `sesion.ahora` al abrir la app, al
+ * Capa imperativa del reloj (spec 008 FR-006): escribe `sesion.ahora` al abrir la app, al
  * volver a primer plano y a cada medianoche de Argentina. Los selectores solo leen ese valor.
  */
 export function useReloj(fuente: () => Date = relojDeEjemplo): void {

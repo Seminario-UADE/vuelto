@@ -135,7 +135,7 @@ export function rehidratar(): AppThunk<Promise<void>> {
         migrado = partes.perfil !== null;
       }
     } catch {
-      // Sin almacenamiento la app funciona en memoria (spec 007, Edge Cases).
+      // Sin almacenamiento la app funciona en memoria (spec 008, Edge Cases).
     }
     // El nombre no estaba en el perfil viejo: queda el del store.
     if (partes.perfil && partes.perfil.nombre === null) {

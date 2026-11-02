@@ -11,7 +11,7 @@ import {
 import type { Comercio } from "./contracts";
 import { RELOJ_EJEMPLO, catalogoComercios, comprasOctubre, mediosDeclarados, promociones } from "./fixtures";
 
-// Spec 007, SC-001: las respuestas de US1 con el motor real sobre los datos de ejemplo
+// Spec 008, SC-001: las respuestas de US1 con el motor real sobre los datos de ejemplo
 // (data-model.md §Datos de ejemplo), con el reloj del miércoles 14/10/2026 al mediodía.
 
 const ahora = new Date(RELOJ_EJEMPLO);
@@ -53,7 +53,7 @@ describe("recomendacionVista (US1)", () => {
       expect.objectContaining({
         medioId: "macro-visa-debito",
         estado: "agotado",
-        motivo: "Tope agotado según 2 compras de octubre",
+        motivo: "Tope agotado este mes, según 2 compras",
       }),
     ]);
   });

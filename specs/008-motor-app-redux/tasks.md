@@ -5,7 +5,7 @@ description: "Tareas para el motor en la app y el store de Redux (issue #81)"
 
 # Tasks: App — motor en el dispositivo y store de Redux
 
-**Input**: `specs/007-motor-app-redux/` (spec.md, plan.md, research.md, data-model.md, contracts/store.md, quickstart.md)
+**Input**: `specs/008-motor-app-redux/` (spec.md, plan.md, research.md, data-model.md, contracts/store.md, quickstart.md)
 
 **Tests**: obligatorios para el cálculo, los reducers, los selectores y la persistencia (SC-001, SC-003, SC-004). Van antes o junto con el código.
 

@@ -1,5 +1,5 @@
 /**
- * Lo derivado del estado (ADR-010, spec 007 FR-004): la recomendación, los topes y las vistas
+ * Lo derivado del estado (ADR-010, spec 008 FR-004): la recomendación, los topes y las vistas
  * se calculan con `@vuelto/motor` en selectores memoizados. Ninguno lee el reloj del sistema:
  * la hora es `sesion.ahora` (FR-005).
  */

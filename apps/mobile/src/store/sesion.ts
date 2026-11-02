@@ -7,7 +7,7 @@ export type EstadoSesion = {
   cuenta: Cuenta;
   /**
    * El reloj del cálculo (ISO). Lo escribe `useReloj`; ningún selector lee el reloj del sistema
-   * (spec 007 FR-005, FR-006). No se persiste.
+   * (spec 008 FR-005, FR-006). No se persiste.
    */
   ahora: string;
   /** Confirmación pendiente de mostrar ("Compra guardada · …"). */
