@@ -1,0 +1,424 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20-a-la-mesa-icbc-mar26",
+  "tarjeta": {
+    "id": "4cd8e5af-0ce7-44cd-924a-0498d9ce8832",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "A La Mesa",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "20% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "15000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "ICBC",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/4cd8e5af-0ce7-44cd-924a-0498d9ce8832/primary_image.jpg?v=1773330157455",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/4cd8e5af-0ce7-44cd-924a-0498d9ce8832/secondary_image.jpg?v=1773330157454",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/4cd8e5af-0ce7-44cd-924a-0498d9ce8832/tertiary_image.jpg?v=1773330157456",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      }
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore,instore_nfc",
+    "start_date": "2026-03-14T03:00:00.000Z",
+    "stop_date": "2027-01-01T02:59:59.999Z",
+    "days_of_week": "JLDMSVX",
+    "title": "20% en A La Mesa",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "20,icbc,alamesa,presencia,todoslosdias",
+    "promo_id": "2462d8c6-b398-4777-82f3-d7bdd3a1af71",
+    "slug": "20-a-la-mesa-icbc-mar26",
+    "short_description": "2603-icbc-a-la-mesa-presencial-20off",
+    "where": "A La Mesa",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            43,
+            27
+          ]
+        },
+        {
+          "map_category": 2,
+          "sub_categories": [
+            12
+          ]
+        },
+        {
+          "map_category": 3,
+          "sub_categories": [
+            49,
+            35
+          ]
+        },
+        {
+          "map_category": 4,
+          "sub_categories": [
+            37
+          ]
+        },
+        {
+          "map_category": 7,
+          "sub_categories": [
+            19
+          ]
+        },
+        {
+          "map_category": 8,
+          "sub_categories": [
+            5
+          ]
+        },
+        {
+          "map_category": 10,
+          "sub_categories": [
+            41
+          ]
+        },
+        {
+          "map_category": 12,
+          "sub_categories": [
+            40
+          ]
+        },
+        {
+          "map_category": 13,
+          "sub_categories": [
+            20,
+            15
+          ]
+        },
+        {
+          "map_category": 14,
+          "sub_categories": [
+            31,
+            9
+          ]
+        },
+        {
+          "map_category": 15,
+          "sub_categories": [
+            11
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "visa",
+      "master"
+    ]
+  },
+  "detalle": {
+    "id": "2462d8c6-b398-4777-82f3-d7bdd3a1af71",
+    "name": "20% en A La Mesa",
+    "description": "Aprovechá 20% de reintegro en A La Mesa pagando con dinero en cuenta o tus tarjetas ICBC.",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-14T18:37:59.565Z",
+    "updated_at": "2026-08-20T19:52:55.831Z",
+    "deleted_at": null,
+    "short_description": "2603-icbc-a-la-mesa-presencial-20off",
+    "publication_description": "Aprovechá 20% de reintegro en A La Mesa pagando con dinero en cuenta o tus tarjetas ICBC.",
+    "slug": "20-a-la-mesa-icbc-mar26",
+    "display_start_date": "2026-03-07T03:00:00.000Z",
+    "display_stop_date": "2027-03-02T02:59:59.999Z",
+    "search_tags": "20,icbc,alamesa,presencia,todoslosdias",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-03-14",
+        "days_of_week": [
+          "thursday",
+          "monday",
+          "sunday",
+          "tuesday",
+          "saturday",
+          "friday",
+          "wednesday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "instore_nfc"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "pct"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "2462d8c6-b398-4777-82f3-d7bdd3a1af71",
+        "benefit_id": "2462d8c6-b398-4777-82f3-d7bdd3a1af71",
+        "name": "20% en A La Mesa",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43,
+                27
+              ]
+            },
+            {
+              "category_id": 2,
+              "subcategory_ids": [
+                12
+              ]
+            },
+            {
+              "category_id": 3,
+              "subcategory_ids": [
+                49,
+                35
+              ]
+            },
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                37
+              ]
+            },
+            {
+              "category_id": 7,
+              "subcategory_ids": [
+                19
+              ]
+            },
+            {
+              "category_id": 8,
+              "subcategory_ids": [
+                5
+              ]
+            },
+            {
+              "category_id": 10,
+              "subcategory_ids": [
+                41
+              ]
+            },
+            {
+              "category_id": 12,
+              "subcategory_ids": [
+                40
+              ]
+            },
+            {
+              "category_id": 13,
+              "subcategory_ids": [
+                20,
+                15
+              ]
+            },
+            {
+              "category_id": 14,
+              "subcategory_ids": [
+                31,
+                9
+              ]
+            },
+            {
+              "category_id": 15,
+              "subcategory_ids": [
+                11
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "bcfcac03-6f79-4995-bfab-7b8916b0747a"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_por_regla"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "week",
+            "aggregate_by": "user",
+            "amount_by_period": 15000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1",
+          "10",
+          "12",
+          "13",
+          "14",
+          "15",
+          "2",
+          "3",
+          "4",
+          "7",
+          "8"
+        ],
+        "sub_categories": [
+          "11",
+          "12",
+          "15",
+          "19",
+          "20",
+          "27",
+          "31",
+          "35",
+          "37",
+          "40",
+          "41",
+          "43",
+          "49",
+          "5",
+          "9"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-14T18:37:58.745Z",
+        "updated_at": "2026-07-14T18:37:58.745Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "visa",
+      "master"
+    ],
+    "terms_and_conditions": "PROPUESTA PARA CARTERA DE CONSUMO VALIDA EN LA REPÚBLICA ARGENTINA DESDE EL 14/03/2026 HASTA EL 31/12/2026. 20% DE AHORRO CON TARJETAS DE CREDITO VISA Y MASTERCARD ICBC EN UN PAGO Y 20% DE AHORRO CON TARJETA VISA DEBITO ICBC. POR CADA $1000 DE CONSUMO SE REINTEGRARÁN $200 EN SU CUENTA. TOPE DE REINTEGRO $15,000 POR CUENTA POR SEMANA. PARA PAGOS CON MODO O SU INTEGRACIÓN CON MOBILE BANKING. NO ACUMULABLE CON OTRAS PROMOCIONES. VISA DEBITO VALIDO SOLO PARA CLIENTES CON PAQUETES DE PRODUCTOS O ACREDITEN SUELDOS EN ICBC. VISA DEBITO EXCLUSIVO PARA EL TITULAR DE CUENTA. NO VÁLIDO PARA COMPRAS MAYORISTAS NI PARA TARJETAS VISA BUSINESS, VISA DISTRIBUTION, VISA PURCHASING, VISA PURCHASING CAMPO, CORPORATE, CORPORATE SIGNATURE, RECARGABLE EMPRESA Y VISA CUENTA CENTRAL. NO VALIDO PARA COMPRAS EFECTUADAS POR MERCADO PAGO, TODO PAGO, PAGO INMEDIATO O PAGO ENTRE PERSONAS. LOS REINTEGROS SE VERÁN ACREDITADOS EN EL MOMENTO DE LA COMPRA O HASTA 30 DÍAS POSTERIORES EN CAJA DE AHORRO O CUENTA CORRIENTE DE LA CUENTA REGISTRADA EN MODO. SÓLO PARA CLIENTES QUE SE ENCUENTREN AL DÍA EN SUS PRODUCTOS. INDUSTRIAL AND COMMERCIAL BANK OF CHINA (ARGENTINA) S.A.U ES UNA SOCIEDAD ANÓNIMA UNIPERSONAL BAJO LA LEY ARGENTINA. SU ACCIONISTA LIMITA SU RESPONSABILIDAD AL CAPITAL APORTADO. (LEY 25738). CUIT: 30-70944784-6. FLORIDA 99, CABA.",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "A La Mesa",
+      "cashback_cap": "15000",
+      "participating_bank": "ICBC",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/4cd8e5af-0ce7-44cd-924a-0498d9ce8832/primary_image.jpg?v=1773330157455",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "¡Aprovechá 20% de reintegro en A La Mesa con ICBC!",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con dinero en cuenta o con tus tarjetas de crédito Visa y/o Mastercard o débito Visa del ICBC a través de MODO. </span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">En tiendas físicas adheridas.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el reintegro aplicado?</strong></b><span style=\"white-space: pre-wrap;\"> </span></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en el resumen de tu tarjeta del ICBC. </span></p>",
+      "applicability_description": "A La Mesa",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

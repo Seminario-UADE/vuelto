@@ -1,0 +1,268 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/15-bbva-tiendas-cercania-jul26",
+  "tarjeta": {
+    "id": "a9e9e244-3f12-4473-8675-e7228fdf66ad",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Tiendas de Cercanía",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "15% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "BBVA",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a9e9e244-3f12-4473-8675-e7228fdf66ad/primary_image.jpg?v=1783025515699",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a9e9e244-3f12-4473-8675-e7228fdf66ad/secondary_image.jpg?v=1783025515715",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a9e9e244-3f12-4473-8675-e7228fdf66ad/tertiary_image.jpg?v=1783025515702",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      }
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore",
+    "start_date": "2026-07-01T03:00:00.000Z",
+    "stop_date": "2027-01-01T02:59:59.999Z",
+    "days_of_week": "LMXJVSD",
+    "title": "15% en Tiendas de ... ",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "tiendas,de cercania,bbva,presencial",
+    "promo_id": "62ae52a2-feeb-4b55-a70e-8b3ef1990762",
+    "slug": "15-bbva-tiendas-cercania-jul26",
+    "short_description": "2607-BBVA-Tiendasdecercania-ADQ-Presencial-15off",
+    "where": "Comercios Adheridos",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            43,
+            26,
+            34
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [],
+    "credit_list": [
+      "visa",
+      "master"
+    ]
+  },
+  "detalle": {
+    "id": "62ae52a2-feeb-4b55-a70e-8b3ef1990762",
+    "name": "15% en Tiendas de ... ",
+    "description": "Aprovechá 15% de reintegro en Tiendas de Cercanía pagando con tus tarjetas de crédito del BBVA. ",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-16T17:44:53.094Z",
+    "updated_at": "2026-08-20T19:52:53.578Z",
+    "deleted_at": null,
+    "short_description": "2607-BBVA-Tiendasdecercania-ADQ-Presencial-15off",
+    "publication_description": "Aprovechá 15% de reintegro en Tiendas de Cercanía pagando con tus tarjetas de crédito del BBVA. ",
+    "slug": "15-bbva-tiendas-cercania-jul26",
+    "display_start_date": "2026-07-01T03:00:00.000Z",
+    "display_stop_date": "2027-04-01T02:59:59.999Z",
+    "search_tags": "tiendas,de cercania,bbva,presencial",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-07-01",
+        "days_of_week": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "62ae52a2-feeb-4b55-a70e-8b3ef1990762",
+        "benefit_id": "62ae52a2-feeb-4b55-a70e-8b3ef1990762",
+        "name": "15% en Tiendas de ... ",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_terminal_id"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43,
+                26,
+                34
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "049ad22b-c0f0-4733-be35-e31256801ce8"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 15,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 10000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "26",
+          "34",
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-16T17:44:51.774Z",
+        "updated_at": "2026-07-16T17:44:51.774Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "visa",
+      "master"
+    ],
+    "terms_and_conditions": "CARTERA DE CONSUMO. PROMOCIÓN VÁLIDA DESDE EL 01/07/2026 HASTA EL 31/12/2026.  LA PROMOCIÓN CONSTA DE 15% DE REINTEGRO CON TOPE DE $10.000 POR USUARIO POR  MES. EL TOPE ES COMPARTIDO Y DISTRIBUIDO ENTRE LOS COMERCIOS ADHERIDOS A ESTA  PROMOCIÓN. VÁLIDA PARA CLIENTES QUE ABONEN SUS COMPRAS EN UN PAGO CON  TARJETAS DE CRÉDITO EMITIDAS POR BBVA. EXCLUSIVO PARA PAGOS REALIZADOS A  TRAVÉS DE APP BBVA ESCANEANDO UN QR MODO. LA PRESENTE PROMOCIÓN ES VÁLIDA  SÓLO PARA CONSUMOS DE TIPO FAMILIAR. EL REINTEGRO SE ACREDITARÁ DENTRO DE LOS  60 DÍAS POSTERIORES A LA COMPRA EN TU CAJA DE AHORROS ACTIVA EN BBVA Y  VINCULADA A MODO. PARA PODER RECIBIR EL REINTEGRO, QUIEN REALIZA LA COMPRA  DEBE SER TITULAR DE UNA CAJA DE AHORROS ACTIVA EN BBVA Y DICHA CUENTA DEBE  ENCONTRARSE VINCULADA A MODO. SI QUIEN REALIZA LA COMPRA ES ADICIONAL DE  TARJETA DE CREDITO Y NO POSEE UNA CAJA DE AHORROS EN BBVA, EL REINTEGRO SE  ACREDITARÁ EN LA CAJA DE AHORROS ACTIVA EN BBVA DEL TITULAR DE LA TARJETA DE  CREDITO. DICHA CAJA DE AHORROS DEBE ENCONTRARSE VINCULADA A MODO. ACUMULA  ÚNICAMENTE CON PROMOCIONES DE MODO. LA PROMOCIÓN NO APLICA A PAGOS  REALIZADOS A TRAVÉS DE OTRAS BILLETERAS VIRTUALES Y/O PLATAFORMAS DE PAGO  ONLINE (POR EJEMPLO MERCADO PAGO, UALÁ, ETC.). LOS ACCIONISTAS DE BANCO BBVA  ARGENTINA S.A. LIMITAN SU RESPONSABILIDAD A LA INTEGRACIÓN DE LAS ACCIONES  SUSCRIPTAS LEY 19.550 Y LEY 25.738. CUIT 30-50000319-3. AVDA.CÓRDOBA 111- PISO 31  CABA - CP 1054AAA.",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "15% de reintegro",
+      "validity_place": "Tiendas de Cercanía",
+      "cashback_cap": "10000",
+      "participating_bank": "BBVA",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a9e9e244-3f12-4473-8675-e7228fdf66ad/primary_image.jpg?v=1783025515699",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Tiendas de cercanía con BBVA",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tus tarjetas de crédito Visa y/o Mastercard  del BBVA, a través de MODO.</span></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el descuento aplicado?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en tu cuenta del BBVA.</span></p>",
+      "applicability_description": "Comercios Adheridos",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

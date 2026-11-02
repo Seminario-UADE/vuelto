@@ -1,0 +1,271 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20-simplicity-comafi-oct26",
+  "tarjeta": {
+    "id": "d773313b-d9bc-4e61-ab32-348828dea515",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": {
+      "promo_id": "25d0aab5-15e0-4478-925c-3eab840954a5"
+    },
+    "content": {
+      "row": [
+        {
+          "text": "Simplicity",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "20% y hasta 3 cuotas sin interés",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Comafi",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/c286838f-2275-4d05-8f46-488ceab0a297_Simplicity_Perfumeria.jpg",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/c286838f-2275-4d05-8f46-488ceab0a297_Simplicity_Perfumeria.jpg",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/c286838f-2275-4d05-8f46-488ceab0a297_Simplicity_Perfumeria.jpg",
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:59+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore,online",
+    "start_date": "2026-10-02T03:00:00.000Z",
+    "stop_date": "2027-01-01T02:59:59.999Z",
+    "days_of_week": "V",
+    "title": "Simplicity octubre 26",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "20,3,csi,simplicity,presencial,online,comafi",
+    "promo_id": "25d0aab5-15e0-4478-925c-3eab840954a5",
+    "slug": "20-simplicity-comafi-oct26",
+    "short_description": "2610-comafi-simplicity-presencialonline-20off",
+    "where": "Simplicity",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 4,
+          "sub_categories": [
+            16
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [],
+    "credit_list": [
+      "master",
+      "visa"
+    ]
+  },
+  "detalle": {
+    "id": "25d0aab5-15e0-4478-925c-3eab840954a5",
+    "name": "Simplicity octubre 26",
+    "description": "",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-09-25T18:46:03.202Z",
+    "updated_at": "2026-10-02T19:45:35.195Z",
+    "deleted_at": null,
+    "short_description": "2610-comafi-simplicity-presencialonline-20off",
+    "publication_description": "Aprovecha 20% de reintegro y hasta 3 cuotas sin interés en Simplicity con Comafi",
+    "slug": "20-simplicity-comafi-oct26",
+    "display_start_date": "2026-10-01T03:00:00.000Z",
+    "display_stop_date": "2027-02-01T02:59:59.999Z",
+    "search_tags": "20,3,csi,simplicity,presencial,online,comafi",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-10-02",
+        "days_of_week": [
+          "friday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "online"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "25d0aab5-15e0-4478-925c-3eab840954a5",
+        "benefit_id": "25d0aab5-15e0-4478-925c-3eab840954a5",
+        "name": ".",
+        "priority": 1,
+        "segmentations": {
+          "whitelist": [
+            "store_terminal_id"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                16
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "ce8aabb1-f663-4832-82ec-de9b5b572aa1"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 10000,
+            "amount_of_transactions_by_period": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "16"
+        ],
+        "preselected": false,
+        "created_at": "2026-09-25T18:46:54.325Z",
+        "updated_at": "2026-10-01T17:35:22.319Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": null
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "master",
+      "visa"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Oferta exclusiva para la cartera de consumo. Promoción válida todos los viernes desde el 02/10/26 hasta el 31/12/26 abonando con tarjetas de crédito Visa y Mastercard emitidas por Banco Comafi. 20% de ahorro y hasta 3 cuotas sin interés abonando a través de MODO. Quedan excluidas aquellas tarjetas de crédito Credial, Business y Corporativas emitidas en Argentina por Banco Comafi. Tope de reintegro mensual de $10.000. Los descuentos se realizan sobre precio de lista, son automáticos y se acreditarán hasta los 30 días en la cuenta del banco utilizado en el pago. No acumulable con otras promociones ni entre sí. Sólo válido para aquellos clientes que se encuentren al día en sus productos y sean titulares de una caja de ahorro en pesos en Banco Comafi.&nbsp;Para compras realizadas por adicionales con tarjeta de débito y/o crédito de Banco Comafi&nbsp; el reintegro siempre se acreditará en la caja de ahorro en pesos que el titular principal de la tarjeta de débito y/o crédito tenga en Banco Comafi. El descuento no será aplicado en aquellos pagos realizados a través de la aplicación de Mercado Pago. La promoción no aplica a pagos a través de billeteras virtuales (excepto Modo), plataformas de pago y/o portales de pagos online ajenos a la empresa. Banco Comafi no se responsabiliza por los cupones presentados por los establecimientos fuera de término, así como tampoco promociona ni garantiza los comercios, los productos y/o servicios o la calidad de los mismos. Banco Comafi S.A. con domicilio en Av. Roque Sáenz Peña 660, piso 1, CUIT 30-60473101-8.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "20% y hasta 3 cuotas sin interés",
+      "validity_place": "Simplicity",
+      "cashback_cap": "10000",
+      "participating_bank": "Comafi",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/c286838f-2275-4d05-8f46-488ceab0a297_Simplicity_Perfumeria.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Simplicity con Banco Comafi",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong></p><p>Realizando una compra con tus tarjetas de crédito Visa y/o Mastercard del Banco Comafi a través de MODO.</p><p><strong> </strong></p><p><strong>¿Cómo es la modalidad de uso?</strong></p><p>En tiendas físicas y online adheridas:</p><p><a href=\"https://www.simplicity.com.ar/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.simplicity.com.ar/</a></p><p></p><p><strong>¿Dónde veo el reintegro aplicado?</strong></p><p>El reintegro lo verás acreditado en tu cuenta del Banco Comafi.</p>",
+      "applicability_description": "Simplicity",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

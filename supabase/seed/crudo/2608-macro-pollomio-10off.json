@@ -1,0 +1,265 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/2608-macro-pollomio-10off",
+  "tarjeta": {
+    "id": "4ed1ca12-4f6c-4c28-b85b-391a9726f404",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "POLLO MIO",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "15000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Macro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/4ed1ca12-4f6c-4c28-b85b-391a9726f404/primary_image.jpg?v=1787670807099",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/4ed1ca12-4f6c-4c28-b85b-391a9726f404/secondary_image.jpg?v=1787670807138",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/4ed1ca12-4f6c-4c28-b85b-391a9726f404/tertiary_image.jpg?v=1787670807048",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      }
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW",
+    "exclusiveness": "all",
+    "payment_flow": "instore,instore_nfc,physical-card",
+    "start_date": "2026-08-26T03:00:00.000Z",
+    "stop_date": "2027-01-01T02:59:59.999Z",
+    "days_of_week": "X",
+    "title": "POLLO MIO",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "SEG_GP",
+    "promo_id": "b7186363-6726-4be3-b4d7-1de7a037274d",
+    "slug": "2608-macro-pollomio-10off",
+    "short_description": "2608-macro-TC48944-pollomio-Presencial-10off",
+    "where": "POLLO MIO",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            43
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [],
+    "credit_list": [
+      "master",
+      "visa",
+      "american_express"
+    ]
+  },
+  "detalle": {
+    "id": "b7186363-6726-4be3-b4d7-1de7a037274d",
+    "name": "POLLO MIO",
+    "description": "SEG_GP",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": false,
+    "created_at": "2026-08-26T23:08:07.075Z",
+    "updated_at": "2026-08-31T22:16:30.884Z",
+    "deleted_at": null,
+    "short_description": "2608-macro-TC48944-pollomio-Presencial-10off",
+    "publication_description": "SEG_GP",
+    "slug": "2608-macro-pollomio-10off",
+    "display_start_date": "2026-08-26T03:00:00.000Z",
+    "display_stop_date": "2027-01-01T02:59:59.999Z",
+    "search_tags": "SEG_GP",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-08-26",
+        "days_of_week": [
+          "wednesday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "PRISMA"
+        ],
+        "segmentation_mode": "by_whitelist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "instore_nfc",
+          "physical-card"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "american_express"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "b7186363-6726-4be3-b4d7-1de7a037274d",
+        "benefit_id": "b7186363-6726-4be3-b4d7-1de7a037274d",
+        "name": "POLLO MIO",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "bin",
+            "store_acquirer_establishment_id"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "6a089c91-a7d3-4199-a578-2132a3733f69"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 10,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_por_regla"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 15000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-08-26T23:08:06.678Z",
+        "updated_at": "2026-08-26T23:08:06.678Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "master",
+      "visa",
+      "american_express"
+    ],
+    "terms_and_conditions": "CARTERA DE CONSUMO. PROMOCIÓN VÁLIDA DESDE EL 26 DE AGOSTO DE 2026 HASTA EL 31 DE DICIEMBRE DE 2026, EXCLUSIVAMENTE LOS DIAS MIERCOLES, CON LAS TARJETAS DE CRÉDITO AMEX CLASICA INTERNACIONAL, AMEX CLASICA INTERNACIONAL NA, AMEX GOLD, AMEX GOLD NA, AMEX PLATINUM, MASTERCARD GOLD, MASTERCARD INTERNACIONAL, MASTERCARD REGIONAL, PLATINUM MASTERCARD, VISA CLASICA INTERNACIONAL, VISA CLASICA INTERNACIONAL NA, VISA CLASICA NACIONAL, VISA CLASICA NACIONAL NA, VISA GOLD, VISA GOLD NA Y VISA PLATINUM DE LOS BANCOS DEL GRUPO MACRO. LA PRESENTE PROMOCIÓN APLICA PARA CONSUMOS DE TIPO PERSONAL/FAMILIAR. EN CASO DE DUDA, EL BANCO SE RESERVA EL DERECHO DE NO ACREDITAR EL MONTO DE LA BONIFICACIÓN HASTA TANTO SEA ACLARADO EL DESTINO DE LOS CONSUMOS. 10% DE DESCUENTO  EN UN PAGO TOPE DE DEVOLUCIÓN 15000 PESOS POR CUENTA POR MES.EL BENEFICIO SERÁ APLICADO DENTRO DE LOS 60 DÍAS DE REALIZADA LA COMPRA, AL CIERRE DEL RESUMEN EN EL CUAL SE REGISTRE LA OPERACIÓN O EN LOS DOS SIGUIENTES. NO ACUMULABLE CON OTRAS PROMOCIONES. NO APLICA PARA PAGOS REALIZADOS A TRAVÉS DE MERCADO PAGO/TODO PAGO Y/O PEI. EL DESCUENTO PROMOCIONADO APLICA SOBRE EL PRECIO CONTADO. (EJEMPLOS REPRESENTATIVOS: COMPRA EN CUOTAS: EN UNA COMPRA CON TARJETA DE CRÉDITO DE $1.200 EN 3 CUOTAS SIN INTERÉS, EL CLIENTE ABONARÁ 3 CUOTAS DE $400 CADA UNA. COMPRA CON DESCUENTO Y EN CUOTAS: CON TARJETA DE CRÉDITO CON 10% DE DESCUENTO Y 3 CUOTAS SIN INTERÉS EN UNA COMPRA DE $1.200, CORRESPONDERÁ 3 CUOTAS DE $400 CADA UNA, Y EL BANCO LE REINTEGRARÁ AL CLIENTE DENTRO DE LOS 60 DÍAS DE REALIZADA LA COMPRA, AL CIERRE DEL RESUMEN EN EL CUAL SE REGISTRE LA OPERACIÓN O EN LOS DOS SIGUIENTES LA SUMA DE $ 120. QUEDA ESTABLECIDO QUE LOS DATOS Y OFERTAS INDICADAS REVISTEN CARÁCTER INFORMATIVO Y EN MODO ALGUNO SUPONEN QUE LOS ESTABLECIMIENTOS, PRODUCTOS Y/O SERVICIOS QUE COMERCIALIZAN O LA CALIDAD DE LOS MISMOS SON PROMOCIONADOS O GARANTIZADOS POR LOS BANCOS DEL GRUPO MACRO, COMO ASÍ TAMPOCO SE RESPONSABILIZAN POR LOS CUPONES PRESENTADOS FUERA DE TÉRMINO POR LOS COMERCIOS. MÁS INFORMACIÓN EN FORMA PREVIA A REALIZAR LA OPERACIÓN AL: 0810-555-2355 PARA BANCO MACRO, 0810-555-7353 PARA CLIENTES MACRO SELECTA,  O EN LA SUCURSAL MÁS CERCANA A SU DOMICILIO",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "10% de reintegro",
+      "validity_place": "POLLO MIO",
+      "cashback_cap": "15000",
+      "participating_bank": "Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/4ed1ca12-4f6c-4c28-b85b-391a9726f404/primary_image.jpg?v=1787670807099",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "POLLO MIO",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo pagar?&nbsp;</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Con tarjeta de crédito usando cualquier método de pago: tarjeta física, MODO QR y NFC (Apple Pay, Google Pay y MODO NFC).</span></p><p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Donde veo el descuento aplicado?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás reflejado en el resumen de la tarjeta con la que hiciste el pago.</span></p><p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Esta promo es acumulable con otras promos de MODO?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">SÍ, esta promo es acumulable con otras promos vigentes de MODO, siempre y cuando el pago se realice con QR y/o MODO NFC.</span></p><p class=\"editor-paragraph\"><br></p>",
+      "applicability_description": "POLLO MIO",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

@@ -1,0 +1,275 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/30-lacoopeencasa-credicoop-oct25",
+  "tarjeta": {
+    "id": "7f5c840c-837b-40fc-9150-b0491bf1daba",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "La Coope en Casa",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "30% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Desde el 01/10 al 31/03",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Exclusivo con",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "15000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Credicoop",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/7f5c840c-837b-40fc-9150-b0491bf1daba/primary_image.jpg?v=1759148601275",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/7f5c840c-837b-40fc-9150-b0491bf1daba/secondary_image.png?v=1759148601263",
+        "tertiary_image": null,
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": true
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "online",
+    "start_date": "2025-10-01T03:00:00.000Z",
+    "stop_date": "2027-01-01T02:59:59.999Z",
+    "days_of_week": "V",
+    "title": "30% en La Coope en Casa",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "30,supermercado,en casa,credicoop,viernes,obrera",
+    "promo_id": "23df25eb-0985-4238-a99a-45a4979d7f1b",
+    "slug": "30-lacoopeencasa-credicoop-oct25",
+    "short_description": "2510-credicoop-lacoopeencasa-online-30off",
+    "where": "La Coope en Casa",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            43
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [
+      "cabal"
+    ],
+    "credit_list": [
+      "cabal"
+    ]
+  },
+  "detalle": {
+    "id": "23df25eb-0985-4238-a99a-45a4979d7f1b",
+    "name": "30% en La Coope en Casa",
+    "description": "Aprovecha 30% de reintegro todos los viernes pagando con tus tarjetas del Credicoop",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-14T18:37:55.528Z",
+    "updated_at": "2026-09-29T17:27:44.003Z",
+    "deleted_at": null,
+    "short_description": "2510-credicoop-lacoopeencasa-online-30off",
+    "publication_description": "Aprovecha 30% de reintegro todos los viernes pagando con tus tarjetas del Credicoop",
+    "slug": "30-lacoopeencasa-credicoop-oct25",
+    "display_start_date": "2025-09-29T03:00:00.000Z",
+    "display_stop_date": "2026-12-31T02:59:59.999Z",
+    "search_tags": "30,supermercado,en casa,credicoop,viernes,obrera",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2025-10-01",
+        "days_of_week": [
+          "friday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "online"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "cabal"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "cabal"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "23df25eb-0985-4238-a99a-45a4979d7f1b",
+        "benefit_id": "23df25eb-0985-4238-a99a-45a4979d7f1b",
+        "name": "30% en La Coope en Casa",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_terminal_id"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "b59fbc01-420f-4d88-8d53-be17029bc4ba"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 30,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "day",
+            "aggregate_by": "user",
+            "amount_by_period": 15000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-14T18:37:54.443Z",
+        "updated_at": "2026-09-29T16:20:44.662Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "cabal"
+    ],
+    "credit_list": [
+      "cabal"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Promoción válida únicamente para consumos con QR de MODO a través de app Banca Credicoop o MODO seleccionando Tarjetas Cabal Credicoop (excepto Agrocabal, Cabal Mayorista y Cabal Empresa). No aplica para pagos con dinero en cuenta y/o transferencia. Aplica a consumos de tipo familiar y efectuados en un pago. Vigente desde el 01/10/25 hasta el 30/09/26 programando el envío para los días viernes. Ejemplo: en un consumo de $50.000 se reintegrarán $15.000 (tope máximo por usuario por día). El reintegro se verá reflejado dentro de los 30 días posteriores al consumo en la cuenta del Banco, para lo cual será requisito que sea de título personal y se encuentre adherida a MODO. Será condición esencial para participar de la misma que al momento de efectuar el reintegro, la tarjeta se encuentre vigente y en estado de cumplimiento normal. Productos excluidos de las promociones: todos los productos pertenecientes a rubros Hogar, Tecnología, Telefonía, Carnes (cortes de carnes: vacuna, porcina, ovina y pollo) y Pescado; los productos incluidos en los planes Precios Cuidados y Productos Esenciales. El beneficio no será acumulable con otros descuentos y/o promociones del comercio. No participan los consumos realizados a través de los programas MasCuotasCabal-MiPyme y Cuotas MiPyme Payway, billeteras virtuales (excepto Modo) y POS móviles. Aplicable a la cartera de consumo. Más información en www.beneficios.bancocredicoop.coop o comunicándose gratuitamente a Credicoop Responde al 0800-888-4500. Banco Credicoop C.L., CUIT 30571421352, Reconquista 484, CABA. MODO es propiedad de Play Digital SA, y se encuentra sujeto a los términos y condiciones de uso disponibles en www.modo.com.ar.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "30% de reintegro",
+      "validity_place": "La Coope en Casa",
+      "cashback_cap": "15000",
+      "participating_bank": "Credicoop",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/7f5c840c-837b-40fc-9150-b0491bf1daba/primary_image.jpg?v=1759148601275",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "¡Aprovechá 30% de reintegro en La Coope en Casa con Credicoop!\t",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tus tarjetas Cabal del Credicoop a través de MODO. </span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el descuento aplicado? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en la cuenta del Credicoop dentro de los 30 días.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">Beneficio exclusivo programando el envío para los días viernes.</strong></b></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><a href=\"https://www.lacoopeencasa.coop/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">https://www.lacoopeencasa.coop/</span></a><span style=\"white-space: pre-wrap;\"> </span></p>",
+      "applicability_description": "La Coope en Casa",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

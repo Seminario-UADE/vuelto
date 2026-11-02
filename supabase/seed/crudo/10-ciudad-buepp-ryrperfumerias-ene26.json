@@ -1,0 +1,351 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/10-ciudad-buepp-ryrperfumerias-ene26",
+  "tarjeta": {
+    "id": "b8477728-9f90-4274-8c34-f9c17abc056f",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Ruiz y Roca Perfumerías",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "10% y 10 cuotas ",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "Desde el 20/01 al 30/06",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "Exclusivo con",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "0",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "Ciudad/Buepp",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": [
+            {
+              "name_bank": "Ciudad",
+              "image_bank": "https://assets.mobile.playdigital.com.ar/images/banks/ciudad.png"
+            },
+            {
+              "name_bank": "Buepp",
+              "image_bank": "https://assets.mobile.playdigital.com.ar/images/banks/buepp.png"
+            }
+          ]
+        }
+      ],
+      "extra_row": null,
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/b8477728-9f90-4274-8c34-f9c17abc056f/primary_image.jpg?v=1785764660996",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/b8477728-9f90-4274-8c34-f9c17abc056f/secondary_image.jpg?v=1785764660990",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/b8477728-9f90-4274-8c34-f9c17abc056f/tertiary_image.jpg?v=1785764661001",
+        "tertiary_backgroundcolor": null,
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": null
+        },
+        {
+          "type": "countdown",
+          "value": false,
+          "label": null
+        },
+        {
+          "type": "online_store",
+          "value": false,
+          "label": null
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore",
+    "start_date": "2026-01-20T03:00:00.000Z",
+    "stop_date": "2027-01-01T02:59:59.999Z",
+    "days_of_week": "M",
+    "title": "10% en RyR Perfumerías",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "perfumerias,ryr,ciudad,buepp,10%",
+    "promo_id": "e18d9819-b235-4028-9feb-1dc6d9c007da",
+    "slug": "10-ciudad-buepp-ryrperfumerias-ene26",
+    "short_description": "2601-Ciudad-Buepp-RyRPerfumerias-Presencial-10off",
+    "where": "RyR Perfumerías",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 4,
+          "sub_categories": [
+            37
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [],
+    "credit_list": [
+      "master",
+      "visa"
+    ]
+  },
+  "detalle": {
+    "id": "e18d9819-b235-4028-9feb-1dc6d9c007da",
+    "name": "10% en RyR Perfumerías",
+    "description": "10% de reintegro los martes en RyR Perfumerias con Ciudad / Buepp",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-16T19:30:32.248Z",
+    "updated_at": "2026-08-20T20:04:54.378Z",
+    "deleted_at": null,
+    "short_description": "2601-Ciudad-Buepp-RyRPerfumerias-Presencial-10off",
+    "publication_description": "10% de reintegro los martes en RyR Perfumerias con Ciudad / Buepp",
+    "slug": "10-ciudad-buepp-ryrperfumerias-ene26",
+    "display_start_date": "2026-01-19T03:00:00.000Z",
+    "display_stop_date": "2027-04-01T02:59:59.999Z",
+    "search_tags": "perfumerias,ryr,ciudad,buepp,10%",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-01-20",
+        "days_of_week": [
+          "tuesday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "e18d9819-b235-4028-9feb-1dc6d9c007da",
+        "benefit_id": "e18d9819-b235-4028-9feb-1dc6d9c007da",
+        "name": "10% en RyR Perfumerías",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                37
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "661d0b0f-556f-4e7b-9c79-823e1cd901a1",
+              "2313b643-1a79-4312-a213-98cd9a3942b1"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 10,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": [
+              {
+                "type": "sin_interes",
+                "number": 1,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 2,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 3,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 4,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 5,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 6,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 8,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 9,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 10,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              }
+            ]
+          }
+        },
+        "limits": {
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "37"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-16T19:30:30.484Z",
+        "updated_at": "2026-07-16T19:30:30.484Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "master",
+      "visa"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Promoción ofrecida por el Banco de la Ciudad de Buenos Aires, CUIT 30-99903208-3 (Banco Ciudad), todos los días martes desde el 20/01/2026 al 31/12/2026 en la República Argentina, para compras realizadas en locales adheridos de Ruiz y Rocca Perfumerías pagando exclusivamente con qr MODO desde App Ciudad o Buepp con tarjetas de crédito Visa o Mastercard de Banco Ciudad. Se otorgará un 10% (diez por ciento) de descuento sin tope de reintegro y hasta 10 cuotas sin interés. El reintegro se acreditará en la cuenta del cliente en un plazo de 15 (quince) días hábiles posteriores a la fecha de realizado el pago. No aplica para planes “Cuota MiPyme” ni para ningún programa de beneficios similar. Para compras realizadas por titulares de tarjetas adicionales, el tarjetahabiente adicional deberá poseer una caja de ahorro del Banco Ciudad asociada a MODO. El producto ofrecido corresponde a la cartera de consumo. T.N.A., T.E.A. Y C.F.T.N.A (IVA Incluido): 0,00% Fijo. T.N.A: Tasa Nominal Anual, T.E.A: Tasa Efectiva Anual, C.F.T.N.A: Costo Financiero Total expresado en forma de tasa nominal anual con IVA. Para más información sobre condiciones y limitaciones aplicables visita www.bancociudad.com.ar</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "10% y 10 cuotas ",
+      "validity_place": "Ruiz y Roca Perfumerías",
+      "cashback_cap": "0",
+      "participating_bank": "Ciudad/Buepp",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/b8477728-9f90-4274-8c34-f9c17abc056f/primary_image.jpg?v=1785764660996",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Ruiz y Roca Perfumerías con Ciudad y Buepp",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio?</strong></b><span style=\"white-space: pre-wrap;\"> </span></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tus tarjetas de crédito Visa y/o Mastercard del Ciudad a través de MODO, App Móvil Ciudad o Buepp.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">En tiendas físicas adheridas.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el descuento aplicado?</strong></b><span style=\"white-space: pre-wrap;\"> </span></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en tu cuenta del Ciudad y/o Buepp.</span></p>",
+      "applicability_description": "RyR Perfumerías",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

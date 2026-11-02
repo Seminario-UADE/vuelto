@@ -1,0 +1,267 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/25-hipotecario-supercristian-feb26",
+  "tarjeta": {
+    "id": "97aa534d-9b50-46c0-9f36-64c94c9c8762",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Super Cristian ",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "25% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Desde el 01/02 al 30/04",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Exclusivo con",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "20000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Banco Hipotecario",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/97aa534d-9b50-46c0-9f36-64c94c9c8762/primary_image.jpg?v=1768834112672",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": null,
+        "tertiary_image": null,
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore",
+    "start_date": "2026-02-01T03:00:00.000Z",
+    "stop_date": "2026-12-01T02:59:59.999Z",
+    "days_of_week": "M",
+    "title": "25% en Super Cristian ",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "martes,super,supermercado,super cristian,febrero,25%,reintegro,mercado",
+    "promo_id": "8e859995-a307-490d-a79f-eae9644f3b12",
+    "slug": "25-hipotecario-supercristian-feb26",
+    "short_description": "2602-hipotecario-supercristian-presencial-25off",
+    "where": "Super Cristian",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            43
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": []
+  },
+  "detalle": {
+    "id": "8e859995-a307-490d-a79f-eae9644f3b12",
+    "name": "25% en Super Cristian ",
+    "description": "Aprovechá 25% de reintegro en Super Cristian pagando con el Hipotecario",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-16T19:17:36.495Z",
+    "updated_at": "2026-08-20T19:47:47.712Z",
+    "deleted_at": null,
+    "short_description": "2602-hipotecario-supercristian-presencial-25off",
+    "publication_description": "Aprovechá 25% de reintegro en Super Cristian pagando con el Hipotecario",
+    "slug": "25-hipotecario-supercristian-feb26",
+    "display_start_date": "2026-01-19T03:00:00.000Z",
+    "display_stop_date": "2026-12-31T02:59:59.999Z",
+    "search_tags": "martes,super,supermercado,super cristian,febrero,25%,reintegro,mercado",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-11-30",
+        "start_date": "2026-02-01",
+        "days_of_week": [
+          "tuesday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "8e859995-a307-490d-a79f-eae9644f3b12",
+        "benefit_id": "8e859995-a307-490d-a79f-eae9644f3b12",
+        "name": "25% en Super Cristian ",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "b164059a-b71a-11ea-b3de-0242ac130004"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 25,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 20000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-16T19:17:23.717Z",
+        "updated_at": "2026-07-16T19:17:23.717Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">PUBLICIDAD CARTERA CONSUMO. PROMOCIÓN VÁLIDA EN LA REPÚBLICA ARGENTINA COMPRANDO DE FORMA PRESENCIAL LOS MARTES EN LOS COMERCIOS INDICADOS EN LA PIEZA</span><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">&nbsp;</strong></b><span style=\"white-space: pre-wrap;\">DESDE EL 01/02/2026 HASTA EL 30/11/2026, AMBOS INCLUSIVE, BENEFICIO EXCLUSIVO PAGANDO CON TARJETA DE DÉBITO VISA EMITIDA POR BANCO HIPOTECARIO SA QUE NO REGISTREN MORA. MEDIANTE LA MODALIDAD DE PAGO CON “QR” A TRAVÉS DE “MODO” DESDE APP BH O APP MODO. SE OTORGARÁ UN DESCUENTO VÍA REINTEGRO DEL 25% CON TOPE MENSUAL POR CLIENTE (CONSIDERANDO LA SUMA DE LOS CONSUMOS REALIZADOS POR EL CLIENTE DURANTE EL MES). TOPES DE REINTEGRO: PARA TODOS&nbsp;LOS CLIENTES: $20.000. NO ACUMULABLE CON OTRAS PROMOCIONES, NI CARTERA DE CLIENTES QUE ACREDITEN PLANES SOCIALES. NO APLICA A LAS OPERACIONES DE EXTRACCIÓN DE DINERO EN EFECTIVO REALIZADAS A TRAVÉS DE EXTRA-CASH. NO APLICA PARA LOS CONSUMOS EFECTUADOS A TRAVÉS DE LA PLATAFORMA MERCADOPAGO. NO APLICA A LOS PAGOS REALIZADOS POR LA PLATAFORMA DE PAGOS MÓVILES (POS MÓVIL, BOTÓN DE PAGO Y BILLETERA ELECTRÓNICA). CONSULTAR PRODUCTOS SELECCIONADOS EN EL COMERCIO ANTES DE REALIZAR LA COMPRA. REINTEGRO: DENTRO DE LOS 30 DÍAS DE REALIZADO EL PAGO SE ACREDITARÁ EN LA CAJA DE AHORRO DE BANCO HIPOTECARIO SA ASOCIADA A MODO. CONSULTE EL AHORRO APLICABLE Y VIGENTE EN CADA COMERCIO ANTES DE EFECTUAR LA COMPRA. BANCO HIPOTECARIO S.A. CUIT 30-50001107-2, RECONQUISTA 151 (1003) CABA.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "25% de reintegro",
+      "validity_place": "Super Cristian ",
+      "cashback_cap": "20000",
+      "participating_bank": "Banco Hipotecario",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/97aa534d-9b50-46c0-9f36-64c94c9c8762/primary_image.jpg?v=1768834112672",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Super Cristian con Banco Hipotecario",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tu tarjeta de débito Visa del Hipotecario a través de MODO.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">En tiendas físicas adheridas.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el reintegro aplicado?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en la cuenta del Hipotecario dentro de los 30 días.</span></p>",
+      "applicability_description": "Super Cristian",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

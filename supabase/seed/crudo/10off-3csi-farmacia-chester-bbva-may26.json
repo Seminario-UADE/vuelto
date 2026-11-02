@@ -1,0 +1,310 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/10off-3csi-farmacia-chester-bbva-may26",
+  "tarjeta": {
+    "id": "092bcbb4-5763-41e6-be90-0e8da27a0e09",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Farmacia Chester",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "10% de reintegro y 3 cuotas",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "10000",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "BBVA",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": [
+            {
+              "name_bank": "BBVA",
+              "image_bank": "https://assets.mobile.playdigital.com.ar/images/banks/bbva.png"
+            }
+          ]
+        }
+      ],
+      "extra_row": null,
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/092bcbb4-5763-41e6-be90-0e8da27a0e09/primary_image.jpg?v=1778099518691",
+        "primary_backgroundcolor": null,
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/092bcbb4-5763-41e6-be90-0e8da27a0e09/secondary_image.jpg?v=1778099518658",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/092bcbb4-5763-41e6-be90-0e8da27a0e09/tertiary_image.jpg?v=1778099518648",
+        "tertiary_backgroundcolor": null,
+        "secondary_backgroundcolor": null,
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": null
+        },
+        {
+          "type": "countdown",
+          "value": false,
+          "label": null
+        },
+        {
+          "type": "online_store",
+          "value": false,
+          "label": null
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore",
+    "start_date": "2026-05-11T03:00:00.000Z",
+    "stop_date": "2027-01-01T02:59:59.999Z",
+    "days_of_week": "L",
+    "title": "10% en Farmacia Chester",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "farmacia,chester,bbva,presencial,reintegro,lunes",
+    "promo_id": "e730db5f-1364-4c7d-8a0a-bec86b318858",
+    "slug": "10off-3csi-farmacia-chester-bbva-may26",
+    "short_description": "2605-BBVA-Farmacia-Chester-Presencial-10off-3csi",
+    "where": "Farmacia Chester",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 4,
+          "sub_categories": [
+            16
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [],
+    "credit_list": [
+      "visa",
+      "master"
+    ]
+  },
+  "detalle": {
+    "id": "e730db5f-1364-4c7d-8a0a-bec86b318858",
+    "name": "10% en Farmacia Chester",
+    "description": "Disfruta los Lunes de reintegros y cuotas con BBVA!",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-16T19:31:15.773Z",
+    "updated_at": "2026-09-24T18:39:53.182Z",
+    "deleted_at": null,
+    "short_description": "2605-BBVA-Farmacia-Chester-Presencial-10off-3csi",
+    "publication_description": "Disfruta los Lunes de reintegros y cuotas con BBVA!",
+    "slug": "10off-3csi-farmacia-chester-bbva-may26",
+    "display_start_date": "2026-05-06T03:00:00.000Z",
+    "display_stop_date": "2026-12-01T02:59:59.999Z",
+    "search_tags": "farmacia,chester,bbva,presencial,reintegro,lunes",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-05-11",
+        "days_of_week": [
+          "monday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "e730db5f-1364-4c7d-8a0a-bec86b318858",
+        "benefit_id": "e730db5f-1364-4c7d-8a0a-bec86b318858",
+        "name": "10% en Farmacia Chester",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_terminal_id"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                16
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "049ad22b-c0f0-4733-be35-e31256801ce8"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 10,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": [
+              {
+                "type": "sin_interes",
+                "number": 1,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 2,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 3,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              }
+            ]
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 10000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "16"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-16T19:31:14.710Z",
+        "updated_at": "2026-07-16T19:31:14.710Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "visa",
+      "master"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">CARTERA DE CONSUMO. PROMOCIÓN VÁLIDA LOS DIAS LUNES DESDE EL 11/05/2026 HASTA EL 30/09/2026 INCLUSIVE. PROMOCIÓN CONSTA DE 10% DE REINTEGRO, TOPE $10.000 POR USUARIO POR MES, VÁLIDA PARA CLIENTES QUE ABONEN SUS COMPRAS EN HASTA 3 CUOTAS A TRAVÉS DE MODO CON TARJETAS DE CRÉDITO EMITIDAS POR BBVA. LA PRESENTE PROMOCIÓN ES VÁLIDA SÓLO PARA CONSUMOS DE TIPO FAMILIAR.EL REINTEGRO SE ACREDITARÁ DENTRO DE LOS 30 DÍAS POSTERIORES A LA COMPRA EN LA CAJA DE AHORRO BBVA VINCULADA A MODO. ACUMULA ÚNICAMENTE CON PROMOCIONES DE MODO. LA PROMOCIÓN NO APLICA A PAGOS REALIZADOS A TRAVÉS DE OTRAS BILLETERAS VIRTUALES Y/O PLATAFORMAS DE PAGO ONLINE (POR EJEMPLO MERCADO PAGO, UALÁ, ETC.). LOS ACCIONISTAS DE BANCO BBVA ARGENTINA S.A. LIMITAN SU RESPONSABILIDAD A LA INTEGRACIÓN DE LAS ACCIONES SUSCRIPTAS LEY 19.550 Y LEY 25.738. CUIT 30-50000319-3. AVDA.CÓRDOBA 111- PISO 31 CABA - CP 1054AAA.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "10% de reintegro y 3 cuotas",
+      "validity_place": "Farmacia Chester",
+      "cashback_cap": "10000",
+      "participating_bank": "BBVA",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/092bcbb4-5763-41e6-be90-0e8da27a0e09/primary_image.jpg?v=1778099518691",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Farmacia Chester con BBVA",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tus tarjetas de crédito Visa y/o Mastercard del BBVA, a través de MODO.</span></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><br><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">En tiendas físicas adheridas.</span></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><br><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el reintegro aplicado?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en tu cuenta del BBVA.</span></p>",
+      "applicability_description": "Farmacia Chester",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

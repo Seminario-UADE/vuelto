@@ -1,0 +1,287 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/30off-paladar-macro-selecta-jul25",
+  "tarjeta": {
+    "id": "898b154f-9a3c-48c1-9f49-68e28b91cabd",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Supermercado Paladar",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "30% de reintegro ",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "25000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Banco Macro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/898b154f-9a3c-48c1-9f49-68e28b91cabd/primary_image.jpg?v=1751382324381",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/898b154f-9a3c-48c1-9f49-68e28b91cabd/primary_image.jpg?v=1751382324381",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/898b154f-9a3c-48c1-9f49-68e28b91cabd/primary_image.jpg?v=1751382324381",
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore",
+    "start_date": "2025-07-01T03:00:00.000Z",
+    "stop_date": "2027-01-01T02:59:59.999Z",
+    "days_of_week": "X",
+    "title": "30% en Paladar",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "miercoles,paladar,supermercado,macro,selecta,SEG_S",
+    "promo_id": "a5738add-aeb1-4845-bb19-06509d1c4c6f",
+    "slug": "30off-paladar-macro-selecta-jul25",
+    "short_description": "2507-Macro-Selecta-Paladar-Presencial-30off",
+    "where": "Supermercado Paladar",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            43,
+            34
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [],
+    "credit_list": [
+      "visa",
+      "master",
+      "american_express"
+    ]
+  },
+  "detalle": {
+    "id": "a5738add-aeb1-4845-bb19-06509d1c4c6f",
+    "name": "30% en Paladar",
+    "description": "Todos los miércoles con tarjetas de crédito Macro Selecta",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-16T19:20:10.286Z",
+    "updated_at": "2026-10-29T19:23:04.571Z",
+    "deleted_at": null,
+    "short_description": "2507-Macro-Selecta-Paladar-Presencial-30off",
+    "publication_description": "Todos los miércoles con tarjetas de crédito Macro Selecta",
+    "slug": "30off-paladar-macro-selecta-jul25",
+    "display_start_date": "2025-07-01T03:00:00.000Z",
+    "display_stop_date": "2027-01-01T02:59:59.999Z",
+    "search_tags": "miercoles,paladar,supermercado,macro,selecta,SEG_S",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2025-07-01",
+        "days_of_week": [
+          "wednesday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "american_express"
+          }
+        ]
+      },
+      "exclusiveness_source": [
+        "modo",
+        "banks"
+      ],
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "a5738add-aeb1-4845-bb19-06509d1c4c6f",
+        "benefit_id": "a5738add-aeb1-4845-bb19-06509d1c4c6f",
+        "name": ".",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "bin",
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43,
+                34
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "6a089c91-a7d3-4199-a578-2132a3733f69"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 30,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "card_issuer",
+            "amount_by_period": 25000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "34",
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-16T19:20:09.599Z",
+        "updated_at": "2026-07-16T19:20:09.599Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "visa",
+      "master",
+      "american_express"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">CARTERA DE CONSUMO. BENEFICIO CON TARJETAS DE CRÉDITO MACRO SELECTA DE BANCO MACRO S.A., PAGANDO A TRAVÉS DE MODO, POR App. MACRO O App. MODO, EXCLUSIVAMENTE LOS DÍAS MIÉRCOLES DEL 01/07/25 AL 31/12/2026, PARA CLIENTES /USUARIOS REGISTRADOS EN MODO, VÁLIDO PARA COMPRAS EN UN PAGO CON QR. 30% DE AHORRO CON TOPE DE DEVOLUCIÓN $25.000 POR MARCA DE TARJETA POR MES. APLICA EN PALADAR PRESENCIAL. EL BENEFICIO NO INCLUYE PRODUCTOS DE ELECTRO, NI PRODUCTOS DEL CONVENIO PRECIOS CUIDADOS/ESENCIALES. NO APLICA PARA COMPRA EN CUOTAS. MODO SERVICIO PRESTADO POR EL PROVEEDOR DE SERVICIOS TECNOLÓGICOS PLAY DIGITAL S.A. CUIT 30716829436, AV. DEL LIBERTADOR 7208 TORRE II P.4 CABA., SIENDO LA MARCA “MODO” DE SU PROPIEDAD. APLICA PARA CONSUMO PERSONAL-FAMILIAR. NO VÁLIDO TARJETA DE CRÉDITO EMPRESA O AGRO. NO ACUMULA CON OTRA PROMOCIÓN. NO APLICA PARA PAGO A TRAVES DE MERCADO PAGO, OTRO PAGO ELECTRÓNICO INMEDIATO, TRANSFERENCIA 3.0. REINTEGRO A REALIZARSE EN EL MOMENTO DE LA COMPRA EN LA CAJA DE AHORRO O CUENTA CORRIENTE DE BANCO MACRO, REGISTRADA. ESTABLECIMIENTOS / PRODUCTOS / SERVICIOS NO SON PROMOCIONADOS / GARANTIZADOS POR BANCO MACRO NI RESULTA RESPONSABLE POR LA PRESENTACIÓN DE CUPÓN FUERA DE TÉRMINO. BEBER CON MODERACIÓN. PROHIBIDA SU VENTA A MENORES DE 18 AÑOS. MÁS INFORMACIÓN EN https://www.macro.com.ar/modo-promos, AL 0810-555-7353 SELECTA, O EN SUCURSALES MACRO, CON SU EJECUTIVO. PALADINI SA CUIT: 30503348728.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "30% de reintegro ",
+      "validity_place": "Supermercado Paladar",
+      "cashback_cap": "25000",
+      "participating_bank": "Banco Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/898b154f-9a3c-48c1-9f49-68e28b91cabd/primary_image.jpg?v=1751382324381",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Supemercado Paladar con Macro",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong><br />Realizando una compra con tus tarjetas de crédito Visa Signature, Visa Infinite Prívate, Mastercard Black y/o American Express Icon Macro Selecta, a través de MODO.</p><p> </p><p><strong>¿Cómo es la modalidad de uso?</strong></p><p>En sucursales físicas adheridas.</p><p> </p><p style=\"text-align:justify\"><strong>¿Dónde veo el reintegro aplicado?</strong></p><p style=\"text-align:justify\">El reintegro lo verás acreditado en tu cuenta de Banco Macro.</p>",
+      "applicability_description": "Supermercado Paladar",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

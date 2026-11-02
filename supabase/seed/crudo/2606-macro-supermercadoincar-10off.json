@@ -1,0 +1,259 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/2606-macro-supermercadoincar-10off",
+  "tarjeta": {
+    "id": "a6fb81d0-4065-4005-aae9-b1d4e11a9dd9",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "SUPERMERCADO INCAR",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Macro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a6fb81d0-4065-4005-aae9-b1d4e11a9dd9/primary_image.jpg?v=1787316594715",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a6fb81d0-4065-4005-aae9-b1d4e11a9dd9/secondary_image.jpg?v=1787316594684",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a6fb81d0-4065-4005-aae9-b1d4e11a9dd9/tertiary_image.jpg?v=1787316594688",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      }
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW",
+    "exclusiveness": "all",
+    "payment_flow": "instore,instore_nfc,physical-card",
+    "start_date": "2026-06-05T03:00:00.000Z",
+    "stop_date": "2027-01-01T02:59:59.999Z",
+    "days_of_week": "V",
+    "title": "SUPERMERCADO INCAR",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "SEG_GPS",
+    "promo_id": "e8b01401-9081-4e96-81df-9e7a98c59a22",
+    "slug": "2606-macro-supermercadoincar-10off",
+    "short_description": "2606-macro-TC45536-supermercadoincar-Presencial-10off",
+    "where": "SUPERMERCADO INCAR",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            43
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [],
+    "credit_list": [
+      "master",
+      "visa",
+      "american_express"
+    ]
+  },
+  "detalle": {
+    "id": "e8b01401-9081-4e96-81df-9e7a98c59a22",
+    "name": "SUPERMERCADO INCAR",
+    "description": "SEG_GPS",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": false,
+    "created_at": "2026-08-06T18:41:42.212Z",
+    "updated_at": "2026-08-31T22:12:02.225Z",
+    "deleted_at": null,
+    "short_description": "2606-macro-TC45536-supermercadoincar-Presencial-10off",
+    "publication_description": "SEG_GPS",
+    "slug": "2606-macro-supermercadoincar-10off",
+    "display_start_date": "2026-06-05T03:00:00.000Z",
+    "display_stop_date": "2027-01-01T02:59:59.999Z",
+    "search_tags": "SEG_GPS",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-06-05",
+        "days_of_week": [
+          "friday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "PRISMA"
+        ],
+        "segmentation_mode": "by_whitelist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "instore_nfc",
+          "physical-card"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "american_express"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "e8b01401-9081-4e96-81df-9e7a98c59a22",
+        "benefit_id": "e8b01401-9081-4e96-81df-9e7a98c59a22",
+        "name": "SUPERMERCADO INCAR",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "bin",
+            "store_acquirer_establishment_id"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "6a089c91-a7d3-4199-a578-2132a3733f69"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 10,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_por_regla"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "transaction_cap": {
+            "amount_by_transaction": 10000
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-08-06T18:41:41.179Z",
+        "updated_at": "2026-08-06T18:41:41.179Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 10000
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "master",
+      "visa",
+      "american_express"
+    ],
+    "terms_and_conditions": "CARTERA DE CONSUMO. PROMOCIÓN VÁLIDA DESDE EL 5 DE JUNIO DE 2026 HASTA EL 31 DE DICIEMBRE DE 2026, EXCLUSIVAMENTE LOS DIAS VIERNES, CON LAS TARJETAS DE CRÉDITO AMEX BLACK, AMEX CLASICA INTERNACIONAL, AMEX CLASICA INTERNACIONAL NA, AMEX GOLD, AMEX GOLD NA, AMEX PLATINUM, MASTERCARD GOLD, MASTERCARD INTERNACIONAL, MASTERCARD REGIONAL, MC BLACK, PLATINUM MASTERCARD, VISA CLASICA INTERNACIONAL, VISA CLASICA INTERNACIONAL NA, VISA CLASICA NACIONAL, VISA CLASICA NACIONAL NA, VISA GOLD, VISA GOLD NA, VISA PLATINUM Y VISA SIGNATURE DE LOS BANCOS DEL GRUPO MACRO. LA PRESENTE PROMOCIÓN APLICA PARA CONSUMOS DE TIPO PERSONAL/FAMILIAR. EN CASO DE DUDA, EL BANCO SE RESERVA EL DERECHO DE NO ACREDITAR EL MONTO DE LA BONIFICACIÓN HASTA TANTO SEA ACLARADO EL DESTINO DE LOS CONSUMOS. 10% DE DESCUENTO  EN UN PAGO TOPE DE DEVOLUCIÓN 10000 PESOS POR TRANSACCION POR MES.EL BENEFICIO SERÁ APLICADO DENTRO DE LOS 60 DÍAS DE REALIZADA LA COMPRA, AL CIERRE DEL RESUMEN EN EL CUAL SE REGISTRE LA OPERACIÓN O EN LOS DOS SIGUIENTES. NO ACUMULABLE CON OTRAS PROMOCIONES. NO APLICA PARA PAGOS REALIZADOS A TRAVÉS DE MERCADO PAGO/TODO PAGO Y/O PEI. EL DESCUENTO PROMOCIONADO APLICA SOBRE EL PRECIO CONTADO. (EJEMPLOS REPRESENTATIVOS: COMPRA EN CUOTAS: EN UNA COMPRA CON TARJETA DE CRÉDITO DE $1.200 EN 3 CUOTAS SIN INTERÉS, EL CLIENTE ABONARÁ 3 CUOTAS DE $400 CADA UNA. COMPRA CON DESCUENTO Y EN CUOTAS: CON TARJETA DE CRÉDITO CON 10% DE DESCUENTO Y 3 CUOTAS SIN INTERÉS EN UNA COMPRA DE $1.200, CORRESPONDERÁ 3 CUOTAS DE $400 CADA UNA, Y EL BANCO LE REINTEGRARÁ AL CLIENTE DENTRO DE LOS 60 DÍAS DE REALIZADA LA COMPRA, AL CIERRE DEL RESUMEN EN EL CUAL SE REGISTRE LA OPERACIÓN O EN LOS DOS SIGUIENTES LA SUMA DE $ 120. QUEDA ESTABLECIDO QUE LOS DATOS Y OFERTAS INDICADAS REVISTEN CARÁCTER INFORMATIVO Y EN MODO ALGUNO SUPONEN QUE LOS ESTABLECIMIENTOS, PRODUCTOS Y/O SERVICIOS QUE COMERCIALIZAN O LA CALIDAD DE LOS MISMOS SON PROMOCIONADOS O GARANTIZADOS POR LOS BANCOS DEL GRUPO MACRO, COMO ASÍ TAMPOCO SE RESPONSABILIZAN POR LOS CUPONES PRESENTADOS FUERA DE TÉRMINO POR LOS COMERCIOS. MÁS INFORMACIÓN EN FORMA PREVIA A REALIZAR LA OPERACIÓN AL: 0810-555-2355 PARA BANCO MACRO, 0810-555-7353 PARA CLIENTES MACRO SELECTA,  O EN LA SUCURSAL MÁS CERCANA A SU DOMICILIO",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "10% de reintegro",
+      "validity_place": "SUPERMERCADO INCAR",
+      "cashback_cap": "10000",
+      "participating_bank": "Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a6fb81d0-4065-4005-aae9-b1d4e11a9dd9/primary_image.jpg?v=1787316594715",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": null,
+      "faq": null,
+      "applicability_description": "SUPERMERCADO INCAR",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

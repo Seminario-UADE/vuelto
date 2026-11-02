@@ -1,0 +1,268 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/10off-farmacias-jubilados-tdbna-abr24",
+  "tarjeta": {
+    "id": "fcb4b9e2-9c42-44c9-8f36-b81e4d1d4d03",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Farmacias",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Desde el 22/04/24 al 28/02/2026",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Exclusivo con",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "BNA",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/fcb4b9e2-9c42-44c9-8f36-b81e4d1d4d03/primary_image.jpg?v=1713539419308",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 52
+          },
+          {
+            "x": 0,
+            "y": 16
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/fcb4b9e2-9c42-44c9-8f36-b81e4d1d4d03/secondary_image.png?v=1713539419197",
+        "tertiary_image": null,
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "all,instore_nfc",
+    "start_date": "2024-04-22T03:00:00.000Z",
+    "stop_date": "2027-02-01T02:59:59.999Z",
+    "days_of_week": "L",
+    "title": "10% en Farmacias TD",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "lunes,bna,farmacias,semana,nación",
+    "promo_id": "b84d4d5a-b85e-451c-8a05-0aa1b388c8a2",
+    "slug": "10off-farmacias-jubilados-tdbna-abr24",
+    "short_description": "2404-BNA-U4846-Farmacias Jubilados-presencial-online-10off",
+    "where": "Farmacias adheridas",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 4,
+          "sub_categories": [
+            16
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [
+      "master"
+    ],
+    "credit_list": []
+  },
+  "detalle": {
+    "id": "b84d4d5a-b85e-451c-8a05-0aa1b388c8a2",
+    "name": "10% en Farmacias TD",
+    "description": "Exclusivamente para Jubilados del Banco Nación",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-08T17:56:49.260Z",
+    "updated_at": "2026-09-14T19:41:22.993Z",
+    "deleted_at": null,
+    "short_description": "2404-BNA-U4846-Farmacias Jubilados-presencial-online-10off",
+    "publication_description": "Exclusivamente para Jubilados del Banco Nación",
+    "slug": "10off-farmacias-jubilados-tdbna-abr24",
+    "display_start_date": "2024-04-19T03:00:00.000Z",
+    "display_stop_date": "2026-11-01T02:59:59.999Z",
+    "search_tags": "lunes,bna,farmacias,semana,nación",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2027-01-31",
+        "start_date": "2024-04-22",
+        "days_of_week": [
+          "monday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "all",
+          "instore_nfc"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "master"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "b84d4d5a-b85e-451c-8a05-0aa1b388c8a2",
+        "benefit_id": "b84d4d5a-b85e-451c-8a05-0aa1b388c8a2",
+        "name": "10% en Farmacias TD",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "bin",
+            "store_terminal_id",
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                16
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "0330e59b-b6e3-43eb-9083-a88fcc61e845"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 10,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 10000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "16"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-08T17:40:43.896Z",
+        "updated_at": "2026-07-08T17:40:43.896Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "master"
+    ],
+    "credit_list": [],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">PROMOCIÓN VÁLIDA PARA JUBILADOS QUE PERCIBAN SU JUBILACIÓN EN UNA CUENTA DEL BANCO NACIÓN, TODOS LOS LUNES DESDE EL 22/04/2024 AL 31/08/2026 PARA COMPRAS CON TARJETAS DE DÉBITO MASTERCARD QUE COMIENCEN CON 551792 Y PAGANDO A TRAVÉS DE LA BILLETERA MODO BNA+ ESCANEANDO EL CÓDIGO QR Y SELECCIONANDO LAS TARJETAS PARTICIPANTES. TOPE DE REINTEGRO HASTA $ 10.000 POR CLIENTE POR MES. SE CONSIDERA MES CALENDARIO. SE CONSIDERA CLIENTE PARA EL BNA EL CUIT DE CADA PERSONA. EXCLUSIVO CARTERA DE CONSUMO. NO VÁLIDO PARA PAGOS CON SALDO EN CUENTA. LA DEVOLUCIÓN O REINTEGRO SE VERÁ REFLEJADA EN LA CUENTA MONETARIA DEL CLIENTE QUE REALICE LA COMPRA ASOCIADA A MODO BNA+ DEL BANCO NACIÓN. CONSULTÁ MÁS CONDICIONES Y COMERCIOS ADHERIDOS EN WWW.SEMANANACION.COM.AR</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "10% de reintegro",
+      "validity_place": "Farmacias",
+      "cashback_cap": "10000",
+      "participating_bank": "BNA",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/fcb4b9e2-9c42-44c9-8f36-b81e4d1d4d03/primary_image.jpg?v=1713539419308",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "¡Aprovechá 10% de reintegro en Farmacias con BNA! ",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tarjetas de débito MasterCard de Banco Nación a través de MODO.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">En tiendas físicas y online adheridas.</span></p><p class=\"editor-paragraph\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el descuento aplicado?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en tu cuenta del Banco Nación.</span></p><p class=\"editor-paragraph\" dir=\"ltr\"><br><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">Consultá los comercios adheridos en: </strong></b><a href=\"https://semananacion.com.ar/semananacion/sn-farmacias\" target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">https://semananacion.com.ar</span></a></p>",
+      "applicability_description": "Farmacias adheridas",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

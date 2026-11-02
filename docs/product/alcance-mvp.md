@@ -65,8 +65,10 @@ va a variar con el tiempo):
 | Deportes | 6 | 18 |
 | Ferretería y Pinturerías | 11 | 10 |
 
-Total: **~1864 promos activas** en MODO en este momento, repartidas en estas
-13 categorías. **El flujo de compra optimizado cubre las 13 categorías, no
+Total: **~1864 promos activas** en MODO en ese momento, repartidas en estas
+13 categorías. (Al 2026-11-02, Supermercados y Farmacias tienen 117 y 54 promos de
+pago vigentes, contadas una por promo; las cifras cambian con el tiempo y no
+necesariamente se contaron con el mismo criterio.) **El flujo de compra optimizado cubre las 13 categorías, no
 solo supermercado** — la recomendación (RF-03/RF-04) ya era genérica por
 compra, no específica de un rubro; restringir el "flujo optimizado" a
 supermercado no tenía un motivo técnico, era simplemente el recorte de
@@ -86,41 +88,64 @@ rubro no existía. Queda como nota para cuando se diseñe el ingestor real: no
 asumir que un filtro "vacío" significa "sin datos" sin probar la variante
 numérica.
 
-### Cadenas de supermercado: la lista previa no está validada contra MODO
+### Cadenas de supermercado: lo que MODO publica hoy (relevado el 2026-11-02)
 
-La lista de "presencia confirmada en CABA/AMBA" (Coto, Carrefour, Jumbo,
-Disco, Vea, Día, Changomas) salió de research general de presencia en la
-zona, no de las promos reales de MODO. Se intentó reconciliarla contra la
-API real (`search_text=<cadena>` sobre el endpoint de promos) con resultado
-mixto:
+La lista previa de cadenas con "presencia confirmada en CABA/AMBA" (Coto,
+Carrefour, Jumbo, Disco, Vea, Día, ChangoMás) salió de research general de
+presencia en la zona, no de las promos reales de MODO. Se la reconcilió con el
+método que este documento pedía: **paginar por completo la categoría
+Supermercados (id 1) con el id numérico y bajar el detalle de cada promo**
+(`GET /promos/api/rewards/v2/benefit/<slug>`), en vez de confiar en
+`search_text`, que no es confiable para términos cortos o comunes. El
+relevamiento (`npm run corpus:relevar -w ingesta`, issue #35) dejó
+**117 promos de pago vigentes de 78 comercios** en Supermercados y 54 en
+Farmacias; los crudos fechados están en `supabase/seed/crudo/`.
 
-| Cadena | Promos encontradas (`search_text`) |
+| Cadena de la lista previa | Promos vigentes en MODO (2026-11-02) |
 |---|---|
-| Vea | 3 |
-| Coto | 2 |
-| Jumbo | 2 |
-| Changomas | 2 |
-| Disco | 1 |
-| Carrefour | 0 |
-| Día | no concluyente (ver abajo) |
+| Coto | **0** |
+| Carrefour | **0** |
+| Jumbo | **0** |
+| Disco | **0** |
+| Vea | **0** |
+| Día | **0** |
+| La Anónima | **0** |
+| ChangoMás | 1 (Credicoop, tarjeta Cabal) |
 
-**Esto no es una reconciliación confiable todavía**: `search_text=Día`
-devolvió 369 resultados, pero ninguno de los títulos revisados menciona a la
-cadena Día — el parámetro de búsqueda no filtra bien términos cortos o
-comunes. Peor todavía: `search_text=La Anónima` dio 0 resultados, a pesar de
-que esa cadena **sí apareció** directamente en el HTML renderizado de la
-página en una corrida anterior de este mismo research ("20% de reintegro en
-La Anónima"). La búsqueda por texto de esta API no es confiable para esta
-tarea.
+Cada una de las cadenas con 0 tiene decenas de promos **vencidas** en el
+listado: participaron de MODO, pero hoy no tienen ninguna promo de pago
+vigente. **La lista previa no vale**: importa qué cadena participa
+efectivamente en MODO hoy, no su presencia genérica en la zona.
 
-**Pendiente, antes de fijar el corpus sembrado a mano (RF-18)**: reconciliar
-la lista de cadenas paginando por completo la categoría "Mercados" (id 1,
-226 promos totales) y revisando los nombres de comercio uno por uno, en vez
-de confiar en `search_text` por cadena. Importa qué cadena participa
-efectivamente en MODO, no su presencia genérica en CABA/AMBA — y eso puede
-afectar qué tan útil es el flujo de compra de supermercado si las cadenas
-grandes (Coto, Carrefour, Jumbo, Disco, Vea, Día) tienen poca o ninguna
-promoción vigente vía MODO.
+Lo que sí hay en Supermercados:
+
+- **Cadenas que podrían servir en CABA/AMBA** (la zona de cada una se verifica
+  en su sitio antes de cargarla, spec `specs/011-corpus-promociones-seed/`,
+  tarea T026): Paladini (con sus variantes «Paladar»), The Food Market,
+  Tiendas de Cercanía, Tienda Nova, Ferias de la Ciudad, Mini Mercados
+  (Semana Nación), ChangoMás y las promos «Beneficio Supermercados» de Macro.
+- **Cadenas que se asocian a otras zonas y hay que verificar antes de contarlas
+  en el alcance**: Cooperativa Obrera (Bahía Blanca y la Patagonia), Unicoop
+  (Córdoba), Alvear, Monarca, Petrelli, Kilbel, Aiello y similares.
+- **Regionales fuera de alcance**: la mayor parte de lo vigente son
+  supermercados de Córdoba y Santa Fe (Villa María, Río Cuarto, La Carlota,
+  Justiniano Posse, Lario, Rafaela). Quedan afuera por la restricción de zona
+  (CABA/AMBA) aunque tengan promos vigentes.
+- **Carnicerías, granjas y almacenes** sueltos, de zona no determinada; se
+  incluyen solo si se confirma que rigen en CABA/AMBA.
+
+**Consecuencia para la demo.** El flujo de supermercado no se puede mostrar
+con Coto, Carrefour ni Jumbo usando datos reales de MODO: hoy no tienen ninguna
+promo vigente. La compra de ejemplo del diseño (`DESIGN.md` §9, «Coto,
+miércoles») es un ejemplo de diseño, no de datos reales. El equipo tiene que
+decidir si el pitch muestra un supermercado que sí tenga promo real (por
+ejemplo, Paladini o The Food Market) o si el recorrido principal pasa por
+Farmacias, que tiene más cadenas nacionales vigentes (Farmacity, Simplicity,
+Farmaonline, Juleriaque, Parfumerie).
+
+**Pendiente que queda:** verificar la zona de cada cadena con una fuente (su
+sitio o sus locales) y fijar el tamaño final del corpus. El detalle de los
+casos que cubre el corpus y sus limitaciones está en `corpus-semilla.md`.
 
 ## Gasto en grupo (nivel 1, última prioridad del MVP)
 

@@ -1,0 +1,280 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20-supermercadospetrelli-icbc-ene26",
+  "tarjeta": {
+    "id": "59c631e2-0658-45f0-bd48-7a15d60b3087",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Supermercados Petrelli",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "20% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Desde el 01/01 al 31/03",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Exclusivo con",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "ICBC",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/59c631e2-0658-45f0-bd48-7a15d60b3087/primary_image.jpg?v=1766494951229",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": null,
+        "tertiary_image": null,
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore",
+    "start_date": "2026-01-01T03:00:00.000Z",
+    "stop_date": "2027-01-01T02:59:59.999Z",
+    "days_of_week": "J",
+    "title": "20% en Petrelli",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "20,supermercados,petrelli,presencial,icbc,jueves",
+    "promo_id": "c5e437ad-dfd9-43ea-9308-2ebd3469b9f6",
+    "slug": "20-supermercadospetrelli-icbc-ene26",
+    "short_description": "2601-icbc-supermercadospetrelli-payroll-presencial-20off",
+    "where": "Supermercados Petrelli",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            43
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "visa",
+      "master"
+    ]
+  },
+  "detalle": {
+    "id": "c5e437ad-dfd9-43ea-9308-2ebd3469b9f6",
+    "name": "20% en Petrelli",
+    "description": "Aprovechá 20% de reintegro en Supermercados Petrelli pagando con tus tarjetas del ICBC.",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-16T19:24:37.021Z",
+    "updated_at": "2026-10-16T12:44:21.809Z",
+    "deleted_at": null,
+    "short_description": "2601-icbc-supermercadospetrelli-payroll-presencial-20off",
+    "publication_description": "Aprovechá 20% de reintegro en Supermercados Petrelli pagando con tus tarjetas del ICBC.",
+    "slug": "20-supermercadospetrelli-icbc-ene26",
+    "display_start_date": "2025-12-23T03:00:00.000Z",
+    "display_stop_date": "2026-12-01T02:59:59.999Z",
+    "search_tags": "20,supermercados,petrelli,presencial,icbc,jueves",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-01-01",
+        "days_of_week": [
+          "thursday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "c5e437ad-dfd9-43ea-9308-2ebd3469b9f6",
+        "benefit_id": "c5e437ad-dfd9-43ea-9308-2ebd3469b9f6",
+        "name": "20% en Petrelli",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "user_national_id",
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "bcfcac03-6f79-4995-bfab-7b8916b0747a"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "week",
+            "aggregate_by": "user",
+            "amount_by_period": 10000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-16T19:24:35.982Z",
+        "updated_at": "2026-07-16T19:24:35.982Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "visa",
+      "master"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">PROPUESTA PARA CARTERA DE CONSUMO VALIDA EN LA&nbsp;REPUBLICA&nbsp;ARGENTINA TODOS LOS JUEVES DESDE EL 01/01/2026 HASTA EL 30/09/2026. 20% DE AHORRO CON TARJETAS DE CRÉDITO VISA Y MASTERCARD ICBC EN UN PAGO Y TARJETAS DE DÉBITO VISA ICBC.&nbsp;PAGANDO CON MODO O SU INTEGRACIÓN CON MOBILE BANKING. PARA CLIENTES QUE DEPOSITEN SU SUELDO EN ICBC.&nbsp;TOPE DE REINTEGRO $10.000 POR USUARIO POR DÍA. EJEMPLO: POR LA COMPRA DE $1.000 SE&nbsp;REINTEGRARAN&nbsp;$200 EN SU CUENTA. PARA COMPRAS EN TODOS LOS PRODUCTOS INCLUIDOS EN LA PROMOCION EN LAS SUCURSALES DE SUPER PETRELLI. VISA&nbsp;DEBITO&nbsp;VALIDO SOLO PARA CLIENTES CON PAQUETES DE PRODUCTOS O ACREDITEN SUELDOS EN ICBC. VISA&nbsp;DEBITO&nbsp;EXCLUSIVO PARA EL TITULAR DE CUENTA.&nbsp;LOS REINTEGROS SE VERÁN ACREDITADOS EN EL MOMENTO DE LA COMPRA O HASTA 30 DÍAS POSTERIORES EN CAJA DE AHORRO O CUENTA CORRIENTE DE LA CUENTA REGISTRADA&nbsp;EN MODO. SOLO PODRAN PARTICIPAR DE LA PROMOCION AQUELLOS CLIENTES QUE SE ENCUENTREN AL DIA EN SUS PRODUCTOS. NO VALIDO PARA COMPRAS EFECTUADAS POR MERCADO PAGO, TODO PAGO, PAGO INMEDIATO O PAGO ENTRE PERSONAS. NO VALIDO PARA COMPRAS MAYORISTAS NI PARA TARJETAS VISA BUSINESS, VISA DISTRIBUTION, VISA PURCHASING, VISA PURCHASING CAMPO, CORPORATE, CORPORATE SIGNATURE, RECARGABLE EMPRESA Y VISA CUENTA CENTRAL. VALIDO PARA CLIENTES CON PAQUETE DE PRODUCTOS EN ICBC. INDUSTRIAL AND COMMERCIAL BANK OF CHINA (ARGENTINA) S.A.U. ES UNA SOCIEDAD ANÓNIMA UNIPERSONAL BAJO LA LEY ARGENTINA. SU ACCIONISTA LIMITA SU RESPONSABILIDAD AL CAPITAL APORTADO.&nbsp;(LEY 25738). CUIT: 30-70944784-6. FLORIDA 99, CABA.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "Supermercados Petrelli",
+      "cashback_cap": "10000",
+      "participating_bank": "ICBC",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/59c631e2-0658-45f0-bd48-7a15d60b3087/primary_image.jpg?v=1766494951229",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "¡Aprovechá 20% de reintegro en Supermercados Petrelli con ICBC!",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tus tarjetas de crédito Visa y/o Mastercard o Visa débito del ICBC a través de MODO. Exclusivo para clientes que depositan su sueldo en ICBC.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso?</strong></b><span style=\"white-space: pre-wrap;\"> </span></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">En tiendas físicas adheridas.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el descuento aplicado?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en la cuenta del ICBC.</span></p>",
+      "applicability_description": "Supermercados Petrelli",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

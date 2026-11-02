@@ -1,0 +1,281 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/50-farmacias-jubilados-supervielle-jul26",
+  "tarjeta": {
+    "id": "e51139a2-c08a-42a3-895d-f779de741bf0",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Farmacias ",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "50% de reintegro",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "6000",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": null
+        },
+        {
+          "text": "Supervielle",
+          "forecolor": null,
+          "backgroundcolor": null,
+          "extra_data": [
+            {
+              "name_bank": "Supervielle",
+              "image_bank": "https://assets.mobile.playdigital.com.ar/images/banks/supervielle.png"
+            }
+          ]
+        }
+      ],
+      "extra_row": null,
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/e51139a2-c08a-42a3-895d-f779de741bf0/primary_image.jpg?v=1783020875092",
+        "primary_backgroundcolor": null,
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/e51139a2-c08a-42a3-895d-f779de741bf0/secondary_image.jpg?v=1783020875087",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/e51139a2-c08a-42a3-895d-f779de741bf0/tertiary_image.jpg?v=1783020875088",
+        "tertiary_backgroundcolor": null,
+        "secondary_backgroundcolor": null,
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": null
+        },
+        {
+          "type": "countdown",
+          "value": false,
+          "label": null
+        },
+        {
+          "type": "online_store",
+          "value": false,
+          "label": null
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore",
+    "start_date": "2026-07-07T03:00:00.000Z",
+    "stop_date": "2026-12-01T02:59:59.999Z",
+    "days_of_week": "M",
+    "title": "Farmacias - Jubilados",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "supervielle,presencial,martes,farmacias,jubilados,reintegro,50",
+    "promo_id": "5ebeea6a-a038-463b-b914-a93c3e5dfc2b",
+    "slug": "50-farmacias-jubilados-supervielle-jul26",
+    "short_description": "2607-supervielle-farmacias-jubilados-presencial-ID5195PUB-50off",
+    "where": "Farmacias adheridas",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 4,
+          "sub_categories": [
+            16
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": false,
+    "calculated_status": "RUNNING",
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": []
+  },
+  "detalle": {
+    "id": "5ebeea6a-a038-463b-b914-a93c3e5dfc2b",
+    "name": "Farmacias - Jubilados",
+    "description": "Aprovechá 20% en sin interés en Farmacias pagando con Supervielle. Exclusivo clientes jubilados",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-16T17:44:29.228Z",
+    "updated_at": "2026-08-20T19:47:55.842Z",
+    "deleted_at": null,
+    "short_description": "2607-supervielle-farmacias-jubilados-presencial-ID5195PUB-50off",
+    "publication_description": "Aprovechá 20% en sin interés en Farmacias pagando con Supervielle. Exclusivo clientes jubilados",
+    "slug": "50-farmacias-jubilados-supervielle-jul26",
+    "display_start_date": "2026-07-02T03:00:00.000Z",
+    "display_stop_date": "2026-12-01T02:59:59.999Z",
+    "search_tags": "supervielle,presencial,martes,farmacias,jubilados,reintegro,50",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-11-30",
+        "start_date": "2026-07-07",
+        "days_of_week": [
+          "tuesday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "5ebeea6a-a038-463b-b914-a93c3e5dfc2b",
+        "benefit_id": "5ebeea6a-a038-463b-b914-a93c3e5dfc2b",
+        "name": "Farmacias - Jubilados",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "user_national_id",
+            "mcc"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                16
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "54fdfe50-7b7e-4316-bf88-97923d5a8a8d"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 50,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 6000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "16"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-16T17:44:26.923Z",
+        "updated_at": "2026-07-16T17:44:26.923Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">CARTERA CONSUMO. Banco Supervielle S.A., Reconquista 330, C.A.B.A., CUIT 33-50000517-9, Inscrip. I.G.J. N° 23, F° 502, L. 45, T° A de Estatutos Nac. (“el Banco”). Vigente en la República Argentina los días martes hasta el 30 de noviembre de 2026 para clientes que perciban su jubilación en el Banco y que realicen compras abonadas en 1 (un) pago mediante la modalidad de pago con “QR” a través de “MODO” desde app Supervielle, app Supervielle Jubilados o app MODO con la tarjeta de débito Visa (“la TD”) en comercios del rubro farmacia y perfumería ubicados en la República Argentina. Tope de reintegro mensual por cliente (considerando la suma de los consumos realizados por el cliente en cualquiera de los comercios del rubro farmacia y perfumería): $6.000. Ej.: para una compra de $5.000, se reintegrará el 50% del precio, es decir, $2.500. El consumo y el reintegro se verán reflejados en la cuenta asociada a MODO dentro de los 30 días de realizada la compra. Es condición necesaria tener una cuenta Supervielle propia adherida a MODO. No aplica a pagos realizados a través de billeteras virtuales o 'proveedores de servicios de pago', excepto MODO. La marca “MODO” es propiedad de Play Digital S.A., CUIT 30-71682943-6, domicilio en Av. del Libertador 7208, Torre principal, Piso 3, C.A.B.A. El Banco no es responsable por los productos y/o servicios comercializados por las marcas y locales participantes en las promociones.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "50% de reintegro",
+      "validity_place": "Farmacias ",
+      "cashback_cap": "6000",
+      "participating_bank": "Supervielle",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/e51139a2-c08a-42a3-895d-f779de741bf0/primary_image.jpg?v=1783020875092",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Farmacias con Supervielle",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con dinero en cuenta o con tus tarjetas de débito Visa del Supervielle a través de MODO. Exclusivo clientes que cobren su jubilación.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">En tiendas físicas adheridas.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el descuento aplicado? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en la cuenta del Supervielle dentro de los 30 días.</span></p>",
+      "applicability_description": "Farmacias adheridas",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

@@ -1,0 +1,319 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/30-icbc-thefoodmarket-oct25",
+  "tarjeta": {
+    "id": "cf2a1d57-cf94-4cc6-b019-8e2c64de688a",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "The Food Market",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "30% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Desde el 02/10 al 31/03",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Exclusivo con",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "20000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "ICBC",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "extra_row": null,
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/cf2a1d57-cf94-4cc6-b019-8e2c64de688a/primary_image.jpg?v=1758649339901",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": null,
+        "tertiary_image": null,
+        "tertiary_backgroundcolor": null,
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": null
+        },
+        {
+          "type": "countdown",
+          "value": false,
+          "label": null
+        },
+        {
+          "type": "online_store",
+          "value": false,
+          "label": null
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore,online",
+    "start_date": "2025-10-02T03:00:00.000Z",
+    "stop_date": "2027-04-01T02:59:59.999Z",
+    "days_of_week": "JVSD",
+    "title": "30% en The Food Market ",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "icbc,exclusive,the food market",
+    "promo_id": "1b536501-6084-42af-b4de-7563e5379e88",
+    "slug": "30-icbc-thefoodmarket-oct25",
+    "short_description": "2510-icbc-thefoodmarket-presencial-online-30off",
+    "where": "The Food Market",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            26,
+            34
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "visa",
+      "master"
+    ]
+  },
+  "detalle": {
+    "id": "1b536501-6084-42af-b4de-7563e5379e88",
+    "name": "30% en The Food Market ",
+    "description": "Aprovechá 30% de reintegro y hasta 3 cuotas sin interés en The Food Market con ICBC Exclusive",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-14T18:36:51.347Z",
+    "updated_at": "2026-10-01T21:35:44.304Z",
+    "deleted_at": null,
+    "short_description": "2510-icbc-thefoodmarket-presencial-online-30off",
+    "publication_description": "Aprovechá 30% de reintegro y hasta 3 cuotas sin interés en The Food Market con ICBC Exclusive",
+    "slug": "30-icbc-thefoodmarket-oct25",
+    "display_start_date": "2025-09-23T03:00:00.000Z",
+    "display_stop_date": "2026-12-31T02:59:59.999Z",
+    "search_tags": "icbc,exclusive,the food market",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2027-03-31",
+        "start_date": "2025-10-02",
+        "days_of_week": [
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "online"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "pct"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "1b536501-6084-42af-b4de-7563e5379e88",
+        "benefit_id": "1b536501-6084-42af-b4de-7563e5379e88",
+        "name": "30% en The Food Market ",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "user_national_id",
+            "store_terminal_id",
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                26,
+                34
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "bcfcac03-6f79-4995-bfab-7b8916b0747a"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 30,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": [
+              {
+                "type": "sin_interes",
+                "number": 1,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 2,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 3,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              }
+            ]
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "week",
+            "aggregate_by": "user",
+            "amount_by_period": 20000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "26",
+          "34"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-14T18:36:50.434Z",
+        "updated_at": "2026-09-29T16:20:44.662Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "visa",
+      "master"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">PROPUESTA PARA CARTERA DE CONSUMO VÁLIDA EN LA REPÚBLICA ARGENTINA LOS DÍAS JUEVES A DOMINGOS DESDE EL 02/10/2025 HASTA EL 30/09/2026. 30% DE AHORRO&nbsp;Y HASTA 3 CUOTAS SIN INTERÉS CON TARJETAS DE CREDITO VISA Y MASTERCARD ICBC&nbsp;Y 30% DE AHORRO CON TARJETAS DE DÉBITO VISA ICBC. PARA CLIENTES QUE POSEAN LOS PAQUETES EXCLUSIVE BANKING, PAGANDO CON MODO O SU INTEGRACIÓN CON MOBILE BANKING. POR LA COMPRA DE $1.000 SE REINTEGRARAN $300 EN SU CUENTA. TOPE DE REINTEGRO $20.000 POR USUARIO POR SEMANA. VÁLIDA PARA COMPRAS ONLINE Y EN TIENDAS FÍSICAS DE THE FOOD MARKET. NO ACUMULABLE CON OTRAS PROMOCIONES. VISA DEBITO VALIDO SOLO PARA CLIENTES CON PAQUETES DE PRODUCTOS O ACREDITEN SUELDOS EN ICBC. VISA DEBITO EXCLUSIVO PARA EL TITULAR DE CUENTA. NO VÁLIDO PARA COMPRAS MAYORISTAS NI PARA TARJETAS VISA BUSINESS, VISA DISTRIBUTION, VISA PURCHASING, VISA PURCHASING CAMPO, CORPORATE, CORPORATE SIGNATURE, RECARGABLE EMPRESA Y VISA CUENTA CENTRAL. NO VALIDO PARA COMPRAS EFECTUADAS POR MERCADO PAGO, TODO PAGO, PAGO INMEDIATO O PAGO ENTRE PERSONAS. LOS REINTEGROS SE VERÁN ACREDITADOS EN EL MOMENTO DE LA COMPRA O HASTA 30 DÍAS POSTERIORES EN CAJA DE AHORRO O CUENTA CORRIENTE DE LA CUENTA REGISTRADA EN MODO. SÓLO PARA CLIENTES QUE SE ENCUENTREN AL DÍA EN SUS PRODUCTOS.&nbsp;(*) EL PLAN EN CUOTAS TIENE TASA NOMINAL ANUAL 0,00%, TASA EFECTIVA ANUAL 0,00%, COSTO FINANCIERO TOTAL NOMINAL ANUAL (CFTNA) 0,00%.&nbsp;INDUSTRIAL AND COMMERCIAL BANK OF CHINA (ARGENTINA) S.A.U ES UNA SOCIEDAD ANÓNIMA UNIPERSONAL BAJO LA LEY ARGENTINA. SU ACCIONISTA LIMITA SU RESPONSABILIDAD AL CAPITAL APORTADO. FLORIDA 99, CABA. CUIT 30709447846</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "30% de reintegro",
+      "validity_place": "The Food Market",
+      "cashback_cap": "20000",
+      "participating_bank": "ICBC",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/cf2a1d57-cf94-4cc6-b019-8e2c64de688a/primary_image.jpg?v=1758649339901",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "¡Aprovechá 30% de reintegro y hasta 3 cuotas sin interés en The Food Market con ICBC Exclusive!\t",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tus tarjetas de crédito Visa y/o Mastercard o débito Visa del ICBC Exclusive a través de MODO.</span></p><p class=\"editor-paragraph\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">En tiendas físicas y online adheridas</span></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><a href=\"https://www.thefoodmarket.com.ar/?gad_source=1&amp;gad_campaignid=16951260633&amp;gbraid=0AAAAACzwq9g2kLwwViNfZI5wGP8WjI7rs&amp;gclid=CjwKCAjw_-3GBhAYEiwAjh9fUEHtYhOvD8JEST4IPV4ZzcQnbcm-PD7ZO-hF61JMsQ5aEC_YwPK6IxoCniEQAvD_BwE\" target=\"_blank\" class=\"editor-link\"><u><span class=\"editor-text-underline\" style=\"white-space: pre-wrap;\">https://www.thefoodmarket.com.ar</span></u></a></p><p class=\"editor-paragraph\" dir=\"ltr\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el descuento aplicado?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en la cuenta del ICBC.</span></p>",
+      "applicability_description": "The Food Market",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

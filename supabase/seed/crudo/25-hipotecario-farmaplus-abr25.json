@@ -1,0 +1,269 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/25-hipotecario-farmaplus-abr25",
+  "tarjeta": {
+    "id": "53d4b7a9-ae54-4173-a52e-8db15b2c342a",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "FarmaPlus",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "25% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Desde el 07/04 al 31/05",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Exclusivo con",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Hipotecario",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/53d4b7a9-ae54-4173-a52e-8db15b2c342a/primary_image.png?v=1743797471471",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/53d4b7a9-ae54-4173-a52e-8db15b2c342a/secondary_image.png?v=1743797471472",
+        "tertiary_image": null,
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore,online",
+    "start_date": "2025-04-07T03:00:00.000Z",
+    "stop_date": "2026-12-01T02:59:59.999Z",
+    "days_of_week": "L",
+    "title": "25% en FarmaPlus",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "farmacia,farmaplus,hipotecario,25,lunes",
+    "promo_id": "3813f68b-b9e2-4360-8e51-47f899c5bcb2",
+    "slug": "25-hipotecario-farmaplus-abr25",
+    "short_description": "2504-hipotecario-farmaplus-presencial-online-25off",
+    "where": "FarmaPlus",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 4,
+          "sub_categories": [
+            16
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": []
+  },
+  "detalle": {
+    "id": "3813f68b-b9e2-4360-8e51-47f899c5bcb2",
+    "name": "25% en FarmaPlus",
+    "description": "Aprovecha 25% de reintegro en FarmaPlus pagando con Visa débito del Hipotecario",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-14T18:40:45.467Z",
+    "updated_at": "2026-09-29T17:29:40.148Z",
+    "deleted_at": null,
+    "short_description": "2504-hipotecario-farmaplus-presencial-online-25off",
+    "publication_description": "Aprovecha 25% de reintegro en FarmaPlus pagando con Visa débito del Hipotecario",
+    "slug": "25-hipotecario-farmaplus-abr25",
+    "display_start_date": "2025-04-04T03:00:00.000Z",
+    "display_stop_date": "2027-01-31T02:59:59.999Z",
+    "search_tags": "farmacia,farmaplus,hipotecario,25,lunes",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-11-30",
+        "start_date": "2025-04-07",
+        "days_of_week": [
+          "monday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "online"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "3813f68b-b9e2-4360-8e51-47f899c5bcb2",
+        "benefit_id": "3813f68b-b9e2-4360-8e51-47f899c5bcb2",
+        "name": "25% en FarmaPlus",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_terminal_id",
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                16
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "b164059a-b71a-11ea-b3de-0242ac130004"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 25,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 10000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "16"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-14T18:40:44.774Z",
+        "updated_at": "2026-09-29T16:20:44.662Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">PUBLICIDAD, CARTERA CONSUMO. PROMOCIÓN VÁLIDA EN LA REPÚBLICA ARGENTINA EN TIENDAS FÍSICAS Y ONLINE DE FARMAPLUS LOS LUNES DESDE EL 07/04/2025 HASTA EL 30/11/2026, AMBOS INCLUSIVE, PARA CONSUMOS EFECTUADOS CON TARJETA DE DÉBITO VISA EMITIDA POR ESTE BANCO QUE NO REGISTRE MORA MEDIANTE LA MODALIDAD DE PAGO CON “QR” A TRAVÉS DE “MODO” DESDE APP BH O APP MODO. NO ACUMULABLE CON OTRAS PROMOCIONES, NI CARTERA DE CLIENTES QUE ACREDITEN PLANES SOCIALES. NO APLICA A LAS OPERACIONES DE EXTRACCIÓN DE DINERO EN EFECTIVO REALIZADAS A TRAVÉS DE EXTRA, CASH. NO APLICA PARA LOS CONSUMOS EFECTUADOS A TRAVÉS DE LA PLATAFORMA MERCADOPAGO. NO APLICA A LOS PAGOS REALIZADOS POR LA PLATAFORMA DE PAGOS MÓVILES (POS MÓVIL, BOTÓN DE PAGO Y BILLETERA ELECTRÓNICA). BENEIFCIO: 25% DE REINTEGRO CON TOPE MENSUAL Y POR CLIENTE DE $10.000. REINTEGRO: DENTRO DE LOS 30 DÍAS DE REALIZADO EL PAGO SE ACREDITARÁ EN LA CAJA DE AHORRO DE BANCO HIPOTECARIO SA ASOCIADA A MODO. CONSULTE EL AHORRO APLICABLE Y VIGENTE EN CADA COMERCIO ANTES DE EFECTUAR LA COMPRA. CONSULTE EL AHORRO APLICABLE Y VIGENTE EN CADA COMERCIO ANTES DE EFECTUAR LA COMPRA. BANCO HIPOTECARIO S.A. RECONQUISTA 151 (1003) CABA. CUIT 30-50001107-2.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "25% de reintegro",
+      "validity_place": "FarmaPlus",
+      "cashback_cap": "10000",
+      "participating_bank": "Hipotecario",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/53d4b7a9-ae54-4173-a52e-8db15b2c342a/primary_image.png?v=1743797471471",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "¡Aprovechá 25% de reintegro en FarmaPlus con el Hipotecario!",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio?</strong></b><span style=\"white-space: pre-wrap;\"> </span></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tus tarjetas de débito Visa del Banco Hipotecario a través de MODO. </span></p><p class=\"editor-paragraph\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">En tiendas físicas y online adheridas. </span></p><p class=\"editor-paragraph\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el reintegro aplicado? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en la cuenta del Hipotecario dentro de los 30 días.</span></p>",
+      "applicability_description": "FarmaPlus",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

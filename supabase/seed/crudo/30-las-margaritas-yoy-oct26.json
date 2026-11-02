@@ -1,0 +1,278 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/30-las-margaritas-yoy-oct26",
+  "tarjeta": {
+    "id": "d5be3b6c-f3ad-4063-a93e-f2bbfe23b45d",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": {
+      "promo_id": "9ab74643-98a7-4a2f-b3d7-1054c362acbd"
+    },
+    "content": {
+      "row": [
+        {
+          "text": "Las Margaritas",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "30% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "7000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "YOY",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/afe12427-b627-4156-9503-bece15e54c63_Las%20margaritasDetalle.jpg",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/afe12427-b627-4156-9503-bece15e54c63_Las%20margaritasDetalle.jpg",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/afe12427-b627-4156-9503-bece15e54c63_Las%20margaritasDetalle.jpg",
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:59+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore,online",
+    "start_date": "2026-10-01T03:00:00.000Z",
+    "stop_date": "2027-02-01T02:59:59.999Z",
+    "days_of_week": "MJ",
+    "title": "MARGARITAS - YOY",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "30,lasmargaritas,presencial,online,yoy,perfumeria",
+    "promo_id": "9ab74643-98a7-4a2f-b3d7-1054c362acbd",
+    "slug": "30-las-margaritas-yoy-oct26",
+    "short_description": "2610-yoy-las-margaritas-presencialonline-30off",
+    "where": "Las Margaritas",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 4,
+          "sub_categories": [
+            37
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "master"
+    ]
+  },
+  "detalle": {
+    "id": "9ab74643-98a7-4a2f-b3d7-1054c362acbd",
+    "name": "MARGARITAS - YOY",
+    "description": "",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-09-21T23:09:57.766Z",
+    "updated_at": "2026-09-23T14:52:51.227Z",
+    "deleted_at": null,
+    "short_description": "2610-yoy-las-margaritas-presencialonline-30off",
+    "publication_description": "Aprovecha 30% de reintegro en Las Margaritas con YOY",
+    "slug": "30-las-margaritas-yoy-oct26",
+    "display_start_date": "2026-09-21T03:00:00.000Z",
+    "display_stop_date": "2027-02-01T02:59:59.999Z",
+    "search_tags": "30,lasmargaritas,presencial,online,yoy,perfumeria",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2027-01-31",
+        "start_date": "2026-10-01",
+        "days_of_week": [
+          "tuesday",
+          "thursday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "online"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "pct"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "9ab74643-98a7-4a2f-b3d7-1054c362acbd",
+        "benefit_id": "9ab74643-98a7-4a2f-b3d7-1054c362acbd",
+        "name": ".",
+        "priority": 1,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit",
+            "store_terminal_id"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                37
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "f3f5910c-013f-47f7-819e-3d802cf3f7b7"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 30,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 7000,
+            "amount_of_transactions_by_period": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "37"
+        ],
+        "preselected": false,
+        "created_at": "2026-09-21T23:11:25.891Z",
+        "updated_at": "2026-09-21T23:13:35.440Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": null
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "master"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">PROPUESTA PARA CARTERA DE CONSUMO VALIDA EN LA REPUBLICA ARGENTINA LOS MARTES Y JUEVES DESDE EL 1/10/2026 AL 31/01/2027. &nbsp;30% DE AHORRO CON TARJETA YOY VISA DEBITO Y YOY MASTERCARD CREDITO Y DINERO EN CUENTA &nbsp; PAGANDO A TRAVES DE MODO O SU INTEGRACIÓN EN LA APP YOY. POR CADA $1000 DE CONSUMO SE REINTEGRARAN $300 EN SU CUENTA. TOPE MAXIMO DE REINTEGRO: $7000 POR CUENTA POR MES. VALIDO SOLO PARA PAGOS CON MODO DESDE APP YOY O APP&nbsp;</span><a href=\"http://modo.no/\" target=\"_blank\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">MODO. NO</span></a><span style=\"white-space: pre-wrap;\">&nbsp;VALIDO PARA COMPRAS EFECTUADAS POR MERCADO PAGO, TODO PAGO, PAGO INMEDIATO O PAGO ENTRE PERSONAS. NO ACUMULABLE CON OTRAS PROMOCIONES. VALIDO SOLO PARA CLIENTES CON VISA DEBITO YOY Y MASTERCARD CREDITO YOY. VISA DEBITO EXCLUSIVO PARA EL TITULAR DE CUENTA. NO VALIDO PARA COMPRAS MAYORISTAS. LOS REINTEGROS SE VERAN ACREDITADOS DENTRO DE LOS 30 DIAS CORRIDOS POSTERIORES A LA FECHA DE REALIZADA LA COMPRA EN EXTRACTO DE CUENTA PARA VISA DEBITO. SOLO PARA CLIENTES QUE SE ENCUENTREN AL DIA EN SUS PRODUCTOS. INDUSTRIAL AND COMMERCIAL BANK OF CHINA (ARGENTINA) S.A.U. ES UNA SOCIEDAD ANONIMA UNIPERSONAL BAJO LA LEY ARGENTINA. SU ACCIONISTA LIMITA SU RESPONSABILIDAD AL CAPITAL APORTADO. (LEY 25738). CUIT: 30-70944784-6. FLORIDA 99, CABA</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "30% de reintegro",
+      "validity_place": "Las Margaritas",
+      "cashback_cap": "7000",
+      "participating_bank": "YOY",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/afe12427-b627-4156-9503-bece15e54c63_Las%20margaritasDetalle.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Las Margaritas con YOY",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong></p><p>Realizando una compra con dinero en cuenta o con tus tarjetas de crédito Mastercard y/o débito Visa de la billetera YOY a través de MODO.</p><p></p><p><strong>¿Cómo es la modalidad de uso?</strong></p><p>En tiendas físicas y online adheridas:</p><p><a href=\"https://www.lasmargaritas.com.ar/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.lasmargaritas.com.ar/</a></p><p></p><p><strong>¿Dónde veo el descuento aplicado?</strong></p><p>El reintegro lo verás acreditado en la cuenta de YOY.</p>",
+      "applicability_description": "Las Margaritas",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

@@ -1,0 +1,345 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/15-comafi-juleriaque-unico-mar25",
+  "tarjeta": {
+    "id": "c00b68cd-7c9a-4952-bb07-ec3f736a2224",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Juleriaque",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "15% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Desde el 01/03 al 30/04",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Exclusivo con",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "0",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Comafi ",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "extra_row": null,
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/c00b68cd-7c9a-4952-bb07-ec3f736a2224/primary_image.jpg?v=1740510305468",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/c00b68cd-7c9a-4952-bb07-ec3f736a2224/secondary_image.png?v=1740510305457",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/c00b68cd-7c9a-4952-bb07-ec3f736a2224/tertiary_image.png?v=1740510305467",
+        "tertiary_backgroundcolor": null,
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": null
+        },
+        {
+          "type": "countdown",
+          "value": false,
+          "label": null
+        },
+        {
+          "type": "online_store",
+          "value": false,
+          "label": null
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore,online",
+    "start_date": "2025-03-01T03:00:00.000Z",
+    "stop_date": "2026-12-01T02:59:59.999Z",
+    "days_of_week": "LMXJVSD",
+    "title": "15% y 9 CSI en Juleriaque",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "15,reintegro,unico,juleriaque,marzo",
+    "promo_id": "450b1a14-62f1-4c1d-ae1a-62136828f103",
+    "slug": "15-comafi-juleriaque-unico-mar25",
+    "short_description": "2503-comafi-unico-juleriaque-presencialonline-15off",
+    "where": "Juleriaque",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 4,
+          "sub_categories": [
+            37
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "visa",
+      "master"
+    ]
+  },
+  "detalle": {
+    "id": "450b1a14-62f1-4c1d-ae1a-62136828f103",
+    "name": "15% y 9 CSI en Juleriaque",
+    "description": "Aprovechá 15% de reintegro y 9CSI en Juleriaque pagando con Banco Comafi",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-16T17:41:17.866Z",
+    "updated_at": "2026-08-31T22:23:14.406Z",
+    "deleted_at": null,
+    "short_description": "2503-comafi-unico-juleriaque-presencialonline-15off",
+    "publication_description": "Aprovechá 15% de reintegro y 9CSI en Juleriaque pagando con Banco Comafi",
+    "slug": "15-comafi-juleriaque-unico-mar25",
+    "display_start_date": "2025-02-25T03:00:00.000Z",
+    "display_stop_date": "2026-12-01T02:59:59.999Z",
+    "search_tags": "15,reintegro,unico,juleriaque,marzo",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-11-30",
+        "start_date": "2025-03-01",
+        "days_of_week": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "TODO_PAGO"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "online"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "450b1a14-62f1-4c1d-ae1a-62136828f103",
+        "benefit_id": "450b1a14-62f1-4c1d-ae1a-62136828f103",
+        "name": "15% y 9 CSI en Juleriaque",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "bin",
+            "store_terminal_id",
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                37
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "ce8aabb1-f663-4832-82ec-de9b5b572aa1"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 15,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": [
+              {
+                "type": "sin_interes",
+                "number": 1,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 2,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 3,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 4,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 5,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 6,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 8,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 9,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              }
+            ]
+          }
+        },
+        "limits": {
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "37"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-16T17:41:17.451Z",
+        "updated_at": "2026-07-16T17:41:17.451Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "visa",
+      "master"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Oferta exclusiva para la cartera de consumo. Promoción válida todos los días desde el 01/03/25 hasta el 30/11/26 abonando con Tarjetas de crédito y débito Visa Signature, y Mastercard Black pertenecientes a clientes que sean además titulares de servicios de cuenta UNICO Black y&nbsp;Tarjetas de Crédito Visa y Mastercard Banco Comafi y Tarjetas Visa débito Banco Comafi pertenecientes a clientes que sean además titulares de servicios de cuenta Premium y/o Platinum. 15% de ahorro y hasta 9 cuotas sin interés abonando a través de MODO. Quedan excluidas aquellas tarjetas de crédito Credial, Business y Corporativas emitidas en Argentina por Banco Comafi. Sin tope de reintegro. Los descuentos se realizan sobre precio de lista, son automáticos y se acreditarán hasta los 30 días en la cuenta del banco utilizado en el pago. No acumulable con otras promociones ni entre sí. Sólo válido para aquellos clientes que se encuentren al día en sus productos y sean titulares de una caja de ahorro en pesos en Banco Comafi. Para compras realizadas por adicionales con tarjeta de débito y/o crédito de Banco Comafi, el reintegro siempre se acreditará en la caja de ahorro en pesos que el titular principal de la tarjeta de débito y/o crédito tenga en Banco Comafi. El beneficio no será aplicado en aquellas compras realizadas a través de MercadoPago. Consultar locales adheridos y medios de pago habilitados en&nbsp;</span><a href=\"http://www.tevabien.com/\" target=\"_blank\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">www.tevabien.com</span></a><span style=\"white-space: pre-wrap;\">. Banco Comafi no se responsabiliza por los cupones presentados por los establecimientos fuera de término, así como tampoco promociona ni garantiza los comercios, los productos y/o servicios o la calidad de los mismos. El beneficio no será aplicado para aquellas compras realizadas con Plan Gobierno. Banco Comafi S.A. con domicilio en&nbsp;</span><a href=\"https://www.google.com/maps/search/Av.+Roque+S%C3%A1enz+Pe%C3%B1a+660,+piso+3?entry=gmail&amp;source=g\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">Av. Roque Sáenz Peña 660, piso 3</span></a><span style=\"white-space: pre-wrap;\">, CUIT 30-604731018.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "15% de reintegro",
+      "validity_place": "Juleriaque",
+      "cashback_cap": "0",
+      "participating_bank": "Comafi ",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/c00b68cd-7c9a-4952-bb07-ec3f736a2224/primary_image.jpg?v=1740510305468",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "¡Aprovechá 15% de reintegro y hasta 9 cuotas sin interés en Juleriaque con Comafi!",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tus tarjetas de crédito Visa Signature, Platinum y/o Mastercard Platinum y Black  del Banco Comafi a través de MODO.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">&nbsp;</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">En tiendas físicas y online adheridas</span></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><a href=\"https://www.juleriaque.com.ar/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">https://www.juleriaque.com.ar/</span></a></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el reintegro aplicado?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en tu cuenta del Banco Comafi.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cuál es el tope de reintegro?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">¡Esta promo no tiene tope!</span></p>",
+      "applicability_description": "Juleriaque",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

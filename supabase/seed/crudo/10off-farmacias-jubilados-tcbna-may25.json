@@ -1,0 +1,280 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/10off-farmacias-jubilados-tcbna-may25",
+  "tarjeta": {
+    "id": "d0bff7ee-73a3-435f-a36c-3ac96888d2af",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Farmacias",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10% y 3 cuotas",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Desde 01/05 al 28/02",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Exclusivo con",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "BNA",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "extra_row": null,
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/d0bff7ee-73a3-435f-a36c-3ac96888d2af/primary_image.jpg?v=1745268433075",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/d0bff7ee-73a3-435f-a36c-3ac96888d2af/secondary_image.png?v=1745268433100",
+        "tertiary_image": null,
+        "tertiary_backgroundcolor": null,
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": null
+        },
+        {
+          "type": "countdown",
+          "value": false,
+          "label": null
+        },
+        {
+          "type": "online_store",
+          "value": false,
+          "label": null
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore,online",
+    "start_date": "2025-05-01T03:00:00.000Z",
+    "stop_date": "2027-02-01T02:59:59.999Z",
+    "days_of_week": "L",
+    "title": "10% en Farmacias",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "lunes,farmacias,jubilados,bna,presencial,online",
+    "promo_id": "450a9697-7941-4a4e-8d57-0de5e0835a55",
+    "slug": "10off-farmacias-jubilados-tcbna-may25",
+    "short_description": "2505-BNA-U3770-Farmacias-Jubilados-presencial-online-10off-y-3csi",
+    "where": "Farmacias adheridas",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 4,
+          "sub_categories": [
+            16
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [],
+    "credit_list": [
+      "visa",
+      "master"
+    ]
+  },
+  "detalle": {
+    "id": "450a9697-7941-4a4e-8d57-0de5e0835a55",
+    "name": "10% en Farmacias",
+    "description": "Exclusivamente para Jubilados del Banco Nación",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-16T17:41:17.519Z",
+    "updated_at": "2026-09-14T19:41:33.643Z",
+    "deleted_at": null,
+    "short_description": "2505-BNA-U3770-Farmacias-Jubilados-presencial-online-10off-y-3csi",
+    "publication_description": "Exclusivamente para Jubilados del Banco Nación",
+    "slug": "10off-farmacias-jubilados-tcbna-may25",
+    "display_start_date": "2025-04-21T03:00:00.000Z",
+    "display_stop_date": "2026-11-01T02:59:59.999Z",
+    "search_tags": "lunes,farmacias,jubilados,bna,presencial,online",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2027-01-31",
+        "start_date": "2025-05-01",
+        "days_of_week": [
+          "monday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "online"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "450a9697-7941-4a4e-8d57-0de5e0835a55",
+        "benefit_id": "450a9697-7941-4a4e-8d57-0de5e0835a55",
+        "name": "10% en Farmacias",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "user_national_id",
+            "store_terminal_id",
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                16
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "0330e59b-b6e3-43eb-9083-a88fcc61e845"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 10,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 10000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "16"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-16T17:41:16.833Z",
+        "updated_at": "2026-07-16T17:41:16.833Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "visa",
+      "master"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">PROMOCIÓN VÁLIDA EN LA REPÚBLICA ARGENTINA LOS DÍAS LUNES DESDE EL 01/05/2025 HASTA EL 31/08/2026, AMBAS FECHAS INCLUSIVE, PARA JUBILADOS QUE PERCIBAN SU JUBILACIÓN EN UNA CUENTA MONETARIA DEL BANCO NACIÓN, PARA COMPRAS EN COMERCIOS ADHERIDOS CON TARJETAS DE CRÉDITO MASTERCARD Y VISA DEL BANCO NACIÓN PAGANDO EXCLUSIVAMENTE CON MODO BNA+ ESCANEANDO QR MODO. TOPE DE DEVOLUCIÓN: HASTA $ 10.000 POR CLIENTE (SE CONSIDERA CLIENTE PARA EL BNA EL CUIT) POR MES (SE CONSIDERA MES PARA EL BNA DEL PRIMERO AL ÚLTIMO DÍA DE CADA MES CALENDARIO) DURANTE LA VIGENCIA DE LA PROMO. EL DESCUENTO SE VERÁ REFLEJADO EN EN LA CUENTA MONETARIA ASOCIADA A BNA+ DE LA PERSONA QUE REALIZÓ LA COMPRA DENTRO DE LOS 30 DÍAS HÁBILES DE OCURRIDA LA TRANSACCIÓN. ADICIONALES DE TARJETAS DE CRÉDITO NO CONTARÁN CON EL BENEFICIO ATENTO A QUE APLICA ÚNICAMENTE AL CLIENTE QUE PERCIBE SU JUBILACIÓN POR EL BNA. EL BENEFICIO NO APLICA EN EL PAGO A TRAVÉS DE OTRAS BILLETERAS O PLATAFORMAS DE PAGO, COMO TAMPOCO PARA PAGOS REALIZADOS MEDIANTE SALDO EN CUENTA. EXCLUSIVO CARTERA DE CONSUMO. TASA NOMINAL ANUAL (TNA) FIJA 0,00%. TASA EFECTIVA ANUAL (TEA) FIJA 0,00%. COSTO FINANCIERO TOTAL EXPRESADO EN TEA (CFTEA) 0,00%. BANCO DE LA NACIÓN ARGENTINA - BARTOLOMÉ MITRE 326, CABA - CUIT 30-50001091-2. PARA MÁS INFORMACIÓN Y CONDICIONES O LIMITACIONES APLICABLES, CONSULTÁ EN WWW.SEMANANACION.COM.AR</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "10% y 3 cuotas",
+      "validity_place": "Farmacias",
+      "cashback_cap": "10000",
+      "participating_bank": "BNA",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/d0bff7ee-73a3-435f-a36c-3ac96888d2af/primary_image.jpg?v=1745268433075",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": " ¡Aprovechá 10% de reintegro y hasta 3 cuotas sin interés en Farmacias con BNA! ",
+      "faq": "<h4 class=\"editor-heading-h4\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio?</strong></b></h4><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tus tarjetas de crédito Mastercard y/o Visa del Banco Nación a través de MODO.</span></p><p class=\"editor-paragraph\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">En tiendas físicas y online adheridas.</span></p><p class=\"editor-paragraph\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el descuento aplicado?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en tu cuenta del Banco Nación.</span></p><p class=\"editor-paragraph\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">Consultá los comercios adheridos en: </strong></b><a href=\"https://semananacion.com.ar/semananacion/sn-farmacias\" target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">https://semananacion.com.ar</span></a></p>",
+      "applicability_description": "Farmacias adheridas",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

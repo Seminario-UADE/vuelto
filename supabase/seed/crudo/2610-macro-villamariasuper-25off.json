@@ -1,0 +1,284 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/2610-macro-villamariasuper-25off",
+  "tarjeta": {
+    "id": "a06d86fc-2e1d-46f0-8a90-a16b94ebdd6a",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": {
+      "promo_id": "524b7f20-9468-49d9-b407-7544b6a72072"
+    },
+    "content": {
+      "row": [
+        {
+          "text": "VILLA MARIA SUPERMERCADOS",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "25% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "20000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Macro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/bbee9cde-80df-4a02-9704-d67c4d509e7d_Super-Generica.jpg",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/bbee9cde-80df-4a02-9704-d67c4d509e7d_Super-Generica.jpg",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/bbee9cde-80df-4a02-9704-d67c4d509e7d_Super-Generica.jpg",
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:59+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW",
+    "exclusiveness": "all",
+    "payment_flow": "instore,instore_nfc,physical-card",
+    "start_date": "2026-10-01T03:00:00.000Z",
+    "stop_date": "2027-01-01T02:59:59.999Z",
+    "days_of_week": "X",
+    "title": "VILLA MARIA SUPERMERCADOS",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "SEG_P",
+    "promo_id": "524b7f20-9468-49d9-b407-7544b6a72072",
+    "slug": "2610-macro-villamariasuper-25off",
+    "short_description": "2610-macro-TC50090-villamariasupermercados-presencial-nfc-25off",
+    "where": "",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            43
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [],
+    "credit_list": [
+      "master",
+      "visa",
+      "american_express"
+    ]
+  },
+  "detalle": {
+    "id": "524b7f20-9468-49d9-b407-7544b6a72072",
+    "name": "VILLA MARIA SUPERMERCADOS",
+    "description": "SEG_P",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": false,
+    "created_at": "2026-09-14T22:02:05.310Z",
+    "updated_at": "2026-10-16T21:06:56.956Z",
+    "deleted_at": null,
+    "short_description": "2610-macro-TC50090-villamariasupermercados-presencial-nfc-25off",
+    "publication_description": "SEG_P",
+    "slug": "2610-macro-villamariasuper-25off",
+    "display_start_date": "2026-09-30T03:00:00.000Z",
+    "display_stop_date": "2027-01-02T02:59:59.999Z",
+    "search_tags": "SEG_P",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-10-01",
+        "days_of_week": [
+          "wednesday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "PRISMA"
+        ],
+        "segmentation_mode": "by_whitelist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "instore_nfc",
+          "physical-card"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "american_express"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "524b7f20-9468-49d9-b407-7544b6a72072",
+        "benefit_id": "524b7f20-9468-49d9-b407-7544b6a72072",
+        "name": ".",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "bin",
+            "store_acquirer_establishment_id"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "6a089c91-a7d3-4199-a578-2132a3733f69"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 25,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_por_regla"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 20000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-09-14T22:01:56.033Z",
+        "updated_at": "2026-09-14T22:02:05.117Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "master",
+      "visa",
+      "american_express"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">CARTERA DE CONSUMO. PROMOCIÓN VÁLIDA DESDE EL 1 DE OCTUBRE DE 2026 HASTA EL 31 DE DICIEMBRE DE 2026, EXCLUSIVAMENTE LOS DIAS MIERCOLES, CON LAS TARJETAS DE CRÉDITO AMEX PLATINUM, MASTERCARD PLATINUM Y VISA PLATINUM DE LOS BANCOS DEL GRUPO MACRO. LA PRESENTE PROMOCIÓN APLICA PARA CONSUMOS DE TIPO PERSONAL/FAMILIAR. EN CASO DE DUDA, EL BANCO SE RESERVA EL DERECHO DE NO ACREDITAR EL MONTO DE LA BONIFICACIÓN HASTA TANTO SEA ACLARADO EL DESTINO DE LOS CONSUMOS. 25% DE DESCUENTO EN UN PAGO TOPE DE DEVOLUCIÓN 20000 PESOS POR CUENTA POR MES.EL BENEFICIO SERÁ APLICADO DENTRO DE LOS 60 DÍAS DE REALIZADA LA COMPRA, AL CIERRE DEL RESUMEN EN EL CUAL SE REGISTRE LA OPERACIÓN O EN LOS DOS SIGUIENTES. NO ACUMULABLE CON OTRAS PROMOCIONES. NO APLICA PARA PAGOS REALIZADOS A TRAVÉS DE MERCADO PAGO/TODO PAGO Y/O PEI. EL DESCUENTO PROMOCIONADO APLICA SOBRE EL PRECIO CONTADO. (EJEMPLOS REPRESENTATIVOS: COMPRA EN CUOTAS: EN UNA COMPRA CON TARJETA DE CRÉDITO DE $1.200 EN 3 CUOTAS SIN INTERÉS, EL CLIENTE ABONARÁ 3 CUOTAS DE $400 CADA UNA. COMPRA CON DESCUENTO Y EN CUOTAS: CON TARJETA DE CRÉDITO CON 10% DE DESCUENTO Y 3 CUOTAS SIN INTERÉS EN UNA COMPRA DE $1.200, CORRESPONDERÁ 3 CUOTAS DE $400 CADA UNA, Y EL BANCO LE REINTEGRARÁ AL CLIENTE DENTRO DE LOS 60 DÍAS DE REALIZADA LA COMPRA, AL CIERRE DEL RESUMEN EN EL CUAL SE REGISTRE LA OPERACIÓN O EN LOS DOS SIGUIENTES LA SUMA DE $ 120. QUEDA ESTABLECIDO QUE LOS DATOS Y OFERTAS INDICADAS REVISTEN CARÁCTER INFORMATIVO Y EN MODO ALGUNO SUPONEN QUE LOS ESTABLECIMIENTOS, PRODUCTOS Y/O SERVICIOS QUE COMERCIALIZAN O LA CALIDAD DE LOS MISMOS SON PROMOCIONADOS O GARANTIZADOS POR LOS BANCOS DEL GRUPO MACRO, COMO ASÍ TAMPOCO SE RESPONSABILIZAN POR LOS CUPONES PRESENTADOS FUERA DE TÉRMINO POR LOS COMERCIOS. MÁS INFORMACIÓN EN FORMA PREVIA A REALIZAR LA OPERACIÓN AL: 0810-555-2355 PARA BANCO MACRO, 0810-555-7353 PARA CLIENTES MACRO SELECTA, O EN LA SUCURSAL MÁS CERCANA A SU DOMICILIO</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "25% de reintegro",
+      "validity_place": "VILLA MARIA SUPERMERCADOS",
+      "cashback_cap": "20000",
+      "participating_bank": "Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/bbee9cde-80df-4a02-9704-d67c4d509e7d_Super-Generica.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "VILLA MARIA SUPERMERCADOS",
+      "faq": "<p><strong>¿Cómo pagar?</strong></p><p>Con tarjeta de crédito usando cualquier método de pago: tarjeta física, MODO QR y NFC (Apple Pay, Google Pay y MODO NFC).</p><p><strong>¿Donde veo el descuento aplicado?</strong></p><p>El reintegro lo verás reflejado en el resumen de la tarjeta con la que hiciste el pago.</p><p><strong>¿Esta promo es acumulable con otras promos de MODO?</strong></p><p>SÍ, esta promo es acumulable con otras promos vigentes de MODO, siempre y cuando el pago se realice con QR y/o MODO NFC. </p><p><br /></p>",
+      "applicability_description": "",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

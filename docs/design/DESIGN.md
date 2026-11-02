@@ -278,6 +278,13 @@ Medios declarados:
 | Macro Visa débito | 15% en farmacias, todos los días | $6.000 / mes | Tope agotado, según 2 compras |
 
 Compra de ejemplo: **Coto, miércoles, $24.500**.
+
+> **Nota (2026-11-02):** Coto es un ejemplo de diseño, no de datos reales. MODO no tiene hoy
+> ninguna promo vigente de Coto, Jumbo, Carrefour, Disco, Vea ni Día (`docs/product/alcance-mvp.md`,
+> `docs/product/corpus-semilla.md`), y los datos de ejemplo de la app
+> (`apps/mobile/src/data/fixtures.ts`) siguen usando esos comercios. Con el corpus real cargado, el
+> recorrido con datos reales usa una cadena que sí tenga promo vigente; qué ejemplo muestra el pitch
+> lo decide el equipo.
 - Te conviene: Galicia Visa crédito → te devuelven ≈$4.900 → te sale ≈$19.600.
 - Después de la compra: ≈$1.600 de tope disponible en Galicia.
 - Alternativas: Provincia Visa débito (hoy no aplica, la promo es los

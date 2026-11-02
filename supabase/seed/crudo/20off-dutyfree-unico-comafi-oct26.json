@@ -1,0 +1,314 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20off-dutyfree-unico-comafi-oct26",
+  "tarjeta": {
+    "id": "a8d02966-9c55-4864-85a3-2927e4e56282",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": {
+      "promo_id": "285f402f-e748-4ada-94e3-20aab36227b2"
+    },
+    "content": {
+      "row": [
+        {
+          "text": "Duty Free",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "20% de reintegro ",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "50000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Comafi",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/74fdb73b-53fa-407a-b302-98a9bd9ac669_279376ea-ef9e-4ba5-b66a-a4a0c3e2e290_primary_image.jpg",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/74fdb73b-53fa-407a-b302-98a9bd9ac669_279376ea-ef9e-4ba5-b66a-a4a0c3e2e290_primary_image.jpg",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/74fdb73b-53fa-407a-b302-98a9bd9ac669_279376ea-ef9e-4ba5-b66a-a4a0c3e2e290_primary_image.jpg",
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:59+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore",
+    "start_date": "2026-09-01T03:00:00.000Z",
+    "stop_date": "2026-12-01T02:59:59.999Z",
+    "days_of_week": "LMXJVSD",
+    "title": "20% en Duty Free - Único",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "duty free,comafi,reintegro,presencial,unico",
+    "promo_id": "285f402f-e748-4ada-94e3-20aab36227b2",
+    "slug": "20off-dutyfree-unico-comafi-oct26",
+    "short_description": "2609-Comafi-DutyFree-Unico-Presencial-20off",
+    "where": "Duty Free",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 3,
+          "sub_categories": [
+            48,
+            49
+          ]
+        },
+        {
+          "map_category": 4,
+          "sub_categories": [
+            37,
+            33
+          ]
+        },
+        {
+          "map_category": 10,
+          "sub_categories": [
+            36,
+            41
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [],
+    "credit_list": [
+      "visa",
+      "master"
+    ]
+  },
+  "detalle": {
+    "id": "285f402f-e748-4ada-94e3-20aab36227b2",
+    "name": "20% en Duty Free - Único",
+    "description": "",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-09-29T15:32:57.482Z",
+    "updated_at": "2026-09-29T20:45:02.275Z",
+    "deleted_at": null,
+    "short_description": "2609-Comafi-DutyFree-Unico-Presencial-20off",
+    "publication_description": "20% de reintegro en Duty con Comafi - Exclusivo UNICO",
+    "slug": "20off-dutyfree-unico-comafi-oct26",
+    "display_start_date": "2026-09-01T03:00:00.000Z",
+    "display_stop_date": "2027-02-01T02:59:59.999Z",
+    "search_tags": "duty free,comafi,reintegro,presencial,unico",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-11-30",
+        "start_date": "2026-09-01",
+        "days_of_week": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "285f402f-e748-4ada-94e3-20aab36227b2",
+        "benefit_id": "285f402f-e748-4ada-94e3-20aab36227b2",
+        "name": ".",
+        "priority": 1,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit",
+            "bin"
+          ],
+          "categories": [
+            {
+              "category_id": 3,
+              "subcategory_ids": [
+                48,
+                49
+              ]
+            },
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                37,
+                33
+              ]
+            },
+            {
+              "category_id": 10,
+              "subcategory_ids": [
+                36,
+                41
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "ce8aabb1-f663-4832-82ec-de9b5b572aa1"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_por_regla"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 50000,
+            "amount_of_transactions_by_period": 0
+          }
+        },
+        "categories": [
+          "10",
+          "3",
+          "4"
+        ],
+        "sub_categories": [
+          "33",
+          "36",
+          "37",
+          "41",
+          "48",
+          "49"
+        ],
+        "preselected": false,
+        "created_at": "2026-09-29T15:36:42.820Z",
+        "updated_at": "2026-09-29T19:38:47.297Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": null
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "visa",
+      "master"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Oferta exclusiva para la cartera de consumo. Promoción válida todos los días desde el 01/09/26 hasta el 30/11/26 abonando con tarjetas de crédito Visa Signature y Mastercard Black pertenecientes a Servicios de cuenta Unico emitidas por Banco Comafi. 20% de ahorro. Quedan excluidas aquellas tarjetas de crédito Credial, Business y Corporativas emitidas en Argentina por Banco Comafi. Tope de reintegro mensual de $50.000. Los descuentos se realizan sobre precio de lista, son automáticos y se acreditarán a los 60 días en el resumen de tarjeta del ingreso del consumo. No acumulable con otras promociones ni entre sí. Sólo válido para aquellos clientes que se encuentren al día en sus productos El descuento no será aplicado en aquellos pagos realizados a través de la aplicación de Mercado Pago. La promoción no aplica a pagos a través de billeteras virtuales (excepto Modo), plataformas de pago y/o portales de pagos online ajenos a la empresa. Banco Comafi no se responsabiliza por los cupones presentados por los establecimientos fuera de término, así como tampoco promociona ni garantiza los comercios, los productos y/o servicios o la calidad de los mismos. Banco Comafi S.A. con domicilio en Av. Roque Sáenz Peña 660, piso 1, CUIT 30-60473101-8. *CFT: 0,0% Costo Financiero Total Efectivo Anual. TNA: 0,0% Tasa Nominal Anual. TEA: 0,0% Tasa Efectiva Anual.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "20% de reintegro ",
+      "validity_place": "Duty Free",
+      "cashback_cap": "50000",
+      "participating_bank": "Comafi",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/74fdb73b-53fa-407a-b302-98a9bd9ac669_279376ea-ef9e-4ba5-b66a-a4a0c3e2e290_primary_image.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Duty Free con Comafi",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong></p><p>Realizando una compra con tus tarjetas crédito Visa Signature y Mastercard Black, del Banco Comafi a través de MODO.</p><p></p><p></p><p><strong>¿Dónde veo el reintegro aplicado?</strong></p><p>El reintegro lo verás acreditado en el resumen de tarjeta del Banco Comafi.</p>",
+      "applicability_description": "Duty Free",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

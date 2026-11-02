@@ -1,0 +1,312 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/10-lasmargaritas-bbva-sep26",
+  "tarjeta": {
+    "id": "504d00c2-8527-45e8-adab-c12ab0f7b79d",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": {
+      "promo_id": "0480a08c-3d77-4b42-b686-b6a6b1fc49bd"
+    },
+    "content": {
+      "row": [
+        {
+          "text": "Las Margaritas",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10% de reintegro y 6 cuotas",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "20000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "BBVA",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/ff380027-1deb-484c-a040-176ffc165508_las%20margaritas.jpg",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/ff380027-1deb-484c-a040-176ffc165508_las%20margaritas.jpg",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/ff380027-1deb-484c-a040-176ffc165508_las%20margaritas.jpg",
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:59+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore,online",
+    "start_date": "2026-09-08T03:00:00.000Z",
+    "stop_date": "2026-12-01T02:59:59.999Z",
+    "days_of_week": "M",
+    "title": "Las Margaritas Martes ",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "las margaritas,bbva,belleza,perfumeria",
+    "promo_id": "0480a08c-3d77-4b42-b686-b6a6b1fc49bd",
+    "slug": "10-lasmargaritas-bbva-sep26",
+    "short_description": "2609-BBVA-LasMargaritas-PresencialOnline-10off-6csi",
+    "where": "Las Margaritas",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 4,
+          "sub_categories": [
+            37
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [],
+    "credit_list": [
+      "visa",
+      "master"
+    ]
+  },
+  "detalle": {
+    "id": "0480a08c-3d77-4b42-b686-b6a6b1fc49bd",
+    "name": "Las Margaritas Martes ",
+    "description": "",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-09-04T16:08:01.494Z",
+    "updated_at": "2026-10-22T19:31:57.722Z",
+    "deleted_at": null,
+    "short_description": "2609-BBVA-LasMargaritas-PresencialOnline-10off-6csi",
+    "publication_description": "Todos los Martes disfruta reintegros y cuotas cuotas con BBVA",
+    "slug": "10-lasmargaritas-bbva-sep26",
+    "display_start_date": "2026-09-07T00:00:00.000Z",
+    "display_stop_date": "2026-11-30T00:00:00.000Z",
+    "search_tags": "las margaritas,bbva,belleza,perfumeria",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-11-30",
+        "start_date": "2026-09-08",
+        "days_of_week": [
+          "tuesday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "online"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          }
+        ]
+      },
+      "exclusiveness_source": [
+        "modo",
+        "banks"
+      ],
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "0480a08c-3d77-4b42-b686-b6a6b1fc49bd",
+        "benefit_id": "0480a08c-3d77-4b42-b686-b6a6b1fc49bd",
+        "name": ".",
+        "priority": 1,
+        "segmentations": {
+          "whitelist": [
+            "store_terminal_id",
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                37
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "049ad22b-c0f0-4733-be35-e31256801ce8"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 10,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": [
+              {
+                "type": "sin_interes",
+                "number": 6,
+                "coefficient": "0",
+                "annual_nominal_rate": "0",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 2,
+                "coefficient": "0",
+                "annual_nominal_rate": "0",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 3,
+                "coefficient": "0",
+                "annual_nominal_rate": "0",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 4,
+                "coefficient": "0",
+                "annual_nominal_rate": "0",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 5,
+                "coefficient": "0",
+                "annual_nominal_rate": "0",
+                "total_financial_cost": "0"
+              }
+            ]
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 20000,
+            "amount_of_transactions_by_period": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "37"
+        ],
+        "preselected": false,
+        "created_at": "2026-09-04T16:10:17.946Z",
+        "updated_at": "2026-09-08T14:49:53.388Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": null
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "visa",
+      "master"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">CARTERA DE CONSUMO. PROMOCIÓN VÁLIDA LOS DIAS MARTES DESDE EL 08/09/2026 HASTA EL 31/10/2026 INCLUSIVE. PROMOCIÓN CONSTA DE 10% DE REINTEGRO, TOPE $20.000 POR USUARIO POR MES, VÁLIDA PARA CLIENTES QUE ABONEN SUS COMPRAS EN HASTA 6 CUOTAS A TRAVÉS DE MODO CON TARJETAS DE CRÉDITO EMITIDAS POR BBVA. LA PRESENTE PROMOCIÓN ES VÁLIDA SÓLO PARA CONSUMOS DE TIPO FAMILIAR. EL REINTEGRO SE ACREDITARÁ DENTRO DE LOS 30 DÍAS POSTERIORES A LA COMPRA EN LA CAJA DE AHORRO BBVA VINCULADA A MODO. ACUMULA ÚNICAMENTE CON PROMOCIONES DE MODO Y PLANES CUOTA SIMPLE. LA PROMOCIÓN NO APLICA A PAGOS REALIZADOS A TRAVÉS DE OTRAS BILLETERAS VIRTUALES Y/O PLATAFORMAS DE PAGO ONLINE (POR EJEMPLO MERCADO PAGO, UALÁ, ETC.). LOS ACCIONISTAS DE BANCO BBVA ARGENTINA S.A. LIMITAN SU RESPONSABILIDAD A LA INTEGRACIÓN DE LAS ACCIONES SUSCRIPTAS LEY 19.550 Y LEY 25.738. CUIT 30-50000319-3. AVDA.CÓRDOBA 111- PISO 31 CABA</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "10% de reintegro y 6 cuotas",
+      "validity_place": "Las Margaritas",
+      "cashback_cap": "20000",
+      "participating_bank": "BBVA",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/ff380027-1deb-484c-a040-176ffc165508_las%20margaritas.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Las Margaritas con BBVA",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong></p><p>Realizando una compra con tus tarjetas de crédito Visa y/o Mastercard del BBVA, a través de MODO.</p><p><br /><strong>¿Dónde veo el reintegro aplicado?</strong></p><p>El reintegro lo verás acreditado en tu cuenta del BBVA.</p><p><br /></p>",
+      "applicability_description": "Las Margaritas",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

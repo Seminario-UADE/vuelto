@@ -1,0 +1,283 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20-farmacias-supervielle-ago26",
+  "tarjeta": {
+    "id": "9ce9f6bb-ec2d-47cd-87ca-1e136d9585e4",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Farmacias",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "20% y 3 cuotas",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "8000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Supervielle",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/9ce9f6bb-ec2d-47cd-87ca-1e136d9585e4/primary_image.jpg?v=1785773294858&t=2026-08-03T15:38:14.874Z",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/9ce9f6bb-ec2d-47cd-87ca-1e136d9585e4/primary_image.jpg?v=1785773294858&t=2026-08-03T15:38:14.874Z",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/9ce9f6bb-ec2d-47cd-87ca-1e136d9585e4/primary_image.jpg?v=1785773294858&t=2026-08-03T15:38:14.874Z",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      }
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore,online",
+    "start_date": "2026-08-04T03:00:00.000Z",
+    "stop_date": "2026-12-01T02:59:59.999Z",
+    "days_of_week": "MX",
+    "title": "20% en farmacias",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "farmacias,supervielle,presencial,online,martes,miercoles",
+    "promo_id": "1fdb4919-e04f-4699-9fbf-179f6494e004",
+    "slug": "20-farmacias-supervielle-ago26",
+    "short_description": "2608-supervielle-ID5348PUB-farmacias-presencialonline-20off-3csi",
+    "where": "Farmacias adheridas",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 4,
+          "sub_categories": [
+            16
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "visa",
+      "master"
+    ]
+  },
+  "detalle": {
+    "id": "1fdb4919-e04f-4699-9fbf-179f6494e004",
+    "name": "20% en farmacias",
+    "description": "Aprovecha 20% de reintegro en farmacias adheridas con tus tarjetas Supervielle",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-08-06T20:21:17.645Z",
+    "updated_at": "2026-08-20T19:47:55.119Z",
+    "deleted_at": null,
+    "short_description": "2608-supervielle-ID5348PUB-farmacias-presencialonline-20off-3csi",
+    "publication_description": "Aprovecha 20% de reintegro en farmacias adheridas con tus tarjetas Supervielle",
+    "slug": "20-farmacias-supervielle-ago26",
+    "display_start_date": "2026-08-03T03:00:00.000Z",
+    "display_stop_date": "2027-04-01T02:59:59.999Z",
+    "search_tags": "farmacias,supervielle,presencial,online,martes,miercoles",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-11-30",
+        "start_date": "2026-08-04",
+        "days_of_week": [
+          "tuesday",
+          "wednesday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "online"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "pct"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "1fdb4919-e04f-4699-9fbf-179f6494e004",
+        "benefit_id": "1fdb4919-e04f-4699-9fbf-179f6494e004",
+        "name": "20% en farmacias",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_terminal_id",
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                16
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "54fdfe50-7b7e-4316-bf88-97923d5a8a8d"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": [
+              {
+                "type": "sin_interes",
+                "number": 2,
+                "coefficient": "0",
+                "annual_nominal_rate": "0",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 3,
+                "coefficient": "0",
+                "annual_nominal_rate": "0",
+                "total_financial_cost": "0"
+              }
+            ]
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 8000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "16"
+        ],
+        "preselected": false,
+        "created_at": "2026-08-06T20:21:16.433Z",
+        "updated_at": "2026-08-06T20:21:16.433Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "visa",
+      "master"
+    ],
+    "terms_and_conditions": "CFTEA: 0,00%. CARTERA CONSUMO. Banco Supervielle S.A., Reconquista 330, C.A.B.A., CUIT 33-50000517-9, Inscrip. I.G.J. N° 23, F° 502, L. 45, T° A de Estatutos Nac. (“el Banco”). Vigente los martes y miércoles del 4 de agosto al 30 de noviembre de 2026 en farmacias adheridas para compras abonadas mediante la modalidad de pago con “QR” a través de “MODO” desde app Supervielle, app Supervielle Jubilados o app MODO con dinero en cuenta (pago con transferencia o “PCT”), la tarjeta de débito Visa (“la TD”) y las tarjetas de crédito Visa y/o MasterCard (“las TC”) que formen parte de un paquete de productos del Banco. La promoción no es aplicable a tarjetas corporativas. Tope de reintegro mensual por cuenta: $8.000. Para compras en hasta 3 cuotas sin interés: Tasa Nominal Anual (TNA): 0,00%; Tasa Efectiva Anual (TEA): 0,00%; Costo Financiero Total Efectivo Anual (CFTEA): 0,00%. El CFTEA y demás datos económicos informados en el presente, corresponden exclusivamente a la operación de compra en cuotas objeto de la presente. Ej.: (i) para una compra de $12.000 en 1 (un) pago con QR se realizará un descuento vía reintegro del 20% sobre el precio. El reintegro de $2.400 se verá reflejado en la cuenta asociada a MODO dentro de los 30 días posteriores a la compra. (ii) Para una compra de $12.000 en 3 cuotas sin interés se realizará un descuento vía reintegro del 20% sobre el precio. Del 1er al 3er resumen que se emitan con posterioridad al cierre y luego de realizada la compra se verá reflejado un consumo de $4.000 en cada uno de ellos. El reintegro se verá reflejado en la cuenta asociada a MODO dentro de los 30 días posteriores a la compra. No combinable con otras promociones ni descuentos vigentes, excepto MODO. La presente promoción no aplica a pagos realizados a través de billeteras virtuales o 'proveedores de servicios de pago', excepto MODO. La marca “MODO” es propiedad de Play Digital S.A., CUIT 30-71682943-6, domicilio en Av. del Libertador 7208, Torre principal, Piso 3, C.A.B.A. El Banco no es responsable por los productos y/o servicios comercializados por las marcas y locales participantes en las promociones.",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "20% y 3 cuotas",
+      "validity_place": "Farmacias",
+      "cashback_cap": "8000",
+      "participating_bank": "Supervielle",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/9ce9f6bb-ec2d-47cd-87ca-1e136d9585e4/primary_image.jpg?v=1785773294858&t=2026-08-03T15:38:14.874Z",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Farmacias con Supervielle",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con dinero en cuenta o con tus tarjetas de crédito Visa y/o Mastercard o débito Visa del Supervielle a través de MODO. </span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">Tiendas online adheridas:</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><a href=\"https://www.farmacialosalamos.com.ar/\" target=\"_blank\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">https://www.farmacialosalamos.com.ar/</span></a></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><a href=\"https://www.farmaciasdelplata.com/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">https://www.farmaciasdelplata.com/</span></a></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><a href=\"https://www.farmagsa.com.ar/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">https://www.farmagsa.com.ar/</span></a></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><a href=\"https://www.farmaciaschester.com.ar/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">https://www.farmaciaschester.com.ar/</span></a></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><a href=\"https://www.farmaciacuyo.com/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">https://www.farmaciacuyo.com/</span></a></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><a href=\"https://www.insudental.com.ar/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">https://www.insudental.com.ar/</span></a></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el descuento aplicado? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en la cuenta del Supervielle dentro de los 30 días.</span></p>",
+      "applicability_description": "Farmacias adheridas",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

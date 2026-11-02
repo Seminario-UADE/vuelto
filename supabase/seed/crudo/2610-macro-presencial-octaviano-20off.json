@@ -1,0 +1,272 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/2610-macro-presencial-octaviano-20off",
+  "tarjeta": {
+    "id": "1b80361b-d62f-45bf-855e-1d95d28810fe",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": {
+      "promo_id": "5d33acb5-b50f-4a21-bf2c-dd890f407de2"
+    },
+    "content": {
+      "row": [
+        {
+          "text": "OCTAVIANO ",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "20% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "15000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Macro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/906a12c9-15d6-4adc-bd40-b73e5750bd50_primary_image%20-%202026-08-12T123651.864.jpg",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/906a12c9-15d6-4adc-bd40-b73e5750bd50_primary_image%20-%202026-08-12T123651.864.jpg",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/906a12c9-15d6-4adc-bd40-b73e5750bd50_primary_image%20-%202026-08-12T123651.864.jpg",
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:59+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW",
+    "exclusiveness": "all",
+    "payment_flow": "instore,instore_nfc,physical-card",
+    "start_date": "2026-10-05T03:00:00.000Z",
+    "stop_date": "2027-01-01T02:59:59.999Z",
+    "days_of_week": "X",
+    "title": "OCTAVIANO ",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "SEG_G",
+    "promo_id": "5d33acb5-b50f-4a21-bf2c-dd890f407de2",
+    "slug": "2610-macro-presencial-octaviano-20off",
+    "short_description": "2610-macro-presencial-TC51777-octaviano-20off",
+    "where": ".",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            43
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [],
+    "credit_list": [
+      "visa"
+    ]
+  },
+  "detalle": {
+    "id": "5d33acb5-b50f-4a21-bf2c-dd890f407de2",
+    "name": "OCTAVIANO ",
+    "description": "SEG_G",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": false,
+    "created_at": "2026-09-24T22:01:16.936Z",
+    "updated_at": "2026-10-14T15:25:24.032Z",
+    "deleted_at": null,
+    "short_description": "2610-macro-presencial-TC51777-octaviano-20off",
+    "publication_description": "SEG_G",
+    "slug": "2610-macro-presencial-octaviano-20off",
+    "display_start_date": "2026-10-05T03:00:00.000Z",
+    "display_stop_date": "2027-01-01T02:59:59.999Z",
+    "search_tags": "SEG_G",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-10-05",
+        "days_of_week": [
+          "wednesday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "PRISMA"
+        ],
+        "segmentation_mode": "by_whitelist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "instore_nfc",
+          "physical-card"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "5d33acb5-b50f-4a21-bf2c-dd890f407de2",
+        "benefit_id": "5d33acb5-b50f-4a21-bf2c-dd890f407de2",
+        "name": ".",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "bin",
+            "store_acquirer_establishment_id"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "6a089c91-a7d3-4199-a578-2132a3733f69"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_por_regla"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 15000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-09-24T22:01:10.862Z",
+        "updated_at": "2026-09-24T22:01:16.703Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "visa"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">CARTERA DE CONSUMO. PROMOCIÓN VÁLIDA DESDE EL 5 DE OCTUBRE DE 2026 HASTA EL 31 DE DICIEMBRE DE 2026, EXCLUSIVAMENTE LOS DIAS MIERCOLES, CON LAS TARJETAS DE CRÉDITO VISA CLASICA INTERNACIONAL, VISA CLASICA INTERNACIONAL NA, VISA CLASICA NACIONAL, VISA CLASICA NACIONAL NA, VISA GOLD Y VISA GOLD NA DE LOS BANCOS DEL GRUPO MACRO. LA PRESENTE PROMOCIÓN APLICA PARA CONSUMOS DE TIPO PERSONAL/FAMILIAR. EN CASO DE DUDA, EL BANCO SE RESERVA EL DERECHO DE NO ACREDITAR EL MONTO DE LA BONIFICACIÓN HASTA TANTO SEA ACLARADO EL DESTINO DE LOS CONSUMOS. 20% DE DESCUENTO &nbsp;EN UN PAGO TOPE DE DEVOLUCIÓN 15000 PESOS POR CUENTA POR MES.EL BENEFICIO SERÁ APLICADO DENTRO DE LOS 60 DÍAS DE REALIZADA LA COMPRA, AL CIERRE DEL RESUMEN EN EL CUAL SE REGISTRE LA OPERACIÓN O EN LOS DOS SIGUIENTES. NO ACUMULABLE CON OTRAS PROMOCIONES. NO APLICA PARA PAGOS REALIZADOS A TRAVÉS DE MERCADO PAGO/TODO PAGO Y/O PEI. EL DESCUENTO PROMOCIONADO APLICA SOBRE EL PRECIO CONTADO. (EJEMPLOS REPRESENTATIVOS: COMPRA EN CUOTAS: EN UNA COMPRA CON TARJETA DE CRÉDITO DE $1.200 EN 3 CUOTAS SIN INTERÉS, EL CLIENTE ABONARÁ 3 CUOTAS DE $400 CADA UNA. COMPRA CON DESCUENTO Y EN CUOTAS: CON TARJETA DE CRÉDITO CON 10% DE DESCUENTO Y 3 CUOTAS SIN INTERÉS EN UNA COMPRA DE $1.200, CORRESPONDERÁ 3 CUOTAS DE $400 CADA UNA, Y EL BANCO LE REINTEGRARÁ AL CLIENTE DENTRO DE LOS 60 DÍAS DE REALIZADA LA COMPRA, AL CIERRE DEL RESUMEN EN EL CUAL SE REGISTRE LA OPERACIÓN O EN LOS DOS SIGUIENTES LA SUMA DE $ 120. QUEDA ESTABLECIDO QUE LOS DATOS Y OFERTAS INDICADAS REVISTEN CARÁCTER INFORMATIVO Y EN MODO ALGUNO SUPONEN QUE LOS ESTABLECIMIENTOS, PRODUCTOS Y/O SERVICIOS QUE COMERCIALIZAN O LA CALIDAD DE LOS MISMOS SON PROMOCIONADOS O GARANTIZADOS POR LOS BANCOS DEL GRUPO MACRO, COMO ASÍ TAMPOCO SE RESPONSABILIZAN POR LOS CUPONES PRESENTADOS FUERA DE TÉRMINO POR LOS COMERCIOS. MÁS INFORMACIÓN EN FORMA PREVIA A REALIZAR LA OPERACIÓN AL: 0810-555-2355 PARA BANCO MACRO, 0810-555-7353 PARA CLIENTES MACRO SELECTA, &nbsp;O EN LA SUCURSAL MÁS CERCANA A SU DOMICILIO</span></p><p class=\"editor-paragraph\"><br></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "OCTAVIANO ",
+      "cashback_cap": "15000",
+      "participating_bank": "Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/906a12c9-15d6-4adc-bd40-b73e5750bd50_primary_image%20-%202026-08-12T123651.864.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "OCTAVIANO ",
+      "faq": "<p><strong>¿Cómo pagar? </strong></p><p>Con tarjeta de crédito usando cualquier método de pago: tarjeta física, MODO QR y NFC (Apple Pay, Google Pay y MODO NFC).</p><p><strong>¿Donde veo el descuento aplicado?</strong></p><p>El reintegro lo verás reflejado en el resumen de la tarjeta con la que hiciste el pago.</p><p><strong>¿Esta promo es acumulable con otras promos de MODO?</strong></p><p>SÍ, esta promo es acumulable con otras promos vigentes de MODO, siempre y cuando el pago se realice con QR y/o MODO NFC.</p><p><br /></p>",
+      "applicability_description": ".",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

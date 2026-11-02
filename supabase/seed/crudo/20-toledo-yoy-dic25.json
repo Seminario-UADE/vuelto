@@ -1,0 +1,280 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20-toledo-yoy-dic25",
+  "tarjeta": {
+    "id": "59a599fb-b11b-4bf3-883f-82cd30cb5115",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Supermercados Toledo",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "20% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Desde el 01/12 al 31/03",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Exclusivo con",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "YOY",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "extra_row": null,
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/59a599fb-b11b-4bf3-883f-82cd30cb5115/primary_image.jpg?v=1764341606304",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": null,
+        "tertiary_image": null,
+        "tertiary_backgroundcolor": null,
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": null
+        },
+        {
+          "type": "countdown",
+          "value": false,
+          "label": null
+        },
+        {
+          "type": "online_store",
+          "value": false,
+          "label": null
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore",
+    "start_date": "2025-12-01T03:00:00.000Z",
+    "stop_date": "2027-02-01T02:59:59.999Z",
+    "days_of_week": "M",
+    "title": "20% en Toledo",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "20,toledo,supermercado,martes,yoy,presencial",
+    "promo_id": "0b34f697-9c44-403a-8f8a-b78de0f3dc68",
+    "slug": "20-toledo-yoy-dic25",
+    "short_description": "2512-yoy-toledo-presencial-20off",
+    "where": "Supermercados Toledo",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            43
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "master"
+    ]
+  },
+  "detalle": {
+    "id": "0b34f697-9c44-403a-8f8a-b78de0f3dc68",
+    "name": "20% en Toledo",
+    "description": "Aprovechá 20% de reintegro en Supermercados Toledo pagando con YOY.",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-14T18:05:50.075Z",
+    "updated_at": "2026-09-22T13:13:32.683Z",
+    "deleted_at": null,
+    "short_description": "2512-yoy-toledo-presencial-20off",
+    "publication_description": "Aprovechá 20% de reintegro en Supermercados Toledo pagando con YOY.",
+    "slug": "20-toledo-yoy-dic25",
+    "display_start_date": "2025-11-28T03:00:00.000Z",
+    "display_stop_date": "2026-12-01T02:59:59.999Z",
+    "search_tags": "20,toledo,supermercado,martes,yoy,presencial",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2027-01-31",
+        "start_date": "2025-12-01",
+        "days_of_week": [
+          "tuesday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "pct"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "0b34f697-9c44-403a-8f8a-b78de0f3dc68",
+        "benefit_id": "0b34f697-9c44-403a-8f8a-b78de0f3dc68",
+        "name": "20% en Toledo",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "f3f5910c-013f-47f7-819e-3d802cf3f7b7"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "week",
+            "aggregate_by": "user",
+            "amount_by_period": 10000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-14T18:05:49.603Z",
+        "updated_at": "2026-07-14T18:05:49.603Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "master"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">PROPUESTA PARA CARTERA DE CONSUMO VALIDA EN LA REPUBLICA ARGENTINA TODOS LOS MARTES DESDE EL 1/12/2025 HASTA EL 31/01/2027. 20% DE AHORRO CON TARJETAS DE CRÉDITO MASTERCARD YOY Y TARJETAS DE DÉBITO VISA YOY. PARA COMPRAS EN TODOS LOS PRODUCTOS INCLUIDOS EN LA PROMOCION EN LAS SUCURSALES DE SUPER TOLEDO ADHERIDAS. TOPE DE REINTEGRO $10.000 POR USUARIO POR SEMANA. EJEMPLO: POR LA COMPRA DE $1.000 EN PRODUCTOS INCLUIDOS EN LA PROMOCION SE LE REINTEGRARAN $200. VISA DEBITO EXCLUSIVO PARA EL TITULAR DE CUENTA. LOS REINTEGROS PODRAN VERSE ACREDITADOS DENTRO DE LOS 30 DIAS DE REALIZADA LA COMPRA. PARA MÁS INFORMACIÓN Y CONDICIONES O LIMITACIONES APLICABLES, DESCARGAR LA APP YOY O COMUNÍQUESE GRATUITAMENTE AL TELÉFONO 0800 345 1969 (LUNES A VIERNES DE 8 A 24HS Y SABADOS, DOMINGOS Y FERIADOS DE 10 A 18HS). INDUSTRIAL AND COMMERCIAL BANK OF CHINA (ARGENTINA) S.A.U. ES UNA SOCIEDAD ANÓNIMA UNIPERSONAL BAJO LA LEY ARGENTINA. SU ACCIONISTA LIMITA SU RESPONSABILIDAD AL CAPITAL APORTADO. CUIT: 30-70944784-6. FLORIDA 99, CABAL</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "Supermercados Toledo",
+      "cashback_cap": "10000",
+      "participating_bank": "YOY",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/59a599fb-b11b-4bf3-883f-82cd30cb5115/primary_image.jpg?v=1764341606304",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "¡Aprovechá 20% de reintegro en Supermercados Toledo con YOY!",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tus tarjetas de crédito Mastercard y/o débito Visa de la billetera YOY a través de MODO.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">En tiendas físicas adheridas.</span></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el descuento aplicado?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en la cuenta de YOY.</span></p>",
+      "applicability_description": "Supermercados Toledo",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

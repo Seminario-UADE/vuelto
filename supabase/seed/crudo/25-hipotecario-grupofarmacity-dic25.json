@@ -1,0 +1,268 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/25-hipotecario-grupofarmacity-dic25",
+  "tarjeta": {
+    "id": "83050242-4ec5-4835-9065-379819083c47",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Grupo Farmacity",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "25% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Desde el 01/12 al 31/03",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Exclusivo con",
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Banco Hipotecario",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/83050242-4ec5-4835-9065-379819083c47/primary_image.jpg?v=1764339961463",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": null,
+        "tertiary_image": null,
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore,online",
+    "start_date": "2025-12-01T03:00:00.000Z",
+    "stop_date": "2026-12-01T02:59:59.999Z",
+    "days_of_week": "L",
+    "title": "25% en Grupo Farmacity",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "lunes,hipotecario,grupo farmacity,farmacity,simplicity,get the look,diciembre,reintegro,25%",
+    "promo_id": "07d2e88a-eae4-45cb-8208-7e8d1714c40c",
+    "slug": "25-hipotecario-grupofarmacity-dic25",
+    "short_description": "2512-hipotecario-grupofarmacity-presencialonline-25off",
+    "where": "Farmacity, Get the Look y Simplicity",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 4,
+          "sub_categories": [
+            16
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": []
+  },
+  "detalle": {
+    "id": "07d2e88a-eae4-45cb-8208-7e8d1714c40c",
+    "name": "25% en Grupo Farmacity",
+    "description": "Aprovechá 25% de reintegro en Farmacity, Get the Look y Simplicity con Hipotecario",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-14T18:05:24.587Z",
+    "updated_at": "2026-09-29T17:14:49.749Z",
+    "deleted_at": null,
+    "short_description": "2512-hipotecario-grupofarmacity-presencialonline-25off",
+    "publication_description": "Aprovechá 25% de reintegro en Farmacity, Get the Look y Simplicity con Hipotecario",
+    "slug": "25-hipotecario-grupofarmacity-dic25",
+    "display_start_date": "2025-11-28T03:00:00.000Z",
+    "display_stop_date": "2026-10-01T02:59:59.999Z",
+    "search_tags": "lunes,hipotecario,grupo farmacity,farmacity,simplicity,get the look,diciembre,reintegro,25%",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-11-30",
+        "start_date": "2025-12-01",
+        "days_of_week": [
+          "monday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "online"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "07d2e88a-eae4-45cb-8208-7e8d1714c40c",
+        "benefit_id": "07d2e88a-eae4-45cb-8208-7e8d1714c40c",
+        "name": "25% en Grupo Farmacity",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                16
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "b164059a-b71a-11ea-b3de-0242ac130004"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 25,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 10000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "16"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-14T18:05:23.318Z",
+        "updated_at": "2026-09-29T16:20:44.662Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">PUBLICIDAD, CARTERA CONSUMO. PROMOCIÓN VÁLIDA EN LA REPÚBLICA ARGENTINA LOS LUNES DESDE EL 01/12/2025 HASTA EL 30/09/2026, AMBOS INCLUSIVE EN&nbsp;FARMACITY&nbsp;</span><a href=\"http://farmacity.com/\" target=\"_blank\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">FARMACITY.COM</span></a><span style=\"white-space: pre-wrap;\">, GET THE LOOK,&nbsp;</span><a href=\"http://getthelook.com/\" target=\"_blank\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">GETTHELOOK.COM</span></a><span style=\"white-space: pre-wrap;\">, SIMPLICITY Y SIMPLICITY.COM. EXCLUSIVO PAGANDO CON MODO (APP BH Y APP MODO)&nbsp; CON TARJETA DE DÉBITO&nbsp;VISA EMITIDA POR ESTE BANCO QUE NO REGISTRE MORA.BENEFICIO: 25% DE REINTEGRO CON TOPE DE $10.000. LOS TOPES DE REINTEGRO SON MENSUALES Y POR CUENTA.&nbsp;NO APLICA A LAS OPERACIONES DE EXTRACCIÓN DE DINERO EN EFECTIVO REALIZADAS A TRAVÉS DE EXTRA-CASH. NO APLICA PARA LOS CONSUMOS EFECTUADOS A TRAVÉS DE LA PLATAFORMA MERCADOPAGO. NO APLICA A LOS PAGOS REALIZADOS POR LA PLATAFORMA DE PAGOS MÓVILES (POS MÓVIL, BOTÓN DE PAGO Y BILLETERA ELECTRÓNICA). TOPE INDICADO EN LA PIEZA. REINTEGRO: TARJETA DE DÉBITO EL REINTEGRO SE ACREDITARÁ EN LA CUENTA DE ORIGEN DE LOS FONDOS A LOS 30 DÍAS HÁBILES DE INGRESADO EL CONSUMO. CONSULTE EL AHORRO APLICABLE Y VIGENTE EN CADA COMERCIO ANTES DE EFECTUAR LA COMPRA. BANCO HIPOTECARIO S.A. RECONQUISTA 151 (1003) CABA. CUIT 30-50001107-2.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "25% de reintegro",
+      "validity_place": "Grupo Farmacity",
+      "cashback_cap": "10000",
+      "participating_bank": "Banco Hipotecario",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/83050242-4ec5-4835-9065-379819083c47/primary_image.jpg?v=1764339961463",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "¡Aprovechá 25% de reintegro en Farmacity, Get The Look y Simplicity con el Hipotecario!",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio?</strong></b><span style=\"white-space: pre-wrap;\"> </span></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tus tarjetas de débito Visa del Hipotecario a través de MODO. </span></p><p class=\"editor-paragraph\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">En tiendas físicas y online adheridas:</span></p><p class=\"editor-paragraph\" dir=\"ltr\"><a href=\"https://www.farmacity.com/\" target=\"_blank\" class=\"editor-link\"><u><span class=\"editor-text-underline\" style=\"white-space: pre-wrap;\">https://www.farmacity.com/</span></u></a><br><a href=\"https://www.getthelook.com.ar/\" target=\"_blank\" class=\"editor-link\"><u><span class=\"editor-text-underline\" style=\"white-space: pre-wrap;\">https://www.getthelook.com.ar/</span></u></a><br><a href=\"https://www.simplicity.com.ar/\" target=\"_blank\" class=\"editor-link\"><u><span class=\"editor-text-underline\" style=\"white-space: pre-wrap;\">https://www.simplicity.com.ar/</span></u></a><br></p><p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el reintegro aplicado? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en la cuenta del Hipotecario.</span></p>",
+      "applicability_description": "Farmacity, Get the Look y Simplicity",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

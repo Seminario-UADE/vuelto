@@ -1,0 +1,276 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/10-lacteoselpuente-macro-may25",
+  "tarjeta": {
+    "id": "9ff98124-a7f3-4850-91d1-def5fd09f070",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Lácteos El Puente",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "10000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Macro ",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/9ff98124-a7f3-4850-91d1-def5fd09f070/primary_image.jpg?v=1779133516250",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/9ff98124-a7f3-4850-91d1-def5fd09f070/primary_image.jpg?v=1779133516250",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/9ff98124-a7f3-4850-91d1-def5fd09f070/primary_image.jpg?v=1779133516250",
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "#FFFFFF",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore,instore_nfc",
+    "start_date": "2026-06-01T03:00:00.000Z",
+    "stop_date": "2027-04-01T02:59:59.999Z",
+    "days_of_week": "M",
+    "title": "10% en Lacteos El Puente",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "macro,lacteoselpuente,presencial,martes,reintegro,SEG_G",
+    "promo_id": "ed8b6310-8f25-47c9-84d9-3dd358f42a4a",
+    "slug": "10-lacteoselpuente-macro-may25",
+    "short_description": "2605-Macro-LacteosElpuente-Presencial-10off",
+    "where": "Lacteos El Puente",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            26,
+            43
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [],
+    "credit_list": [
+      "visa"
+    ]
+  },
+  "detalle": {
+    "id": "ed8b6310-8f25-47c9-84d9-3dd358f42a4a",
+    "name": "10% en Lacteos El Puente",
+    "description": "Aprovecha 10% de reintegro en Lacteos El Puente con Macro",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-16T19:31:55.886Z",
+    "updated_at": "2026-10-29T18:19:12.496Z",
+    "deleted_at": null,
+    "short_description": "2605-Macro-LacteosElpuente-Presencial-10off",
+    "publication_description": "Aprovecha 10% de reintegro en Lacteos El Puente con Macro",
+    "slug": "10-lacteoselpuente-macro-may25",
+    "display_start_date": "2026-05-15T03:00:00.000Z",
+    "display_stop_date": "2026-11-01T02:59:59.999Z",
+    "search_tags": "macro,lacteoselpuente,presencial,martes,reintegro,SEG_G",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2027-03-31",
+        "start_date": "2026-06-01",
+        "days_of_week": [
+          "tuesday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "instore_nfc"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "exclusiveness_source": [
+        "modo",
+        "banks"
+      ],
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "ed8b6310-8f25-47c9-84d9-3dd358f42a4a",
+        "benefit_id": "ed8b6310-8f25-47c9-84d9-3dd358f42a4a",
+        "name": ".",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_acquirer_establishment_id",
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                26,
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "6a089c91-a7d3-4199-a578-2132a3733f69"
+            ]
+          },
+          "amount_range": {
+            "min": 30000
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 10,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 10000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "26",
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-16T19:31:54.901Z",
+        "updated_at": "2026-07-16T19:31:54.901Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "visa"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">CARTERA DE CONSUMO. PROMOCIÓN DEL 01/06/2026 AL 31/03/2027 LOS MARTES, PARA COMPRAS EN COMERCIOS ADHERIDOS DE LACTEOS EL PUENTE. EXCLUSIVO PARA PAGOS SIN CONTACTO REALIZADOS CON MODO NFC O PAGANDO CON MODO DESDE LA APP MACRO, APP MODO EN CUALQUIER QR CON TARJETAS DE CRÉDITO VISA EMITIDAS POR BANCO MACRO: 10% DE AHORRO CON TOPE TOTAL $10.000 POR USUARIO POR MES, Y MINIMO DE COMPRA DE $30.000 POR USUARIO POR MES. ESTABLECIMIENTOS, PRODUCTOS, SERVICIOS NO SON PROMOCIONADOS NI GARANTIZADOS POR BANCO MACRO S.A, NI RESULTA RESPONSABLE POR LA PRESENTACIÓN DE CUPÓN FUERA DE TÉRMINO. CUANDO CORRESPONDA EL DESCUENTO APLICARÁ AL CIERRE DEL RESUMEN EN EL QUE SE REGISTRE LA OPERACIÓN O EN LOS DOS SIGUIENTES. MODO Y MODO NFC: REINTEGRO A REALIZARSE EN EL MOMENTO DE LA COMPRA EN LA CAJA DE AHORRO O CUENTA CORRIENTE DE BANCO MACRO REGISTRADA EN MODO. PARA QUE APLIQUE EL BENEFICIO, EL PAGO A COMERCIOS DEBE SER REALIZADO CON TARJETAS DE CRÉDITO DE BANCO MACRO Y TENER CUENTA ABIERTA EN BANCO MACRO ASOCIADA A MODO. NO APLICA A PAGOS REALIZADOS CON TARJETAS AGRO/EMPRESA NI A TRAVÉS DE MERCADOPAGO, NI TRANSFERENCIAS 3.0 (QR/PEI/PAGO INMEDIATO). NO APLICA A COMPRAS ONLINE. MODO: SERVICIO PRESTADO POR EL PROVEEDOR DE SERVICIOS TECNOLÓGICOS PLAY DIGITAL S.A. CUIT 30716829436, AV. DEL LIBERTADOR 7208 TORRE II P.4 CABA., SIENDO LA MARCA “MODO” DE SU PROPIEDAD. EL AHORRO SERÁ REINTEGRADO ESTABLECIMIENTOS, PRODUCTOS Y SERVICIOS NO SON PROMOCIONADOS NI GARANTIZADOS POR BANCO MACRO NI TAMPOCO SE RESPONSABILIZA POR LOS CUPONES PRESENTADOS POR LOS COMERCIOS FUERA DE TÉRMINO. MÁS INFORMACIÓN EN SUCURSALES O AL 0810-555-2355 O AL 0810-555-7353 PARA CLIENTES SELECTA.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "10% de reintegro",
+      "validity_place": "Lácteos El Puente",
+      "cashback_cap": "10000",
+      "participating_bank": "Macro ",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/9ff98124-a7f3-4850-91d1-def5fd09f070/primary_image.jpg?v=1779133516250",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Lacteos El Puente con Macro",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align:start\"><b><strong class=\"editor-text-bold\" style=\"white-space:pre-wrap\">¿Cómo puedo acceder al beneficio? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align:start\"><span style=\"white-space:pre-wrap\">Realizando una compra con tus tarjetas de crédito Visa Macro, a través de MODO QR y MODO NFC.</span></p><p class=\"editor-paragraph\" style=\"text-align:start\"><br /></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align:start\"><b><strong class=\"editor-text-bold\" style=\"white-space:pre-wrap\">¿Cómo es la modalidad de uso?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align:start\"><span style=\"white-space:pre-wrap\">En tiendas físicas adheridas.</span></p><p class=\"editor-paragraph\" style=\"text-align:justify\"><br /></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align:justify\"><b><strong class=\"editor-text-bold\" style=\"white-space:pre-wrap\">¿Dónde veo el reintegro aplicado?</strong></b><br /><span style=\"white-space:pre-wrap\">El reintegro lo verás acreditado en tu cuenta del Banco Macro. </span></p>",
+      "applicability_description": "Lacteos El Puente",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

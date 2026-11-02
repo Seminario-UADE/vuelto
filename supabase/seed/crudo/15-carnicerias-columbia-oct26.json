@@ -1,0 +1,270 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/15-carnicerias-columbia-oct26",
+  "tarjeta": {
+    "id": "22aea50d-38a2-4bd5-80d2-461faea8ae7a",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": {
+      "promo_id": "08e3a304-be63-4d2d-98d6-4c768ae9d478"
+    },
+    "content": {
+      "row": [
+        {
+          "text": "Carnicerías",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "15% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "8000",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Columbia",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "image": {
+        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/0441ac0d-8ecd-4bfe-bcdd-43f8aadfb2b8_primary_image.jpg",
+        "primary_backgroundcolor": "#FFFFFF",
+        "primary_position": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/0441ac0d-8ecd-4bfe-bcdd-43f8aadfb2b8_primary_image.jpg",
+        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/0441ac0d-8ecd-4bfe-bcdd-43f8aadfb2b8_primary_image.jpg",
+        "secondary_backgroundcolor": "#FFFFFF",
+        "optional_images_pack": {
+          "landscape_app": null,
+          "landscape_web": null,
+          "landscape_bgcolor": "",
+          "portrait_app": null
+        }
+      },
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:59+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore",
+    "start_date": "2026-10-01T03:00:00.000Z",
+    "stop_date": "2027-04-01T02:59:59.999Z",
+    "days_of_week": "X",
+    "title": "15% en carnicerías",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "carnicerias,columbia,miercoles,reintegro",
+    "promo_id": "08e3a304-be63-4d2d-98d6-4c768ae9d478",
+    "slug": "15-carnicerias-columbia-oct26",
+    "short_description": "2610-columbia-carnicerias-presencial-online-15off",
+    "where": "Carnicerías que acepten MODO.",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            44
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": false,
+    "calculated_status": "RUNNING",
+    "debit_list": [
+      "visa",
+      "master"
+    ],
+    "credit_list": []
+  },
+  "detalle": {
+    "id": "08e3a304-be63-4d2d-98d6-4c768ae9d478",
+    "name": "15% en carnicerías",
+    "description": "",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-09-03T18:38:42.858Z",
+    "updated_at": "2026-10-02T02:04:14.263Z",
+    "deleted_at": null,
+    "short_description": "2610-columbia-carnicerias-presencial-online-15off",
+    "publication_description": "Aprovecha 15% de reintegro en carnicería pagando con TD Visa o Mastercard de Banco Columbia.",
+    "slug": "15-carnicerias-columbia-oct26",
+    "display_start_date": "2026-09-15T03:00:00.000Z",
+    "display_stop_date": "2027-06-01T02:59:59.999Z",
+    "search_tags": "carnicerias,columbia,miercoles,reintegro",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2027-03-31",
+        "start_date": "2026-10-01",
+        "days_of_week": [
+          "wednesday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "debit_card",
+            "issuer": "master"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "08e3a304-be63-4d2d-98d6-4c768ae9d478",
+        "benefit_id": "08e3a304-be63-4d2d-98d6-4c768ae9d478",
+        "name": ".",
+        "priority": 1,
+        "segmentations": {
+          "whitelist": [
+            "mcc"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                44
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "ad400e13-f76a-4877-a01d-1819d16146e9"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 15,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 8000,
+            "amount_of_transactions_by_period": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "44"
+        ],
+        "preselected": false,
+        "created_at": "2026-09-03T18:41:47.003Z",
+        "updated_at": "2026-10-02T02:03:57.700Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": null
+      }
+    ],
+    "debit_list": [
+      "visa",
+      "master"
+    ],
+    "credit_list": [],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">CARTERA DE CONSUMO PROMOCION VALIDA TODOS LOS MIERCOLES DEL MES DESDE EL 01/10/2026 AL 31/03/2027 EN TODA LA REPUBLICA ARGENTINA, EN LAS COMPRAS REALIZADAS EN COMERCIOS REGISTRADOS BAJO EL RUBRO CARNICERIAS CON LAS TARJETAS DE DEBITO VISA O MASTERCARD EMITIDA POR BANCO COLUMBIA. SOBRE DICHAS COMPRAS SE OTORGARÁ UN 15% DE DESCUENTO TOPE $8.000 POR MES ABONANDO CON QR DE MODO DESDE LA APP DE BANCO COLUMBIA. SI CONSUMIS $30.000 SE TE REINTEGRARA $4.500 COMO MAXIMO EN 30 DIAS EN LA CAJA DE AHORRO. EL DESCUENTO NO APLICARA SI ES REALIZADO CON BILLETERAS, QR DE MERCADO MPAGO O POR NFC. BANCO COLUMBIA S.A. NO SE RESPONSABILIZA POR LA CALIDAD Y FUNCIONAMIENTO DE PRODUCTOS PUBLICADOS</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "15% de reintegro",
+      "validity_place": "Carnicerías",
+      "cashback_cap": "8000",
+      "participating_bank": "Columbia",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/0441ac0d-8ecd-4bfe-bcdd-43f8aadfb2b8_primary_image.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Carnicerías con Columbia",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong></p><p>Realizando una compra con tus tarjetas de débito Visa y/o Mastercard de Banco Columbia a través MODO.</p><p></p><p></p><p><strong>¿Dónde veo el descuento aplicado?</strong></p><p>El reintegro lo verás acreditado en la cuenta del Columbia dentro de los 30 días.</p>",
+      "applicability_description": "Carnicerías que acepten MODO.",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}
