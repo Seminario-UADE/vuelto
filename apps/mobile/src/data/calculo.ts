@@ -307,7 +307,11 @@ function compraVista(c: CompraMotor): Compra | null {
   };
 }
 
-/** «Mis compras»: las del mes en curso, con lo gastado y lo devuelto. */
+/**
+ * «Mis compras»: lista todas las del período de topes (mes o semana, lo que empiece antes), así
+ * ninguna compra que consume un tope queda sin poder verse o borrarse (spec 010, FR-003).
+ * Lo gastado y lo devuelto siguen siendo los del mes en curso.
+ */
 export function comprasVista(compras: CompraMotor[], ahora: Date): ResumenCompras {
   const hoy = fechaArgentina(ahora);
   const mes = nombreDelMes(hoy);
@@ -316,7 +320,7 @@ export function comprasVista(compras: CompraMotor[], ahora: Date): ResumenCompra
     mes,
     gastaste: delMes.reduce((s, c) => s + c.monto, 0),
     devolvieron: devolvieron(delMes, mes),
-    compras: delMes.flatMap((c) => {
+    compras: comprasDelPeriodo(compras, hoy).flatMap((c) => {
       const v = compraVista(c);
       return v ? [v] : [];
     }),

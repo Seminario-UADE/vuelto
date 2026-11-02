@@ -190,6 +190,18 @@ describe("comprasVista y textoDias", () => {
     expect(r.gastaste).toBe(101500);
   });
 
+  it("lista todo el período de topes (mes o semana, lo que empiece antes) y los totales siguen siendo del mes (spec 010, FR-003)", () => {
+    // Miércoles 2/12: la semana arrancó el lunes 30/11, antes que el mes.
+    const hoy = new Date("2026-12-02T15:00:00.000Z");
+    const base = comprasOctubre[0]!;
+    const del29 = { ...base, id: "nov29", fecha: "2026-11-29", monto: 1000 };
+    const del30 = { ...base, id: "nov30", fecha: "2026-11-30", monto: 2000 };
+    const del1 = { ...base, id: "dic1", fecha: "2026-12-01", monto: 4000 };
+    const r = comprasVista([del29, del30, del1], hoy);
+    expect(r.compras.map((c) => c.id).sort()).toEqual(["dic1", "nov30"]);
+    expect(r.gastaste).toBe(4000);
+  });
+
   it("textoDias", () => {
     expect(textoDias(null)).toBe("todos los días");
     expect(textoDias(["sab"])).toBe("los sábados");

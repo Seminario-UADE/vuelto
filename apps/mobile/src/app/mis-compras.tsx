@@ -95,7 +95,12 @@ export default function MisCompras() {
               <Card padding={space.lg} gap={0}>
                 {lista.map((c, i) => (
                   <View key={c.id} style={divisor(i)}>
-                    <CompraRow c={c} />
+                    <CompraRow
+                      c={c}
+                      onBorrar={() =>
+                        router.push({ pathname: "/borrar-compra", params: { id: c.id, comercio: c.comercio.nombre } })
+                      }
+                    />
                   </View>
                 ))}
               </Card>

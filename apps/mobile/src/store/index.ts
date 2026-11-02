@@ -27,17 +27,23 @@ const reducer = combineReducers({
 });
 
 export type RootState = ReturnType<typeof reducer>;
-export type Extra = { almacenamiento: Almacenamiento };
+/**
+ * Lo que los thunks reciben además del estado. `generarId` da el UUID de cada compra nueva:
+ * `expo-crypto` en la app, uno determinista en los tests (spec 010, R1).
+ */
+export type Extra = { almacenamiento: Almacenamiento; generarId: () => string };
 
-export function crearStore(opciones: { almacenamiento: Almacenamiento; estadoInicial: Partial<RootState> | null }) {
+export function crearStore(opciones: {
+  almacenamiento: Almacenamiento;
+  estadoInicial: Partial<RootState> | null;
+  generarId: () => string;
+}) {
   const listener = createListenerMiddleware<RootState>();
+  const extra: Extra = { almacenamiento: opciones.almacenamiento, generarId: opciones.generarId };
   const store = configureStore({
     reducer,
     preloadedState: opciones.estadoInicial ?? undefined,
-    middleware: (porDefecto) =>
-      porDefecto({ thunk: { extraArgument: { almacenamiento: opciones.almacenamiento } satisfies Extra } }).prepend(
-        listener.middleware,
-      ),
+    middleware: (porDefecto) => porDefecto({ thunk: { extraArgument: extra } }).prepend(listener.middleware),
   });
   escucharPersistencia(listener, opciones.almacenamiento);
   return store;

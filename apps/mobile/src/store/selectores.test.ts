@@ -106,7 +106,7 @@ describe("guardarCompra (US3)", () => {
     s.dispatch(comercioElegido("coto"));
     expect(selectRecomendacion(s.getState())?.topeDisponible).toBe(5500);
     expect(s.getState().compras.lista[0]).toMatchObject({
-      id: "n11",
+      id: "00000000-0000-4000-8000-000000000001",
       reintegroEsperado: 1000,
       descuentoObtenido: null,
     });
