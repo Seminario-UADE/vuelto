@@ -76,7 +76,7 @@ description: "Tareas para el motor en la app y el store de Redux (issue #81)"
 
 ## Phase 7: Verificación y cierre
 
-- [ ] T024 Simulador de iOS (Expo Go): quickstart pasos 2–6, capturas para el PR; sin pedidos de red al tipear.
-- [ ] T025 Web (`expo export --platform web` y `npm run web`) y build `preview` de EAS (Android).
-- [ ] T026 `docs/architecture/03-frontend.md` (FR-015) y entrada en `docs/bitacora-prompts.md`.
+- [X] T024 Simulador de iOS (Expo Go): quickstart pasos 2–6, capturas para el PR; sin pedidos de red al tipear.
+- [X] T025 Web (`expo export --platform web` y `npm run web`) y build `preview` de EAS (Android).
+- [X] T026 `docs/architecture/03-frontend.md` (FR-015) y entrada en `docs/bitacora-prompts.md`.
 - [ ] T027 `/code-review`, `test-runner`, `rules-guardian`; PR con `Closes #81`.
