@@ -1544,6 +1544,175 @@ la que no tiene dependencias (#75). Es una issue chica: va sin spec-kit.
 
 ---
 
+## 2026-11-02 — Corpus de promociones sembrado a mano desde MODO (issue #35, parte de Supermercados y Farmacias)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con spec-kit, el agente `spec-critic`, la CLI `gh`,
+el navegador integrado, Docker (Postgres y PostgREST de Supabase) y la API pública de MODO.
+
+**Objetivo:** dejar listo el corpus real de las categorías 1 y 4 para la demo con la ingesta
+apagada, y las herramientas para armarlo, validarlo y cargarlo. Spec `specs/011-corpus-promociones-seed/`.
+
+**Prompts principales:**
+1. "Mi parte es la de spazos32, ¿con qué podemos avanzar?" (con la tabla de reparto por prioridad).
+2. "Fijate que hubo un par de PR, decime si la parte que tengo que hacer yo está bloqueada por algo
+   que falte." → #9 y #34 ya estaban mergeadas; quedaban cuatro huecos del esquema.
+3. "Sí, pull y #35", con tres decisiones: resolver `skills-lock.json` con la versión de `main`;
+   las promos sembradas llevan `fuente = 'manual'`; el corpus incluye solo CABA/AMBA.
+4. Dos decisiones más en el camino: una promo que no aclara dónde rige se guarda con
+   `jurisdiccion = null` (se trata como global); un tope que ni el detalle ni la letra chica
+   informan queda `monto = null`.
+5. "Avanzá con eso pero no hagas ningún PR todavía" y, por tandas, "Sí, Phase 4", "Sí, Phase 6" y
+   "Sí, documentos".
+
+**Resultado:**
+- Spec, plan, investigación, modelo de datos, contrato, quickstart y 56 tareas. `spec-critic` encontró
+  2 bloqueantes (de dónde sale la letra chica y la regla de jurisdicción) y 9 hallazgos altos; todos
+  se resolvieron o quedaron como decisión escrita.
+- **Hallazgo clave:** MODO sí tiene un endpoint de detalle por promo
+  (`GET /promos/api/rewards/v2/benefit/<slug>`) con los legales, el tope estructurado, el monto
+  mínimo, el canal y los bancos por id. Una lectura anterior («no existe») era un error de búsqueda.
+- Workspace `ingesta/` con el cliente de MODO (User-Agent `VueltoBot (UADE)`, pausa de al menos 1 s,
+  reintentos), el mapeo del detalle a borrador por código (sin ningún modelo de lenguaje), el validador,
+  los ids UUID v5, la traducción de banco con alias, `resaltar` (marca frases de la letra chica sin
+  interpretarlas), el generador de SQL y fixtures, la carga remota idempotente y el reporte de cobertura.
+  El motor solo suma el export de `normalizar`.
+- Relevamiento real (2026-11-02): 171 promos vigentes (117 y 54). Los datos reales corrigieron el
+  diseño varias veces: `physical-card`, `all`, `reset_by: promo`, `limits: null`, la red
+  `patagonia_365`, la categoría 15 y que «Exclusivo con» es exclusividad de banco y no el alcance del
+  tope. 12 promos multibanco generan 258 de las 408 entradas candidatas.
+- Hallazgos para el pitch (`docs/product/corpus-semilla.md`, `alcance-mvp.md`): Coto, Carrefour,
+  Jumbo, Disco, Vea, Día y La Anónima tienen 0 promos vigentes; 21 promos que MODO lista como
+  vigentes tienen una fecha de fin ya pasada en su letra chica; 121 de las 171 exigen pagar con MODO.
+- Verificado con la imagen de Postgres de Supabase y PostgREST locales: las 7 migraciones, el seed,
+  82 bancos y 408 promos reales de prueba cargan sin violar ningún `check`; la carga remota con el
+  cliente real de `supabase-js` es idempotente (segunda carga sin cambios, `actualizada_en` quieto),
+  da de baja y reactiva. La versión original de `rls.test.sql` falla justo las 2 aserciones que se
+  ajustaron cuando hay corpus cargado.
+- Lo que hizo el código y conviene revisar: un tope diario no se aproxima (se propone
+  excluir como `tope_no_representable`, ver abajo); las redes que el contrato no tiene se ignoran con una nota; se partieron las
+  promos multibanco en una entrada por banco; `montoMinimo` y `canal` no exigen fragmento de la letra
+  chica porque salen de campos estructurados.
+- **Errores propios corregidos con los tests:** el relevamiento abortaba entero ante un 500
+  transitorio de MODO; el parser de argumentos tomaba el valor de una bandera suelta; el `dist/` del
+  motor estaba desactualizado y Node no veía `normalizar`; dos mensajes ambiguos y una regex al revés.
+- **Revisiones (`/code-review` con sus dos ejes, `test-runner` y `rules-guardian`).** No hubo violaciones
+  duras de las reglas del proyecto. Encontraron defectos reales que se corrigieron con tests primero:
+  `corpus:relevar` y `corpus:borrador` resolvían la carpeta de crudos contra el directorio actual y
+  rompían con `npm run … -w ingesta` (el comando que documenté); las claves de `Object.prototype`
+  (`constructor`, `toString`) pasaban como día o período válido; el validador lanzaba con un
+  `exclusiones.json` malformado; la convivencia con la ingesta comparaba el `fuente_id` exacto y no el
+  slug; `mapear.ts` leía la letra chica contra lo que decía la spec (la nota de fecha pasó a
+  `corpus:borrador`); la alarma «transversal» se disparaba antes del filtro por dueño; `nivel_de_cliente`
+  y el contraste del nombre de banco estaban en la spec pero no en el pipeline; y la verificación de
+  desfase del generador no estaba en ningún gate (ahora es un test sobre los archivos reales). También
+  se unificó la lista de columnas de `promociones` (estaba repetida en 8 lugares), se movieron los
+  helpers duplicados a `crudo.ts` y `args.ts` y se quitó un ciclo de tipos.
+- **Errores propios de esta etapa:** afirmé que los comandos documentados andaban cuando solo había
+  probado `node ingesta/src/corpus/…` desde la raíz; y los scripts de edición que pasé por shell
+  perdieron un nivel de barras invertidas (una regex quedó con caracteres de control y otra sin
+  escapar), lo que se detectó con los propios tests y se corrigió con las herramientas de edición.
+- **Decisión del equipo (tope diario):** `rules-guardian` señaló que cargar el tope diario (`reset_by =
+  day`, 4 promos) como «por compra» puede sobrestimar el tope restante. El equipo decidió excluirlo: se
+  propone como `tope_no_representable`, igual que el tope «para toda la promo». Con los crudos reales
+  quedan 159 promos con 399 entradas candidatas y 12 exclusiones propuestas.
+- **No verificado:** `supabase db reset` con la CLI (lo corre el job `supabase-rls` del CI; se probó el
+  equivalente con la imagen de Postgres de Supabase, incluidas las cinco pruebas pgTAP), Node 22 (solo
+  Node 24.14) y la revisión humana de las promos, que es lo que falta.
+
+---
+
+## 2026-11-03 — Review de los PR #92 y #93 y sus correcciones (issue #35)
+
+**Herramienta:** Claude Code (Opus 5.5).
+
+**Objetivo:** auditar los PR del corpus sembrado a mano (#92: spec 011 y workspace `ingesta`; #93:
+relevamiento de MODO) y aplicar las correcciones del review.
+
+**Prompts principales:**
+1. "hace una auditoria y review de estos PR" (#92 y #93)
+2. "podrias mandar directamente las correcciones y subirlas al PR?"
+
+**Resultado:**
+- Review publicado en los dos PR después de correr lint, typecheck, los tests de `ingesta`,
+  `corpus:generar -- --verificar` y `corpus:cobertura`, y de cruzar las cifras de `corpus-semilla.md` con
+  los 171 crudos.
+- **Convivencia con MODO:** la carga remota salteaba una manual que ya existía como `modo` activa, pero
+  no la daba de baja si seguía en el archivo: quedaban las dos activas. Ahora la da de baja, también si
+  es una partida (`slug#b-…`), y el contrato de #51 dice que compara por slug, no por `fuente_id`.
+- **Tope doble:** una promo con tope por período y además tope por transacción se cargaba solo con el
+  primero (el segundo quedaba en una nota). `Tope` guarda uno solo, y quedarse con el del período
+  sobrestima el reintegro de una compra grande: se propone como `tope_no_representable`, como el
+  diario. Hoy ningún crudo tiene los dos.
+- `CLAUDE.md` aclara que los scripts `corpus:*` piden Node ≥ 22.18.
+- Quedaron sin cambiar, a propósito: el índice de bancos que se arma por llamada (barato; lo puede
+  resolver #51), la detección de nivel de cliente por título (la cubre la revisión humana) y la cita
+  «ADR-005 §Consecuencias», que el repo ya usa así en `requisitos.md`. La carga por lotes sin
+  transacción ya estaba documentada en el contrato (M13): el review se equivocó al marcarlo.
+
+---
+
+## 2026-11-03 — El relevamiento leía una sola sección de MODO (issue #35)
+
+**Herramienta:** Claude Code (Opus 5.5), con el navegador integrado para ver qué pide la web de MODO.
+
+**Objetivo:** corregir de dónde lee las promos `corpus:relevar`, después de que el equipo marcara que no podía
+ser que Coto, Jumbo, Disco, Vea y Día no tuvieran ninguna promo vigente.
+
+**Prompts principales:**
+1. "NO PUEDE SER que no haya promociones de los supermercados que marco el #93, son los principales que suelen
+   aparecer casi siempre. Eso significa que el #92 esta mal hecho"
+2. "Sí, arrancá por ahí" (corregir primero de dónde se leen las promos)
+
+**Resultado:**
+- La sospecha era correcta. Abriendo www.modo.com.ar/promos y mirando sus pedidos de red: la web arma la
+  página con un contenedor de seis secciones (carrusel, destacadas, supermercados, exclusivas online,
+  financiación y más promos), cada una pedida a `/v2/slots`. El relevamiento leía solo «más promos» con el
+  endpoint anterior (`/slots`). Las promos de noviembre de Coto (25% los martes), Jumbo, Disco, Vea, Día y La
+  Anónima están en carrusel, destacadas y supermercados, no en «más promos».
+- `modo.ts` lee el contenedor activo, sus secciones y cada sección página por página; `relevar.ts` filtra
+  vigentes, reintegros y categoría con los campos de la tarjeta nueva, y cuenta una vez la promo que aparece
+  en varias secciones. `crudo.ts` lee comercio y banco de la tarjeta nueva y de la anterior.
+- Al regenerar #93 apareció el caso inverso: 4 promos vigentes según su detalle (farmacias para jubilados
+  del BNA, Grupo Farmacity con Hipotecario, Lácteos El Puente con Macro) que la web no muestra en ninguna
+  sección pero el listado anterior sí. El relevamiento usa los dos listados y junta por slug o id.
+- Las conclusiones de #93 sobre supermercados quedan inválidas: hay que volver a relevar.
+- **Error de la sesión anterior:** en el review de #92/#93 verifiqué que las cifras de los documentos
+  coincidieran con los crudos, pero no que los crudos estuvieran completos.
+
+---
+
+## 2026-11-03 — Las promos nunca se cargan a mano: ingesta automática diaria (issue #35, ADR-011)
+
+**Herramienta:** Claude Code (Opus 5.5).
+
+**Objetivo:** reemplazar el corpus sembrado a mano de #92 por una ingesta automática que publique las promos
+de MODO todos los días, sin nadie en el medio.
+
+**Prompts principales:**
+1. "Las promos NUNCA se cargan a mano, es un error de decision y es inaceptable, las promos son cargadas
+   automaticamente cada cierto tiempo, o cada vez que cambien."
+2. Respuestas a las preguntas de diseño: sin revisión humana; GitHub Actions programado; una vez por día;
+   rehacer #92 hacia lo automático.
+3. "Sí, avanzá" (sobre el plan: qué se borra, qué se reutiliza y cómo se publica).
+
+**Resultado:**
+- `ingesta/src/corpus/ingestar.ts`: lista MODO (todas las secciones de la web más el listado anterior, las 13
+  categorías), baja el detalle de cada promo vigente y el catálogo de bancos, mapea por código, valida y
+  publica en Supabase: capturas crudas (solo si cambiaron), promos `modo` con su captura, y bajas.
+- `.github/workflows/ingesta.yml`: todos los días a las 06:00 ART y a mano desde Actions.
+- Descartes automáticos con motivo (vencida, tope diario o por toda la promo, nivel de cliente, más de tres
+  categorías, formato desconocido, no publicable). Resguardos: no da de baja una promo cuyo detalle falló y no
+  escribe nada si publicaría menos de la mitad de las activas.
+- Decisión de la sesión: una promo de varios bancos se guarda una vez por banco, pero las partes comparten un
+  solo tope (`modo:<slug>`), para no prometer un tope por banco.
+- Se borró lo manual: `promociones.json`, exclusiones y grupos de tope, `corpus:borrador`, `corpus:generar`,
+  `corpus:cobertura`, `corpus:relevar`, el seed de promociones y las fixtures del motor. ADR-011 reemplaza la
+  consecuencia de ADR-005 sobre sembrar a mano.
+- Lo que no hace todavía: leer la letra chica (#51) ni decir **cómo pagar** (QR/NFC de MODO, tarjeta física u
+  online), que es el próximo paso.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
