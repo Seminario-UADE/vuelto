@@ -1,5 +1,13 @@
 # Research: Corpus de promociones sembrado a mano desde MODO
 
+> **Reemplazada en parte por [ADR-011](../../docs/decisions/011-corpus-siempre-automatico.md) (2026-11-03).**
+> Las promos nunca se cargan a mano: las publica la ingesta automática todos los días
+> (`ingesta/src/corpus/ingestar.ts`, `.github/workflows/ingesta.yml`). Lo que este documento dice
+> sobre `promociones.json`, revisión humana, exclusiones y grupos de tope a mano, crudos en el repo,
+> seed de promociones y fixtures del motor ya no rige. Siguen vigentes el mapeo del detalle de MODO,
+> la validación, los ids estables, el contrato de escritura y las reglas de tope y jurisdicción.
+> El contrato actual está en [contracts/corpus.md](contracts/corpus.md).
+
 Fase 0 del plan. Cada decisión resuelve un hallazgo de [critica.md](critica.md) (A = alto, M = medio). Los datos salen de una muestra de 14 detalles de promo (de 111 comercios distintos entre las dos categorías) y del relevamiento completo del listado, ambos del 2026-11-02.
 
 ## Lo que se verificó en la muestra

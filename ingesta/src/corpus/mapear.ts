@@ -1,11 +1,12 @@
 /**
- * Mapeo del detalle de una promo de MODO a un borrador de entrada del corpus
- * (`specs/011-corpus-promociones-seed/data-model.md` §Mapeo).
+ * Mapeo del detalle de una promo de MODO a las promociones que publica la
+ * ingesta (`specs/011-corpus-promociones-seed/data-model.md` §Mapeo, ADR-011).
  *
  * Todo lo que MODO ya trae estructurado se mapea por código. Lo que solo está
- * en la letra chica (acumulabilidad, alcance del tope, jurisdicción) queda en
- * `null` y lo completa una persona: esta función no interpreta la prosa y no
- * usa ningún modelo de lenguaje (constitución §III).
+ * en la letra chica (acumulabilidad, jurisdicción) queda en `null` hasta que lo
+ * lea el extractor de #51: esta función no interpreta la prosa y no usa ningún
+ * modelo de lenguaje (constitución §III). Lo que no se puede representar sin
+ * sobrestimar el reintegro se descarta solo, con su motivo.
  *
  * Un campo que no reconoce no se ignora: lanza `ErrorDeMapeo` con la ruta del
  * campo, así una promo con un formato nuevo no entra a medias.
@@ -15,10 +16,10 @@ import { contrastar } from "./bancos.ts";
 import { bancoDeLaTarjeta, comercioDeLaTarjeta, esObjeto } from "./crudo.ts";
 import type { Objeto } from "./crudo.ts";
 import { CANALES, DIAS, REDES, esFechaISO } from "./dominio.ts";
-import { FUENTE_CORPUS } from "./tipos.ts";
-import type { BancoCatalogo, EntradaCorpus, MotivoExclusion } from "./tipos.ts";
+import { FUENTE_INGESTA } from "./tipos.ts";
+import type { BancoCatalogo, Descarte, MotivoDescarte, PromocionIngestada } from "./tipos.ts";
 
-/** Lo que guarda `supabase/seed/crudo/<slug>.json`. */
+/** Lo que se guarda en `capturas_crudas`: la tarjeta del listado y el detalle, tal cual (RNF-08). */
 export interface Crudo {
   capturadoEl: string;
   url: string;
@@ -29,25 +30,18 @@ export interface Crudo {
 }
 
 export interface OpcionesMapeo {
-  /** Ids de categoría que emite esta corrida: cada persona carga las suyas. */
-  categoriasDelDueno: readonly number[];
-  /** Fecha ISO de hoy, para `revision.verificadaEl`. */
+  /** Ids de categoría que se publican: una promo de otras categorías no se emite. */
+  categorias: readonly number[];
+  /** Fecha ISO de hoy: una promo que ya terminó se descarta aunque MODO la siga listando. */
   hoy: string;
   /** Catálogo de bancos de MODO, para contrastar el nombre del listado con el banco del detalle. `null` = no contrasta. */
   catalogoBancos: readonly BancoCatalogo[] | null;
 }
 
-/** Una exclusión que el mapeo propone; la persona la confirma y la registra con su nombre. */
-export interface ExclusionPropuesta {
-  slug: string;
-  motivo: MotivoExclusion;
-  detalle: string | null;
-}
-
 export interface ResultadoMapeo {
-  borradores: EntradaCorpus[];
-  exclusiones: ExclusionPropuesta[];
-  /** Lo que se dejó de emitir sin ser una exclusión (por ejemplo, categorías de otro dueño). */
+  promociones: PromocionIngestada[];
+  descartes: Descarte[];
+  /** Lo que conviene mirar sin frenar la publicación (una red ignorada, un banco que no cuadra con el listado). */
   avisos: string[];
 }
 
@@ -98,7 +92,7 @@ const NIVEL_DE_CLIENTE = /selecta|\b(?:platinum|black|signature|infinite|nivel\s
  * Los reinicios de tope que el motor representa. `day` y `promo` existen en MODO pero no se
  * aproximan: un tope diario tratado como «por compra» o como semanal puede sobrestimar el
  * saldo (el motor no acumula consumo entre compras del mismo día), así que esas promos se
- * proponen para excluir (`tope_no_representable`). Lo mismo una promo con tope por período y
+ * descartan (`tope_no_representable`). Lo mismo una promo con tope por período y
  * además tope por transacción: `Tope` guarda uno solo.
  */
 const PERIODO_DE_MODO = { month: "mensual", week: "semanal" } as const;
@@ -166,29 +160,20 @@ function mapearTarjetas(conditions: Objeto, notas: string[]): TarjetasMapeadas {
 /**
  * `instore` e `instore_nfc` son los pagos con MODO (QR o NFC) en el local;
  * `physical-card` es la tarjeta física, que no pasa por MODO; `all` son todos
- * los canales. Con la tarjeta física no hay que pagar con MODO: se anota cuál es el caso.
+ * los canales.
  */
-function mapearCanal(conditions: Objeto, notas: string[]): (typeof CANALES)[number] | null {
+function mapearCanal(conditions: Objeto): (typeof CANALES)[number] | null {
   const ruta = "conditions.payment_flow.flows";
   const flujos = lista(objeto(conditions.payment_flow, "conditions.payment_flow").flows, ruta);
   let presencial = false;
   let online = false;
-  let tarjetaFisica = false;
   let todos = false;
   flujos.forEach((flujo, i) => {
-    if (flujo === "instore" || flujo === "instore_nfc") presencial = true;
-    else if (flujo === "physical-card") {
-      presencial = true;
-      tarjetaFisica = true;
-    } else if (flujo === "online") online = true;
+    if (flujo === "instore" || flujo === "instore_nfc" || flujo === "physical-card") presencial = true;
+    else if (flujo === "online") online = true;
     else if (flujo === "all") todos = true;
     else throw new ErrorDeMapeo(`${ruta}[${i}]`, `canal desconocido: ${JSON.stringify(flujo)}`);
   });
-  if (flujos.length > 0 && !tarjetaFisica && !todos) {
-    notas.push("Exige pagar con MODO (QR o NFC), no con la tarjeta física a secas.");
-  } else if (tarjetaFisica) {
-    notas.push("Vale con la tarjeta física, sin pasar por MODO.");
-  }
   if (todos || (presencial && online)) return "ambos";
   if (presencial) return "presencial";
   if (online) return "online";
@@ -200,7 +185,7 @@ interface TopeMapeado {
   periodo: "mensual" | "semanal" | "por_compra" | null;
 }
 
-/** Un tope que el motor no puede representar: la promo se propone para exclusión. */
+/** Un tope que el motor no puede representar: la promo se descarta. */
 interface TopeNoRepresentable {
   noRepresentable: string;
 }
@@ -248,28 +233,28 @@ export function mapearDetalle(crudo: Crudo, opciones: OpcionesMapeo): ResultadoM
   const slug = texto(detalle.slug, "slug");
   const titulo = texto(detalle.name, "name");
 
-  const sinBorradores = (motivo: MotivoExclusion, detalleTexto: string | null): ResultadoMapeo => ({
-    borradores: [],
-    exclusiones: [{ slug, motivo, detalle: detalleTexto }],
+  const descartar = (motivo: MotivoDescarte, detalleTexto: string | null): ResultadoMapeo => ({
+    promociones: [],
+    descartes: [{ slug, motivo, detalle: detalleTexto }],
     avisos: [],
   });
 
   if (typeof detalle.real_status === "string" && detalle.real_status !== "RUNNING") {
-    return sinBorradores("vencida_en_la_fuente", `real_status = ${detalle.real_status}`);
+    return descartar("vencida_en_la_fuente", `real_status = ${detalle.real_status}`);
   }
   if (typeof detalle.type === "string" && detalle.type !== "cashback") {
-    return sinBorradores("no_es_reintegro", `type = ${detalle.type}`);
+    return descartar("no_es_reintegro", `type = ${detalle.type}`);
   }
   const ofertas = lista(detalle.offers, "offers");
   if (ofertas.length !== 1) {
-    return sinBorradores("otro", `La promo tiene ${ofertas.length} ofertas; revisar a mano.`);
+    return descartar("otro", `La promo tiene ${ofertas.length} ofertas: el mapeo lee una sola.`);
   }
   const oferta = objeto(ofertas[0], "offers[0]");
 
   const resultados = objeto(oferta.outcomes, "offers[0].outcomes");
-  if (!esObjeto(resultados.cashback)) return sinBorradores("no_es_reintegro", "la oferta no tiene cashback");
+  if (!esObjeto(resultados.cashback)) return descartar("no_es_reintegro", "la oferta no tiene cashback");
   if (resultados.cashback.amount_type !== "percent") {
-    return sinBorradores("no_es_reintegro", `cashback.amount_type = ${JSON.stringify(resultados.cashback.amount_type)}`);
+    return descartar("no_es_reintegro", `cashback.amount_type = ${JSON.stringify(resultados.cashback.amount_type)}`);
   }
   const porcentaje = resultados.cashback.amount;
   if (typeof porcentaje !== "number" || !Number.isFinite(porcentaje)) {
@@ -283,15 +268,11 @@ export function mapearDetalle(crudo: Crudo, opciones: OpcionesMapeo): ResultadoM
   });
   if (categorias.length === 0) throw new ErrorDeMapeo("offers[0].categories", "la lista de categorías está vacía");
 
-  // Solo se opina sobre las promos que tienen alguna categoría de este dueño: las demás las carga otra persona.
-  const avisos: string[] = [];
-  const propias = categorias.filter((c) => opciones.categoriasDelDueno.includes(c));
-  for (const c of categorias.filter((x) => !propias.includes(x))) {
-    avisos.push(`${slug}: categoría ${c} fuera del reparto de esta corrida (la carga otro dueño).`);
-  }
-  if (propias.length === 0) return { borradores: [], exclusiones: [], avisos };
+  // Una promo que además vale en categorías que no se publican se emite solo en las que sí.
+  const propias = categorias.filter((c) => opciones.categorias.includes(c));
+  if (propias.length === 0) return { promociones: [], descartes: [], avisos: [] };
   if (categorias.length > 3) {
-    return sinBorradores("transversal", `La promo vale en ${categorias.length} categorías (${categorias.join(", ")}).`);
+    return descartar("transversal", `La promo vale en ${categorias.length} categorías (${categorias.join(", ")}).`);
   }
 
   // El perfil del usuario no distingue niveles de cliente: la promo no se puede recomendar bien.
@@ -299,59 +280,65 @@ export function mapearDetalle(crudo: Crudo, opciones: OpcionesMapeo): ResultadoM
   const descripcionInterna = typeof detalle.short_description === "string" ? detalle.short_description : "";
   const nivel = [titulo, rotuloDelBanco ?? "", descripcionInterna].join(" ").match(NIVEL_DE_CLIENTE);
   if (nivel !== null) {
-    return sinBorradores("nivel_de_cliente", `El nombre o la descripción indican un nivel de cliente («${nivel[0]}»): el perfil no lo distingue.`);
+    return descartar("nivel_de_cliente", `El nombre o la descripción indican un nivel de cliente («${nivel[0]}»): el perfil no lo distingue.`);
   }
 
   const requisitos = objeto(oferta.requirements, "offers[0].requirements");
   const bancos = lista(objeto(requisitos.banks, "offers[0].requirements.banks").list, "offers[0].requirements.banks.list").map(
     (id, i) => texto(id, `offers[0].requirements.banks.list[${i}]`),
   );
-  if (bancos.length === 0) return sinBorradores("banco_no_determinado", "la promo no lista ningún banco");
+  if (bancos.length === 0) return descartar("banco_no_determinado", "la promo no lista ningún banco");
 
   const conditions = objeto(detalle.conditions, "conditions");
   const schedule = objeto(conditions.schedule, "conditions.schedule");
   for (const lado of ["start_date", "stop_date"] as const) {
     if (!esFechaISO(schedule[lado])) throw new ErrorDeMapeo(`conditions.schedule.${lado}`, "se esperaba una fecha ISO");
   }
+  if ((schedule.stop_date as string) < opciones.hoy) {
+    return descartar("vencida_en_la_fuente", `Terminó el ${schedule.stop_date as string} y MODO la sigue listando.`);
+  }
   const dias = mapearDias(schedule);
 
-  const notasComunes: string[] = [];
-  const tarjetas = mapearTarjetas(conditions, notasComunes);
+  const notas: string[] = [];
+  const tarjetas = mapearTarjetas(conditions, notas);
   if (tarjetas.debito.length + tarjetas.credito.length === 0 && tarjetas.noSoportadas.length > 0) {
-    return sinBorradores("otro", `Solo acepta redes que el contrato no representa: ${tarjetas.noSoportadas.join(", ")}.`);
+    return descartar("otro", `Solo acepta redes que el contrato no representa: ${tarjetas.noSoportadas.join(", ")}.`);
   }
-  const canal = mapearCanal(conditions, notasComunes);
+  const canal = mapearCanal(conditions);
   const tope = mapearTope(oferta);
-  if ("noRepresentable" in tope) return sinBorradores("tope_no_representable", tope.noRepresentable);
+  if ("noRepresentable" in tope) return descartar("tope_no_representable", tope.noRepresentable);
 
   const minimo = esObjeto(requisitos.amount_range) ? numeroOCero(requisitos.amount_range.min, "offers[0].requirements.amount_range.min") : 0;
   const comercio = comercioDeLaTarjeta(crudo.tarjeta);
-  if (comercio !== null) {
-    notasComunes.push(`Comercio provisional tomado de la tarjeta del listado: «${comercio}». Revisar la regla de escritura (D3).`);
-  }
   // Con un solo banco, el rótulo del listado tiene que ser ese banco; en una promo multibanco es «Bancos adheridos».
+  // Si no cuadra se avisa, pero manda el id del detalle, que es el dato estructurado.
   if (opciones.catalogoBancos !== null && bancos.length === 1 && rotuloDelBanco !== null) {
-    const contraste = contrastar(rotuloDelBanco, bancos[0]!, opciones.catalogoBancos);
-    if (contraste.mensaje !== null) notasComunes.push(contraste.mensaje);
-  }
-  if (bancos.length > 1) {
-    notasComunes.push(
-      `La promo se partió en ${bancos.length} entradas, una por banco. El tope es por usuario: decidir si comparten saldo (grupo de tope, D5).`,
-    );
-  }
-  if (categorias.length > 1) {
-    notasComunes.push(`La promo vale en ${categorias.length} categorías: una entrada por categoría.`);
+    try {
+      const contraste = contrastar(rotuloDelBanco, bancos[0]!, opciones.catalogoBancos);
+      if (contraste.mensaje !== null) notas.push(contraste.mensaje);
+    } catch (error) {
+      notas.push(`No se pudo contrastar el banco: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
-  const borradores: EntradaCorpus[] = [];
+  // Una promo partida (por banco o por categoría) es una sola oferta de MODO con un solo tope por usuario:
+  // las partes comparten el saldo. Tratarlas como topes separados sumaría un tope por banco y sobrestimaría
+  // lo que queda por recuperar (constitución §V).
+  const partida = bancos.length * propias.length > 1 || categorias.length > 1;
+  const compartido = partida && tope.monto !== null && tope.periodo !== "por_compra";
+  const fragmentosFuente: Record<string, string | null> = compartido
+    ? { "tope.alcance": `offers[0].limits: una sola oferta de MODO para ${bancos.length} banco(s) y ${categorias.length} categoría(s).` }
+    : {};
+
+  const promociones: PromocionIngestada[] = [];
   for (const bancoId of bancos) {
     for (const categoriaId of propias) {
       const partes: string[] = [];
       if (bancos.length > 1) partes.push(`b-${bancoId.slice(0, 8)}`);
       if (categorias.length > 1) partes.push(`c-${categoriaId}`);
-      borradores.push({
+      promociones.push({
         fuenteId: partes.length === 0 ? slug : `${slug}#${partes.join(".")}`,
-        fuente: FUENTE_CORPUS,
+        fuente: FUENTE_INGESTA,
         titulo,
         bancoId,
         categoriaId,
@@ -359,18 +346,21 @@ export function mapearDetalle(crudo: Crudo, opciones: OpcionesMapeo): ResultadoM
         porcentaje,
         tarjetas: { debito: [...tarjetas.debito], credito: [...tarjetas.credito] },
         vigencia: { desde: schedule.start_date as string, hasta: schedule.stop_date as string, dias },
-        tope: { monto: tope.monto, periodo: tope.periodo, alcance: null, grupoTopeId: null },
+        tope: {
+          monto: tope.monto,
+          periodo: tope.periodo,
+          alcance: compartido ? "compartido" : null,
+          grupoTopeId: compartido ? `modo:${slug}` : null,
+        },
         montoMinimo: minimo > 0 ? minimo : null,
         jurisdiccion: null,
         canal,
         acumulable: null,
-        fragmentosFuente: {},
-        fixture: false,
-        revision: { verificadaEl: opciones.hoy, revisor: "", notas: [...notasComunes] },
+        fragmentosFuente: { ...fragmentosFuente },
       });
     }
   }
-  return { borradores, exclusiones: [], avisos };
+  return { promociones, descartes: [], avisos: notas.map((n) => `${slug}: ${n}`) };
 }
 
 export type IntentoDeMapeo = { ok: true; resultado: ResultadoMapeo } | { ok: false; ruta: string };

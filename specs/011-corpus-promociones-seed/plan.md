@@ -1,5 +1,13 @@
 # Implementation Plan: Corpus de promociones sembrado a mano desde MODO (Supermercados y Farmacias)
 
+> **Reemplazada en parte por [ADR-011](../../docs/decisions/011-corpus-siempre-automatico.md) (2026-11-03).**
+> Las promos nunca se cargan a mano: las publica la ingesta automática todos los días
+> (`ingesta/src/corpus/ingestar.ts`, `.github/workflows/ingesta.yml`). Lo que este documento dice
+> sobre `promociones.json`, revisión humana, exclusiones y grupos de tope a mano, crudos en el repo,
+> seed de promociones y fixtures del motor ya no rige. Siguen vigentes el mapeo del detalle de MODO,
+> la validación, los ids estables, el contrato de escritura y las reglas de tope y jurisdicción.
+> El contrato actual está en [contracts/corpus.md](contracts/corpus.md).
+
 **Branch**: `feat/35-corpus-promociones-seed` | **Date**: 2026-11-02 | **Spec**: [spec.md](spec.md)
 
 **Input**: Feature specification from `/specs/011-corpus-promociones-seed/spec.md`, más los hallazgos de [critica.md](critica.md) (spec-critic) y una muestra de 14 detalles de promo de MODO relevada el 2026-11-02.

@@ -1,5 +1,13 @@
 # Crítica adversarial: spec 011, corpus de promociones sembrado a mano (issue #35)
 
+> **Reemplazada en parte por [ADR-011](../../docs/decisions/011-corpus-siempre-automatico.md) (2026-11-03).**
+> Las promos nunca se cargan a mano: las publica la ingesta automática todos los días
+> (`ingesta/src/corpus/ingestar.ts`, `.github/workflows/ingesta.yml`). Lo que este documento dice
+> sobre `promociones.json`, revisión humana, exclusiones y grupos de tope a mano, crudos en el repo,
+> seed de promociones y fixtures del motor ya no rige. Siguen vigentes el mapeo del detalle de MODO,
+> la validación, los ids estables, el contrato de escritura y las reglas de tope y jurisdicción.
+> El contrato actual está en [contracts/corpus.md](contracts/corpus.md).
+
 Revisión del 2026-11-02 contra `CLAUDE.md`, `.specify/memory/constitution.md` (v3.0.0),
 `packages/motor/src/{tipos,publicable,elegibilidad,tope}.ts`, `packages/motor/src/test/fabricas.ts`,
 `supabase/migrations/20261101000001_catalogos.sql`, `supabase/migrations/20261101000006_promociones.sql`,

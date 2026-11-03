@@ -1,0 +1,47 @@
+# Ingesta automática de promociones de MODO (issue #35, ADR-011).
+# Todos los días baja las promos vigentes, las mapea por código (sin modelo de
+# lenguaje) y las publica en Supabase. Nadie carga ni revisa promos a mano.
+#
+# Necesita dos secrets del repo (Settings → Secrets and variables → Actions):
+#   SUPABASE_URL                 https://<proyecto>.supabase.co
+#   SUPABASE_SERVICE_ROLE_KEY    la service role del proyecto (salta RLS: nunca va al repo)
+#
+# Si una corrida falla, GitHub avisa por mail y la base queda con lo de la corrida
+# anterior. Se puede correr a mano desde la pestaña Actions («Run workflow»).
+name: Ingesta de promociones
+
+on:
+  schedule:
+    # 09:00 UTC = 06:00 en Argentina, antes de que la gente salga a comprar.
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+# Dos corridas a la vez escribirían las mismas filas: la segunda espera.
+concurrency:
+  group: ingesta-promociones
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ingestar:
+    runs-on: ubuntu-latest
+    # Un detalle por promo vigente de las 13 categorías, con 1,2 s de pausa entre pedidos
+    # (RNF-13). La primera corrida real pasó los 26 minutos: el tope es holgado hasta medir
+    # cuánto dura de verdad (pendiente, T066 de la spec 011).
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # `ingestar.ts` corre con Node directo e importa `@vuelto/motor` desde `dist/`.
+      - run: npm run build -w @vuelto/motor
+      - name: Ingestar y publicar
+        run: npm run ingestar -w @vuelto/ingesta -- --aplicar
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

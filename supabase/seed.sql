@@ -1,7 +1,6 @@
 -- Datos iniciales de las categorías (solo `supabase db reset`). Idempotente.
--- En el proyecto alojado el seed no corre: las categorías, los bancos y el corpus los carga,
--- con la service role, `node --env-file=supabase/.env ingesta/src/corpus/cargar.ts --aplicar`
--- (desde la raíz del repo; sin `--aplicar` solo muestra qué haría).
+-- En el proyecto alojado el seed no corre: las categorías, los bancos y las promociones
+-- los publica todos los días la ingesta automática (`.github/workflows/ingesta.yml`, ADR-011).
 
 -- Las 13 categorías de MODO (CATEGORIAS_MODO en packages/motor/src/categorias.ts).
 insert into public.categorias (id, nombre) values
@@ -20,7 +19,6 @@ insert into public.categorias (id, nombre) values
   (14, 'Entretenimiento')
 on conflict (id) do update set nombre = excluded.nombre;
 
--- Los bancos (el catálogo completo de MODO, con sus ids reales) y las promociones
--- del corpus sembrado a mano no se escriben acá: los genera
--- `npm run corpus:generar -w ingesta` en `seed/bancos.sql` y `seed/promociones.sql`,
--- que `config.toml` carga a continuación (issue #35). No se inventan ids.
+-- Los bancos (el catálogo completo de MODO, con sus ids reales) están en `seed/bancos.sql`,
+-- que `config.toml` carga a continuación. Las promociones no se siembran: en una base local
+-- se cargan corriendo la ingesta contra ella (ver `ingesta/src/corpus/ingestar.ts`).

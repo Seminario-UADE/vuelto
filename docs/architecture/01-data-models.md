@@ -39,8 +39,8 @@ en `packages/motor/src/tipos.ts` (issue #33). Decisiones que fija:
   nombre del banco (`name_bank`), pero el **detalle** de cada promo
   (`GET /promos/api/rewards/v2/benefit/<slug>`) lo trae por id en
   `requirements.banks.list`: de ahí sale el `bancoId` cuando se puede.
-  Cuando hay que traducir un nombre (la ingesta de #51 y el contraste del
-  seed), se compara contra `name` del catálogo **normalizado** (minúsculas,
+  Cuando hay que traducir un nombre (el extractor de #51 y el contraste que
+  hace la ingesta con el rótulo del listado), se compara contra `name` del catálogo **normalizado** (minúsculas,
   sin acentos, sin espacios de más) **más una tabla de alias explícita**
   (`ingesta/src/corpus/bancos-alias.ts`), porque la comparación normalizada
   sola no alcanza: el listado dice "Banco Macro", "Banco Hipotecario" o "BNA"

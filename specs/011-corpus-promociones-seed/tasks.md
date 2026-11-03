@@ -1,5 +1,9 @@
 ---
 
+> **Reemplazada en parte por [ADR-011](../../docs/decisions/011-corpus-siempre-automatico.md) (2026-11-03).**
+> Las tareas de carga y revisión a mano (tandas, exclusiones, grupos de tope, fixtures, seed de
+> promociones, cobertura) quedan sin efecto. Lo que sigue está en la **Phase 10** al final.
+
 description: "Tareas para el corpus de promociones sembrado a mano desde MODO (issue #35, Supermercados y Farmacias)"
 ---
 
@@ -188,6 +192,20 @@ Las historias P1 se ordenan por dependencia, no por número: **US3** (banco) y l
 - [ ] T056 [HUMANO] Abrir el PR desde `feat/35-corpus-promociones-seed` con **`Refs #35`** (no `Closes`) hasta que Joaquín termine su mitad; en la descripción: qué cubre esta parte, las decisiones del equipo, el hallazgo del detalle de MODO, el corpus por tandas y los pendientes (J1 a J7). Cerrar la issue con `Closes #35` en el PR que complete el corpus.
 
 ---
+
+## Phase 10: ingesta automática (ADR-011, 2026-11-03)
+
+El PO rechazó la carga a mano: las promos se publican solas, todos los días.
+
+- [X] T058 `ingestar.ts`: lista MODO (todas las secciones y el listado anterior, las 13 categorías), baja el detalle y el catálogo de bancos, mapea, valida y publica. `listado.ts` (ex `relevar.ts`, sin escribir archivos), `publicar.ts` (ex `cargar.ts`: capturas crudas, promos `modo` con `captura_cruda_id`, bajas, resguardo de la mitad, sin tocar las promos cuyo detalle falló).
+- [X] T059 `mapear.ts`: fuente `modo`, sin revisión ni fixture; descarta solo (vencida por `stop_date`, tope no representable, nivel de cliente, transversal); las partes de una promo comparten el tope (`compartido`, `modo:<slug>`). `validar.ts` valida una promo tipada.
+- [X] T060 `.github/workflows/ingesta.yml`: cron diario a las 06:00 ART y `workflow_dispatch`, con los secrets del repo.
+- [X] T061 Borrar lo manual: `promociones.json`, `exclusiones.json`, `grupos-tope.json`, `seed/promociones.sql`, `borrador`, `generar`, `cobertura`, `insumos`, `resaltar` y las fixtures `PROMOS_CORPUS` del motor. `corpus.test.sql` controla las promos `modo`.
+- [X] T062 ADR-011; ADR-005, `CLAUDE.md`, `04-infrastructure.md`, `requisitos.md`, `pendientes.md`, este `contracts/corpus.md` y `quickstart.md` actualizados.
+- [ ] T063 [HUMANO] Cargar `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` como secrets del repo y correr el workflow a mano la primera vez.
+- [ ] T064 Agregar a la promo y a la recomendación **cómo pagar** (QR o NFC de MODO, tarjeta física, online), desde `conditions.payment_flow.flows`: contrato del motor, columna de `promociones`, mapeo y texto de la recomendación.
+- [ ] T065 [HUMANO] Redefinir #53: ya no hay un corpus revisado a mano contra el cual medir el extractor.
+- [ ] T066 Medir cuánto dura una corrida completa (la primera prueba local, el 2026-11-03, pasó los 26 minutos con las 13 categorías) y verificar contra una base de prueba que escribe bien: capturas, promos, bajas, y que una segunda corrida no reescribe nada. Ajustar `timeout-minutes` (hoy 90) o acortar la corrida (por ejemplo, no volver a pedir el detalle de una promo cuya tarjeta no cambió).
 
 ## Dependencias entre fases
 

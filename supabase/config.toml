@@ -68,9 +68,9 @@ schema_paths = []
 enabled = true
 # Specifies an ordered list of seed files to load during db reset.
 # Supports glob patterns relative to supabase directory: "./seeds/*.sql"
-# Orden: categorías, bancos (los necesita `promociones.banco_id`) y promociones.
-# `seed/bancos.sql` y `seed/promociones.sql` son generados (npm run corpus:generar -w ingesta).
-sql_paths = ["./seed.sql", "./seed/bancos.sql", "./seed/promociones.sql"]
+# Orden: categorías y bancos. Las promociones no se siembran: las publica la
+# ingesta automática (`npm run ingestar -w @vuelto/ingesta -- --aplicar`, ADR-011).
+sql_paths = ["./seed.sql", "./seed/bancos.sql"]
 
 [db.network_restrictions]
 # Enable management of network restrictions.
