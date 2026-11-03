@@ -15,14 +15,14 @@ RLS, sin Edge Function (ADR-009), y guarda el resultado en el slice `perfil` de 
 La integridad la garantiza la tabla. La lógica de la pantalla (buscador, duplicados, mínimo de un
 medio) va en funciones puras con tests.
 
-**Estado de las dependencias (02/11)**: #34 y #39 cerradas. Faltan #81 (store de Redux con el
-slice `perfil`) y #40 (sesión). Lo que no depende de ellas (modelo, buscador, acceso a Supabase y
-selector de medio) se hace ya. Conectar las pantallas espera a esas dos.
+**Estado de las dependencias (03/11)**: #34, #39, #81 (store de Redux) y #40 (sesión) cerradas. El
+slice `perfil` ya guarda `MedioDePago` de la base en vez de ids de un catálogo fijo (T008), y las
+pantallas están conectadas (fases 2b y 3).
 
 ## Technical Context
 
 - **Stack**: TypeScript strict, Expo + Expo Router, `@supabase/supabase-js` (los instaló la #39).
-  Redux Toolkit y `@vuelto/motor` en la app los suma la #81 (ADR-010).
+  Redux Toolkit y `@vuelto/motor` ya están en la app (#81, cerrada).
 - **Datos**: tablas `bancos` (lectura) y `medios_de_pago` (del dueño), de la #34. En la app, el
   slice `perfil`, que la #81 persiste en el dispositivo: esa es la lectura sin conexión.
 - **Tests**: funciones puras de `apps/mobile/src/perfil/` con Vitest (`npm run test -w
@@ -49,10 +49,10 @@ ADR-010, RNF-02, ADR-009, contrato de tipos #33). La spec no cambia.
 1. **Sin Edge Function.** ADR-009 y ADR-010 dejan el perfil como CRUD directo con `supabase-js` y
    RLS. Una función `perfil` haría lo mismo que una policy, con más código.
 2. **Los tipos de red y tarjeta son los del motor.** ADR-010 deja que la app importe
-   `@vuelto/motor`. Hasta que la #81 sume la dependencia, `modelo.ts` declara `Red` y
-   `TipoTarjeta` con los mismos valores de `packages/motor/src/tipos.ts`, y un test compara las
-   dos listas. Cuando entre la #81, se reemplazan por `import type` del motor. El `check` de la
-   tabla rechaza cualquier otro valor.
+   `@vuelto/motor` y la #81 ya lo sumó: `modelo.ts` hace `import type { Red, TipoTarjeta }` y
+   `ETIQUETAS_RED` / `ETIQUETAS_TIPO` son `Record<...>` sobre esos tipos, así que si el motor suma
+   un valor, la app no compila. `REDES` y `TIPOS_TARJETA` salen de las claves de esos mapas. El
+   `check` de la tabla rechaza cualquier otro valor.
 3. **La integridad está en la base, no en la pantalla.** El `unique` de la tripleta (FR-004)
    también protege contra dos dispositivos o un doble toque. `not null` y `check` cubren FR-005
    y FR-011. La app no usa `update`: la spec solo pide agregar y sacar.

@@ -40,14 +40,16 @@ function aFila(m: MedioNuevo) {
 
 /** Corre el pedido sin lanzar: un error de la base o de red vuelve clasificado. */
 async function ejecutar<T>(pedido: PromiseLike<Respuesta>, mapear: (data: unknown) => T): Promise<Resultado<T>> {
+  let r: Respuesta;
   try {
-    const r = await pedido;
-    if (r.error) return { ok: false, error: clasificarError({ status: r.status, code: r.error.code ?? null }) };
-    return { ok: true, datos: mapear(r.data) };
+    r = await pedido;
   } catch {
     // El fetch no llegó: supabase-js lanza o devuelve status 0 según el caso.
     return { ok: false, error: "sin_conexion" };
   }
+  if (r.error) return { ok: false, error: clasificarError({ status: r.status, code: r.error.code ?? null }) };
+  // Fuera del try: un fallo del mapeo es un bug nuestro y no puede pasar por «sin conexión».
+  return { ok: true, datos: mapear(r.data) };
 }
 
 export function crearDatosPerfil(cliente: SupabaseClient) {
