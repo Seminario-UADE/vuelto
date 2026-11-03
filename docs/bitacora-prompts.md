@@ -1762,6 +1762,54 @@ de MODO todos los días, sin nadie en el medio.
 
 ---
 
+## 2026-11-02 — Perfil: onboarding y Perfil conectados a Supabase (issue #41, fases 2b y 3)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** cerrar las fases 2b y 3 de la spec 001 ahora que la #81 (Redux) y
+la #40 (sesión) están en `main`, y antes revisar que nada contradiga ADR-010.
+
+**Prompts principales:**
+1. "Analizá #80 (ADR-010) y decime si hay algún cambio; si no, comenzá con las
+   fases 2b y 3."
+2. Ante el hallazgo de abajo, el PO eligió la opción A: el slice guarda el medio
+   completo.
+
+**Resultado:**
+- Hallazgo: el slice `perfil` guardaba solo ids del catálogo de ejemplo y el
+  motor, las vistas y las compras se apoyaban en ellos. Un medio real de
+  Supabase (UUID, banco de MODO) no se hubiera recomendado nunca.
+- `perfil.medios` pasa a ser la lista de `medios_de_pago` tal como la devuelve
+  Supabase (`id`, `bancoId`, `nombreBanco`, `tipo`, `red`). El motor la usa
+  directo (`medioDelMotor`) y las pantallas arman el nombre con `medioVista`
+  ("Galicia Visa crédito", "Crédito · Banco Galicia"). Sin catálogo aparte.
+- Los datos de ejemplo pasan a la misma forma (`mediosGuardados`), con los
+  mismos ids: las compras de ejemplo siguen coincidiendo y un test comprueba que
+  los textos no cambiaron. Lo guardado con ids viejos se migra una vez.
+- Thunks en `store/perfil-remoto.ts` (`leerMedios`, `confirmarMedios`,
+  `agregarMedio`, `sacarMedio`, `leerBancos`) sobre `perfil/datos.ts`, inyectado
+  en el store (`Extra.perfilRemoto`). Estado de la lectura (`carga`) en el
+  slice, sin persistir.
+- Onboarding: buscador de bancos, tipo y red; nada se guarda hasta «Confirmar»,
+  que manda todo en un pedido. Pestañas: si el celular no tiene medios, esperan
+  la lectura de Supabase y, si tampoco hay, mandan al onboarding.
+- Perfil: lista del slice, agregar, sacar (nunca el último) y modo solo lectura
+  sin conexión.
+- `Red` y `TipoTarjeta` salen del motor (T012).
+- Una compra con un medio que se sacó del perfil se sigue mostrando ("Medio que
+  sacaste de tu perfil"); antes desaparecía de «Mis compras».
+- Verificación: lint, typecheck, build y tests en verde (motor 192, app 222,
+  supabase 40). No se probó en Expo Go ni en el simulador.
+- Queda pendiente:
+  - T013: `rules-guardian`, `/code-review` y `test-runner`, y el PR.
+  - El seed de `bancos` tiene solo Galicia: los ~28 bancos los carga la ingesta
+    (#35), y faltan `imagen` y `on_hub_list` (US3).
+  - Un usuario que confirma sus medios y cierra la app antes de terminar el
+    onboarding, al volver salta comercios y primera respuesta (sus medios ya
+    están en Supabase).
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
