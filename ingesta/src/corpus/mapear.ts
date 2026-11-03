@@ -98,7 +98,8 @@ const NIVEL_DE_CLIENTE = /selecta|\b(?:platinum|black|signature|infinite|nivel\s
  * Los reinicios de tope que el motor representa. `day` y `promo` existen en MODO pero no se
  * aproximan: un tope diario tratado como «por compra» o como semanal puede sobrestimar el
  * saldo (el motor no acumula consumo entre compras del mismo día), así que esas promos se
- * proponen para excluir (`tope_no_representable`).
+ * proponen para excluir (`tope_no_representable`). Lo mismo una promo con tope por período y
+ * además tope por transacción: `Tope` guarda uno solo.
  */
 const PERIODO_DE_MODO = { month: "mensual", week: "semanal" } as const;
 
@@ -204,7 +205,7 @@ interface TopeNoRepresentable {
   noRepresentable: string;
 }
 
-function mapearTope(oferta: Objeto, notas: string[]): TopeMapeado | TopeNoRepresentable {
+function mapearTope(oferta: Objeto): TopeMapeado | TopeNoRepresentable {
   const limites = oferta.limits === undefined || oferta.limits === null ? {} : objeto(oferta.limits, "offers[0].limits");
   const porPeriodo = limites.period_cap === undefined ? {} : objeto(limites.period_cap, "offers[0].limits.period_cap");
   const porTransaccion =
@@ -230,7 +231,11 @@ function mapearTope(oferta: Objeto, notas: string[]): TopeMapeado | TopeNoRepres
     if (periodo === undefined) {
       throw new ErrorDeMapeo("offers[0].limits.period_cap.reset_by", `reinicio desconocido: ${JSON.stringify(reinicio)}`);
     }
-    if (montoTransaccion > 0) notas.push(`Además hay un tope por transacción de $${montoTransaccion}.`);
+    if (montoTransaccion > 0) {
+      return {
+        noRepresentable: `Tiene tope ${periodo} de $${montoPeriodo} y además tope por transacción de $${montoTransaccion}: el contrato guarda un solo tope, y quedarse con el ${periodo} sobrestima el reintegro de una compra grande.`,
+      };
+    }
     return { monto: montoPeriodo, periodo };
   }
   if (montoTransaccion > 0) return { monto: montoTransaccion, periodo: "por_compra" };
@@ -316,7 +321,7 @@ export function mapearDetalle(crudo: Crudo, opciones: OpcionesMapeo): ResultadoM
     return sinBorradores("otro", `Solo acepta redes que el contrato no representa: ${tarjetas.noSoportadas.join(", ")}.`);
   }
   const canal = mapearCanal(conditions, notasComunes);
-  const tope = mapearTope(oferta, notasComunes);
+  const tope = mapearTope(oferta);
   if ("noRepresentable" in tope) return sinBorradores("tope_no_representable", tope.noRepresentable);
 
   const minimo = esObjeto(requisitos.amount_range) ? numeroOCero(requisitos.amount_range.min, "offers[0].requirements.amount_range.min") : 0;

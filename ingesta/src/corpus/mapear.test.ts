@@ -220,13 +220,13 @@ describe("mapearDetalle — tope", () => {
     expect(r.borradores[0]!.tope).toMatchObject({ monto: 500, periodo: "por_compra" });
   });
 
-  it("con los dos, gana el tope por período y se anota el de la transacción", () => {
+  it("con tope por período y por transacción: no representable (quedarse con uno sobrestima)", () => {
     const r = mapearDetalle(
       conDetalle("petrelli", (d) => (d.offers[0].limits.transaction_cap.amount_by_transaction = 500)),
       OPCIONES,
     );
-    expect(r.borradores[0]!.tope).toMatchObject({ monto: 10000, periodo: "semanal" });
-    expect(r.borradores[0]!.revision.notas.join(" ")).toMatch(/transacci[oó]n.*500/);
+    expect(r.borradores).toEqual([]);
+    expect(r.exclusiones[0]).toMatchObject({ motivo: "tope_no_representable", detalle: expect.stringMatching(/transacci[oó]n de \$500/) });
   });
 
   it("nunca deja un monto sin período", () => {

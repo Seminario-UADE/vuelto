@@ -1557,6 +1557,36 @@ apagada, y las herramientas para armarlo, validarlo y cargarlo. Spec `specs/011-
 
 ---
 
+## 2026-11-03 — Review de los PR #92 y #93 y sus correcciones (issue #35)
+
+**Herramienta:** Claude Code (Opus 5.5).
+
+**Objetivo:** auditar los PR del corpus sembrado a mano (#92: spec 011 y workspace `ingesta`; #93:
+relevamiento de MODO) y aplicar las correcciones del review.
+
+**Prompts principales:**
+1. "hace una auditoria y review de estos PR" (#92 y #93)
+2. "podrias mandar directamente las correcciones y subirlas al PR?"
+
+**Resultado:**
+- Review publicado en los dos PR después de correr lint, typecheck, los tests de `ingesta`,
+  `corpus:generar -- --verificar` y `corpus:cobertura`, y de cruzar las cifras de `corpus-semilla.md` con
+  los 171 crudos.
+- **Convivencia con MODO:** la carga remota salteaba una manual que ya existía como `modo` activa, pero
+  no la daba de baja si seguía en el archivo: quedaban las dos activas. Ahora la da de baja, también si
+  es una partida (`slug#b-…`), y el contrato de #51 dice que compara por slug, no por `fuente_id`.
+- **Tope doble:** una promo con tope por período y además tope por transacción se cargaba solo con el
+  primero (el segundo quedaba en una nota). `Tope` guarda uno solo, y quedarse con el del período
+  sobrestima el reintegro de una compra grande: se propone como `tope_no_representable`, como el
+  diario. Hoy ningún crudo tiene los dos.
+- `CLAUDE.md` aclara que los scripts `corpus:*` piden Node ≥ 22.18.
+- Quedaron sin cambiar, a propósito: el índice de bancos que se arma por llamada (barato; lo puede
+  resolver #51), la detección de nivel de cliente por título (la cubre la revisión humana) y la cita
+  «ADR-005 §Consecuencias», que el repo ya usa así en `requisitos.md`. La carga por lotes sin
+  transacción ya estaba documentada en el contrato (M13): el review se equivocó al marcarlo.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

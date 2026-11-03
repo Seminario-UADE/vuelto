@@ -231,6 +231,26 @@ describe("cargarCorpus — convivencia con la ingesta (research D2)", () => {
     expect(base.promociones.size).toBe(1);
   });
 
+  it("da de baja la manual activa cuando ya existe la de modo, aunque siga en el archivo", async () => {
+    const e = entrada();
+    const manual = filaDe(e);
+    const deModo = filaDe(e, { fuente: "modo", id: "e1000000-0000-4000-8000-000000000001" });
+    const base = baseFalsa([manual, deModo]);
+    const r = await cargarCorpus(insumos([e]), base.cliente, { aplicar: true, ahora: AHORA });
+    expect(r.resumen.promociones).toMatchObject({ darDeBaja: 1, omitidasPorModo: ["20-paladini-icbc-ago26"] });
+    expect(base.promociones.get("manual|20-paladini-icbc-ago26")!.dada_de_baja_en).toBe(AHORA());
+    expect(base.promociones.get("modo|20-paladini-icbc-ago26")!.dada_de_baja_en).toBeNull();
+  });
+
+  it("también da de baja una manual partida (slug#b-…) si la de modo tiene ese slug", async () => {
+    const partida = entrada({ fuenteId: "promo-x#b-0123abcd" });
+    const deModo = filaDe(entrada({ fuenteId: "promo-x" }), { fuente: "modo" });
+    const base = baseFalsa([filaDe(partida), deModo]);
+    const r = await cargarCorpus(insumos([partida]), base.cliente, { aplicar: true, ahora: AHORA });
+    expect(r.resumen.promociones.darDeBaja).toBe(1);
+    expect(base.promociones.get("manual|promo-x#b-0123abcd")!.dada_de_baja_en).toBe(AHORA());
+  });
+
   it("si la de modo está dada de baja, la manual se escribe normalmente", async () => {
     const e = entrada();
     const base = baseFalsa([filaDe(e, { fuente: "modo", dada_de_baja_en: "2026-10-01T00:00:00.000Z" })]);

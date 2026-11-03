@@ -36,8 +36,8 @@ Fase 0 del plan. Cada decisión resuelve un hallazgo de [critica.md](critica.md)
 
 **Decisión.** El corpus manual y las promos que publique #51 coexisten sin duplicarse con dos reglas, una para cada lado:
 
-- **#51** (al publicar `('modo', X)`): si existe `('manual', X)` activa, la da de baja en la misma operación.
-- **La carga remota**: no escribe ni reactiva una entrada manual cuyo `fuente_id` ya existe como `modo` activa.
+- **#51** (al publicar `('modo', X)`): si existe `('manual', X)` activa, o una partida `('manual', X#…)`, la da de baja en la misma operación. Se compara por slug (`slugBase`), no por `fuente_id` exacto.
+- **La carga remota**: no escribe ni reactiva una entrada manual cuyo slug ya existe como `modo` activa, y si esa manual sigue activa la da de baja (por si #51 no lo hizo).
 
 El corpus manual **no se borra** del JSON: sigue siendo la verdad contra la que #53 mide al extractor.
 

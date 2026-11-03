@@ -23,7 +23,9 @@ Declaración end-to-end de dónde se usa IA en el proyecto: `docs/uso-de-ia.md`.
 ## Estado
 
 Monorepo con npm workspaces inicializado (issue #32). Requiere Node ≥ 22.13
-(versión fijada en `.nvmrc`; ESLint 10 y Vitest 5 no soportan Node 20).
+(versión fijada en `.nvmrc`; ESLint 10 y Vitest 5 no soportan Node 20). Los
+scripts `corpus:*` de `ingesta` piden Node ≥ 22.18: corren los `.ts` con Node
+directo, sin compilar.
 
 | Workspace | Contenido |
 |---|---|
