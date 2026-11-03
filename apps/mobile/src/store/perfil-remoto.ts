@@ -100,7 +100,7 @@ export function sacarMedio(id: string): AppThunk<Promise<Resultado<null>>> {
     if (!perfilRemoto) return SIN_CONEXION;
     const r = await escribir(dispatch, getState, () => perfilRemoto.sacarMedio(id), () => dispatch(medioSacado(id)));
     // Si no se pudo sacar porque la fila ya no estaba o no era del usuario, el slice puede estar viejo.
-    if (!r.ok && r.error === "otro") void dispatch(leerMedios());
+    if (!r.ok && (r.error === "otro" || r.error === "ultimo_medio")) void dispatch(leerMedios());
     return r;
   };
 }

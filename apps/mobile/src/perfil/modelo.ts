@@ -75,11 +75,12 @@ export function puedeSacar(medios: readonly MedioDePago[]): boolean {
   return medios.length >= 2;
 }
 
-export type CasoDeError = "duplicado" | "banco_inexistente" | "sesion_vencida" | "sin_conexion" | "otro";
+export type CasoDeError = "duplicado" | "banco_inexistente" | "ultimo_medio" | "sesion_vencida" | "sin_conexion" | "otro";
 
 export const MENSAJES_ERROR: Record<CasoDeError, string> = {
   duplicado: "Esa tarjeta ya está en tu perfil",
   banco_inexistente: "Ese banco ya no está disponible",
+  ultimo_medio: "Necesitás al menos un medio de pago: agregá otro antes de sacar este",
   sesion_vencida: "Tu sesión venció. Volvé a entrar para seguir",
   sin_conexion: "Necesitás conexión para editar tu perfil",
   otro: "No pudimos guardar el cambio. Probá de nuevo",
@@ -96,6 +97,8 @@ export type Fallo = {
 export function clasificarError({ status, code }: Fallo): CasoDeError {
   if (code === "23505") return "duplicado";
   if (code === "23503") return "banco_inexistente";
+  // El trigger de la base (VM001): FR-009 aunque la copia local esté vieja.
+  if (code === "VM001") return "ultimo_medio";
   if (status === 401) return "sesion_vencida";
   if (status === 0) return "sin_conexion";
   return "otro";
