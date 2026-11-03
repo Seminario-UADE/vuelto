@@ -1,134 +1,117 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20-toledo-yoy-dic25",
   "tarjeta": {
-    "id": "59a599fb-b11b-4bf3-883f-82cd30cb5115",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "Supermercados Toledo",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "card_id": "59a599fb-b11b-4bf3-883f-82cd30cb5115",
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "Supermercados Toledo",
+      "cashback_cap": "10000",
+      "participating_bank": "YOY",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/59a599fb-b11b-4bf3-883f-82cd30cb5115/primary_image.jpg?v=1764341606304",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 20,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "0b34f697-9c44-403a-8f8a-b78de0f3dc68",
+      "name": "20% en Toledo",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "20-toledo-yoy-dic25",
+        "short_description": "2512-yoy-toledo-presencial-20off",
+        "description": "Aprovechá 20% de reintegro en Supermercados Toledo pagando con YOY.",
+        "display_start_date": "2025-11-28T03:00:00.000Z",
+        "display_stop_date": "2026-12-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2027-01-31",
+          "start_date": "2025-12-01",
+          "days_of_week": [
+            "tuesday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "20% de reintegro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
         },
-        {
-          "text": "Desde el 01/12 al 31/03",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
         },
-        {
-          "text": "Exclusivo con",
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "pct"
+            }
+          ]
         },
-        {
-          "text": "10000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "0b34f697-9c44-403a-8f8a-b78de0f3dc68",
+      "name": "20% en Toledo",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
         },
-        {
-          "text": "YOY",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "extra_row": null,
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/59a599fb-b11b-4bf3-883f-82cd30cb5115/primary_image.jpg?v=1764341606304",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": null,
-        "tertiary_image": null,
-        "tertiary_backgroundcolor": null,
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": null
-        },
-        {
-          "type": "countdown",
-          "value": false,
-          "label": null
-        },
-        {
-          "type": "online_store",
-          "value": false,
-          "label": null
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2025-12-01T03:00:00.000Z",
-    "stop_date": "2027-02-01T02:59:59.999Z",
-    "days_of_week": "M",
-    "title": "20% en Toledo",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "20,toledo,supermercado,martes,yoy,presencial",
-    "promo_id": "0b34f697-9c44-403a-8f8a-b78de0f3dc68",
-    "slug": "20-toledo-yoy-dic25",
-    "short_description": "2512-yoy-toledo-presencial-20off",
-    "where": "Supermercados Toledo",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            43
+      "requirements": {
+        "banks": {
+          "list": [
+            "f3f5910c-013f-47f7-819e-3d802cf3f7b7"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "week",
+          "aggregate_by": "user",
+          "amount_by_period": 10000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [
-      "visa"
-    ],
-    "credit_list": [
-      "master"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "0b34f697-9c44-403a-8f8a-b78de0f3dc68",

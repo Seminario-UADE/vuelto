@@ -1,133 +1,121 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20-paladini-gnp-icbc-agos26",
   "tarjeta": {
-    "id": "f6996cec-d89f-4811-9b1b-efc0f3154917",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": {
-      "promo_id": "440719f9-8f41-4616-a4e5-d1ffb6e5fbf8"
+    "card_id": "f6996cec-d89f-4811-9b1b-efc0f3154917",
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "Paladini",
+      "cashback_cap": "10000",
+      "participating_bank": "ICBC",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/307af09e-7f60-46fe-abcf-74e8f9915cd4_paladini.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
     },
-    "content": {
-      "row": [
-        {
-          "text": "Paladini",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "suggested_order": 20,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "440719f9-8f41-4616-a4e5-d1ffb6e5fbf8",
+      "name": "20% en Paladini GNP",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "20-paladini-gnp-icbc-agos26",
+        "short_description": "2608-icbc-paladini-gnp-presencial-20off",
+        "description": "PALADINI ICBC-MODO GNP",
+        "display_start_date": "2026-07-31T03:00:00.000Z",
+        "display_stop_date": "2027-04-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2027-01-29",
+          "start_date": "2026-08-07",
+          "days_of_week": [
+            "friday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "20% de reintegro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
         },
-        {
-          "text": null,
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
         },
-        {
-          "text": null,
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "pct"
+            }
+          ]
         },
-        {
-          "text": "10000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "440719f9-8f41-4616-a4e5-d1ffb6e5fbf8",
+      "name": ".",
+      "priority": 1,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
         },
-        {
-          "text": "ICBC",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/307af09e-7f60-46fe-abcf-74e8f9915cd4_paladini.jpg",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/307af09e-7f60-46fe-abcf-74e8f9915cd4_paladini.jpg",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/307af09e-7f60-46fe-abcf-74e8f9915cd4_paladini.jpg",
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
-        },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2026-08-07T03:00:00.000Z",
-    "stop_date": "2027-01-30T02:59:59.999Z",
-    "days_of_week": "V",
-    "title": "20% en Paladini GNP",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "paladini,gnp,icbc,20%,reintegro,viernes",
-    "promo_id": "440719f9-8f41-4616-a4e5-d1ffb6e5fbf8",
-    "slug": "20-paladini-gnp-icbc-agos26",
-    "short_description": "2608-icbc-paladini-gnp-presencial-20off",
-    "where": "Paladini",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            43
+      "requirements": {
+        "banks": {
+          "list": [
+            "bcfcac03-6f79-4995-bfab-7b8916b0747a"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "week",
+          "aggregate_by": "user",
+          "amount_by_period": 10000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [
-      "visa"
-    ],
-    "credit_list": [
-      "visa",
-      "master"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "440719f9-8f41-4616-a4e5-d1ffb6e5fbf8",

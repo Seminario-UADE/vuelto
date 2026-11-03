@@ -1,128 +1,112 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/25-hipotecario-unicoop-feb26",
   "tarjeta": {
-    "id": "8f6b431b-73bf-4a6a-b65f-d74109bc5a16",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "Unicoop",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "card_id": "8f6b431b-73bf-4a6a-b65f-d74109bc5a16",
+    "card": {
+      "benefit": "25% de reintegro",
+      "validity_place": "Unicoop",
+      "cashback_cap": "20000",
+      "participating_bank": "Banco Hipotecario",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/8f6b431b-73bf-4a6a-b65f-d74109bc5a16/primary_image.jpg?v=1768836760887",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 15,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "c50c0011-b38a-411f-8bff-8ef7df1a2c8b",
+      "name": "25% en Unicoop",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "25-hipotecario-unicoop-feb26",
+        "short_description": "2602-hipotecario-unicoop-presencial-25off",
+        "description": "Aprovechá 25% de reintegro en Unicoop pagando con el Hipotecario",
+        "display_start_date": "2026-01-19T03:00:00.000Z",
+        "display_stop_date": "2026-12-31T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-11-30",
+          "start_date": "2026-02-01",
+          "days_of_week": [
+            "tuesday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "25% de reintegro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
         },
-        {
-          "text": "Desde el 01/02 al 30/04",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
         },
-        {
-          "text": "Exclusivo con",
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            }
+          ]
         },
-        {
-          "text": "20000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "c50c0011-b38a-411f-8bff-8ef7df1a2c8b",
+      "name": "25% en Unicoop",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 25,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
         },
-        {
-          "text": "Banco Hipotecario",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/8f6b431b-73bf-4a6a-b65f-d74109bc5a16/primary_image.jpg?v=1768836760887",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": null,
-        "tertiary_image": null,
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
-        },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2026-02-01T03:00:00.000Z",
-    "stop_date": "2026-12-01T02:59:59.999Z",
-    "days_of_week": "M",
-    "title": "25% en Unicoop",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "unicoop,febrero,martes,25%,super,supermercado,mercado,hipotecario",
-    "promo_id": "c50c0011-b38a-411f-8bff-8ef7df1a2c8b",
-    "slug": "25-hipotecario-unicoop-feb26",
-    "short_description": "2602-hipotecario-unicoop-presencial-25off",
-    "where": "Unicoop",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            43
+      "requirements": {
+        "banks": {
+          "list": [
+            "b164059a-b71a-11ea-b3de-0242ac130004"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 20000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [
-      "visa"
-    ],
-    "credit_list": []
+    "coupon": null
   },
   "detalle": {
     "id": "c50c0011-b38a-411f-8bff-8ef7df1a2c8b",

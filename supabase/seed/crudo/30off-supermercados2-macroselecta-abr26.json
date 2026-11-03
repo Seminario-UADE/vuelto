@@ -1,132 +1,127 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/30off-supermercados2-macroselecta-abr26",
   "tarjeta": {
-    "id": "f451a061-fa0a-4922-aecb-902e473ea32e",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "Beneficio Supermercados",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "card_id": "f451a061-fa0a-4922-aecb-902e473ea32e",
+    "card": {
+      "benefit": "30% de reintegro Nivel 2",
+      "validity_place": "Beneficio Supermercados",
+      "cashback_cap": "40000",
+      "participating_bank": "Macro Selecta",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/f451a061-fa0a-4922-aecb-902e473ea32e/primary_image.jpg?v=1775671955107&t=2026-03-11T15:01:20.775Z",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 15,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "d2180790-0689-4891-aac0-da7edd3b4193",
+      "name": "Supermercados Selecta N2",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "30off-supermercados2-macroselecta-abr26",
+        "short_description": "2604-MacroSelecta2-Supermercados-Presencial-30off",
+        "description": "del 01/04/2026 al 30/06/2026 con TC Macro Selecta",
+        "display_start_date": "2026-04-01T03:00:00.000Z",
+        "display_stop_date": "2027-04-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2027-03-31",
+          "start_date": "2026-04-01",
+          "days_of_week": [
+            "wednesday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "30% de reintegro Nivel 2",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
         },
-        {
-          "text": null,
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "instore_nfc"
+          ]
         },
-        {
-          "text": null,
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "american_express"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            }
+          ]
         },
-        {
-          "text": "40000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "Macro Selecta",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/f451a061-fa0a-4922-aecb-902e473ea32e/primary_image.jpg?v=1775671955107&t=2026-03-11T15:01:20.775Z",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
+        "exclusiveness_source": [
+          "modo",
+          "banks"
         ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/f451a061-fa0a-4922-aecb-902e473ea32e/primary_image.jpg?v=1775671955107&t=2026-03-11T15:01:20.775Z",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/f451a061-fa0a-4922-aecb-902e473ea32e/primary_image.jpg?v=1775671955107&t=2026-03-11T15:01:20.775Z",
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "d2180790-0689-4891-aac0-da7edd3b4193",
+      "name": ".",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 30,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
-        },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore,instore_nfc",
-    "start_date": "2026-04-01T03:00:00.000Z",
-    "stop_date": "2027-04-01T02:59:59.999Z",
-    "days_of_week": "X",
-    "title": "Supermercados Selecta N2",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "SEG_NS2,LYT11GLL",
-    "promo_id": "d2180790-0689-4891-aac0-da7edd3b4193",
-    "slug": "30off-supermercados2-macroselecta-abr26",
-    "short_description": "2604-MacroSelecta2-Supermercados-Presencial-30off",
-    "where": "Supermercados",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            43,
-            26,
-            34
+      "requirements": {
+        "banks": {
+          "list": [
+            "6a089c91-a7d3-4199-a578-2132a3733f69"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 40000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "26",
+        "34",
+        "43"
       ]
     },
-    "stores_whitelist": false,
     "calculated_status": "RUNNING",
-    "debit_list": [],
-    "credit_list": [
-      "american_express",
-      "visa",
-      "master"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "d2180790-0689-4891-aac0-da7edd3b4193",

@@ -1,0 +1,270 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/2611-macro-presencial-ahoracarne-10off",
+  "tarjeta": {
+    "card_id": "ec30d701-f474-456a-b962-0336f429dddb",
+    "card": {
+      "benefit": "10% de reintegro",
+      "validity_place": "AHORA CARNE",
+      "cashback_cap": "10600",
+      "participating_bank": "Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/adc0b4d0-aaae-4600-b202-475a5982ed71_Carnicerias-Detalle-1%20(1).jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 25,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "cd55e2ea-eedd-4804-9dfb-172ddfc38a62",
+      "name": "AHORA CARNE",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "2611-macro-presencial-ahoracarne-10off",
+        "short_description": "2611-macro-presencial-TD52417-ahoracarne-10off",
+        "description": "SEG_GPS",
+        "display_start_date": "2026-11-01T03:00:00.000Z",
+        "display_stop_date": "2026-12-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-11-30",
+          "start_date": "2026-11-01",
+          "days_of_week": [
+            "monday",
+            "tuesday",
+            "wednesday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [
+            "PRISMA",
+            "FISERV"
+          ],
+          "segmentation_mode": "by_whitelist"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "instore_nfc",
+            "physical-card"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            }
+          ]
+        },
+        "exclusiveness_source": [
+          "modo",
+          "banks"
+        ],
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "cd55e2ea-eedd-4804-9dfb-172ddfc38a62",
+      "name": ".",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 10,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_por_regla"
+        },
+        "financing": {
+          "installments": []
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "6a089c91-a7d3-4199-a578-2132a3733f69"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "card",
+          "amount_by_period": 10600,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "cd55e2ea-eedd-4804-9dfb-172ddfc38a62",
+    "name": "AHORA CARNE",
+    "description": "SEG_GPS",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": false,
+    "created_at": "2026-10-19T22:01:45.227Z",
+    "updated_at": "2026-11-03T15:14:08.880Z",
+    "deleted_at": null,
+    "short_description": "2611-macro-presencial-TD52417-ahoracarne-10off",
+    "publication_description": "SEG_GPS",
+    "slug": "2611-macro-presencial-ahoracarne-10off",
+    "display_start_date": "2026-11-01T03:00:00.000Z",
+    "display_stop_date": "2026-12-01T02:59:59.999Z",
+    "search_tags": "SEG_GPS",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-11-30",
+        "start_date": "2026-11-01",
+        "days_of_week": [
+          "monday",
+          "tuesday",
+          "wednesday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "PRISMA",
+          "FISERV"
+        ],
+        "segmentation_mode": "by_whitelist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "instore_nfc",
+          "physical-card"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "exclusiveness_source": [
+        "modo",
+        "banks"
+      ],
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "cd55e2ea-eedd-4804-9dfb-172ddfc38a62",
+        "benefit_id": "cd55e2ea-eedd-4804-9dfb-172ddfc38a62",
+        "name": ".",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "bin",
+            "store_acquirer_establishment_id"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "6a089c91-a7d3-4199-a578-2132a3733f69"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 10,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_por_regla"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "card",
+            "amount_by_period": 10600,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-10-19T22:01:39.328Z",
+        "updated_at": "2026-10-19T22:01:45.006Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">CARTERA DE CONSUMO. PROMOCIÓN VÁLIDA DESDE EL 1 DE NOVIEMBRE DE 2026 HASTA EL 30 DE NOVIEMBRE DE 2026, EXCLUSIVAMENTE LOS DIAS LUNES, MARTES Y MIERCOLES, CON TARJETAS DEBITO Y VISA DEBITO BLACK DETALLADAS DE LOS BANCOS DEL GRUPO MACRO. EL 10% DE DESCUENTO APLICARÁ SOBRE EL PRECIO CONTADO. TOPE DE DEVOLUCIÓN 10600 PESOS POR TARJETA POR MES NO ACUMULABLE CON OTRAS PROMOCIONES. NO APLICA PARA PAGOS REALIZADOS A TRAVÉS DE MERCADO PAGO/ TODO PAGO Y/O PEI. LA PRESENTE PROMOCIÓN APLICA PARA CONSUMOS DE TIPO PERSONAL FAMILIAR. EN CASO DE DUDA, EL BANCO SE RESERVA EL DERECHO DE NO ACREDITAR EL MONTO DE LA BONIFICACIÓN HASTA TANTO SEA ACLARADO EL DESTINO DE LOS CONSUMOS. EN EL SUPUESTO DE COMPRAS CON TARJETA VISA DÉBITO, EL DESCUENTO SE REALIZARÁ EN UNA CUENTA DEL CLIENTE DENTRO DE LOS 5 DÍAS HÁBILES DE REALIZADA LA OPERACIÓN. QUEDA ESTABLECIDO QUE LOS DATOS Y OFERTAS INDICADAS REVISTEN CARÁCTER INFORMATIVO Y EN MODO ALGUNO SUPONEN QUE LOS ESTABLECIMIENTOS, PRODUCTOS Y O SERVICIOS QUE COMERCIALIZAN O LA CALIDAD DE LOS MISMOS SON PROMOCIONADOS O GARANTIZADOS POR LOS BANCOS DEL GRUPO MACRO, COMO ASÍ TAMPOCO SE RESPONSABILIZAN POR LOS CUPONES PRESENTADOS FUERA DE TÉRMINO POR LOS COMERCIOS. PARA MÁS INFORMACIÓN COMUNÍQUESE EN FORMA PREVIA A REALIZAR LA OPERACIÓN TELEFÓNICAMENTE AL 0810-555-2355 PARA BANCO MACRO, 0810-555-7353 PARA CLIENTES MACRO SELECTA, 0810-888-3300 PARA BANCO DEL TUCUMÁN O ACÉRQUESE A LA SUCURSAL MÁS CERCANA A SU DOMICILIO.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "10% de reintegro",
+      "validity_place": "AHORA CARNE",
+      "cashback_cap": "10600",
+      "participating_bank": "Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/adc0b4d0-aaae-4600-b202-475a5982ed71_Carnicerias-Detalle-1%20(1).jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "AHORA CARNE",
+      "faq": "<p><strong>¿Cómo pagar? </strong></p><p>Con tarjeta de crédito usando cualquier método de pago: tarjeta física, MODO QR y NFC (Apple Pay, Google Pay y MODO NFC).</p><p><strong>¿Donde veo el descuento aplicado?</strong></p><p>El reintegro lo verás reflejado en el resumen de la tarjeta con la que hiciste el pago.</p><p><strong>¿Esta promo es acumulable con otras promos de MODO?</strong></p><p>SÍ, esta promo es acumulable con otras promos vigentes de MODO, siempre y cuando el pago se realice con QR y/o MODO NFC.</p><p><br /></p>",
+      "applicability_description": ".",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

@@ -1,0 +1,263 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/25off-gethelook-galicia-ago26",
+  "tarjeta": {
+    "card_id": "971802a2-21ac-4a78-9f3b-92064be6cd24",
+    "card": {
+      "benefit": "25% de reintegro",
+      "validity_place": "Get the Look",
+      "cashback_cap": "15000",
+      "participating_bank": "Galicia",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/971802a2-21ac-4a78-9f3b-92064be6cd24/primary_image.jpg?v=1785259416190",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 15,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "81c7f9db-40e6-49b8-b49c-53967c0ca61a",
+      "name": "25% en Get The Look",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "25off-gethelook-galicia-ago26",
+        "short_description": "2608-Galicia-GetTheLook0308-Presencial-25off",
+        "description": "Todos los Jueves pagando con Galicia Débito.",
+        "display_start_date": "2026-07-28T03:00:00.000Z",
+        "display_stop_date": "2027-01-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-08-03",
+          "days_of_week": [
+            "thursday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            }
+          ]
+        },
+        "exclusiveness_source": [
+          "modo",
+          "banks"
+        ],
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "81c7f9db-40e6-49b8-b49c-53967c0ca61a",
+      "name": "25% en Get The Look",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 25,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "88d8705e-2dda-46f9-8411-bb4916af858e"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 15000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "4"
+      ],
+      "sub_categories": [
+        "16",
+        "37"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "81c7f9db-40e6-49b8-b49c-53967c0ca61a",
+    "name": "25% en Get The Look",
+    "description": "Todos los Jueves pagando con Galicia Débito.",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-08-06T20:23:00.625Z",
+    "updated_at": "2026-10-22T15:44:39.111Z",
+    "deleted_at": null,
+    "short_description": "2608-Galicia-GetTheLook0308-Presencial-25off",
+    "publication_description": "Todos los Jueves pagando con Galicia Débito.",
+    "slug": "25off-gethelook-galicia-ago26",
+    "display_start_date": "2026-07-28T03:00:00.000Z",
+    "display_stop_date": "2027-01-01T02:59:59.999Z",
+    "search_tags": null,
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-08-03",
+        "days_of_week": [
+          "thursday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "exclusiveness_source": [
+        "modo",
+        "banks"
+      ],
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "81c7f9db-40e6-49b8-b49c-53967c0ca61a",
+        "benefit_id": "81c7f9db-40e6-49b8-b49c-53967c0ca61a",
+        "name": "25% en Get The Look",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_terminal_id",
+            "bin"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                37,
+                16
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "88d8705e-2dda-46f9-8411-bb4916af858e"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 25,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 15000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "16",
+          "37"
+        ],
+        "preselected": false,
+        "created_at": "2026-08-06T20:22:59.209Z",
+        "updated_at": "2026-10-22T15:44:27.308Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">CARTERA DE CONSUMO. Promoción del 25% de ahorro en compras realizadas, en el país. Tope de reintegro: $15.000 en total por mes. Incluye compras con tarjetas adicionales. Válida para Jueves comprendidos entre el 03/08/2026 y el 30/09/2026, para compras realizadas con Tarjeta Galicia Débito escaneando el QR de MODO desde la app Galicia y/o MODO. No aplica para pagos con dinero en cuenta y/o transferencia. Promoción valida únicamente en los comercios adheridos. El importe ahorrado se acreditará dentro de los 10 días hábiles posteriores a la compra en la caja de ahorro común. Para acceder a la promoción, el participante deberá tener abierta una caja de ahorro común en el Banco, en donde se acreditará el monto del reintegro. Si el cliente tuviera más de una cuenta, el crédito se realizará en cualquiera de ellas a elección del Banco. Dicha promoción no es acumulable con otras promociones vigentes. Ejemplo: En una compra de $1000 en un pago: el importe del ahorro es de $250. No aplica para compras realizadas con tarjetas de Credito Visa Business, Visa Rural y Tarjetas de Débito emitidas a por Anses para Asignación Universal por hijo ni Progresar. La promoción no aplica a pagos a través de billeteras virtuales (excepto Modo), mPos y/o plataformas de pago online. MODO es marca registrada por Play Digital S.A., CUIT 30-71682943-6, con domicilio en Av. del Libertador 7208, Torre I, Piso 3, CABA (“PDSA”) y es un Proveedor de Servicios Tecnológicos de Banco Galicia. Sólo podrán participar de la promoción aquellos clientes que al momento de comprar se encuentren al día con sus productos. Banco Galicia solo es el medio de pago para la adquisición del producto/servicio. El Banco podrá limitar o excluir el acceso a promociones y beneficios vigentes o futuros en caso de incumplimiento de los términos y condiciones de los productos y/o promociones, o conductas abusivas o contrarias a su finalidad. En caso de anulación, devolución o reversión de la transacción que originó el beneficio, el Banco podrá revocar el reintegro y debitar el importe correspondiente de la cuenta acreditada, la tarjeta de crédito o compensarlo con otros saldos o beneficios futuros. Ofrecido por Banco de Galicia y Buenos Aires S.A. CUIT: 30-50000173-5, Tte. J.D. Perón 430 (C1038AAI), CABA, Argentina.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "25% de reintegro",
+      "validity_place": "Get the Look",
+      "cashback_cap": "15000",
+      "participating_bank": "Galicia",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/971802a2-21ac-4a78-9f3b-92064be6cd24/primary_image.jpg?v=1785259416190",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Get The Look con Galicia",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio?</strong></b><span style=\"white-space: pre-wrap;\"> </span></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tus tarjetas de débito Visa del Banco Galicia, a través de MODO. </span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el reintegro aplicado? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en tu cuenta del Banco Galicia.</span></p>",
+      "applicability_description": "Get The Look",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

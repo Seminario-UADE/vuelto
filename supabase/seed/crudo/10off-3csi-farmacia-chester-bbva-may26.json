@@ -1,144 +1,138 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/10off-3csi-farmacia-chester-bbva-may26",
   "tarjeta": {
-    "id": "092bcbb4-5763-41e6-be90-0e8da27a0e09",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "Farmacia Chester",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+    "card_id": "092bcbb4-5763-41e6-be90-0e8da27a0e09",
+    "card": {
+      "benefit": "10% de reintegro y 3 cuotas",
+      "validity_place": "Farmacia Chester",
+      "cashback_cap": "10000",
+      "participating_bank": "BBVA",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/092bcbb4-5763-41e6-be90-0e8da27a0e09/primary_image.jpg?v=1778099518691",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 20,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "e730db5f-1364-4c7d-8a0a-bec86b318858",
+      "name": "10% en Farmacia Chester",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "10off-3csi-farmacia-chester-bbva-may26",
+        "short_description": "2605-BBVA-Farmacia-Chester-Presencial-10off-3csi",
+        "description": "Disfruta los Lunes de reintegros y cuotas con BBVA!",
+        "display_start_date": "2026-05-06T03:00:00.000Z",
+        "display_stop_date": "2026-12-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-05-11",
+          "days_of_week": [
+            "monday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "10% de reintegro y 3 cuotas",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
         },
-        {
-          "text": "",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
         },
-        {
-          "text": "",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
-        },
-        {
-          "text": "10000",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
-        },
-        {
-          "text": "BBVA",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": [
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
             {
-              "name_bank": "BBVA",
-              "image_bank": "https://assets.mobile.playdigital.com.ar/images/banks/bbva.png"
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            }
+          ]
+        },
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "e730db5f-1364-4c7d-8a0a-bec86b318858",
+      "name": "10% en Farmacia Chester",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 10,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": [
+            {
+              "type": "sin_interes",
+              "number": 1,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 2,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 3,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
             }
           ]
         }
-      ],
-      "extra_row": null,
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/092bcbb4-5763-41e6-be90-0e8da27a0e09/primary_image.jpg?v=1778099518691",
-        "primary_backgroundcolor": null,
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/092bcbb4-5763-41e6-be90-0e8da27a0e09/secondary_image.jpg?v=1778099518658",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/092bcbb4-5763-41e6-be90-0e8da27a0e09/tertiary_image.jpg?v=1778099518648",
-        "tertiary_backgroundcolor": null,
-        "secondary_backgroundcolor": null,
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "049ad22b-c0f0-4733-be35-e31256801ce8"
+          ]
+        },
+        "amount_range": {
+          "min": 0
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": null
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 10000,
+          "amount_of_transactions_by_period": 0
         },
-        {
-          "type": "countdown",
-          "value": false,
-          "label": null
-        },
-        {
-          "type": "online_store",
-          "value": false,
-          "label": null
+        "transaction_cap": {
+          "amount_by_transaction": 0
         }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2026-05-11T03:00:00.000Z",
-    "stop_date": "2027-01-01T02:59:59.999Z",
-    "days_of_week": "L",
-    "title": "10% en Farmacia Chester",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "farmacia,chester,bbva,presencial,reintegro,lunes",
-    "promo_id": "e730db5f-1364-4c7d-8a0a-bec86b318858",
-    "slug": "10off-3csi-farmacia-chester-bbva-may26",
-    "short_description": "2605-BBVA-Farmacia-Chester-Presencial-10off-3csi",
-    "where": "Farmacia Chester",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
+      },
       "categories": [
-        {
-          "map_category": 4,
-          "sub_categories": [
-            16
-          ]
-        }
+        "4"
+      ],
+      "sub_categories": [
+        "16"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [],
-    "credit_list": [
-      "visa",
-      "master"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "e730db5f-1364-4c7d-8a0a-bec86b318858",

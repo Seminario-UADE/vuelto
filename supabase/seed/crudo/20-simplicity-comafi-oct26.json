@@ -1,131 +1,112 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20-simplicity-comafi-oct26",
   "tarjeta": {
-    "id": "d773313b-d9bc-4e61-ab32-348828dea515",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": {
-      "promo_id": "25d0aab5-15e0-4478-925c-3eab840954a5"
+    "card_id": "d773313b-d9bc-4e61-ab32-348828dea515",
+    "card": {
+      "benefit": "20% y hasta 3 cuotas sin interés",
+      "validity_place": "Simplicity",
+      "cashback_cap": "10000",
+      "participating_bank": "Comafi",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/c286838f-2275-4d05-8f46-488ceab0a297_Simplicity_Perfumeria.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
     },
-    "content": {
-      "row": [
-        {
-          "text": "Simplicity",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "suggested_order": 20,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "25d0aab5-15e0-4478-925c-3eab840954a5",
+      "name": "Simplicity octubre 26",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "20-simplicity-comafi-oct26",
+        "short_description": "2610-comafi-simplicity-presencialonline-20off",
+        "description": "Aprovecha 20% de reintegro y hasta 3 cuotas sin interés en Simplicity con Comafi",
+        "display_start_date": "2026-10-01T03:00:00.000Z",
+        "display_stop_date": "2027-02-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-10-02",
+          "days_of_week": [
+            "friday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "20% y hasta 3 cuotas sin interés",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
         },
-        {
-          "text": null,
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "online"
+          ]
         },
-        {
-          "text": null,
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            }
+          ]
         },
-        {
-          "text": "10000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "25d0aab5-15e0-4478-925c-3eab840954a5",
+      "name": ".",
+      "priority": 1,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
         },
-        {
-          "text": "Comafi",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/c286838f-2275-4d05-8f46-488ceab0a297_Simplicity_Perfumeria.jpg",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/c286838f-2275-4d05-8f46-488ceab0a297_Simplicity_Perfumeria.jpg",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/c286838f-2275-4d05-8f46-488ceab0a297_Simplicity_Perfumeria.jpg",
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "",
-          "portrait_app": null
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
-        },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:59+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore,online",
-    "start_date": "2026-10-02T03:00:00.000Z",
-    "stop_date": "2027-01-01T02:59:59.999Z",
-    "days_of_week": "V",
-    "title": "Simplicity octubre 26",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "20,3,csi,simplicity,presencial,online,comafi",
-    "promo_id": "25d0aab5-15e0-4478-925c-3eab840954a5",
-    "slug": "20-simplicity-comafi-oct26",
-    "short_description": "2610-comafi-simplicity-presencialonline-20off",
-    "where": "Simplicity",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 4,
-          "sub_categories": [
-            16
+      "requirements": {
+        "banks": {
+          "list": [
+            "ce8aabb1-f663-4832-82ec-de9b5b572aa1"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 10000,
+          "amount_of_transactions_by_period": 0
+        }
+      },
+      "categories": [
+        "4"
+      ],
+      "sub_categories": [
+        "16"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [],
-    "credit_list": [
-      "master",
-      "visa"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "25d0aab5-15e0-4478-925c-3eab840954a5",

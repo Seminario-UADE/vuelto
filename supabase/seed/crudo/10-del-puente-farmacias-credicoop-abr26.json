@@ -1,145 +1,110 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/10-del-puente-farmacias-credicoop-abr26",
   "tarjeta": {
-    "id": "f6cbf29c-8a99-4175-ac91-3c5b5fdd91ac",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "Del Puente Farmacias",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+    "card_id": "f6cbf29c-8a99-4175-ac91-3c5b5fdd91ac",
+    "card": {
+      "benefit": "10% de reintegro",
+      "validity_place": "Del Puente Farmacias",
+      "cashback_cap": "3000",
+      "participating_bank": "Credicoop",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/f6cbf29c-8a99-4175-ac91-3c5b5fdd91ac/primary_image.jpg?v=1776086849439",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 30,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "7ac66c42-b95a-4b17-9716-e0a5fa592921",
+      "name": "RedBC - Del Puente Far...",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "10-del-puente-farmacias-credicoop-abr26",
+        "short_description": "2604-credicoop-del-puente-farmacias-presencial-10off",
+        "description": "Todos los martes con tarjetas Cabal Credicoop",
+        "display_start_date": "2026-04-13T03:00:00.000Z",
+        "display_stop_date": "2027-01-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-04-14",
+          "days_of_week": [
+            "tuesday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "10% de reintegro",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
         },
-        {
-          "text": "",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
         },
-        {
-          "text": "",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
-        },
-        {
-          "text": "3000",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
-        },
-        {
-          "text": "Credicoop",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": [
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
             {
-              "name_bank": "Credicoop",
-              "image_bank": "https://assets.mobile.playdigital.com.ar/images/banks/credicoop.png"
+              "type": "debit_card",
+              "issuer": "cabal"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "cabal"
             }
           ]
-        }
-      ],
-      "extra_row": null,
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/f6cbf29c-8a99-4175-ac91-3c5b5fdd91ac/primary_image.jpg?v=1776086849439",
-        "primary_backgroundcolor": null,
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/f6cbf29c-8a99-4175-ac91-3c5b5fdd91ac/secondary_image.jpg?v=1776086849446",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/f6cbf29c-8a99-4175-ac91-3c5b5fdd91ac/tertiary_image.jpg?v=1776086849481",
-        "tertiary_backgroundcolor": null,
-        "secondary_backgroundcolor": null,
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
+        },
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "7ac66c42-b95a-4b17-9716-e0a5fa592921",
+      "name": "RedBC - Del Puente Far...",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 10,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": null
-        },
-        {
-          "type": "countdown",
-          "value": false,
-          "label": null
-        },
-        {
-          "type": "online_store",
-          "value": false,
-          "label": null
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2026-04-14T03:00:00.000Z",
-    "stop_date": "2027-01-01T02:59:59.999Z",
-    "days_of_week": "M",
-    "title": "RedBC - Del Puente Far...",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "RedCredicoop",
-    "promo_id": "7ac66c42-b95a-4b17-9716-e0a5fa592921",
-    "slug": "10-del-puente-farmacias-credicoop-abr26",
-    "short_description": "2604-credicoop-del-puente-farmacias-presencial-10off",
-    "where": "Del Puente Farmacias",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 4,
-          "sub_categories": [
-            16
+      "requirements": {
+        "banks": {
+          "list": [
+            "b59fbc01-420f-4d88-8d53-be17029bc4ba"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "transaction_cap": {
+          "amount_by_transaction": 3000
+        }
+      },
+      "categories": [
+        "4"
+      ],
+      "sub_categories": [
+        "16"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [
-      "cabal"
-    ],
-    "credit_list": [
-      "cabal"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "7ac66c42-b95a-4b17-9716-e0a5fa592921",

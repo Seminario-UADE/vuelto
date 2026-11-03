@@ -1,0 +1,253 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/tienda-mas-go-y-mastercard-2608-142",
+  "tarjeta": {
+    "card_id": "8b4683ea-84ff-4693-8382-478038d1f647",
+    "card": {
+      "benefit": "35% de reintegro",
+      "validity_place": "Tienda Mas GO",
+      "cashback_cap": "20000",
+      "participating_bank": "Ciudad",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/966b0fc9-84f8-4ec0-bf15-64a1afdbc978_primary_image%20-%202026-07-13T124007.971.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 32,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "c08d2195-c1eb-4c8a-acbd-fc68e7f16c0d",
+      "name": "Tienda Más GO! y Mastercard",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "tienda-mas-go-y-mastercard-2608-142",
+        "short_description": "2808-Ciudad-Tiendamasgo-Presencial-35off",
+        "description": "Aprovecha 35% de reintegro en Tienda Mas GO con Ciudad",
+        "display_start_date": "2026-08-26T03:00:00.000Z",
+        "display_stop_date": "2027-01-03T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-08-27",
+          "days_of_week": [
+            "thursday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            }
+          ]
+        },
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "c08d2195-c1eb-4c8a-acbd-fc68e7f16c0d",
+      "name": ",",
+      "priority": 1,
+      "outcomes": {
+        "cashback": {
+          "amount": 35,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "2313b643-1a79-4312-a213-98cd9a3942b1",
+            "661d0b0f-556f-4e7b-9c79-823e1cd901a1"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 20000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "c08d2195-c1eb-4c8a-acbd-fc68e7f16c0d",
+    "name": "Tienda Más GO! y Mastercard",
+    "description": "Aprovecha 35% de reintegro en Tienda Mas GO con Ciudad",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-08-24T22:36:22.244Z",
+    "updated_at": "2026-09-29T17:46:06.055Z",
+    "deleted_at": null,
+    "short_description": "2808-Ciudad-Tiendamasgo-Presencial-35off",
+    "publication_description": "Aprovecha 35% de reintegro en Tienda Mas GO con Ciudad",
+    "slug": "tienda-mas-go-y-mastercard-2608-142",
+    "display_start_date": "2026-08-26T03:00:00.000Z",
+    "display_stop_date": "2027-01-03T02:59:59.999Z",
+    "search_tags": "Mas Go,Chango Mas",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-08-27",
+        "days_of_week": [
+          "thursday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "c08d2195-c1eb-4c8a-acbd-fc68e7f16c0d",
+        "benefit_id": "c08d2195-c1eb-4c8a-acbd-fc68e7f16c0d",
+        "name": ",",
+        "priority": 1,
+        "segmentations": {
+          "whitelist": [
+            "store_terminal_id"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "2313b643-1a79-4312-a213-98cd9a3942b1",
+              "661d0b0f-556f-4e7b-9c79-823e1cd901a1"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 35,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 20000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-08-24T22:39:55.288Z",
+        "updated_at": "2026-09-29T16:20:44.662Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "master"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">PROMOCIÓN OFRECIDA POR EL BANCO DE LA CIUDAD DE BUENOS AIRES, CUIT 30-99903208-3 (BANCO CIUDAD), VÁLIDA DESDE EL 27/08/2026 HASTA EL 31/12/2026 INCLUSIVE, TODOS LOS JUEVES, EN COMERCIOS FÍSICOS ADHERIDOS. PAGANDO EXCLUSIVAMENTE CON QR MODO A TRAVÉS DE APP CIUDAD O BUEPP CON TARJETAS DE CRÉDITO MASTERCARD BANCO CIUDAD. SE OTORGARÁ UN 35% (TREINTA Y CINCO POR CIENTO) DE DESCUENTO SOBRE EL IMPORTE DE LA COMPRA, CON UN TOPE DE HASTA $20.000 (VEINTE MIL) MENSUAL POR CLIENTE. EL BENEFICIO PODRÁ VISUALIZARSE VÍA REINTEGRO, EL CUAL SERÁ ACREDITADO EN LA CUENTA DEL CLIENTE DENTRO DE LOS 15 DÍAS HÁBILES POSTERIORES A LA FECHA DE REALIZADA LA COMPRA. PARA COMPRAS REALIZADAS POR TITULARES DE TARJETAS ADICIONALES, EL TARJETAHABIENTE ADICIONAL DEBERÁ POSEER UNA CAJA DE AHORRO DEL BANCO CIUDAD ASOCIADA A MODO. LA PRESENTE PROMOCIÓN ES VÁLIDA SÓLO PARA CONSUMOS DE TIPO FAMILIAR. CONFORME RES. 51-E/2017, 240-E/2017 Y 12/24 DE LA SECRETARÍA DE COMERCIO. T.N.A., T.E.A. Y C.F.T.N.A. (IVA INCLUIDO): 0,00% FIJO. T.N.A.: TASA NOMINAL ANUAL; T.E.A.: TASA EFECTIVA ANUAL; C.F.T.N.A.: COSTO FINANCIERO TOTAL EXPRESADO EN FORMA DE TASA NOMINAL ANUAL CON IVA. EL PRODUCTO OFRECIDO CORRESPONDE A LA CARTERA DE CONSUMO. PARA MÁS INFORMACIÓN CONSULTE EN&nbsp;</span><a href=\"https://nam02.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.bancociudad.com.ar%2F&amp;data=05%7C02%7CMOsorio%40bancociudad.com.ar%7C16b7de4ac2334b65688c08deccabca58%7C99d6b2c51dda4246b042ef21eb53f345%7C0%7C0%7C639173235457614615%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&amp;sdata=VP0lv7MiL9qj5uh0MF3GqQ3m9487Fmb0BgTZqTL7WBA%3D&amp;reserved=0\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">WWW.BANCOCIUDAD.COM.AR</span></a></p>",
+    "terms_and_conditions_url": "https://www.bancociudad.com.ar",
+    "coupon": null,
+    "card": {
+      "benefit": "35% de reintegro",
+      "validity_place": "Tienda Mas GO",
+      "cashback_cap": "20000",
+      "participating_bank": "Ciudad",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/966b0fc9-84f8-4ec0-bf15-64a1afdbc978_primary_image%20-%202026-07-13T124007.971.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Tienda Mas GO con Ciudad",
+      "faq": "",
+      "applicability_description": "Todo el país",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

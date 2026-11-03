@@ -1,0 +1,284 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20-toledo-general-icbc-nov26",
+  "tarjeta": {
+    "card_id": "97a21b0f-3a49-463d-af60-3020d1f00574",
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "Toledo",
+      "cashback_cap": "10000",
+      "participating_bank": "ICBC",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/d32feaa6-c69e-486b-9d4e-d5b769b6ba35_toledo.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 15,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "b9a36206-474b-47de-bb19-bd52a1b3e6c8",
+      "name": "20% en Toledo GENERAL",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "20-toledo-general-icbc-nov26",
+        "short_description": "2611-ICBC-Toledo-General-Presencial-20off",
+        "description": "20% en Toledo",
+        "display_start_date": "2026-10-30T03:00:00.000Z",
+        "display_stop_date": "2027-03-25T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-11-24",
+          "start_date": "2026-11-03",
+          "days_of_week": [
+            "tuesday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "pct"
+            }
+          ]
+        },
+        "exclusiveness_source": [
+          "modo",
+          "banks"
+        ],
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "b9a36206-474b-47de-bb19-bd52a1b3e6c8",
+      "name": ".",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "bcfcac03-6f79-4995-bfab-7b8916b0747a"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "week",
+          "aggregate_by": "user",
+          "amount_by_period": 10000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "34",
+        "43"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "b9a36206-474b-47de-bb19-bd52a1b3e6c8",
+    "name": "20% en Toledo GENERAL",
+    "description": "",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-10-20T03:00:13.378Z",
+    "updated_at": "2026-11-02T13:22:59.807Z",
+    "deleted_at": null,
+    "short_description": "2611-ICBC-Toledo-General-Presencial-20off",
+    "publication_description": "20% en Toledo",
+    "slug": "20-toledo-general-icbc-nov26",
+    "display_start_date": "2026-10-30T03:00:00.000Z",
+    "display_stop_date": "2027-03-25T02:59:59.999Z",
+    "search_tags": "toledo,supermercado,20%,general,icbc,presencial,martes",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-11-24",
+        "start_date": "2026-11-03",
+        "days_of_week": [
+          "tuesday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "pct"
+          }
+        ]
+      },
+      "exclusiveness_source": [
+        "modo",
+        "banks"
+      ],
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "b9a36206-474b-47de-bb19-bd52a1b3e6c8",
+        "benefit_id": "b9a36206-474b-47de-bb19-bd52a1b3e6c8",
+        "name": ".",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit",
+            "user_national_id"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43,
+                34
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "bcfcac03-6f79-4995-bfab-7b8916b0747a"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "week",
+            "aggregate_by": "user",
+            "amount_by_period": 10000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "34",
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-10-20T03:00:12.891Z",
+        "updated_at": "2026-10-30T15:58:33.264Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "visa",
+      "master"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">PROPUESTA PARA CARTERA DE CONSUMO VALIDA EN LA REPUBLICA ARGENTINA LOS DÍAS MARTES DESDE EL&nbsp;03/11/2026 HASTA EL 24/11/2026. 20% DE AHORRO CON TARJETAS DE CRÉDITO VISA Y MASTERCARD ICBC EN UN PAGO Y TARJETAS DE DÉBITO VISA ICBC. PARA COMPRAS EN TODOS LOS PRODUCTOS INCLUIDOS EN LA PROMOCION EN LAS SUCURSALES DE SUPER TOLEDO ADHERIDAS. TOPE DE REINTEGRO $10.000 POR USUARIO POR DÍA. EJEMPLO: POR LA COMPRA DE $1.000 EN PRODUCTOS INCLUIDOS EN LA PROMOCION SE LE&nbsp;REINTEGRARAN&nbsp;$200. VISA&nbsp;DEBITO&nbsp;VALIDO SOLO PARA CLIENTES CON PAQUETES DE PRODUCTOS O ACREDITEN SUELDOS EN ICBC. VISA&nbsp;DEBITO&nbsp;EXCLUSIVO PARA EL TITULAR DE CUENTA.&nbsp;LOS REINTEGROS SE VERÁN ACREDITADOS EN EL MOMENTO DE LA COMPRA O HASTA 30 DÍAS POSTERIORES EN CAJA DE AHORRO O CUENTA CORRIENTE DE LA CUENTA REGISTRADA&nbsp;EN MODO. SOLO PODRAN PARTICIPAR DE LA PROMOCION AQUELLOS CLIENTES QUE SE ENCUENTREN AL DIA EN SUS PRODUCTOS. NO VALIDO PARA COMPRAS EFECTUADAS POR MERCADO PAGO, TODO PAGO, PAGO INMEDIATO O PAGO ENTRE PERSONAS. NO VALIDO PARA COMPRAS MAYORISTAS NI PARA TARJETAS VISA BUSINESS, VISA DISTRIBUTION, VISA PURCHASING, VISA PURCHASING CAMPO, CORPORATE, CORPORATE SIGNATURE, RECARGABLE EMPRESA Y VISA CUENTA CENTRAL. VALIDO PARA CLIENTES CON PAQUETE DE PRODUCTOS EN ICBC. INDUSTRIAL AND COMMERCIAL BANK OF CHINA (ARGENTINA) S.A.U. ES UNA SOCIEDAD ANÓNIMA UNIPERSONAL BAJO LA LEY ARGENTINA. SU ACCIONISTA LIMITA SU RESPONSABILIDAD AL CAPITAL APORTADO.&nbsp;(LEY 25738). CUIT: 30-70944784-6. FLORIDA 99, CABA.</span><br></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "Toledo",
+      "cashback_cap": "10000",
+      "participating_bank": "ICBC",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/d32feaa6-c69e-486b-9d4e-d5b769b6ba35_toledo.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Supermercados Toledo con ICBC",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong></p><p>Realizando una compra con tus tarjetas de crédito Visa y/o Mastercard y débito Visa del ICBC a través de MODO.</p><p></p><p><strong>¿Dónde veo el reintegro aplicado?</strong></p><p>El reintegro lo verás acreditado en la cuenta del ICBC dentro de los 30 días.</p>",
+      "applicability_description": "Comercios adheridos",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

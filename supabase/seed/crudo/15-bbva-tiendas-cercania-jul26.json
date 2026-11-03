@@ -1,114 +1,124 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/15-bbva-tiendas-cercania-jul26",
   "tarjeta": {
-    "id": "a9e9e244-3f12-4473-8675-e7228fdf66ad",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "Tiendas de Cercanía",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "card_id": "a9e9e244-3f12-4473-8675-e7228fdf66ad",
+    "card": {
+      "benefit": "15% de reintegro",
+      "validity_place": "Tiendas de Cercanía",
+      "cashback_cap": "10000",
+      "participating_bank": "BBVA",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a9e9e244-3f12-4473-8675-e7228fdf66ad/primary_image.jpg?v=1783025515699",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 20,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "62ae52a2-feeb-4b55-a70e-8b3ef1990762",
+      "name": "15% en Tiendas de ... ",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "15-bbva-tiendas-cercania-jul26",
+        "short_description": "2607-BBVA-Tiendasdecercania-ADQ-Presencial-15off",
+        "description": "Aprovechá 15% de reintegro en Tiendas de Cercanía pagando con tus tarjetas de crédito del BBVA. ",
+        "display_start_date": "2026-07-01T03:00:00.000Z",
+        "display_stop_date": "2027-04-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-07-01",
+          "days_of_week": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "15% de reintegro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
         },
-        {
-          "text": "",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
         },
-        {
-          "text": "",
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            }
+          ]
         },
-        {
-          "text": "10000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "BBVA",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a9e9e244-3f12-4473-8675-e7228fdf66ad/primary_image.jpg?v=1783025515699",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a9e9e244-3f12-4473-8675-e7228fdf66ad/secondary_image.jpg?v=1783025515715",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a9e9e244-3f12-4473-8675-e7228fdf66ad/tertiary_image.jpg?v=1783025515702",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
-        }
+        "has_differential_amount": false
       }
     },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2026-07-01T03:00:00.000Z",
-    "stop_date": "2027-01-01T02:59:59.999Z",
-    "days_of_week": "LMXJVSD",
-    "title": "15% en Tiendas de ... ",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "tiendas,de cercania,bbva,presencial",
-    "promo_id": "62ae52a2-feeb-4b55-a70e-8b3ef1990762",
-    "slug": "15-bbva-tiendas-cercania-jul26",
-    "short_description": "2607-BBVA-Tiendasdecercania-ADQ-Presencial-15off",
-    "where": "Comercios Adheridos",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            43,
-            26,
-            34
-          ]
+    "offer": {
+      "id": "62ae52a2-feeb-4b55-a70e-8b3ef1990762",
+      "name": "15% en Tiendas de ... ",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 15,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
         }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "049ad22b-c0f0-4733-be35-e31256801ce8"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 10000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "26",
+        "34",
+        "43"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [],
-    "credit_list": [
-      "visa",
-      "master"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "62ae52a2-feeb-4b55-a70e-8b3ef1990762",

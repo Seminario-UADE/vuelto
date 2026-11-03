@@ -1,111 +1,114 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/2608-macro-pollomio-15-off",
   "tarjeta": {
-    "id": "8c3d71db-37d9-4757-841a-6735b2a14139",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "POLLO MIO",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "card_id": "8c3d71db-37d9-4757-841a-6735b2a14139",
+    "card": {
+      "benefit": "15% de reintegro",
+      "validity_place": "POLLO MIO",
+      "cashback_cap": "25000",
+      "participating_bank": "Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/8c3d71db-37d9-4757-841a-6735b2a14139/primary_image.jpg?v=1787670805688",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 25,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "6c6157f2-eedb-4156-8c8a-d39423d323cd",
+      "name": "POLLO MIO",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "2608-macro-pollomio-15-off",
+        "short_description": "2608-macro-TD48948-pollomio-Presencial-15off",
+        "description": "SEG_S",
+        "display_start_date": "2026-08-26T03:00:00.000Z",
+        "display_stop_date": "2027-01-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-08-26",
+          "days_of_week": [
+            "wednesday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "15% de reintegro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [
+            "PRISMA"
+          ],
+          "segmentation_mode": "by_whitelist"
         },
-        {
-          "text": "",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "instore_nfc",
+            "physical-card"
+          ]
         },
-        {
-          "text": "",
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            }
+          ]
         },
-        {
-          "text": "25000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "Macro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/8c3d71db-37d9-4757-841a-6735b2a14139/primary_image.jpg?v=1787670805688",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/8c3d71db-37d9-4757-841a-6735b2a14139/secondary_image.jpg?v=1787670805681",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/8c3d71db-37d9-4757-841a-6735b2a14139/tertiary_image.jpg?v=1787670805673",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
-        }
+        "has_differential_amount": false
       }
     },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW",
-    "exclusiveness": "all",
-    "payment_flow": "instore,instore_nfc,physical-card",
-    "start_date": "2026-08-26T03:00:00.000Z",
-    "stop_date": "2027-01-01T02:59:59.999Z",
-    "days_of_week": "X",
-    "title": "POLLO MIO",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "SEG_S",
-    "promo_id": "6c6157f2-eedb-4156-8c8a-d39423d323cd",
-    "slug": "2608-macro-pollomio-15-off",
-    "short_description": "2608-macro-TD48948-pollomio-Presencial-15off",
-    "where": "POLLO MIO",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            43
-          ]
+    "offer": {
+      "id": "6c6157f2-eedb-4156-8c8a-d39423d323cd",
+      "name": "POLLO MIO",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 15,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_por_regla"
+        },
+        "financing": {
+          "installments": []
         }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "6a089c91-a7d3-4199-a578-2132a3733f69"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "card",
+          "amount_by_period": 25000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [
-      "visa"
-    ],
-    "credit_list": []
+    "coupon": null
   },
   "detalle": {
     "id": "6c6157f2-eedb-4156-8c8a-d39423d323cd",

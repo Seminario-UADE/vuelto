@@ -1,132 +1,122 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/2610-macro-justinianopossesupermer-25off",
   "tarjeta": {
-    "id": "7475ea8d-bb3a-4a14-a421-a1ecf8672724",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": {
-      "promo_id": "4b4fbe3f-ced4-4d8f-9eec-01bc836047b1"
+    "card_id": "7475ea8d-bb3a-4a14-a421-a1ecf8672724",
+    "card": {
+      "benefit": "25% de reintegro",
+      "validity_place": "JUSTINIANO POSSE SUPERMERCADO",
+      "cashback_cap": "20000",
+      "participating_bank": "Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/0011a95a-e633-469c-b27c-3ceb991f7695_Super-Generica.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
     },
-    "content": {
-      "row": [
-        {
-          "text": "JUSTINIANO POSSE SUPERMERCADO",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "suggested_order": 25,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "4b4fbe3f-ced4-4d8f-9eec-01bc836047b1",
+      "name": "JUSTINIANO POSSE SUPERMER",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "2610-macro-justinianopossesupermer-25off",
+        "short_description": "2610-macro-TC50088-justinianopossesupermer-presencial-25off",
+        "description": "SEG_P",
+        "display_start_date": "2026-09-29T03:00:00.000Z",
+        "display_stop_date": "2027-01-02T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-10-01",
+          "days_of_week": [
+            "wednesday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "25% de reintegro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [
+            "PRISMA"
+          ],
+          "segmentation_mode": "by_whitelist"
         },
-        {
-          "text": null,
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "instore_nfc",
+            "physical-card"
+          ]
         },
-        {
-          "text": null,
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "american_express"
+            }
+          ]
         },
-        {
-          "text": "20000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "4b4fbe3f-ced4-4d8f-9eec-01bc836047b1",
+      "name": ".",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 25,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_por_regla"
         },
-        {
-          "text": "Macro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/0011a95a-e633-469c-b27c-3ceb991f7695_Super-Generica.jpg",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/0011a95a-e633-469c-b27c-3ceb991f7695_Super-Generica.jpg",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/0011a95a-e633-469c-b27c-3ceb991f7695_Super-Generica.jpg",
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "",
-          "portrait_app": null
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
-        },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:59+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW",
-    "exclusiveness": "all",
-    "payment_flow": "instore,instore_nfc,physical-card",
-    "start_date": "2026-10-01T03:00:00.000Z",
-    "stop_date": "2027-01-01T02:59:59.999Z",
-    "days_of_week": "X",
-    "title": "JUSTINIANO POSSE SUPERMER",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "SEG_P",
-    "promo_id": "4b4fbe3f-ced4-4d8f-9eec-01bc836047b1",
-    "slug": "2610-macro-justinianopossesupermer-25off",
-    "short_description": "2610-macro-TC50088-justinianopossesupermer-presencial-25off",
-    "where": "",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            43
+      "requirements": {
+        "banks": {
+          "list": [
+            "6a089c91-a7d3-4199-a578-2132a3733f69"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 20000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [],
-    "credit_list": [
-      "master",
-      "visa",
-      "american_express"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "4b4fbe3f-ced4-4d8f-9eec-01bc836047b1",

@@ -1,128 +1,142 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/2607-macro-shopterron-20off-3csi",
   "tarjeta": {
-    "id": "384bd944-3a35-45d3-9a62-a5e2074f7056",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "SHOP TERRON",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "20% y hasta 3 cuotas sin interés",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": null,
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": null,
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "20000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "Macro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/384bd944-3a35-45d3-9a62-a5e2074f7056/primary_image.jpg?v=1787849533320",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/384bd944-3a35-45d3-9a62-a5e2074f7056/primary_image.jpg?v=1787849533320",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/384bd944-3a35-45d3-9a62-a5e2074f7056/primary_image.jpg?v=1787849533320",
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
-        }
-      },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
-        },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
-        }
-      ]
+    "card_id": "384bd944-3a35-45d3-9a62-a5e2074f7056",
+    "card": {
+      "benefit": "20% y hasta 3 cuotas sin interés",
+      "validity_place": "SHOP TERRON",
+      "cashback_cap": "20000",
+      "participating_bank": "Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/384bd944-3a35-45d3-9a62-a5e2074f7056/primary_image.jpg?v=1787849533320",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
     },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW",
-    "exclusiveness": "all",
-    "payment_flow": "instore,instore_nfc,physical-card",
-    "start_date": "2026-07-01T03:00:00.000Z",
-    "stop_date": "2027-01-01T02:59:59.999Z",
-    "days_of_week": "LMXJVSD",
-    "title": "SHOP TERRON",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "SEG_S",
-    "promo_id": "3d0ba008-7705-483f-bb0c-cef2bd475283",
-    "slug": "2607-macro-shopterron-20off-3csi",
-    "short_description": "2607-macro-TC46691-shopterron-Presencial-20off-3csi",
-    "where": "SHOP TERRON",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            34
+    "suggested_order": 25,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "3d0ba008-7705-483f-bb0c-cef2bd475283",
+      "name": "SHOP TERRON",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "2607-macro-shopterron-20off-3csi",
+        "short_description": "2607-macro-TC46691-shopterron-Presencial-20off-3csi",
+        "description": "SEG_S",
+        "display_start_date": "2026-07-01T03:00:00.000Z",
+        "display_stop_date": "2027-01-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-07-01",
+          "days_of_week": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [
+            "PRISMA"
+          ],
+          "segmentation_mode": "by_whitelist"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "instore_nfc",
+            "physical-card"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            }
+          ]
+        },
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "3d0ba008-7705-483f-bb0c-cef2bd475283",
+      "name": ".",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_por_regla"
+        },
+        "financing": {
+          "installments": [
+            {
+              "type": "sin_interes",
+              "number": 1,
+              "coefficient": "0",
+              "annual_nominal_rate": "0",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 2,
+              "coefficient": "0",
+              "annual_nominal_rate": "0",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 3,
+              "coefficient": "0",
+              "annual_nominal_rate": "0",
+              "total_financial_cost": "0"
+            }
           ]
         }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "6a089c91-a7d3-4199-a578-2132a3733f69"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 20000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "34"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [],
-    "credit_list": [
-      "visa"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "3d0ba008-7705-483f-bb0c-cef2bd475283",

@@ -1,0 +1,269 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/aiello-nov26",
+  "tarjeta": {
+    "card_id": "24fa67ee-fced-41db-a468-fde8effc5486",
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "Aiello supermercados",
+      "cashback_cap": "20000",
+      "participating_bank": "Comafi",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/2a108f2a-df42-4597-b91e-ae7a3eaa73d9_Aiello-Detalle.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 12,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "45d5f6ca-27cc-4502-b691-5730bf907895",
+      "name": "Aiello supermercados nov26",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "aiello-nov26",
+        "short_description": "2611-Comafi-SupermercadosAiello-Presencial-Online-20off",
+        "description": "20% en Supermercados Aiello",
+        "display_start_date": "2026-11-03T03:00:00.000Z",
+        "display_stop_date": "2027-04-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2027-01-31",
+          "start_date": "2026-11-03",
+          "days_of_week": [
+            "tuesday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            }
+          ]
+        },
+        "exclusiveness_source": [
+          "modo",
+          "banks"
+        ],
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "45d5f6ca-27cc-4502-b691-5730bf907895",
+      "name": ".",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "ce8aabb1-f663-4832-82ec-de9b5b572aa1"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 20000,
+          "amount_of_transactions_by_period": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "45d5f6ca-27cc-4502-b691-5730bf907895",
+    "name": "Aiello supermercados nov26",
+    "description": "",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-10-21T12:21:20.735Z",
+    "updated_at": "2026-11-02T12:46:58.543Z",
+    "deleted_at": null,
+    "short_description": "2611-Comafi-SupermercadosAiello-Presencial-Online-20off",
+    "publication_description": "20% en Supermercados Aiello",
+    "slug": "aiello-nov26",
+    "display_start_date": "2026-11-03T03:00:00.000Z",
+    "display_stop_date": "2027-04-01T02:59:59.999Z",
+    "search_tags": "comafi,supermercados,aiello,20,reintegro,martes",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2027-01-31",
+        "start_date": "2026-11-03",
+        "days_of_week": [
+          "tuesday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "exclusiveness_source": [
+        "modo",
+        "banks"
+      ],
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "45d5f6ca-27cc-4502-b691-5730bf907895",
+        "benefit_id": "45d5f6ca-27cc-4502-b691-5730bf907895",
+        "name": ".",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit",
+            "store_terminal_id"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "ce8aabb1-f663-4832-82ec-de9b5b572aa1"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 20000,
+            "amount_of_transactions_by_period": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-10-21T12:22:44.327Z",
+        "updated_at": "2026-10-21T12:41:07.343Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": null
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "visa",
+      "master"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Oferta exclusiva para la cartera de consumo. Promoción válida los días martes desde el 03/11/26 hasta el 31/01/27 abonando con tarjetas de crédito Visa y Mastercard, Visa débito emitidas por Banco Comafi. 20% de ahorro abonando a través de MODO. Quedan excluidas aquellas tarjetas de crédito Credial, Business y Corporativas emitidas en Argentina por Banco Comafi. Tope de reintegro mensual de $20.000. Los descuentos se realizan sobre precio de lista, son automáticos y se acreditarán hasta los 30 días en la cuenta del banco utilizado en el pago. No acumulable con otras promociones ni entre sí. Sólo válido para aquellos clientes que se encuentren al día en sus productos y sean titulares de una caja de ahorro en pesos en Banco Comafi. Para compras realizadas por adicionales con tarjeta de débito y/o crédito de Banco Comafi el reintegro siempre se acreditará en la caja de ahorro en pesos que el titular principal de la tarjeta de débito y/o crédito tenga en Banco Comafi. El descuento no será aplicado en aquellos pagos realizados a través de la aplicación de Mercado Pago. La promoción no aplica a pagos a través de billeteras virtuales (excepto Modo), plataformas de pago y/o portales de pagos online ajenos a la empresa. Banco Comafi no se responsabiliza por los cupones presentados por los establecimientos fuera de término, así como tampoco promociona ni garantiza los comercios, los productos y/o servicios o la calidad de los mismos. Banco Comafi S.A. con domicilio en Av. Roque Sáenz Peña 660, piso 1, CUIT 30-60473101-8.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "Aiello supermercados",
+      "cashback_cap": "20000",
+      "participating_bank": "Comafi",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/2a108f2a-df42-4597-b91e-ae7a3eaa73d9_Aiello-Detalle.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Aiello supermercados",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong></p><p>Realizando una compra con tus tarjetas crédito y/o débito Visa y tarjetas de crédito Mastercard, del Banco Comafi a través de MODO.</p><p></p><p><strong>¿Dónde veo el reintegro aplicado?</strong></p><p>El reintegro lo verás acreditado en tu cuenta del Banco Comafi.</p>",
+      "applicability_description": ".",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

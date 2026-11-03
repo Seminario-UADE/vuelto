@@ -126,7 +126,7 @@ No se dan por chequeados hasta resolver el pendiente que los frena
 
 | Requisito | Qué falta | Issue |
 |---|---|---|
-| RF-18 | Corpus sembrado a mano: el relevamiento del 2026-11-02 ya verificó qué hay vigente en MODO (`corpus-semilla.md`, `alcance-mvp.md`); falta la revisión humana de la letra chica y de la zona de cada cadena (Supermercados y Farmacias: #35; las demás categorías: Joaquín) | #35 |
+| RF-18 | Corpus sembrado a mano: el relevamiento del 2026-11-03 ya verificó qué hay vigente en MODO (`corpus-semilla.md`, `alcance-mvp.md`); falta la revisión humana de la letra chica y de la zona de cada cadena (Supermercados y Farmacias: #35; las demás categorías: Joaquín) | #35 |
 | RF-13, RNF-13 | Dónde corre el cron de ingesta (relevamiento de fuentes ya resuelto, ver `fuentes-promos.md`) | `pendientes.md` |
 | RF-08, RNF-09 | Proveedor/modelo del extractor y precisión sobre tickets reales | #10 |
 | RF-05 | Cómo se dispara el momento de uso (notificación / geolocalización) | `pendientes.md` |

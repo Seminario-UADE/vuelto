@@ -1,0 +1,292 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/30-supermercados-gp-nov26",
+  "tarjeta": {
+    "card_id": "b9c22f40-6be1-4a96-99bf-6e8adc1e7923",
+    "card": {
+      "benefit": "30% de reintegro",
+      "validity_place": "Supermercados adheridos",
+      "cashback_cap": "15000",
+      "participating_bank": "Bancos adheridos",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/fbb8a137-55d5-4963-b8b6-1cd163852fa1_Supermercados-8.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 15,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "bc42efa8-3141-4a38-aea2-4f7571daf579",
+      "name": "30% en Supermercados adheridos",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "30-supermercados-gp-nov26",
+        "short_description": "2611-GP-Supermercados-Presencial-30off",
+        "description": "30% en Supermercados",
+        "display_start_date": "2026-10-26T03:00:00.000Z",
+        "display_stop_date": "2027-03-29T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-11-01",
+          "days_of_week": [
+            "friday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            }
+          ]
+        },
+        "exclusiveness_source": [
+          "modo",
+          "banks"
+        ],
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "bc42efa8-3141-4a38-aea2-4f7571daf579",
+      "name": ".",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 30,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "74f9a732-f38f-4e2e-8263-b51e114ce1f3",
+            "d58d01e9-9411-4f6f-980f-fd469bcef30d",
+            "521bea00-ec3a-49ab-a019-6ae0bddf57c3",
+            "888318e4-0537-457c-9db2-767dbc2f6bd3"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 15000,
+          "amount_of_transactions_by_period": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "13",
+        "26",
+        "27",
+        "34",
+        "43",
+        "44",
+        "45"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "bc42efa8-3141-4a38-aea2-4f7571daf579",
+    "name": "30% en Supermercados adheridos",
+    "description": "",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-10-23T12:50:56.691Z",
+    "updated_at": "2026-10-27T15:27:56.380Z",
+    "deleted_at": null,
+    "short_description": "2611-GP-Supermercados-Presencial-30off",
+    "publication_description": "30% en Supermercados",
+    "slug": "30-supermercados-gp-nov26",
+    "display_start_date": "2026-10-26T03:00:00.000Z",
+    "display_stop_date": "2027-03-29T02:59:59.999Z",
+    "search_tags": "supermercado,gp,san juan,santa fe,entre rios,santa cruz,30%,presencial",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-11-01",
+        "days_of_week": [
+          "friday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "exclusiveness_source": [
+        "modo",
+        "banks"
+      ],
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "bc42efa8-3141-4a38-aea2-4f7571daf579",
+        "benefit_id": "bc42efa8-3141-4a38-aea2-4f7571daf579",
+        "name": ".",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43,
+                44,
+                45,
+                13,
+                26,
+                27,
+                34
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "74f9a732-f38f-4e2e-8263-b51e114ce1f3",
+              "d58d01e9-9411-4f6f-980f-fd469bcef30d",
+              "521bea00-ec3a-49ab-a019-6ae0bddf57c3",
+              "888318e4-0537-457c-9db2-767dbc2f6bd3"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 30,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 15000,
+            "amount_of_transactions_by_period": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "13",
+          "26",
+          "27",
+          "34",
+          "43",
+          "44",
+          "45"
+        ],
+        "preselected": false,
+        "created_at": "2026-10-23T12:51:39.292Z",
+        "updated_at": "2026-10-23T12:51:49.226Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": null
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "master",
+      "visa"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Válido Cartera Consumo. Vigencia: Aplicable exclusivamente los días viernes desde el 01/11/2026 al 31/12/2026. Promoción: válida únicamente en comercios adheridos abonando en un pago, con Tarjetas de Crédito y Débito emitidas por los BANCOS participantes, utilizando Modo desde la app del Banco o app Modo. Es necesario que previo a realizar el pago el usuario tenga asociada a MODO la cuenta y la tarjeta de crédito o débito con la que realizará la compra. Beneficio: Se otorgará un reintegro del 30 % en la cuenta asociada del cliente, dentro de los 30 días de realizada la compra. Tope de reintegro: $15.000 por usuario por mes. Ejemplo: En una compra de $100.000 abonada con tarjeta Visa o Mastercad del Banco en un pago, el usuario recibirá dentro de los 30 días posteriores al pago un reintegro de $15.000 (Tope de la promoción). No aplica para pagos en cuotas ni efectuados a través de otras billeteras o plataformas de pago. Consulte locales adheridos El Banco solo informa el medio y las condiciones para el pago de los productos/servicios ofrecidos por el proveedor, previo a la contratación del producto o servicio, verifique con el proveedor sus condiciones y alcance de la garantía. Banco de Santa Cruz S.A. - CUIT 30-50009880-1 – Av. Pte. Dr. Néstor C. Kirchner 812, Río Gallegos, Santa Cruz, Nuevo Banco Santa Fe S.A. – CUIT 30-69243266-1 - San Martin N°715, Provincia de Santa Fe, Banco de San Juan S.A. - CUIT 30-50000944-2 –Av. Ignacio de la Roza 85 oeste, Capital, San Juan, Nuevo Banco de Entre Ríos S.A. - Cuit 33-70799551-9 - Monte Caseros 128, Paraná, Entre Ríos. MODO es un servicio prestado por el proveedor de servicios tecnológicos play digital s.a. cuit 30716829436 av del libertador 7208 torre ii p.4 caba, siendo la marca modo de su propiedad.</span></p><p class=\"editor-paragraph\"><br></p><p class=\"editor-paragraph\"><br></p>",
+    "terms_and_conditions_url": "https://beneficios.modo.com.ar/beneficios/bc42efa8-3141-4a38-aea2-4f7571daf579/nuevo?from=duplicate&source=f5ff847f-f380-4c07-a39a-3de25ecb38a1&sections=validity,usageMode,paymentMethods,acquirers,reimbursementMechanics,benefit,conditions,banks,categories,stores,sharedContribution,publication",
+    "coupon": null,
+    "card": {
+      "benefit": "30% de reintegro",
+      "validity_place": "Supermercados adheridos",
+      "cashback_cap": "15000",
+      "participating_bank": "Bancos adheridos",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/fbb8a137-55d5-4963-b8b6-1cd163852fa1_Supermercados-8.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Supermercados adheridos",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong></p><p>Todos los viernes pagando con tus tarjetas de crédito Visa y/o Mastercard y/o Débito Visa de Banco San Juan, Banco Santa Fe, Banco Santa Cruz y Banco Entre Ríos a través de MODO.</p><p></p><p><strong>¿Dónde veo el descuento aplicado?</strong></p><p>El reintegro lo verás acreditado en la cuenta de tu banco que elegiste comprar.</p>",
+      "applicability_description": "Comercios adheridos",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

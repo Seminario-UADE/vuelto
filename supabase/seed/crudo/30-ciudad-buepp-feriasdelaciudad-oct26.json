@@ -1,141 +1,141 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/30-ciudad-buepp-feriasdelaciudad-oct26",
   "tarjeta": {
-    "id": "39463f69-0340-4b67-8889-af2cf6bf4185",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": {
-      "promo_id": "4acb0508-dbd5-4832-ae47-5e4159a9e34b"
+    "card_id": "39463f69-0340-4b67-8889-af2cf6bf4185",
+    "card": {
+      "benefit": "30% de reintegro",
+      "validity_place": "Ferias de la Ciudad",
+      "cashback_cap": "10000",
+      "participating_bank": "Ciudad / Buepp",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/e110c8a4-7d14-4a61-840b-baa5e4c67c70_primary_image%20-%202026-10-01T205040.397.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
     },
-    "content": {
-      "row": [
-        {
-          "text": "Ferias de la Ciudad",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "suggested_order": 30,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "4acb0508-dbd5-4832-ae47-5e4159a9e34b",
+      "name": "30% Ferias de la Ciudad OCT26",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "30-ciudad-buepp-feriasdelaciudad-oct26",
+        "short_description": "2610-ciudad-buepp-feriasdelaciudad-presencial-30off",
+        "description": "Lunes, martes, jueves y sábados 30% en Ferias de la Ciudad con Buepp",
+        "display_start_date": "2026-10-01T03:00:00.000Z",
+        "display_stop_date": "2027-02-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-10-03",
+          "days_of_week": [
+            "monday",
+            "tuesday",
+            "thursday",
+            "saturday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "30% de reintegro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE",
+            "PRISMA",
+            "NAVE",
+            "GETNET"
+          ],
+          "segmentation_mode": "by_blacklist"
         },
-        {
-          "text": null,
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
         },
-        {
-          "text": null,
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "cabal"
+            },
+            {
+              "type": "debit_card",
+              "issuer": "maestro"
+            },
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "pct"
+            }
+          ]
         },
-        {
-          "text": "10000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "4acb0508-dbd5-4832-ae47-5e4159a9e34b",
+      "name": ".",
+      "priority": 1,
+      "outcomes": {
+        "cashback": {
+          "amount": 30,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
         },
-        {
-          "text": "Ciudad / Buepp",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/e110c8a4-7d14-4a61-840b-baa5e4c67c70_primary_image%20-%202026-10-01T205040.397.jpg",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/e110c8a4-7d14-4a61-840b-baa5e4c67c70_primary_image%20-%202026-10-01T205040.397.jpg",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/e110c8a4-7d14-4a61-840b-baa5e4c67c70_primary_image%20-%202026-10-01T205040.397.jpg",
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "",
-          "portrait_app": null
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
-        },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2026-10-03T03:00:00.000Z",
-    "stop_date": "2027-01-01T02:59:59.999Z",
-    "days_of_week": "LMJS",
-    "title": "30% Ferias de la Ciudad OCT26",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "30,feriasdelaciudad,presencial,ciudad,buepp",
-    "promo_id": "4acb0508-dbd5-4832-ae47-5e4159a9e34b",
-    "slug": "30-ciudad-buepp-feriasdelaciudad-oct26",
-    "short_description": "2610-ciudad-buepp-feriasdelaciudad-presencial-30off",
-    "where": "Ferias de la Ciudad",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            13,
-            26,
-            27,
-            34,
-            43,
-            44,
-            45
+      "requirements": {
+        "banks": {
+          "list": [
+            "661d0b0f-556f-4e7b-9c79-823e1cd901a1",
+            "2313b643-1a79-4312-a213-98cd9a3942b1"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 10000,
+          "amount_of_transactions_by_period": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "13",
+        "26",
+        "27",
+        "34",
+        "43",
+        "44",
+        "45"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [
-      "maestro",
-      "visa"
-    ],
-    "credit_list": [
-      "master",
-      "visa",
-      "cabal"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "4acb0508-dbd5-4832-ae47-5e4159a9e34b",

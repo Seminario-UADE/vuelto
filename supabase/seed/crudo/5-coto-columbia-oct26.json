@@ -1,0 +1,263 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/5-coto-columbia-oct26",
+  "tarjeta": {
+    "card_id": "c82b386f-6a4d-47f9-b340-11b7c6699c16",
+    "card": {
+      "benefit": "5% de reintegro",
+      "validity_place": "Coto",
+      "cashback_cap": "0",
+      "participating_bank": "Columbia",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/095b174c-3ff5-41a7-989e-d4603873f36f_COTO_Supermercado.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 15,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "0f1f2f56-d2e7-44b2-ab67-686e689a11f8",
+      "name": "COTO MARTES 5%",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "5-coto-columbia-oct26",
+        "short_description": "2610-columbia-adicional-coto-presencial-5off",
+        "description": "Aprovechá 5% de reintegro adicional en Supermercados COTO con Banco Columbia",
+        "display_start_date": "2026-09-30T03:00:00.000Z",
+        "display_stop_date": "2027-01-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-11-30",
+          "start_date": "2026-10-01",
+          "days_of_week": [
+            "tuesday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "debit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            }
+          ]
+        },
+        "exclusiveness_source": [
+          "modo",
+          "banks"
+        ],
+        "has_differential_amount": true
+      }
+    },
+    "offer": {
+      "id": "0f1f2f56-d2e7-44b2-ab67-686e689a11f8",
+      "name": ".",
+      "priority": 1,
+      "outcomes": {
+        "cashback": {
+          "amount": 5,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "ad400e13-f76a-4877-a01d-1819d16146e9"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": null,
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "0f1f2f56-d2e7-44b2-ab67-686e689a11f8",
+    "name": "COTO MARTES 5%",
+    "description": "",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-09-14T14:11:11.483Z",
+    "updated_at": "2026-10-29T18:56:38.640Z",
+    "deleted_at": null,
+    "short_description": "2610-columbia-adicional-coto-presencial-5off",
+    "publication_description": "Aprovechá 5% de reintegro adicional en Supermercados COTO con Banco Columbia",
+    "slug": "5-coto-columbia-oct26",
+    "display_start_date": "2026-09-30T03:00:00.000Z",
+    "display_stop_date": "2027-01-01T02:59:59.999Z",
+    "search_tags": "5,extra,coto,columbia,presencial,martes",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-11-30",
+        "start_date": "2026-10-01",
+        "days_of_week": [
+          "tuesday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "debit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "exclusiveness_source": [
+        "modo",
+        "banks"
+      ],
+      "has_differential_amount": true
+    },
+    "offers": [
+      {
+        "id": "0f1f2f56-d2e7-44b2-ab67-686e689a11f8",
+        "benefit_id": "0f1f2f56-d2e7-44b2-ab67-686e689a11f8",
+        "name": ".",
+        "priority": 1,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "ad400e13-f76a-4877-a01d-1819d16146e9"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 5,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": null,
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-09-14T14:13:42.131Z",
+        "updated_at": "2026-10-05T18:13:25.218Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": null
+      }
+    ],
+    "debit_list": [
+      "master",
+      "visa"
+    ],
+    "credit_list": [
+      "master",
+      "visa"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">CARTERA DE CONSUMO PROMOCION  VALIDA  TODOS LOS DIAS MARTES DESDE EL 01/10/2026 AL 30/11/2026 EN COTO, EN LAS COMPRAS REALIZADAS EN COMERCIOS CON LAS TARJETAS DE CREDITO Y DEBITO MASTERCARD Y VISA EMITIDA POR  BANCO COLUMBIA. SOBRE DICHAS COMPRAS SE OTORGARÁ UN 5 % DE DESCUENTO SIN TOPE POR CUENTA Y POR SEMANA. ABONANDO CON QR DE MODO DESDE LA APP DE BANCO COLUMBIA. CONSULTE EN COTO PRODUCTOS ALCANZADOS POR LA PROMOCION. SI CONSUMIS $30.000 SE TE REINTEGRARA $1.500 COMO MAXIMO EN 30 DIAS EN LA CAJA DE AHORRO. EL DESCUENTO NO APLICARA SI ES REALIZADO CON BILLETERAS, QR DE MERCADO MPAGO O POR NFC. BANCO COLUMBIA S.A. NO SE RESPONSABILIZA POR LA CALIDAD Y FUNCIONAMIENTO DE PRODUCTOS PUBLICADOS. </span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "5% de reintegro",
+      "validity_place": "Coto",
+      "cashback_cap": "0",
+      "participating_bank": "Columbia",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/095b174c-3ff5-41a7-989e-d4603873f36f_COTO_Supermercado.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Coto con Banco Columbia",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong></p><p>Realizando una compra con tus tarjetas de crédito o débito Visa y/o Mastercard de Banco Columbia a través MODO.</p><p></p><p><strong>¿Cómo es la modalidad de uso?</strong></p><p>En tiendas físicas adheridas.</p><p></p><p><strong>¿Dónde veo el descuento aplicado?</strong></p><p>El reintegro lo verás acreditado en la cuenta del Columbia dentro de los 30 días.</p>",
+      "applicability_description": "Coto",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

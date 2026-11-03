@@ -1,131 +1,123 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20-supermercados-monarca-icbc-ago25",
   "tarjeta": {
-    "id": "92852ab3-32b5-4af1-823c-fbf9a1c27e8d",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "Supermercados Monarca",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "card_id": "92852ab3-32b5-4af1-823c-fbf9a1c27e8d",
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "Supermercados Monarca",
+      "cashback_cap": "10000",
+      "participating_bank": "ICBC",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/92852ab3-32b5-4af1-823c-fbf9a1c27e8d/primary_image.jpg?v=1753472321648",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 70,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "33137570-7e17-4431-aeea-555587508ce4",
+      "name": "20% en Super Monarca",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "20-supermercados-monarca-icbc-ago25",
+        "short_description": "2508-icbc-supermercados-monarca-presencial-20off",
+        "description": "Aprovechá 20% de reintegro en supermercados Monarca pagando con tus tarjetas del ICBC.",
+        "display_start_date": "2025-07-25T03:00:00.000Z",
+        "display_stop_date": "2026-12-31T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2027-01-31",
+          "start_date": "2025-08-01",
+          "days_of_week": [
+            "tuesday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "20% de reintegro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
         },
-        {
-          "text": "Desde el 01/08 al 31/03",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
         },
-        {
-          "text": "Exclusivo con",
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "pct"
+            }
+          ]
         },
-        {
-          "text": "10000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "33137570-7e17-4431-aeea-555587508ce4",
+      "name": "20% en Super Monarca",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
         },
-        {
-          "text": "ICBC",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/92852ab3-32b5-4af1-823c-fbf9a1c27e8d/primary_image.jpg?v=1753472321648",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": null,
-        "tertiary_image": null,
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
-        },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2025-08-01T03:00:00.000Z",
-    "stop_date": "2027-02-01T02:59:59.999Z",
-    "days_of_week": "M",
-    "title": "20% en Super Monarca",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "20,icbc,martes,super,monarca,presencial",
-    "promo_id": "33137570-7e17-4431-aeea-555587508ce4",
-    "slug": "20-supermercados-monarca-icbc-ago25",
-    "short_description": "2508-icbc-supermercados-monarca-presencial-20off",
-    "where": "Supermercados Monarca",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            43
+      "requirements": {
+        "banks": {
+          "list": [
+            "bcfcac03-6f79-4995-bfab-7b8916b0747a"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "day",
+          "aggregate_by": "user",
+          "amount_by_period": 10000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [
-      "visa"
-    ],
-    "credit_list": [
-      "visa",
-      "master"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "33137570-7e17-4431-aeea-555587508ce4",

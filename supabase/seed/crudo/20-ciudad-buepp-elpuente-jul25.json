@@ -1,129 +1,117 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20-ciudad-buepp-elpuente-jul25",
   "tarjeta": {
-    "id": "77a2bc32-f906-41b8-b902-d9c664b3263e",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "El Puente",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "card_id": "77a2bc32-f906-41b8-b902-d9c664b3263e",
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "El Puente",
+      "cashback_cap": "20000",
+      "participating_bank": "Ciudad/Buepp",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/77a2bc32-f906-41b8-b902-d9c664b3263e/primary_image.jpg?v=1773086884234",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 20,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "a58e7466-a0e6-4c65-928a-8b0da2327e1d",
+      "name": "20% en El Puente",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "20-ciudad-buepp-elpuente-jul25",
+        "short_description": "2507-ciudad-buepp-elpuente-presencial-20off",
+        "description": "Aprovechá 20% de reintegro en El Puente con tus tarjetas del Ciudad y Buep",
+        "display_start_date": "2025-07-01T03:00:00.000Z",
+        "display_stop_date": "2027-04-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2025-07-01",
+          "days_of_week": [
+            "monday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "20% de reintegro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
         },
-        {
-          "text": "Desde el 01/07 al 30/06",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
         },
-        {
-          "text": "Exclusivo con",
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            }
+          ]
         },
-        {
-          "text": "20000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "a58e7466-a0e6-4c65-928a-8b0da2327e1d",
+      "name": "20% en El Puente",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
         },
-        {
-          "text": "Ciudad/Buepp",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/77a2bc32-f906-41b8-b902-d9c664b3263e/primary_image.jpg?v=1773086884234",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/77a2bc32-f906-41b8-b902-d9c664b3263e/secondary_image.jpg?v=1773086884253",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/77a2bc32-f906-41b8-b902-d9c664b3263e/tertiary_image.jpg?v=1773086884254",
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
-        },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2025-07-01T03:00:00.000Z",
-    "stop_date": "2027-01-01T02:59:59.999Z",
-    "days_of_week": "L",
-    "title": "20% en El Puente",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "lunes,elpuente,el puente,reintegro,20,julio,ciudad,buepp",
-    "promo_id": "a58e7466-a0e6-4c65-928a-8b0da2327e1d",
-    "slug": "20-ciudad-buepp-elpuente-jul25",
-    "short_description": "2507-ciudad-buepp-elpuente-presencial-20off",
-    "where": "El Puente",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            43
+      "requirements": {
+        "banks": {
+          "list": [
+            "661d0b0f-556f-4e7b-9c79-823e1cd901a1",
+            "2313b643-1a79-4312-a213-98cd9a3942b1"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 20000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [],
-    "credit_list": [
-      "master",
-      "visa"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "a58e7466-a0e6-4c65-928a-8b0da2327e1d",

@@ -1,114 +1,118 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20-entrelaspraderas-supervielle-mar26",
   "tarjeta": {
-    "id": "ce2c97ab-2b1a-42a1-8dcc-583ed949f2cd",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "Entre las Praderas",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "card_id": "ce2c97ab-2b1a-42a1-8dcc-583ed949f2cd",
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "Entre las Praderas",
+      "cashback_cap": "10000",
+      "participating_bank": "Supervielle",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/ce2c97ab-2b1a-42a1-8dcc-583ed949f2cd/primary_image.jpg?v=1772809758532",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 20,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "3aa8abcc-86c7-4471-9b43-fcfac4736139",
+      "name": "20% en Entre las Praderas",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "20-entrelaspraderas-supervielle-mar26",
+        "short_description": "2603-supervielle-ID4684PUB-entrelaspraderas-presencial-20off",
+        "description": "Aprovechá 20% de reintegro en Frigorífico Entre Las Praderas con tus tarjetas Supervielle",
+        "display_start_date": "2026-02-27T03:00:00.000Z",
+        "display_stop_date": "2026-12-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-11-30",
+          "start_date": "2026-03-01",
+          "days_of_week": [
+            "tuesday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "20% de reintegro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
         },
-        {
-          "text": "",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
         },
-        {
-          "text": "",
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            }
+          ]
         },
-        {
-          "text": "10000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "Supervielle",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/ce2c97ab-2b1a-42a1-8dcc-583ed949f2cd/primary_image.jpg?v=1772809758532",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/ce2c97ab-2b1a-42a1-8dcc-583ed949f2cd/secondary_image.jpg?v=1772809758494",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/ce2c97ab-2b1a-42a1-8dcc-583ed949f2cd/tertiary_image.jpg?v=1772809758610",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
-        }
+        "has_differential_amount": false
       }
     },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2026-03-01T03:00:00.000Z",
-    "stop_date": "2026-12-01T02:59:59.999Z",
-    "days_of_week": "M",
-    "title": "20% en Entre las Praderas",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "20,supervielle,presencial,martes,entrelaspraderas,carnicerias",
-    "promo_id": "3aa8abcc-86c7-4471-9b43-fcfac4736139",
-    "slug": "20-entrelaspraderas-supervielle-mar26",
-    "short_description": "2603-supervielle-ID4684PUB-entrelaspraderas-presencial-20off",
-    "where": "Entre las Praderas",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            44
-          ]
+    "offer": {
+      "id": "3aa8abcc-86c7-4471-9b43-fcfac4736139",
+      "name": "20% en Entre las Praderas",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
         }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "54fdfe50-7b7e-4316-bf88-97923d5a8a8d"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 10000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "44"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [
-      "visa"
-    ],
-    "credit_list": [
-      "master",
-      "visa"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "3aa8abcc-86c7-4471-9b43-fcfac4736139",

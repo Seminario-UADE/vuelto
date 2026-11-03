@@ -1,148 +1,176 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/10-ciudad-buepp-rouge-beauty24-ene26",
   "tarjeta": {
-    "id": "80d0a018-0281-45be-996a-8793288ca2ae",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "Rouge y Beauty24",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+    "card_id": "80d0a018-0281-45be-996a-8793288ca2ae",
+    "card": {
+      "benefit": "10% de reintegro",
+      "validity_place": "Rouge y Beauty24",
+      "cashback_cap": "0",
+      "participating_bank": "Ciudad/Buepp",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/80d0a018-0281-45be-996a-8793288ca2ae/primary_image.jpg?v=1768848658370",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 18,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "9246cbfa-4c3e-4bcc-b86e-ecbaca0ddbc7",
+      "name": "10% en Rouge y Beauty24",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "10-ciudad-buepp-rouge-beauty24-ene26",
+        "short_description": "2601-ciudad-buepp-rouge-beauty24-presencialonline-10off",
+        "description": "Aprovechá 10% de reintegro y hasta 10 cuotas sin interés en Rouge y Beauty24 con Ciudad y Buepp",
+        "display_start_date": "2026-01-19T03:00:00.000Z",
+        "display_stop_date": "2027-04-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-01-27",
+          "days_of_week": [
+            "tuesday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "10% de reintegro",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
         },
-        {
-          "text": "Desde el 27/01 al 30/06",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "online"
+          ]
         },
-        {
-          "text": "Exclusivo con",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
-        },
-        {
-          "text": "0",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
-        },
-        {
-          "text": "Ciudad/Buepp",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": [
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
             {
-              "name_bank": "Ciudad",
-              "image_bank": "https://assets.mobile.playdigital.com.ar/images/banks/ciudad.png"
+              "type": "credit_card",
+              "issuer": "visa"
             },
             {
-              "name_bank": "Buepp",
-              "image_bank": "https://assets.mobile.playdigital.com.ar/images/banks/buepp.png"
+              "type": "credit_card",
+              "issuer": "master"
+            }
+          ]
+        },
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "9246cbfa-4c3e-4bcc-b86e-ecbaca0ddbc7",
+      "name": "10% en Rouge y Beauty24",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 10,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": [
+            {
+              "type": "sin_interes",
+              "number": 10,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 9,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 8,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 6,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 5,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 4,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 3,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 2,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 1,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
             }
           ]
         }
-      ],
-      "extra_row": null,
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/80d0a018-0281-45be-996a-8793288ca2ae/primary_image.jpg?v=1768848658370",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": null,
-        "tertiary_image": null,
-        "tertiary_backgroundcolor": null,
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "661d0b0f-556f-4e7b-9c79-823e1cd901a1",
+            "2313b643-1a79-4312-a213-98cd9a3942b1"
+          ]
+        },
+        "amount_range": {
+          "min": 0
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": null
-        },
-        {
-          "type": "countdown",
-          "value": false,
-          "label": null
-        },
-        {
-          "type": "online_store",
-          "value": false,
-          "label": null
+      "limits": {
+        "transaction_cap": {
+          "amount_by_transaction": 0
         }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore,online",
-    "start_date": "2026-01-27T03:00:00.000Z",
-    "stop_date": "2027-01-01T02:59:59.999Z",
-    "days_of_week": "M",
-    "title": "10% en Rouge y Beauty24",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "rouge,beauty24,perfumería,ciudad,buepp,10%,10 csi,financiación,enero",
-    "promo_id": "9246cbfa-4c3e-4bcc-b86e-ecbaca0ddbc7",
-    "slug": "10-ciudad-buepp-rouge-beauty24-ene26",
-    "short_description": "2601-ciudad-buepp-rouge-beauty24-presencialonline-10off",
-    "where": "Rouge y Beauty24",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
+      },
       "categories": [
-        {
-          "map_category": 4,
-          "sub_categories": [
-            37
-          ]
-        }
+        "4"
+      ],
+      "sub_categories": [
+        "37"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [],
-    "credit_list": [
-      "visa",
-      "master"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "9246cbfa-4c3e-4bcc-b86e-ecbaca0ddbc7",

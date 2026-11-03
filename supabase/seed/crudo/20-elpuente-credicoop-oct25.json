@@ -1,0 +1,261 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20-elpuente-credicoop-oct25",
+  "tarjeta": {
+    "card_id": "c0cf47f6-e0cd-4c66-8aae-f7264af5fec3",
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "El Puente",
+      "cashback_cap": "6000",
+      "participating_bank": "Credicoop",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/c0cf47f6-e0cd-4c66-8aae-f7264af5fec3/primary_image.jpg?v=1773088862402",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 10,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "03e0221c-fa6a-4f1c-b12b-b4957454d2f4",
+      "name": "20% en El Puente ",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "20-elpuente-credicoop-oct25",
+        "short_description": "2510-credicoop-elpuente-presencial-20off",
+        "description": "Aprovecha 20% de reintegro en El Puente con tarjetas Cabal Credicoop.",
+        "display_start_date": "2025-10-01T03:00:00.000Z",
+        "display_stop_date": "2026-12-31T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2025-10-01",
+          "days_of_week": [
+            "wednesday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "debit_card",
+              "issuer": "cabal"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "cabal"
+            }
+          ]
+        },
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "03e0221c-fa6a-4f1c-b12b-b4957454d2f4",
+      "name": "20% en El Puente ",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "b59fbc01-420f-4d88-8d53-be17029bc4ba"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "week",
+          "aggregate_by": "user",
+          "amount_by_period": 6000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "03e0221c-fa6a-4f1c-b12b-b4957454d2f4",
+    "name": "20% en El Puente ",
+    "description": "Aprovecha 20% de reintegro en El Puente con tarjetas Cabal Credicoop.",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-14T18:04:57.413Z",
+    "updated_at": "2026-10-07T18:57:45.525Z",
+    "deleted_at": null,
+    "short_description": "2510-credicoop-elpuente-presencial-20off",
+    "publication_description": "Aprovecha 20% de reintegro en El Puente con tarjetas Cabal Credicoop.",
+    "slug": "20-elpuente-credicoop-oct25",
+    "display_start_date": "2025-10-01T03:00:00.000Z",
+    "display_stop_date": "2026-12-31T02:59:59.999Z",
+    "search_tags": "el puente,credicoop,super,supermercado,miercoles,reintegro,octubre,20%",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2025-10-01",
+        "days_of_week": [
+          "wednesday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "cabal"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "cabal"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "03e0221c-fa6a-4f1c-b12b-b4957454d2f4",
+        "benefit_id": "03e0221c-fa6a-4f1c-b12b-b4957454d2f4",
+        "name": "20% en El Puente ",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "b59fbc01-420f-4d88-8d53-be17029bc4ba"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "week",
+            "aggregate_by": "user",
+            "amount_by_period": 6000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-14T18:04:56.168Z",
+        "updated_at": "2026-07-14T18:04:56.168Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "cabal"
+    ],
+    "credit_list": [
+      "cabal"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Promo válida únicamente para consumos con QR de MODO a través de la App Banca Credicoop o MODO seleccionando Tarjetas Cabal Credicoop (excepto Agrocabal, Mayorista y Cabal Empresa). Vigente los días miércoles desde el 01/10/25 hasta el 30/09/26. Ejemplo: En un consumo de $50.000 abonando con QR recibirá un reintegro de $6.000 (tope máximo por usuario por miércoles). El reintegro se verá reflejado dentro de los 30 días posteriores al consumo en la cuenta del banco, para lo cual será requisito que sea de título personal y se encuentre adherida a MODO. Será condición esencial para participar de la misma que al momento de efectuar el reintegro, la tarjeta se encuentre vigente y en estado de cumplimiento normal. No participan los consumos realizados a través de los programas MasCuotasCabal-MiPyme y Cuotas MiPyme Payway, billeteras virtuales (excepto Modo) y POS móviles. Aplicable a la cartera de consumo. MODO es propiedad de Play Digital SA, y se encuentra sujeto a los términos y condiciones de uso disponibles en www.modo.com.ar.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "El Puente",
+      "cashback_cap": "6000",
+      "participating_bank": "Credicoop",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/c0cf47f6-e0cd-4c66-8aae-f7264af5fec3/primary_image.jpg?v=1773088862402",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "¡Aprovechá 20% de reintegro en El Puente con Credicoop!",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tus tarjetas de crédito o débito Cabal del Credicoop a través de MODO. </span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">En tiendas físicas adheridas.</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el reintegro aplicado? </strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en la cuenta del Credicoop dentro de los 30 días.</span></p>",
+      "applicability_description": "El Puente",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

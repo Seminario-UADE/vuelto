@@ -1,135 +1,164 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/10-comafi-juleriaque-mar25",
   "tarjeta": {
-    "id": "e5ac6d67-d8ec-4800-b86d-237c934063e4",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "Juleriaque",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "10% de reintegro ",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "Desde el 01/03 al 30/04",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "Exclusivo con",
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "0",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "Comafi",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "extra_row": null,
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/e5ac6d67-d8ec-4800-b86d-237c934063e4/primary_image.jpg?v=1740499182539",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/e5ac6d67-d8ec-4800-b86d-237c934063e4/secondary_image.png?v=1740499182378",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/e5ac6d67-d8ec-4800-b86d-237c934063e4/tertiary_image.png?v=1740499182376",
-        "tertiary_backgroundcolor": null,
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
-        }
-      },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": null
-        },
-        {
-          "type": "countdown",
-          "value": false,
-          "label": null
-        },
-        {
-          "type": "online_store",
-          "value": false,
-          "label": null
-        }
-      ]
+    "card_id": "e5ac6d67-d8ec-4800-b86d-237c934063e4",
+    "card": {
+      "benefit": "10% de reintegro ",
+      "validity_place": "Juleriaque",
+      "cashback_cap": "0",
+      "participating_bank": "Comafi",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/e5ac6d67-d8ec-4800-b86d-237c934063e4/primary_image.jpg?v=1740499182539",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
     },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore,online",
-    "start_date": "2025-03-01T03:00:00.000Z",
-    "stop_date": "2026-12-01T02:59:59.999Z",
-    "days_of_week": "LMXJVSD",
-    "title": "10% y 6 CSI en Juleriaque",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "10,reintegro,comafi,juleriaque,carterageneral,marzo",
-    "promo_id": "584c1ca2-a69c-4b61-b55c-d4dd9394da03",
-    "slug": "10-comafi-juleriaque-mar25",
-    "short_description": "2503-comafi-juleriaque-cg-presencialonline-10off",
-    "where": "Juleriaque",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 4,
-          "sub_categories": [
-            37
+    "suggested_order": 30,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "584c1ca2-a69c-4b61-b55c-d4dd9394da03",
+      "name": "10% y 6 CSI en Juleriaque",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "10-comafi-juleriaque-mar25",
+        "short_description": "2503-comafi-juleriaque-cg-presencialonline-10off",
+        "description": "Aprovechá 10% de reintegro y 6 CSI en Juleriaque pagando con Banco Comafi",
+        "display_start_date": "2025-02-25T03:00:00.000Z",
+        "display_stop_date": "2026-12-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-11-30",
+          "start_date": "2025-03-01",
+          "days_of_week": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [
+            "TODO_PAGO"
+          ],
+          "segmentation_mode": "by_blacklist"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "online"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            }
+          ]
+        },
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "584c1ca2-a69c-4b61-b55c-d4dd9394da03",
+      "name": "10% y 6 CSI en Juleriaque",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 10,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": [
+            {
+              "type": "sin_interes",
+              "number": 1,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 2,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 3,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 4,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 5,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 6,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            }
           ]
         }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "ce8aabb1-f663-4832-82ec-de9b5b572aa1"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "4"
+      ],
+      "sub_categories": [
+        "37"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [
-      "visa"
-    ],
-    "credit_list": [
-      "visa",
-      "master"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "584c1ca2-a69c-4b61-b55c-d4dd9394da03",

@@ -1,134 +1,140 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/10-yoy-juleriaque-dic25",
   "tarjeta": {
-    "id": "26d748d0-c632-4038-9fc6-270ea7d65ac2",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "Juleriaque ",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "10% de reintegro ",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "Desde 01/12 al 31/03",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "Exclusivo con",
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "20000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "YOY",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "extra_row": null,
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/26d748d0-c632-4038-9fc6-270ea7d65ac2/primary_image.jpg?v=1763060856869",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": null,
-        "tertiary_image": null,
-        "tertiary_backgroundcolor": null,
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
-        }
-      },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": null
-        },
-        {
-          "type": "countdown",
-          "value": false,
-          "label": null
-        },
-        {
-          "type": "online_store",
-          "value": false,
-          "label": null
-        }
-      ]
+    "card_id": "26d748d0-c632-4038-9fc6-270ea7d65ac2",
+    "card": {
+      "benefit": "10% de reintegro ",
+      "validity_place": "Juleriaque ",
+      "cashback_cap": "20000",
+      "participating_bank": "YOY",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/26d748d0-c632-4038-9fc6-270ea7d65ac2/primary_image.jpg?v=1763060856869",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
     },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2025-12-01T03:00:00.000Z",
-    "stop_date": "2027-02-01T02:59:59.999Z",
-    "days_of_week": "LMXJVSD",
-    "title": "10% en Juleriaque ",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "Juleriaque,YOY,10off,Diciembre,presencial,6 CSI,farmacia,peluquerías,perfumería",
-    "promo_id": "4892ed90-1570-4386-bacd-ae2488105460",
-    "slug": "10-yoy-juleriaque-dic25",
-    "short_description": "2512-YOY-juleriaque-presencial-10off",
-    "where": "Juleriaque",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 4,
-          "sub_categories": [
-            37
+    "suggested_order": 20,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "4892ed90-1570-4386-bacd-ae2488105460",
+      "name": "10% en Juleriaque ",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "10-yoy-juleriaque-dic25",
+        "short_description": "2512-YOY-juleriaque-presencial-10off",
+        "description": "Aprovechá el 10% de reintegro y 6 cuotas sin interes con YOY",
+        "display_start_date": "2025-11-13T00:00:00.000Z",
+        "display_stop_date": "2027-03-31T00:00:00.000Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2027-01-31",
+          "start_date": "2025-12-01",
+          "days_of_week": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "pct"
+            }
+          ]
+        },
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "4892ed90-1570-4386-bacd-ae2488105460",
+      "name": "10% en Juleriaque ",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 10,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": [
+            {
+              "type": "sin_interes",
+              "number": 6,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 3,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            }
           ]
         }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "f3f5910c-013f-47f7-819e-3d802cf3f7b7"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 20000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "4"
+      ],
+      "sub_categories": [
+        "37"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [
-      "visa"
-    ],
-    "credit_list": [
-      "master"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "4892ed90-1570-4386-bacd-ae2488105460",

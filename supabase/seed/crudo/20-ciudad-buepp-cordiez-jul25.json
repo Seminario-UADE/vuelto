@@ -1,0 +1,264 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20-ciudad-buepp-cordiez-jul25",
+  "tarjeta": {
+    "card_id": "323e2229-5736-48a3-8ad2-c3aaff1092e3",
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "Cordiez",
+      "cashback_cap": "20000",
+      "participating_bank": "Ciudad/Buepp",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/323e2229-5736-48a3-8ad2-c3aaff1092e3/primary_image.jpg?v=1751637717838",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 15,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "8eb370c0-79dd-4b8c-b13d-dfd9d4c6ab41",
+      "name": "20% en Cordiez",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "20-ciudad-buepp-cordiez-jul25",
+        "short_description": "2507-ciudad-buepp-cordiez-presencial-online-20off",
+        "description": "Aprovechá 20% de reintegro en Cordiez con tus tarjetas del Ciudad y Buep",
+        "display_start_date": "2025-07-01T03:00:00.000Z",
+        "display_stop_date": "2027-04-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2025-07-01",
+          "days_of_week": [
+            "monday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "online"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            }
+          ]
+        },
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "8eb370c0-79dd-4b8c-b13d-dfd9d4c6ab41",
+      "name": "20% en Cordiez",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "661d0b0f-556f-4e7b-9c79-823e1cd901a1",
+            "2313b643-1a79-4312-a213-98cd9a3942b1"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 20000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "8eb370c0-79dd-4b8c-b13d-dfd9d4c6ab41",
+    "name": "20% en Cordiez",
+    "description": "Aprovechá 20% de reintegro en Cordiez con tus tarjetas del Ciudad y Buep",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-16T19:17:32.395Z",
+    "updated_at": "2026-08-20T19:52:14.026Z",
+    "deleted_at": null,
+    "short_description": "2507-ciudad-buepp-cordiez-presencial-online-20off",
+    "publication_description": "Aprovechá 20% de reintegro en Cordiez con tus tarjetas del Ciudad y Buep",
+    "slug": "20-ciudad-buepp-cordiez-jul25",
+    "display_start_date": "2025-07-01T03:00:00.000Z",
+    "display_stop_date": "2027-04-01T02:59:59.999Z",
+    "search_tags": "cordiez,supermercado,ciudad,buepp,reintegro,20,lunes,julio",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2025-07-01",
+        "days_of_week": [
+          "monday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "online"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "8eb370c0-79dd-4b8c-b13d-dfd9d4c6ab41",
+        "benefit_id": "8eb370c0-79dd-4b8c-b13d-dfd9d4c6ab41",
+        "name": "20% en Cordiez",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "661d0b0f-556f-4e7b-9c79-823e1cd901a1",
+              "2313b643-1a79-4312-a213-98cd9a3942b1"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 20000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-16T19:17:27.811Z",
+        "updated_at": "2026-07-16T19:17:27.811Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "master",
+      "visa"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Promoción ofrecida por el Banco de la Ciudad de Buenos Aires, CUIT 30-99903208-3 (Banco Ciudad) los días lunes desde el 01/07/2025 al 31/12/2026, en toda la República Argentina, en compras realizadas en comercios adheridos y en la tienda online www.cordiez.com.ar . Se otorgará un 20% (veinte por ciento) de descuento, con un tope máximo de devolución mensual por cliente de $20.000 (Veinte mil pesos) pagando exclusivamente con QR de MODO, desde Buepp o App Ciudad. El descuento podrá visualizarse vía reintegro, a acreditar en la cuenta del cliente dentro de los 45 días posteriores a la fecha de realizada la compra. Si el cliente tuviera más de una cuenta, el crédito se realizará en cualquiera de ellas a elección del banco. Aplica para compras en un pago. Será requisito excluyente, previo a realizarse la compra, tener asociada a MODO la cuenta del Banco Ciudad. Para compras realizadas por titulares de tarjetas adicionales, el tarjetahabiente adicional deberá poseer una caja de ahorro del Banco Ciudad asociada a MODO. Quedan excluidas de la promoción las cuentas en mora y/o bloqueadas por motivos administrativos. No incluye productos de convenio de precios justos, electrodomésticos y carne vacuna. La presente promoción es válida solo para consumos de tipo familiar. En caso de duda sobre el destino del consumo, no se acreditará el monto de la bonificación hasta tanto se aclare el mismo. Los descuentos publicados no son acumulables con otras promociones. Conforme RES. 915 e/2017, 51- E/2017 y 240 E/2017. T.N.A., T.E.A. Y C.F.T.N.A (IVA Incluido): 0,00% Fijo. T.N.A: Tasa Nominal Anual, T.E.A: Tasa Efectiva Anual, C.F.T.N.A: Costo Financiero Total expresado en forma de tasa nominal anual con IVA. El producto ofrecido corresponde a la cartera de consumo. Para más información y condiciones o limitaciones aplicables, consulte en www.bancociudad.com.ar.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "Cordiez",
+      "cashback_cap": "20000",
+      "participating_bank": "Ciudad/Buepp",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/323e2229-5736-48a3-8ad2-c3aaff1092e3/primary_image.jpg?v=1751637717838",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "¡Aprovechá 20% de reintegro en Cordiez con Ciudad y Buepp!",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo puedo acceder al beneficio?</strong></b><span style=\"white-space: pre-wrap;\"> </span></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">Realizando una compra con tus tarjetas de crédito Visa y Mastercard del Ciudad/Buepp a través de MODO. </span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo es la modalidad de uso?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">En tiendas físicas y online adheridas:</span></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">https://www.cordiez.com.ar/</span></p><p class=\"editor-paragraph\" style=\"text-align: start;\"><br></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Dónde veo el descuento aplicado?</strong></b><span style=\"white-space: pre-wrap;\"> </span></p><p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: start;\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás acreditado en tu cuenta del Ciudad y/o Buepp. </span></p>",
+      "applicability_description": "Cordiez",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

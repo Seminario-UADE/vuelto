@@ -1,128 +1,113 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/25-hipotecario-farmaplus-abr25",
   "tarjeta": {
-    "id": "53d4b7a9-ae54-4173-a52e-8db15b2c342a",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "FarmaPlus",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "card_id": "53d4b7a9-ae54-4173-a52e-8db15b2c342a",
+    "card": {
+      "benefit": "25% de reintegro",
+      "validity_place": "FarmaPlus",
+      "cashback_cap": "10000",
+      "participating_bank": "Hipotecario",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/53d4b7a9-ae54-4173-a52e-8db15b2c342a/primary_image.png?v=1743797471471",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 30,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "3813f68b-b9e2-4360-8e51-47f899c5bcb2",
+      "name": "25% en FarmaPlus",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "25-hipotecario-farmaplus-abr25",
+        "short_description": "2504-hipotecario-farmaplus-presencial-online-25off",
+        "description": "Aprovecha 25% de reintegro en FarmaPlus pagando con Visa débito del Hipotecario",
+        "display_start_date": "2025-04-04T03:00:00.000Z",
+        "display_stop_date": "2027-01-31T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-11-30",
+          "start_date": "2025-04-07",
+          "days_of_week": [
+            "monday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "25% de reintegro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
         },
-        {
-          "text": "Desde el 07/04 al 31/05",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "online"
+          ]
         },
-        {
-          "text": "Exclusivo con",
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            }
+          ]
         },
-        {
-          "text": "10000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "3813f68b-b9e2-4360-8e51-47f899c5bcb2",
+      "name": "25% en FarmaPlus",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 25,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
         },
-        {
-          "text": "Hipotecario",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/53d4b7a9-ae54-4173-a52e-8db15b2c342a/primary_image.png?v=1743797471471",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/53d4b7a9-ae54-4173-a52e-8db15b2c342a/secondary_image.png?v=1743797471472",
-        "tertiary_image": null,
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
-        },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore,online",
-    "start_date": "2025-04-07T03:00:00.000Z",
-    "stop_date": "2026-12-01T02:59:59.999Z",
-    "days_of_week": "L",
-    "title": "25% en FarmaPlus",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "farmacia,farmaplus,hipotecario,25,lunes",
-    "promo_id": "3813f68b-b9e2-4360-8e51-47f899c5bcb2",
-    "slug": "25-hipotecario-farmaplus-abr25",
-    "short_description": "2504-hipotecario-farmaplus-presencial-online-25off",
-    "where": "FarmaPlus",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 4,
-          "sub_categories": [
-            16
+      "requirements": {
+        "banks": {
+          "list": [
+            "b164059a-b71a-11ea-b3de-0242ac130004"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 10000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "4"
+      ],
+      "sub_categories": [
+        "16"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [
-      "visa"
-    ],
-    "credit_list": []
+    "coupon": null
   },
   "detalle": {
     "id": "3813f68b-b9e2-4360-8e51-47f899c5bcb2",

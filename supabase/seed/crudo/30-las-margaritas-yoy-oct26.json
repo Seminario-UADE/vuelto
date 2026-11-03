@@ -1,132 +1,116 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/30-las-margaritas-yoy-oct26",
   "tarjeta": {
-    "id": "d5be3b6c-f3ad-4063-a93e-f2bbfe23b45d",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": {
-      "promo_id": "9ab74643-98a7-4a2f-b3d7-1054c362acbd"
+    "card_id": "d5be3b6c-f3ad-4063-a93e-f2bbfe23b45d",
+    "card": {
+      "benefit": "30% de reintegro",
+      "validity_place": "Las Margaritas",
+      "cashback_cap": "7000",
+      "participating_bank": "YOY",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/afe12427-b627-4156-9503-bece15e54c63_Las%20margaritasDetalle.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
     },
-    "content": {
-      "row": [
-        {
-          "text": "Las Margaritas",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "suggested_order": 20,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "9ab74643-98a7-4a2f-b3d7-1054c362acbd",
+      "name": "MARGARITAS - YOY",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "30-las-margaritas-yoy-oct26",
+        "short_description": "2610-yoy-las-margaritas-presencialonline-30off",
+        "description": "Aprovecha 30% de reintegro en Las Margaritas con YOY",
+        "display_start_date": "2026-09-21T03:00:00.000Z",
+        "display_stop_date": "2027-02-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2027-01-31",
+          "start_date": "2026-10-01",
+          "days_of_week": [
+            "tuesday",
+            "thursday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "30% de reintegro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
         },
-        {
-          "text": null,
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "online"
+          ]
         },
-        {
-          "text": null,
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "pct"
+            }
+          ]
         },
-        {
-          "text": "7000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "9ab74643-98a7-4a2f-b3d7-1054c362acbd",
+      "name": ".",
+      "priority": 1,
+      "outcomes": {
+        "cashback": {
+          "amount": 30,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
         },
-        {
-          "text": "YOY",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/afe12427-b627-4156-9503-bece15e54c63_Las%20margaritasDetalle.jpg",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/afe12427-b627-4156-9503-bece15e54c63_Las%20margaritasDetalle.jpg",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/afe12427-b627-4156-9503-bece15e54c63_Las%20margaritasDetalle.jpg",
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "",
-          "portrait_app": null
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
-        },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:59+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore,online",
-    "start_date": "2026-10-01T03:00:00.000Z",
-    "stop_date": "2027-02-01T02:59:59.999Z",
-    "days_of_week": "MJ",
-    "title": "MARGARITAS - YOY",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "30,lasmargaritas,presencial,online,yoy,perfumeria",
-    "promo_id": "9ab74643-98a7-4a2f-b3d7-1054c362acbd",
-    "slug": "30-las-margaritas-yoy-oct26",
-    "short_description": "2610-yoy-las-margaritas-presencialonline-30off",
-    "where": "Las Margaritas",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 4,
-          "sub_categories": [
-            37
+      "requirements": {
+        "banks": {
+          "list": [
+            "f3f5910c-013f-47f7-819e-3d802cf3f7b7"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 7000,
+          "amount_of_transactions_by_period": 0
+        }
+      },
+      "categories": [
+        "4"
+      ],
+      "sub_categories": [
+        "37"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [
-      "visa"
-    ],
-    "credit_list": [
-      "master"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "9ab74643-98a7-4a2f-b3d7-1054c362acbd",

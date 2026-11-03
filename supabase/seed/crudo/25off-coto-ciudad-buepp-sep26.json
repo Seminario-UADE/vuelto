@@ -1,0 +1,268 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/25off-coto-ciudad-buepp-sep26",
+  "tarjeta": {
+    "card_id": "f013b0cd-71f1-4b66-8d3d-bcf9a9533766",
+    "card": {
+      "benefit": "25% de reintegro",
+      "validity_place": "COTO",
+      "cashback_cap": "30000",
+      "participating_bank": "Ciudad/Buepp",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/fa28087e-7494-4c2d-b6f5-db2ec9453733_coto.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 10,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "ea8de1eb-e373-42a8-87c2-0b5434364a37",
+      "name": "Coto lunes -25%",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "25off-coto-ciudad-buepp-sep26",
+        "short_description": "2609-ciudad-buepp-coto-MD-presencial-25off",
+        "description": "-25% todos los lunes en Coto pagando con QR MODO presencial",
+        "display_start_date": "2026-09-06T00:00:00.000Z",
+        "display_stop_date": "2027-02-28T00:00:00.000Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-09-07",
+          "days_of_week": [
+            "monday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "cabal"
+            }
+          ]
+        },
+        "has_differential_amount": true
+      }
+    },
+    "offer": {
+      "id": "ea8de1eb-e373-42a8-87c2-0b5434364a37",
+      "name": ".",
+      "priority": 1,
+      "outcomes": {
+        "cashback": {
+          "amount": 25,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "2313b643-1a79-4312-a213-98cd9a3942b1",
+            "661d0b0f-556f-4e7b-9c79-823e1cd901a1"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "week",
+          "aggregate_by": "user",
+          "amount_by_period": 30000,
+          "amount_of_transactions_by_period": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "34",
+        "43"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "ea8de1eb-e373-42a8-87c2-0b5434364a37",
+    "name": "Coto lunes -25%",
+    "description": "",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-09-03T13:53:32.685Z",
+    "updated_at": "2026-09-18T19:39:43.248Z",
+    "deleted_at": null,
+    "short_description": "2609-ciudad-buepp-coto-MD-presencial-25off",
+    "publication_description": "-25% todos los lunes en Coto pagando con QR MODO presencial",
+    "slug": "25off-coto-ciudad-buepp-sep26",
+    "display_start_date": "2026-09-06T00:00:00.000Z",
+    "display_stop_date": "2027-02-28T00:00:00.000Z",
+    "search_tags": "coto,25%,descuento,supermercado,lunes,ciudad,buepp,presencial",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-09-07",
+        "days_of_week": [
+          "monday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "cabal"
+          }
+        ]
+      },
+      "has_differential_amount": true
+    },
+    "offers": [
+      {
+        "id": "ea8de1eb-e373-42a8-87c2-0b5434364a37",
+        "benefit_id": "ea8de1eb-e373-42a8-87c2-0b5434364a37",
+        "name": ".",
+        "priority": 1,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43,
+                34
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "2313b643-1a79-4312-a213-98cd9a3942b1",
+              "661d0b0f-556f-4e7b-9c79-823e1cd901a1"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 25,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "week",
+            "aggregate_by": "user",
+            "amount_by_period": 30000,
+            "amount_of_transactions_by_period": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "34",
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-09-03T13:59:29.991Z",
+        "updated_at": "2026-09-04T17:54:34.598Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": null
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "master",
+      "visa",
+      "cabal"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Promoción ofrecida por el Banco de la Ciudad de Buenos Aires, CUIT 30-99903208-3 (Banco Ciudad) los días lunes desde el 07/09/2026 al 31/12/2026, en toda la República Argentina, se otorgará un 25% (veinticinco) de descuento durante dicha vigencia sobre el importe bruto de los productos participantes (excluyendo aquellos con promociones vigentes) con tope de reintegro de $30.000 por semana, en compras realizadas en locales físicos adheridos de COTO CICSA, pagando con QR MODO a través de App Ciudad o Buepp, tarjetas de crédito Visa, Mastercard o Cabal de Banco Ciudad. Aplica para compras en un pago. Será requisito excluyente, previo a realizarse la compra, tener asociada a MODO la cuenta del Banco Ciudad. Para compras realizadas por titulares de tarjetas adicionales, el tarjetahabiente adicional deberá poseer una caja de ahorro del Banco Ciudad asociada a MODO. Quedan excluidas de la promoción las cuentas en mora y/o bloqueadas por motivos administrativos. La presente promoción es válida solo para consumos de tipo familiar. El descuento podrá visualizarse vía reintegro, a acreditar en la cuenta del cliente dentro de los 15 días posteriores a la fecha de realizada la compra. Si el cliente tuviera más de una cuenta, el crédito se realizará en cualquiera de ellas a elección del banco. En caso de duda sobre el destino del consumo, no se acreditará el monto de la bonificación hasta tanto se aclare el mismo. Para obtener el descuento en las compras efectuadas a través de internet (Coto Digital) debe realizar la compra el día lunes, independientemente del día de entrega. La compra online está sujeta a disponibilidad de envío por parte del supermercado. Excusiones informadas por el comercio: electrodomésticos, rodados, neumáticos. No incluye productos de bodegas Catena Zapata, Nicola Catena, Bodega Ernesto Catena (Alma Negra, Padrillos, Animal, Enemigo y Gran Enemigo), malbec DV Catena bot. X 1,5 lt., malbec la rioja DV Catena, malbec salta DV Catena, Saint Felicien, Nicasia, Tilia, bodega Leoncio Arizu (Luigi Bosca), Bodega La Rural (Rutini, Trumpeter, San Felipe y cepa tradicional semillon/malbec-malbec/tinto blend), Chandon ni terrazas de los Andes (Latitud 33°, Castel, Altos del Plata, Valmont, Beltour, Cheval y Clos du Moulin), bodega norton (lote negro, quorum vi, privada family blend), bodega cadus wines (cadus), Casa Pirque (Altaland, La Posta, Petit Caro, malbec/cabernet franc, Casa de Herrero, malbec ojo de buen cubero y malbec/cabernet franc/ pinot noir Cuchillo de Palo, malbec río de los Ciervos Araucana, malbec nico y blend beso de dante luca, aruma y luca), bodega Bianchi (vino chardonnay reservado maría carmen, vino gran corte Enzo Bianchi, vinos malbec y cabernet sauvignon particular Bianchi), bodega Valentín Bianchi (vino tinto corte y malbec iv generación), bodega Monteviejo (festivo y petite fleur), ni vinos en tetrabrik ni generosos. El descuento en champañas y espumantes no inlcuye productos de bodegas Chandon, mercier, Catena Zapata, Barón B, dom Perignon, Pommery, Möet Chandon, la grande dame ni Krug, no incluye cortes de carnes de novillo, novillito, ternera, menudencias ni carnes elaboradas, porcinos y embutidos. No incluye pollo entero ni trozado, fresco ni congelado, no incluye leches infantiles etapas 1 y 2 (fluídas ni en polvo), ni harinas en todas sus presentaciones, ni azúcar en todas sus presentaciones, ni aceite de girasol y mezcla girasol-soja en todas sus presentaciones, ni productos incluidos en programas de precios del gobierno y/o aplicables por normativa vigente. Se excluyen todas las presentaciones de las siguientes marcas: Coca Cola, Coca Cola Light, Coca Cola sin azúcar, Crush, Fanta, Fanta sin azúcar, Schweppes, Sprite y Sprite sin azúcar, Aquarius, Smartwater, Cepita, Benedictino, Powerade, Ades, hi-c ni monster. No valido para venta on line. Precios y promociones para consumo familiar. Esta publicación no acumula con otros descuentos, ofertas y/o promociones bancarias. Coto c.i.c.s.a. - paysandú 1842 - c1416cdp - capital federal - fonocoto 0800-888-4848 - </span><a href=\"http://www.coto.com.ar/\" target=\"_blank\" class=\"editor-link\"><span style=\"white-space: pre-wrap;\">WWW.COTO.COM.AR</span></a></p>",
+    "terms_and_conditions_url": "https://www.bancociudad.com.ar",
+    "coupon": null,
+    "card": {
+      "benefit": "25% de reintegro",
+      "validity_place": "COTO",
+      "cashback_cap": "30000",
+      "participating_bank": "Ciudad/Buepp",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/fa28087e-7494-4c2d-b6f5-db2ec9453733_coto.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Coto con Ciudad y Buepp",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong></p><p>Realizando una compra con tus tarjetas de crédito Visa, Mastercard y Cabal del Ciudad a través de MODO o app Buepp.</p><p></p><p><strong>¿Dónde veo el reintegro aplicado?</strong></p><p>El reintegro lo verás acreditado en la cuenta del Ciudad o Buepp dentro de los 30 días.</p><p><strong>Aplica exclusiones.</strong></p><p><br /></p>",
+      "applicability_description": "COTO",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

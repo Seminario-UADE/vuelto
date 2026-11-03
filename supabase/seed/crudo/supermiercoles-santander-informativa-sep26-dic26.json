@@ -1,147 +1,156 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/supermiercoles-santander-informativa-sep26-dic26",
   "tarjeta": {
-    "id": "dc09d14c-2acc-4407-ada5-c628b85378bf",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": {
-      "promo_id": "e22a786d-40e8-4911-a189-27493512bdb5"
+    "card_id": "dc09d14c-2acc-4407-ada5-c628b85378bf",
+    "card": {
+      "benefit": "Hasta 25% de reintegro y 6 cuotas",
+      "validity_place": "Supermiércoles",
+      "cashback_cap": "0",
+      "participating_bank": "Santander",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/cc52d399-f471-42ce-b8e8-88047f3b1068_primary_image%20(11).jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/534953c8-ed98-4b75-878a-df15b5caaf64_landscape_app.jpg",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/8160388b-d15e-4ab0-a688-37b5a8bfe505_Supermiercoles-25.jpg",
+      "icon": null
     },
-    "content": {
-      "row": [
-        {
-          "text": "Supermiércoles",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "suggested_order": 12,
+    "cta_type": "open_url",
+    "cta_value": "https://www.modo.com.ar/promos/{{slug}}",
+    "benefit": {
+      "id": "e22a786d-40e8-4911-a189-27493512bdb5",
+      "name": "Supermiércoles Santander",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "supermiercoles-santander-informativa-sep26-dic26",
+        "short_description": "2609-Supermiércoles-Santander-Presencial-Online-NFC-25off-15off-6CSI-Informativa ",
+        "description": "25% en Indumentaria y 15% en Joyerías, Perfumerías y Librerías con Santander Sorpresa y Visa .",
+        "display_start_date": "2026-08-31T03:00:00.000Z",
+        "display_stop_date": "2027-03-30T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-30",
+          "start_date": "2026-09-02",
+          "days_of_week": [
+            "wednesday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "Hasta 25% de reintegro y 6 cuotas",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
         },
-        {
-          "text": null,
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "online",
+            "instore_nfc"
+          ]
         },
-        {
-          "text": null,
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            }
+          ]
         },
-        {
-          "text": "0",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "e22a786d-40e8-4911-a189-27493512bdb5",
+      "name": ".",
+      "priority": 1,
+      "outcomes": {
+        "cashback": {
+          "amount": 25,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_por_regla"
         },
-        {
-          "text": "Santander",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/cc52d399-f471-42ce-b8e8-88047f3b1068_primary_image%20(11).jpg",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/cc52d399-f471-42ce-b8e8-88047f3b1068_primary_image%20(11).jpg",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/cc52d399-f471-42ce-b8e8-88047f3b1068_primary_image%20(11).jpg",
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/534953c8-ed98-4b75-878a-df15b5caaf64_landscape_app.jpg",
-          "landscape_web": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/534953c8-ed98-4b75-878a-df15b5caaf64_landscape_app.jpg",
-          "landscape_bgcolor": "",
-          "portrait_app": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/8160388b-d15e-4ab0-a688-37b5a8bfe505_Supermiercoles-25.jpg"
+        "financing": {
+          "installments": [
+            {
+              "type": "sin_interes",
+              "number": 1,
+              "coefficient": "0",
+              "annual_nominal_rate": "0",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 2,
+              "coefficient": "0",
+              "annual_nominal_rate": "0",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 3,
+              "coefficient": "0",
+              "annual_nominal_rate": "0",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 4,
+              "coefficient": "0",
+              "annual_nominal_rate": "0",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 5,
+              "coefficient": "0",
+              "annual_nominal_rate": "0",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 6,
+              "coefficient": "0",
+              "annual_nominal_rate": "0",
+              "total_financial_cost": "0"
+            }
+          ]
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
+      "requirements": {
+        "banks": {
+          "list": [
+            "167504f6-caaf-4ead-b65b-6e6695ae6209"
+          ]
         },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
+        "amount_range": {
+          "min": 0
         }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW",
-    "exclusiveness": "all",
-    "payment_flow": "instore,online,instore_nfc",
-    "start_date": "2026-09-02T03:00:00.000Z",
-    "stop_date": "2026-12-31T02:59:59.999Z",
-    "days_of_week": "X",
-    "title": "Supermiércoles Santander",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "supermiercoles,santander,sorpresa,visa,reintegro,cuotas,miercoles,presencial,online",
-    "promo_id": "e22a786d-40e8-4911-a189-27493512bdb5",
-    "slug": "supermiercoles-santander-informativa-sep26-dic26",
-    "short_description": "2609-Supermiércoles-Santander-Presencial-Online-NFC-25off-15off-6CSI-Informativa ",
-    "where": "",
-    "landscape_app": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/534953c8-ed98-4b75-878a-df15b5caaf64_landscape_app.jpg",
-    "portrait_app": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/8160388b-d15e-4ab0-a688-37b5a8bfe505_Supermiercoles-25.jpg",
-    "landscape_web": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/534953c8-ed98-4b75-878a-df15b5caaf64_landscape_app.jpg",
-    "landscape_bgcolor": "",
-    "categories_whitelist": {
+      },
+      "limits": null,
       "categories": [
-        {
-          "map_category": 3,
-          "sub_categories": [
-            48,
-            35,
-            49
-          ]
-        },
-        {
-          "map_category": 4,
-          "sub_categories": [
-            37
-          ]
-        },
-        {
-          "map_category": 13,
-          "sub_categories": [
-            20,
-            15
-          ]
-        }
+        "13",
+        "3",
+        "4"
+      ],
+      "sub_categories": [
+        "15",
+        "20",
+        "35",
+        "37",
+        "48",
+        "49"
       ]
     },
-    "stores_whitelist": false,
     "calculated_status": "RUNNING",
-    "debit_list": [
-      "visa"
-    ],
-    "credit_list": [
-      "visa"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "e22a786d-40e8-4911-a189-27493512bdb5",

@@ -1,0 +1,293 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/15off-3csi-farmacity-gp-ago26",
+  "tarjeta": {
+    "card_id": "5cb7cf75-85df-4f2e-96a8-c8929fab089c",
+    "card": {
+      "benefit": "15% y 3 cuotas",
+      "validity_place": "Farmacity, Simplicity, Get The Look",
+      "cashback_cap": "10000",
+      "participating_bank": "Bancos adheridos",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/5cb7cf75-85df-4f2e-96a8-c8929fab089c/primary_image.jpg?v=1785789293089&t=2026-08-03T17:52:39.637Z",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 15,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "a219b21f-b103-4493-aa7f-246b68d041ab",
+      "name": "15% y 3 CSI en Farmacity ",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "15off-3csi-farmacity-gp-ago26",
+        "short_description": "2608-gp-farmacity-presencial-15off-3CSI",
+        "description": "15% de descuento y 3 CSI los Viernes con tope de $10.000 mensual ",
+        "display_start_date": "2026-08-03T03:00:00.000Z",
+        "display_stop_date": "2027-01-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-08-07",
+          "days_of_week": [
+            "friday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "online"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            }
+          ]
+        },
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "a219b21f-b103-4493-aa7f-246b68d041ab",
+      "name": ".",
+      "priority": 1,
+      "outcomes": {
+        "cashback": {
+          "amount": 15,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": [
+            {
+              "type": "sin_interes",
+              "number": 3,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "74f9a732-f38f-4e2e-8263-b51e114ce1f3",
+            "888318e4-0537-457c-9db2-767dbc2f6bd3",
+            "521bea00-ec3a-49ab-a019-6ae0bddf57c3",
+            "d58d01e9-9411-4f6f-980f-fd469bcef30d"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 10000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "4"
+      ],
+      "sub_categories": [
+        "16",
+        "33",
+        "37",
+        "50",
+        "8"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "a219b21f-b103-4493-aa7f-246b68d041ab",
+    "name": "15% y 3 CSI en Farmacity ",
+    "description": "15% de descuento y 3 CSI los Viernes con tope de $10.000 mensual ",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-08-03T17:53:32.676Z",
+    "updated_at": "2026-10-09T14:31:33.367Z",
+    "deleted_at": null,
+    "short_description": "2608-gp-farmacity-presencial-15off-3CSI",
+    "publication_description": "15% de descuento y 3 CSI los Viernes con tope de $10.000 mensual ",
+    "slug": "15off-3csi-farmacity-gp-ago26",
+    "display_start_date": "2026-08-03T03:00:00.000Z",
+    "display_stop_date": "2027-01-01T02:59:59.999Z",
+    "search_tags": "farmacity,gp,grupopetersen,viernes,presencial",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-08-07",
+        "days_of_week": [
+          "friday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "online"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "a219b21f-b103-4493-aa7f-246b68d041ab",
+        "benefit_id": "a219b21f-b103-4493-aa7f-246b68d041ab",
+        "name": ".",
+        "priority": 1,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit",
+            "store_terminal_id"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                50,
+                8,
+                16,
+                33,
+                37
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "74f9a732-f38f-4e2e-8263-b51e114ce1f3",
+              "888318e4-0537-457c-9db2-767dbc2f6bd3",
+              "521bea00-ec3a-49ab-a019-6ae0bddf57c3",
+              "d58d01e9-9411-4f6f-980f-fd469bcef30d"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 15,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": [
+              {
+                "type": "sin_interes",
+                "number": 3,
+                "coefficient": "0.00",
+                "annual_nominal_rate": "0.00",
+                "total_financial_cost": "0"
+              }
+            ]
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 10000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "16",
+          "33",
+          "37",
+          "50",
+          "8"
+        ],
+        "preselected": false,
+        "created_at": "2026-08-03T17:55:48.275Z",
+        "updated_at": "2026-10-09T14:31:08.309Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "master",
+      "visa"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Válido Cartera Consumo. Válido los días Viernes desde el 07/08/2026 al 31/12/2026 inclusive. </span><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">Beneficio pagando con MODO</strong></b><span style=\"white-space: pre-wrap;\">: 15% de reintegro abonando en 3 pago con tarjeta de crédito Visa o Mastercard emitidas por el Banco, en comercios adheridos, utilizando Modo desde app del Banco o app MODO. </span><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">Tope de reintegro de $10.000 por cuenta por mes.</strong></b><span style=\"white-space: pre-wrap;\"> Es necesario que previo a realizar el pago el usuario tenga asociada a MODO la cuenta y tarjeta del Banco con la que realizará la compra. Reintegro: Se realizará en la cuenta asociada del cliente dentro de los 30 días de realizada la compra. No aplica para compras en cuotas. Ejemplo: En una compra en un pago de $100.000 con Tarjeta de crédito Visa, o Mastercard, el usuario recibirá dentro de los 30 días posteriores al pago un reintegro de $10.000 (tope de la promoción). Los beneficios informados no aplican a otras billeteras o plataformas de pago. El Banco solo informa el medio y las condiciones para el pago de los productos/servicios ofrecidos por el proveedor. Previo a la contratación del producto o servicio, verifique con el proveedor sus condiciones y alcance de la garantía. Banco de San Juan S.A. - CUIT 30-50000944-2 –Av. Ignacio de la Roza 85 oeste, Capital, San Juan. Nuevo Banco Santa Fe S.A. – CUIT 30-69243266-1 - San Martin N°715, Provincia de Santa Fe. Banco de Santa Cruz S.A. - CUIT 30-50009880-1 – Av. Pte. Dr. Néstor C. Kirchner 812, Río Gallegos, Santa Cruz. Nuevo Banco de Entre Ríos S.A. - Cuit 33-70799551-9 - Monte Caseros 128, Paraná, Entre Ríos. MODO es un servicio prestado por el proveedor de servicios tecnológicos play digital s.a. cuit 30716829436 av del libertador 7208 torre ii p.4 caba, siendo la marca modo de su propiedad.</span></p><p class=\"editor-paragraph\"><span style=\"white-space: pre-wrap;\">&nbsp;</span></p>",
+    "terms_and_conditions_url": "https:// Prueba Carga 1 GP",
+    "coupon": null,
+    "card": {
+      "benefit": "15% y 3 cuotas",
+      "validity_place": "Farmacity, Simplicity, Get The Look",
+      "cashback_cap": "10000",
+      "participating_bank": "Bancos adheridos",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/5cb7cf75-85df-4f2e-96a8-c8929fab089c/primary_image.jpg?v=1785789293089&t=2026-08-03T17:52:39.637Z",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Grupo Farmacity con GP",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong></p><p>Todos los viernes pagando con tus tarjetas de crédito Visa y/o Mastercard de Banco San Juan, Banco Santa Fe, Banco Santa Cruz  y Banco Entre Ríos a través de MODO.</p><p><br /></p><p><strong>¿Dónde veo el reintegro aplicado?</strong></p><p>El reintegro se verá reflejado en la cuenta de banco dentro de los 30 días.</p>",
+      "applicability_description": null,
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

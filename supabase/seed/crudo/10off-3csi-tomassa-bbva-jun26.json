@@ -1,144 +1,124 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/10off-3csi-tomassa-bbva-jun26",
   "tarjeta": {
-    "id": "275f8c96-9bf4-4fc6-bac7-bb0083509d66",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "Tomassa",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+    "card_id": "275f8c96-9bf4-4fc6-bac7-bb0083509d66",
+    "card": {
+      "benefit": "10% y 3 cuotas",
+      "validity_place": "Tomassa",
+      "cashback_cap": "10000",
+      "participating_bank": "BBVA",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/275f8c96-9bf4-4fc6-bac7-bb0083509d66/primary_image.jpg?v=1782477919325&t=2026-06-25T19:18:39.949Z",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 20,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "26f63b94-cca2-4093-8980-b2d69f664765",
+      "name": "10% y 3 CSI Tomassa",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "10off-3csi-tomassa-bbva-jun26",
+        "short_description": "2606-BBVA-Tomassa-Presencial-10off-3csi",
+        "description": "Disfrutá los martes de reintegros y cuotas con BBVA",
+        "display_start_date": "2026-06-26T03:00:00.000Z",
+        "display_stop_date": "2027-04-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-06-30",
+          "days_of_week": [
+            "tuesday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "10% y 3 cuotas",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
         },
-        {
-          "text": "",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
         },
-        {
-          "text": "",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
-        },
-        {
-          "text": "10000",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
-        },
-        {
-          "text": "BBVA",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": [
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
             {
-              "name_bank": "BBVA",
-              "image_bank": "https://assets.mobile.playdigital.com.ar/images/banks/bbva.png"
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            }
+          ]
+        },
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "26f63b94-cca2-4093-8980-b2d69f664765",
+      "name": "10% y 3 CSI Tomassa",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 10,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": [
+            {
+              "type": "sin_interes",
+              "number": 3,
+              "coefficient": "0.00",
+              "annual_nominal_rate": "0.00",
+              "total_financial_cost": "0"
             }
           ]
         }
-      ],
-      "extra_row": null,
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/275f8c96-9bf4-4fc6-bac7-bb0083509d66/primary_image.jpg?v=1782477919325&t=2026-06-25T19:18:39.949Z",
-        "primary_backgroundcolor": null,
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/275f8c96-9bf4-4fc6-bac7-bb0083509d66/primary_image.jpg?v=1782477919325&t=2026-06-25T19:18:39.949Z",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/275f8c96-9bf4-4fc6-bac7-bb0083509d66/primary_image.jpg?v=1782477919325&t=2026-06-25T19:18:39.949Z",
-        "tertiary_backgroundcolor": null,
-        "secondary_backgroundcolor": null,
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "049ad22b-c0f0-4733-be35-e31256801ce8"
+          ]
+        },
+        "amount_range": {
+          "min": 0
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": null
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 10000,
+          "amount_of_transactions_by_period": 0
         },
-        {
-          "type": "countdown",
-          "value": false,
-          "label": null
-        },
-        {
-          "type": "online_store",
-          "value": false,
-          "label": null
+        "transaction_cap": {
+          "amount_by_transaction": 0
         }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2026-06-30T03:00:00.000Z",
-    "stop_date": "2027-01-01T02:59:59.999Z",
-    "days_of_week": "M",
-    "title": "10% y 3 CSI Tomassa",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "tomassa,bbva,presencial,martes,perfumerias",
-    "promo_id": "26f63b94-cca2-4093-8980-b2d69f664765",
-    "slug": "10off-3csi-tomassa-bbva-jun26",
-    "short_description": "2606-BBVA-Tomassa-Presencial-10off-3csi",
-    "where": "Tomassa",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
+      },
       "categories": [
-        {
-          "map_category": 4,
-          "sub_categories": [
-            37
-          ]
-        }
+        "4"
+      ],
+      "sub_categories": [
+        "37"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [],
-    "credit_list": [
-      "visa",
-      "master"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "26f63b94-cca2-4093-8980-b2d69f664765",

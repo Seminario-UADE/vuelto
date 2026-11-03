@@ -1,146 +1,124 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20off-dutyfree-premiumplatinum-comafi-oct26",
   "tarjeta": {
-    "id": "ef082990-0ef0-491a-9323-cdb43567cae4",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": {
-      "promo_id": "579bf77d-a920-4512-a10b-9fbea3e1ba64"
+    "card_id": "ef082990-0ef0-491a-9323-cdb43567cae4",
+    "card": {
+      "benefit": "20% de reintegro ",
+      "validity_place": "Duty Free",
+      "cashback_cap": "40000",
+      "participating_bank": "Comafi",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/279376ea-ef9e-4ba5-b66a-a4a0c3e2e290_primary_image.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
     },
-    "content": {
-      "row": [
-        {
-          "text": "Duty Free",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "suggested_order": 20,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "579bf77d-a920-4512-a10b-9fbea3e1ba64",
+      "name": "20% en Duty Free - Premium Platinum",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "20off-dutyfree-premiumplatinum-comafi-oct26",
+        "short_description": "2609-Comafi-DutyFree-Platinum-Presencial-20off",
+        "description": "20% de reintegro en Duty con Comafi - Exclusivo Premium Platinum",
+        "display_start_date": "2026-09-01T03:00:00.000Z",
+        "display_stop_date": "2027-02-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-11-30",
+          "start_date": "2026-09-01",
+          "days_of_week": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "20% de reintegro ",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
         },
-        {
-          "text": null,
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
         },
-        {
-          "text": null,
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            }
+          ]
         },
-        {
-          "text": "40000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "579bf77d-a920-4512-a10b-9fbea3e1ba64",
+      "name": ".",
+      "priority": 1,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_por_regla"
         },
-        {
-          "text": "Comafi",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/279376ea-ef9e-4ba5-b66a-a4a0c3e2e290_primary_image.jpg",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/279376ea-ef9e-4ba5-b66a-a4a0c3e2e290_primary_image.jpg",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/279376ea-ef9e-4ba5-b66a-a4a0c3e2e290_primary_image.jpg",
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "",
-          "portrait_app": null
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
+      "requirements": {
+        "banks": {
+          "list": [
+            "ce8aabb1-f663-4832-82ec-de9b5b572aa1"
+          ]
         },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
+        "amount_range": {
+          "min": 0
         }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:59+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2026-09-01T03:00:00.000Z",
-    "stop_date": "2026-12-01T02:59:59.999Z",
-    "days_of_week": "LMXJVSD",
-    "title": "20% en Duty Free - Premium Platinum",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "duty free,comafi,reintegro,presencial,platinum,premium",
-    "promo_id": "579bf77d-a920-4512-a10b-9fbea3e1ba64",
-    "slug": "20off-dutyfree-premiumplatinum-comafi-oct26",
-    "short_description": "2609-Comafi-DutyFree-Platinum-Presencial-20off",
-    "where": "Duty Free",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "",
-    "categories_whitelist": {
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 40000,
+          "amount_of_transactions_by_period": 0
+        }
+      },
       "categories": [
-        {
-          "map_category": 3,
-          "sub_categories": [
-            48,
-            49
-          ]
-        },
-        {
-          "map_category": 4,
-          "sub_categories": [
-            37,
-            33
-          ]
-        },
-        {
-          "map_category": 10,
-          "sub_categories": [
-            36,
-            41
-          ]
-        }
+        "10",
+        "3",
+        "4"
+      ],
+      "sub_categories": [
+        "33",
+        "36",
+        "37",
+        "41",
+        "48",
+        "49"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [],
-    "credit_list": [
-      "visa",
-      "master"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "579bf77d-a920-4512-a10b-9fbea3e1ba64",

@@ -66,9 +66,10 @@ va a variar con el tiempo):
 | Ferretería y Pinturerías | 11 | 10 |
 
 Total: **~1864 promos activas** en MODO en ese momento, repartidas en estas
-13 categorías. (Al 2026-11-02, Supermercados y Farmacias tienen 117 y 54 promos de
-pago vigentes, contadas una por promo; las cifras cambian con el tiempo y no
-necesariamente se contaron con el mismo criterio.) **El flujo de compra optimizado cubre las 13 categorías, no
+13 categorías. (Al 2026-11-03, Supermercados y Farmacias tienen 235 y 102
+reintegros vigentes, contados uno por promo sobre todas las secciones de la web;
+las cifras cambian con el tiempo y no necesariamente se contaron con el mismo
+criterio.) **El flujo de compra optimizado cubre las 13 categorías, no
 solo supermercado** — la recomendación (RF-03/RF-04) ya era genérica por
 compra, no específica de un rubro; restringir el "flujo optimizado" a
 supermercado no tenía un motivo técnico, era simplemente el recorte de
@@ -88,60 +89,62 @@ rubro no existía. Queda como nota para cuando se diseñe el ingestor real: no
 asumir que un filtro "vacío" significa "sin datos" sin probar la variante
 numérica.
 
-### Cadenas de supermercado: lo que MODO publica hoy (relevado el 2026-11-02)
+### Cadenas de supermercado: lo que MODO publica hoy (relevado el 2026-11-03)
 
 La lista previa de cadenas con "presencia confirmada en CABA/AMBA" (Coto,
 Carrefour, Jumbo, Disco, Vea, Día, ChangoMás) salió de research general de
-presencia en la zona, no de las promos reales de MODO. Se la reconcilió con el
-método que este documento pedía: **paginar por completo la categoría
-Supermercados (id 1) con el id numérico y bajar el detalle de cada promo**
-(`GET /promos/api/rewards/v2/benefit/<slug>`), en vez de confiar en
-`search_text`, que no es confiable para términos cortos o comunes. El
-relevamiento (`npm run corpus:relevar -w ingesta`, issue #35) dejó
-**117 promos de pago vigentes de 78 comercios** en Supermercados y 54 en
-Farmacias; los crudos fechados están en `supabase/seed/crudo/`.
+presencia en la zona, no de las promos reales de MODO. Se la reconcilió
+leyendo **lo mismo que muestra la web de promos**: sus seis secciones
+(carrusel principal, destacadas, supermercados, exclusivas online,
+financiación y más promos, por `/v2/slots`) más el listado anterior por
+categoría, y bajando el detalle de cada promo
+(`GET /promos/api/rewards/v2/benefit/<slug>`). El relevamiento
+(`npm run corpus:relevar -w ingesta`, issue #35) dejó **235 reintegros
+vigentes de 138 comercios** en Supermercados y 102 en Farmacias; los crudos
+fechados están en `supabase/seed/crudo/`.
 
-| Cadena de la lista previa | Promos vigentes en MODO (2026-11-02) |
+| Cadena de la lista previa | Reintegros vigentes en MODO (2026-11-03) |
 |---|---|
-| Coto | **0** |
+| Coto | 3: 25% los martes con bancos adheridos, sin tope; 25% los lunes con Ciudad/Buepp; 5% con Columbia |
+| Jumbo | 2: 20% martes y jueves con bancos adheridos; 25% los martes con Hipotecario |
+| Disco | 2: 20% viernes y sábado con bancos adheridos; 25% los martes con Hipotecario |
+| Vea | 2: 20% los viernes con bancos adheridos; 25% los martes con Hipotecario |
+| Día | 1: 20% viernes y sábado con bancos adheridos |
+| La Anónima | 4: bancos adheridos, Hipotecario (dos) e ICBC |
+| ChangoMás | 6: bancos adheridos, Hipotecario (dos), Comafi, YOY y Credicoop |
 | Carrefour | **0** |
-| Jumbo | **0** |
-| Disco | **0** |
-| Vea | **0** |
-| Día | **0** |
-| La Anónima | **0** |
-| ChangoMás | 1 (Credicoop, tarjeta Cabal) |
 
-Cada una de las cadenas con 0 tiene decenas de promos **vencidas** en el
-listado: participaron de MODO, pero hoy no tienen ninguna promo de pago
-vigente. **La lista previa no vale**: importa qué cadena participa
-efectivamente en MODO hoy, no su presencia genérica en la zona.
+**Corrección (2026-11-03).** Un primer relevamiento, del 2026-11-02, había
+concluido que Coto, Jumbo, Disco, Vea, Día y La Anónima no tenían ninguna
+promo vigente. Fue un error de método: leía solo la sección «más promos», y
+las promos de las cadenas grandes se publican en carrusel, destacadas y
+supermercados. Lección para el ingestor, como la del id de categoría: el
+listado tiene que ser **el mismo que arma la web**, no una de sus secciones
+(`docs/product/fuentes-promos.md`).
 
-Lo que sí hay en Supermercados:
+Además de las cadenas grandes, en Supermercados hay:
 
 - **Cadenas que podrían servir en CABA/AMBA** (la zona de cada una se verifica
   en su sitio antes de cargarla, spec `specs/011-corpus-promociones-seed/`,
   tarea T026): Paladini (con sus variantes «Paladar»), The Food Market,
-  Tiendas de Cercanía, Tienda Nova, Ferias de la Ciudad, Mini Mercados
-  (Semana Nación), ChangoMás y las promos «Beneficio Supermercados» de Macro.
+  Tiendas de Cercanía, Tienda Nova, Supercoop CABA, Makro y Basualdo.
 - **Cadenas que se asocian a otras zonas y hay que verificar antes de contarlas
   en el alcance**: Cooperativa Obrera (Bahía Blanca y la Patagonia), Unicoop
   (Córdoba), Alvear, Monarca, Petrelli, Kilbel, Aiello y similares.
-- **Regionales fuera de alcance**: la mayor parte de lo vigente son
+- **Regionales fuera de alcance**: buena parte de lo vigente son
   supermercados de Córdoba y Santa Fe (Villa María, Río Cuarto, La Carlota,
   Justiniano Posse, Lario, Rafaela). Quedan afuera por la restricción de zona
   (CABA/AMBA) aunque tengan promos vigentes.
 - **Carnicerías, granjas y almacenes** sueltos, de zona no determinada; se
   incluyen solo si se confirma que rigen en CABA/AMBA.
 
-**Consecuencia para la demo.** El flujo de supermercado no se puede mostrar
-con Coto, Carrefour ni Jumbo usando datos reales de MODO: hoy no tienen ninguna
-promo vigente. La compra de ejemplo del diseño (`DESIGN.md` §9, «Coto,
-miércoles») es un ejemplo de diseño, no de datos reales. El equipo tiene que
-decidir si el pitch muestra un supermercado que sí tenga promo real (por
-ejemplo, Paladini o The Food Market) o si el recorrido principal pasa por
-Farmacias, que tiene más cadenas nacionales vigentes (Farmacity, Simplicity,
-Farmaonline, Juleriaque, Parfumerie).
+**Consecuencia para la demo.** El flujo de supermercado se puede mostrar con
+datos reales de las cadenas grandes. La compra de ejemplo del diseño
+(`DESIGN.md` §9, «Coto, miércoles») no coincide con ninguna promo real de
+Coto de hoy (son los lunes y los martes): si el pitch usa datos reales, el día
+de la compra de ejemplo tiene que cambiar. Casi todas estas promos de
+noviembre vencen el 30/11 o el 31/12, así que antes del pitch hay que volver a
+relevar.
 
 **Pendiente que queda:** verificar la zona de cada cadena con una fuente (su
 sitio o sus locales) y fijar el tamaño final del corpus. El detalle de los

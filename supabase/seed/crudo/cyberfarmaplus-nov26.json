@@ -1,0 +1,254 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/cyberfarmaplus-nov26",
+  "tarjeta": {
+    "card_id": "39552ad7-0efd-455a-9aaa-7159f11d3855",
+    "card": {
+      "benefit": "30% de reintegro",
+      "validity_place": "Farmaplus",
+      "cashback_cap": "15000",
+      "participating_bank": "BBVA",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/e2342096-bf58-420e-8db8-dc4ed4f5f04b_FarmaPlus2-Detalle%20(1).jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 15,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "51446efd-116a-4281-89c6-dcd23fe7063a",
+      "name": "CyberFarmaplus",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "cyberfarmaplus-nov26",
+        "short_description": "2611-BBVA-Farmaplus-Cyber-Online-30off",
+        "description": "30% en Farmaplus",
+        "display_start_date": "2026-11-02T03:00:00.000Z",
+        "display_stop_date": "2026-11-05T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-11-04",
+          "start_date": "2026-11-02",
+          "days_of_week": [
+            "monday",
+            "tuesday",
+            "wednesday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
+        },
+        "payment_flow": {
+          "flows": [
+            "online"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            }
+          ]
+        },
+        "exclusiveness_source": [
+          "modo",
+          "banks"
+        ],
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "51446efd-116a-4281-89c6-dcd23fe7063a",
+      "name": ".",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 30,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "049ad22b-c0f0-4733-be35-e31256801ce8"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 15000,
+          "amount_of_transactions_by_period": 0
+        }
+      },
+      "categories": [
+        "4"
+      ],
+      "sub_categories": [
+        "16"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "51446efd-116a-4281-89c6-dcd23fe7063a",
+    "name": "CyberFarmaplus",
+    "description": "",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-10-20T16:30:19.152Z",
+    "updated_at": "2026-10-27T19:40:24.914Z",
+    "deleted_at": null,
+    "short_description": "2611-BBVA-Farmaplus-Cyber-Online-30off",
+    "publication_description": "30% en Farmaplus",
+    "slug": "cyberfarmaplus-nov26",
+    "display_start_date": "2026-11-02T03:00:00.000Z",
+    "display_stop_date": "2026-11-05T02:59:59.999Z",
+    "search_tags": "bbva,farmaplus,30,reintegro,cyber",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-11-04",
+        "start_date": "2026-11-02",
+        "days_of_week": [
+          "monday",
+          "tuesday",
+          "wednesday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "online"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          }
+        ]
+      },
+      "exclusiveness_source": [
+        "modo",
+        "banks"
+      ],
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "51446efd-116a-4281-89c6-dcd23fe7063a",
+        "benefit_id": "51446efd-116a-4281-89c6-dcd23fe7063a",
+        "name": ".",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_terminal_id",
+            "store_financing_online_id"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                16
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "049ad22b-c0f0-4733-be35-e31256801ce8"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 30,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 15000,
+            "amount_of_transactions_by_period": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "16"
+        ],
+        "preselected": false,
+        "created_at": "2026-10-20T16:31:38.739Z",
+        "updated_at": "2026-10-20T18:01:18.808Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": null
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "master"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">CARTERA DE CONSUMO. PROMOCIÓN VÁLIDA DEL 02/11/2026 AL 04/11/2026 INCLUSIVE. PROMOCIÓN CONSTA DE 30% DE REINTEGRO, TOPE $15.000 POR USUARIO POR VIGENCIA DE LA PROMOCIÓN. VÁLIDA PARA CLIENTES QUE ABONEN SUS COMPRAS EN UN PAGO A TRAVÉS DE MODO CON TARJETAS DE CRÉDITO MASTERCARD EMITIDAS POR BBVA. LA PRESENTE PROMOCIÓN ES VÁLIDA SÓLO PARA CONSUMOS DE TIPO FAMILIAR. EL REINTEGRO SE ACREDITARÁ DENTRO DE LOS 30 DÍAS POSTERIORES A LA COMPRA EN LA CAJA DE AHORRO BBVA VINCULADA A MODO. ACUMULA ÚNICAMENTE CON PROMOCIONES DE MODO Y PLANES CUOTA SIMPLE. LA PROMOCIÓN NO APLICA A PAGOS REALIZADOS A TRAVÉS DE OTRAS BILLETERAS VIRTUALES Y/O PLATAFORMAS DE PAGO ONLINE (POR EJEMPLO MERCADO PAGO, UALÁ, ETC.). LOS ACCIONISTAS DE BANCO BBVA ARGENTINA S.A. LIMITAN SU RESPONSABILIDAD A LA INTEGRACIÓN DE LAS ACCIONES SUSCRIPTAS LEY 19.550 Y LEY 25.738. CUIT 30-50000319-3. AVDA.CÓRDOBA 111- PISO 31 CABA</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "30% de reintegro",
+      "validity_place": "Farmaplus",
+      "cashback_cap": "15000",
+      "participating_bank": "BBVA",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/e2342096-bf58-420e-8db8-dc4ed4f5f04b_FarmaPlus2-Detalle%20(1).jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Farmaplus",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong></p><p>Realizando una compra con tus tarjetas de crédito Mastercard del BBVA, a través de MODO.</p><p></p><p></p><p><strong>¿Dónde veo el descuento aplicado?</strong></p><p>El reintegro lo verás acreditado en tu cuenta del BBVA.</p>",
+      "applicability_description": ".",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

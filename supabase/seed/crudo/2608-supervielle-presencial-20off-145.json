@@ -1,0 +1,278 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/2608-supervielle-presencial-20off-145",
+  "tarjeta": {
+    "card_id": "9874e160-7b11-4d56-9fb8-f1b04d790287",
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "El palacio del fiambre",
+      "cashback_cap": "10000",
+      "participating_bank": "Supervielle",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/e80e5114-df94-41af-8c54-c5098f1ff0d2_primary_image%20-%202026-08-04T162028.171.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 25,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "4158447d-0195-4d3a-8d07-fd900e5a4ec5",
+      "name": "El Palacio del Fiambre",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "2608-supervielle-presencial-20off-145",
+        "short_description": "2608-supervielle-gastronomía-presencial-20off",
+        "description": "Disfrutá tus ahorros pagando con MODO desde la app Supervielle",
+        "display_start_date": "2026-08-06T03:00:00.000Z",
+        "display_stop_date": "2026-12-10T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-11-30",
+          "start_date": "2026-08-13",
+          "days_of_week": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            }
+          ]
+        },
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "4158447d-0195-4d3a-8d07-fd900e5a4ec5",
+      "name": ".",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "54fdfe50-7b7e-4316-bf88-97923d5a8a8d"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 10000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "26"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "4158447d-0195-4d3a-8d07-fd900e5a4ec5",
+    "name": "El Palacio del Fiambre",
+    "description": "Disfrutá tus ahorros pagando con MODO desde la app Supervielle",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-08-11T17:44:54.936Z",
+    "updated_at": "2026-08-27T13:38:33.857Z",
+    "deleted_at": null,
+    "short_description": "2608-supervielle-gastronomía-presencial-20off",
+    "publication_description": "Disfrutá tus ahorros pagando con MODO desde la app Supervielle",
+    "slug": "2608-supervielle-presencial-20off-145",
+    "display_start_date": "2026-08-06T03:00:00.000Z",
+    "display_stop_date": "2026-12-10T02:59:59.999Z",
+    "search_tags": "",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-11-30",
+        "start_date": "2026-08-13",
+        "days_of_week": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "4158447d-0195-4d3a-8d07-fd900e5a4ec5",
+        "benefit_id": "4158447d-0195-4d3a-8d07-fd900e5a4ec5",
+        "name": ".",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                26
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "54fdfe50-7b7e-4316-bf88-97923d5a8a8d"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 10000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "26"
+        ],
+        "preselected": false,
+        "created_at": "2026-08-11T17:44:39.489Z",
+        "updated_at": "2026-08-11T18:55:40.525Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "visa",
+      "master"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">CARTERA CONSUMO. Banco Supervielle S.A., Reconquista 330, C.A.B.A., CUIT 33-50000517-9, Inscrip. I.G.J. N° 23, F° 502, L. 45, T° A de Estatutos Nac. (“el Banco”). Vigente en la República Argentina todos los días del 13 de agosto al 30 de noviembre de 2026 para consumos realizados en locales adheridos abonados mediante la modalidad de pago con “QR” a través de “MODO” desde app Supervielle o app MODO con la tarjeta de débito Visa y las tarjetas de crédito Visa y/o MasterCard que formen parte de un paquete de productos del Banco. Tope de reintegro mensual por cuenta: $10.000. Ej: para una compra con QR cuyo precio fuera $ 10.000 se realizará un descuento vía reintegro del 20% sobre el precio, es decir, $2.000. El consumo y el reintegro se verán reflejados en la cuenta asociada a MODO dentro de los 30 días de realizada la compra. Es condición necesaria tener una cuenta Supervielle propia adherida a MODO. La presente promoción no aplica tarjetas corporativas ni a pagos realizados a través de billeteras virtuales o “proveedores de servicios de pago” distintos de MODO. La marca “MODO” es propiedad de Play Digital S.A., CUIT 30-71682943-6, domicilio en Av. del Libertador 7208, Torre principal, Piso 3, CABA. El Banco no es responsable por los productos y/o servicios comercializados por las marcas y locales participantes en las promociones.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "El palacio del fiambre",
+      "cashback_cap": "10000",
+      "participating_bank": "Supervielle",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/e80e5114-df94-41af-8c54-c5098f1ff0d2_primary_image%20-%202026-08-04T162028.171.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "El Palacio del Fiambre",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong></p><p>Realizando una compra con tus tarjetas de crédito Visa y/o Mastercard o débito Visa del Supervielle a través de MODO.  Exclusivo para pagos de la cuota social en el Club Atlético Provincial.</p><p></p><p></p><p><strong>¿Dónde veo el descuento aplicado?</strong></p><p>El reintegro lo verás acreditado en la cuenta del Supervielle dentro de los 30 días.</p>",
+      "applicability_description": "El palacio del fiambre",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

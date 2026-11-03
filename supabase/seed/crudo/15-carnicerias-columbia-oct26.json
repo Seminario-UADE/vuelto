@@ -1,131 +1,111 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/15-carnicerias-columbia-oct26",
   "tarjeta": {
-    "id": "22aea50d-38a2-4bd5-80d2-461faea8ae7a",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": {
-      "promo_id": "08e3a304-be63-4d2d-98d6-4c768ae9d478"
+    "card_id": "22aea50d-38a2-4bd5-80d2-461faea8ae7a",
+    "card": {
+      "benefit": "15% de reintegro",
+      "validity_place": "Carnicerías",
+      "cashback_cap": "8000",
+      "participating_bank": "Columbia",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/0441ac0d-8ecd-4bfe-bcdd-43f8aadfb2b8_primary_image.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
     },
-    "content": {
-      "row": [
-        {
-          "text": "Carnicerías",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "suggested_order": 25,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "08e3a304-be63-4d2d-98d6-4c768ae9d478",
+      "name": "15% en carnicerías",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "15-carnicerias-columbia-oct26",
+        "short_description": "2610-columbia-carnicerias-presencial-online-15off",
+        "description": "Aprovecha 15% de reintegro en carnicería pagando con TD Visa o Mastercard de Banco Columbia.",
+        "display_start_date": "2026-09-15T03:00:00.000Z",
+        "display_stop_date": "2027-06-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2027-03-31",
+          "start_date": "2026-10-01",
+          "days_of_week": [
+            "wednesday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "15% de reintegro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
         },
-        {
-          "text": null,
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
         },
-        {
-          "text": null,
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "debit_card",
+              "issuer": "master"
+            }
+          ]
         },
-        {
-          "text": "8000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "08e3a304-be63-4d2d-98d6-4c768ae9d478",
+      "name": ".",
+      "priority": 1,
+      "outcomes": {
+        "cashback": {
+          "amount": 15,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
         },
-        {
-          "text": "Columbia",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/0441ac0d-8ecd-4bfe-bcdd-43f8aadfb2b8_primary_image.jpg",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/0441ac0d-8ecd-4bfe-bcdd-43f8aadfb2b8_primary_image.jpg",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/0441ac0d-8ecd-4bfe-bcdd-43f8aadfb2b8_primary_image.jpg",
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "",
-          "portrait_app": null
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
-        },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:59+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2026-10-01T03:00:00.000Z",
-    "stop_date": "2027-04-01T02:59:59.999Z",
-    "days_of_week": "X",
-    "title": "15% en carnicerías",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "carnicerias,columbia,miercoles,reintegro",
-    "promo_id": "08e3a304-be63-4d2d-98d6-4c768ae9d478",
-    "slug": "15-carnicerias-columbia-oct26",
-    "short_description": "2610-columbia-carnicerias-presencial-online-15off",
-    "where": "Carnicerías que acepten MODO.",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            44
+      "requirements": {
+        "banks": {
+          "list": [
+            "ad400e13-f76a-4877-a01d-1819d16146e9"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 8000,
+          "amount_of_transactions_by_period": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "44"
       ]
     },
-    "stores_whitelist": false,
     "calculated_status": "RUNNING",
-    "debit_list": [
-      "visa",
-      "master"
-    ],
-    "credit_list": []
+    "coupon": null
   },
   "detalle": {
     "id": "08e3a304-be63-4d2d-98d6-4c768ae9d478",

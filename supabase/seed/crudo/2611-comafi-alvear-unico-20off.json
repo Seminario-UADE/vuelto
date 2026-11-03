@@ -1,0 +1,269 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/2611-comafi-alvear-unico-20off",
+  "tarjeta": {
+    "card_id": "324b55a1-d045-4a34-bb55-bf919ede6671",
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "Alvear Supermercados",
+      "cashback_cap": "20000",
+      "participating_bank": "Comafi",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/58970fbd-97b5-4262-ad47-dad857fec373_Alvear-Detalle.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 20,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "c401eec2-a4f7-4790-a3bc-ba3f29766f4f",
+      "name": "Alvear supermercados nov26 UNICO",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "2611-comafi-alvear-unico-20off",
+        "short_description": "2611-comafi-alvear-unico-presencial-20off",
+        "description": "20% de reintegro en Alvear Supermercados UNICO",
+        "display_start_date": "2026-11-03T03:00:00.000Z",
+        "display_stop_date": "2027-04-29T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2027-01-31",
+          "start_date": "2026-11-03",
+          "days_of_week": [
+            "tuesday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            }
+          ]
+        },
+        "exclusiveness_source": [
+          "modo",
+          "banks"
+        ],
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "c401eec2-a4f7-4790-a3bc-ba3f29766f4f",
+      "name": ".",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "ce8aabb1-f663-4832-82ec-de9b5b572aa1"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 30000,
+          "amount_of_transactions_by_period": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "c401eec2-a4f7-4790-a3bc-ba3f29766f4f",
+    "name": "Alvear supermercados nov26 UNICO",
+    "description": "",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-10-21T18:24:59.931Z",
+    "updated_at": "2026-11-02T13:02:40.496Z",
+    "deleted_at": null,
+    "short_description": "2611-comafi-alvear-unico-presencial-20off",
+    "publication_description": "20% de reintegro en Alvear Supermercados UNICO",
+    "slug": "2611-comafi-alvear-unico-20off",
+    "display_start_date": "2026-11-03T03:00:00.000Z",
+    "display_stop_date": "2027-04-29T02:59:59.999Z",
+    "search_tags": "unico,supermercados,alvear,presencial,20,reintegro,comafi",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2027-01-31",
+        "start_date": "2026-11-03",
+        "days_of_week": [
+          "tuesday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          },
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "exclusiveness_source": [
+        "modo",
+        "banks"
+      ],
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "c401eec2-a4f7-4790-a3bc-ba3f29766f4f",
+        "benefit_id": "c401eec2-a4f7-4790-a3bc-ba3f29766f4f",
+        "name": ".",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_cuit",
+            "bin"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                43
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "ce8aabb1-f663-4832-82ec-de9b5b572aa1"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 30000,
+            "amount_of_transactions_by_period": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "43"
+        ],
+        "preselected": false,
+        "created_at": "2026-10-21T18:25:26.496Z",
+        "updated_at": "2026-10-21T19:07:43.485Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": null
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [
+      "master",
+      "visa"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Oferta exclusiva para la cartera de consumo. Promoción válida los días martes desde el 03/11/26 hasta el 31/01/27 abonando con tarjetas de crédito Visa Signature y Mastercard Black, Visa débito emitidas por Banco Comafi y pertenecientes a un servicio de cuenta UNICO. 20% de ahorro abonando a través de MODO. Quedan excluidas aquellas tarjetas de crédito Credial, Business y Corporativas emitidas en Argentina por Banco Comafi. Tope de reintegro mensual de $30.000. Los descuentos se realizan sobre precio de lista, son automáticos y se acreditarán hasta los 30 días en la cuenta del banco utilizado en el pago. No acumulable con otras promociones ni entre sí. Sólo válido para aquellos clientes que se encuentren al día en sus productos y sean titulares de una caja de ahorro en pesos en Banco Comafi. Para compras realizadas por adicionales con tarjeta de débito y/o crédito de Banco Comafi el reintegro siempre se acreditará en la caja de ahorro en pesos que el titular principal de la tarjeta de débito y/o crédito tenga en Banco Comafi. El descuento no será aplicado en aquellos pagos realizados a través de la aplicación de Mercado Pago. La promoción no aplica a pagos a través de billeteras virtuales (excepto Modo), plataformas de pago y/o portales de pagos online ajenos a la empresa. Banco Comafi no se responsabiliza por los cupones presentados por los establecimientos fuera de término, así como tampoco promociona ni garantiza los comercios, los productos y/o servicios o la calidad de los mismos. Banco Comafi S.A. con domicilio en Av. Roque Sáenz Peña 660, piso 1, CUIT 30-60473101-8.</span></p>",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "20% de reintegro",
+      "validity_place": "Alvear Supermercados",
+      "cashback_cap": "20000",
+      "participating_bank": "Comafi",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/58970fbd-97b5-4262-ad47-dad857fec373_Alvear-Detalle.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "Alvear supermercados con Comafi",
+      "faq": "<p><strong>¿Cómo puedo acceder al beneficio?</strong></p><p>Realizando una compra con tus tarjetas de debito Visa o tus tarjetas de crédito Visa Signature y Mastercard Black, del Banco Comafi a través de MODO.</p><p><strong>¿Dónde veo el reintegro aplicado?</strong></p><p>El reintegro lo verás acreditado en el resumen de tarjeta del Banco Comafi.</p>",
+      "applicability_description": "",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

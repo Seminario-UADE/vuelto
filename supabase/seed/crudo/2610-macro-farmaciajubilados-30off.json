@@ -1,0 +1,260 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/2610-macro-farmaciajubilados-30off",
+  "tarjeta": {
+    "card_id": "c792f27c-cc5b-4de3-94b0-ef107ed7f8fe",
+    "card": {
+      "benefit": "30% de reintegro",
+      "validity_place": "FARMACIA JUBILADOS",
+      "cashback_cap": "7000",
+      "participating_bank": "Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/b50fc1ed-1498-46a6-9358-776472dbb82a_Farmacia-Detalle.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 25,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "9af79a3c-94cd-494d-9777-33d5d1724c87",
+      "name": "FARMACIA JUBILADOS",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "2610-macro-farmaciajubilados-30off",
+        "short_description": "2610-macro-TD50140-farmaciajubilados-Presencial-NFC-30off",
+        "description": "SEG_GPS",
+        "display_start_date": "2026-09-21T03:00:00.000Z",
+        "display_stop_date": "2027-01-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-10-01",
+          "days_of_week": [
+            "thursday"
+          ],
+          "daily_stop_time": "23:59:59",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [],
+          "segmentation_mode": "no_segmentation"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "instore_nfc",
+            "physical-card"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "debit_card",
+              "issuer": "visa"
+            }
+          ]
+        },
+        "exclusiveness_source": [
+          "modo",
+          "banks"
+        ],
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "9af79a3c-94cd-494d-9777-33d5d1724c87",
+      "name": ".",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 30,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_por_regla"
+        },
+        "financing": {
+          "installments": []
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "6a089c91-a7d3-4199-a578-2132a3733f69"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "card",
+          "amount_by_period": 7000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "4"
+      ],
+      "sub_categories": [
+        "16"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "9af79a3c-94cd-494d-9777-33d5d1724c87",
+    "name": "FARMACIA JUBILADOS",
+    "description": "SEG_GPS",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": false,
+    "created_at": "2026-09-15T22:03:31.994Z",
+    "updated_at": "2026-11-02T19:18:28.787Z",
+    "deleted_at": null,
+    "short_description": "2610-macro-TD50140-farmaciajubilados-Presencial-NFC-30off",
+    "publication_description": "SEG_GPS",
+    "slug": "2610-macro-farmaciajubilados-30off",
+    "display_start_date": "2026-09-21T03:00:00.000Z",
+    "display_stop_date": "2027-01-01T02:59:59.999Z",
+    "search_tags": "SEG_GPS",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-10-01",
+        "days_of_week": [
+          "thursday"
+        ],
+        "daily_stop_time": "23:59:59",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [],
+        "segmentation_mode": "no_segmentation"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "instore_nfc",
+          "physical-card"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "debit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "exclusiveness_source": [
+        "modo",
+        "banks"
+      ],
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "9af79a3c-94cd-494d-9777-33d5d1724c87",
+        "benefit_id": "9af79a3c-94cd-494d-9777-33d5d1724c87",
+        "name": ".",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "bin",
+            "mcc"
+          ],
+          "categories": [
+            {
+              "category_id": 4,
+              "subcategory_ids": [
+                16
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "6a089c91-a7d3-4199-a578-2132a3733f69"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 30,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_por_regla"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "card",
+            "amount_by_period": 7000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "4"
+        ],
+        "sub_categories": [
+          "16"
+        ],
+        "preselected": false,
+        "created_at": "2026-09-15T22:03:26.876Z",
+        "updated_at": "2026-09-15T22:03:31.788Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [
+      "visa"
+    ],
+    "credit_list": [],
+    "terms_and_conditions": "CARTERA DE CONSUMO. PROMOCIÓN VÁLIDA PARA COMPRAS CON LAS TARJETAS VISA DÉBITO DE PERSONAS FÍSICAS QUE ACREDITAN SU JUBILACIÓN EN LOS BANCOS DEL GRUPO MACRO ÚNICAMENTE PARA COMERCIOS QUE ESTÉN HABILITADOS EN VISA EN EL RUBRO FARMACIAS. VÁLIDA LOS DÍAS JUEVES DESDE EL  01/10/2026 AL 31/12/2026. 30% DE DESCUENTO, CON UN TOPE DE DEVOLUCIÓN DE $7.000 POR CUENTA Y POR MES, MONTO ÚNICO A DEVOLVER POR MES CON INDEPENDENCIA DE LA CANTIDAD DE OPERACIONES QUE SE REALICEN. EL DESCUENTO SERÁ ACREDITADO EN LA CUENTA DEL CLIENTE DENTRO DE LOS TREINTA DÍAS HÁBILES DE REALIZADA LA OPERACIÓN. LOS BANCOS DEL GRUPO MACRO NO SE RESPONSABILIZAN POR LOS CUPONES PRESENTADOS FUERA DE TÉRMINO POR LOS COMERCIOS. EL BENEFICIO INCLUYE LOS PAGOS A TRAVÉS DE MODO TANTO DE LA APP MACRO COMO EN LA APP MODO. NO APLICA PARA PAGOS REALIZADOS A TRAVÉS DE AGRUPADORES COMO VIÜMI, MERCADO PAGO/TODO PAGO/PEI Y OTROS . CONSULTE BASES, CONDICIONES Y TODA INFORMACIÓN ADICIONAL EN MACRO.COM.AR , COMUNÍQUESE AL 0810-555-2355 PARA BANCO MACRO, O DIRÍJASE A LA SUCURSAL DEL BANCO MÁS CERCANA A SU DOMICILIO.",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "30% de reintegro",
+      "validity_place": "FARMACIA JUBILADOS",
+      "cashback_cap": "7000",
+      "participating_bank": "Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/publication-card/b50fc1ed-1498-46a6-9358-776472dbb82a_Farmacia-Detalle.jpg",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "FARMACIA JUBILADOS",
+      "faq": "<p><strong>¿Cómo pagar? </strong></p><p>Con tarjeta de crédito usando cualquier método de pago: tarjeta física, MODO QR y NFC (Apple Pay, Google Pay y MODO NFC).</p><p><strong>¿Donde veo el descuento aplicado?</strong></p><p>El reintegro lo verás reflejado en el resumen de la tarjeta con la que hiciste el pago.</p><p><strong>¿Esta promo es acumulable con otras promos de MODO?</strong></p><p>SÍ, esta promo es acumulable con otras promos vigentes de MODO, siempre y cuando el pago se realice con QR y/o MODO NFC.</p><p><br /></p>",
+      "applicability_description": "",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

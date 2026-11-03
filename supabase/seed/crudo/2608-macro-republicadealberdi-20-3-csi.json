@@ -1,0 +1,323 @@
+{
+  "capturadoEl": "2026-11-03",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/2608-macro-republicadealberdi-20-3-csi",
+  "tarjeta": {
+    "card_id": "c8c407f2-41f4-41a9-b955-a02b6f6f8a79",
+    "card": {
+      "benefit": "20% y hasta 3 cuotas",
+      "validity_place": "REPUBLICA DE ALBERDI BELGRANO",
+      "cashback_cap": "20000",
+      "participating_bank": "Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/c8c407f2-41f4-41a9-b955-a02b6f6f8a79/primary_image.jpg?v=1786028641235",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 25,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "de648271-483c-435d-8b4a-0af979eea42f",
+      "name": "REPUBLICA DE ALBERDI",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "2608-macro-republicadealberdi-20-3-csi",
+        "short_description": "2608-macro-TC47279-republicadealberdi-Presencial-20-3-csi",
+        "description": "SEG_GPS",
+        "display_start_date": "2026-08-01T03:00:00.000Z",
+        "display_stop_date": "2027-01-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-08-01",
+          "days_of_week": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
+        },
+        "acquirers": {
+          "list": [
+            "PRISMA",
+            "FISERV"
+          ],
+          "segmentation_mode": "by_whitelist"
+        },
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "instore_nfc",
+            "physical-card"
+          ]
+        },
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            }
+          ]
+        },
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "de648271-483c-435d-8b4a-0af979eea42f",
+      "name": "REPUBLICA DE ALBERDI",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 20,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_por_regla"
+        },
+        "financing": {
+          "installments": [
+            {
+              "type": "sin_interes",
+              "number": 1,
+              "coefficient": "0",
+              "annual_nominal_rate": "0",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 2,
+              "coefficient": "0",
+              "annual_nominal_rate": "0",
+              "total_financial_cost": "0"
+            },
+            {
+              "type": "sin_interes",
+              "number": 3,
+              "coefficient": "0",
+              "annual_nominal_rate": "0",
+              "total_financial_cost": "0"
+            }
+          ]
+        }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "6a089c91-a7d3-4199-a578-2132a3733f69"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 20000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "34"
+      ]
+    },
+    "calculated_status": "RUNNING",
+    "coupon": null
+  },
+  "detalle": {
+    "id": "de648271-483c-435d-8b4a-0af979eea42f",
+    "name": "REPUBLICA DE ALBERDI",
+    "description": "SEG_GPS",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": false,
+    "created_at": "2026-08-06T18:28:30.924Z",
+    "updated_at": "2026-08-14T20:26:22.109Z",
+    "deleted_at": null,
+    "short_description": "2608-macro-TC47279-republicadealberdi-Presencial-20-3-csi",
+    "publication_description": "SEG_GPS",
+    "slug": "2608-macro-republicadealberdi-20-3-csi",
+    "display_start_date": "2026-08-01T03:00:00.000Z",
+    "display_stop_date": "2027-01-01T02:59:59.999Z",
+    "search_tags": "SEG_GPS",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2026-08-01",
+        "days_of_week": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "PRISMA",
+          "FISERV"
+        ],
+        "segmentation_mode": "by_whitelist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "instore_nfc",
+          "physical-card"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "master"
+          },
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "de648271-483c-435d-8b4a-0af979eea42f",
+        "benefit_id": "de648271-483c-435d-8b4a-0af979eea42f",
+        "name": "REPUBLICA DE ALBERDI",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "bin",
+            "store_acquirer_establishment_id"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                34
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "6a089c91-a7d3-4199-a578-2132a3733f69"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_por_regla"
+          },
+          "financing": {
+            "installments": [
+              {
+                "type": "sin_interes",
+                "number": 1,
+                "coefficient": "0",
+                "annual_nominal_rate": "0",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 2,
+                "coefficient": "0",
+                "annual_nominal_rate": "0",
+                "total_financial_cost": "0"
+              },
+              {
+                "type": "sin_interes",
+                "number": 3,
+                "coefficient": "0",
+                "annual_nominal_rate": "0",
+                "total_financial_cost": "0"
+              }
+            ]
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 20000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "34"
+        ],
+        "preselected": false,
+        "created_at": "2026-08-06T18:28:28.519Z",
+        "updated_at": "2026-08-06T18:28:28.519Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "master",
+      "visa"
+    ],
+    "terms_and_conditions": "CARTERA DE CONSUMO. PROMOCIÓN VÁLIDA DESDE EL 1 DE AGOSTO DE 2026 HASTA EL 31 DE DICIEMBRE DE 2026, TODOS LOS DIAS, CON LAS TARJETAS DE CRÉDITO MASTERCARD GOLD, MASTERCARD INTERNACIONAL, MASTERCARD REGIONAL, MC BLACK, PLATINUM MASTERCARD, VISA CLASICA INTERNACIONAL, VISA CLASICA INTERNACIONAL NA, VISA CLASICA NACIONAL, VISA CLASICA NACIONAL NA, VISA GOLD, VISA GOLD NA, VISA PLATINUM Y VISA SIGNATURE DE LOS BANCOS DEL GRUPO MACRO. LA PRESENTE PROMOCIÓN APLICA PARA CONSUMOS DE TIPO PERSONAL/FAMILIAR. EN CASO DE DUDA, EL BANCO SE RESERVA EL DERECHO DE NO ACREDITAR EL MONTO DE LA BONIFICACIÓN HASTA TANTO SEA ACLARADO EL DESTINO DE LOS CONSUMOS. 20% DE DESCUENTO  EN UN PAGO SIN INTERES Y DE 2 A 3 CUOTAS CON TNA (TASA NOMINAL ANUAL) 0%, CON TEA (TASA EFECTIVA ANUAL) 0%, CON CFT (COSTO FINANCIERO TOTAL EFECTIVO ANUAL) 0%, TOPE DE DEVOLUCIÓN 20000 PESOS POR CUENTA POR MES.EL BENEFICIO SERÁ APLICADO DENTRO DE LOS 60 DÍAS DE REALIZADA LA COMPRA, AL CIERRE DEL RESUMEN EN EL CUAL SE REGISTRE LA OPERACIÓN O EN LOS DOS SIGUIENTES. NO ACUMULABLE CON OTRAS PROMOCIONES. NO APLICA PARA PAGOS REALIZADOS A TRAVÉS DE MERCADO PAGO/TODO PAGO Y/O PEI. EL DESCUENTO PROMOCIONADO APLICA SOBRE EL PRECIO CONTADO. (EJEMPLOS REPRESENTATIVOS: COMPRA EN CUOTAS: EN UNA COMPRA CON TARJETA DE CRÉDITO DE $1.200 EN 3 CUOTAS SIN INTERÉS, EL CLIENTE ABONARÁ 3 CUOTAS DE $400 CADA UNA. COMPRA CON DESCUENTO Y EN CUOTAS: CON TARJETA DE CRÉDITO CON 10% DE DESCUENTO Y 3 CUOTAS SIN INTERÉS EN UNA COMPRA DE $1.200, CORRESPONDERÁ 3 CUOTAS DE $400 CADA UNA, Y EL BANCO LE REINTEGRARÁ AL CLIENTE DENTRO DE LOS 60 DÍAS DE REALIZADA LA COMPRA, AL CIERRE DEL RESUMEN EN EL CUAL SE REGISTRE LA OPERACIÓN O EN LOS DOS SIGUIENTES LA SUMA DE $ 120. QUEDA ESTABLECIDO QUE LOS DATOS Y OFERTAS INDICADAS REVISTEN CARÁCTER INFORMATIVO Y EN MODO ALGUNO SUPONEN QUE LOS ESTABLECIMIENTOS, PRODUCTOS Y/O SERVICIOS QUE COMERCIALIZAN O LA CALIDAD DE LOS MISMOS SON PROMOCIONADOS O GARANTIZADOS POR LOS BANCOS DEL GRUPO MACRO, COMO ASÍ TAMPOCO SE RESPONSABILIZAN POR LOS CUPONES PRESENTADOS FUERA DE TÉRMINO POR LOS COMERCIOS. MÁS INFORMACIÓN EN FORMA PREVIA A REALIZAR LA OPERACIÓN AL: 0810-555-2355 PARA BANCO MACRO, 0810-555-7353 PARA CLIENTES MACRO SELECTA,  O EN LA SUCURSAL MÁS CERCANA A SU DOMICILIO",
+    "terms_and_conditions_url": null,
+    "coupon": null,
+    "card": {
+      "benefit": "20% y hasta 3 cuotas",
+      "validity_place": "REPUBLICA DE ALBERDI BELGRANO",
+      "cashback_cap": "20000",
+      "participating_bank": "Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/c8c407f2-41f4-41a9-b955-a02b6f6f8a79/primary_image.jpg?v=1786028641235",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png"
+    },
+    "details": {
+      "name": "REPUBLICA DE ALBERDI BELGRANO",
+      "faq": "<p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Cómo pagar?&nbsp;</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Con tarjeta de crédito usando cualquier método de pago: tarjeta física, MODO QR y NFC (Apple Pay, Google Pay y MODO NFC).</span></p><p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Donde veo el descuento aplicado?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">El reintegro lo verás reflejado en el resumen de la tarjeta con la que hiciste el pago.</span></p><p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"white-space: pre-wrap;\">¿Esta promo es acumulable con otras promos de MODO?</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">SÍ, esta promo es acumulable con otras promos vigentes de MODO, siempre y cuando el pago se realice con QR y/o MODO NFC.</span></p><p class=\"editor-paragraph\"><br></p>",
+      "applicability_description": "REPUBLICA DE ALBERDI",
+      "primary_button": null,
+      "secondary_button": null,
+      "download_button": null
+    }
+  }
+}

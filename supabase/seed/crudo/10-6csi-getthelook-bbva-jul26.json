@@ -1,144 +1,117 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/10-6csi-getthelook-bbva-jul26",
   "tarjeta": {
-    "id": "6a720cc1-0e07-4902-b5e0-ba39e434a190",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "Get The Look",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+    "card_id": "6a720cc1-0e07-4902-b5e0-ba39e434a190",
+    "card": {
+      "benefit": "10% y 6 cuotas",
+      "validity_place": "Get The Look",
+      "cashback_cap": "20000",
+      "participating_bank": "BBVA",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/6a720cc1-0e07-4902-b5e0-ba39e434a190/primary_image.jpg?v=1782418640311&t=2026-06-25T14:02:49.473Z",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 20,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "b762da34-7a04-44ae-a7ed-9e102470014a",
+      "name": "10% y 6 CSI Get The Look",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "10-6csi-getthelook-bbva-jul26",
+        "short_description": "2607-BBVA-GetTheLook-Presencial-Online-10off-6csi",
+        "description": "Disfruta los martes de reintegros y cuotas con BBVA ",
+        "display_start_date": "2026-06-25T03:00:00.000Z",
+        "display_stop_date": "2026-12-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-11-30",
+          "start_date": "2026-07-01",
+          "days_of_week": [
+            "tuesday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "10% y 6 cuotas",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
         },
-        {
-          "text": "",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "online"
+          ]
         },
-        {
-          "text": "",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
-        },
-        {
-          "text": "20000",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": null
-        },
-        {
-          "text": "BBVA",
-          "forecolor": null,
-          "backgroundcolor": null,
-          "extra_data": [
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
             {
-              "name_bank": "BBVA",
-              "image_bank": "https://assets.mobile.playdigital.com.ar/images/banks/bbva.png"
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
             }
           ]
-        }
-      ],
-      "extra_row": null,
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/6a720cc1-0e07-4902-b5e0-ba39e434a190/primary_image.jpg?v=1782418640311&t=2026-06-25T14:02:49.473Z",
-        "primary_backgroundcolor": null,
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/6a720cc1-0e07-4902-b5e0-ba39e434a190/primary_image.jpg?v=1782418640311&t=2026-06-25T14:02:49.473Z",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/6a720cc1-0e07-4902-b5e0-ba39e434a190/primary_image.jpg?v=1782418640311&t=2026-06-25T14:02:49.473Z",
-        "tertiary_backgroundcolor": null,
-        "secondary_backgroundcolor": null,
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
+        },
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "b762da34-7a04-44ae-a7ed-9e102470014a",
+      "name": "10% y 6 CSI Get The Look",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 10,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": null
-        },
-        {
-          "type": "countdown",
-          "value": false,
-          "label": null
-        },
-        {
-          "type": "online_store",
-          "value": false,
-          "label": null
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore,online",
-    "start_date": "2026-07-01T03:00:00.000Z",
-    "stop_date": "2026-12-01T02:59:59.999Z",
-    "days_of_week": "M",
-    "title": "10% y 6 CSI Get The Look",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "get the look,bbva,martes,presencial,online",
-    "promo_id": "b762da34-7a04-44ae-a7ed-9e102470014a",
-    "slug": "10-6csi-getthelook-bbva-jul26",
-    "short_description": "2607-BBVA-GetTheLook-Presencial-Online-10off-6csi",
-    "where": "Get The Look",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 4,
-          "sub_categories": [
-            37
+      "requirements": {
+        "banks": {
+          "list": [
+            "049ad22b-c0f0-4733-be35-e31256801ce8"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "user",
+          "amount_by_period": 20000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "4"
+      ],
+      "sub_categories": [
+        "37"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [],
-    "credit_list": [
-      "visa",
-      "master"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "b762da34-7a04-44ae-a7ed-9e102470014a",

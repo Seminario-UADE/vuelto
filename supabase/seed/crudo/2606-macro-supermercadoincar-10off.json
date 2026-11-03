@@ -1,113 +1,116 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/2606-macro-supermercadoincar-10off",
   "tarjeta": {
-    "id": "a6fb81d0-4065-4005-aae9-b1d4e11a9dd9",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "SUPERMERCADO INCAR",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "card_id": "a6fb81d0-4065-4005-aae9-b1d4e11a9dd9",
+    "card": {
+      "benefit": "10% de reintegro",
+      "validity_place": "SUPERMERCADO INCAR",
+      "cashback_cap": "10000",
+      "participating_bank": "Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a6fb81d0-4065-4005-aae9-b1d4e11a9dd9/primary_image.jpg?v=1787316594715",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 25,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "e8b01401-9081-4e96-81df-9e7a98c59a22",
+      "name": "SUPERMERCADO INCAR",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "2606-macro-supermercadoincar-10off",
+        "short_description": "2606-macro-TC45536-supermercadoincar-Presencial-10off",
+        "description": "SEG_GPS",
+        "display_start_date": "2026-06-05T03:00:00.000Z",
+        "display_stop_date": "2027-01-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2026-06-05",
+          "days_of_week": [
+            "friday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "10% de reintegro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [
+            "PRISMA"
+          ],
+          "segmentation_mode": "by_whitelist"
         },
-        {
-          "text": "",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore",
+            "instore_nfc",
+            "physical-card"
+          ]
         },
-        {
-          "text": "",
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "american_express"
+            }
+          ]
         },
-        {
-          "text": "10000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "Macro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a6fb81d0-4065-4005-aae9-b1d4e11a9dd9/primary_image.jpg?v=1787316594715",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
-        ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a6fb81d0-4065-4005-aae9-b1d4e11a9dd9/secondary_image.jpg?v=1787316594684",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/a6fb81d0-4065-4005-aae9-b1d4e11a9dd9/tertiary_image.jpg?v=1787316594688",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
-        }
+        "has_differential_amount": false
       }
     },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW",
-    "exclusiveness": "all",
-    "payment_flow": "instore,instore_nfc,physical-card",
-    "start_date": "2026-06-05T03:00:00.000Z",
-    "stop_date": "2027-01-01T02:59:59.999Z",
-    "days_of_week": "V",
-    "title": "SUPERMERCADO INCAR",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "SEG_GPS",
-    "promo_id": "e8b01401-9081-4e96-81df-9e7a98c59a22",
-    "slug": "2606-macro-supermercadoincar-10off",
-    "short_description": "2606-macro-TC45536-supermercadoincar-Presencial-10off",
-    "where": "SUPERMERCADO INCAR",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            43
-          ]
+    "offer": {
+      "id": "e8b01401-9081-4e96-81df-9e7a98c59a22",
+      "name": "SUPERMERCADO INCAR",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 10,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_por_regla"
+        },
+        "financing": {
+          "installments": []
         }
+      },
+      "requirements": {
+        "banks": {
+          "list": [
+            "6a089c91-a7d3-4199-a578-2132a3733f69"
+          ]
+        },
+        "amount_range": {
+          "min": 0
+        }
+      },
+      "limits": {
+        "transaction_cap": {
+          "amount_by_transaction": 10000
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "43"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [],
-    "credit_list": [
-      "master",
-      "visa",
-      "american_express"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "e8b01401-9081-4e96-81df-9e7a98c59a22",

@@ -1,131 +1,125 @@
 {
-  "capturadoEl": "2026-11-02",
+  "capturadoEl": "2026-11-03",
   "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/25off-platinum-paladar-macro-jul25",
   "tarjeta": {
-    "id": "f5f83e46-8dab-43fb-813b-a40fcc8b130f",
-    "type": "classic_free_content",
-    "backgroundcolor": null,
-    "extra_params": null,
-    "content": {
-      "row": [
-        {
-          "text": "Supermercado Paladar",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+    "card_id": "f5f83e46-8dab-43fb-813b-a40fcc8b130f",
+    "card": {
+      "benefit": "25% de reintegro ",
+      "validity_place": "Supermercado Paladar",
+      "cashback_cap": "20000",
+      "participating_bank": "Banco Macro",
+      "image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/f5f83e46-8dab-43fb-813b-a40fcc8b130f/primary_image.jpg?v=1751324075564",
+      "banner_image": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_banner.png",
+      "banner_image_portrait": "https://assets.mobile.playdigital.com.ar/images/promotions/hub/default_new_banner.png",
+      "icon": null
+    },
+    "suggested_order": 20,
+    "cta_type": "open_deeplink",
+    "cta_value": "",
+    "benefit": {
+      "id": "35a7fbf1-6cc2-41a9-b824-b67ae243d7eb",
+      "name": "25% en Paladar",
+      "type": "cashback",
+      "reward_type": "cash",
+      "scope": "Bancaria",
+      "status": "active",
+      "publication": {
+        "slug": "25off-platinum-paladar-macro-jul25",
+        "short_description": "2507-Macro-Platinum-Paladar-Presencial-20off",
+        "description": "Todos los miércoles con tarjetas de crédito Macro Platinum",
+        "display_start_date": "2025-06-30T03:00:00.000Z",
+        "display_stop_date": "2027-01-01T02:59:59.999Z"
+      },
+      "conditions": {
+        "schedule": {
+          "stop_date": "2026-12-31",
+          "start_date": "2025-07-01",
+          "days_of_week": [
+            "wednesday"
+          ],
+          "daily_stop_time": "23:59:00",
+          "daily_start_time": "00:00:00"
         },
-        {
-          "text": "25% de reintegro ",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "acquirers": {
+          "list": [
+            "MERCADOLIBRE"
+          ],
+          "segmentation_mode": "by_blacklist"
         },
-        {
-          "text": null,
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
+        "payment_flow": {
+          "flows": [
+            "instore"
+          ]
         },
-        {
-          "text": null,
-          "forecolor": "#414141",
-          "backgroundcolor": "#FFFFFF"
+        "exclusiveness": "all",
+        "payment_methods": {
+          "methods": [
+            {
+              "type": "credit_card",
+              "issuer": "visa"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "master"
+            },
+            {
+              "type": "credit_card",
+              "issuer": "american_express"
+            }
+          ]
         },
-        {
-          "text": "20000",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        },
-        {
-          "text": "Banco Macro",
-          "forecolor": "#121212",
-          "backgroundcolor": "#FFFFFF"
-        }
-      ],
-      "image": {
-        "primary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/f5f83e46-8dab-43fb-813b-a40fcc8b130f/primary_image.jpg?v=1751324075564",
-        "primary_backgroundcolor": "#FFFFFF",
-        "primary_position": [
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          },
-          {
-            "x": 0,
-            "y": 0
-          }
+        "exclusiveness_source": [
+          "modo",
+          "banks"
         ],
-        "secondary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/f5f83e46-8dab-43fb-813b-a40fcc8b130f/primary_image.jpg?v=1751324075564",
-        "tertiary_image": "https://assets.mobile.playdigital.com.ar/promotions_dynamics/f5f83e46-8dab-43fb-813b-a40fcc8b130f/primary_image.jpg?v=1751324075564",
-        "secondary_backgroundcolor": "#FFFFFF",
-        "optional_images_pack": {
-          "landscape_app": null,
-          "landscape_web": null,
-          "landscape_bgcolor": "#FFFFFF",
-          "portrait_app": null
+        "has_differential_amount": false
+      }
+    },
+    "offer": {
+      "id": "35a7fbf1-6cc2-41a9-b824-b67ae243d7eb",
+      "name": ".",
+      "priority": 0,
+      "outcomes": {
+        "cashback": {
+          "amount": 25,
+          "amount_type": "percent",
+          "cashback_mode": "cashback_bancario"
+        },
+        "financing": {
+          "installments": []
         }
       },
-      "tag_extras": [
-        {
-          "type": "time_range",
-          "value": false,
-          "label": ""
-        },
-        {
-          "type": "countdown",
-          "value": false
-        },
-        {
-          "type": "online_store",
-          "value": false
-        }
-      ]
-    },
-    "daily_start_time": "03:00:00+00",
-    "daily_stop_time": "02:59:00+00",
-    "trigger_type": "payment_promotion",
-    "promo_visibility": "MBW_and_engine",
-    "exclusiveness": "all",
-    "payment_flow": "instore",
-    "start_date": "2025-07-01T03:00:00.000Z",
-    "stop_date": "2027-01-01T02:59:59.999Z",
-    "days_of_week": "X",
-    "title": "25% en Paladar",
-    "status": "active",
-    "promotion_type": "Bancaria",
-    "search_tags": "miercoles,paladar,supemercado,platinum,macro,SEG_P",
-    "promo_id": "35a7fbf1-6cc2-41a9-b824-b67ae243d7eb",
-    "slug": "25off-platinum-paladar-macro-jul25",
-    "short_description": "2507-Macro-Platinum-Paladar-Presencial-20off",
-    "where": "Supermercado Paladar",
-    "landscape_app": null,
-    "portrait_app": null,
-    "landscape_web": null,
-    "landscape_bgcolor": "#FFFFFF",
-    "categories_whitelist": {
-      "categories": [
-        {
-          "map_category": 1,
-          "sub_categories": [
-            43,
-            34
+      "requirements": {
+        "banks": {
+          "list": [
+            "6a089c91-a7d3-4199-a578-2132a3733f69"
           ]
+        },
+        "amount_range": {
+          "min": 0
         }
+      },
+      "limits": {
+        "period_cap": {
+          "reset_by": "month",
+          "aggregate_by": "card_issuer",
+          "amount_by_period": 20000,
+          "amount_of_transactions_by_period": 0
+        },
+        "transaction_cap": {
+          "amount_by_transaction": 0
+        }
+      },
+      "categories": [
+        "1"
+      ],
+      "sub_categories": [
+        "34",
+        "43"
       ]
     },
-    "stores_whitelist": true,
     "calculated_status": "RUNNING",
-    "debit_list": [],
-    "credit_list": [
-      "visa",
-      "master",
-      "american_express"
-    ]
+    "coupon": null
   },
   "detalle": {
     "id": "35a7fbf1-6cc2-41a9-b824-b67ae243d7eb",
