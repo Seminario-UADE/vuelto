@@ -113,7 +113,7 @@ Martín termina el onboarding, guarda una compra y cierra la app. Al abrirla, si
 - **FR-004**: La recomendación y los topes DEBEN derivarse del estado (perfil, corpus, compras, simulación y reloj) con funciones memoizadas: el mismo estado devuelve el mismo objeto sin recalcular.
 - **FR-005**: Ninguna función que derive la recomendación o los topes DEBE leer el reloj del sistema. La hora entra como un valor del estado (`ahora`).
 - **FR-006**: `ahora` (instante ISO 8601 con zona) DEBE vivir en el slice `sesion`, sin persistirse, y actualizarse al abrir la app, al volver a primer plano y al pasar la medianoche de Argentina, leyendo una fuente de reloj inyectable. Mientras la app use los datos de ejemplo, la fuente devuelve siempre `2026-10-14T12:00:00-03:00` (reloj fijo de la spec 006, FR-038).
-- **FR-007**: El texto de la base y la cifra de cada tope DEBEN salir de las plantillas del motor (Principio V): con cero compras, sin cifra; el estado "queda poco" es el del motor (20% del tope o menos).
+- **FR-007**: El texto de la base y la cifra de cada tope DEBEN salir de las plantillas del motor (Principio V): con cero compras, sin cifra; el estado "queda poco" es el del motor (30% del tope o menos, `DESIGN.md` §5).
 - **FR-008**: Al guardar una compra con un comercio de categoría conocida, la app DEBE evaluarla con el motor (reloj: mediodía de la fecha de la compra) y, si el medio elegido tiene una opción, registrar su promoción en `promocionId` y el ahorro estimado en `reintegroEsperado`. `descuentoObtenido` queda `null` (el usuario no informó el descuento), así el motor calcula el consumo y la base lo cuenta como "sin descuento informado". Si el medio no tiene opción, `promocionId` y `reintegroEsperado` quedan `null`.
 
 **Estado**
@@ -151,10 +151,10 @@ Martín termina el onboarding, guarda una compra y cierra la app. Al abrirla, si
 
 ## Assumptions
 
-- **Monto opcional**: hasta que #43 agregue `monto: null` al motor, "sin monto" se consulta con monto 0: el ahorro es 0 y `topeRestanteTrasCompra` es el tope disponible. Limitaciones aceptadas hasta #43: una promo con monto mínimo se descartaría, y si dos medios aplican, con ahorro 0 el motor desempata por id de medio (no por porcentaje). Los datos de ejemplo no tienen ninguno de los dos casos.
+- **Monto opcional**: el motor acepta `monto: null` desde la issue #75 (PR #87) y la app lo pasa así: el ahorro es 0, `topeRestanteTrasCompra` es el tope disponible, una promo con monto mínimo no se descarta (el motivo lo avisa) y las opciones se ordenan por porcentaje. Hasta el 03/11 la app consultaba con monto 0.
 - **Reloj fijo**: los datos de ejemplo son de octubre de 2026; con el reloj real las promos estarían vencidas. La fuente del reloj se cambia por la real cuando #42 traiga el corpus vigente.
 - **Catálogos** (medios y comercios ofrecidos en el onboarding): siguen siendo datos estáticos de `fixtures.ts`; no son estado del usuario.
 - **Medios sin promos** (Mercado Pago): no entran al perfil del motor. Para el motor un medio necesita banco, tipo y red; inventarlos estaría prohibido por el Principio III.
 - **Persistencia**: AsyncStorage con un listener propio, sin `redux-persist`. Con los datos de ejemplo el corpus es de pocas promos; medir el corpus real es de #42.
-- **Cambio de comportamiento aceptado**: el umbral de "queda poco" pasa del 30% del mock al 20% del motor (DESIGN.md §5, spec 005). Con los datos de ejemplo, Santander ($2.300 de $8.000) pasa de "queda poco" a "disponible".
+- **Umbral de "queda poco"**: al pasar del mock al motor quedó en el 20% de la spec 005; el 03/11 el motor subió al 30% de `DESIGN.md` §5, el mismo que tenía el mock. Con los datos de ejemplo, Santander ($2.300 de $8.000) es "queda poco".
 - **Contactos**: la lista sale de los datos de ejemplo; aceptar o quitar un contacto vive en el slice y se pierde al cerrar, como hoy.

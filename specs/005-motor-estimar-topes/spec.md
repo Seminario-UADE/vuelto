@@ -15,7 +15,7 @@
 - **Issue #37** (ya mergeada): define los saldos (propios o de grupo, mensuales o semanales). Esta spec los reutiliza sin duplicar el cálculo.
 - **Issue #45** (pantalla «Mis topes»): la Edge Function `GET /topes` llama a estas funciones y la app pinta el resultado. Son de la issue #45: el **resumen del encabezado** ("Te devolvieron · Te quedan · Tope total del mes"), el filtro por rubro, el orden de las tarjetas, el detalle de compras de un tope y las **etiquetas de cada pantalla** ("de tope disponible", "Queda poco", "Tope agotado", "de $10.000 / mes"), que se eligen a partir del estado que devuelve el motor.
 - **Texto vs. issue**: donde el cuerpo de la issue #38 (anterior al diseño) y `DESIGN.md` difieren, manda el diseño (decisión del usuario, 26/10): redondeo a centenas, sin cifra cuando no hay compras y sin "N de ellas estimadas" en el texto.
-- **Error del diseño**: la tabla de datos de `DESIGN.md` marca "queda poco" a un tope de $8.000 con $2.300 restantes (28,75%), contra su propia regla del 20% (§5). Esta spec respeta la regla (decisión del usuario, 26/10).
+- **Umbral actualizado (03/11)**: la auditoría de pantallas v5 subió "queda poco" al 30% en `DESIGN.md` §5, y con eso el ejemplo de Santander ($2.300 de $8.000, 28,75%) queda bien. El motor pasa al 30%; los ejemplos de abajo están actualizados.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -52,8 +52,8 @@ Para cada estimación, el motor arma los textos que la pantalla necesita, siguie
 **Acceptance Scenarios** (consulta en octubre, salvo que se indique otra fecha):
 
 1. **Given** un tope mensual de $10.000 con $6.540 restantes según 3 compras de octubre, **When** se formatea, **Then** la cifra es "≈$6.500", la base es "según 3 compras de octubre" y el estado es `disponible`.
-2. **Given** un tope de $8.000 con $1.600 restantes según 4 compras de octubre, **When** se formatea, **Then** el estado es `queda_poco` (exactamente el 20%) y la cifra es "≈$1.600".
-3. **Given** un tope de $10.000 con $2.050 restantes, **When** se formatea, **Then** la cifra es "≈$2.000" y el estado es `disponible` (el umbral se compara con el restante exacto, no con la cifra redondeada).
+2. **Given** un tope de $8.000 con $2.400 restantes según 4 compras de octubre, **When** se formatea, **Then** el estado es `queda_poco` (exactamente el 30%) y la cifra es "≈$2.400".
+3. **Given** un tope de $10.000 con $3.050 restantes, **When** se formatea, **Then** la cifra es "≈$3.000" y el estado es `disponible` (el umbral se compara con el restante exacto, no con la cifra redondeada).
 4. **Given** un tope mensual agotado según 2 compras de octubre, **When** se formatea, **Then** la cifra es `null`, el estado es `agotado` y la base es "según 2 compras de octubre · vuelve el 1/11".
 5. **Given** un tope semanal de $5.000 sin compras esta semana, **When** se formatea, **Then** la cifra es `null`, el estado es `sin_compras` y la base es "Sin compras registradas esta semana: todavía no podemos estimar cuánto te queda."
 6. **Given** una sola compra, **When** se formatea, **Then** la base dice "según 1 compra de octubre" (singular).
@@ -88,7 +88,7 @@ Para cada estimación, el motor arma los textos que la pantalla necesita, siguie
 **Textos** (`DESIGN.md` §5 y §8)
 
 - **FR-007**: El motor MUST ofrecer una función `formatearEstimacion(estimacion)` que devuelva el **estado** (`disponible`, `queda_poco`, `agotado` o `sin_compras`), la **cifra** (texto o `null`) y la **base** en palabras, generados por plantilla, nunca por un modelo de lenguaje (constitución §II). Las etiquetas que rodean a esos textos en cada pantalla son de la issue #45.
-- **FR-008**: Estado, evaluado en este orden con los importes exactos en centavos: `agotado` si el restante es 0; si no, `sin_compras` si la base tiene cero compras; si no, `queda_poco` si el restante es menor o igual al 20% del tope (`restante × 5 ≤ tope`); si no, `disponible`.
+- **FR-008**: Estado, evaluado en este orden con los importes exactos en centavos: `agotado` si el restante es 0; si no, `sin_compras` si la base tiene cero compras; si no, `queda_poco` si el restante es menor o igual al 30% del tope (`restante × 100 ≤ tope × 30`); si no, `disponible`.
 - **FR-009**: Cifra, en los estados `disponible` y `queda_poco`: "≈$X" con el restante redondeado hacia abajo a la centena y separador de miles con punto; si ese redondeo da $0, "menos de $100". En `agotado` y `sin_compras`, `null`.
 - **FR-010**: Base: "según N compras de <mes>" si el período es mensual, "según N compras de esta semana" si es semanal (singular con 1 compra). En `agotado` se agrega " · vuelve el D/M" (día siguiente al fin del período, sin ceros a la izquierda). En `sin_compras` la base es "Sin compras registradas este mes: todavía no podemos estimar cuánto te queda." (o "esta semana").
 - **FR-011**: Invariante comprobable de la constitución §V: si la cifra no es `null`, la base no es vacía; y la cifra, cuando existe, nunca representa más que el restante.
@@ -125,4 +125,4 @@ Sin cambios: el contrato de `recomendar()` (issues #36 y #37).
 
 - Los grupos de tope compartido son de un mismo banco; si no, el banco de la estimación es `null`.
 - Fechas en hora de Argentina, como en las issues anteriores.
-- "Queda poco" usa el umbral de 20% de `DESIGN.md` §5.
+- "Queda poco" usa el umbral de 30% de `DESIGN.md` §5 (era 20% hasta la auditoría v5).

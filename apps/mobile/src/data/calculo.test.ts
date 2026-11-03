@@ -10,6 +10,7 @@ import {
   type EntradasMotor,
 } from "./calculo";
 import type { Comercio } from "./contracts";
+import { SIN_PROMO } from "./vista-recomendacion";
 import {
   RELOJ_EJEMPLO,
   catalogoComercios,
@@ -49,20 +50,26 @@ describe("recomendacionVista (US1)", () => {
     expect(r?.dia).toBe("hoy miércoles");
   });
 
-  it("las promos de otro rubro no aparecen como alternativa (research R4)", () => {
-    expect(recomendacionVista(entradas, comercio("coto"), 10000)?.alternativas).toEqual([]);
+  it("las promos de otro rubro no aparecen como alternativa (research R4): los demás medios, sin promo", () => {
+    const alternativas = recomendacionVista(entradas, comercio("coto"), 10000)?.alternativas ?? [];
+    expect(alternativas.length).toBeGreaterThan(0);
+    expect(alternativas.every((a) => a.motivo === SIN_PROMO)).toBe(true);
   });
 
   it("Farmacity: sin recomendación y Macro agotado con su base", () => {
     const r = recomendacionVista(entradas, comercio("farmacity"), 10000);
     expect(r?.resultado).toBe("sin-promo");
-    expect(r?.alternativas).toEqual([
+    const [primera, ...resto] = r?.alternativas ?? [];
+    expect(primera).toEqual(
       expect.objectContaining({
         medioId: "macro-visa-debito",
         estado: "agotado",
         motivo: "Tope agotado este mes, según 2 compras",
       }),
-    ]);
+    );
+    // "¿Por qué no X?" también para los medios sin ninguna promo en farmacias (issue #46).
+    expect(resto.map((a) => a.motivo)).toEqual(resto.map(() => SIN_PROMO));
+    expect(resto.length).toBeGreaterThan(0);
   });
 
   it("YPF un miércoles: no aplica hoy y dice cuándo sí", () => {
@@ -116,7 +123,7 @@ describe("topesVista", () => {
       reinicio: "se reinicia el 1/11",
       promo: "20% en supermercados · los miércoles",
     });
-    expect(de("santander-mastercard-credito")).toMatchObject({ estado: "disponible", cifra: "≈$2.300" });
+    expect(de("santander-mastercard-credito")).toMatchObject({ estado: "queda-poco", cifra: "≈$2.300" });
     expect(de("macro-visa-debito")).toMatchObject({
       estado: "agotado",
       cifra: null,

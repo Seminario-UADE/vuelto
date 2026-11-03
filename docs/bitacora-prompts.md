@@ -1879,6 +1879,95 @@ arreglos y haz la opción A"):
 
 ---
 
+## 2026-11-03 — "Queda poco" al 30% del tope, como pide el diseño
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** alinear el motor con el diseño nuevo de la app: un tope pasa
+a "queda poco" con el 30% o menos, no con el 20%.
+
+**Prompts principales:**
+1. "Analizá el PR #76 y fijate si nuestro motor encaja con eso. ¿Podés
+   mirar también las imágenes?" Se revisaron las capturas de la app y el
+   código que traduce la respuesta del motor. Aparecieron cuatro choques;
+   uno era que el diseño subió "queda poco" al 30% y el motor seguía en 20%.
+2. "Traete los últimos cambios del proyecto: ya debería estar el cambio de
+   que el motor corre en la app con Redux." Ya estaba (ADR-010 y los PRs
+   de la app de Joaquín), y el motor seguía en 20%.
+3. "Hacé el cambio al 30%."
+
+**Resultado:**
+- El motor marca "queda poco" con el 30% del tope o menos. El ejemplo de
+  Santander del diseño ($2.300 de $8.000) ahora sale bien, y deja de ser el
+  error que se había anotado en la issue #38.
+- Se actualizaron los tests del motor, la spec 005 y un test de la app que
+  esperaba el 20%. 193 tests del motor, 378 de la app y 40 de la Edge
+  Function en verde.
+
+---
+
+## 2026-11-03 — La pantalla muestra el porqué de cada medio de pago (issue #46)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** terminar la issue #46 ahora que existe la pantalla, y hacer
+los arreglos chicos que quedaron del monto opcional (PR #87, de jeqm0302).
+
+**Prompts principales:**
+1. "Revisemos el PR #87: ¿qué toca y afecta algo de lo que veníamos
+   charlando?" Ya estaba mergeado. Toca los textos del motor de la issue
+   #46, y el aviso nuevo de compra mínima se perdía porque la app corta el
+   texto del motor en el " · ".
+2. "¿Podemos hacer nosotros los arreglos chicos después de aprobarlo? ¿Bajo
+   qué issue?" Bajo la issue #46, que sigue abierta.
+3. "Revisá la pantalla." Mostraba el motivo y las otras tarjetas, pero no
+   las tarjetas sin ninguna promo, y podía mostrar promos de bancos que el
+   usuario no tiene.
+4. "Avanzá así": si una tarjeta ya es una opción, no repetir sus descartes;
+   si tiene dos promos descartadas, mostrar las dos.
+
+**Resultado:**
+- El motor manda, por cada promo, el texto de qué da y de qué período es su
+  tope. La app deja de cortar los textos del motor, así el aviso de compra
+  mínima llega al usuario y un tope semanal ya no dice "de octubre".
+- La app le pasa al motor el monto vacío, no un 0: sin monto, las opciones
+  se ordenan por porcentaje y las promos con compra mínima no se descartan.
+- En "Otras opciones", cada tarjeta del usuario dice por qué no conviene, o
+  "Sin promo para esta compra". Ya no aparecen promos de bancos que no
+  tenés, ni la tarjeta recomendada repetida.
+- Dentro de una opción con varias promos acumulables, van por porcentaje.
+- Se actualizaron los contratos y las specs 005 y 008. Las revisiones de
+  código no encontraron incumplimientos de reglas; se ajustaron nombres,
+  una conversión repetida y un lugar que deducía el período leyendo un
+  texto. 211 tests del motor, 385 de la app y 40 de la Edge Function en
+  verde.
+
+---
+
+## 2026-11-03 — PR #98 al día con main (conflictos con el perfil del PR #100)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** que el PR #98 se pueda mergear después de que entró a `main` el
+perfil con los medios guardados del usuario (PR #100).
+
+**Prompts principales:**
+1. "Traete los últimos cambios al repo."
+2. "Revisás mi PR 98, que al parecer tenía conflictos con lo que está ahora en main?"
+
+**Resultado:**
+- Chocaban tres archivos. En el cálculo de la app, el PR #98 había borrado la
+  lista de promociones que servía para adivinar el banco, y el PR #100 la había
+  adaptado a los medios del perfil. Quedó borrada, como quería el PR #98, y la
+  pantalla usa los medios que guardó el usuario, como quería el PR #100.
+- Ahora "Sin promo para esta compra" aparece para los medios reales del perfil
+  del usuario, no para los de ejemplo.
+- En la bitácora quedaron las dos entradas, en orden de fecha.
+- Tests en verde: 213 del motor, 447 de la app, 40 de la Edge Function y 274
+  de la ingesta. Lint y typecheck en verde.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

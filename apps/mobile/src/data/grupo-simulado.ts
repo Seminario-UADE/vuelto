@@ -19,11 +19,11 @@ import {
   promociones,
 } from "./fixtures";
 import { pedidoPresencial, recomendarSeguro, textoDia } from "./calculo";
-import { queDa } from "./vista-recomendacion";
+import { razonDe } from "./vista-recomendacion";
 import { aprox, fechaCorta } from "../lib/format";
 import { mediodia } from "../lib/reloj";
 import { RUBROS } from "../lib/rubros";
-import { textoBase } from "../lib/textos";
+import { periodoDeVista, textoBase } from "../lib/textos";
 
 type Opcion = {
   quien: { nombre: string; esVos: boolean; orden: number };
@@ -80,17 +80,13 @@ export function recomendarGrupo(
       const mejor = r?.mejor ?? null;
       const medio = mejor ? medioDeLaApp(mejor.medioDePagoId) : undefined;
       if (mejor && medio) {
-        const motorBase = mejor.promociones[0]?.base ?? null;
-        const promo = promociones.find((p) => p.id === mejor.promociones[0]?.promocionId);
-        const base = textoBase(
-          motorBase?.comprasRegistradas ?? 0,
-          promo?.tope.periodo === "semanal" ? "semana" : "mes",
-          mes,
-        );
+        const principal = mejor.promociones[0];
+        const periodo = periodoDeVista(principal?.periodo ?? null);
+        const base = textoBase(principal?.base?.comprasRegistradas ?? 0, periodo, mes);
         opciones.push({
           quien: { nombre: "Vos", esVos: true, orden: -1 },
           medio: `tu ${medio.nombre}`,
-          razon: queDa(mejor.motivo),
+          razon: razonDe(mejor),
           reintegro: mejor.ahorroEstimado,
           conBase: base.tipo === "compras",
           base,
@@ -102,7 +98,7 @@ export function recomendarGrupo(
           detalle:
             base.tipo === "compras"
               ? `Tu ${medio.nombre}: ${aprox(mejor.ahorroEstimado)} de reintegro, ${base.texto}`
-              : `Tu ${medio.nombre}: ${queDa(mejor.motivo)}, sin base ${base.texto.includes("semana") ? "esta semana" : "este mes"}`,
+              : `Tu ${medio.nombre}: ${razonDe(mejor)}, sin base ${periodo === "semana" ? "esta semana" : "este mes"}`,
         });
         return;
       }
@@ -145,7 +141,7 @@ export function recomendarGrupo(
       opciones.push({
         quien: { nombre: nombreC, esVos: false, orden },
         medio: `su ${nombreMedio}`,
-        razon: queDa(mejor.motivo),
+        razon: razonDe(mejor),
         reintegro: mejor.ahorroEstimado,
         conBase: tieneCompras && mejor.promociones[0]?.topeRestanteTrasCompra !== null,
         base,
