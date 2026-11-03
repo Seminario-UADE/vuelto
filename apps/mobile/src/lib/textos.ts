@@ -1,4 +1,10 @@
+import type { PeriodoAcumulable } from "@vuelto/motor";
 import type { Base, Periodo } from "../data/contracts";
+
+/** El período del motor en la vista; sin período, mensual como en el motor. */
+export function periodoDeVista(periodo: PeriodoAcumulable | null): Periodo {
+  return periodo === "semanal" ? "semana" : "mes";
+}
 
 /**
  * Texto de la base de un estimado (Principio V), en un solo lugar. Lo usan el adaptador

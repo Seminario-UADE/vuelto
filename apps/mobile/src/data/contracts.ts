@@ -68,23 +68,12 @@ export type {
   Recomendacion as RespuestaRecomendar,
 } from "@vuelto/motor";
 
-/**
- * La compra que se evalúa, con el monto opcional (constitución §I). Hasta que #43 agregue
- * `monto: null` al motor, `calculo.ts` lo consulta como 0.
- */
+/** La compra que se evalúa, con el monto opcional (constitución §I, issue #75). */
 export type PedidoRecomendar = {
   comercio: string | null;
   categoriaId: number;
   monto: number | null;
   canal: "presencial" | "online";
-};
-
-/** Promoción del catálogo (lectura con RLS), para nombrar lo que el motor devuelve por id. */
-export type PromocionCatalogo = {
-  id: string;
-  titulo: string;
-  bancoId: string;
-  categoriaId: number;
 };
 
 // ─── Vista: lo que pintan las pantallas ───────────────────────────────────────

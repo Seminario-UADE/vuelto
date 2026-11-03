@@ -70,7 +70,7 @@ export function estimarTopes(
     .map((e) => e.estimacion);
 }
 
-/** "Queda poco" con el 30% del tope o menos (DESIGN.md §5, auditoría v5). */
+/** "Queda poco" con el 30% del tope o menos (DESIGN.md §5, FR-008). */
 const PORCENTAJE_QUEDA_POCO = 30;
 
 /**

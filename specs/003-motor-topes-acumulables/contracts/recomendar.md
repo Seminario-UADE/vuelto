@@ -20,6 +20,10 @@ La firma no cambia (ver `specs/002-motor-recomendar/contracts/recomendar.md`). C
 - `base` es `null` en una `PromocionAplicada` si y solo si la promo no informa tope o su tope es
   por compra. En un `Descarte`, si y solo si la causa no es `tope_agotado` o el tope es por compra
   de $0.
+- `periodo` (`"mensual"`, `"semanal"` o `null`) dice de qué período es `base`; es `null` en los
+  mismos casos (issue #46).
+- `textoPromo` es la parte de `motivo` de esa promo, sin su tope: qué da y, sin monto, la compra
+  mínima. La pantalla lo muestra aparte de la cifra del tope sin cortar el motivo (issue #46).
 
 ## Ejemplo de salida (US2-1)
 
@@ -29,8 +33,14 @@ La firma no cambia (ver `specs/002-motor-recomendar/contracts/recomendar.md`). C
     "medioDePagoId": "galicia-credito-visa",
     "ahorroEstimado": 3000,
     "promociones": [
-      { "promocionId": "A", "ahorroEstimado": 2000, "topeRestanteTrasCompra": null, "base": null },
-      { "promocionId": "B", "ahorroEstimado": 1000, "topeRestanteTrasCompra": null, "base": null }
+      {
+        "promocionId": "A", "ahorroEstimado": 2000, "topeRestanteTrasCompra": null, "base": null,
+        "periodo": null, "textoPromo": "20% en supermercados"
+      },
+      {
+        "promocionId": "B", "ahorroEstimado": 1000, "topeRestanteTrasCompra": null, "base": null,
+        "periodo": null, "textoPromo": "10% en supermercados"
+      }
     ],
     "motivo": "20% en supermercados · la promo no informa tope + 10% en supermercados · la promo no informa tope"
   },

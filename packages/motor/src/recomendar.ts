@@ -7,7 +7,7 @@ import { aCentavos, aCentesimosDePunto, aPesos, aplicarPorcentaje } from "./dine
 import { mediosCompatibles, primeraReglaQueFalla, type ContextoDeCompra } from "./elegibilidad.ts";
 import { PerfilSinMediosError } from "./errores.ts";
 import { diaArgentina, fechaArgentina } from "./fecha.ts";
-import { motivoCombinado, motivoDescarte, motivoOpcion, type TopeTrasCompra } from "./motivos.ts";
+import { motivoCombinado, motivoDescarte, motivoOpcion, textoPromo, type TopeTrasCompra } from "./motivos.ts";
 import { compararIds } from "./orden.ts";
 import { calcularSaldos, clasificarTope, type Saldo } from "./tope.ts";
 import type {
@@ -97,8 +97,9 @@ interface PromoAplicable {
 
 /**
  * Arma una opción con una o varias promos del mismo medio. Las promos se
- * reparten el saldo en orden de ahorro sin tope y luego por id, así ninguna
- * combinación supera el restante de un saldo (FR-010).
+ * reparten el saldo en orden de ahorro sin tope, luego de porcentaje (sin
+ * monto todos los ahorros son 0) y luego por id, así ninguna combinación
+ * supera el restante de un saldo (FR-010).
  */
 function armarOpcion(
   medio: MedioDePago,
@@ -107,7 +108,10 @@ function armarOpcion(
   sinMonto: boolean,
 ): Candidata {
   const ordenadas = [...grupo].sort(
-    (a, b) => b.ahorroSinTope - a.ahorroSinTope || compararIds(a.promo.id, b.promo.id),
+    (a, b) =>
+      b.ahorroSinTope - a.ahorroSinTope ||
+      aCentesimosDePunto(b.promo.porcentaje) - aCentesimosDePunto(a.promo.porcentaje) ||
+      compararIds(a.promo.id, b.promo.id),
   );
   const restantes = new Map<Saldo, number>();
   // Las que quedan en $0 porque otra promo de esta misma opción agotó el saldo (FR-010).
@@ -132,6 +136,8 @@ function armarOpcion(
       ahorroEstimado: aPesos(ahorros[i] ?? 0),
       topeRestanteTrasCompra: tope ? aPesos(tope.restante) : null,
       base: a.saldo ? a.saldo.base : null,
+      periodo: a.saldo ? a.saldo.periodo : null,
+      textoPromo: textoPromo(a.promo, sinMonto, sinSaldo.has(a.promo.id)),
     };
   });
   const opcion: OpcionDePago = {
