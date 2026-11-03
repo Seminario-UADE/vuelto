@@ -47,7 +47,9 @@ mensajes de la base ni trazas.
         "promocionId": "promo-kansas-20",
         "ahorroEstimado": 3000,
         "topeRestanteTrasCompra": 7000,
-        "base": { "comprasRegistradas": 2, "comprasSinDescuentoInformado": 0 }
+        "base": { "comprasRegistradas": 2, "comprasSinDescuentoInformado": 0 },
+        "periodo": "mensual",
+        "textoPromo": "20% en Kansas"
       }
     ],
     "motivo": "20% en Kansas · te quedan ≈$7.000 de tope, según 2 compras de octubre"
