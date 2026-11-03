@@ -1854,11 +1854,28 @@ elija con un toque en «¿Con qué pago?». Issue chica: sin spec-kit.
 - Perfil: lista con quitar, y agregar con autocompletar del catálogo o el nombre
   escrito a mano. Uno del catálogo abre su pantalla; uno escrito a mano no
   (no tiene rubro).
-- «¿Con qué pago?»: `selectComerciosFrecuentes` ya los ponía primero; ahora los
-  arma por nombre.
+- «¿Con qué pago?»: los habituales reemplazan a los frecuentes de ejemplo como
+  accesos rápidos (`selectComerciosFrecuentes`), armados por nombre.
 - Verificación: lint, typecheck, build y tests en verde (app 450, motor 192,
   supabase 40). No se probó en Expo Go.
-- Depende de #41: el PR va después del de #41.
+
+**Ajustes del 2026-11-03** (después de integrar main con #41 cerrada, #92 y #93;
+prompts: "Terminemos el otro que tengo asignado", "sigue los pasos para los
+arreglos y haz la opción A"):
+- rules-guardian sin hallazgos; `/code-review` marcó que los comercios no seguían
+  los cuidados que #41 dejó para los medios. Se alinearon: las escrituras pasan
+  por `escribir` (cambio de cuenta, sin conexión → solo lectura), `leerComercios`
+  descarta una lectura que se cruzó con una escritura (contador propio por
+  lista), `sacarComercio` verifica la fila borrada y Perfil edita solo con
+  `carga === "lista"`.
+- Onboarding: los repetidos se comparan con `comercioRepetido` («coto» = «Coto»)
+  y un duplicado muestra el mensaje de comercios, no el de tarjetas.
+- Opción A (elegida por el usuario): un habitual escrito a mano se puede tocar en
+  Inicio y avisa «No conocemos promos para …» en vez de quedar en blanco.
+  Asignarle categoría queda para #43.
+- Limitación conocida: el autocompletar sale del catálogo de ejemplo (12
+  comercios), no del corpus real de MODO; queda pendiente para #43.
+- Verificación: lint, typecheck, build y tests en verde (app 460).
 
 ---
 

@@ -23,14 +23,18 @@ import { Text } from "./text";
 export function ComerciosDelPerfil() {
   const dispatch = useAppDispatch();
   const comercios = useAppSelector((s) => s.perfil.comercios);
-  const sinConexion = useAppSelector((s) => s.perfil.carga === "sin-conexion");
+  // Como los medios: se edita solo con el perfil leído de Supabase (sin conexión o con error, solo lectura).
+  const editable = useAppSelector((s) => s.perfil.carga === "lista");
   const [agregando, setAgregando] = useState(false);
-  const [q, setQ] = useState("");
+  const [busqueda, setBusqueda] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const sugerencias = useAsync(() => (q.trim() ? api.buscarComercios(q) : Promise.resolve([])), q);
+  const sugerencias = useAsync(
+    () => (busqueda.trim() ? api.buscarComercios(busqueda) : Promise.resolve([])),
+    busqueda,
+  );
 
-  const texto = q.trim();
+  const texto = busqueda.trim();
   const opciones = (sugerencias.datos ?? []).filter((c) => !comercioRepetido(comercios, c.nombre)).slice(0, 5);
   const ofrecerTexto =
     texto !== "" && !comercioRepetido(comercios, texto) && !opciones.some((c) => comercioRepetido([c], texto));
@@ -41,7 +45,7 @@ export function ComerciosDelPerfil() {
     const r = await dispatch(agregarComercio(nombre));
     setEnviando(false);
     if (r.ok) {
-      setQ("");
+      setBusqueda("");
       setAgregando(false);
     } else {
       setError(r.error === "duplicado" ? MENSAJE_COMERCIO_REPETIDO : MENSAJES_ERROR[r.error]);
@@ -58,7 +62,8 @@ export function ComerciosDelPerfil() {
 
   const abrir = (nombre: string) => {
     const c = comercioPorNombre(nombre);
-    // Solo los del catálogo tienen pantalla de comercio; uno escrito a mano no tiene rubro.
+    // Solo los del catálogo tienen pantalla de comercio. Uno escrito a mano no tiene rubro: no hay
+    // promos conocidas para él (en Inicio lo avisa) hasta que #43 le asigne categoría.
     if (c.categoriaId !== null) router.push({ pathname: "/comercio/[id]", params: { id: c.id } });
   };
 
@@ -67,13 +72,13 @@ export function ComerciosDelPerfil() {
       <SectionHeader
         title="Comercios donde comprás"
         action={
-          sinConexion
+          !editable
             ? undefined
             : {
                 label: agregando ? "Cancelar" : "Agregar",
                 onPress: () => {
                   setError(null);
-                  setQ("");
+                  setBusqueda("");
                   setAgregando((x) => !x);
                 },
               }
@@ -100,7 +105,7 @@ export function ComerciosDelPerfil() {
                   {c.nombre}
                 </Text>
               </Pressable>
-              {sinConexion ? null : (
+              {!editable ? null : (
                 <Pressable
                   onPress={() => void sacar(c.id)}
                   disabled={enviando}
@@ -122,7 +127,7 @@ export function ComerciosDelPerfil() {
           ))}
         </Card>
       )}
-      {agregando && !sinConexion ? (
+      {agregando && editable ? (
         <View style={{ gap: space.md }}>
           <View
             style={{
@@ -137,10 +142,10 @@ export function ComerciosDelPerfil() {
           >
             <Icon name="buscar" size={20} color={colors.inkSecondary} />
             <TextInput
-              value={q}
+              value={busqueda}
               onChangeText={(t) => {
                 setError(null);
-                setQ(t);
+                setBusqueda(t);
               }}
               placeholder="Buscá o escribí un comercio"
               placeholderTextColor={colors.inkSecondary}

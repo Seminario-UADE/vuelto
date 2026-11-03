@@ -237,6 +237,51 @@ describe("comercios habituales (issue #47)", () => {
     expect(s.getState().perfil.comercios).toEqual([{ id: "c9", nombre: "Coto" }]);
   });
 
+  it("confirmarComercios no vuelve a mandar los ya guardados, aunque cambie la mayúscula", async () => {
+    const r = remoto();
+    const s = armar(r);
+    await s.dispatch(agregarComercio("coto"));
+    await s.dispatch(confirmarComercios(["Coto", "Jumbo"]));
+    expect(r.llamadas).toEqual(["agregarComercio:coto", "confirmarComercios:Jumbo"]);
+  });
+
+  it("si cambió la cuenta mientras volaba el pedido, no se guarda en el slice nuevo", async () => {
+    const r = remoto();
+    const s = armar(r);
+    r.datos.agregarComercio = async (nombre) => {
+      s.dispatch(usuarioCambio({ id: "u2", email: "otra@mail.com" }));
+      return ok({ id: "c9", nombre });
+    };
+    expect((await s.dispatch(agregarComercio("Coto"))).ok).toBe(false);
+    expect(s.getState().perfil.comercios).toEqual([]);
+  });
+
+  it("una lectura que salió antes de agregar un comercio no lo borra", async () => {
+    let soltar!: () => void;
+    const r = remoto();
+    r.datos.leerMisComercios = () => new Promise((res) => (soltar = () => res(ok([]))));
+    const s = armar(r);
+    const lectura = s.dispatch(leerComercios());
+    await s.dispatch(agregarComercio("Coto"));
+    soltar();
+    await lectura;
+    expect(s.getState().perfil.comercios).toEqual([{ id: "c9", nombre: "Coto" }]);
+  });
+
+  it("sin conexión al guardar, el perfil pasa a solo lectura", async () => {
+    const s = armar(remoto({ agregarComercio: { ok: false, error: "sin_conexion" } }));
+    expect(await s.dispatch(agregarComercio("Coto"))).toEqual({ ok: false, error: "sin_conexion" });
+    expect(s.getState().perfil.carga).toBe("sin-conexion");
+  });
+
+  it("si la base no borró la fila, no se saca y se vuelve a leer", async () => {
+    const r = remoto({ sacarComercio: { ok: false, error: "otro" } });
+    const s = armar(r);
+    await s.dispatch(agregarComercio("Coto"));
+    expect((await s.dispatch(sacarComercio("c9"))).ok).toBe(false);
+    expect(r.llamadas).toContain("leerMisComercios");
+  });
+
   it("sacar deja el perfil sin comercios si era el único (RF-02)", async () => {
     const s = armar();
     await s.dispatch(agregarComercio("Coto"));

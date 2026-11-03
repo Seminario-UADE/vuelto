@@ -4,6 +4,7 @@ import { mediosDeclarados, ticketDeEjemplo } from "../data/fixtures";
 import { escenarioElegido } from "./acciones";
 import { comerciosLeidos, mediosConfirmados } from "./perfil";
 import {
+  selectComercioSimulado,
   selectComerciosFrecuentes,
   selectPerfilVista,
   selectRecomendacion,
@@ -45,6 +46,18 @@ describe("perfil del onboarding (FR-002 de la spec 006)", () => {
     );
     expect(selectPerfilVista(s.getState()).medios.map((m) => m.nombreCorto)).toEqual(["BBVA"]);
     expect(selectComerciosFrecuentes(s.getState()).map((c) => c.nombre)).toEqual(["YPF", "Shell"]);
+  });
+
+  it("un habitual escrito a mano se puede tocar, sin rubro inventado ni recomendación", () => {
+    const s = storeDePrueba();
+    s.dispatch(mediosConfirmados(mediosDeEjemplo(["bbva-visa-credito"])));
+    s.dispatch(comerciosLeidos([{ id: "c1", nombre: "Panadería Juan" }]));
+    const [libre] = selectComerciosFrecuentes(s.getState());
+    expect(libre).toMatchObject({ nombre: "Panadería Juan", categoriaId: null });
+    s.dispatch(comercioElegido(libre!.id));
+    // Inicio avisa «No conocemos promos para…» en vez de quedar en blanco (issue #47).
+    expect(selectComercioSimulado(s.getState())?.nombre).toBe("Panadería Juan");
+    expect(selectRecomendacion(s.getState())).toBeNull();
   });
 
   it("si saltó los comercios, los frecuentes de ejemplo", () => {

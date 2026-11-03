@@ -45,9 +45,18 @@ export const selectEntradasMotor = createSelector(
   }),
 );
 
+/** Los comercios que eligió el usuario; si saltó ese paso, los frecuentes de ejemplo. */
+export const selectComerciosFrecuentes = createSelector([(s: RootState) => s.perfil.comercios], (habituales): Comercio[] => {
+  // Del catálogo si lo conoce (con su rubro); si no, el comercio por su nombre, sin rubro inventado.
+  const elegidos = habituales.map((c) => comercioPorNombre(c.nombre));
+  return elegidos.length > 0 ? elegidos : catalogoComercios.filter((c) => c.frecuente);
+});
+
+/** El comercio que tocó: del catálogo o uno de sus habituales escritos a mano (sin rubro). */
 export const selectComercioSimulado = createSelector(
-  [(s: RootState) => s.simulacion.comercioId],
-  (id): Comercio | null => catalogoComercios.find((c) => c.id === id) ?? null,
+  [(s: RootState) => s.simulacion.comercioId, selectComerciosFrecuentes],
+  (id, frecuentes): Comercio | null =>
+    catalogoComercios.find((c) => c.id === id) ?? frecuentes.find((c) => c.id === id) ?? null,
 );
 
 /** «¿Con qué pago?»: se recalcula con cada cambio del monto, sin red (US2). */
@@ -73,13 +82,6 @@ export const selectResumenCompras = createSelector(
 export const selectMediosDelUsuario = createSelector([(s: RootState) => s.perfil.medios], (medios): MedioDePago[] =>
   medios.map(medioVista),
 );
-
-/** Los comercios que eligió el usuario; si saltó ese paso, los frecuentes de ejemplo. */
-export const selectComerciosFrecuentes = createSelector([(s: RootState) => s.perfil.comercios], (habituales): Comercio[] => {
-  // Del catálogo si lo conoce (con su rubro); si no, el comercio por su nombre, sin rubro inventado.
-  const elegidos = habituales.map((c) => comercioPorNombre(c.nombre));
-  return elegidos.length > 0 ? elegidos : catalogoComercios.filter((c) => c.frecuente);
-});
 
 export const selectPerfilVista = createSelector(
   [(s: RootState) => s.perfil.nombre, selectMediosDelUsuario, selectComerciosFrecuentes],

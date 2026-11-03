@@ -110,7 +110,12 @@ export function crearDatosPerfil(cliente: SupabaseClient) {
         (data) => data as ComercioHabitual,
       ),
 
-    sacarComercio: (id: string): Promise<Resultado<null>> => ejecutar(comercios().delete().eq("id", id), () => null),
+    sacarComercio: async (id: string): Promise<Resultado<null>> => {
+      const r = await ejecutar(comercios().delete().eq("id", id).select("id"), (data) => (data as unknown[]).length);
+      if (!r.ok) return r;
+      // Igual que `sacarMedio`: el RLS no avisa si no tocó ninguna fila.
+      return r.datos > 0 ? { ok: true, datos: null } : { ok: false, error: "otro" };
+    },
   };
 }
 

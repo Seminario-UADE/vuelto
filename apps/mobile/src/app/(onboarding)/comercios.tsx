@@ -13,7 +13,7 @@ import type { Comercio, Rubro } from "@/data/contracts";
 import { useAsync } from "@/hooks/use-async";
 import { RUBROS } from "@/lib/rubros";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { MENSAJES_ERROR } from "@/perfil/modelo";
+import { comercioRepetido, MENSAJE_COMERCIO_REPETIDO, MENSAJES_ERROR } from "@/perfil/modelo";
 import { confirmarComercios } from "@/store/perfil-remoto";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 
@@ -42,13 +42,14 @@ export default function Comercios() {
 
   const seguir = async (guardar: boolean) => {
     if (guardar) {
-      const nuevos = elegidos.filter((n) => !guardados.some((g) => g.nombre === n));
       setEnviando(true);
       setError(null);
-      const r = await dispatch(confirmarComercios(nuevos));
+      // El thunk descarta los ya guardados y los repetidos («coto» = «Coto»).
+      const r = await dispatch(confirmarComercios(elegidos));
       setEnviando(false);
       if (!r.ok) {
-        setError(`${MENSAJES_ERROR[r.error]}. Podés saltear este paso y agregarlos después desde Perfil.`);
+        const motivo = r.error === "duplicado" ? MENSAJE_COMERCIO_REPETIDO : MENSAJES_ERROR[r.error];
+        setError(`${motivo}. Podés saltear este paso y agregarlos después desde Perfil.`);
         return;
       }
     }
@@ -141,9 +142,13 @@ export default function Comercios() {
                 <Chip
                   key={c.id}
                   label={c.nombre}
-                  selected={elegidos.includes(c.nombre)}
+                  selected={comercioRepetido(elegidos.map((nombre) => ({ nombre })), c.nombre)}
                   onPress={() =>
-                    setElegidos((xs) => (xs.includes(c.nombre) ? xs.filter((x) => x !== c.nombre) : [...xs, c.nombre]))
+                    setElegidos((xs) =>
+                      comercioRepetido(xs.map((nombre) => ({ nombre })), c.nombre)
+                        ? xs.filter((x) => !comercioRepetido([{ nombre: x }], c.nombre))
+                        : [...xs, c.nombre],
+                    )
                   }
                 />
               ))}
