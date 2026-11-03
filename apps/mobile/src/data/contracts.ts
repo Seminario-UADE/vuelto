@@ -30,7 +30,7 @@ export type Base =
   | { tipo: "sin-compras"; texto: string }
   | { tipo: "contacto"; texto: string };
 
-/** Lo decide el motor (`formatearEstimacion`): `queda-poco` con ≤20% del tope (DESIGN.md §5). */
+/** Lo decide el motor (`formatearEstimacion`): `queda-poco` con ≤30% del tope (DESIGN.md §5). */
 export type EstadoTope = "disponible" | "queda-poco" | "agotado" | "sin-base";
 
 export type MedioDePago = {

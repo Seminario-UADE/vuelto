@@ -110,7 +110,7 @@ describe("topesVista", () => {
       reinicio: "se reinicia el 1/11",
       promo: "20% en supermercados · los miércoles",
     });
-    expect(de("santander-mastercard-credito")).toMatchObject({ estado: "disponible", cifra: "≈$2.300" });
+    expect(de("santander-mastercard-credito")).toMatchObject({ estado: "queda-poco", cifra: "≈$2.300" });
     expect(de("macro-visa-debito")).toMatchObject({
       estado: "agotado",
       cifra: null,

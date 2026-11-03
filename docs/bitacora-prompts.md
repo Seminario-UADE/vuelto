@@ -1713,6 +1713,33 @@ de MODO todos los días, sin nadie en el medio.
 
 ---
 
+## 2026-11-03 — "Queda poco" al 30% del tope, como pide el diseño
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** alinear el motor con el diseño nuevo de la app: un tope pasa
+a "queda poco" con el 30% o menos, no con el 20%.
+
+**Prompts principales:**
+1. "Analizá el PR #76 y fijate si nuestro motor encaja con eso. ¿Podés
+   mirar también las imágenes?" Se revisaron las capturas de la app y el
+   código que traduce la respuesta del motor. Aparecieron cuatro choques;
+   uno era que el diseño subió "queda poco" al 30% y el motor seguía en 20%.
+2. "Traete los últimos cambios del proyecto: ya debería estar el cambio de
+   que el motor corre en la app con Redux." Ya estaba (ADR-010 y los PRs
+   de la app de Joaquín), y el motor seguía en 20%.
+3. "Hacé el cambio al 30%."
+
+**Resultado:**
+- El motor marca "queda poco" con el 30% del tope o menos. El ejemplo de
+  Santander del diseño ($2.300 de $8.000) ahora sale bien, y deja de ser el
+  error que se había anotado en la issue #38.
+- Se actualizaron los tests del motor, la spec 005 y un test de la app que
+  esperaba el 20%. 193 tests del motor, 378 de la app y 40 de la Edge
+  Function en verde.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
