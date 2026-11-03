@@ -65,8 +65,11 @@ va a variar con el tiempo):
 | Deportes | 6 | 18 |
 | Ferretería y Pinturerías | 11 | 10 |
 
-Total: **~1864 promos activas** en MODO en este momento, repartidas en estas
-13 categorías. **El flujo de compra optimizado cubre las 13 categorías, no
+Total: **~1864 promos activas** en MODO en ese momento, repartidas en estas
+13 categorías. (Al 2026-11-03, Supermercados y Farmacias tienen 235 y 102
+reintegros vigentes, contados uno por promo sobre todas las secciones de la web;
+las cifras cambian con el tiempo y no necesariamente se contaron con el mismo
+criterio.) **El flujo de compra optimizado cubre las 13 categorías, no
 solo supermercado** — la recomendación (RF-03/RF-04) ya era genérica por
 compra, no específica de un rubro; restringir el "flujo optimizado" a
 supermercado no tenía un motivo técnico, era simplemente el recorte de
@@ -86,43 +89,64 @@ rubro no existía. Queda como nota para cuando se diseñe el ingestor real: no
 asumir que un filtro "vacío" significa "sin datos" sin probar la variante
 numérica.
 
-### Cadenas de supermercado: la lista previa no está validada contra MODO
+### Cadenas de supermercado: lo que MODO publica hoy (relevado el 2026-11-03)
 
-La lista de "presencia confirmada en CABA/AMBA" (Coto, Carrefour, Jumbo,
-Disco, Vea, Día, Changomas) salió de research general de presencia en la
-zona, no de las promos reales de MODO. Se intentó reconciliarla contra la
-API real (`search_text=<cadena>` sobre el endpoint de promos) con resultado
-mixto:
+La lista previa de cadenas con "presencia confirmada en CABA/AMBA" (Coto,
+Carrefour, Jumbo, Disco, Vea, Día, ChangoMás) salió de research general de
+presencia en la zona, no de las promos reales de MODO. Se la reconcilió
+leyendo **lo mismo que muestra la web de promos**: sus seis secciones
+(carrusel principal, destacadas, supermercados, exclusivas online,
+financiación y más promos, por `/v2/slots`) más el listado anterior por
+categoría, y bajando el detalle de cada promo
+(`GET /promos/api/rewards/v2/benefit/<slug>`). El relevamiento del
+2026-11-03 (issue #35) dejó **235 reintegros vigentes de 138 comercios** en
+Supermercados y 102 en Farmacias. Desde ADR-011 lo mismo lo hace la ingesta
+automática todos los días, y lo que MODO devuelve queda en `capturas_crudas`.
 
-| Cadena | Promos encontradas (`search_text`) |
+| Cadena de la lista previa | Reintegros vigentes en MODO (2026-11-03) |
 |---|---|
-| Vea | 3 |
-| Coto | 2 |
-| Jumbo | 2 |
-| Changomas | 2 |
-| Disco | 1 |
-| Carrefour | 0 |
-| Día | no concluyente (ver abajo) |
+| Coto | 3: 25% los martes con bancos adheridos, sin tope; 25% los lunes con Ciudad/Buepp; 5% con Columbia |
+| Jumbo | 2: 20% martes y jueves con bancos adheridos; 25% los martes con Hipotecario |
+| Disco | 2: 20% viernes y sábado con bancos adheridos; 25% los martes con Hipotecario |
+| Vea | 2: 20% los viernes con bancos adheridos; 25% los martes con Hipotecario |
+| Día | 1: 20% viernes y sábado con bancos adheridos |
+| La Anónima | 4: bancos adheridos, Hipotecario (dos) e ICBC |
+| ChangoMás | 6: bancos adheridos, Hipotecario (dos), Comafi, YOY y Credicoop |
+| Carrefour | **0** |
 
-**Esto no es una reconciliación confiable todavía**: `search_text=Día`
-devolvió 369 resultados, pero ninguno de los títulos revisados menciona a la
-cadena Día — el parámetro de búsqueda no filtra bien términos cortos o
-comunes. Peor todavía: `search_text=La Anónima` dio 0 resultados, a pesar de
-que esa cadena **sí apareció** directamente en el HTML renderizado de la
-página en una corrida anterior de este mismo research ("20% de reintegro en
-La Anónima"). La búsqueda por texto de esta API no es confiable para esta
-tarea.
+**Corrección (2026-11-03).** Un primer relevamiento, del 2026-11-02, había
+concluido que Coto, Jumbo, Disco, Vea, Día y La Anónima no tenían ninguna
+promo vigente. Fue un error de método: leía solo la sección «más promos», y
+las promos de las cadenas grandes se publican en carrusel, destacadas y
+supermercados. Lección para el ingestor, como la del id de categoría: el
+listado tiene que ser **el mismo que arma la web**, no una de sus secciones
+(`docs/product/fuentes-promos.md`).
 
-**Resuelto por la ingesta automática (ADR-011)**: había que reconciliar
-la lista de cadenas paginando por completo la categoría "Mercados" (id 1,
-226 promos totales) y revisando los nombres de comercio uno por uno, en vez
-de confiar en `search_text` por cadena. La ingesta diaria recorre todas las
-secciones de la web de MODO y el listado por categoría, así que qué cadenas
-tienen promo sale solo, todos los días. Importa qué cadena participa
-efectivamente en MODO, no su presencia genérica en CABA/AMBA — y eso puede
-afectar qué tan útil es el flujo de compra de supermercado si las cadenas
-grandes (Coto, Carrefour, Jumbo, Disco, Vea, Día) tienen poca o ninguna
-promoción vigente vía MODO.
+Además de las cadenas grandes, en Supermercados hay:
+
+- **Cadenas que podrían servir en CABA/AMBA**: Paladini (con sus variantes
+  «Paladar»), The Food Market, Tiendas de Cercanía, Tienda Nova, Supercoop
+  CABA, Makro y Basualdo.
+- **Cadenas que se asocian a otras zonas**: Cooperativa Obrera (Bahía Blanca y
+  la Patagonia), Unicoop (Córdoba), Alvear, Monarca, Petrelli, Kilbel, Aiello
+  y similares.
+- **Regionales fuera de alcance**: buena parte de lo vigente son
+  supermercados de Córdoba y Santa Fe (Villa María, Río Cuarto, La Carlota,
+  Justiniano Posse, Lario, Rafaela).
+- **Carnicerías, granjas y almacenes** sueltos, de zona no determinada.
+
+La zona de cada promo no se verifica a mano (ADR-011): la ingesta publica lo
+que MODO trae, con `jurisdiccion = null` hasta que el extractor de #51 lea la
+letra chica y descarte solo las de otra provincia.
+
+**Consecuencia para la demo.** El flujo de supermercado se puede mostrar con
+datos reales de las cadenas grandes. La compra de ejemplo del diseño
+(`DESIGN.md` §9, «Coto, miércoles») no coincide con ninguna promo real de
+Coto de hoy (son los lunes y los martes): si el pitch usa datos reales, el día
+de la compra de ejemplo tiene que cambiar. Las promos vencen y cambian cada
+mes, pero ya no hace falta volver a relevar antes del pitch: la ingesta diaria
+mantiene la base al día. El detalle de los casos y sus limitaciones está en
+`corpus-semilla.md`.
 
 ## Gasto en grupo (nivel 1, última prioridad del MVP)
 
