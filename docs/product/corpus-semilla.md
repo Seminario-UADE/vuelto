@@ -1,14 +1,12 @@
-# Corpus sembrado a mano (issue #35): cobertura, exclusiones y limitaciones
+# Relevamiento de MODO del 2026-11-03 (issue #35): qué publica MODO en Supermercados y Farmacias
 
-Este documento acompaña a `supabase/seed/promociones.json`, el corpus de promociones sembrado a mano desde MODO para la demo (ADR-005 §Consecuencias, spec `specs/011-corpus-promociones-seed/`). Cubre las categorías **Supermercados (1)** y **Farmacias, Perfumerías y Peluquerías (4)**; Gastronomía, Combustibles y el resto los carga Joaquín en el mismo archivo.
+Foto de lo que MODO publicaba el 2026-11-03 en **Supermercados (1)** y **Farmacias, Perfumerías y Peluquerías (4)**, y de qué casos del motor se pueden ilustrar con promos reales. Sirve para el pitch y para saber qué esperar de la ingesta.
 
-> **Estado: borrador.** Las cifras de este documento salen del relevamiento automático del 2026-11-03. La columna «Estado» de la matriz pasa de «candidata» a «confirmada» a medida que una persona revisa la letra chica de cada promo. Se regenera la parte automática con `npm run corpus:cobertura -w ingesta -- --casos`.
->
-> **Pendiente de decisión (2026-11-03):** el equipo marcó que las promos no se cargan a mano sino automáticamente, cada cierto tiempo o cuando cambian. Este documento y la spec 011 se adaptan en ese paso; las cifras del relevamiento siguen valiendo.
+> **Las promos no se cargan a mano (ADR-011).** Este relevamiento ya no es la base de un corpus revisado por una persona: las promos las publica la ingesta automática todos los días (`ingesta/src/corpus/ingestar.ts`) y lo que devuelve MODO queda en `capturas_crudas`. Las cifras de abajo son de ese día; las promos cambian cada mes.
 
 ## Qué se relevó
 
-El 2026-11-03, con `npm run corpus:relevar -w ingesta -- --categorias 1,4` (User-Agent `VueltoBot (UADE)`, pausa de 1,2 s), sobre la API pública de MODO. El relevamiento lee **las seis secciones que muestra la web de promos** (carrusel principal, destacadas, supermercados, exclusivas online, financiación y más promos, por `/v2/slots`) y **además el listado anterior por categoría** (`/slots`), que trae algunas promos vigentes que la web no muestra (`docs/product/fuentes-promos.md`):
+El 2026-11-03, con el relevamiento de la ingesta (User-Agent `VueltoBot (UADE)`, pausa de 1,2 s), sobre la API pública de MODO. El relevamiento lee **las seis secciones que muestra la web de promos** (carrusel principal, destacadas, supermercados, exclusivas online, financiación y más promos, por `/v2/slots`) y **además el listado anterior por categoría** (`/slots`), que trae algunas promos vigentes que la web no muestra (`docs/product/fuentes-promos.md`):
 
 | | Supermercados (1) | Farmacias (4) | Total |
 |---|---|---|---|
@@ -17,9 +15,9 @@ El 2026-11-03, con `npm run corpus:relevar -w ingesta -- --categorias 1,4` (User
 
 **Corrección del relevamiento anterior.** El del 2026-11-02 leía solo la sección «más promos» y dio 171 promos. Ahí no aparecen las cadenas grandes: Coto, Jumbo, Disco, Vea, Día y La Anónima están en carrusel, destacadas y supermercados. Ese relevamiento concluyó por error que no tenían promos vigentes. Al revés, 4 promos vigentes según su detalle solo están en el listado anterior (dos de farmacias para jubilados del BNA, Grupo Farmacity con Hipotecario y Lácteos El Puente con Macro).
 
-Se descartaron 3.881 tarjetas vencidas, 594 que no son reintegros (cuotas, sorteos) y 1.245 de otras categorías, contando cada promo una vez. De cada una de las 336 se guardó la tarjeta del listado y el detalle completo en `supabase/seed/crudo/<slug>.json` (RNF-08).
+Se descartaron 3.881 tarjetas vencidas, 594 que no son reintegros (cuotas, sorteos) y 1.245 de otras categorías, contando cada promo una vez. De cada una de las 336 se bajó la tarjeta del listado y el detalle completo (RNF-08); hoy la ingesta los guarda en `capturas_crudas`.
 
-Con esos crudos, el mapeo automático da **1.279 entradas candidatas de 311 promos** (las otras 25 se proponen como exclusión) y ninguna falla por un formato desconocido. **69 promos «multibanco»** se parten en una entrada por banco (hasta 25 bancos: Supermercados Delca, Farmacias Santa Ana, Gassmann, Chester y las promos «Bancos adheridos» de las cadenas grandes). Muchas de esas son cadenas regionales que probablemente caigan por zona al verificarlas; hasta entonces el tamaño final del corpus no se puede decir.
+Con esos crudos, el mapeo automático da **1.279 entradas de 311 promos** (las otras 25 se descartan solas) y ninguna falla por un formato desconocido. **69 promos «multibanco»** se parten en una entrada por banco (hasta 25 bancos: Supermercados Delca, Farmacias Santa Ana, Gassmann, Chester y las promos «Bancos adheridos» de las cadenas grandes). Muchas son cadenas regionales: quedan publicadas con `jurisdiccion = null` hasta que el extractor de #51 lea la zona en la letra chica. Desde ADR-011 las partes de una promo multibanco comparten un solo tope.
 
 ## Cadenas grandes de supermercado
 
@@ -38,7 +36,7 @@ Las promos «Bancos adheridos» valen para unos 19 bancos cada una: el mapeo las
 
 ## Matriz de cobertura de los casos del motor
 
-Cada caso es una situación que el motor distingue (constitución §VI, RF-04). **«Candidatas»** son promos reales relevadas que parecen ilustrar el caso. Lo que sale de campos estructurados de MODO es firme; lo que sale de la letra chica lo marca el código con frases del texto y **lo confirma una persona**. No se inventa ninguna promo para llenar un caso (FR-013).
+Cada caso es una situación que el motor distingue (constitución §VI, RF-04). **«Candidatas»** son promos reales relevadas que parecen ilustrar el caso. Lo que sale de campos estructurados de MODO es firme; lo que sale de la letra chica se marcó buscando frases del texto y es solo indicio hasta que lo lea el extractor de #51 (nadie lo revisa a mano). No se inventa ninguna promo para llenar un caso (FR-013).
 
 | Caso | Cómo se detecta | Candidatas | Ejemplo | Estado |
 |---|---|---|---|---|
@@ -52,11 +50,11 @@ Cada caso es una situación que el motor distingue (constitución §VI, RF-04). 
 | Sin tope informado | Sin tope por período ni por transacción: `monto = null` | 14 | `coto-noviembre26` | candidata |
 | Solo online | `flows` solo `online` | 22 | `15off-farmacity-macro-online-nov26` | candidata |
 | Presencial y online | `flows` con ambos o `all` | 61 | `jumbo-noviembre26` | candidata |
-| **No acumulable** | Frase «no acumula», «no será acumulable»… en la letra chica | 173 | `coto-noviembre26` | candidata, a confirmar |
-| **Acumulable** (`acumulable = true`) | Mención afirmativa: «podrá ser acumulable con…» | 67 | `jumbo-noviembre26` | candidata, a confirmar |
+| **No acumulable** | Frase «no acumula», «no será acumulable»… en la letra chica | 173 | `coto-noviembre26` | indicio (lo confirma #51) |
+| **Acumulable** (`acumulable = true`) | Mención afirmativa: «podrá ser acumulable con…» | 67 | `jumbo-noviembre26` | indicio (lo confirma #51) |
 | `acumulable = null` | La letra chica no dice nada | el resto | cualquiera sin las frases anteriores | por construcción |
-| **Tope compartido** | Frase «el tope es compartido…» en la letra chica | 4 | `15-bbva-tiendas-cercania-oct26` (y `-jul26`, `-ago26`, `-sep26`) | candidata, a confirmar |
-| Tope exclusivo | Solo lo dice la letra chica | sin candidatas automáticas | — | por revisar |
+| **Tope compartido** | Frase «el tope es compartido…» en la letra chica | 4 | `15-bbva-tiendas-cercania-oct26` (y `-jul26`, `-ago26`, `-sep26`) | indicio (lo confirma #51) |
+| Tope exclusivo | Solo lo dice la letra chica | sin candidatas automáticas | — | sin indicio |
 | **Vencida** | La letra chica da por terminada una promo que MODO aún lista (ver más abajo) | 28 | `10-icbc-juleriaque-abr25` | candidata |
 
 Notas sobre los casos:
@@ -86,14 +84,12 @@ Condiciones reales de las promos que el contrato de tipos (`Promocion`) y el per
 | **Tope por período y además tope por transacción** | 0 promos | El contrato guarda un solo tope, y quedarse con el del período sobrestima el reintegro de una compra grande: si aparece, se propone excluirla (`tope_no_representable`). |
 | **Red que el contrato no tiene** (`patagonia_365`) | 2 promos | Se ignora la red con una nota; si es la única, se excluye la promo. |
 | **Saldo de grupo optimista** | Promos con grupo de tope | Si un grupo de tope tiene miembros fuera del corpus (excluidos), el saldo restante sale optimista (constitución §V). |
-| **Vigencia verificada en una fecha** | Todo el corpus | Cada promo lleva su fecha de verificación; muchas de noviembre vencen el 30/11. |
+| **Vigencia verificada en una fecha** | Todo el corpus | La ingesta diaria da de baja las que vencen; muchas de noviembre vencen el 30/11. |
 | **Categoría 15** | A La Mesa (ICBC) | MODO usa una categoría 15 que no está entre las 13 del repo; la tabla `categorias` la rechazaría. Afecta a promos transversales, no a Supermercados ni Farmacias. |
 
-## Exclusiones
+## Descartes
 
-El registro de exclusiones está en `supabase/seed/exclusiones.json`, con el slug, un motivo de un conjunto cerrado (`fuera_de_zona`, `comercio_no_determinado`, `banco_no_determinado`, `nivel_de_cliente`, `transversal`, `no_es_reintegro`, `tope_no_representable`, `vencida_en_la_fuente`, `detalle_inexistente`, `otro`), la fecha y quién lo verificó. Un test del repo comprueba que ninguna entrada ni exclusión pierda su crudo. Que ningún crudo quede sin destino lo verifica `npm run corpus:cobertura -w ingesta -- --estricto`, que se corre a mano antes del PR final (no en el CI mientras el corpus se revisa).
-
-Exclusiones que el mapeo propone solas al 2026-11-03 (todas las confirma una persona):
+La ingesta descarta sola, sin revisión, y deja el motivo en el registro de cada corrida (`specs/011-corpus-promociones-seed/contracts/corpus.md`). Lo que el mapeo descartaba el 2026-11-03:
 
 | Motivo | Promos |
 |---|---|
@@ -101,11 +97,4 @@ Exclusiones que el mapeo propone solas al 2026-11-03 (todas las confirma una per
 | `transversal` (vale en más de 3 categorías) | 1 |
 | `tope_no_representable` (el tope se reinicia por día, 6, o vale para toda la promo, 12) | 18 |
 
-Las exclusiones por zona, por nivel de cliente y por letra chica vencida salen de la revisión humana y se agregan a medida que se revisa.
-
-## Cómo se actualiza este documento
-
-1. `npm run corpus:relevar -w ingesta -- --categorias 1,4` renueva los crudos.
-2. `npm run corpus:cobertura -w ingesta -- --lista` muestra las promos pendientes por comercio.
-3. `npm run corpus:cobertura -w ingesta -- --casos --todos` regenera las candidatas de la matriz.
-4. Al terminar la revisión, la columna «Estado» de la matriz queda en «confirmada» con su promo, o en «sin ejemplo real vigente» con la fecha.
+Las promos de otra provincia y las que la letra chica da por vencidas no se descartan todavía: hace falta leer la letra chica (#51).

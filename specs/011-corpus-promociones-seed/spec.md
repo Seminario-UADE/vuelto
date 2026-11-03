@@ -1,4 +1,12 @@
-# Feature Specification: Corpus de promociones sembrado a mano desde MODO (Supermercados y Farmacias)
+# Feature Specification: Corpus de promociones de MODO (antes «sembrado a mano»; hoy ingesta automática)
+
+> **Reemplazada en parte por [ADR-011](../../docs/decisions/011-corpus-siempre-automatico.md) (2026-11-03).**
+> Las promos nunca se cargan a mano: las publica la ingesta automática todos los días
+> (`ingesta/src/corpus/ingestar.ts`, `.github/workflows/ingesta.yml`). Lo que este documento dice
+> sobre `promociones.json`, revisión humana, exclusiones y grupos de tope a mano, crudos en el repo,
+> seed de promociones y fixtures del motor ya no rige. Siguen vigentes el mapeo del detalle de MODO,
+> la validación, los ids estables, el contrato de escritura y las reglas de tope y jurisdicción.
+> El contrato actual está en [contracts/corpus.md](contracts/corpus.md).
 
 **Feature Branch**: `feat/35-corpus-promociones-seed` (sobre `main`)
 

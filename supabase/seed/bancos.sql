@@ -1,5 +1,6 @@
--- GENERADO por `npm run corpus:generar -w ingesta` desde docs/product/data/modo-bancos-raw.json. No editar a mano.
--- Catálogo de bancos de MODO, con su id real. Idempotente (`supabase db reset` y carga remota).
+-- Foto del catálogo de bancos de MODO (docs/product/data/modo-bancos-raw.json, 2026-11-02), con su id real.
+-- Solo para la base local (`supabase db reset`). Idempotente. En el proyecto alojado el catálogo
+-- lo mantiene al día la ingesta automática, que lo baja de MODO en cada corrida (ADR-011).
 
 insert into public.bancos (id, nombre) values
   ('0330e59b-b6e3-43eb-9083-a88fcc61e845', 'Banco Nación'),

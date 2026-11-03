@@ -1617,6 +1617,38 @@ ser que Coto, Jumbo, Disco, Vea y Día no tuvieran ninguna promo vigente.
 
 ---
 
+## 2026-11-03 — Las promos nunca se cargan a mano: ingesta automática diaria (issue #35, ADR-011)
+
+**Herramienta:** Claude Code (Opus 5.5).
+
+**Objetivo:** reemplazar el corpus sembrado a mano de #92 por una ingesta automática que publique las promos
+de MODO todos los días, sin nadie en el medio.
+
+**Prompts principales:**
+1. "Las promos NUNCA se cargan a mano, es un error de decision y es inaceptable, las promos son cargadas
+   automaticamente cada cierto tiempo, o cada vez que cambien."
+2. Respuestas a las preguntas de diseño: sin revisión humana; GitHub Actions programado; una vez por día;
+   rehacer #92 hacia lo automático.
+3. "Sí, avanzá" (sobre el plan: qué se borra, qué se reutiliza y cómo se publica).
+
+**Resultado:**
+- `ingesta/src/corpus/ingestar.ts`: lista MODO (todas las secciones de la web más el listado anterior, las 13
+  categorías), baja el detalle de cada promo vigente y el catálogo de bancos, mapea por código, valida y
+  publica en Supabase: capturas crudas (solo si cambiaron), promos `modo` con su captura, y bajas.
+- `.github/workflows/ingesta.yml`: todos los días a las 06:00 ART y a mano desde Actions.
+- Descartes automáticos con motivo (vencida, tope diario o por toda la promo, nivel de cliente, más de tres
+  categorías, formato desconocido, no publicable). Resguardos: no da de baja una promo cuyo detalle falló y no
+  escribe nada si publicaría menos de la mitad de las activas.
+- Decisión de la sesión: una promo de varios bancos se guarda una vez por banco, pero las partes comparten un
+  solo tope (`modo:<slug>`), para no prometer un tope por banco.
+- Se borró lo manual: `promociones.json`, exclusiones y grupos de tope, `corpus:borrador`, `corpus:generar`,
+  `corpus:cobertura`, `corpus:relevar`, el seed de promociones y las fixtures del motor. ADR-011 reemplaza la
+  consecuencia de ADR-005 sobre sembrar a mano.
+- Lo que no hace todavía: leer la letra chica (#51) ni decir **cómo pagar** (QR/NFC de MODO, tarjeta física u
+  online), que es el próximo paso.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

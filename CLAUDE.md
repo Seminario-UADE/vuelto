@@ -23,8 +23,8 @@ Declaración end-to-end de dónde se usa IA en el proyecto: `docs/uso-de-ia.md`.
 ## Estado
 
 Monorepo con npm workspaces inicializado (issue #32). Requiere Node ≥ 22.13
-(versión fijada en `.nvmrc`; ESLint 10 y Vitest 5 no soportan Node 20). Los
-scripts `corpus:*` de `ingesta` piden Node ≥ 22.18: corren los `.ts` con Node
+(versión fijada en `.nvmrc`; ESLint 10 y Vitest 5 no soportan Node 20). El
+script `ingestar` de `ingesta` pide Node ≥ 22.18: corre los `.ts` con Node
 directo, sin compilar.
 
 | Workspace | Contenido |
@@ -32,7 +32,7 @@ directo, sin compilar.
 | `packages/motor` (`@vuelto/motor`) | Motor de reglas: TS puro, sin `dependencies`, tests Vitest |
 | `apps/mobile` | App Expo (issue #39). Importa `@vuelto/motor` y guarda su estado en Redux; la recomendación y los topes son selectores (ADR-010, issue #81). Sincroniza el corpus y las compras del período desde Supabase (`src/sync/`, issue #42). Tests Vitest de cálculo, store, persistencia y sincronización; `npm run test:integracion -w @vuelto/mobile` prueba las consultas contra un Supabase local (Docker) |
 | `supabase` (`@vuelto/supabase`) | Edge Functions (`functions/`: `recomendar`, hoy fuera del camino de la app por ADR-010, y `_shared/`, tests Vitest); `migrations/` (esquema con RLS), `seed.sql` y `tests/database/` (pgTAP, `supabase test db`). Los `functions/*/index.ts` corren en Deno: los chequea `deno check` en el CI, no `tsc` |
-| `ingesta` | Corpus de promociones sembrado a mano desde MODO (issue #35): `src/corpus/` con el relevamiento, el mapeo del detalle de MODO, la validación, el generador de SQL y de fixtures, la carga remota y el reporte de cobertura. Tests Vitest sin red. El extractor con Gemini (#50, #51) se suma acá |
+| `ingesta` (`@vuelto/ingesta`) | Ingesta automática de promociones de MODO (issue #35, ADR-011): `src/corpus/` con el listado de la API pública, el mapeo del detalle, la validación y la publicación en Supabase (capturas crudas, promos y bajas). La corre todos los días `.github/workflows/ingesta.yml`. Tests Vitest sin red. El extractor con Gemini de la letra chica (#50, #51) se suma acá |
 
 Comandos (desde la raíz; recorren todos los workspaces, los mismos que corre el CI):
 
@@ -56,18 +56,19 @@ Un solo workspace: `npm run test -w @vuelto/motor`. Tests en modo watch:
 `npx vitest` dentro de `packages/motor`. Un workspace nuevo se suma a
 `workspaces` del `package.json` raíz y define los scripts que le apliquen.
 
-Corpus de promociones sembrado a mano (issue #35, `specs/011-corpus-promociones-seed/`), desde la raíz:
+Ingesta de promociones (ADR-011). Las promos **nunca se cargan a mano**: las
+publica todos los días el workflow `ingesta.yml` (06:00 ART, también a mano
+desde la pestaña Actions), con los secrets `SUPABASE_URL` y
+`SUPABASE_SERVICE_ROLE_KEY` del repo. A mano, desde la raíz (red, pausa >= 1 s
+entre pedidos a MODO; más de 25 minutos con las 13 categorías, duración a medir):
 
 ```bash
-npm run corpus:relevar -w ingesta -- --categorias 1,4   # baja el listado y el detalle de MODO a supabase/seed/crudo/ (red, pausa >= 1 s)
-npm run corpus:cobertura -w ingesta -- --lista          # qué promos faltan revisar, por comercio (--casos: candidatas por caso)
-npm run corpus:borrador -w ingesta -- <slug>            # borrador de una promo y frases de su letra chica
-npm run corpus:generar -w ingesta                       # valida promociones.json y regenera SQL y fixtures (--verificar: no escribe)
-node --env-file=supabase/.env ingesta/src/corpus/cargar.ts [--aplicar]   # carga remota; por defecto no escribe
+node --env-file=supabase/.env ingesta/src/corpus/ingestar.ts            # prueba: baja y mapea, no escribe
+node --env-file=supabase/.env ingesta/src/corpus/ingestar.ts --aplicar  # publica en la base de supabase/.env
 ```
 
-Si cambia `packages/motor/src`, recompilarlo (`npm run build -w @vuelto/motor`) antes de correr un script
-`corpus:*`: usan el motor compilado, mientras que los tests de Vitest usan su código fuente.
+Si cambia `packages/motor/src`, recompilarlo (`npm run build -w @vuelto/motor`) antes de correr
+`ingestar.ts`: usa el motor compilado, mientras que los tests de Vitest usan su código fuente.
 
 ## Stack decidido (costo $0 durante el cuatrimestre)
 
@@ -111,8 +112,8 @@ Si cambia `packages/motor/src`, recompilarlo (`npm run build -w @vuelto/motor`) 
 - **La ingesta de promociones es 100% automática, sin revisión humana.** El
   extractor publica el borrador directo si completa el esquema (todos los
   campos obligatorios no `null`); si no lo completa, se descarta solo, sin
-  cola de aprobación. (El corpus sembrado a mano de la issue #35 no es
-  ingesta: ver ADR-005 §Consecuencias.)
+  cola de aprobación. Las promos nunca se cargan a mano: corpus, seed ni
+  fixtures (ADR-011).
 - **Topes de reintegro siempre se muestran como estimados, con su base**
   (ej. "≈$18.000, según 4 compras registradas"). Nunca una cifra falsamente
   precisa.

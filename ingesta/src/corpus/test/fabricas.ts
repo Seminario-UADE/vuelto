@@ -1,16 +1,16 @@
-/** Datos de prueba compartidos por los tests del corpus. No es código de producción. */
+/** Datos de prueba compartidos por los tests de la ingesta. No es código de producción. */
 import { readFileSync } from "node:fs";
-import type { BancoCatalogo, EntradaCorpus, Exclusion, GruposTope } from "../tipos.ts";
+import type { BancoCatalogo, PromocionIngestada } from "../tipos.ts";
 
 export const BANCO_ICBC = "bcfcac03-6f79-4995-bfab-7b8916b0747a";
 export const BANCO_GALICIA = "88d8705e-2dda-46f9-8411-bb4916af858e";
-export const CATALOGO_PRUEBA: readonly string[] = [BANCO_ICBC, BANCO_GALICIA];
+export const CATALOGO_PRUEBA: ReadonlySet<string> = new Set([BANCO_ICBC, BANCO_GALICIA]);
 
-/** Una entrada válida: los tests la rompen de a una regla por vez. */
-export function entrada(datos: Partial<EntradaCorpus> = {}): EntradaCorpus {
+/** Una promo válida: los tests la rompen de a una regla por vez. */
+export function promocion(datos: Partial<PromocionIngestada> = {}): PromocionIngestada {
   return {
     fuenteId: "20-paladini-icbc-ago26",
-    fuente: "manual",
+    fuente: "modo",
     titulo: "20% en Paladini",
     bancoId: BANCO_ICBC,
     categoriaId: 1,
@@ -24,30 +24,7 @@ export function entrada(datos: Partial<EntradaCorpus> = {}): EntradaCorpus {
     canal: "presencial",
     acumulable: null,
     fragmentosFuente: {},
-    fixture: false,
-    revision: { verificadaEl: "2026-11-02", revisor: "spazos32", notas: [] },
     ...datos,
-  };
-}
-
-export const GRUPOS_PRUEBA: GruposTope = {
-  "icbc:modo-mensual": {
-    banco: "icbc",
-    clave: "modo-mensual",
-    fragmento: "TOPE DE REINTEGRO $10.000 POR USUARIO POR MES",
-    creadoPor: "spazos32",
-  },
-};
-
-export const SIN_EXCLUSIONES: readonly Exclusion[] = [];
-
-export function contexto(
-  datos: { gruposTope?: GruposTope; exclusiones?: readonly Exclusion[] } = {},
-) {
-  return {
-    catalogoBancos: CATALOGO_PRUEBA,
-    gruposTope: datos.gruposTope ?? GRUPOS_PRUEBA,
-    exclusiones: datos.exclusiones ?? SIN_EXCLUSIONES,
   };
 }
 

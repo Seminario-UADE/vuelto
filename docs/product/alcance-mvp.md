@@ -98,10 +98,10 @@ leyendo **lo mismo que muestra la web de promos**: sus seis secciones
 (carrusel principal, destacadas, supermercados, exclusivas online,
 financiación y más promos, por `/v2/slots`) más el listado anterior por
 categoría, y bajando el detalle de cada promo
-(`GET /promos/api/rewards/v2/benefit/<slug>`). El relevamiento
-(`npm run corpus:relevar -w ingesta`, issue #35) dejó **235 reintegros
-vigentes de 138 comercios** en Supermercados y 102 en Farmacias; los crudos
-fechados están en `supabase/seed/crudo/`.
+(`GET /promos/api/rewards/v2/benefit/<slug>`). El relevamiento del
+2026-11-03 (issue #35) dejó **235 reintegros vigentes de 138 comercios** en
+Supermercados y 102 en Farmacias. Desde ADR-011 lo mismo lo hace la ingesta
+automática todos los días, y lo que MODO devuelve queda en `capturas_crudas`.
 
 | Cadena de la lista previa | Reintegros vigentes en MODO (2026-11-03) |
 |---|---|
@@ -124,31 +124,29 @@ listado tiene que ser **el mismo que arma la web**, no una de sus secciones
 
 Además de las cadenas grandes, en Supermercados hay:
 
-- **Cadenas que podrían servir en CABA/AMBA** (la zona de cada una se verifica
-  en su sitio antes de cargarla, spec `specs/011-corpus-promociones-seed/`,
-  tarea T026): Paladini (con sus variantes «Paladar»), The Food Market,
-  Tiendas de Cercanía, Tienda Nova, Supercoop CABA, Makro y Basualdo.
-- **Cadenas que se asocian a otras zonas y hay que verificar antes de contarlas
-  en el alcance**: Cooperativa Obrera (Bahía Blanca y la Patagonia), Unicoop
-  (Córdoba), Alvear, Monarca, Petrelli, Kilbel, Aiello y similares.
+- **Cadenas que podrían servir en CABA/AMBA**: Paladini (con sus variantes
+  «Paladar»), The Food Market, Tiendas de Cercanía, Tienda Nova, Supercoop
+  CABA, Makro y Basualdo.
+- **Cadenas que se asocian a otras zonas**: Cooperativa Obrera (Bahía Blanca y
+  la Patagonia), Unicoop (Córdoba), Alvear, Monarca, Petrelli, Kilbel, Aiello
+  y similares.
 - **Regionales fuera de alcance**: buena parte de lo vigente son
   supermercados de Córdoba y Santa Fe (Villa María, Río Cuarto, La Carlota,
-  Justiniano Posse, Lario, Rafaela). Quedan afuera por la restricción de zona
-  (CABA/AMBA) aunque tengan promos vigentes.
-- **Carnicerías, granjas y almacenes** sueltos, de zona no determinada; se
-  incluyen solo si se confirma que rigen en CABA/AMBA.
+  Justiniano Posse, Lario, Rafaela).
+- **Carnicerías, granjas y almacenes** sueltos, de zona no determinada.
+
+La zona de cada promo no se verifica a mano (ADR-011): la ingesta publica lo
+que MODO trae, con `jurisdiccion = null` hasta que el extractor de #51 lea la
+letra chica y descarte solo las de otra provincia.
 
 **Consecuencia para la demo.** El flujo de supermercado se puede mostrar con
 datos reales de las cadenas grandes. La compra de ejemplo del diseño
 (`DESIGN.md` §9, «Coto, miércoles») no coincide con ninguna promo real de
 Coto de hoy (son los lunes y los martes): si el pitch usa datos reales, el día
-de la compra de ejemplo tiene que cambiar. Casi todas estas promos de
-noviembre vencen el 30/11 o el 31/12, así que antes del pitch hay que volver a
-relevar.
-
-**Pendiente que queda:** verificar la zona de cada cadena con una fuente (su
-sitio o sus locales) y fijar el tamaño final del corpus. El detalle de los
-casos que cubre el corpus y sus limitaciones está en `corpus-semilla.md`.
+de la compra de ejemplo tiene que cambiar. Las promos vencen y cambian cada
+mes, pero ya no hace falta volver a relevar antes del pitch: la ingesta diaria
+mantiene la base al día. El detalle de los casos y sus limitaciones está en
+`corpus-semilla.md`.
 
 ## Gasto en grupo (nivel 1, última prioridad del MVP)
 

@@ -29,19 +29,18 @@ Los nombres están en `apps/mobile/.env.example` y `supabase/.env.example`
 |---|---|---|---|
 | `EXPO_PUBLIC_SUPABASE_URL` | App mobile | `apps/mobile/.env` (local); variable de entorno del perfil en EAS | No es secreta (URL pública del proyecto). Cambia solo si se crea otro proyecto |
 | `EXPO_PUBLIC_SUPABASE_ANON_KEY` | App mobile | `apps/mobile/.env` (local); variable del perfil en EAS (`eas env:create`) | Es pública por diseño: la protege RLS, no el secreto. Rotar en Supabase (Settings → API Keys) y reconstruir la app con la nueva |
-| `GEMINI_API_KEY` | Edge Functions (ticket); script de ingesta (letra chica) | Edge Functions: `supabase secrets set`; local: `supabase/.env`; ingesta: donde corra el cron (¹) | Generar key nueva en Google AI Studio → `supabase secrets set` + redeploy de la función → actualizar la ingesta → revocar la vieja |
-| `SUPABASE_SERVICE_ROLE_KEY` | Solo el proceso de ingesta (RNF-05) | Donde corra el cron (¹); local: `supabase/.env`. Nunca en EAS ni en la app. En las Edge Functions Supabase ya inyecta la suya: no se setea a mano | Crear una key nueva en Supabase (Settings → API Keys) y actualizar el lugar donde corre la ingesta en el mismo momento; revocar la vieja. Con las keys JWT legacy, rotar el JWT secret invalida también la anon key y obliga a reconstruir la app |
+| `GEMINI_API_KEY` | Edge Functions (ticket); script de ingesta (letra chica) | Edge Functions: `supabase secrets set`; local: `supabase/.env`; ingesta: secret del repo en GitHub Actions (¹) | Generar key nueva en Google AI Studio → `supabase secrets set` + redeploy de la función → actualizar la ingesta → revocar la vieja |
+| `SUPABASE_SERVICE_ROLE_KEY` | Solo el proceso de ingesta (RNF-05) | Secret del repo en GitHub Actions (¹); local: `supabase/.env`. Nunca en EAS ni en la app. En las Edge Functions Supabase ya inyecta la suya: no se setea a mano | Crear una key nueva en Supabase (Settings → API Keys) y actualizar el lugar donde corre la ingesta en el mismo momento; revocar la vieja. Con las keys JWT legacy, rotar el JWT secret invalida también la anon key y obliga a reconstruir la app |
 
-¹ Dónde corre el cron está pendiente (ver «Pendiente: dónde corre el cron»).
-Si termina siendo GitHub Actions, ambos secrets viven como secret de repo. La
-ingesta también necesita `SUPABASE_URL` (no secreta) junto con la service role
-key.
+¹ La ingesta corre en GitHub Actions (ADR-011, «Dónde corre el cron»): los
+secrets viven como secret del repo y solo los recibe el workflow
+`ingesta.yml`. La ingesta también necesita `SUPABASE_URL` (no secreta, pero
+también como secret para no versionar el proyecto) junto con la service role
+key. `GEMINI_API_KEY` se suma cuando entre el extractor de #51.
 
-La carga del corpus de promociones sembrado a mano (issue #35) las lee del
-entorno de quien la corre, no de un archivo versionado:
-`node --env-file=supabase/.env ingesta/src/corpus/cargar.ts` (por defecto no
-escribe: muestra qué haría; `--aplicar` escribe). La corre a mano quien tenga la
-service role; no corre en el CI.
+La ingesta lee esas variables del entorno, nunca de un archivo versionado. A
+mano: `node --env-file=supabase/.env ingesta/src/corpus/ingestar.ts` (por
+defecto no escribe: muestra qué haría; `--aplicar` escribe).
 
 Reglas (RNF-04, RNF-05):
 
@@ -86,29 +85,31 @@ workflow tenía un job `no-code-yet` que lo mantenía en verde sin
 
 | Paso | Dónde corre | Qué hace |
 |---|---|---|
-| 1. Disparo | Cron — **pendiente dónde** | Arranca el proceso programado |
+| 1. Disparo | GitHub Actions, `ingesta.yml`: todos los días a las 06:00 ART, y a mano («Run workflow») | Arranca `ingesta/src/corpus/ingestar.ts --aplicar` |
 | 2. Captura | Playwright, o `fetch`/`curl` directo cuando la fuente lo permite | Abre cada página (SPA) en navegador headless y espera el render — salvo MODO, la única fuente del MVP (`../product/alcance-mvp.md`), que expone una API REST pública (`modo.com.ar/promos/api/rewards/...`) y no necesita navegador |
-| 3. Guardado | Supabase `capturas_crudas` | Contenido crudo, con service role key |
-| 4. Extracción | Gemini | El crudo se manda con el esquema estructurado |
-| 5. Verificación | El propio script | Chequeo de salud: fuente en cero o contenido irreconocible se marca y avisa |
-| 6. Publicación | El propio script | Si la promo completa los campos obligatorios del esquema se publica en la base validada; si no, se descarta sola (sin revisión humana, ADR-005) |
+| 3. Guardado | Supabase `capturas_crudas` | Tarjeta del listado y detalle de MODO, tal cual, con service role key. Solo si cambió respecto de la última captura de esa promo |
+| 4. Extracción | Código (hoy); Gemini para la letra chica (#51) | Lo que MODO trae estructurado se mapea por código, sin modelo de lenguaje. La letra chica (acumulabilidad, jurisdicción) queda en `null` hasta #51 |
+| 5. Verificación | El propio script | Validación de cada promo (`esPromocionPublicable` y rangos). Chequeo de salud: un formato que el mapeo no reconoce o un detalle que no se pudo bajar hacen fallar la corrida (mail de GitHub); si la corrida publicaría menos de la mitad de las promos activas, no escribe nada |
+| 6. Publicación | El propio script | Upsert por `(fuente, fuente_id)` en lotes de 50 de lo que cambió; las promos que dejan de publicarse se dan de baja (`dada_de_baja_en`), nunca se borran. Lo que no completa el esquema se descarta solo (sin revisión humana, ADR-005) |
 
 El paso 5 no es opcional: sin chequeo de salud, un rediseño de página o un
 bloqueo de WAF degrada el corpus en silencio.
 
-### Pendiente: dónde corre el cron
+### Dónde corre el cron: GitHub Actions (ADR-011)
 
-GitHub Actions es candidato (gratis en repo público) pero tiene tres
-problemas sin resolver:
+Decidido: GitHub Actions, una vez por día. Los tres reparos que lo dejaban
+pendiente, y cómo quedan:
 
-- La service role key en secretos de repo es superficie real si hay un PR
-  desde un fork o un workflow mal escrito.
-- Actions está pensado para build/test/deploy del propio repo, no para un
-  cron de scraping de terceros como servicio de producción.
-- IPs de los runners son de datacenter — bancos con WAF probablemente
-  bloquean o tiran captcha.
-
-Se decide cuando se sepa si las fuentes efectivamente bloquean esas IPs.
+- **Service role en secrets del repo.** Solo la recibe `ingesta.yml`, que se
+  dispara por `schedule` y `workflow_dispatch`, nunca por `pull_request`: un
+  PR desde un fork no la ve (GitHub no pasa secrets a esos workflows). El
+  workflow corre con `permissions: contents: read`.
+- **Actions como servicio de producción.** Para el MVP alcanza: si una corrida
+  falla, la base conserva la anterior y GitHub avisa por mail. La app nunca
+  depende de que la ingesta ande en ese momento.
+- **IPs de datacenter.** La única fuente del MVP es la API pública de MODO, no
+  la web de un banco con WAF. La primera corrida en Actions confirma que MODO
+  no bloquea esas IPs; si bloqueara, la corrida falla sin tocar la base.
 
 ## Distribución para el pitch
 

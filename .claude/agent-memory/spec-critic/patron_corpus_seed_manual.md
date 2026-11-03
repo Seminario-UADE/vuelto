@@ -5,6 +5,11 @@ metadata:
   type: project
 ---
 
+> 2026-11-03: el PO rechazó el corpus sembrado a mano (ADR-011). Las promos las publica la
+> ingesta automática todos los días; una spec que proponga cargar o revisar promos a mano
+> contradice ADR-011 y hay que marcarla. Los puntos de abajo siguen sirviendo para criticar
+> specs que cargan datos reales.
+
 Visto 2026-11-02 en `specs/008-corpus-promociones-seed/spec.md` (issue #35). Fallas que
 aparecen cuando una spec carga datos reales en vez de definir lógica:
 

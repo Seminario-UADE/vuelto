@@ -1,18 +1,9 @@
 /**
- * Lo que comparten los scripts `corpus:*`: argumentos, raíz del repo, «hoy» y el
- * arranque como script.
+ * Lo que comparten los scripts de la ingesta: argumentos, «hoy» y el arranque como script.
  */
-import { dirname, resolve } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { fechaArgentina } from "@vuelto/motor";
-
-/**
- * La raíz del repo. Los scripts de npm corren con `ingesta/` como carpeta de trabajo
- * (`npm run … -w ingesta`), así que ninguna ruta del repo puede resolverse contra `cwd`.
- */
-export function raizDelRepo(): string {
-  return resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
-}
 
 /** La fecha de hoy en Argentina (`YYYY-MM-DD`), con la misma función que usa el motor. */
 export function hoyEnArgentina(ahora: Date = new Date()): string {
@@ -74,15 +65,4 @@ export function esEntrada(urlDelModulo: string): boolean {
   const ejecutado = process.argv[1];
   if (ejecutado === undefined) return false;
   return pathToFileURL(resolve(ejecutado)).href === urlDelModulo;
-}
-
-/** `"1,4"` → `[1, 4]`. Lanza un error que nombra la opción si algo no es un entero. */
-export function listaDeEnteros(valor: string, opcion: string): number[] {
-  const partes = valor.split(",").map((p) => p.trim()).filter((p) => p !== "");
-  if (partes.length === 0) throw new Error(`${opcion} necesita al menos un número`);
-  return partes.map((p) => {
-    const n = Number(p);
-    if (!Number.isInteger(n)) throw new Error(`${opcion}: "${p}" no es un número entero`);
-    return n;
-  });
 }

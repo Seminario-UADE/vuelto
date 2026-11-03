@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SLUG_SEGURO, bancoDeLaTarjeta, comercioDeLaTarjeta, esObjeto, legalDelCrudo, slugDelCrudo } from "./crudo.ts";
+import { SLUG_SEGURO, bancoDeLaTarjeta, comercioDeLaTarjeta, esObjeto, jsonCanonico } from "./crudo.ts";
 
 describe("esObjeto", () => {
   it("distingue un objeto de null, un arreglo y un primitivo", () => {
@@ -43,17 +43,12 @@ describe("comercioDeLaTarjeta y bancoDeLaTarjeta", () => {
   });
 });
 
-describe("slugDelCrudo y legalDelCrudo", () => {
-  it("leen el slug y la letra chica del detalle", () => {
-    const crudo = { detalle: { slug: "a-b", terms_and_conditions: "<p>x</p>" } };
-    expect(slugDelCrudo(crudo)).toBe("a-b");
-    expect(legalDelCrudo(crudo)).toBe("<p>x</p>");
+describe("jsonCanonico", () => {
+  it("ordena las claves de cada objeto, también las anidadas, y respeta el orden de las listas", () => {
+    expect(jsonCanonico({ b: 1, a: { d: [3, { f: 1, e: 2 }], c: null } })).toBe('{"a":{"c":null,"d":[3,{"e":2,"f":1}]},"b":1}');
   });
 
-  it("null y texto vacío cuando no están", () => {
-    expect(slugDelCrudo({ detalle: {} })).toBeNull();
-    expect(slugDelCrudo({ detalle: null })).toBeNull();
-    expect(legalDelCrudo({ detalle: {} })).toBe("");
-    expect(legalDelCrudo({ detalle: { terms_and_conditions: 5 } })).toBe("");
+  it("dos objetos iguales con las claves en otro orden dan el mismo texto", () => {
+    expect(jsonCanonico({ x: 1, y: 2 })).toBe(jsonCanonico({ y: 2, x: 1 }));
   });
 });
