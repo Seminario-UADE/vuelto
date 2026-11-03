@@ -63,6 +63,7 @@ Condiciones reales de las promos que el contrato de tipos (`Promocion`) y el per
 | **Niveles de cliente** (Selecta, Platinum…) | 5 promos | No se cargan: el mapeo las propone como exclusión `nivel_de_cliente` por el nombre, el rótulo del banco o la descripción interna. |
 | **Tope diario** (`reset_by = day`) | 4 promos | No se cargan: el motor no representa el tope por día y aproximarlo puede sobrestimar el saldo restante. Se proponen para excluir (`tope_no_representable`). |
 | **Tope para toda la duración de la promo** (`reset_by = promo`) | 1 promo | No se puede representar (no se renueva por mes ni por semana): se propone excluirla (`tope_no_representable`). |
+| **Tope por período y además tope por transacción** | 0 promos al 2026-11-02 | El contrato guarda un solo tope, y quedarse con el del período sobrestima el reintegro de una compra grande: si aparece, se propone excluirla (`tope_no_representable`). |
 | **Red que el contrato no tiene** (`patagonia_365`) | 2 promos | Se ignora la red con una nota; si es la única, se excluye la promo. |
 | **Saldo de grupo optimista** | Promos con grupo de tope | Si un grupo de tope tiene miembros fuera del corpus (excluidos), el saldo restante sale optimista (constitución §V). |
 | **Vigencia verificada en una fecha** | Todo el corpus | Cada promo lleva su fecha de verificación; antes del pitch hay que volver a relevar. |
