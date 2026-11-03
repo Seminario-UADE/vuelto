@@ -13,10 +13,18 @@ import {
   type MedioDePago,
   type MedioNuevo,
 } from "../perfil/modelo";
-import type { AppThunk } from "./index";
+import type { AppDispatch, AppThunk, RootState } from "./index";
 import { cargaCambio, medioAgregado, medioSacado, mediosConfirmados, mediosLeidos } from "./perfil";
 
 const SIN_CONEXION = { ok: false, error: "sin_conexion" } as const;
+
+/**
+ * Cuenta las escrituras que empezaron. Una lectura que salió antes de una escritura trae datos
+ * viejos: si el contador cambió mientras volaba, su resultado se descarta.
+ */
+let escrituras = 0;
+
+const usuarioActual = (getState: () => RootState) => getState().sesion.usuario?.id ?? null;
 
 /**
  * Lee los medios del usuario y reemplaza los locales. Sin medios, las pestañas llevan al onboarding
@@ -24,25 +32,56 @@ const SIN_CONEXION = { ok: false, error: "sin_conexion" } as const;
  */
 export function leerMedios(): AppThunk<Promise<void>> {
   return async (dispatch, getState, { perfilRemoto }) => {
-    const usuarioId = getState().sesion.usuario?.id ?? null;
-    if (!perfilRemoto || usuarioId === null) return;
+    const usuarioId = usuarioActual(getState);
+    if (usuarioId === null) return;
+    // Sin Supabase no hay cómo leer: que las pestañas no esperen para siempre (FR-010).
+    if (!perfilRemoto) {
+      dispatch(cargaCambio("sin-conexion"));
+      return;
+    }
+    const escrituraAlSalir = escrituras;
     dispatch(cargaCambio("leyendo"));
     const r = await perfilRemoto.leerMisMedios();
     // Se cerró la sesión o entró otra cuenta mientras volaba el pedido: no es de este usuario.
-    if ((getState().sesion.usuario?.id ?? null) !== usuarioId) return;
+    if (usuarioActual(getState) !== usuarioId) return;
+    if (escrituras !== escrituraAlSalir) {
+      // Una escritura se cruzó: esta lectura puede ser anterior. La escritura ya dejó el slice al día.
+      if (getState().perfil.carga === "leyendo") dispatch(cargaCambio("lista"));
+      return;
+    }
     if (r.ok) dispatch(mediosLeidos(r.datos));
     else dispatch(cargaCambio(r.error === "sin_conexion" ? "sin-conexion" : "error"));
   };
 }
 
+/**
+ * Corre una escritura y la deja en el slice solo si sigue siendo la misma cuenta. Si no llegó a
+ * Supabase, el perfil pasa a solo lectura hasta la próxima lectura.
+ */
+async function escribir<T>(
+  dispatch: AppDispatch,
+  getState: () => RootState,
+  pedido: () => Promise<Resultado<T>>,
+  guardar: (datos: T) => void,
+): Promise<Resultado<T>> {
+  const usuarioId = usuarioActual(getState);
+  escrituras += 1;
+  const r = await pedido();
+  escrituras += 1;
+  if (usuarioActual(getState) !== usuarioId) return { ok: false, error: "otro" };
+  if (r.ok) guardar(r.datos);
+  else if (r.error === "sin_conexion") dispatch(cargaCambio("sin-conexion"));
+  return r;
+}
+
 /** El paso de medios del onboarding: todos en un solo pedido (FR-011). Hasta acá no se guardó nada. */
 export function confirmarMedios(nuevos: readonly MedioNuevo[]): AppThunk<Promise<Resultado<MedioDePago[]>>> {
-  return async (dispatch, _getState, { perfilRemoto }) => {
+  return async (dispatch, getState, { perfilRemoto }) => {
     if (!puedeConfirmar(nuevos)) return { ok: false, error: "otro" };
     if (!perfilRemoto) return SIN_CONEXION;
-    const r = await perfilRemoto.confirmarOnboarding(nuevos);
-    if (r.ok) dispatch(mediosConfirmados(r.datos));
-    return r;
+    return escribir(dispatch, getState, () => perfilRemoto.confirmarOnboarding(nuevos), (d) =>
+      dispatch(mediosConfirmados(d)),
+    );
   };
 }
 
@@ -50,9 +89,7 @@ export function agregarMedio(nuevo: MedioNuevo): AppThunk<Promise<Resultado<Medi
   return async (dispatch, getState, { perfilRemoto }) => {
     if (esDuplicado(getState().perfil.medios, nuevo)) return { ok: false, error: "duplicado" };
     if (!perfilRemoto) return SIN_CONEXION;
-    const r = await perfilRemoto.agregarMedio(nuevo);
-    if (r.ok) dispatch(medioAgregado(r.datos));
-    return r;
+    return escribir(dispatch, getState, () => perfilRemoto.agregarMedio(nuevo), (d) => dispatch(medioAgregado(d)));
   };
 }
 
@@ -61,8 +98,9 @@ export function sacarMedio(id: string): AppThunk<Promise<Resultado<null>>> {
   return async (dispatch, getState, { perfilRemoto }) => {
     if (!puedeSacar(getState().perfil.medios)) return { ok: false, error: "otro" };
     if (!perfilRemoto) return SIN_CONEXION;
-    const r = await perfilRemoto.sacarMedio(id);
-    if (r.ok) dispatch(medioSacado(id));
+    const r = await escribir(dispatch, getState, () => perfilRemoto.sacarMedio(id), () => dispatch(medioSacado(id)));
+    // Si no se pudo sacar porque la fila ya no estaba o no era del usuario, el slice puede estar viejo.
+    if (!r.ok && r.error === "otro") void dispatch(leerMedios());
     return r;
   };
 }
