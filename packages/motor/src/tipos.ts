@@ -240,6 +240,12 @@ export interface EstimacionTope {
   consumido: number;
   restante: number;
   base: BaseEstimacion;
+  /**
+   * Las compras que consumieron el saldo (issue #45): las que cuenta
+   * `base.comprasRegistradas`, incluidas las de miembros vencidos del grupo.
+   * En el orden de `compararIds`.
+   */
+  compraIds: string[];
   periodo: { tipo: PeriodoAcumulable; desde: FechaISO; hasta: FechaISO };
 }
 

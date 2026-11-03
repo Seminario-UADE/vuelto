@@ -28,6 +28,7 @@ import type {
   BorradorCompra,
   Comercio,
   Compra,
+  ComprasDeTope,
   EstadoTope,
   MedioDePago,
   PedidoRecomendar,
@@ -201,6 +202,7 @@ function topeMedio(est: EstimacionTope, entradas: EntradasMotor, hoy: string): T
   // el 1/11"); la tarjeta los muestra por separado.
   const [segun = texto.base] = texto.base.split(" · ");
   return {
+    clave: est.grupoTopeId !== null ? `grupo:${est.grupoTopeId}` : `promo:${promo.id}`,
     medio,
     rubro,
     promo: `${promo.porcentaje}% en ${RUBROS[rubro].enFrase} · ${textoDias(promo.vigencia.dias)}`,
@@ -223,6 +225,11 @@ function topeMedio(est: EstimacionTope, entradas: EntradasMotor, hoy: string): T
       (estado === "disponible" || estado === "queda-poco") && aplicaElDia(promo, hoy) && texto.cifra
         ? `Hoy es ${nombreDelDia(hoy)}: en ${RUBROS[rubro].enFrase}, con ${medio.nombreCorto} te quedan ${texto.cifra} de tope.`
         : null,
+    promociones: est.promocionIds.flatMap((id) => {
+      const p = entradas.promociones.find((x) => x.id === id);
+      return p ? [p.titulo] : [];
+    }),
+    compraIds: est.compraIds,
   };
 }
 
@@ -275,6 +282,25 @@ export function topesVista(entradas: EntradasMotor): ResumenTopes {
     mediosConTope: medios.filter((t) => t.estado === "disponible" || t.estado === "queda-poco").length,
     reinicioMensualEnDias: Math.round((Date.parse(reinicio) - Date.parse(hoy)) / 86_400_000),
     medios,
+  };
+}
+
+/**
+ * Las compras que consumieron un tope (issue #45). Son las que el motor contó en la base de la
+ * estimación (`compraIds`), así la lista y el "según N compras" salen del mismo cálculo; la app
+ * no decide qué compra pertenece a qué tope. En el orden de `compras` (como «Mis compras»).
+ * `null` si el tope ya no está (venció o se sacó el medio del perfil).
+ */
+export function comprasDeTopeVista(topes: ResumenTopes, compras: CompraMotor[], clave: string): ComprasDeTope | null {
+  const tope = topes.medios.find((t) => t.clave === clave);
+  if (!tope) return null;
+  const ids = new Set(tope.compraIds);
+  return {
+    tope,
+    compras: compras.flatMap((c) => {
+      const v = ids.has(c.id) ? compraVista(c) : null;
+      return v ? [v] : [];
+    }),
   };
 }
 

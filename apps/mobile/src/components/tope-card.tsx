@@ -5,6 +5,7 @@ import { colors, radius, space } from "@/theme";
 import { Avatar } from "./avatar";
 import { Badge } from "./badge";
 import { Icon, iconoDeRubro } from "./icon";
+import { PressableScale } from "./pressable-scale";
 import { Text } from "./text";
 import { TopeBar } from "./tope-bar";
 
@@ -66,10 +67,17 @@ export function TopeResumen({ t }: { t: TopeMedio }) {
   );
 }
 
-/** Fila completa para la pestaña Topes. */
-export function TopeDetalle({ t }: { t: TopeMedio }) {
+/**
+ * Fila completa para la pestaña Topes. Con `onPress` es tocable y lleva a las compras que lo
+ * consumieron (issue #45); sin él, es el encabezado de esa pantalla.
+ */
+export function TopeDetalle({ t, onPress }: { t: TopeMedio; onPress?: () => void }) {
+  const Contenedor = onPress ? PressableScale : View;
   return (
-    <View
+    <Contenedor
+      onPress={onPress}
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={onPress ? `${etiqueta(t)} Ver las compras que lo consumieron.` : undefined}
       style={{
         gap: space.md,
         padding: space.lg,
@@ -78,7 +86,11 @@ export function TopeDetalle({ t }: { t: TopeMedio }) {
         backgroundColor: colors.surface,
       }}
     >
-      <View accessible accessibilityLabel={etiqueta(t)} style={{ flexDirection: "row", gap: space.md }}>
+      <View
+        accessible={!onPress}
+        accessibilityLabel={onPress ? undefined : etiqueta(t)}
+        style={{ flexDirection: "row", gap: space.md }}
+      >
         <View
           style={{
             width: 40,
@@ -111,6 +123,7 @@ export function TopeDetalle({ t }: { t: TopeMedio }) {
             {pesos(t.nominal)} / {t.periodo}
           </Text>
         </View>
+        {onPress ? <Icon name="chevron" size={18} color={colors.inkSecondary} /> : null}
       </View>
       {t.disponible === null || t.base.tipo !== "compras" ? (
         <View style={{ padding: space.md, borderRadius: radius.row, backgroundColor: colors.canvas }}>
@@ -142,7 +155,7 @@ export function TopeDetalle({ t }: { t: TopeMedio }) {
           </Text>
         </View>
       ) : null}
-    </View>
+    </Contenedor>
   );
 }
 

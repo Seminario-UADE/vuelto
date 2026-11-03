@@ -24,6 +24,7 @@ describe("estimarTopes (US1)", () => {
         consumido: 3500,
         restante: 6500,
         base: { comprasRegistradas: 3, comprasSinDescuentoInformado: 0 },
+        compraIds: ["c1", "c2", "c3"],
         periodo: { tipo: "mensual", desde: "2026-10-01", hasta: "2026-10-31" },
       },
     ]);
@@ -124,6 +125,35 @@ describe("estimarTopes (US1)", () => {
   });
 });
 
+describe("estimarTopes: compras que consumieron el tope (issue #45)", () => {
+  it("un grupo lista las compras de todos sus miembros, también las de uno vencido", () => {
+    const compras = [
+      compraRegistrada({ id: "c-dia", promocionId: "dia" }),
+      compraRegistrada({ id: "c-coto", promocionId: "coto" }),
+      compraRegistrada({ id: "c-otra", promocionId: "otra" }),
+    ];
+    const r = estimarTopes([deGrupo("dia", 10000), deGrupo("coto", 10000, vencida)], compras, perfil(), AHORA);
+    expect(r).toMatchObject([{ promocionIds: ["dia"], compraIds: ["c-coto", "c-dia"], base: { comprasRegistradas: 2 } }]);
+  });
+
+  it("deja afuera las compras de otro período y las posteriores a la consulta", () => {
+    const compras = [
+      compraRegistrada({ id: "septiembre", promocionId: "galicia", fecha: "2026-09-30" }),
+      compraRegistrada({ id: "octubre", promocionId: "galicia", fecha: "2026-10-01" }),
+      compraRegistrada({ id: "manana", promocionId: "galicia", fecha: "2026-10-23" }),
+    ];
+    const r = estimarTopes([conTope("galicia", 10000)], compras, perfil(), AHORA);
+    expect(r[0]?.compraIds).toEqual(["octubre"]);
+  });
+
+  it("sin compras la lista está vacía, y siempre coincide con la base", () => {
+    const compras = [compraRegistrada({ id: "b", promocionId: "a" }), compraRegistrada({ id: "a", promocionId: "a" })];
+    const r = estimarTopes([conTope("a", 5000), conTope("z", 5000)], compras, perfil(), AHORA);
+    expect(r.map((e) => e.compraIds)).toEqual([["a", "b"], []]);
+    for (const e of r) expect(e.compraIds).toHaveLength(e.base.comprasRegistradas);
+  });
+});
+
 describe("formatearEstimacion (US2)", () => {
   const OCTUBRE = { tipo: "mensual" as const, desde: "2026-10-01", hasta: "2026-10-31" };
   const SEMANA_DEL_1_10 = { tipo: "semanal" as const, desde: "2026-09-28", hasta: "2026-10-04" };
@@ -141,6 +171,7 @@ describe("formatearEstimacion (US2)", () => {
     consumido: tope - restante,
     restante,
     base: { comprasRegistradas: compras, comprasSinDescuentoInformado: 0 },
+    compraIds: Array.from({ length: compras }, (_, i) => `c${i}`),
     periodo,
   });
 

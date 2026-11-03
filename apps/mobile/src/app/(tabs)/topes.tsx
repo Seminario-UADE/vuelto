@@ -101,7 +101,11 @@ export default function Topes() {
 
           <View style={{ gap: space.md }}>
             {lista.map((m) => (
-              <TopeDetalle key={m.medio.id} t={m} />
+              <TopeDetalle
+                key={m.clave}
+                t={m}
+                onPress={() => router.push({ pathname: "/tope/[clave]", params: { clave: m.clave } })}
+              />
             ))}
           </View>
 
