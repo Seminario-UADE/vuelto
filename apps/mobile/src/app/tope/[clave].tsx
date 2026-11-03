@@ -8,6 +8,7 @@ import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
 import { Text } from "@/components/text";
 import { TopeDetalle } from "@/components/tope-card";
+import { estePeriodo } from "@/lib/textos";
 import { useAppSelector } from "@/store/hooks";
 import { selectComprasDeTope, selectMarcasDeSubida } from "@/store/selectores";
 import { colors, space } from "@/theme";
@@ -34,22 +35,20 @@ export default function ComprasDelTope() {
     );
   }
 
-  const { tope, compras } = datos;
-  const periodo = tope.periodo === "semana" ? "esta semana" : "este mes";
+  const { tope, compras, sinMostrar } = datos;
 
   return (
     <Screen>
-      {/* El consejo del día ya se vio en «Tus topes»; acá lo que importa son las compras. */}
-      <TopeDetalle t={{ ...tope, consejo: null }} />
+      <TopeDetalle t={tope} />
 
-      {tope.promociones.length > 1 ? (
+      {tope.clave.startsWith("grupo:") ? (
         <View style={{ gap: space.sm }}>
           <Text variant="label" weight="semibold" tone="inkSecondary" accessibilityRole="header">
-            Comparten este tope
+            Tope compartido entre
           </Text>
           <Card padding={space.lg} gap={space.sm}>
-            {tope.promociones.map((titulo) => (
-              <Text key={titulo} variant="bodyMd">
+            {tope.promociones.map((titulo, i) => (
+              <Text key={i} variant="bodyMd">
                 {titulo}
               </Text>
             ))}
@@ -61,11 +60,11 @@ export default function ComprasDelTope() {
         <Text variant="label" weight="semibold" tone="inkSecondary" accessibilityRole="header">
           Compras que lo consumieron
         </Text>
-        {compras.length === 0 ? (
+        {compras.length === 0 && sinMostrar === 0 ? (
           <Text variant="bodyMd" tone="inkSecondary">
-            Ninguna compra registrada {periodo} con {tope.promociones.length > 1 ? "estas promos" : "esta promo"}.
+            Ninguna compra registrada {estePeriodo(tope.periodo)} con {tope.clave.startsWith("grupo:") ? "estas promos" : "esta promo"}.
           </Text>
-        ) : (
+        ) : compras.length === 0 ? null : (
           <Card padding={space.lg} gap={0}>
             {compras.map((c, i) => (
               <View key={c.id} style={divisor(i)}>
@@ -81,6 +80,12 @@ export default function ComprasDelTope() {
             ))}
           </Card>
         )}
+        {sinMostrar > 0 ? (
+          <Text variant="label" tone="inkSecondary">
+            {sinMostrar === 1 ? "Una compra" : `${sinMostrar} compras`} con un medio de pago que todavía no podemos mostrar
+            también {sinMostrar === 1 ? "cuenta" : "cuentan"} para este tope.
+          </Text>
+        ) : null}
       </View>
 
       <View style={{ flexDirection: "row", gap: space.sm }}>

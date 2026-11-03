@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { estimarTopes } from "@vuelto/motor";
+import { claveDeTope } from "../data/calculo";
 import { promosConTopeCompartido } from "../data/compras/prueba";
 import { mediosDeclarados } from "../data/fixtures";
 import { escenarioElegido } from "./acciones";
@@ -35,11 +36,13 @@ describe("selectComprasDeTope", () => {
     const topes = selectTopes(s.getState()).medios;
     expect(topes.length).toBeGreaterThan(0);
     for (const t of topes) {
-      const est = directo.find((e) => (e.grupoTopeId ?? e.promocionIds[0]) === t.clave.replace(/^\w+:/, ""));
+      const est = directo.find((e) => claveDeTope(e) === t.clave);
       const r = selectComprasDeTope(s.getState(), t.clave);
       expect(r?.compras.map((c) => c.id).sort()).toEqual(est?.compraIds);
       // La lista y el "según N compras" de la tarjeta salen del mismo cálculo (Principio V).
-      if (t.base.tipo === "compras") expect(r?.compras).toHaveLength(t.base.cantidad);
+      if (t.base.tipo === "compras") expect((r?.compras.length ?? 0) + (r?.sinMostrar ?? 0)).toBe(t.base.cantidad);
+      expect(r?.sinMostrar).toBe(0);
+      expect(r?.tope.consejo).toBeNull();
     }
   });
 
@@ -80,6 +83,17 @@ describe("selectComprasDeTope", () => {
     s.dispatch(escenarioElegido("mes-vacio"));
     s.dispatch(guardarCompra({ ...borrador, usarPromo: false }));
     expect(selectComprasDeTope(s.getState(), "grupo:galicia-mensual")?.compras).toEqual([]);
+  });
+
+  it("una compra que el motor cuenta pero con un medio fuera del catálogo se informa aparte", () => {
+    const s = conMartin({ corpus: { ...corpusInicial, promociones: promosConTopeCompartido() } });
+    s.dispatch(escenarioElegido("mes-vacio"));
+    const compra = s.dispatch(guardarCompra(borrador));
+    const rara = { ...compra, id: "medio-desconocido", medioDePagoId: "uuid-de-un-medio-sin-mapear" };
+    const r = selectComprasDeTope(storeDePrueba({ ...s.getState(), compras: { lista: [compra, rara] } }).getState(), "grupo:galicia-mensual");
+    expect(r?.compras.map((c) => c.id)).toEqual([compra.id]);
+    expect(r?.sinMostrar).toBe(1);
+    expect(r?.tope.base).toMatchObject({ tipo: "compras", cantidad: 2 });
   });
 
   it("un tope que no está devuelve null", () => {

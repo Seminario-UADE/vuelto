@@ -1,13 +1,17 @@
 import type { Base, Periodo } from "../data/contracts";
 
+/** "esta semana" o "este mes". */
+export function estePeriodo(periodo: Periodo): string {
+  return periodo === "semana" ? "esta semana" : "este mes";
+}
+
 /**
  * Texto de la base de un estimado (Principio V), en un solo lugar. Lo usan el adaptador
  * de la Edge Function y el servidor simulado.
  */
 export function textoBase(cantidad: number, periodo: Periodo, mes: string): Base {
   if (cantidad === 0) {
-    const cuando = periodo === "semana" ? "esta semana" : "este mes";
-    return { tipo: "sin-compras", texto: `Sin compras registradas ${cuando}: todavía no podemos estimar cuánto te queda.` };
+    return { tipo: "sin-compras", texto: `Sin compras registradas ${estePeriodo(periodo)}: todavía no podemos estimar cuánto te queda.` };
   }
   const compras = `${cantidad} ${cantidad === 1 ? "compra" : "compras"}`;
   return {
