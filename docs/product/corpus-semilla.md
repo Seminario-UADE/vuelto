@@ -55,35 +55,35 @@ Cada caso es una situación que el motor distingue (constitución §VI, RF-04). 
 | `acumulable = null` | La letra chica no dice nada | el resto | cualquiera sin las frases anteriores | por construcción |
 | **Tope compartido** | Frase «el tope es compartido…» en la letra chica | 4 | `15-bbva-tiendas-cercania-oct26` (y `-jul26`, `-ago26`, `-sep26`) | indicio (lo confirma #51) |
 | Tope exclusivo | Solo lo dice la letra chica | sin candidatas automáticas | — | sin indicio |
-| **Vencida** | La letra chica da por terminada una promo que MODO aún lista (ver más abajo) | 28 | `10-icbc-juleriaque-abr25` | candidata |
+| **Vencida** | La letra chica da por terminada una promo que MODO aún lista (ver más abajo) | 28 | `10-icbc-juleriaque-abr25` | indicio (se publica hasta #51) |
 
 Notas sobre los casos:
 
-- **Tope compartido.** Las cuatro promos de Tiendas de Cercanía con BBVA dicen «el tope es compartido y distribuido entre los comercios adheridos a esta promoción», con $10.000 por usuario por mes. Son cuatro versiones publicadas con vigencias que se superponen (jul, ago, sep y oct). Hay que decidir con la letra chica si son la misma promo republicada o cuatro, y si comparten un solo saldo: en ese caso van con el mismo `grupoTopeId` registrado en `grupos-tope.json`.
+- **Tope compartido.** Las cuatro promos de Tiendas de Cercanía con BBVA dicen «el tope es compartido y distribuido entre los comercios adheridos a esta promoción», con $10.000 por usuario por mes. Son cuatro versiones publicadas con vigencias que se superponen (jul, ago, sep y oct). Hoy la ingesta solo agrupa el tope de las partes de una misma promo multibanco (`grupoTopeId = modo:<slug>`), así que estas cuatro se publican con un tope cada una. Agrupar promos distintas que comparten un saldo queda para el extractor de #51, que lee la letra chica.
 - **Tope exclusivo.** El texto «Exclusivo con» de la tarjeta del listado es exclusividad **de banco**, no el alcance del tope; no sirve para detectar este caso.
-- **Vencida.** Es el caso que testea que el motor descarta por vigencia. La candidata natural es una de las promos que MODO lista con fecha estructurada futura pero cuya letra chica ya dio por terminada. Se carga con `vigencia.hasta` igual a la fecha de la letra chica. Para que la app la reciba, esa fecha tiene que caer dentro del período en curso; si no, sirve solo para los tests del motor.
+- **Vencida.** Es el caso que testea que el motor descarta por vigencia. La ingesta toma `vigencia.hasta` de `schedule.stop_date`, así que una promo que MODO lista con fecha futura pero cuya letra chica ya dio por terminada se publica como vigente hasta que #51 lea la fecha de la letra chica. Lo que la ingesta sí descarta solo es la promo con `stop_date` pasado o `real_status` distinto de `RUNNING` (`vencida_en_la_fuente`).
 
 ## Hallazgo: promos que MODO sigue listando después de su fecha de cierre
 
-De las 336 promos vigentes según MODO, **28 tienen en su letra chica una fecha de fin ya pasada** mientras que el dato estructurado (`schedule.stop_date`) está en el futuro. Ejemplos: ICBC–Juleriaque (estructura hasta 2027-01-31, letra chica hasta el 30/09/2026), BBVA–The Food Market (estructura hasta 2026-11-30, letra chica hasta el 31/10/2026). Por la regla de la spec (la letra chica prevalece sobre los datos estructurados, US2-5), estas promos **no son vigentes**: se excluyen con motivo `vencida_en_la_fuente` o, una o dos, se dejan como el caso «vencida». El borrador de cada una trae una nota que lo avisa.
+De las 336 promos vigentes según MODO, **28 tienen en su letra chica una fecha de fin ya pasada** mientras que el dato estructurado (`schedule.stop_date`) está en el futuro. Ejemplos: ICBC–Juleriaque (estructura hasta 2027-01-31, letra chica hasta el 30/09/2026), BBVA–The Food Market (estructura hasta 2026-11-30, letra chica hasta el 31/10/2026). Si la letra chica prevalece, estas promos **no son vigentes**, pero la ingesta todavía no lee la letra chica: hoy **se publican** con la fecha estructurada. Es el riesgo aceptado en ADR-011 (lo que la API declara pero la letra chica contradice se publica hasta que el extractor de #51 lea la letra chica, sin revisión humana).
 
-La fecha se toma de la fecha más reciente que aparece en el texto: es una pista, no una conclusión. Una persona la confirma leyendo la letra chica.
+La cifra sale de buscar la fecha más reciente que aparece en el texto: es un indicio, no una conclusión. Lo resuelve #51.
 
 ## Limitaciones del corpus
 
-Condiciones reales de las promos que el contrato de tipos (`Promocion`) y el perfil del usuario (banco, tipo, red) **no representan**. Las promos se cargan igual, porque es lo que MODO publica, y se dejan registradas acá para que nadie las ignore en el pitch.
+Condiciones reales de las promos que el contrato de tipos (`Promocion`) y el perfil del usuario (banco, tipo, red) **no representan**. La ingesta las publica igual, porque es lo que MODO publica, y se dejan registradas acá para que nadie las ignore en el pitch.
 
 | Limitación | Alcance (de las 336) | Efecto sobre la recomendación |
 |---|---|---|
 | **Cómo se paga** (QR o NFC de MODO, tarjeta física, online) | 263 promos exigen pagar con MODO (`flows` sin `physical-card`); 72 valen con la tarjeta física y 1 en todos los canales | El dato está en cada promo (`payment_flow`) pero el contrato no lo guarda, así que la app no puede decir **cómo** pagar. Pendiente: sumarlo al contrato y a la recomendación. |
 | **Restricción por rango de tarjeta (BIN)** | 107 promos (`segmentations.whitelist` con `bin`) | El beneficio puede valer solo para ciertos productos de la tarjeta del banco; el perfil no distingue. |
 | **Condición sobre el cliente** (`user_national_id`: por ejemplo, sueldo acreditado en el banco) | 49 promos | La recomendación asume que el usuario cumple la condición. |
-| **Niveles de cliente** (Selecta, Platinum…) | 6 promos | No se cargan: el mapeo las propone como exclusión `nivel_de_cliente` por el nombre, el rótulo del banco o la descripción interna. |
-| **Tope diario** (`reset_by = day`) | 6 promos | No se cargan: el motor no representa el tope por día y aproximarlo puede sobrestimar el saldo restante. Se proponen para excluir (`tope_no_representable`). |
-| **Tope para toda la duración de la promo** (`reset_by = promo`) | 12 promos (casi todas del Cyber Monday) | No se puede representar (no se renueva por mes ni por semana): se propone excluirlas (`tope_no_representable`). |
-| **Tope por período y además tope por transacción** | 0 promos | El contrato guarda un solo tope, y quedarse con el del período sobrestima el reintegro de una compra grande: si aparece, se propone excluirla (`tope_no_representable`). |
-| **Red que el contrato no tiene** (`patagonia_365`) | 2 promos | Se ignora la red con una nota; si es la única, se excluye la promo. |
-| **Saldo de grupo optimista** | Promos con grupo de tope | Si un grupo de tope tiene miembros fuera del corpus (excluidos), el saldo restante sale optimista (constitución §V). |
+| **Niveles de cliente** (Selecta, Platinum…) | 6 promos | No se publican: el mapeo las descarta solo (`nivel_de_cliente`) por el nombre, el rótulo del banco o la descripción interna. |
+| **Tope diario** (`reset_by = day`) | 6 promos | No se publican: el motor no representa el tope por día y aproximarlo puede sobrestimar el saldo restante. El mapeo las descarta solo (`tope_no_representable`). |
+| **Tope para toda la duración de la promo** (`reset_by = promo`) | 12 promos (casi todas del Cyber Monday) | No se puede representar (no se renueva por mes ni por semana): el mapeo las descarta solo (`tope_no_representable`). |
+| **Tope por período y además tope por transacción** | 0 promos | El contrato guarda un solo tope, y quedarse con el del período sobrestima el reintegro de una compra grande: si aparece, el mapeo la descarta sola (`tope_no_representable`). |
+| **Red que el contrato no tiene** (`patagonia_365`) | 2 promos | Se ignora la red con un aviso; si es la única, el mapeo descarta la promo. |
+| **Tope compartido entre promos distintas** | Por ejemplo, las 4 de Tiendas de Cercanía | La ingesta solo agrupa las partes de una misma promo multibanco, y las publica todas o ninguna. Si dos promos distintas comparten un saldo, cada una sale con su tope y el saldo restante es optimista (constitución §V) hasta #51. |
 | **Vigencia verificada en una fecha** | Todo el corpus | La ingesta diaria da de baja las que vencen; muchas de noviembre vencen el 30/11. |
 | **Categoría 15** | A La Mesa (ICBC) | MODO usa una categoría 15 que no está entre las 13 del repo; la tabla `categorias` la rechazaría. Afecta a promos transversales, no a Supermercados ni Farmacias. |
 
