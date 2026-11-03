@@ -1587,6 +1587,33 @@ relevamiento de MODO) y aplicar las correcciones del review.
 
 ---
 
+## 2026-11-03 — El relevamiento leía una sola sección de MODO (issue #35)
+
+**Herramienta:** Claude Code (Opus 5.5), con el navegador integrado para ver qué pide la web de MODO.
+
+**Objetivo:** corregir de dónde lee las promos `corpus:relevar`, después de que el equipo marcara que no podía
+ser que Coto, Jumbo, Disco, Vea y Día no tuvieran ninguna promo vigente.
+
+**Prompts principales:**
+1. "NO PUEDE SER que no haya promociones de los supermercados que marco el #93, son los principales que suelen
+   aparecer casi siempre. Eso significa que el #92 esta mal hecho"
+2. "Sí, arrancá por ahí" (corregir primero de dónde se leen las promos)
+
+**Resultado:**
+- La sospecha era correcta. Abriendo www.modo.com.ar/promos y mirando sus pedidos de red: la web arma la
+  página con un contenedor de seis secciones (carrusel, destacadas, supermercados, exclusivas online,
+  financiación y más promos), cada una pedida a `/v2/slots`. El relevamiento leía solo «más promos» con el
+  endpoint anterior (`/slots`). Las promos de noviembre de Coto (25% los martes), Jumbo, Disco, Vea, Día y La
+  Anónima están en carrusel, destacadas y supermercados, no en «más promos».
+- `modo.ts` lee el contenedor activo, sus secciones y cada sección página por página; `relevar.ts` filtra
+  vigentes, reintegros y categoría con los campos de la tarjeta nueva, y cuenta una vez la promo que aparece
+  en varias secciones. `crudo.ts` lee comercio y banco de la tarjeta nueva y de la anterior.
+- Las conclusiones de #93 sobre supermercados quedan inválidas: hay que volver a relevar.
+- **Error de la sesión anterior:** en el review de #92/#93 verifiqué que las cifras de los documentos
+  coincidieran con los crudos, pero no que los crudos estuvieran completos.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

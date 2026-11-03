@@ -19,7 +19,10 @@ function fetchSimulado(responder: (url: string) => { estado: number; cuerpo: str
 }
 
 const json = (x: unknown) => ({ estado: 200, cuerpo: JSON.stringify(x) });
-const pagina = (n: number) => ({ data: { cards: Array.from({ length: n }, (_, i) => ({ slug: `s${i}` })) } });
+/** Una página de `/v2/slots` con `n` tarjetas, de un total de `total` páginas. */
+const pagina = (n: number, total = 1) => ({
+  slots: [{ slot_id: "s", cards: Array.from({ length: n }, (_, i) => ({ card_id: `c${i}` })), pagination: { total_pages: total } }],
+});
 
 describe("crearClienteMODO — ritmo y User-Agent", () => {
   it("una pausa menor a 1000 ms es un error de configuración", () => {
@@ -102,37 +105,83 @@ describe("crearClienteMODO — reintentos", () => {
   });
 });
 
-describe("crearClienteMODO — listado", () => {
-  it("pide la categoría por id numérico, de 100 en 100", async () => {
-    const { fn, pedidos } = fetchSimulado(() => json(pagina(3)));
-    await crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).listarPagina(4, 2);
-    const url = new URL(pedidos[0]!.url);
-    expect(url.pathname).toBe("/promos/api/rewards/slots");
-    expect(url.searchParams.get("slots")).toBe("web-modo-hub-mas-promos");
-    expect(url.searchParams.get("categories")).toBe("4");
-    expect(url.searchParams.get("page")).toBe("2");
-    expect(url.searchParams.get("limit")).toBe("100");
+describe("crearClienteMODO — secciones", () => {
+  it("lee el contenedor activo de la web y devuelve sus secciones activas, en orden", async () => {
+    const { fn, pedidos } = fetchSimulado((url) =>
+      url.includes("/slots-container/active")
+        ? json({ id: "x", slug: "web-modo-container-hub-promos-1" })
+        : json({
+            slots: [
+              { id: "web-modo-hub-carrousel_principal", status: "active" },
+              { id: "web-modo-hub-vieja", status: "inactive" },
+              { id: "web-modo-hub-supermercados", status: "active" },
+            ],
+          }),
+    );
+    const secciones = await crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).secciones();
+    expect(secciones).toEqual(["web-modo-hub-carrousel_principal", "web-modo-hub-supermercados"]);
+    expect(new URL(pedidos[0]!.url).searchParams.get("source")).toBe("web_modo");
+    expect(new URL(pedidos[1]!.url).pathname).toBe("/promos/api/rewards/slots-container/web-modo-container-hub-promos-1");
   });
 
-  it("pagina hasta una página corta", async () => {
-    const respuestas = [pagina(100), pagina(100), pagina(12)];
+  it("sin contenedor activo es un error", async () => {
+    const { fn } = fetchSimulado(() => json({}));
+    await expect(crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).secciones()).rejects.toThrow(/contenedor activo/);
+  });
+
+  it("un contenedor sin secciones activas es un error", async () => {
+    const { fn } = fetchSimulado((url) => (url.includes("active") ? json({ slug: "c" }) : json({ slots: [] })));
+    await expect(crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).secciones()).rejects.toThrow(/ninguna sección/);
+  });
+
+  it("un contenedor sin lista de secciones es un error", async () => {
+    const { fn } = fetchSimulado((url) => (url.includes("active") ? json({ slug: "c" }) : json({})));
+    await expect(crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).secciones()).rejects.toThrow(/lista de secciones/);
+  });
+});
+
+describe("crearClienteMODO — listado", () => {
+  it("pide la sección a /v2/slots como la web, de 100 en 100", async () => {
+    const { fn, pedidos } = fetchSimulado(() => json(pagina(3)));
+    await crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).listarPagina("web-modo-hub-supermercados", 2);
+    const url = new URL(pedidos[0]!.url);
+    expect(url.pathname).toBe("/promos/api/rewards/v2/slots");
+    expect(url.searchParams.get("ids")).toBe("web-modo-hub-supermercados");
+    expect(url.searchParams.get("page")).toBe("2");
+    expect(url.searchParams.get("limit")).toBe("100");
+    expect(url.searchParams.get("source")).toBe("web_modo");
+  });
+
+  it("pagina hasta el total de páginas que informa MODO", async () => {
+    const respuestas = [pagina(100, 3), pagina(100, 3), pagina(12, 3)];
     let n = 0;
     const { fn } = fetchSimulado(() => json(respuestas[n++]));
-    const tarjetas = await crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).listarCategoria(1);
+    const tarjetas = await crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).listarSeccion("s");
     expect(tarjetas).toHaveLength(212);
     expect(n).toBe(3);
   });
 
-  it("corta si el listado nunca termina", async () => {
-    const { fn } = fetchSimulado(() => json(pagina(100)));
-    const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {}, maxPaginas: 3 });
-    await expect(cliente.listarCategoria(1)).rejects.toThrow(/3 páginas/);
+  it("una sección vacía (0 páginas) termina enseguida", async () => {
+    const { fn } = fetchSimulado(() => json(pagina(0, 0)));
+    expect(await crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).listarSeccion("s")).toEqual([]);
   });
 
-  it("una respuesta sin data.cards es un error que nombra la URL", async () => {
+  it("corta si el listado nunca termina", async () => {
+    const { fn } = fetchSimulado(() => json(pagina(100, 999)));
+    const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {}, maxPaginas: 3 });
+    await expect(cliente.listarSeccion("s")).rejects.toThrow(/3 páginas/);
+  });
+
+  it("una respuesta sin slots[0].cards es un error que nombra la sección", async () => {
     const { fn } = fetchSimulado(() => json({ nada: true }));
     const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} });
-    await expect(cliente.listarPagina(1, 1)).rejects.toThrow(/slots/);
+    await expect(cliente.listarPagina("web-modo-hub-x", 1)).rejects.toThrow(/web-modo-hub-x/);
+  });
+
+  it("una respuesta sin total de páginas es un error", async () => {
+    const { fn } = fetchSimulado(() => json({ slots: [{ cards: [] }] }));
+    const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} });
+    await expect(cliente.listarPagina("s", 1)).rejects.toThrow(/total_pages/);
   });
 });
 
