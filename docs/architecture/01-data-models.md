@@ -45,6 +45,10 @@ en `packages/motor/src/tipos.ts` (issue #33). Decisiones que fija:
   `bancos`. Una categoría nueva no requiere cambiar el motor.
 - **Red**: los 9 valores tal cual los usa MODO en `debit_list` /
   `credit_list`.
+- **Monto opcional** (issue #75): `CompraPropuesta.monto` es `number | null`,
+  requerido y nullable. Con `null` el motor recomienda igual: ahorro $0, el
+  tope disponible con su base y el orden por porcentaje y tope disponible
+  (`specs/002-motor-recomendar/contracts/recomendar.md`, «Sin monto»).
 
 **Fuera de alcance del MVP:** sucursales adheridas y tarjetas excluidas.
 MODO no las trae estructuradas y ninguna historia del MVP las usa; quedan

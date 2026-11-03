@@ -21,7 +21,8 @@ recomendar(
 
 ## Precondiciones (las garantiza la capa externa)
 
-- `compra.monto > 0`; cada `promocion.porcentaje` en (0, 100]; `vigencia.desde ≤ vigencia.hasta`.
+- `compra.monto` es `null` o `> 0` (issue #75: `null` = el usuario todavía no escribió el
+  monto; ver «Sin monto» más abajo); cada `promocion.porcentaje` en (0, 100]; `vigencia.desde ≤ vigencia.hasta`.
 - `comprasDelPeriodo` son del usuario y están confirmadas. Pueden incluir otros meses: el motor
   filtra.
 - Ids únicos dentro de cada lista.
@@ -37,6 +38,18 @@ recomendar(
   `descartadas` se ordena por `promocionId` (FR-023).
 - Todos los importes son pesos con a lo sumo dos decimales exactos.
 - `base` es `null` si y solo si la promoción no informa tope o el descarte no es por tope.
+
+## Sin monto (`compra.monto === null`, issue #75)
+
+- Cada opción y cada promo aplicada llevan `ahorroEstimado: 0`.
+- `topeRestanteTrasCompra` es el tope disponible antes de la compra, con su `base` (con cero
+  compras registradas la base lo dice y el motivo no da cifra, constitución §V).
+- Orden: mayor porcentaje (las acumulables combinadas suman los suyos), después mayor tope
+  disponible (una promo que no informa tope va antes) y después el mismo desempate por medio y
+  por promo que con monto.
+- Una promo con `montoMinimo` no se descarta por `monto_minimo`: no se puede saber si la compra
+  llega. El motivo avisa "pide una compra mínima de $X".
+- Ningún motivo da una cifra que dependa del monto.
 
 ## Errores
 
