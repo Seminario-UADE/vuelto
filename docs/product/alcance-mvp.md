@@ -113,10 +113,12 @@ página en una corrida anterior de este mismo research ("20% de reintegro en
 La Anónima"). La búsqueda por texto de esta API no es confiable para esta
 tarea.
 
-**Pendiente, antes de fijar el corpus sembrado a mano (RF-18)**: reconciliar
+**Resuelto por la ingesta automática (ADR-011)**: había que reconciliar
 la lista de cadenas paginando por completo la categoría "Mercados" (id 1,
 226 promos totales) y revisando los nombres de comercio uno por uno, en vez
-de confiar en `search_text` por cadena. Importa qué cadena participa
+de confiar en `search_text` por cadena. La ingesta diaria recorre todas las
+secciones de la web de MODO y el listado por categoría, así que qué cadenas
+tienen promo sale solo, todos los días. Importa qué cadena participa
 efectivamente en MODO, no su presencia genérica en CABA/AMBA — y eso puede
 afectar qué tan útil es el flujo de compra de supermercado si las cadenas
 grandes (Coto, Carrefour, Jumbo, Disco, Vea, Día) tienen poca o ninguna
