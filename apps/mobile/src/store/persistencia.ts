@@ -9,6 +9,7 @@
 import type { ListenerMiddlewareInstance } from "@reduxjs/toolkit";
 import { fechaArgentina } from "@vuelto/motor";
 import { comprasDelPeriodo } from "../data/calculo";
+import { ETIQUETAS_RED } from "../perfil/modelo";
 import {
   rehidratado,
   sesionCerrada,
@@ -67,15 +68,35 @@ const esTexto = (x: unknown): x is string => typeof x === "string";
 const textoONull = (x: unknown) => x === null || esTexto(x);
 const listaDeTextos = (x: unknown): x is string[] => Array.isArray(x) && x.every(esTexto);
 
+const TIPOS = ["debito", "credito"];
+const REDES_VALIDAS = Object.keys(ETIQUETAS_RED);
+
+function medioGuardadoValido(m: unknown): boolean {
+  return (
+    esObjeto(m) &&
+    esTexto(m.id) &&
+    esTexto(m.bancoId) &&
+    textoONull(m.nombreBanco) &&
+    esTexto(m.tipo) &&
+    TIPOS.includes(m.tipo) &&
+    esTexto(m.red) &&
+    REDES_VALIDAS.includes(m.red)
+  );
+}
+
 function perfilValido(x: unknown): EstadoPerfil | null {
   if (!esObjeto(x)) return null;
+  // Lo guardado antes de #41 no trae `mediosGuardados`: entra vacío. Si trae algo inválido, el perfil entero no vale.
+  const guardados = x.mediosGuardados ?? [];
   const ok =
     typeof x.onboardingCompleto === "boolean" &&
+    Array.isArray(guardados) &&
+    guardados.every(medioGuardadoValido) &&
     listaDeTextos(x.medios) &&
     listaDeTextos(x.comercios) &&
     textoONull(x.nombre) &&
     textoONull(x.invitacionPendiente);
-  return ok ? (x as EstadoPerfil) : null;
+  return ok ? ({ ...x, mediosGuardados: guardados } as EstadoPerfil) : null;
 }
 
 /** La forma mínima que el motor necesita de una promo: lo que falte lo rompería al evaluar (spec 009 FR-017). */

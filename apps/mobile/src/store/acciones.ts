@@ -3,6 +3,7 @@
  */
 import { createAction } from "@reduxjs/toolkit";
 import type { Compra, Promocion } from "@vuelto/motor";
+import type { MedioDePago as MedioGuardado } from "../perfil/modelo";
 
 /** Escenarios para probar estados vacíos y de error (solo desarrollo, en Perfil). */
 export type Escenario = "normal" | "mes-vacio" | "ticket-ilegible";
@@ -13,6 +14,12 @@ export type EstadoPerfil = {
   onboardingCompleto: boolean;
   /** Ids del catálogo de medios de la app. */
   medios: string[];
+  /**
+   * Los medios que el usuario declaró, tal como los guarda Supabase (`perfil/datos.ts`): banco por
+   * id de MODO, tipo y red. Es lo que va a reemplazar a `medios` (T008, issue #41); hasta que las
+   * pantallas lo usen queda vacío y nada lo lee.
+   */
+  mediosGuardados: MedioGuardado[];
   /** Ids del catálogo de comercios. */
   comercios: string[];
   /** Invitación abierta antes de terminar el onboarding (ADR-008 §1). */

@@ -15,8 +15,9 @@ RLS, sin Edge Function (ADR-009), y guarda el resultado en el slice `perfil` de 
 La integridad la garantiza la tabla. La lógica de la pantalla (buscador, duplicados, mínimo de un
 medio) va en funciones puras con tests.
 
-**Estado de las dependencias (02/11)**: #34 y #39 cerradas. La #81 cerró (store de Redux). Falta #40 (sesión), y el slice `perfil` hoy guarda ids de un
-catálogo fijo (`medios: string[]`), no `MedioDePago` de la base: reconciliarlo es parte de T008. Lo que no depende de ellas (modelo, buscador, acceso a Supabase y
+**Estado de las dependencias (02/11)**: #34 y #39 cerradas. La #81 cerró (store de Redux). Falta #40 (sesión). El slice `perfil` ya tiene `mediosGuardados: MedioDePago[]`
+(lo que devuelve `datos.ts`), al lado de `medios: string[]` (ids del catálogo fijo), que sigue siendo lo que lee el
+motor hasta T008. Lo que no depende de ellas (modelo, buscador, acceso a Supabase y
 selector de medio) se hace ya. Conectar las pantallas espera a esas dos.
 
 ## Technical Context
@@ -78,15 +79,21 @@ ADR-010, RNF-02, ADR-009, contrato de tipos #33). La spec no cambia.
 8. **Los bancos no se borran del catálogo.** El sembrado hace upsert por `id`, y `banco_id` es FK
    sin `on delete` (no deja borrar un banco con medios). Así un medio ya declarado siempre tiene
    un banco que mostrar (Edge Cases de la spec).
-9. **`on_hub_list` puede faltar.** La tabla `bancos` de la #34 no lo tiene (ver abajo). El modelo
-   lo lleva como `boolean | null`: `null` = no se sabe, y el buscador lo ordena como no
-   priorizado. Nunca se inventa un valor.
+9. **`on_hub_list` puede faltar.** La tabla `bancos` de la #34 no lo tenía; una migración lo suma
+   (nullable, ver abajo) pero la ingesta todavía no lo carga. El modelo lo lleva como
+   `boolean | null`: `null` = no se sabe, y el buscador lo ordena como no priorizado. Nunca se
+   inventa un valor.
+10. **El slice `perfil` guarda los medios de la base al lado de los del catálogo fijo.** Se suma
+    `mediosGuardados: MedioDePago[]` (aditivo: lo persistido antes entra con `[]`, un medio con red
+    o tipo inválidos descarta el perfil). `medios: string[]` y los selectores no cambian: T008
+    mueve `selectEntradasMotor` a `mediosGuardados` y retira `medios` cuando conecte las pantallas.
+    Al cerrar sesión se vacía junto con el resto del slice.
 
 ## Lo que dejó la #34 (PR #84)
 
 | Tabla | Qué hay en `main` | Diferencia con lo pedido |
 |---|---|---|
-| `bancos` | `id` uuid (id de MODO), `nombre` not null. `select` para `authenticated`; escribe solo la service role | **Faltan `imagen` y `on_hub_list`.** Sin `on_hub_list`, US3 (FR-002) no se cumple con datos reales: hace falta una migración nueva y que la ingesta lo cargue |
+| `bancos` | `id` uuid (id de MODO), `nombre` not null. `select` para `authenticated`; escribe solo la service role | **Faltaban `on_hub_list` y el logo.** La migración `20261103000008_bancos_hub.sql` suma `on_hub_list boolean` y `logo_url text`, ambos nullables (la columna no se llama `imagen`: el test de estructura la prohíbe por RNF-06). El seed local los trae de MODO. **Falta que la ingesta los cargue** (`publicar.ts` solo escribe `id` y `nombre`); hasta entonces, en el proyecto alojado quedan `null` |
 | `bancos` (seed) | Solo Galicia, con su id real | El resto lo carga la ingesta. Hasta entonces el buscador tiene un banco |
 | `medios_de_pago` | `id`, `user_id` default `auth.uid()` (cascade), `banco_id` FK, `tipo` y `red` con `check`, `creado_en`. `unique (user_id, banco_id, tipo, red)` | Las columnas son `user_id` y `creado_en` (el plan decía `usuario_id` y `creado`) |
 | `medios_de_pago` | Una policy `for all` del dueño | Permite `update`; la app no lo usa |
@@ -136,7 +143,7 @@ la #81.
 
 | Operación | Llamada |
 |---|---|
-| `leerBancos()` | `from("bancos").select("id, nombre")` (sin `on_hub_list` hasta que la base lo tenga) |
+| `leerBancos()` | `from("bancos").select("id, nombre, on_hub_list")` (`null` si la ingesta no lo cargó) |
 | `leerMisMedios()` | `from("medios_de_pago").select("id, banco_id, tipo, red, bancos(nombre)").order("creado_en")` |
 | `confirmarOnboarding(nuevos)` | `insert([...]).select(<lo mismo que leerMisMedios>)`, un solo pedido (decisión 5) |
 | `agregarMedio(nuevo)` / `sacarMedio(id)` | `insert(...).select(...)` / `delete().eq("id", id)` |
