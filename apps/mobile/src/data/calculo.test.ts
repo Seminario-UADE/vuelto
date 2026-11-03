@@ -3,6 +3,7 @@ import {
   compraParaGuardar,
   comprasVista,
   perfilDelMotor,
+  promoPropuesta,
   recomendacionVista,
   textoDias,
   topesVista,
@@ -146,6 +147,7 @@ describe("compraParaGuardar (FR-008)", () => {
     monto: 5000,
     medioId: "galicia-visa-credito",
     textoExtraido: null,
+    usarPromo: true,
   };
 
   it("con el medio recomendado: promo de Galicia, $1.000 esperados, sin descuento informado", () => {
@@ -177,6 +179,25 @@ describe("compraParaGuardar (FR-008)", () => {
     expect(c).toMatchObject({ categoriaId: null, promocionId: null, reintegroEsperado: null });
   });
 
+  it("con usarPromo en false la compra queda sin promo ni reintegro y no consume ningún tope (spec 010, SC-006)", () => {
+    const sin = compraParaGuardar(entradas, { ...borrador, usarPromo: false }, "n1");
+    expect(sin).toMatchObject({ promocionId: null, reintegroEsperado: null, descuentoObtenido: null });
+    const antes = topesVista(entradas);
+    const despues = topesVista({ ...entradas, compras: [sin, ...comprasOctubre] });
+    const galicia = (t: typeof antes) => t.medios.find((m) => m.medio.id === "galicia-visa-credito");
+    expect(galicia(despues)?.disponible).toBe(galicia(antes)?.disponible);
+  });
+
+  it("lo que propone la hoja es lo que se guarda, incluso con un ticket de otro día (SC-007)", () => {
+    const hoyJueves = { ...entradas, ahora: new Date("2026-10-15T15:00:00.000Z") };
+    for (const fecha of ["2026-10-14", "2026-10-15"]) {
+      const propuesta = promoPropuesta(hoyJueves, comercio("coto"), "galicia-visa-credito", fecha, 5000);
+      const guardada = compraParaGuardar(hoyJueves, { ...borrador, fecha }, "n1");
+      expect(guardada.promocionId).toBe(propuesta.promociones[0]?.promocionId ?? null);
+      expect(guardada.reintegroEsperado).toBe(propuesta.promociones.length > 0 ? propuesta.reintegro : null);
+    }
+  });
+
   it("sin monto o sin medio falla", () => {
     expect(() => compraParaGuardar(entradas, { ...borrador, monto: null }, "n1")).toThrow("Falta el monto");
   });
@@ -190,9 +211,73 @@ describe("comprasVista y textoDias", () => {
     expect(r.gastaste).toBe(101500);
   });
 
+  it("lista todo el período de topes (mes o semana, lo que empiece antes) y los totales siguen siendo del mes (spec 010, FR-003)", () => {
+    // Miércoles 2/12: la semana arrancó el lunes 30/11, antes que el mes.
+    const hoy = new Date("2026-12-02T15:00:00.000Z");
+    const base = comprasOctubre[0]!;
+    const del29 = { ...base, id: "nov29", fecha: "2026-11-29", monto: 1000 };
+    const del30 = { ...base, id: "nov30", fecha: "2026-11-30", monto: 2000 };
+    const del1 = { ...base, id: "dic1", fecha: "2026-12-01", monto: 4000 };
+    const r = comprasVista([del29, del30, del1], hoy);
+    expect(r.compras.map((c) => c.id).sort()).toEqual(["dic1", "nov30"]);
+    expect(r.gastaste).toBe(4000);
+  });
+
   it("textoDias", () => {
     expect(textoDias(null)).toBe("todos los días");
     expect(textoDias(["sab"])).toBe("los sábados");
     expect(textoDias(["lun", "mie", "vie"])).toBe("los lunes, miércoles y viernes");
+  });
+});
+
+describe("promoPropuesta (spec 010, FR-022)", () => {
+  it("propone la promo vigente ese día, con su reintegro estimado y su base", () => {
+    const p = promoPropuesta(entradas, comercio("coto"), "galicia-visa-credito", "2026-10-14", 24500);
+    expect(p.promociones.map((x) => x.promocionId)).toEqual(["promo-galicia-super-mie"]);
+    expect(p.promociones[0]?.nombre).toContain("Galicia");
+    expect(p.reintegro).toBe(4900);
+    expect(p.base).toBe("según 3 compras de octubre");
+  });
+
+  it("evalúa en la fecha de la compra: el jueves la promo de los miércoles no corre", () => {
+    const jueves = promoPropuesta(entradas, comercio("coto"), "galicia-visa-credito", "2026-10-15", 24500);
+    expect(jueves.promociones).toEqual([]);
+    expect(jueves.reintegro).toBeNull();
+    expect(jueves.base).toBeNull();
+  });
+
+  it("sin monto no inventa un reintegro", () => {
+    const p = promoPropuesta(entradas, comercio("coto"), "galicia-visa-credito", "2026-10-14", null);
+    expect(p.promociones).toHaveLength(1);
+    expect(p.reintegro).toBeNull();
+  });
+
+  it("un medio sin promo para ese comercio no propone nada", () => {
+    const p = promoPropuesta(entradas, comercio("coto"), "santander-mastercard-credito", "2026-10-14", 24500);
+    expect(p).toMatchObject({ promociones: [], reintegro: null, base: null });
+  });
+
+  it("un comercio fuera del catálogo (sin rubro) no propone nada", () => {
+    const libre: Comercio = {
+      id: "libre-kiosco",
+      nombre: "Kiosco",
+      inicial: "K",
+      rubro: "otro",
+      categoriaId: null,
+      frecuente: false,
+    };
+    expect(promoPropuesta(entradas, libre, "galicia-visa-credito", "2026-10-14", 5000).promociones).toEqual([]);
+  });
+
+  it("con el tope agotado el motor descarta la promo y no se propone", () => {
+    const base = comprasOctubre[0]!;
+    const agotada = {
+      ...entradas,
+      compras: [
+        ...comprasOctubre,
+        { ...base, id: "x1", medioDePagoId: "galicia-visa-credito", promocionId: "promo-galicia-super-mie", descuentoObtenido: 6500, fecha: "2026-10-13" },
+      ],
+    };
+    expect(promoPropuesta(agotada, comercio("coto"), "galicia-visa-credito", "2026-10-14", 24500).promociones).toEqual([]);
   });
 });
