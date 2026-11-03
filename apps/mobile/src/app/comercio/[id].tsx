@@ -37,6 +37,7 @@ export default function ConQuePagar() {
   // Derivada con el motor en el dispositivo: cambia con cada tecla del monto, sin red (ADR-010).
   const rec = useAppSelector(selectRecomendacion);
   const r = elegido === params.id ? rec : null;
+  const sinPromo = r !== null && r.medio === null;
 
   const usar = () => {
     if (!r?.medio) return;
@@ -75,13 +76,13 @@ export default function ConQuePagar() {
 
         {r ? <RecomendacionCard r={r} /> : <Skeleton height={220} r={radius.card} />}
 
-        {/* Siempre visible: vacío, la tarjeta muestra el tope disponible con su base (#43). */}
+        {/* Siempre visible: vacío, la tarjeta muestra el tope disponible con su base (#43). Sin
+            promo el monto no cambia la respuesta, así que el hint no promete un reintegro. */}
         <Card>
           <MontoInput
             value={monto}
             onChange={setMonto}
-            // Sin promo, el monto no cambia la respuesta: no se promete nada.
-            hint={r && !r.medio ? undefined : "Con el monto te decimos cuánto te devuelven y cuánto tope te queda."}
+            hint={sinPromo ? undefined : "Con el monto te decimos cuánto te devuelven y cuánto tope te queda."}
           />
         </Card>
 

@@ -1544,6 +1544,61 @@ la que no tiene dependencias (#75). Es una issue chica: va sin spec-kit.
 
 ---
 
+## 2026-11-03 — «¿Con qué pago?» sin monto, con el motor en la app (issue #43)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI, el navegador integrado
+(`expo start --web`) y subagentes (`/code-review`, `test-runner`,
+`rules-guardian`).
+
+**Objetivo:** cerrar lo que faltaba de la #43 una vez mergeada la #75 (PR #87,
+`monto: null` en el motor). Es XS/S: va sin spec-kit.
+
+**Prompts principales:**
+1. "Leé CLAUDE.md, el ADR-010 y la issue #43. Trabajá en un branch nuevo desde
+   main (con #87 ya mergeado). Falta: `recomendarSeguro` sin el parche
+   `pedido.monto ?? 0`, pasando `null` al motor; el `MontoInput` de
+   `comercio/[id].tsx` siempre visible; verificar a mano cada criterio de
+   aceptación (dígito por dígito, inspector de red, modo avión, sin promo,
+   alternativas, «Pagué con esto»); test del selector contra `recomendar()`
+   directo. Después `/code-review`, `test-runner` y `rules-guardian`. PR con
+   «Closes #43» y entrada en la bitácora. Decime qué criterio no pudiste
+   verificar."
+
+**Resultado:**
+- La IA frenó antes de empezar: el PR #87 todavía no estaba mergeado (en
+  `main`, `monto` seguía siendo `number`). Se esperó a que el PO lo mergeara.
+- `recomendarSeguro` pasa el pedido tal cual: sin monto, el motor recibe
+  `null`, ordena por porcentaje y tope y no descarta por compra mínima.
+- `queDa` conserva el aviso «pide una compra mínima de $X» que el motor agrega
+  sin monto (antes la tarjeta lo perdía).
+- El campo de monto se ve siempre, también sin promo; ahí no muestra el texto
+  "te decimos cuánto te devuelven", porque el monto no cambia la respuesta.
+- Tests nuevos: el selector con monto 10.000, 2.500 y `null` llama a
+  `recomendar()` con los mismos argumentos que una llamada directa armada
+  aparte y da lo mismo; compra mínima sin monto; `queDa`. 383 tests de la app
+  en verde.
+- Verificación a mano en la web, con un usuario de prueba en un Supabase
+  local:
+  - Al elegir Coto aparece la recomendación sin monto: tope ≈$6.500 según 3
+    compras de octubre.
+  - Tipeando 10000 dígito por dígito, el tope después de la compra pasa por
+    $6.500, $6.498, $6.480 y $4.500, y queda «Te devuelven ≈$2.000».
+  - Ningún request de red al tipear (inspector de red).
+  - Sin red (`fetch` y XHR bloqueados y Metro apagado): YPF, Farmacity y Coto
+    siguen funcionando y «Usar Galicia» lleva a «Revisá tu compra» en modo
+    excepción, con cero intentos de red.
+  - No se probó en el simulador ni con modo avión real: no había simulador
+    booteado ni Expo Go instalado.
+- `rules-guardian`: sin violaciones. `/code-review` (estándares): sin
+  violaciones duras; queda como deuda que `queDa` depende del texto del motivo.
+- `/code-review` (spec) marcó criterios de la #43 que el código todavía no
+  cumple: elegir categoría, presencial/online, autocompletar desde el corpus,
+  descartadas plegadas (DESIGN.md §6 pide lo contrario: visibles), el botón
+  dice «Usar Galicia» y no «Pagué con esto» (DESIGN.md §5) y la fecha de
+  sincronización no aparece en la pantalla del comercio.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
