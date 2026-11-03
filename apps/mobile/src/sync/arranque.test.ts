@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { mediosDeEjemplo } from "../data/fixtures";
 import { RELOJ_EJEMPLO } from "../data/fixtures";
 import { CLAVE, CLAVE_CORPUS, rehidratar } from "../store/persistencia";
-import { mediosElegidos } from "../store/perfil";
+import { mediosConfirmados } from "../store/perfil";
 import { esperar, memoria, storeDePrueba } from "../store/prueba";
 import { selectFrescura, selectRecomendacion } from "../store/selectores";
 import { comercioElegido, montoCambiado } from "../store/simulacion";
@@ -26,7 +27,7 @@ describe("arranque con lo sincronizado guardado (US2)", () => {
   it("reabrir SIN red da la misma recomendación, con el reloj real y sin error (SC-001)", async () => {
     const disco = memoria();
     const { s: a } = await abrir(disco);
-    a.dispatch(mediosElegidos(["galicia-visa-credito"]));
+    a.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
     await a.dispatch(sincronizar("apertura"));
     a.dispatch(comercioElegido("coto"));
     a.dispatch(montoCambiado(10000));

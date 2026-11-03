@@ -51,6 +51,9 @@ complete a mano.
   interna) pasa a ser imprescindible, no solo deseable: es la única señal de
   cuánto confiar en el corpus. Se espera desigual — alta en vigencia y
   porcentaje, baja en tope compartido y acumulabilidad.
-- Secuencia recomendada: sembrar el corpus a mano en los primeros sprints
+- ~~Secuencia recomendada: sembrar el corpus a mano en los primeros sprints
   para tener contra qué correr el motor, y construir la ingesta automática
-  después. La demo no puede depender de que el scraper funcione.
+  después.~~ **Reemplazada por ADR-011**: el corpus es siempre automático
+  (ingesta diaria en GitHub Actions). La demo no depende de que el scraper
+  funcione en ese momento: la app lee de Supabase, que conserva la última
+  corrida buena.

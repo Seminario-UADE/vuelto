@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { mediosDeEjemplo } from "../data/fixtures";
 import { compraDePrueba } from "../data/compras/prueba";
 import { repositorioDeMemoria, type Guion } from "../data/compras/repositorio.memoria";
 import type { Subida } from "../data/compras/repositorio";
@@ -7,7 +8,7 @@ import { adoptarOperaciones, eliminarCompra, guardarCompra, iniciarCompras, rein
 import { compraAgregada } from "./compras";
 import { CLAVE_COLA, guardadoEncolado } from "./cola";
 import type { Operacion } from "../data/compras/operaciones";
-import { mediosElegidos } from "./perfil";
+import { mediosConfirmados } from "./perfil";
 import { rehidratar } from "./persistencia";
 import { esperar, memoria, storeDePrueba } from "./prueba";
 
@@ -45,7 +46,7 @@ async function escenario(
   );
   const s = storeDePrueba(null, disco, { subida });
   await s.dispatch(rehidratar());
-  s.dispatch(mediosElegidos(mediosDeclarados.map((m) => m.id)));
+  s.dispatch(mediosConfirmados(mediosDeEjemplo(mediosDeclarados.map((m) => m.id))));
   await s.dispatch(iniciarCompras());
   /** Espera a que termine el vaciado que dispararon guardar y borrar. */
   const reposo = async () => {
@@ -262,9 +263,9 @@ describe("dueño y bloqueos (FR-008, FR-009, FR-017)", () => {
 
   it("un medio sin correspondencia queda bloqueado y no traba a las demás (SC-008)", async () => {
     const { s, repo, reposo } = await escenario({
-      contexto: { medioRemoto: (id) => (id === "mercado-pago" ? null : MEDIO) },
+      contexto: { medioRemoto: (id) => (id === "macro-visa-debito" ? null : MEDIO) },
     });
-    s.dispatch(guardarCompra({ ...borrador, medioId: "mercado-pago" }));
+    s.dispatch(guardarCompra({ ...borrador, medioId: "macro-visa-debito" }));
     s.dispatch(guardarCompra({ ...borrador, monto: 1000 }));
     await reposo();
     await s.dispatch(vaciarCola());

@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { mediosDeEjemplo } from "../data/fixtures";
 import { mediosDeclarados, ticketDeEjemplo } from "../data/fixtures";
 import { escenarioElegido } from "./acciones";
-import { comerciosElegidos, mediosElegidos } from "./perfil";
+import { comerciosElegidos, mediosConfirmados } from "./perfil";
 import {
   selectComerciosFrecuentes,
   selectPerfilVista,
@@ -18,7 +19,7 @@ import { storeDePrueba } from "./prueba";
 
 function conMartin() {
   const s = storeDePrueba();
-  s.dispatch(mediosElegidos(mediosDeclarados.map((m) => m.id)));
+  s.dispatch(mediosConfirmados(mediosDeEjemplo(mediosDeclarados.map((m) => m.id))));
   return s;
 }
 
@@ -35,7 +36,7 @@ const borrador = {
 describe("perfil del onboarding (FR-002 de la spec 006)", () => {
   it("medios y comercios frecuentes salen de lo que eligió el usuario", () => {
     const s = storeDePrueba();
-    s.dispatch(mediosElegidos(["bbva-visa-credito"]));
+    s.dispatch(mediosConfirmados(mediosDeEjemplo(["bbva-visa-credito"])));
     s.dispatch(comerciosElegidos(["ypf", "shell"]));
     expect(selectPerfilVista(s.getState()).medios.map((m) => m.nombreCorto)).toEqual(["BBVA"]);
     expect(selectComerciosFrecuentes(s.getState()).map((c) => c.nombre)).toEqual(["YPF", "Shell"]);

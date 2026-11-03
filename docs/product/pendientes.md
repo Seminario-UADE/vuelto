@@ -27,7 +27,8 @@
       del extractor (issue #51) exija los rangos.
 - [ ] Experimento de precisión del extractor (entregable de research)
 - [ ] Proveedor/modelo del extractor, con salida estructurada
-- [ ] Dónde corre el cron de ingesta
+- [x] Dónde corre el cron de ingesta — **resuelto** (03/11/2026, ADR-011): GitHub Actions, una vez
+      por día (`.github/workflows/ingesta.yml`)
 - [ ] Expo vs. Flutter formalmente (nivel real del equipo en TS/Dart)
 - [x] Estrategia de sincronización del corpus al dispositivo — **resuelta** (02/11/2026, issue #42,
       spec 009): primera sincronización con todo lo del período, después incremental por

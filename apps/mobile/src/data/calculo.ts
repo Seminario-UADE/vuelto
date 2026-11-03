@@ -1,9 +1,9 @@
 /**
  * Núcleo funcional de la app (ADR-009, ADR-010): llama a `@vuelto/motor` y traduce su
  * resultado a lo que pintan las pantallas. Funciones puras: el estado entra por parámetro,
- * incluido `ahora`, y nada lee el reloj del sistema (spec 008 FR-005). Los catálogos de medios y
- * comercios son datos estáticos de `fixtures.ts`, no estado. Los selectores del store las
- * envuelven con `createSelector`.
+ * incluido `ahora`, y nada lee el reloj del sistema (spec 008 FR-005). Los medios son los que
+ * guardó el usuario (slice `perfil`, issue #41); el catálogo de comercios es estático
+ * (`fixtures.ts`). Los selectores del store las envuelven con `createSelector`.
  */
 import {
   diaArgentina,
@@ -40,7 +40,9 @@ import type {
   Rubro,
   TopeMedio,
 } from "./contracts";
-import { catalogoComercios, catalogoMedios, mediosDelMotor } from "./fixtures";
+import { catalogoComercios } from "./fixtures";
+import type { MedioDePago as MedioGuardado } from "../perfil/modelo";
+import { medioDelMotor, medioVista } from "../perfil/vista";
 import { aVista } from "./vista-recomendacion";
 import { mediodia } from "../lib/reloj";
 import { RUBROS } from "../lib/rubros";
@@ -49,6 +51,8 @@ import { textoBase } from "../lib/textos";
 /** Lo que el motor necesita para una persona, ya con su forma. */
 export type EntradasMotor = {
   perfil: PerfilMotor;
+  /** Los mismos medios del perfil, con el nombre del banco para mostrarlos. */
+  medios: MedioGuardado[];
   promociones: Promocion[];
   compras: CompraMotor[];
   ahora: Date;
@@ -91,25 +95,26 @@ export function textoDias(dias: Dia[] | null): string {
   return `los ${nombres.length > 0 ? `${nombres.join(", ")} y ` : ""}${ultimo}`;
 }
 
-/**
- * Perfil del motor con los medios que eligió el usuario. Los medios sin forma en el motor
- * (Mercado Pago) quedan afuera: no tienen banco ni red que evaluar (Principio III).
- */
-export function perfilDelMotor(medios: string[], nombre: string | null): PerfilMotor {
+/** Perfil del motor con los medios que guardó el usuario (banco, tipo y red, issue #41). */
+export function perfilDelMotor(medios: readonly MedioGuardado[], nombre: string | null): PerfilMotor {
   return {
     nombreParaMostrar: nombre,
-    mediosDePago: medios.flatMap((id) => {
-      const m = mediosDelMotor[id];
-      return m ? [m] : [];
-    }),
+    mediosDePago: medios.map(medioDelMotor),
     comerciosHabituales: [],
   };
 }
 
-/** Medios del catálogo de la app que corresponden a un perfil del motor. */
-function mediosDeLaApp(perfil: PerfilMotor): MedioDePago[] {
-  const ids = new Set(perfil.mediosDePago.map((m) => m.id));
-  return catalogoMedios.filter((m) => ids.has(m.id));
+/** Un medio que ya no está en el perfil (lo sacó): sus compras se siguen mostrando, sin inventar su nombre. */
+function medioQuitado(id: string): MedioDePago {
+  return {
+    id,
+    banco: "",
+    nombre: "Medio que sacaste de tu perfil",
+    nombreCorto: "ese medio",
+    detalle: "Ya no está en tu perfil",
+    inicial: "·",
+    conCobertura: true,
+  };
 }
 
 function rubroDeCategoria(categoriaId: number): Rubro {
@@ -117,18 +122,18 @@ function rubroDeCategoria(categoriaId: number): Rubro {
   return (par?.[0] as Rubro | undefined) ?? "otro";
 }
 
-/** Nombre del banco de la app ("Galicia") para un `bancoId` del motor ("galicia"). */
-function nombreDeBanco(bancoId: string): string {
-  const medio = catalogoMedios.find((m) => mediosDelMotor[m.id]?.bancoId === bancoId);
-  return medio?.banco ?? bancoId;
+/** Nombre corto del banco ("Galicia") para un `bancoId` del motor, con los medios del usuario. */
+function nombreDeBanco(bancoId: string, medios: readonly MedioGuardado[]): string {
+  const medio = medios.find((m) => m.bancoId === bancoId);
+  return medio ? medioVista(medio).banco : bancoId;
 }
 
 /** Catálogo para nombrar lo que el motor devuelve por id (`aVista`). */
-function promocionesCatalogo(promociones: Promocion[]): PromocionCatalogo[] {
+function promocionesCatalogo(promociones: Promocion[], medios: readonly MedioGuardado[]): PromocionCatalogo[] {
   return promociones.map((p) => ({
     id: p.id,
     titulo: p.titulo,
-    bancoId: nombreDeBanco(p.bancoId),
+    bancoId: nombreDeBanco(p.bancoId, medios),
     categoriaId: p.categoriaId,
   }));
 }
@@ -144,7 +149,10 @@ export function pedidoPresencial(comercio: Comercio & { categoriaId: number }, m
 }
 
 /** `recomendar()` sin excepción por perfil vacío: sin medios evaluables no hay promo. */
-export function recomendarSeguro(pedido: PedidoRecomendar, entradas: EntradasMotor): RecomendacionMotor {
+export function recomendarSeguro(
+  pedido: PedidoRecomendar,
+  entradas: Omit<EntradasMotor, "medios">,
+): RecomendacionMotor {
   const { perfil, promociones, compras, ahora } = entradas;
   try {
     // Hasta #43 el motor exige monto: "sin monto" se consulta con 0 (spec 008, Assumptions).
@@ -171,8 +179,8 @@ export function recomendacionVista(
   const respuesta = { ...r, descartadas: r.descartadas.filter((d) => d.causa !== "categoria") };
   const hoy = fechaArgentina(entradas.ahora);
   return aVista(pedido, respuesta, comercio, {
-    medios: mediosDeLaApp(entradas.perfil),
-    promociones: promocionesCatalogo(entradas.promociones),
+    medios: entradas.medios.map(medioVista),
+    promociones: promocionesCatalogo(entradas.promociones, entradas.medios),
     mes: nombreDelMes(hoy),
     dia: textoDia(hoy),
   });
@@ -196,7 +204,8 @@ export function claveDeTope(est: EstimacionTope): ClaveTope {
 }
 
 function topeMedio(est: EstimacionTope, entradas: EntradasMotor, hoy: string): TopeMedio | null {
-  const medio = catalogoMedios.find((m) => m.id === est.mediosDePagoIds[0]);
+  const guardado = entradas.medios.find((m) => m.id === est.mediosDePagoIds[0]);
+  const medio = guardado ? medioVista(guardado) : null;
   const promo = entradas.promociones.find((p) => p.id === est.promocionIds[0]);
   if (!medio || !promo) return null;
   const texto = formatearEstimacion(est);
@@ -323,9 +332,9 @@ export function comercioPorNombre(nombre: string): Comercio {
   );
 }
 
-function compraVista(c: CompraMotor): Compra | null {
-  const medio = catalogoMedios.find((m) => m.id === c.medioDePagoId);
-  if (!medio) return null;
+function compraVista(c: CompraMotor, medios: readonly MedioGuardado[]): Compra {
+  const guardado = medios.find((m) => m.id === c.medioDePagoId);
+  const medio = guardado ? medioVista(guardado) : medioQuitado(c.medioDePagoId);
   return {
     id: c.id,
     comercio: comercioPorNombre(c.comercio),
@@ -343,7 +352,7 @@ function compraVista(c: CompraMotor): Compra | null {
  * ninguna compra que consume un tope queda sin poder verse o borrarse (spec 010, FR-003).
  * Lo gastado y lo devuelto siguen siendo los del mes en curso.
  */
-export function comprasVista(compras: CompraMotor[], ahora: Date): ResumenCompras {
+export function comprasVista(compras: CompraMotor[], ahora: Date, medios: readonly MedioGuardado[]): ResumenCompras {
   const hoy = fechaArgentina(ahora);
   const mes = nombreDelMes(hoy);
   const delMes = comprasDelMes(compras, hoy);
@@ -351,10 +360,7 @@ export function comprasVista(compras: CompraMotor[], ahora: Date): ResumenCompra
     mes,
     gastaste: delMes.reduce((s, c) => s + c.monto, 0),
     devolvieron: devolvieron(delMes, mes),
-    compras: comprasDelPeriodo(compras, hoy).flatMap((c) => {
-      const v = compraVista(c);
-      return v ? [v] : [];
-    }),
+    compras: comprasDelPeriodo(compras, hoy).map((c) => compraVista(c, medios)),
   };
 }
 
@@ -410,7 +416,7 @@ export function promoPropuesta(
  */
 export function compraParaGuardar(entradas: EntradasMotor, b: BorradorCompra, id: string): CompraMotor {
   if (b.monto === null || b.medioId === null) throw new Error("Falta el monto o el medio de pago");
-  if (!catalogoMedios.some((m) => m.id === b.medioId)) throw new Error(`Medio desconocido: ${b.medioId}`);
+  if (!entradas.perfil.mediosDePago.some((m) => m.id === b.medioId)) throw new Error(`Medio desconocido: ${b.medioId}`);
   const comercio = comercioPorNombre((b.comercio ?? "").trim() || "Compra");
   const propuesta = b.usarPromo ? promoPropuesta(entradas, comercio, b.medioId, b.fecha, b.monto) : null;
   const tienePromo = propuesta !== null && propuesta.promociones.length > 0;

@@ -77,7 +77,9 @@ select throws_ok($$ select * from public.capturas_crudas $$, '42501', null, 'A n
 select throws_ok($$ insert into public.capturas_crudas (origen, contenido) values ('x', 'y') $$, '42501', null, 'A no escribe capturas_crudas');
 
 -- (d) corpus y catálogos: lectura sí
-select is((select count(*)::int from public.promociones), 1, 'A lee promociones');
+-- Se cuenta solo la promoción de este test: el reinicio local ya carga el corpus sembrado (issue #35).
+select is((select count(*)::int from public.promociones where id = 'd1000000-0000-4000-8000-000000000001'), 1, 'A lee la promoción de prueba');
+select cmp_ok((select count(*)::int from public.promociones), '>=', 1, 'A lee promociones');
 select is((select count(*)::int from public.categorias), 13, 'A lee las 13 categorías');
 select cmp_ok((select count(*)::int from public.bancos), '>=', 1, 'A lee bancos');
 
@@ -118,13 +120,16 @@ reset role;
 
 -- ===== Medio con compras: no se borra solo; la cuenta sí se borra entera =====
 select throws_ok($$ delete from public.medios_de_pago where id = 'b1000000-0000-4000-8000-000000000001' $$, '23503', null, 'no se borra un medio de pago con compras');
+-- Cuántas promociones hay antes de borrar la cuenta (incluye el corpus sembrado, issue #35): al final tiene que ser el mismo número.
+create temp table promociones_antes as select count(*)::int as n from public.promociones;
 delete from auth.users where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 select is((select count(*)::int from public.compras where user_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'), 0, 'borrar la cuenta de A borra sus compras');
 select is((select count(*)::int from public.medios_de_pago where user_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'), 0, 'borrar la cuenta de A borra sus medios de pago');
 select is((select count(*)::int from public.comercios_habituales where user_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'), 0, 'borrar la cuenta de A borra sus comercios');
 select is((select count(*)::int from public.perfiles where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'), 0, 'borrar la cuenta de A borra su perfil');
 select is((select count(*)::int from public.compras where user_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'), 1, 'la compra de B sigue');
-select is((select count(*)::int from public.promociones), 2, 'las promociones no se tocan');
+select is((select count(*)::int from public.promociones where id = 'd1000000-0000-4000-8000-000000000001' or titulo = 'Promo manual'), 2, 'las promociones de prueba no se tocan');
+select is((select count(*)::int from public.promociones), (select n from promociones_antes), 'borrar la cuenta no borra ninguna promoción, tampoco las del corpus sembrado');
 
 select * from finish();
 rollback;
