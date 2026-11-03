@@ -1544,6 +1544,28 @@ la que no tiene dependencias (#75). Es una issue chica: va sin spec-kit.
 
 ---
 
+## 2026-11-03 — Fila de compra legible a 375 px
+
+**Herramienta:** Claude Code (Opus 5.5 / Sonnet 5.5), navegador integrado con `mobile-web`.
+
+**Objetivo:** que `CompraRow` no parta el nombre del comercio a mitad de palabra
+y se lea bien a 375 px, también con texto grande, sin cambiar lo que muestra.
+
+**Prompts principales:**
+1. «Arreglar el layout de `compra-row.tsx` a 375 px (Farmaci/ty, medio de pago en tres líneas), verificar con capturas antes y después.»
+
+**Resultado:**
+- Reproducido en «Mis compras» con viewport mobile. Causa: la columna derecha
+  (monto + reintegro) y el botón de borrar le dejaban poco ancho al bloque central.
+- Fila reorganizada: renglón 1 comercio + monto, renglón 2 medio de pago, renglón 3
+  origen (y marca de subida) + reintegro, que envuelve si no entra. Mismo contenido y
+  misma etiqueta de accesibilidad.
+- Verificado con texto escalado a 1,5× en el navegador. Lint, typecheck y tests en verde.
+- Errores de la IA: el primer intento dejó el medio de pago en tres líneas; se movió el
+  reintegro al renglón del origen.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
