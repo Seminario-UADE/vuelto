@@ -1449,6 +1449,55 @@ usuario pasó al slice `sesion`.
 
 ---
 
+## 2026-11-02 — Perfil: plan alineado con ADR-010 y piezas base (issue #41)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (plan y tareas de la
+spec 001) y `gh` CLI.
+
+**Objetivo:** actualizar el plan de la #41, escrito el 25/10, con ADR-010 y
+con lo que dejó la #34 en `main`, e implementar lo que no depende de la #81
+(store de Redux) ni de la #40 (sesión).
+
+**Prompts principales:**
+1. "Actualizá `plan.md` y `tasks.md` de `specs/001-perfil-billeteras/` con
+   ADR-010 y con las tablas reales de la #34. Marcá qué fases quedan
+   bloqueadas y por qué issue. La spec no cambia."
+2. "Implementá test-first las fases que no dependen de la #81 ni de la #40:
+   modelo, buscador de bancos, acceso a Supabase con el cliente por
+   parámetro y el selector de banco, tipo y red. No conectes las pantallas:
+   eso lo reescribe la #81."
+3. "Corré lint, typecheck, test y build, y abrí el PR sin cerrar la issue."
+
+**Resultado:**
+- Plan y tareas actualizados:
+  - El perfil vive en el slice `perfil` de Redux, que lo persiste: se cayó
+    el cache propio de la feature (decisión 6).
+  - `Red` y `TipoTarjeta` se declaran con los valores del motor hasta que la
+    #81 sume `@vuelto/motor`; un test compara las dos listas (decisión 2).
+  - Perfil vacío: lo detecta el motor con `PerfilSinMediosError`, ya no la
+    Edge Function (decisión 4).
+  - Nueva decisión 9: `on_hub_list` es `boolean | null`, porque la tabla
+    `bancos` no lo tiene. Nunca se inventa un valor.
+  - Las fases 2b y 3 (conectar onboarding y Perfil) quedan bloqueadas por la
+    #81 y la #40.
+- Código en `apps/mobile/src/perfil/` (`modelo.ts`, `buscar-bancos.ts`,
+  `datos.ts`) y `components/selector-medio.tsx`. 33 tests nuevos.
+- Lo que encontró el plan al cruzarse con la #34:
+  - la tabla `bancos` no tiene `imagen` ni `on_hub_list`, así que US3
+    (bancos frecuentes primero) no se cumple con datos reales;
+  - las columnas son `user_id` y `creado_en`, no `usuario_id` y `creado`.
+- Errores de la IA en el proceso: el primer intento de editar el plan con un
+  script falló por las comillas en la terminal; se reescribió el archivo
+  entero.
+- Queda pendiente:
+  - Conectar el onboarding y Perfil (T008 a T011) cuando cierren la #81 y la
+    #40.
+  - Migración que sume `on_hub_list` (y `imagen`) a `bancos`, y que la
+    ingesta lo cargue.
+  - El selector no se probó en pantalla: todavía no lo usa ninguna.
+
+---
+
 ## 2026-11-02 — Sincronizar el corpus y las compras del período (issue #42)
 
 **Herramienta:** Claude Code (Sonnet 5.5), con spec-kit, `spec-critic`, `rules-guardian` y un Supabase local
