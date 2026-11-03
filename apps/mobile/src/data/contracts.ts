@@ -191,6 +191,8 @@ export type BorradorCompra = {
   monto: number | null;
   medioId: string | null;
   textoExtraido: string | null;
+  /** `false` = el usuario quitó la promo propuesta (spec 010, FR-024). Por defecto, `true`. */
+  usarPromo: boolean;
 };
 
 /** Contacto vinculado: solo lo que ADR-008 §3 deja ver. Sin topes, compras ni medios. */

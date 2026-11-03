@@ -8,7 +8,7 @@ export * from "./publicable.ts";
 export { recomendar } from "./recomendar.ts";
 export { estimarTopes, formatearEstimacion } from "./estimar.ts";
 export { PerfilSinMediosError } from "./errores.ts";
-export { JURISDICCIONES_VALIDAS } from "./elegibilidad.ts";
+export { JURISDICCIONES_VALIDAS, normalizar } from "./elegibilidad.ts";
 /**
  * La Edge Function y la app calculan "hoy", los períodos y los textos de fecha
  * con las mismas funciones que el motor (issues #43, #37 y #81).

@@ -36,12 +36,51 @@ function compararListasDeIds(a: string[], b: string[]): number {
   return a.length - b.length;
 }
 
-function compararOpciones(a: OpcionDePago, b: OpcionDePago): number {
+/** Una opción armada, con lo que hace falta para ordenarla sin monto. */
+interface Candidata {
+  opcion: OpcionDePago;
+  /** Suma de los porcentajes de sus promos, en centésimos de punto. */
+  porcentaje: number;
+  /** En centavos; `Infinity` si alguna promo no informa tope. */
+  topeDisponible: number;
+}
+
+/** Mayor primero, sin restar: `Infinity - Infinity` daría `NaN`. */
+function mayorPrimero(a: number, b: number): number {
+  return a === b ? 0 : a > b ? -1 : 1;
+}
+
+/**
+ * Con monto: mayor ahorro. Sin monto el ahorro es 0 en todas, así que va
+ * mayor porcentaje y después mayor tope disponible (issue #75). En los dos
+ * casos se desempata por medio y por promo, comparando por código.
+ */
+function compararCandidatas(a: Candidata, b: Candidata, sinMonto: boolean): number {
   return (
-    b.ahorroEstimado - a.ahorroEstimado ||
-    compararIds(a.medioDePagoId, b.medioDePagoId) ||
-    compararListasDeIds(idsDePromos(a), idsDePromos(b))
+    b.opcion.ahorroEstimado - a.opcion.ahorroEstimado ||
+    (sinMonto
+      ? mayorPrimero(a.porcentaje, b.porcentaje) || mayorPrimero(a.topeDisponible, b.topeDisponible)
+      : 0) ||
+    compararIds(a.opcion.medioDePagoId, b.opcion.medioDePagoId) ||
+    compararListasDeIds(idsDePromos(a.opcion), idsDePromos(b.opcion))
   );
+}
+
+/** Lo que el usuario puede llegar a recibir con la opción: cada saldo compartido cuenta una vez. */
+function topeDisponible(grupo: PromoAplicable[]): number {
+  const contados = new Set<Saldo>();
+  let total = 0;
+  for (const a of grupo) {
+    if (a.saldo) {
+      if (!contados.has(a.saldo)) total += a.saldo.restante;
+      contados.add(a.saldo);
+    } else if (a.topePorCompra !== null) {
+      total += a.topePorCompra;
+    } else {
+      return Infinity;
+    }
+  }
+  return total;
 }
 
 /** Una promo que pasó todas las reglas y le queda tope. */
@@ -52,7 +91,7 @@ interface PromoAplicable {
   saldo: Saldo | null;
   /** En centavos, solo si el tope es por compra. */
   topePorCompra: number | null;
-  /** Monto por porcentaje, sin ningún tope, en centavos. */
+  /** Monto por porcentaje, sin ningún tope, en centavos. 0 si la compra no tiene monto. */
   ahorroSinTope: number;
 }
 
@@ -61,7 +100,12 @@ interface PromoAplicable {
  * reparten el saldo en orden de ahorro sin tope y luego por id, así ninguna
  * combinación supera el restante de un saldo (FR-010).
  */
-function armarOpcion(medio: MedioDePago, grupo: PromoAplicable[], fecha: FechaISO): OpcionDePago {
+function armarOpcion(
+  medio: MedioDePago,
+  grupo: PromoAplicable[],
+  fecha: FechaISO,
+  sinMonto: boolean,
+): Candidata {
   const ordenadas = [...grupo].sort(
     (a, b) => b.ahorroSinTope - a.ahorroSinTope || compararIds(a.promo.id, b.promo.id),
   );
@@ -90,16 +134,22 @@ function armarOpcion(medio: MedioDePago, grupo: PromoAplicable[], fecha: FechaIS
       base: a.saldo ? a.saldo.base : null,
     };
   });
-  return {
+  const opcion: OpcionDePago = {
     medioDePagoId: medio.id,
     ahorroEstimado: aPesos(ahorros.reduce((t, x) => t + x, 0)),
     promociones,
     motivo:
       ordenadas.length === 1 && ordenadas[0]
-        ? motivoOpcion(ordenadas[0].promo, topes[0] ?? null)
+        ? motivoOpcion(ordenadas[0].promo, topes[0] ?? null, sinMonto)
         : motivoCombinado(
             ordenadas.map((a, i) => ({ promo: a.promo, tope: topes[i] ?? null, sinSaldo: sinSaldo.has(a.promo.id) })),
+            sinMonto,
           ),
+  };
+  return {
+    opcion,
+    porcentaje: ordenadas.reduce((t, a) => t + aCentesimosDePunto(a.promo.porcentaje), 0),
+    topeDisponible: topeDisponible(ordenadas),
   };
 }
 
@@ -113,7 +163,9 @@ export function recomendar(
   if (perfil.mediosDePago.length === 0) throw new PerfilSinMediosError();
 
   const ctx: ContextoDeCompra = { compra, fecha: fechaArgentina(ahora), dia: diaArgentina(ahora) };
-  const montoCentavos = aCentavos(compra.monto);
+  // Sin monto (issue #75): ahorro 0 y el tope tras la compra es el disponible.
+  const sinMonto = compra.monto === null;
+  const montoCentavos = compra.monto === null ? 0 : aCentavos(compra.monto);
   const aplicables: PromoAplicable[] = [];
   const descartadas: Descarte[] = [];
   const saldos = calcularSaldos(promociones, comprasDelPeriodo, ctx.fecha);
@@ -160,19 +212,22 @@ export function recomendar(
   }
 
   // Por medio: las acumulables (=== true) juntas si son dos o más; las demás, solas (FR-008).
-  const opciones: OpcionDePago[] = [];
+  const candidatas: Candidata[] = [];
+  const armar = (medio: MedioDePago, grupo: PromoAplicable[]) =>
+    candidatas.push(armarOpcion(medio, grupo, ctx.fecha, sinMonto));
   for (const medio of perfil.mediosDePago) {
     const delMedio = aplicables.filter((a) => a.medios.includes(medio));
     const acumulables = delMedio.filter((a) => a.promo.acumulable === true);
     if (acumulables.length >= 2) {
-      opciones.push(armarOpcion(medio, acumulables, ctx.fecha));
-      for (const a of delMedio) if (a.promo.acumulable !== true) opciones.push(armarOpcion(medio, [a], ctx.fecha));
+      armar(medio, acumulables);
+      for (const a of delMedio) if (a.promo.acumulable !== true) armar(medio, [a]);
     } else {
-      for (const a of delMedio) opciones.push(armarOpcion(medio, [a], ctx.fecha));
+      for (const a of delMedio) armar(medio, [a]);
     }
   }
 
-  opciones.sort(compararOpciones);
+  candidatas.sort((a, b) => compararCandidatas(a, b, sinMonto));
+  const opciones = candidatas.map((c) => c.opcion);
   descartadas.sort((a, b) => compararIds(a.promocionId, b.promocionId));
   const [mejor = null, ...alternativas] = opciones;
   return { mejor, alternativas, descartadas };

@@ -6,7 +6,7 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
 
 **Input**: `spec.md` y `plan.md` de `specs/001-perfil-billeteras/`. Todo lo que dice "según plan" está detallado en `plan.md` §Decisiones y §Código de la app.
 
-> **Actualizado el 02/11/2026 por ADR-010.** El perfil vive en el slice `perfil` de Redux (#81), que también lo persiste: se cayó el cache propio de esta feature. Las fases 1 y 2a (modelo, buscador, acceso a Supabase y selector) se hacen ya; conectar las pantallas (fases 2b y 3) espera a la #81 y la #40.
+> **Actualizado el 02/11/2026 por ADR-010.** El perfil vive en el slice `perfil` de Redux (#81), que también lo persiste: se cayó el cache propio de esta feature. Las fases 1 y 2a (modelo, buscador, acceso a Supabase y selector) se hacen ya; conectar las pantallas (fases 2b y 3) espera a la #40 y a que el slice `perfil` guarde `MedioDePago` (la #81 ya cerró).
 
 **Tests**: test-first para las funciones puras de `apps/mobile/src/perfil/`: cada test se escribe antes y tiene que fallar primero. Las pantallas se prueban con los escenarios de aceptación de la spec.
 
@@ -52,7 +52,7 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
   - sin resultados: "Ese banco o emisor no está disponible en esta versión. Podés seguir con otro medio de pago." (US1-7);
   - devuelve el `MedioNuevo` por un callback y no guarda nada.
 
-## Phase 2b: User Story 1 — conectar el onboarding (P1) 🎯 MVP — **BLOQUEADA por #81 y #40**
+## Phase 2b: User Story 1 — conectar el onboarding (P1) 🎯 MVP — **BLOQUEADA por #40 y por reconciliar el slice `perfil` con `MedioDePago`**
 
 - [ ] T008 [US1] En `apps/mobile/src/app/(onboarding)/medios.tsx`:
   - reemplazar la lista fija de medios por `SelectorMedio` y mostrar la lista de agregados, que se pueden quitar antes de confirmar;
@@ -66,7 +66,7 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
 
 ---
 
-## Phase 3: User Story 2 — Editar desde Perfil (P2) — **BLOQUEADA por #81 y #40**
+## Phase 3: User Story 2 — Editar desde Perfil (P2) — **BLOQUEADA por #40 y por reconciliar el slice `perfil` con `MedioDePago`**
 
 - [ ] T010 [US2] En `apps/mobile/src/app/(tabs)/perfil.tsx`:
   - lista de medios del slice `perfil` con `nombreBanco`, tipo y etiqueta de red;
@@ -86,7 +86,7 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
 
 ## Phase 4: Cierre
 
-- [ ] T012 Cuando la #81 sume `@vuelto/motor` a la app, reemplazar `Red` y `TipoTarjeta` de `pf/modelo.ts` por `import type` del motor (decisión 2).
+- [x] T012 ~~Reemplazar `Red` y `TipoTarjeta` por `import type` del motor~~ (hecho: la #81 ya sumó el motor).
 - [ ] T013 Correr `rules-guardian`, `/code-review` y `test-runner`, y corregir lo que encuentren. Agregar la entrada en `docs/bitacora-prompts.md`. El PR cierra la issue (`Closes #41`).
 
 ---
@@ -94,4 +94,4 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
 ## Orden
 
 - **Phase 1 y 2a**: ya. Son funciones puras y un componente que recibe todo por props.
-- **Phase 2b y 3**: cuando cierren la #81 (slice `perfil`) y la #40 (sesión). T008 y T010 reusan `SelectorMedio`.
+- **Phase 2b y 3**: cuando cierre la #40 (sesión) y el slice `perfil` guarde `MedioDePago` en vez de ids del catálogo fijo. T008 y T010 reusan `SelectorMedio`.

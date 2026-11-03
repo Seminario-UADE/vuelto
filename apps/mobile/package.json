@@ -10,7 +10,9 @@
     "web": "expo start --web",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:integracion": "vitest run --config vitest.integracion.config.mts src/sync/repositorio-supabase.integracion.test.ts",
+    "medir:corpus": "vitest run --config vitest.integracion.config.mts src/sync/medir-corpus.integracion.test.ts"
   },
   "dependencies": {
     "@expo-google-fonts/hanken-grotesk": "^0.4.3",
@@ -22,6 +24,7 @@
     "expo": "~58.0.14",
     "expo-clipboard": "~58.0.3",
     "expo-constants": "~58.0.12",
+    "expo-crypto": "~58.0.7",
     "expo-font": "~58.0.8",
     "expo-haptics": "~58.0.7",
     "expo-image": "~58.0.15",

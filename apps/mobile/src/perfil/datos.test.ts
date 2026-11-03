@@ -111,4 +111,9 @@ describe("datos del perfil", () => {
     const { cliente } = clienteFalso({ data: null, error: { message: "FetchError" }, status: 0 });
     expect(await crearDatosPerfil(cliente).leerBancos()).toEqual({ ok: false, error: "sin_conexion" });
   });
+
+  it("una respuesta mal formada no se disfraza de sin conexión", async () => {
+    const { cliente } = clienteFalso({ data: null, error: null, status: 200 });
+    await expect(crearDatosPerfil(cliente).leerMisMedios()).rejects.toThrow();
+  });
 });

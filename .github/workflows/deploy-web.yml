@@ -1,0 +1,44 @@
+name: Deploy web
+
+# Publica la versión web de la app en https://vuelto.expo.app (EAS Hosting)
+# cuando el CI de main termina bien (todos sus jobs: lint, typecheck, tests,
+# deno-check, build y supabase-rls).
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-web
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Un workflow_run dispara también con CI fallido; solo seguimos si pasó entero.
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      # Variables públicas: terminan en el bundle (ver apps/mobile/.env.example).
+      EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # El commit que validó el CI, no el último de main.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Compilar el motor
+        run: npm run build -w @vuelto/motor
+      - name: Exportar la web
+        working-directory: apps/mobile
+        run: npx expo export --platform web
+      - name: Publicar en producción
+        working-directory: apps/mobile
+        run: npx eas-cli@latest deploy --prod --non-interactive

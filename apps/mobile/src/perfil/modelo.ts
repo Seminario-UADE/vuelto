@@ -4,28 +4,14 @@
  * Plan: `specs/001-perfil-billeteras/plan.md`.
  */
 
+import type { Red, TipoTarjeta } from "@vuelto/motor";
+
+export type { Red, TipoTarjeta };
+
 /**
- * Los mismos valores que `Red` y `TipoTarjeta` de `@vuelto/motor` (un test lo
- * comprueba). Cuando la #81 sume el motor a la app, se reemplazan por
- * `import type` (decisión 2 del plan).
+ * Etiqueta visible de cada red (tabla de la spec). `Record<Red, _>` obliga a cubrir todas las
+ * redes del motor: si el motor suma una, esto no compila.
  */
-export const REDES = [
-  "visa",
-  "master",
-  "american_express",
-  "dinners_club",
-  "maestro",
-  "cabal",
-  "naranja",
-  "confiable",
-  "tarjeta_sol",
-] as const;
-export type Red = (typeof REDES)[number];
-
-export const TIPOS_TARJETA = ["debito", "credito"] as const;
-export type TipoTarjeta = (typeof TIPOS_TARJETA)[number];
-
-/** Etiqueta visible de cada red (tabla de la spec). */
 export const ETIQUETAS_RED: Record<Red, string> = {
   visa: "Visa",
   master: "Mastercard",
@@ -42,6 +28,9 @@ export const ETIQUETAS_TIPO: Record<TipoTarjeta, string> = {
   debito: "Débito",
   credito: "Crédito",
 };
+
+export const REDES = Object.keys(ETIQUETAS_RED) as Red[];
+export const TIPOS_TARJETA = Object.keys(ETIQUETAS_TIPO) as TipoTarjeta[];
 
 /** Banco del catálogo de MODO. */
 export type Banco = {
@@ -78,7 +67,7 @@ export function puedeConfirmar(nuevos: readonly MedioNuevo[]): boolean {
 }
 
 /** El perfil no puede quedar vacío (FR-009). */
-export function puedeSacar(medios: readonly unknown[]): boolean {
+export function puedeSacar(medios: readonly MedioDePago[]): boolean {
   return medios.length >= 2;
 }
 

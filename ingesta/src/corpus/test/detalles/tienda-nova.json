@@ -1,0 +1,221 @@
+{
+  "capturadoEl": "2026-11-02",
+  "url": "https://www.modo.com.ar/promos/api/rewards/v2/benefit/20off-tiendanova-macro-dic25",
+  "tarjeta": {
+    "id": "22652310-965f-42fa-a6b7-38a3bfbdf7bf",
+    "type": "classic_free_content",
+    "backgroundcolor": null,
+    "extra_params": null,
+    "content": {
+      "row": [
+        {
+          "text": "Tienda Nova",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "20% de reintegro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": null,
+          "forecolor": "#414141",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "0",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        },
+        {
+          "text": "Macro",
+          "forecolor": "#121212",
+          "backgroundcolor": "#FFFFFF"
+        }
+      ],
+      "tag_extras": [
+        {
+          "type": "time_range",
+          "value": false,
+          "label": ""
+        },
+        {
+          "type": "countdown",
+          "value": false
+        },
+        {
+          "type": "online_store",
+          "value": false
+        }
+      ]
+    },
+    "daily_start_time": "03:00:00+00",
+    "daily_stop_time": "02:59:00+00",
+    "trigger_type": "payment_promotion",
+    "promo_visibility": "MBW_and_engine",
+    "exclusiveness": "all",
+    "payment_flow": "instore,instore_nfc",
+    "start_date": "2025-12-11T03:00:00.000Z",
+    "stop_date": "2027-01-01T02:59:59.999Z",
+    "days_of_week": "JV",
+    "title": "20% en Tienda Nova",
+    "status": "active",
+    "promotion_type": "Bancaria",
+    "search_tags": "tienda nova,macro,nfc,20,SEG_GPS",
+    "promo_id": "b5646006-abf1-4e79-ae77-24685a405823",
+    "slug": "20off-tiendanova-macro-dic25",
+    "short_description": "2512-Macro-tiendanova-presencial-20off",
+    "where": "Tienda Nova",
+    "landscape_app": null,
+    "portrait_app": null,
+    "landscape_web": null,
+    "landscape_bgcolor": "#FFFFFF",
+    "categories_whitelist": {
+      "categories": [
+        {
+          "map_category": 1,
+          "sub_categories": [
+            26
+          ]
+        }
+      ]
+    },
+    "stores_whitelist": true,
+    "calculated_status": "RUNNING",
+    "debit_list": [],
+    "credit_list": [
+      "visa"
+    ]
+  },
+  "detalle": {
+    "id": "b5646006-abf1-4e79-ae77-24685a405823",
+    "name": "20% en Tienda Nova",
+    "description": "Aprovecha 20% de reintegro en Tienda Nova con Macro",
+    "type": "cashback",
+    "reward_type": "cash",
+    "scope": "Bancaria",
+    "status": "active",
+    "real_status": "RUNNING",
+    "is_engine_active": true,
+    "created_at": "2026-07-16T19:22:39.481Z",
+    "updated_at": "2026-09-21T18:29:15.517Z",
+    "deleted_at": null,
+    "short_description": "2512-Macro-tiendanova-presencial-20off",
+    "publication_description": "Aprovecha 20% de reintegro en Tienda Nova con Macro",
+    "slug": "20off-tiendanova-macro-dic25",
+    "display_start_date": "2025-12-09T03:00:00.000Z",
+    "display_stop_date": "2027-01-01T02:59:59.999Z",
+    "search_tags": "tienda nova,macro,nfc,20,SEG_GPS",
+    "conditions": {
+      "schedule": {
+        "stop_date": "2026-12-31",
+        "start_date": "2025-12-11",
+        "days_of_week": [
+          "thursday",
+          "friday"
+        ],
+        "daily_stop_time": "23:59:00",
+        "daily_start_time": "00:00:00"
+      },
+      "acquirers": {
+        "list": [
+          "MERCADOLIBRE"
+        ],
+        "segmentation_mode": "by_blacklist"
+      },
+      "payment_flow": {
+        "flows": [
+          "instore",
+          "instore_nfc"
+        ]
+      },
+      "exclusiveness": "all",
+      "payment_methods": {
+        "methods": [
+          {
+            "type": "credit_card",
+            "issuer": "visa"
+          }
+        ]
+      },
+      "has_differential_amount": false
+    },
+    "offers": [
+      {
+        "id": "b5646006-abf1-4e79-ae77-24685a405823",
+        "benefit_id": "b5646006-abf1-4e79-ae77-24685a405823",
+        "name": ".",
+        "priority": 0,
+        "segmentations": {
+          "whitelist": [
+            "store_terminal_id",
+            "store_cuit"
+          ],
+          "categories": [
+            {
+              "category_id": 1,
+              "subcategory_ids": [
+                26
+              ]
+            }
+          ]
+        },
+        "requirements": {
+          "banks": {
+            "list": [
+              "6a089c91-a7d3-4199-a578-2132a3733f69"
+            ]
+          },
+          "amount_range": {
+            "min": 0
+          }
+        },
+        "outcomes": {
+          "cashback": {
+            "amount": 20,
+            "amount_type": "percent",
+            "cashback_mode": "cashback_bancario"
+          },
+          "financing": {
+            "installments": []
+          }
+        },
+        "limits": {
+          "period_cap": {
+            "reset_by": "month",
+            "aggregate_by": "user",
+            "amount_by_period": 10000,
+            "amount_of_transactions_by_period": 0
+          },
+          "transaction_cap": {
+            "amount_by_transaction": 0
+          }
+        },
+        "categories": [
+          "1"
+        ],
+        "sub_categories": [
+          "26"
+        ],
+        "preselected": false,
+        "created_at": "2026-07-16T19:22:36.292Z",
+        "updated_at": "2026-08-06T20:19:58.945Z",
+        "deleted_at": null,
+        "offer_caps": [],
+        "offer_transaction_cap": 0
+      }
+    ],
+    "debit_list": [],
+    "credit_list": [
+      "visa"
+    ],
+    "terms_and_conditions": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">CARTERA DE CONSUMO. BENEFICIO CON TARJETAS DE CRÉDITO VISA DE BANCO MACRO S.A., PAGANDO A TRAVÉS DE MODO POR APP MACRO/APP MODO, EXCLUSIVAMENTE PAGANDO A TRAVÉS DE MODO NFC CON TARJETAS DE CRÉDITO VISA EMITIDAS POR BANCO MACRO S.A. JUEVES Y VIERNES DEL 11/12/2025 AL 31/12/2026, PARA CLIENTES /USUARIOS REGISTRADOS EN MODO. 20% DE AHORRO CON TOPE DE DEVOLUCIÓN $10.000 POR USUARIO, POR MES, VÁLIDO PARA COMPRAS EN UN PAGO CON QR - NFC. APLICA EN LOCALES ADHERIDOS DE TIENDA NOVA. MODO: SERVICIO PRESTADO POR EL PROVEEDOR DE SERVICIOS TECNOLÓGICOS PLAY DIGITAL S.A. CUIT 30716829436 AV. DEL LIBERTADOR 7208 TORRE II P.4 CABA., SIENDO LA MARCA \"MODO\" DE SU PROPIEDAD. APLICA PARA CONSUMO PERSONAL-FAMILIAR. NO VÁLIDO TARJETA DE CRÉDITO EMPRESA O AGRO. NO ACUMULA CON OTRA PROMOCIÓN. NO APLICA PARA PAGO A TRAVES DE MERCADO PAGO, OTRO PAGO ELECTRÓNICO INMEDIATO, TRANSFERENCIA 3.0. REINTEGRO A REALIZARSE EN EL MOMENTO DE LA COMPRA, EN LA CAJA DE AHORRO O CUENTA CORRIENTE DE BANCO MACRO REGISTRADA EN MODO. ESTABLECIMIENTOS /PRODUCTOS /SERVICIOS NO SON PROMOCIONADOS /GARANTIZADOS POR BANCO MACRO, NI RESULTA RESPONSABLE POR LA PRESENTACIÓN DE CUPÓN FUERA DE TÉRMINO. INFORMACIÓN DE LOS TÉRMINOS Y CONDICIONES AL 0810-555-2355, EN HTTP://WWW.MACRO.COM.AR/MODO-PROMOS O EN SUCURSALES MACRO.</span></p>",
+    "terms_and_conditions_url": null
+  }
+}
