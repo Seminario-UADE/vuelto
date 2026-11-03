@@ -6,7 +6,7 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
 
 **Input**: `spec.md` y `plan.md` de `specs/001-perfil-billeteras/`. Todo lo que dice "según plan" está detallado en `plan.md` §Decisiones y §Código de la app.
 
-> **Actualizado el 02/11/2026 por ADR-010.** El perfil vive en el slice `perfil` de Redux (#81), que también lo persiste: se cayó el cache propio de esta feature. Las fases 1 y 2a (modelo, buscador, acceso a Supabase y selector) se hacen ya; conectar las pantallas (fases 2b y 3) espera a la #81 y la #40.
+> **Actualizado el 02/11/2026 por ADR-010.** El perfil vive en el slice `perfil` de Redux (#81), que también lo persiste: se cayó el cache propio de esta feature. Las fases 1 y 2a (modelo, buscador, acceso a Supabase y selector) se hacen ya; conectar las pantallas (fases 2b y 3) quedó hecho el 03/11, con la #40 cerrada y el slice `perfil` guardando `MedioDePago`.
 
 **Tests**: test-first para las funciones puras de `apps/mobile/src/perfil/`: cada test se escribe antes y tiene que fallar primero. Las pantallas se prueban con los escenarios de aceptación de la spec.
 
@@ -86,7 +86,7 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
 
 ## Phase 4: Cierre
 
-- [x] T012 Cuando la #81 sume `@vuelto/motor` a la app, reemplazar `Red` y `TipoTarjeta` de `pf/modelo.ts` por `import type` del motor (decisión 2).
+- [x] T012 ~~Reemplazar `Red` y `TipoTarjeta` por `import type` del motor~~ (hecho: la #81 ya sumó el motor).
 - [ ] T013 Correr `rules-guardian`, `/code-review` y `test-runner`, y corregir lo que encuentren. Agregar la entrada en `docs/bitacora-prompts.md`. El PR cierra la issue (`Closes #41`).
 
 ---
@@ -94,4 +94,4 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
 ## Orden
 
 - **Phase 1 y 2a**: ya. Son funciones puras y un componente que recibe todo por props.
-- **Phase 2b y 3**: cuando cierren la #81 (slice `perfil`) y la #40 (sesión). T008 y T010 reusan `SelectorMedio`.
+- **Phase 2b y 3**: hechas (03/11): la #40 cerró y el slice `perfil` guarda `MedioDePago`. T008 y T010 reusan `SelectorMedio`.

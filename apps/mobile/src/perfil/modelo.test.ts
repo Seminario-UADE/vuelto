@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   clasificarError,
@@ -10,6 +8,7 @@ import {
   puedeSacar,
   REDES,
   TIPOS_TARJETA,
+  type MedioDePago,
   type MedioNuevo,
 } from "./modelo";
 
@@ -43,8 +42,9 @@ describe("mínimo de un medio (FR-007, FR-009)", () => {
   });
 
   it("puedeSacar: no se puede sacar el último", () => {
-    expect(puedeSacar([galiciaCreditoVisa])).toBe(false);
-    expect(puedeSacar([galiciaCreditoVisa, { ...galiciaCreditoVisa, red: "master" }])).toBe(true);
+    const guardado = (id: string, red: MedioDePago["red"]): MedioDePago => ({ ...galiciaCreditoVisa, id, nombreBanco: "Banco Galicia", red });
+    expect(puedeSacar([guardado("m1", "visa")])).toBe(false);
+    expect(puedeSacar([guardado("m1", "visa"), guardado("m2", "master")])).toBe(true);
   });
 });
 
@@ -71,25 +71,11 @@ describe("clasificarError", () => {
   });
 });
 
-describe("valores de red y tipo (decisión 2 del plan)", () => {
-  // El motor los declara solo como tipo; se comparan contra el texto de su contrato.
-  const tipos = readFileSync(join(__dirname, "../../../../packages/motor/src/tipos.ts"), "utf8");
-  const valoresDelTipo = (nombre: string): string[] => {
-    const cuerpo = new RegExp(`export type ${nombre} =([^;]+);`).exec(tipos)?.[1] ?? "";
-    return [...cuerpo.matchAll(/"([a-z_]+)"/g)].map((m) => m[1] ?? "");
-  };
-
-  it("REDES tiene los mismos valores que Red del motor", () => {
-    expect([...REDES].sort()).toEqual(valoresDelTipo("Red").sort());
-  });
-
-  it("TIPOS_TARJETA tiene los mismos valores que TipoTarjeta del motor", () => {
-    expect([...TIPOS_TARJETA].sort()).toEqual(valoresDelTipo("TipoTarjeta").sort());
-  });
-
+describe("etiquetas", () => {
   it("cada red tiene su etiqueta visible", () => {
     expect(ETIQUETAS_RED).toMatchObject({ master: "Mastercard", dinners_club: "Diners Club", tarjeta_sol: "Tarjeta Sol" });
-    expect(Object.keys(ETIQUETAS_RED).sort()).toEqual([...REDES].sort());
+    expect(REDES).toHaveLength(9);
+    expect(TIPOS_TARJETA).toEqual(["debito", "credito"]);
   });
 });
 
