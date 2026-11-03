@@ -1449,6 +1449,55 @@ usuario pasó al slice `sesion`.
 
 ---
 
+## 2026-11-02 — Perfil: plan alineado con ADR-010 y piezas base (issue #41)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (plan y tareas de la
+spec 001) y `gh` CLI.
+
+**Objetivo:** actualizar el plan de la #41, escrito el 25/10, con ADR-010 y
+con lo que dejó la #34 en `main`, e implementar lo que no depende de la #81
+(store de Redux) ni de la #40 (sesión).
+
+**Prompts principales:**
+1. "Actualizá `plan.md` y `tasks.md` de `specs/001-perfil-billeteras/` con
+   ADR-010 y con las tablas reales de la #34. Marcá qué fases quedan
+   bloqueadas y por qué issue. La spec no cambia."
+2. "Implementá test-first las fases que no dependen de la #81 ni de la #40:
+   modelo, buscador de bancos, acceso a Supabase con el cliente por
+   parámetro y el selector de banco, tipo y red. No conectes las pantallas:
+   eso lo reescribe la #81."
+3. "Corré lint, typecheck, test y build, y abrí el PR sin cerrar la issue."
+
+**Resultado:**
+- Plan y tareas actualizados:
+  - El perfil vive en el slice `perfil` de Redux, que lo persiste: se cayó
+    el cache propio de la feature (decisión 6).
+  - `Red` y `TipoTarjeta` se declaran con los valores del motor hasta que la
+    #81 sume `@vuelto/motor`; un test compara las dos listas (decisión 2).
+  - Perfil vacío: lo detecta el motor con `PerfilSinMediosError`, ya no la
+    Edge Function (decisión 4).
+  - Nueva decisión 9: `on_hub_list` es `boolean | null`, porque la tabla
+    `bancos` no lo tiene. Nunca se inventa un valor.
+  - Las fases 2b y 3 (conectar onboarding y Perfil) quedan bloqueadas por la
+    #81 y la #40.
+- Código en `apps/mobile/src/perfil/` (`modelo.ts`, `buscar-bancos.ts`,
+  `datos.ts`) y `components/selector-medio.tsx`. 33 tests nuevos.
+- Lo que encontró el plan al cruzarse con la #34:
+  - la tabla `bancos` no tiene `imagen` ni `on_hub_list`, así que US3
+    (bancos frecuentes primero) no se cumple con datos reales;
+  - las columnas son `user_id` y `creado_en`, no `usuario_id` y `creado`.
+- Errores de la IA en el proceso: el primer intento de editar el plan con un
+  script falló por las comillas en la terminal; se reescribió el archivo
+  entero.
+- Queda pendiente:
+  - Conectar el onboarding y Perfil (T008 a T011) cuando cierren la #81 y la
+    #40.
+  - Migración que sume `on_hub_list` (y `imagen`) a `bancos`, y que la
+    ingesta lo cargue.
+  - El selector no se probó en pantalla: todavía no lo usa ninguna.
+
+---
+
 ## 2026-11-02 — Sincronizar el corpus y las compras del período (issue #42)
 
 **Herramienta:** Claude Code (Sonnet 5.5), con spec-kit, `spec-critic`, `rules-guardian` y un Supabase local
@@ -1544,6 +1593,25 @@ la que no tiene dependencias (#75). Es una issue chica: va sin spec-kit.
 
 ---
 
+## 2026-11-03 — Fila de compra legible a 375 px
+
+**Herramienta:** Claude Code (Opus 5.5 / Sonnet 5.5), navegador integrado con `mobile-web`.
+
+**Objetivo:** que `CompraRow` no parta el nombre del comercio a mitad de palabra
+y se lea bien a 375 px, también con texto grande, sin cambiar lo que muestra.
+
+**Prompts principales:**
+1. «Arreglar el layout de `compra-row.tsx` a 375 px (Farmaci/ty, medio de pago en tres líneas), verificar con capturas antes y después.»
+
+**Resultado:**
+- Reproducido en «Mis compras» con viewport mobile. Causa: la columna derecha
+  (monto + reintegro) y el botón de borrar le dejaban poco ancho al bloque central.
+- Fila reorganizada: renglón 1 comercio + monto, renglón 2 medio de pago, renglón 3
+  origen (y marca de subida) + reintegro, que envuelve si no entra. Mismo contenido y
+  misma etiqueta de accesibilidad.
+- Verificado con texto escalado a 1,5× en el navegador. Lint, typecheck y tests en verde.
+- Errores de la IA: el primer intento dejó el medio de pago en tres líneas; se movió el
+  reintegro al renglón del origen.
 ## 2026-11-02 — Corpus de promociones sembrado a mano desde MODO (issue #35, parte de Supermercados y Farmacias)
 
 **Herramienta:** Claude Code (Sonnet 5.5), con spec-kit, el agente `spec-critic`, la CLI `gh`,
@@ -1713,6 +1781,54 @@ de MODO todos los días, sin nadie en el medio.
 
 ---
 
+## 2026-11-02 — Perfil: onboarding y Perfil conectados a Supabase (issue #41, fases 2b y 3)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** cerrar las fases 2b y 3 de la spec 001 ahora que la #81 (Redux) y
+la #40 (sesión) están en `main`, y antes revisar que nada contradiga ADR-010.
+
+**Prompts principales:**
+1. "Analizá #80 (ADR-010) y decime si hay algún cambio; si no, comenzá con las
+   fases 2b y 3."
+2. Ante el hallazgo de abajo, el PO eligió la opción A: el slice guarda el medio
+   completo.
+
+**Resultado:**
+- Hallazgo: el slice `perfil` guardaba solo ids del catálogo de ejemplo y el
+  motor, las vistas y las compras se apoyaban en ellos. Un medio real de
+  Supabase (UUID, banco de MODO) no se hubiera recomendado nunca.
+- `perfil.medios` pasa a ser la lista de `medios_de_pago` tal como la devuelve
+  Supabase (`id`, `bancoId`, `nombreBanco`, `tipo`, `red`). El motor la usa
+  directo (`medioDelMotor`) y las pantallas arman el nombre con `medioVista`
+  ("Galicia Visa crédito", "Crédito · Banco Galicia"). Sin catálogo aparte.
+- Los datos de ejemplo pasan a la misma forma (`mediosGuardados`), con los
+  mismos ids: las compras de ejemplo siguen coincidiendo y un test comprueba que
+  los textos no cambiaron. Lo guardado con ids viejos se migra una vez.
+- Thunks en `store/perfil-remoto.ts` (`leerMedios`, `confirmarMedios`,
+  `agregarMedio`, `sacarMedio`, `leerBancos`) sobre `perfil/datos.ts`, inyectado
+  en el store (`Extra.perfilRemoto`). Estado de la lectura (`carga`) en el
+  slice, sin persistir.
+- Onboarding: buscador de bancos, tipo y red; nada se guarda hasta «Confirmar»,
+  que manda todo en un pedido. Pestañas: si el celular no tiene medios, esperan
+  la lectura de Supabase y, si tampoco hay, mandan al onboarding.
+- Perfil: lista del slice, agregar, sacar (nunca el último) y modo solo lectura
+  sin conexión.
+- `Red` y `TipoTarjeta` salen del motor (T012).
+- Una compra con un medio que se sacó del perfil se sigue mostrando ("Medio que
+  sacaste de tu perfil"); antes desaparecía de «Mis compras».
+- Verificación: lint, typecheck, build y tests en verde (motor 192, app 222,
+  supabase 40). No se probó en Expo Go ni en el simulador.
+- Queda pendiente:
+  - T013: `rules-guardian`, `/code-review` y `test-runner`, y el PR.
+  - El seed de `bancos` tiene solo Galicia: los ~28 bancos los carga la ingesta
+    (#35), y faltan `imagen` y `on_hub_list` (US3).
+  - Un usuario que confirma sus medios y cierra la app antes de terminar el
+    onboarding, al volver salta comercios y primera respuesta (sus medios ya
+    están en Supabase).
+
+---
+
 ## 2026-11-03 — "Queda poco" al 30% del tope, como pide el diseño
 
 **Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
@@ -1775,6 +1891,30 @@ los arreglos chicos que quedaron del monto opcional (PR #87, de jeqm0302).
   una conversión repetida y un lugar que deducía el período leyendo un
   texto. 211 tests del motor, 385 de la app y 40 de la Edge Function en
   verde.
+
+---
+
+## 2026-11-03 — PR #98 al día con main (conflictos con el perfil del PR #100)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** que el PR #98 se pueda mergear después de que entró a `main` el
+perfil con los medios guardados del usuario (PR #100).
+
+**Prompts principales:**
+1. "Traete los últimos cambios al repo."
+2. "Revisás mi PR 98, que al parecer tenía conflictos con lo que está ahora en main?"
+
+**Resultado:**
+- Chocaban tres archivos. En el cálculo de la app, el PR #98 había borrado la
+  lista de promociones que servía para adivinar el banco, y el PR #100 la había
+  adaptado a los medios del perfil. Quedó borrada, como quería el PR #98, y la
+  pantalla usa los medios que guardó el usuario, como quería el PR #100.
+- Ahora "Sin promo para esta compra" aparece para los medios reales del perfil
+  del usuario, no para los de ejemplo.
+- En la bitácora quedaron las dos entradas, en orden de fecha.
+- Tests en verde: 213 del motor, 447 de la app, 40 de la Edge Function y 274
+  de la ingesta. Lint y typecheck en verde.
 
 ---
 
