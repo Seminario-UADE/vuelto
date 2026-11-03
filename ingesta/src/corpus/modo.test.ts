@@ -185,6 +185,34 @@ describe("crearClienteMODO — listado", () => {
   });
 });
 
+describe("crearClienteMODO — listado anterior por categoría", () => {
+  /** Una página del listado anterior (`/slots`), con `n` tarjetas. */
+  const paginaAnterior = (n: number) => ({ data: { cards: Array.from({ length: n }, (_, i) => ({ slug: `s${i}` })) } });
+
+  it("pide la categoría por id numérico a /slots y pagina hasta una página corta", async () => {
+    const respuestas = [paginaAnterior(100), paginaAnterior(7)];
+    let n = 0;
+    const { fn, pedidos } = fetchSimulado(() => json(respuestas[n++]));
+    const tarjetas = await crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).listarCategoria(4);
+    expect(tarjetas).toHaveLength(107);
+    const url = new URL(pedidos[1]!.url);
+    expect(url.pathname).toBe("/promos/api/rewards/slots");
+    expect(url.searchParams.get("categories")).toBe("4");
+    expect(url.searchParams.get("page")).toBe("2");
+  });
+
+  it("corta si el listado nunca termina", async () => {
+    const { fn } = fetchSimulado(() => json(paginaAnterior(100)));
+    const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {}, maxPaginas: 2 });
+    await expect(cliente.listarCategoria(1)).rejects.toThrow(/2 páginas/);
+  });
+
+  it("una respuesta sin data.cards es un error", async () => {
+    const { fn } = fetchSimulado(() => json({}));
+    await expect(crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).listarCategoria(1)).rejects.toThrow(/data\.cards/);
+  });
+});
+
 describe("crearClienteMODO — detalle y bancos", () => {
   it("pide el detalle por slug", async () => {
     const { fn, pedidos } = fetchSimulado(() => json({ slug: "x" }));

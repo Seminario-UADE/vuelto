@@ -5,7 +5,10 @@
  * de la web dice qué secciones muestra (carrusel, destacadas, supermercados,
  * más promos…) y cada sección se pide entera a `/v2/slots`. Leer una sola
  * sección deja afuera promos que la página sí muestra: las de Coto, Jumbo, Día
- * y otras cadenas grandes no están en «más promos».
+ * y otras cadenas grandes no están en «más promos». A la vez, el listado por
+ * categoría del endpoint anterior (`/slots`) trae algunas promos vigentes que la
+ * web ya no muestra en ninguna sección (por ejemplo, las de jubilados del BNA):
+ * el relevamiento usa los dos.
  *
  * Scraping respetuoso (RNF-13): User-Agent identificado y una pausa mínima de
  * 1 s entre pedidos. `fetch` y la espera se inyectan para que los tests no
@@ -46,6 +49,8 @@ export interface ClienteMODO {
   listarPagina(seccion: string, pagina: number): Promise<PaginaDeSeccion>;
   /** Todas las tarjetas de una sección, página por página. */
   listarSeccion(seccion: string): Promise<unknown[]>;
+  /** Todas las tarjetas de una categoría en el listado anterior (`/slots`, id numérico: el slug devuelve 0). */
+  listarCategoria(categoria: number): Promise<unknown[]>;
   /** Detalle de una promo (legales, tope estructurado, bancos por id). `null` si no existe. */
   detalle(slug: string): Promise<unknown | null>;
   /** Catálogo de bancos de MODO. */
@@ -140,6 +145,21 @@ export function crearClienteMODO(opciones: OpcionesMODO): ClienteMODO {
         if (pagina >= totalPaginas || tarjetas.length === 0) return todas;
       }
       throw new Error(`La sección ${seccion} pasó las ${maxPaginas} páginas sin terminar`);
+    },
+
+    async listarCategoria(categoria) {
+      const todas: unknown[] = [];
+      for (let pagina = 1; pagina <= maxPaginas; pagina++) {
+        const ruta = `/slots?slots=web-modo-hub-mas-promos&categories=${categoria}&page=${pagina}&limit=${POR_PAGINA}`;
+        const { cuerpo } = await pedir(ruta);
+        const tarjetas = (cuerpo as { data?: { cards?: unknown } } | null)?.data?.cards;
+        if (!Array.isArray(tarjetas)) {
+          throw new Error(`La respuesta de /slots (categoría ${categoria}, página ${pagina}) no trae data.cards`);
+        }
+        todas.push(...tarjetas);
+        if (tarjetas.length < POR_PAGINA) return todas;
+      }
+      throw new Error(`El listado de la categoría ${categoria} pasó las ${maxPaginas} páginas sin terminar`);
     },
 
     async detalle(slug) {

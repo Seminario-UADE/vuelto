@@ -29,12 +29,29 @@ function tarjeta(slug: string, o: OpcionesTarjeta = {}): Libre {
   };
 }
 
-/** Un cliente que sirve estas secciones, en este orden. */
-function clienteCon(listados: Record<string, Libre[]>, detalle: ClienteMODO["detalle"]): ClienteMODO {
+/** Tarjeta del listado anterior (`/slots`), que trae el slug, el id y el banco (fila 5) en otra forma. */
+function tarjetaAnterior(slug: string, extra: Libre = {}): Libre {
+  return {
+    slug,
+    promo_id: `promo-${slug}`,
+    calculated_status: "RUNNING",
+    trigger_type: "payment_promotion",
+    content: { row: [{ text: "Comercio" }, {}, {}, {}, {}, { text: "BNA" }] },
+    ...extra,
+  };
+}
+
+/** Un cliente que sirve estas secciones, en este orden, y opcionalmente el listado anterior por categoría. */
+function clienteCon(
+  listados: Record<string, Libre[]>,
+  detalle: ClienteMODO["detalle"],
+  porCategoria: Record<number, Libre[]> = {},
+): ClienteMODO {
   return {
     secciones: vi.fn(async () => Object.keys(listados)),
     listarPagina: vi.fn(),
     listarSeccion: vi.fn(async (s: string) => listados[s] ?? []),
+    listarCategoria: vi.fn(async (c: number) => porCategoria[c] ?? []),
     detalle,
     bancos: vi.fn(),
   };
@@ -47,11 +64,12 @@ function detalleDe(slug: string): Libre {
   return d;
 }
 
-function entorno(listados: Record<string, Libre[]>, sinDetalle: string[] = []) {
+function entorno(listados: Record<string, Libre[]>, sinDetalle: string[] = [], porCategoria: Record<number, Libre[]> = {}) {
   const escritos = new Map<string, string>();
   const cliente = clienteCon(
     listados,
     vi.fn(async (slug: string) => (sinDetalle.includes(slug) ? null : detalleDe(slug))),
+    porCategoria,
   );
   return {
     escritos,
@@ -107,6 +125,38 @@ describe("relevar", () => {
     const r = await relevar([1], deps);
     expect([...escritos.keys()].sort()).toEqual(["crudo/b.json", "crudo/coto.json"]);
     expect(r.candidatas).toBe(2);
+  });
+
+  it("suma las promos vigentes que solo trae el listado anterior por categoría y las informa", async () => {
+    const { deps, escritos } = entorno({ supermercados: [tarjeta("coto")] }, [], {
+      1: [tarjetaAnterior("coto", { promo_id: "promo-coto" }), tarjetaAnterior("jubilados-bna")],
+    });
+    const r = await relevar([1], deps);
+    expect([...escritos.keys()]).toEqual(["crudo/coto.json", "crudo/jubilados-bna.json"]);
+    expect(r.soloEnElListadoAnterior).toEqual(["jubilados-bna"]);
+    expect(r.porBanco).toEqual({ ICBC: 1, BNA: 1 });
+    // La promo que está en los dos guarda la tarjeta de la web.
+    expect((JSON.parse(escritos.get("crudo/coto.json")!) as Libre).tarjeta.card).toBeDefined();
+  });
+
+  it("del listado anterior descarta las vencidas y las que no son de pago, y la categoría es la pedida", async () => {
+    const { deps, escritos } = entorno({}, [], {
+      4: [
+        tarjetaAnterior("farma"),
+        tarjetaAnterior("vieja", { calculated_status: "FINISHED" }),
+        tarjetaAnterior("cuotas", { trigger_type: "installments" }),
+      ],
+    });
+    const r = await relevar([1, 4], deps);
+    expect([...escritos.keys()]).toEqual(["crudo/farma.json"]);
+    expect(r.porCategoria).toEqual({ 1: 0, 4: 1 });
+    expect(r.descartadas).toEqual({ noVigente: 1, noEsReintegro: 1, otraCategoria: 0 });
+  });
+
+  it("una tarjeta del listado anterior con slug inválido lanza antes de escribir", async () => {
+    const { deps, escritos } = entorno({ s: [tarjeta("a")] }, [], { 1: [tarjetaAnterior("../x")] });
+    await expect(relevar([1], deps)).rejects.toThrow(/categoría 1.*slug/);
+    expect(escritos.size).toBe(0);
   });
 
   it("guarda { capturadoEl, url, tarjeta, detalle } y cuenta por banco", async () => {
@@ -230,6 +280,7 @@ describe("codigoDeSalida", () => {
     porCategoria: {},
     porBanco: {},
     secciones: [],
+    soloEnElListadoAnterior: [],
     descartadas: { noVigente: 0, noEsReintegro: 0, otraCategoria: 0 },
     detalleInexistente: [],
     detalleConError: [],
