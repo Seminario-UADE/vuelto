@@ -10,11 +10,11 @@ Baja todas las secciones que muestra hoy la web de promos de MODO, se queda con 
 
 | Aspecto | Garantía |
 |---|---|
-| Red | `GET /promos/api/rewards/slots-container/active` y `/slots-container/<contenedor>` (las secciones de la web), `GET /promos/api/rewards/v2/slots?ids=<sección>&page=<n>&limit=100` (cada sección, hasta `pagination.total_pages`) y `GET /promos/api/rewards/v2/benefit/<slug>`. Leer una sola sección deja afuera promos que la web muestra (`docs/product/fuentes-promos.md`) |
+| Red | `GET /promos/api/rewards/slots-container/active` y `/slots-container/<contenedor>` (las secciones de la web), `GET /promos/api/rewards/v2/slots?ids=<sección>&page=<n>&limit=100` (cada sección, hasta `pagination.total_pages`), además `GET /promos/api/rewards/slots?...&categories=<id>&page=<n>&limit=100` (el listado anterior por categoría, que trae algunas promos vigentes que la web no muestra) y `GET /promos/api/rewards/v2/benefit/<slug>`. Leer una sola sección deja afuera promos que la web muestra (`docs/product/fuentes-promos.md`) |
 | Ritmo | User-Agent `VueltoBot (UADE)`; pausa configurable con `--pausa-ms`, mínimo 1000 |
-| Filtro | `calculated_status = RUNNING`, `benefit.type = cashback` (descarta cuotas y sorteos) y alguna de las categorías pedidas en `offer.categories` |
-| Identidad | Dos tarjetas con el mismo `benefit.publication.slug` o `benefit.id` son la misma promo, aunque estén en secciones distintas |
-| Salida | `supabase/seed/crudo/<slug>.json` y un resumen por consola (secciones recorridas, candidatas, por categoría y por banco, y descartadas por no vigente, no reintegro u otra categoría) |
+| Filtro | `calculated_status = RUNNING`; reintegro (`benefit.type = cashback` en `/v2/slots`, `trigger_type = payment_promotion` en `/slots`); y alguna de las categorías pedidas (`offer.categories`, o la categoría del listado anterior) |
+| Identidad | Dos tarjetas con el mismo slug o el mismo id de beneficio (`benefit.id` = `promo_id`) son la misma promo, aunque estén en secciones o listados distintos; se guarda la tarjeta de la web |
+| Salida | `supabase/seed/crudo/<slug>.json` y un resumen por consola (secciones recorridas, las que solo están en el listado anterior, candidatas, por categoría y por banco, y descartadas por no vigente, no reintegro u otra categoría) |
 | Fallo | Cada crudo se escribe completo o no se escribe. Un 404 del detalle se cuenta en `detalleInexistente`; un error de servidor o de red que no se recupera tras los reintentos se registra en `detalleConError` y no frena a las demás, pero el comando **sale con código 1** porque el relevamiento quedó incompleto. Un formato que el mapeo no reconoce se informa con su ruta y no invalida el crudo (se guarda para poder reproducirlo) |
 | Idempotencia | Repetirlo el mismo día reescribe los mismos archivos |
 

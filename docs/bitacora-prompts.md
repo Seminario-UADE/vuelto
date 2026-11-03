@@ -1608,6 +1608,9 @@ ser que Coto, Jumbo, Disco, Vea y Día no tuvieran ninguna promo vigente.
 - `modo.ts` lee el contenedor activo, sus secciones y cada sección página por página; `relevar.ts` filtra
   vigentes, reintegros y categoría con los campos de la tarjeta nueva, y cuenta una vez la promo que aparece
   en varias secciones. `crudo.ts` lee comercio y banco de la tarjeta nueva y de la anterior.
+- Al regenerar #93 apareció el caso inverso: 4 promos vigentes según su detalle (farmacias para jubilados
+  del BNA, Grupo Farmacity con Hipotecario, Lácteos El Puente con Macro) que la web no muestra en ninguna
+  sección pero el listado anterior sí. El relevamiento usa los dos listados y junta por slug o id.
 - Las conclusiones de #93 sobre supermercados quedan inválidas: hay que volver a relevar.
 - **Error de la sesión anterior:** en el review de #92/#93 verifiqué que las cifras de los documentos
   coincidieran con los crudos, pero no que los crudos estuvieran completos.
