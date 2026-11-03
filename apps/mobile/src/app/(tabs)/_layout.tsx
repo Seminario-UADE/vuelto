@@ -1,7 +1,9 @@
 import { Redirect, Tabs } from "expo-router";
-import { Text } from "react-native";
+import { EmptyState } from "@/components/empty-state";
+import { Text, View } from "react-native";
 import { Icon, type IconName } from "@/components/icon";
-import { useAppSelector } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { leerMedios } from "@/store/perfil-remoto";
 import { colors, floatingShadow, fonts } from "@/theme";
 
 const tab = (title: string, icon: IconName) => ({
@@ -27,10 +29,30 @@ const tab = (title: string, icon: IconName) => ({
 export default function TabsLayout() {
   const usuario = useAppSelector((s) => s.sesion.usuario);
   const perfil = useAppSelector((s) => s.perfil);
+  const dispatch = useAppDispatch();
   // Toda la app está detrás de la sesión: sin usuario, a Bienvenida (crear cuenta o entrar).
   if (!usuario) return <Redirect href="/bienvenida" />;
-  // Usuario nuevo, sin medios: directo al onboarding de perfil.
-  if (!perfil.onboardingCompleto || perfil.medios.length === 0) return <Redirect href="/medios" />;
+  const sinMedios = !perfil.onboardingCompleto || perfil.medios.length === 0;
+  // Entra en un celular sin nada guardado: hasta saber si ya tiene medios en Supabase no se decide
+  // (si los tiene, no repite el onboarding).
+  if (sinMedios && (perfil.carga === "sin-leer" || perfil.carga === "leyendo")) {
+    return <View style={{ flex: 1, backgroundColor: colors.canvas }} />;
+  }
+  // No se pudo leer y no hay nada guardado: no se sabe si tiene medios en Supabase, así que no se lo
+  // manda a repetir el onboarding (FR-010: ni carga infinita ni redirección a ciegas).
+  if (sinMedios && (perfil.carga === "sin-conexion" || perfil.carga === "error")) {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.canvas, justifyContent: "center" }}>
+        <EmptyState
+          title="No pudimos cargar tu perfil"
+          body="Necesitamos conexión para leer tus medios de pago."
+          action={{ label: "Reintentar", onPress: () => void dispatch(leerMedios()) }}
+        />
+      </View>
+    );
+  }
+  // Sin medios en el perfil: al onboarding, sin salida hasta confirmar (issue #41, T009).
+  if (sinMedios) return <Redirect href="/medios" />;
   return (
     <Tabs
       screenOptions={{

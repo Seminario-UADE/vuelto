@@ -8,6 +8,8 @@
 import { RUBROS } from "../lib/rubros";
 import type { Compra as CompraMotor, Dia, MedioDePago as MedioMotor, Promocion } from "@vuelto/motor";
 import type { Comercio, Contacto, MedioDePago, Rubro } from "./contracts";
+import type { MedioDePago as MedioGuardado } from "../perfil/modelo";
+import { medioDelMotor } from "../perfil/vista";
 
 /**
  * Reloj de los datos de ejemplo: miércoles 14 de octubre de 2026 al mediodía de Argentina
@@ -122,16 +124,43 @@ export const comercios = {
 export const catalogoComercios: Comercio[] = Object.values(comercios);
 
 /**
- * Medios del catálogo con la forma del motor (data-model.md §Medios). Mercado Pago no está:
- * es una billetera sin banco ni red, y el motor no puede evaluarla sin inventarlos.
+ * Los medios de ejemplo con la forma que guarda el slice `perfil` (issue #41): la misma que
+ * devuelve `medios_de_pago`. Los `bancoId` son slugs porque el corpus de ejemplo los usa así; los
+ * de la base son UUID de MODO. `medioVista` arma con ellos los textos de `medios`.
  */
-export const mediosDelMotor: Record<string, MedioMotor> = {
-  [medios.galicia.id]: { id: medios.galicia.id, bancoId: "galicia", tipo: "credito", red: "visa" },
-  [medios.santander.id]: { id: medios.santander.id, bancoId: "santander", tipo: "credito", red: "master" },
-  [medios.provincia.id]: { id: medios.provincia.id, bancoId: "provincia", tipo: "debito", red: "visa" },
-  [medios.macro.id]: { id: medios.macro.id, bancoId: "macro", tipo: "debito", red: "visa" },
-  [medios.bbva.id]: { id: medios.bbva.id, bancoId: "bbva", tipo: "credito", red: "visa" },
-};
+export const mediosGuardados = {
+  galicia: { id: medios.galicia.id, bancoId: "galicia", nombreBanco: "Banco Galicia", tipo: "credito", red: "visa" },
+  santander: {
+    id: medios.santander.id,
+    bancoId: "santander",
+    nombreBanco: "Banco Santander",
+    tipo: "credito",
+    red: "master",
+  },
+  provincia: {
+    id: medios.provincia.id,
+    bancoId: "provincia",
+    nombreBanco: "Banco Provincia",
+    tipo: "debito",
+    red: "visa",
+  },
+  macro: { id: medios.macro.id, bancoId: "macro", nombreBanco: "Banco Macro", tipo: "debito", red: "visa" },
+  bbva: { id: medios.bbva.id, bancoId: "bbva", nombreBanco: "BBVA", tipo: "credito", red: "visa" },
+} satisfies Record<string, MedioGuardado>;
+
+/** Los medios de ejemplo guardados con esos ids; los que no existen quedan afuera. */
+export function mediosDeEjemplo(ids: readonly string[]): MedioGuardado[] {
+  const todos: MedioGuardado[] = Object.values(mediosGuardados);
+  return ids.flatMap((id) => todos.filter((m) => m.id === id));
+}
+
+/**
+ * Medios de ejemplo con la forma del motor (data-model.md §Medios). Mercado Pago no está: es una
+ * billetera sin banco ni red, y el motor no puede evaluarla sin inventarlos.
+ */
+export const mediosDelMotor: Record<string, MedioMotor> = Object.fromEntries(
+  Object.values(mediosGuardados).map((m) => [m.id, medioDelMotor(m)]),
+);
 
 const promo = (
   id: string,

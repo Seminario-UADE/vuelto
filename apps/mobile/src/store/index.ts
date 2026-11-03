@@ -10,6 +10,7 @@ import {
   type UnknownAction,
 } from "@reduxjs/toolkit";
 import type { Subida } from "../data/compras/repositorio";
+import type { DatosPerfil } from "../perfil/datos";
 import type { RepositorioSincronizacion } from "../sync/contratos";
 import { cola, escucharPersistenciaCola } from "./cola";
 import { compras } from "./compras";
@@ -45,6 +46,8 @@ export type Extra = {
   subida: Subida | null;
   /** `null` = no hay cliente de Supabase (variables faltantes): no se sincroniza. */
   repositorio: RepositorioSincronizacion | null;
+  /** Lee y escribe los medios del perfil en Supabase (issue #41); `null` sin cliente de Supabase. */
+  perfilRemoto: DatosPerfil | null;
   /** El reloj real. La app: `() => new Date()`. Los tests lo controlan (spec 009 R2). */
   reloj: () => Date;
   coordinacion: Coordinacion;
@@ -56,6 +59,7 @@ export function crearStore(opciones: {
   generarId: () => string;
   subida?: Subida | null;
   repositorio?: RepositorioSincronizacion | null;
+  perfilRemoto?: DatosPerfil | null;
   reloj?: () => Date;
 }) {
   const listener = createListenerMiddleware<RootState>();
@@ -64,6 +68,7 @@ export function crearStore(opciones: {
     generarId: opciones.generarId,
     subida: opciones.subida ?? null,
     repositorio: opciones.repositorio ?? null,
+    perfilRemoto: opciones.perfilRemoto ?? null,
     reloj: opciones.reloj ?? (() => new Date()),
     coordinacion: { enVuelo: false, ultimoIntentoMs: null },
   };
