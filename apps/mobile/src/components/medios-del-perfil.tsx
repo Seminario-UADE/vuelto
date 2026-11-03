@@ -37,8 +37,10 @@ export function MediosDelPerfil() {
     void dispatch(leerMedios());
   }, [dispatch]);
 
-  const sinConexion = carga === "sin-conexion";
-  const sePuedeSacar = !sinConexion && puedeSacar(guardados);
+  // Solo se edita con la lectura al día: sin conexión, con error o leyendo queda en solo lectura (FR-010).
+  const sinConexion = carga === "sin-conexion" || carga === "error";
+  const editable = carga === "lista";
+  const sePuedeSacar = editable && puedeSacar(guardados);
 
   const agregar = async (m: MedioNuevo) => {
     setEnviando(true);
@@ -62,7 +64,7 @@ export function MediosDelPerfil() {
       <SectionHeader
         title="Tus medios de pago"
         action={
-          sinConexion
+          !editable
             ? undefined
             : {
                 label: agregando ? "Cancelar" : "Agregar",
@@ -94,13 +96,13 @@ export function MediosDelPerfil() {
               key={m.id}
               medio={m}
               indice={i}
-              onQuitar={sinConexion ? undefined : () => void sacar(m.id)}
+              onQuitar={!editable ? undefined : () => void sacar(m.id)}
               quitarDeshabilitado={!sePuedeSacar || enviando}
             />
           ))}
         </Card>
       )}
-      {!sinConexion && guardados.length === 1 ? (
+      {editable && guardados.length === 1 ? (
         <Text variant="label" tone="inkSecondary">
           Necesitás al menos un medio: agregá otro antes de sacar este.
         </Text>
@@ -110,7 +112,7 @@ export function MediosDelPerfil() {
           {error}
         </Text>
       ) : null}
-      {agregando && !sinConexion ? (
+      {agregando && editable ? (
         <Card padding={space.lg} gap={space.md}>
           {bancos.datos ? (
             <SelectorMedio bancos={bancos.datos} medios={guardados} onAgregar={(m) => void agregar(m)} />

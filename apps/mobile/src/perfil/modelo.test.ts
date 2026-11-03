@@ -55,6 +55,7 @@ describe("clasificarError", () => {
 
   it("23503 es un banco que ya no está", () => {
     expect(clasificarError({ status: 409, code: "23503" })).toBe("banco_inexistente");
+    expect(clasificarError({ status: 400, code: "VM001" })).toBe("ultimo_medio");
   });
 
   it("401 es la sesión vencida", () => {

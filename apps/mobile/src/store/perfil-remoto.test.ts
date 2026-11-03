@@ -89,6 +89,27 @@ describe("leerMedios (T009, T011)", () => {
     expect(s.getState().perfil.carga).toBe("error");
   });
 
+  it("una lectura que salió antes de una escritura no la pisa", async () => {
+    let soltar!: () => void;
+    const r = remoto();
+    r.datos.leerMisMedios = () => new Promise((res) => (soltar = () => res(ok([guardado("m1")]))));
+    const s = armar(r);
+    s.dispatch(mediosConfirmados([guardado("m1")]));
+    const lectura = s.dispatch(leerMedios());
+    await s.dispatch(agregarMedio({ ...nuevo, red: "master" }));
+    soltar();
+    await lectura;
+    expect(s.getState().perfil.medios.map((m) => m.id)).toEqual(["m1", "m2"]);
+    expect(s.getState().perfil.carga).toBe("lista");
+  });
+
+  it("sin Supabase pasa a sin-conexion: las pestañas no esperan para siempre", async () => {
+    const s = storeDePrueba(null, memoria(), {});
+    s.dispatch(usuarioCambio({ id: "u1", email: "ana@mail.com" }));
+    await s.dispatch(leerMedios());
+    expect(s.getState().perfil.carga).toBe("sin-conexion");
+  });
+
   it("sin usuario no pide nada", async () => {
     const r = remoto();
     const s = armar(r, false);
@@ -169,6 +190,18 @@ describe("agregarMedio y sacarMedio (T010)", () => {
     s.dispatch(mediosConfirmados([guardado("m1"), guardado("m2", "master")]));
     expect(await s.dispatch(sacarMedio("m1"))).toEqual({ ok: false, error: "sin_conexion" });
     expect(s.getState().perfil.medios).toHaveLength(2);
+    expect(s.getState().perfil.carga).toBe("sin-conexion");
+  });
+
+  it("si cambió la cuenta mientras volaba el pedido, no se guarda en el slice nuevo", async () => {
+    const r = remoto();
+    const s = armar(r);
+    r.datos.confirmarOnboarding = async () => {
+      s.dispatch(usuarioCambio({ id: "u2", email: "otra@mail.com" }));
+      return ok([guardado("m1")]);
+    };
+    expect((await s.dispatch(confirmarMedios([nuevo]))).ok).toBe(false);
+    expect(s.getState().perfil.medios).toEqual([]);
   });
 });
 

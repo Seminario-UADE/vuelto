@@ -56,8 +56,12 @@ ADR-010, RNF-02, ADR-009, contrato de tipos #33). La spec no cambia.
 3. **La integridad está en la base, no en la pantalla.** El `unique` de la tripleta (FR-004)
    también protege contra dos dispositivos o un doble toque. `not null` y `check` cubren FR-005
    y FR-011. La app no usa `update`: la spec solo pide agregar y sacar.
-4. **"Al menos un medio" lo controla la app** (FR-007, FR-009). Un trigger en la base frenaría
-   el borrado en cascada al eliminar la cuenta. Si el perfil igual queda vacío, el motor lanza
+4. **"Al menos un medio": la app lo evita y la base lo garantiza** (FR-007, FR-009). La app no
+   ofrece sacar el último, pero mira su copia local: con dos dispositivos se podría borrar. La
+   migración `20261103000001` agrega un trigger por sentencia (`VM001`) que rechaza un `DELETE`
+   que deje a un usuario sin medios, salvo que el usuario ya no exista, así que el borrado en
+   cascada al eliminar la cuenta pasa (cubierto en `medios_minimo_uno.test.sql`). Crear el primer
+   medio no lo toca: FR-007 sigue siendo de la app. Si el perfil igual queda vacío, el motor lanza
    `PerfilSinMediosError` en el selector de recomendación (#43) y la app lleva al onboarding.
 5. **El onboarding se guarda en un solo `insert` de varias filas** (FR-011): entra todo o nada.
    Desde Perfil, cada alta o baja es un pedido aparte.

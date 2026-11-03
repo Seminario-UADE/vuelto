@@ -84,7 +84,12 @@ export function crearDatosPerfil(cliente: SupabaseClient) {
       ejecutar(medios().insert(aFila(nuevo)).select(COLUMNAS_MEDIO).single(), (data) => aMedio(data as FilaMedio)),
 
     /** Llamar solo si `puedeSacar` (FR-009). */
-    sacarMedio: (id: string): Promise<Resultado<null>> => ejecutar(medios().delete().eq("id", id), () => null),
+    sacarMedio: async (id: string): Promise<Resultado<null>> => {
+      const r = await ejecutar(medios().delete().eq("id", id).select("id"), (data) => (data as unknown[]).length);
+      if (!r.ok) return r;
+      // El RLS no avisa si no tocó ninguna fila: sin fila borrada no se da por sacado.
+      return r.datos > 0 ? { ok: true, datos: null } : { ok: false, error: "otro" };
+    },
 
     // Comercios habituales (issue #47): solo el nombre; `user_id` lo pone la base.
     leerMisComercios: (): Promise<Resultado<ComercioHabitual[]>> =>
