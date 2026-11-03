@@ -1596,6 +1596,8 @@ la que no tiene dependencias (#75). Es una issue chica: va sin spec-kit.
   descartadas plegadas (DESIGN.md §6 pide lo contrario: visibles), el botón
   dice «Usar Galicia» y no «Pagué con esto» (DESIGN.md §5) y la fecha de
   sincronización no aparece en la pantalla del comercio.
+- Decisión del PO: el PR #95 queda con «Refs #43» y no cierra la issue
+  hasta resolver esos criterios.
 
 ---
 
