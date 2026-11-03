@@ -17,7 +17,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { normalizar } from "@vuelto/motor";
 import { ejecutarComoScript, hoyEnArgentina, parsearArgumentos, raizDelRepo } from "./args.ts";
-import { FILA_BANCO, FILA_COMERCIO, legalDelCrudo, slugDelCrudo, textoDeLaFila } from "./crudo.ts";
+import { bancoDeLaTarjeta, comercioDeLaTarjeta, legalDelCrudo, slugDelCrudo } from "./crudo.ts";
 import { slugBase } from "./ids.ts";
 import { leerInsumos } from "./insumos.ts";
 import { intentarMapear } from "./mapear.ts";
@@ -132,8 +132,8 @@ export function listaDeRevision(crudos: readonly Crudo[], opciones: OpcionesMape
   const items: ItemDeRevision[] = crudos.map((crudo) => {
     const item: ItemDeRevision = {
       slug: slugDelCrudo(crudo) ?? "(sin slug)",
-      comercio: textoDeLaFila(crudo.tarjeta, FILA_COMERCIO) ?? "(sin comercio)",
-      banco: textoDeLaFila(crudo.tarjeta, FILA_BANCO) ?? "(sin banco)",
+      comercio: comercioDeLaTarjeta(crudo.tarjeta) ?? "(sin comercio)",
+      banco: bancoDeLaTarjeta(crudo.tarjeta) ?? "(sin banco)",
       entradas: 0,
       exclusion: null,
       error: null,

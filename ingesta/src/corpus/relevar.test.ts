@@ -12,15 +12,31 @@ function fixture(nombre: string): Crudo {
 
 type Libre = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-/** Tarjeta del listado mínima, con el estado, el tipo y el banco (fila 5) que usa el relevamiento. */
-function tarjeta(slug: string, extra: Libre = {}): Libre {
+interface OpcionesTarjeta {
+  estado?: string;
+  tipo?: string;
+  categorias?: string[];
+  promoId?: string;
+}
+
+/** Tarjeta de `/v2/slots` mínima, con lo que usa el relevamiento: slug, id, estado, tipo, categorías y banco. */
+function tarjeta(slug: string, o: OpcionesTarjeta = {}): Libre {
   return {
-    slug,
-    promo_id: `promo-${slug}`,
-    calculated_status: "RUNNING",
-    trigger_type: "payment_promotion",
-    content: { row: [{ text: "Comercio" }, {}, {}, {}, {}, { text: "ICBC" }] },
-    ...extra,
+    card: { validity_place: "Comercio", participating_bank: "ICBC" },
+    benefit: { id: o.promoId ?? `promo-${slug}`, type: o.tipo ?? "cashback", publication: { slug } },
+    offer: { categories: o.categorias ?? ["1"] },
+    calculated_status: o.estado ?? "RUNNING",
+  };
+}
+
+/** Un cliente que sirve estas secciones, en este orden. */
+function clienteCon(listados: Record<string, Libre[]>, detalle: ClienteMODO["detalle"]): ClienteMODO {
+  return {
+    secciones: vi.fn(async () => Object.keys(listados)),
+    listarPagina: vi.fn(),
+    listarSeccion: vi.fn(async (s: string) => listados[s] ?? []),
+    detalle,
+    bancos: vi.fn(),
   };
 }
 
@@ -31,14 +47,12 @@ function detalleDe(slug: string): Libre {
   return d;
 }
 
-function entorno(listados: Record<number, Libre[]>, sinDetalle: string[] = []) {
+function entorno(listados: Record<string, Libre[]>, sinDetalle: string[] = []) {
   const escritos = new Map<string, string>();
-  const cliente: ClienteMODO = {
-    listarPagina: vi.fn(),
-    listarCategoria: vi.fn(async (c: number) => listados[c] ?? []),
-    detalle: vi.fn(async (slug: string) => (sinDetalle.includes(slug) ? null : detalleDe(slug))),
-    bancos: vi.fn(),
-  };
+  const cliente = clienteCon(
+    listados,
+    vi.fn(async (slug: string) => (sinDetalle.includes(slug) ? null : detalleDe(slug))),
+  );
   return {
     escritos,
     deps: {
@@ -53,46 +67,62 @@ function entorno(listados: Record<number, Libre[]>, sinDetalle: string[] = []) {
 }
 
 describe("relevar", () => {
-  it("se queda con las promos vigentes de tipo pago y descarta cuotas y sorteos", async () => {
+  it("recorre todas las secciones que informa la web, en su orden", async () => {
+    const { deps, escritos } = entorno({ carrusel: [tarjeta("a")], supermercados: [tarjeta("b")], "mas-promos": [tarjeta("c")] });
+    const r = await relevar([1], deps);
+    expect(r.secciones).toEqual(["carrusel", "supermercados", "mas-promos"]);
+    expect([...escritos.keys()]).toEqual(["crudo/a.json", "crudo/b.json", "crudo/c.json"]);
+  });
+
+  it("se queda con los reintegros vigentes y descarta cuotas, sorteos y vencidas", async () => {
     const { deps, escritos } = entorno({
-      1: [
+      seccion: [
         tarjeta("a"),
-        tarjeta("b", { calculated_status: "FINISHED" }),
-        tarjeta("c", { trigger_type: "installments" }),
-        tarjeta("d", { trigger_type: "payment_scratch" }),
+        tarjeta("b", { estado: "FINISHED" }),
+        tarjeta("c", { tipo: "financing" }),
+        tarjeta("d", { tipo: "payment_scratch" }),
       ],
     });
     const r = await relevar([1], deps);
     expect([...escritos.keys()]).toEqual(["crudo/a.json"]);
     expect(r.candidatas).toBe(1);
-    expect(r.descartadas).toEqual({ noVigente: 1, noEsPago: 2 });
+    expect(r.descartadas).toEqual({ noVigente: 1, noEsReintegro: 2, otraCategoria: 0 });
   });
 
-  it("dos tarjetas con el mismo slug o promo_id cuentan una vez, también entre categorías", async () => {
+  it("filtra por las categorías pedidas y cuenta una promo en cada categoría pedida que tiene", async () => {
     const { deps, escritos } = entorno({
-      1: [tarjeta("a"), tarjeta("a", { id: "otra-tarjeta" }), tarjeta("b", { promo_id: "mismo" })],
-      4: [tarjeta("a"), tarjeta("c", { promo_id: "mismo" })],
+      seccion: [tarjeta("super"), tarjeta("farma", { categorias: ["4"] }), tarjeta("ambas", { categorias: ["1", "4"] }), tarjeta("nafta", { categorias: ["8"] })],
     });
     const r = await relevar([1, 4], deps);
-    expect([...escritos.keys()].sort()).toEqual(["crudo/a.json", "crudo/b.json"]);
+    expect([...escritos.keys()].sort()).toEqual(["crudo/ambas.json", "crudo/farma.json", "crudo/super.json"]);
+    expect(r.porCategoria).toEqual({ 1: 2, 4: 2 });
+    expect(r.descartadas.otraCategoria).toBe(1);
+  });
+
+  it("una promo que aparece en varias secciones (mismo slug o mismo id de beneficio) cuenta una vez", async () => {
+    const { deps, escritos } = entorno({
+      carrusel: [tarjeta("coto"), tarjeta("b", { promoId: "mismo" })],
+      supermercados: [tarjeta("coto"), tarjeta("c", { promoId: "mismo" })],
+    });
+    const r = await relevar([1], deps);
+    expect([...escritos.keys()].sort()).toEqual(["crudo/b.json", "crudo/coto.json"]);
     expect(r.candidatas).toBe(2);
-    expect(r.porCategoria).toEqual({ 1: 2, 4: 0 });
   });
 
   it("guarda { capturadoEl, url, tarjeta, detalle } y cuenta por banco", async () => {
-    const { deps, escritos } = entorno({ 1: [tarjeta("a"), tarjeta("b")] });
+    const { deps, escritos } = entorno({ seccion: [tarjeta("a"), tarjeta("b")] });
     const r = await relevar([1], deps);
     const guardado = JSON.parse(escritos.get("crudo/a.json")!) as Libre;
     expect(guardado.capturadoEl).toBe("2026-11-02");
     expect(guardado.url).toBe("https://www.modo.com.ar/promos/api/rewards/v2/benefit/a");
-    expect(guardado.tarjeta.slug).toBe("a");
+    expect(guardado.tarjeta.benefit.publication.slug).toBe("a");
     expect(guardado.detalle.slug).toBe("a");
     expect(escritos.get("crudo/a.json")!.endsWith("\n")).toBe(true);
     expect(r.porBanco).toEqual({ ICBC: 2 });
   });
 
   it("un detalle inexistente se informa y no escribe nada", async () => {
-    const { deps, escritos } = entorno({ 1: [tarjeta("a"), tarjeta("b")] }, ["b"]);
+    const { deps, escritos } = entorno({ seccion: [tarjeta("a"), tarjeta("b")] }, ["b"]);
     const r = await relevar([1], deps);
     expect(r.detalleInexistente).toEqual(["b"]);
     expect([...escritos.keys()]).toEqual(["crudo/a.json"]);
@@ -100,15 +130,13 @@ describe("relevar", () => {
 
   it("si el detalle de una promo falla, lo registra y sigue con las demás", async () => {
     const escritos = new Map<string, string>();
-    const cliente: ClienteMODO = {
-      listarPagina: vi.fn(),
-      listarCategoria: vi.fn(async () => [tarjeta("a"), tarjeta("b"), tarjeta("c")]),
-      detalle: vi.fn(async (slug: string) => {
+    const cliente = clienteCon(
+      { seccion: [tarjeta("a"), tarjeta("b"), tarjeta("c")] },
+      vi.fn(async (slug: string) => {
         if (slug === "b") throw new Error("MODO respondió 500 en .../benefit/b");
         return detalleDe(slug);
       }),
-      bancos: vi.fn(),
-    };
+    );
     const r = await relevar([1], {
       cliente,
       escribir: (ruta, contenido) => void escritos.set(ruta, contenido),
@@ -122,7 +150,7 @@ describe("relevar", () => {
   });
 
   it("repetirlo escribe exactamente lo mismo", async () => {
-    const { deps, escritos } = entorno({ 1: [tarjeta("a")] });
+    const { deps, escritos } = entorno({ seccion: [tarjeta("a")] });
     await relevar([1], deps);
     const primera = escritos.get("crudo/a.json");
     await relevar([1], deps);
@@ -130,29 +158,27 @@ describe("relevar", () => {
   });
 
   it("un slug que no es seguro como nombre de archivo lanza antes de escribir", async () => {
-    const { deps, escritos } = entorno({ 1: [tarjeta("../../etc/passwd")] });
+    const { deps, escritos } = entorno({ seccion: [tarjeta("../../etc/passwd")] });
     await expect(relevar([1], deps)).rejects.toThrow(/slug/);
     expect(escritos.size).toBe(0);
   });
 
   it("una tarjeta sin slug lanza", async () => {
-    const { deps } = entorno({ 1: [{ calculated_status: "RUNNING", trigger_type: "payment_promotion" }] });
+    const { deps } = entorno({ seccion: [{ calculated_status: "RUNNING", benefit: { type: "cashback" } }] });
     await expect(relevar([1], deps)).rejects.toThrow(/slug/);
   });
 
   it("informa cuántas promos mapean a borrador, cuántas a exclusión y cuáles fallan", async () => {
     const escritos = new Map<string, string>();
-    const cliente: ClienteMODO = {
-      listarPagina: vi.fn(),
-      listarCategoria: vi.fn(async () => [tarjeta("ok"), tarjeta("fuera"), tarjeta("rota")]),
-      detalle: vi.fn(async (slug: string) => {
+    const cliente = clienteCon(
+      { seccion: [tarjeta("ok"), tarjeta("fuera"), tarjeta("rota")] },
+      vi.fn(async (slug: string) => {
         const d = detalleDe(slug);
         if (slug === "fuera") d.offers[0].requirements.banks.list = [];
         if (slug === "rota") d.conditions.schedule.days_of_week = ["someday"];
         return d;
       }),
-      bancos: vi.fn(),
-    };
+    );
     const r = await relevar([1], {
       cliente,
       escribir: (ruta, contenido) => void escritos.set(ruta, contenido),
@@ -203,7 +229,8 @@ describe("codigoDeSalida", () => {
     candidatas: 1,
     porCategoria: {},
     porBanco: {},
-    descartadas: { noVigente: 0, noEsPago: 0 },
+    secciones: [],
+    descartadas: { noVigente: 0, noEsReintegro: 0, otraCategoria: 0 },
     detalleInexistente: [],
     detalleConError: [],
     mapeo: { borradores: 1, exclusiones: [], errores: [] },

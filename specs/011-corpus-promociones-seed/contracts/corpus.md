@@ -6,15 +6,15 @@ Todos los comandos son scripts del workspace `ingesta`, se corren desde la raíz
 
 ## `npm run corpus:relevar -w ingesta -- --categorias 1,4`
 
-Baja el listado de MODO de las categorías indicadas, se queda con las promos vigentes de tipo pago, baja el detalle de cada una y guarda el crudo.
+Baja todas las secciones que muestra hoy la web de promos de MODO, se queda con los reintegros vigentes de las categorías indicadas, baja el detalle de cada uno y guarda el crudo.
 
 | Aspecto | Garantía |
 |---|---|
-| Red | `GET /promos/api/rewards/slots?...&categories=<id>&page=<n>&limit=100` y `GET /promos/api/rewards/v2/benefit/<slug>` |
+| Red | `GET /promos/api/rewards/slots-container/active` y `/slots-container/<contenedor>` (las secciones de la web), `GET /promos/api/rewards/v2/slots?ids=<sección>&page=<n>&limit=100` (cada sección, hasta `pagination.total_pages`) y `GET /promos/api/rewards/v2/benefit/<slug>`. Leer una sola sección deja afuera promos que la web muestra (`docs/product/fuentes-promos.md`) |
 | Ritmo | User-Agent `VueltoBot (UADE)`; pausa configurable con `--pausa-ms`, mínimo 1000 |
-| Filtro | `calculated_status = RUNNING` y `trigger_type = payment_promotion`; descarta `installments` y `payment_scratch` |
-| Identidad | Dos tarjetas con el mismo `slug` o `promo_id` son la misma promo |
-| Salida | `supabase/seed/crudo/<slug>.json` y un resumen por consola (candidatas, por categoría y por banco) |
+| Filtro | `calculated_status = RUNNING`, `benefit.type = cashback` (descarta cuotas y sorteos) y alguna de las categorías pedidas en `offer.categories` |
+| Identidad | Dos tarjetas con el mismo `benefit.publication.slug` o `benefit.id` son la misma promo, aunque estén en secciones distintas |
+| Salida | `supabase/seed/crudo/<slug>.json` y un resumen por consola (secciones recorridas, candidatas, por categoría y por banco, y descartadas por no vigente, no reintegro u otra categoría) |
 | Fallo | Cada crudo se escribe completo o no se escribe. Un 404 del detalle se cuenta en `detalleInexistente`; un error de servidor o de red que no se recupera tras los reintentos se registra en `detalleConError` y no frena a las demás, pero el comando **sale con código 1** porque el relevamiento quedó incompleto. Un formato que el mapeo no reconoce se informa con su ruta y no invalida el crudo (se guarda para poder reproducirlo) |
 | Idempotencia | Repetirlo el mismo día reescribe los mismos archivos |
 

@@ -1,7 +1,10 @@
 /**
- * Relevamiento de las promos vigentes de MODO: baja el listado de cada
- * categoría, se queda con las promos de pago vigentes, baja el detalle de cada
- * una y guarda el crudo (`supabase/seed/crudo/<slug>.json`, RNF-08).
+ * Relevamiento de las promos vigentes de MODO: baja todas las secciones que
+ * muestra la web de promos, se queda con los reintegros vigentes de las
+ * categorías pedidas, baja el detalle de cada uno y guarda el crudo
+ * (`supabase/seed/crudo/<slug>.json`, RNF-08). Una misma promo aparece en
+ * varias secciones (por ejemplo, Coto en «carrusel», «destacadas» y
+ * «supermercados»): cuenta una vez.
  *
  *   npm run corpus:relevar -w ingesta -- --categorias 1,4
  *
@@ -17,7 +20,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { ejecutarComoScript, hoyEnArgentina, listaDeEnteros, parsearArgumentos, raizDelRepo } from "./args.ts";
-import { FILA_BANCO, SLUG_SEGURO, esObjeto, textoDeLaFila } from "./crudo.ts";
+import { SLUG_SEGURO, bancoDeLaTarjeta, esObjeto } from "./crudo.ts";
 import { leerCatalogoBancos } from "./insumos.ts";
 import { intentarMapear } from "./mapear.ts";
 import { crearClienteMODO, urlDetalle } from "./modo.ts";
@@ -42,7 +45,9 @@ export interface ResumenRelevamiento {
   candidatas: number;
   porCategoria: Record<number, number>;
   porBanco: Record<string, number>;
-  descartadas: { noVigente: number; noEsPago: number };
+  /** Las secciones de la web que se recorrieron. */
+  secciones: string[];
+  descartadas: { noVigente: number; noEsReintegro: number; otraCategoria: number };
   detalleInexistente: string[];
   /** Promos cuyo detalle falló (error de servidor o de red tras los reintentos): se reintentan en otra corrida. */
   detalleConError: { slug: string; error: string }[];
@@ -58,7 +63,8 @@ export async function relevar(categorias: readonly number[], deps: DependenciasR
     candidatas: 0,
     porCategoria: Object.fromEntries(categorias.map((c) => [c, 0])),
     porBanco: {},
-    descartadas: { noVigente: 0, noEsPago: 0 },
+    secciones: [],
+    descartadas: { noVigente: 0, noEsReintegro: 0, otraCategoria: 0 },
     detalleInexistente: [],
     detalleConError: [],
     mapeo: { borradores: 0, exclusiones: [], errores: [] },
@@ -67,27 +73,39 @@ export async function relevar(categorias: readonly number[], deps: DependenciasR
   // Primera pasada: listar, filtrar y deduplicar. Nada se escribe hasta validar todos los slugs.
   const vistos = new Set<string>();
   const candidatas: { slug: string; tarjeta: Record<string, unknown> }[] = [];
-  for (const categoria of categorias) {
-    for (const t of await deps.cliente.listarCategoria(categoria)) {
-      if (!esObjeto(t)) throw new Error(`Una tarjeta de la categoría ${categoria} no es un objeto`);
+  resumen.secciones = await deps.cliente.secciones();
+  for (const seccion of resumen.secciones) {
+    for (const t of await deps.cliente.listarSeccion(seccion)) {
+      if (!esObjeto(t)) throw new Error(`Una tarjeta de la sección ${seccion} no es un objeto`);
+      const beneficio = esObjeto(t.benefit) ? t.benefit : {};
+      const publicacion = esObjeto(beneficio.publication) ? beneficio.publication : {};
+      const slug = publicacion.slug;
+      if (typeof slug !== "string" || !SLUG_SEGURO.test(slug)) {
+        throw new Error(`Una tarjeta de la sección ${seccion} trae un slug inválido: ${JSON.stringify(slug)}`);
+      }
+      const clavePromo = typeof beneficio.id === "string" ? `promo:${beneficio.id}` : null;
+      if (vistos.has(`slug:${slug}`) || (clavePromo !== null && vistos.has(clavePromo))) continue;
+      vistos.add(`slug:${slug}`);
+      if (clavePromo !== null) vistos.add(clavePromo);
       if (t.calculated_status !== "RUNNING") {
         resumen.descartadas.noVigente++;
         continue;
       }
-      if (t.trigger_type !== "payment_promotion") {
-        resumen.descartadas.noEsPago++;
+      // Cuotas, sorteos y otros beneficios no son reintegros.
+      if (beneficio.type !== "cashback") {
+        resumen.descartadas.noEsReintegro++;
         continue;
       }
-      if (typeof t.slug !== "string" || !SLUG_SEGURO.test(t.slug)) {
-        throw new Error(`Una tarjeta de la categoría ${categoria} trae un slug inválido: ${JSON.stringify(t.slug)}`);
+      const oferta = esObjeto(t.offer) ? t.offer : {};
+      const deLaTarjeta = Array.isArray(oferta.categories) ? oferta.categories.map(Number) : [];
+      const pedidas = categorias.filter((c) => deLaTarjeta.includes(c));
+      if (pedidas.length === 0) {
+        resumen.descartadas.otraCategoria++;
+        continue;
       }
-      const clavePromo = typeof t.promo_id === "string" ? `promo:${t.promo_id}` : null;
-      if (vistos.has(`slug:${t.slug}`) || (clavePromo !== null && vistos.has(clavePromo))) continue;
-      vistos.add(`slug:${t.slug}`);
-      if (clavePromo !== null) vistos.add(clavePromo);
-      candidatas.push({ slug: t.slug, tarjeta: t });
-      resumen.porCategoria[categoria] = (resumen.porCategoria[categoria] ?? 0) + 1;
-      const banco = textoDeLaFila(t, FILA_BANCO) ?? "(sin banco)";
+      candidatas.push({ slug, tarjeta: t });
+      for (const c of pedidas) resumen.porCategoria[c] = (resumen.porCategoria[c] ?? 0) + 1;
+      const banco = bancoDeLaTarjeta(t) ?? "(sin banco)";
       resumen.porBanco[banco] = (resumen.porBanco[banco] ?? 0) + 1;
     }
   }

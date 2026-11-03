@@ -12,7 +12,7 @@
  */
 import type { Dia, Red } from "@vuelto/motor";
 import { contrastar } from "./bancos.ts";
-import { FILA_BANCO, FILA_COMERCIO, esObjeto, textoDeLaFila } from "./crudo.ts";
+import { bancoDeLaTarjeta, comercioDeLaTarjeta, esObjeto } from "./crudo.ts";
 import type { Objeto } from "./crudo.ts";
 import { CANALES, DIAS, REDES, esFechaISO } from "./dominio.ts";
 import { FUENTE_CORPUS } from "./tipos.ts";
@@ -295,7 +295,7 @@ export function mapearDetalle(crudo: Crudo, opciones: OpcionesMapeo): ResultadoM
   }
 
   // El perfil del usuario no distingue niveles de cliente: la promo no se puede recomendar bien.
-  const rotuloDelBanco = textoDeLaFila(crudo.tarjeta, FILA_BANCO);
+  const rotuloDelBanco = bancoDeLaTarjeta(crudo.tarjeta);
   const descripcionInterna = typeof detalle.short_description === "string" ? detalle.short_description : "";
   const nivel = [titulo, rotuloDelBanco ?? "", descripcionInterna].join(" ").match(NIVEL_DE_CLIENTE);
   if (nivel !== null) {
@@ -325,7 +325,7 @@ export function mapearDetalle(crudo: Crudo, opciones: OpcionesMapeo): ResultadoM
   if ("noRepresentable" in tope) return sinBorradores("tope_no_representable", tope.noRepresentable);
 
   const minimo = esObjeto(requisitos.amount_range) ? numeroOCero(requisitos.amount_range.min, "offers[0].requirements.amount_range.min") : 0;
-  const comercio = textoDeLaFila(crudo.tarjeta, FILA_COMERCIO);
+  const comercio = comercioDeLaTarjeta(crudo.tarjeta);
   if (comercio !== null) {
     notasComunes.push(`Comercio provisional tomado de la tarjeta del listado: «${comercio}». Revisar la regla de escritura (D3).`);
   }

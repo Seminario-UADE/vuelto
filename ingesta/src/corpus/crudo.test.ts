@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FILA_BANCO, FILA_COMERCIO, SLUG_SEGURO, esObjeto, legalDelCrudo, slugDelCrudo, textoDeLaFila } from "./crudo.ts";
+import { SLUG_SEGURO, bancoDeLaTarjeta, comercioDeLaTarjeta, esObjeto, legalDelCrudo, slugDelCrudo } from "./crudo.ts";
 
 describe("esObjeto", () => {
   it("distingue un objeto de null, un arreglo y un primitivo", () => {
@@ -20,29 +20,26 @@ describe("SLUG_SEGURO", () => {
   });
 });
 
-describe("textoDeLaFila", () => {
-  const tarjeta = { content: { row: [{ text: "  Paladini " }, {}, {}, {}, {}, { text: "ICBC" }, { text: "   " }] } };
-
-  it("devuelve el texto recortado de la celda pedida", () => {
-    expect(textoDeLaFila(tarjeta, FILA_COMERCIO)).toBe("Paladini");
-    expect(textoDeLaFila(tarjeta, FILA_BANCO)).toBe("ICBC");
+describe("comercioDeLaTarjeta y bancoDeLaTarjeta", () => {
+  it("leen la tarjeta de /v2/slots (card.validity_place y card.participating_bank), recortados", () => {
+    const tarjeta = { card: { validity_place: "  COTO ", participating_bank: "Bancos adheridos" } };
+    expect(comercioDeLaTarjeta(tarjeta)).toBe("COTO");
+    expect(bancoDeLaTarjeta(tarjeta)).toBe("Bancos adheridos");
   });
 
-  it("null si la celda no existe, no tiene texto o está en blanco", () => {
-    expect(textoDeLaFila(tarjeta, 1)).toBeNull();
-    expect(textoDeLaFila(tarjeta, 6)).toBeNull();
-    expect(textoDeLaFila(tarjeta, 99)).toBeNull();
+  it("leen también la tarjeta del listado anterior (fila 0 el comercio, fila 5 el banco)", () => {
+    const tarjeta = { content: { row: [{ text: "  Paladini " }, {}, {}, {}, {}, { text: "ICBC" }] } };
+    expect(comercioDeLaTarjeta(tarjeta)).toBe("Paladini");
+    expect(bancoDeLaTarjeta(tarjeta)).toBe("ICBC");
   });
 
-  it("null si la tarjeta no tiene la forma esperada", () => {
-    expect(textoDeLaFila(null, 0)).toBeNull();
-    expect(textoDeLaFila({}, 0)).toBeNull();
-    expect(textoDeLaFila({ content: { row: "x" } }, 0)).toBeNull();
-  });
-
-  it("las posiciones de comercio y banco son las de la tarjeta de MODO", () => {
-    expect(FILA_COMERCIO).toBe(0);
-    expect(FILA_BANCO).toBe(5);
+  it("null si falta, está en blanco o la tarjeta no tiene la forma esperada", () => {
+    expect(comercioDeLaTarjeta({ card: { validity_place: "   " } })).toBeNull();
+    expect(bancoDeLaTarjeta({ card: {} })).toBeNull();
+    expect(bancoDeLaTarjeta({ content: { row: [{ text: "x" }] } })).toBeNull();
+    expect(comercioDeLaTarjeta(null)).toBeNull();
+    expect(comercioDeLaTarjeta({})).toBeNull();
+    expect(comercioDeLaTarjeta({ content: { row: "x" } })).toBeNull();
   });
 });
 

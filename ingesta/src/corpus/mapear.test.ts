@@ -468,6 +468,20 @@ describe("mapearDetalle — nivel de cliente (Selecta, Platinum…)", () => {
     expect(mapearDetalle(crudo, OPCIONES).exclusiones[0]).toMatchObject({ motivo: "nivel_de_cliente" });
   });
 
+  it("el rótulo de la tarjeta de /v2/slots («Macro Platinum») también", () => {
+    const crudo = structuredClone(cargar("petrelli")) as unknown as { tarjeta: Libre } & Crudo;
+    crudo.tarjeta = { card: { validity_place: "Paladar", participating_bank: "Macro Platinum" } };
+    expect(mapearDetalle(crudo, OPCIONES).exclusiones[0]).toMatchObject({ motivo: "nivel_de_cliente", detalle: expect.stringContaining("Platinum") });
+  });
+
+  it("el comercio provisional sale de la tarjeta de /v2/slots", () => {
+    const crudo = structuredClone(cargar("petrelli")) as unknown as { tarjeta: Libre } & Crudo;
+    crudo.tarjeta = { card: { validity_place: "Supermercados Petrelli", participating_bank: "ICBC" } };
+    const b = mapearDetalle(crudo, OPCIONES).borradores[0]!;
+    expect(b.comercio).toBe("Supermercados Petrelli");
+    expect(b.revision.notas.join(" ")).not.toMatch(/no se resuelve|pero el detalle trae/);
+  });
+
   it("la descripción interna con «Platinum» también", () => {
     const crudo = conDetalle("petrelli", (d) => (d.short_description = "2507-Macro-Platinum-Paladar-Presencial-20off"));
     expect(mapearDetalle(crudo, OPCIONES).exclusiones[0]).toMatchObject({ motivo: "nivel_de_cliente", detalle: expect.stringContaining("Platinum") });
