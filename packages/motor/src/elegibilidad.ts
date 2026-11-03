@@ -70,8 +70,12 @@ export const REGLAS_DE_PROMOCION: readonly Regla[] = [
   },
   {
     causa: "monto_minimo",
+    // Sin monto no se puede saber si llega al mínimo: la promo no se descarta
+    // y el motivo avisa el mínimo (issue #75).
     cumple: (p, { compra }) =>
-      p.montoMinimo === null || aCentavos(compra.monto) >= aCentavos(p.montoMinimo),
+      p.montoMinimo === null ||
+      compra.monto === null ||
+      aCentavos(compra.monto) >= aCentavos(p.montoMinimo),
   },
 ];
 
