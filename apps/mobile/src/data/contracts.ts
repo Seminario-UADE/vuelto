@@ -69,8 +69,8 @@ export type {
 } from "@vuelto/motor";
 
 /**
- * La compra que se evalúa, con el monto opcional (constitución §I). Hasta que #43 agregue
- * `monto: null` al motor, `calculo.ts` lo consulta como 0.
+ * La compra que se evalúa, con el monto opcional (constitución §I): `null` llega tal cual al
+ * motor (`CompraPropuesta.monto`, issue #75).
  */
 export type PedidoRecomendar = {
   comercio: string | null;

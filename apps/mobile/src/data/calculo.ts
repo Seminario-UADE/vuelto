@@ -145,8 +145,8 @@ export function pedidoPresencial(comercio: Comercio & { categoriaId: number }, m
 export function recomendarSeguro(pedido: PedidoRecomendar, entradas: EntradasMotor): RecomendacionMotor {
   const { perfil, promociones, compras, ahora } = entradas;
   try {
-    // Hasta #43 el motor exige monto: "sin monto" se consulta con 0 (spec 008, Assumptions).
-    return recomendar({ ...pedido, monto: pedido.monto ?? 0 }, perfil, promociones, compras, ahora);
+    // Sin monto va `null`: el motor ordena por porcentaje y tope y no descarta por mínimo (#75).
+    return recomendar(pedido, perfil, promociones, compras, ahora);
   } catch (error) {
     if (error instanceof PerfilSinMediosError) return { mejor: null, alternativas: [], descartadas: [] };
     throw error;

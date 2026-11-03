@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as motor from "@vuelto/motor";
-import { mediosDeclarados } from "../data/fixtures";
+import { catalogoComercios, mediosDeclarados, mediosDelMotor } from "../data/fixtures";
 import { mediosElegidos } from "./perfil";
 import { sincronizado } from "./acciones";
 import { selectEntradasMotor, selectFrescura, selectRecomendacion, selectTopes } from "./selectores";
@@ -35,6 +35,42 @@ describe("selectRecomendacion (US1, US2)", () => {
       topeDespues: { disponible: 4500 },
     });
   });
+
+  it.each([10000, 2500, null])(
+    "mismo estado y monto (%s) → lo mismo que llamar recomendar() directo con esos argumentos (#43)",
+    (monto) => {
+      const s = conMartin();
+      s.dispatch(comercioElegido("coto"));
+      s.dispatch(montoCambiado(monto));
+      vi.mocked(motor.recomendar).mockClear();
+      const r = selectRecomendacion(s.getState());
+
+      // Los argumentos se arman acá, sin pasar por calculo.ts, desde el mismo estado.
+      const estado = s.getState();
+      const coto = catalogoComercios.find((c) => c.id === "coto");
+      if (!coto || coto.categoriaId === null) throw new Error("coto");
+      const args: Parameters<typeof motor.recomendar> = [
+        { comercio: coto.nombre, categoriaId: coto.categoriaId, monto, canal: "presencial" },
+        {
+          nombreParaMostrar: null,
+          mediosDePago: estado.perfil.medios.flatMap((id) => {
+            const m = mediosDelMotor[id];
+            return m ? [m] : [];
+          }),
+          comerciosHabituales: [],
+        },
+        estado.corpus.promociones,
+        estado.compras.lista,
+        new Date(estado.sesion.ahora),
+      ];
+      const directo = motor.recomendar(...args);
+
+      expect(motor.recomendar).toHaveBeenNthCalledWith(1, ...args);
+      expect(vi.mocked(motor.recomendar).mock.results[0]?.value).toEqual(directo);
+      expect(r?.medio?.id ?? null).toBe(directo.mejor?.medioDePagoId ?? null);
+      expect(r?.reintegro).toBe(monto === null ? null : (directo.mejor?.ahorroEstimado ?? null));
+    },
+  );
 
   it("sin comercio elegido no hay recomendación", () => {
     expect(selectRecomendacion(conMartin().getState())).toBeNull();

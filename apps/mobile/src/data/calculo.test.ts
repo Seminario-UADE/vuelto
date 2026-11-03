@@ -73,6 +73,18 @@ describe("recomendacionVista (US1)", () => {
     expect(r?.teSale).toBeNull();
   });
 
+  it("sin monto, el motor recibe null: una promo con compra mínima no se descarta y avisa el mínimo", () => {
+    const conMinimo = {
+      ...entradas,
+      promociones: promociones.map((p) => (p.id === "promo-galicia-super-mie" ? { ...p, montoMinimo: 20000 } : p)),
+    };
+    const sinMonto = recomendacionVista(conMinimo, comercio("coto"), null);
+    expect(sinMonto?.medio?.id).toBe("galicia-visa-credito");
+    expect(sinMonto?.razon).toBe("20% en supermercados los miércoles · pide una compra mínima de $20.000");
+    expect(sinMonto?.topeDisponible).toBe(6500);
+    expect(recomendacionVista(conMinimo, comercio("coto"), 10000)?.resultado).toBe("sin-promo");
+  });
+
   it("perfil sin medios evaluables (solo Mercado Pago): sin promo, sin error", () => {
     const r = recomendacionVista(
       { ...entradas, perfil: perfilDelMotor(["mercado-pago"], null) },

@@ -51,12 +51,18 @@ function medioDeDescarte(d: Descarte, c: Catalogos): MedioDePago | null {
 /**
  * Qué da la promo, sin el tope ni la base que el motor agrega al motivo (issue #46): la
  * tarjeta los muestra aparte, con su cifra. "20% en supermercados los miércoles · te quedan
- * ≈$6.500 de tope, según 3 compras de octubre" → "20% en supermercados los miércoles".
+ * ≈$6.500 de tope, según 3 compras de octubre" → "20% en supermercados los miércoles". Sin
+ * monto queda el aviso de compra mínima del motor (#75): la tarjeta no lo muestra en otro lado.
  */
 export function queDa(motivo: string): string {
   return motivo
     .split(" + ")
-    .map((parte) => parte.split(" · ")[0] ?? parte)
+    .map((parte) =>
+      parte
+        .split(" · ")
+        .filter((tramo, i) => i === 0 || tramo.startsWith("pide una compra mínima"))
+        .join(" · "),
+    )
     .join(" + ");
 }
 

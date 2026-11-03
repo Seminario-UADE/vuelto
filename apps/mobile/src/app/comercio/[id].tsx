@@ -75,15 +75,15 @@ export default function ConQuePagar() {
 
         {r ? <RecomendacionCard r={r} /> : <Skeleton height={220} r={radius.card} />}
 
-        {r?.medio ? (
-          <Card>
-            <MontoInput
-              value={monto}
-              onChange={setMonto}
-              hint="Con el monto te decimos cuánto te devuelven y cuánto tope te queda."
-            />
-          </Card>
-        ) : null}
+        {/* Siempre visible: vacío, la tarjeta muestra el tope disponible con su base (#43). */}
+        <Card>
+          <MontoInput
+            value={monto}
+            onChange={setMonto}
+            // Sin promo, el monto no cambia la respuesta: no se promete nada.
+            hint={r && !r.medio ? undefined : "Con el monto te decimos cuánto te devuelven y cuánto tope te queda."}
+          />
+        </Card>
 
         {r ? (
           r.alternativas.length > 0 ? (

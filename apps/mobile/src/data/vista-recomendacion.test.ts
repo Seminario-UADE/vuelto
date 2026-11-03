@@ -124,4 +124,10 @@ describe("queDa", () => {
     );
     expect(queDa("20% en Kansas")).toBe("20% en Kansas");
   });
+
+  it("sin monto conserva el aviso de compra mínima del motor (#75)", () => {
+    expect(
+      queDa("20% en supermercados los miércoles · pide una compra mínima de $20.000 · te quedan ≈$6.500 de tope, según 3 compras de octubre"),
+    ).toBe("20% en supermercados los miércoles · pide una compra mínima de $20.000");
+  });
 });
