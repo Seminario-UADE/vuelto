@@ -51,7 +51,7 @@ export interface ClienteMODO {
   listarSeccion(seccion: string): Promise<unknown[]>;
   /** Todas las tarjetas de una categoría en el listado anterior (`/slots`, id numérico: el slug devuelve 0). */
   listarCategoria(categoria: number): Promise<unknown[]>;
-  /** Detalle de una promo (legales, tope estructurado, bancos por id). `null` si no existe. */
+  /** Detalle de una promo (legales, tope estructurado, bancos por id). `null` si no existe o MODO no lo sirve (404 o 400). */
   detalle(slug: string): Promise<unknown | null>;
   /** Catálogo de bancos de MODO. */
   bancos(): Promise<unknown[]>;
@@ -65,8 +65,11 @@ export function crearClienteMODO(opciones: OpcionesMODO): ClienteMODO {
   const reintentos = opciones.reintentos ?? 2;
   let hizoPedidos = false;
 
-  /** Un pedido. Un 5xx o un corte de red se reintentan (con la misma pausa); un 4xx no. */
-  async function pedir(ruta: string): Promise<{ estado: number; cuerpo: unknown }> {
+  /**
+   * Un pedido. Un 5xx o un corte de red se reintentan (con la misma pausa); un 4xx no.
+   * Los estados de `inexistente` devuelven `cuerpo: null` en vez de lanzar.
+   */
+  async function pedir(ruta: string, inexistente: readonly number[] = [404]): Promise<{ estado: number; cuerpo: unknown }> {
     const url = `${BASE}${ruta}`;
     let ultimoError = "";
     for (let intento = 0; intento <= reintentos; intento++) {
@@ -82,7 +85,7 @@ export function crearClienteMODO(opciones: OpcionesMODO): ClienteMODO {
         continue;
       }
       const texto = await respuesta.text();
-      if (respuesta.status === 404) return { estado: 404, cuerpo: null };
+      if (inexistente.includes(respuesta.status)) return { estado: respuesta.status, cuerpo: null };
       if (respuesta.status >= 500) {
         ultimoError = `MODO respondió ${respuesta.status} en ${url}`;
         continue;
@@ -163,8 +166,10 @@ export function crearClienteMODO(opciones: OpcionesMODO): ClienteMODO {
     },
 
     async detalle(slug) {
-      const { estado, cuerpo } = await pedir(`${RUTA_DETALLE}/${encodeURIComponent(slug)}`);
-      return estado === 404 ? null : cuerpo;
+      // MODO responde 400 (siempre, no de a ratos) a algunos slugs que el listado sí publica:
+      // es un detalle que no se puede leer, no un corte, y no tiene que hacer fallar la corrida.
+      const { cuerpo } = await pedir(`${RUTA_DETALLE}/${encodeURIComponent(slug)}`, [400, 404]);
+      return cuerpo;
     },
 
     async bancos() {

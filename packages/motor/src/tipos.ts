@@ -156,7 +156,11 @@ export interface Compra {
 export interface CompraPropuesta {
   comercio: string | null;
   categoriaId: CategoriaId;
-  monto: number;
+  /**
+   * `null` = el usuario todavía no escribió el monto (constitución 2.0.1:
+   * el monto es opcional). Si no es `null`, tiene que ser mayor a 0.
+   */
+  monto: number | null;
   canal: Canal;
 }
 

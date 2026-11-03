@@ -263,10 +263,17 @@ describe("mapearDetalle — canal y datos de contexto", () => {
     [["instore"], "presencial"],
     [["instore", "instore_nfc"], "presencial"],
     [["instore", "online"], "ambos"],
+    [["instore", "trip"], "presencial"],
     [[], null],
   ])("flows %j da canal %s", (flows, canal) => {
     const r = mapearDetalle(conDetalle("petrelli", (d) => (d.conditions.payment_flow.flows = flows)), OPCIONES);
     expect(r.promociones[0]!.canal).toBe(canal);
+  });
+
+  it("un pago de transporte (solo trip) se descarta con su motivo, sin cortar la corrida", () => {
+    const r = mapearDetalle(conDetalle("petrelli", (d) => (d.conditions.payment_flow.flows = ["trip"])), OPCIONES);
+    expect(r.promociones).toEqual([]);
+    expect(r.descartes[0]).toMatchObject({ motivo: "otro", detalle: expect.stringMatching(/transporte/) });
   });
 
   it("sin tarjeta del listado el comercio queda null", () => {

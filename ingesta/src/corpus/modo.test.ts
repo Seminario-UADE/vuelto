@@ -227,6 +227,18 @@ describe("crearClienteMODO — detalle y bancos", () => {
     expect(detalle).toBeNull();
   });
 
+  it("un 400 del detalle también devuelve null, sin reintentar", async () => {
+    const { fn, pedidos } = fetchSimulado(() => ({ estado: 400, cuerpo: "Bad Request" }));
+    const detalle = await crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).detalle("2608-icbc");
+    expect(detalle).toBeNull();
+    expect(pedidos).toHaveLength(1);
+  });
+
+  it("un 400 fuera del detalle sigue siendo un error", async () => {
+    const { fn } = fetchSimulado(() => ({ estado: 400, cuerpo: "Bad Request" }));
+    await expect(crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).bancos()).rejects.toThrow(/400/);
+  });
+
   it("un error de servidor lanza con el estado y la URL", async () => {
     const { fn } = fetchSimulado(() => ({ estado: 500, cuerpo: "boom" }));
     const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} });

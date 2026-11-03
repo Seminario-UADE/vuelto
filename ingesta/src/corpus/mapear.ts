@@ -157,14 +157,28 @@ function mapearTarjetas(conditions: Objeto, notas: string[]): TarjetasMapeadas {
   return tarjetas;
 }
 
+const RUTA_FLUJOS = "conditions.payment_flow.flows";
+
+const flujosDePago = (conditions: Objeto): unknown[] =>
+  lista(objeto(conditions.payment_flow, "conditions.payment_flow").flows, RUTA_FLUJOS);
+
+/**
+ * `trip` es el pago de un viaje en transporte público con MODO: no es una compra en un
+ * comercio y el contrato no tiene canal para eso.
+ */
+const soloViajes = (conditions: Objeto): boolean => {
+  const flujos = flujosDePago(conditions);
+  return flujos.length > 0 && flujos.every((f) => f === "trip");
+};
+
 /**
  * `instore` e `instore_nfc` son los pagos con MODO (QR o NFC) en el local;
  * `physical-card` es la tarjeta física, que no pasa por MODO; `all` son todos
- * los canales.
+ * los canales. `trip` junto a otros canales no suma nada: vale lo demás.
  */
 function mapearCanal(conditions: Objeto): (typeof CANALES)[number] | null {
-  const ruta = "conditions.payment_flow.flows";
-  const flujos = lista(objeto(conditions.payment_flow, "conditions.payment_flow").flows, ruta);
+  const ruta = RUTA_FLUJOS;
+  const flujos = flujosDePago(conditions);
   let presencial = false;
   let online = false;
   let todos = false;
@@ -172,7 +186,7 @@ function mapearCanal(conditions: Objeto): (typeof CANALES)[number] | null {
     if (flujo === "instore" || flujo === "instore_nfc" || flujo === "physical-card") presencial = true;
     else if (flujo === "online") online = true;
     else if (flujo === "all") todos = true;
-    else throw new ErrorDeMapeo(`${ruta}[${i}]`, `canal desconocido: ${JSON.stringify(flujo)}`);
+    else if (flujo !== "trip") throw new ErrorDeMapeo(`${ruta}[${i}]`, `canal desconocido: ${JSON.stringify(flujo)}`);
   });
   if (todos || (presencial && online)) return "ambos";
   if (presencial) return "presencial";
@@ -303,6 +317,9 @@ export function mapearDetalle(crudo: Crudo, opciones: OpcionesMapeo): ResultadoM
   const tarjetas = mapearTarjetas(conditions, notas);
   if (tarjetas.debito.length + tarjetas.credito.length === 0 && tarjetas.noSoportadas.length > 0) {
     return descartar("otro", `Solo acepta redes que el contrato no representa: ${tarjetas.noSoportadas.join(", ")}.`);
+  }
+  if (soloViajes(conditions)) {
+    return descartar("otro", "Es un pago de transporte público (payment_flow = trip), no una compra en un comercio.");
   }
   const canal = mapearCanal(conditions);
   const tope = mapearTope(oferta);

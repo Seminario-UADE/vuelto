@@ -1449,6 +1449,55 @@ usuario pasó al slice `sesion`.
 
 ---
 
+## 2026-11-02 — Perfil: plan alineado con ADR-010 y piezas base (issue #41)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit (plan y tareas de la
+spec 001) y `gh` CLI.
+
+**Objetivo:** actualizar el plan de la #41, escrito el 25/10, con ADR-010 y
+con lo que dejó la #34 en `main`, e implementar lo que no depende de la #81
+(store de Redux) ni de la #40 (sesión).
+
+**Prompts principales:**
+1. "Actualizá `plan.md` y `tasks.md` de `specs/001-perfil-billeteras/` con
+   ADR-010 y con las tablas reales de la #34. Marcá qué fases quedan
+   bloqueadas y por qué issue. La spec no cambia."
+2. "Implementá test-first las fases que no dependen de la #81 ni de la #40:
+   modelo, buscador de bancos, acceso a Supabase con el cliente por
+   parámetro y el selector de banco, tipo y red. No conectes las pantallas:
+   eso lo reescribe la #81."
+3. "Corré lint, typecheck, test y build, y abrí el PR sin cerrar la issue."
+
+**Resultado:**
+- Plan y tareas actualizados:
+  - El perfil vive en el slice `perfil` de Redux, que lo persiste: se cayó
+    el cache propio de la feature (decisión 6).
+  - `Red` y `TipoTarjeta` se declaran con los valores del motor hasta que la
+    #81 sume `@vuelto/motor`; un test compara las dos listas (decisión 2).
+  - Perfil vacío: lo detecta el motor con `PerfilSinMediosError`, ya no la
+    Edge Function (decisión 4).
+  - Nueva decisión 9: `on_hub_list` es `boolean | null`, porque la tabla
+    `bancos` no lo tiene. Nunca se inventa un valor.
+  - Las fases 2b y 3 (conectar onboarding y Perfil) quedan bloqueadas por la
+    #81 y la #40.
+- Código en `apps/mobile/src/perfil/` (`modelo.ts`, `buscar-bancos.ts`,
+  `datos.ts`) y `components/selector-medio.tsx`. 33 tests nuevos.
+- Lo que encontró el plan al cruzarse con la #34:
+  - la tabla `bancos` no tiene `imagen` ni `on_hub_list`, así que US3
+    (bancos frecuentes primero) no se cumple con datos reales;
+  - las columnas son `user_id` y `creado_en`, no `usuario_id` y `creado`.
+- Errores de la IA en el proceso: el primer intento de editar el plan con un
+  script falló por las comillas en la terminal; se reescribió el archivo
+  entero.
+- Queda pendiente:
+  - Conectar el onboarding y Perfil (T008 a T011) cuando cierren la #81 y la
+    #40.
+  - Migración que sume `on_hub_list` (y `imagen`) a `bancos`, y que la
+    ingesta lo cargue.
+  - El selector no se probó en pantalla: todavía no lo usa ninguna.
+
+---
+
 ## 2026-11-02 — Sincronizar el corpus y las compras del período (issue #42)
 
 **Herramienta:** Claude Code (Sonnet 5.5), con spec-kit, `spec-critic`, `rules-guardian` y un Supabase local
@@ -1477,6 +1526,70 @@ compras del período al store de Redux y siga funcionando sin señal.
   (`npm run medir:corpus`) y una proyección rotulada con promos de ejemplo (2.000 promos ≈ 880 KB).
 - Sin `tsx` instalado, el medidor se corre con Vitest (sin dependencias nuevas).
 - La prueba manual en modo avión queda bloqueada por #40 (login), #35 (corpus) y #41 (medios en la base).
+
+---
+
+## 2026-11-01/02 — Integración de PRs, análisis de ADR-010 y monto opcional en el motor (issue #75)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** destrabar los PRs pendientes (#77, #83, #84), revisar qué
+issues propias se pueden cerrar o arrancar dentro de ADR-010 e implementar
+la que no tiene dependencias (#75). Es una issue chica: va sin spec-kit.
+
+**Prompts principales:**
+1. "El PR #77 tiene conflicto con `main` en `docs/bitacora-prompts.md`.
+   Resolvelo sin borrar ni reescribir ninguna entrada: dejá las de las dos
+   ramas en orden de fecha, con el separador de siempre. Mostrame la
+   solución antes de aplicarla y no mergees a `main`."
+2. "Mergeá el PR #77 y actualizá `main`. Después resumime los PRs #83 y #84:
+   qué hacen, si chocan con `main` o entre ellos y si cumplen las reglas de
+   `CLAUDE.md`. No los mergees hasta que lo apruebe."
+3. "Revisá criterio por criterio si las issues #41, #43 y #45 se pueden
+   cerrar con lo que hay en `main`, y qué las bloquea."
+4. "Leé completos el ADR-010 y el PR #80 y cruzalos con las issues
+   abiertas: qué se puede arrancar ya, qué está bloqueado y qué quedó
+   desactualizado."
+5. "Implementá la #75 en el motor (`monto: number | null`) con los criterios
+   de la issue y sus tests. Si la issue no define un caso, decidilo y
+   avisame. No subas nada hasta que lo apruebe."
+
+**Resultado:**
+- PR #77: el conflicto era de dos entradas agregadas en el mismo lugar. Se
+  dejaron las tres (#39, #46 y ADR-010) por fecha, sin perder ninguna línea.
+  Mergeado con el CI en verde.
+- PRs #83 (secrets, cierra #9) y #84 (esquema con RLS, cierra #34):
+  mergeados, sin conflictos y con el CI de `main` en verde, incluido el job
+  `supabase-rls`. Se aceptaron las 5 decisiones abiertas de la spec 007.
+- Ninguna de las issues #41, #43 y #45 se puede cerrar: las tres dependen de
+  la #81 (motor en la app y store de Redux). La #75 no depende de nada y la
+  #43 la necesita.
+- #75 implementada:
+  - Sin monto, el ahorro es $0 y se muestra el tope disponible antes de la
+    compra, con su base. Con cero compras registradas no hay cifra.
+  - Orden sin monto: mayor porcentaje (las acumulables suman los suyos) y
+    después mayor tope disponible; una promo sin tope informado va antes.
+  - Decisión propia, aprobada: una promo con compra mínima no se descarta
+    sin monto; el motivo avisa "pide una compra mínima de $X".
+  - Con monto, el motor no cambia. La Edge Function `recomendar` no se tocó
+    (ADR-010 §5).
+  - 13 tests nuevos; 205 del motor y 40 de la Edge Function en verde.
+    Contrato de la spec 002 y `01-data-models.md` actualizados.
+- Errores de la IA en el proceso:
+  - Dijo primero que a la #41 solo la bloqueaba el login (#40). Al leer
+    ADR-010 se corrigió: el perfil pasa a Redux, así que también depende de
+    la #81.
+  - El lint y el typecheck fallaron al principio por un `node_modules`
+    desactualizado, no por el cambio; se resolvió con `npm ci`.
+- Queda pendiente:
+  - `theme.test.ts` de la app falla solo en Windows: arma las rutas con `/`.
+    En el CI (Linux) pasa.
+  - El ADR-010 sigue en estado «propuesto» y nombra las tablas en singular;
+    en la base quedaron en plural.
+  - Sumar la #81 como dependencia en la #41 y la #44, y aclarar en la #45
+    que el comentario sobre la Edge Function de topes quedó superado.
+  - El plan de la #41 (`specs/001-perfil-billeteras/`) es anterior a
+    ADR-010: dice que la app no importa el motor y no usa Redux.
 
 ---
 
