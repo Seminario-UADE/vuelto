@@ -52,12 +52,12 @@ Carga el corpus en el Supabase al que apunta el entorno.
 | Lotes | Hasta 50 filas por pedido, cada uno confirmado por separado y en menos de 5 minutos (contrato de escritura de `04-infrastructure.md`, PR #91); nunca una transacción con todo el corpus |
 | Idempotencia | `upsert` por `(fuente, fuente_id)`; correrlo dos veces seguidas deja la base igual y no mueve `actualizada_en` |
 | Bajas | Fila `manual` que ya no está en el archivo ⇒ `dada_de_baja_en = now()`; si vuelve, `null`. **Nunca `delete`** |
-| Convivencia | No escribe ni reactiva una `manual` cuyo `fuente_id` ya existe como `modo` activa (se compara por el `slug`: una manual partida `slug#b-…` también se omite) |
+| Convivencia | No escribe ni reactiva una `manual` cuyo `fuente_id` ya existe como `modo` activa, y si esa `manual` está activa la da de baja (se compara por el `slug`: una manual partida `slug#b-…` también se omite y se da de baja) |
 | Campos que no se envían | `revision` y `fixture` (no son columnas) |
 | Salida | Resumen por categoría y por acción; código distinto de cero si algo falla |
 
 ## Garantías que otras issues pueden usar
 
 - **#50 / #51**: `resolverBanco(nombre, catalogo)` y la tabla de alias de `ingesta/src/corpus/bancos.ts`; `normalizar` exportada por `@vuelto/motor`; el cliente de MODO de `modo.ts` con pausa y User-Agent; el mapeo `mapear.ts` del detalle de MODO a `BorradorPromocion`.
-- **#51**: al publicar `('modo', X)` debe dar de baja `('manual', X)` (D2).
+- **#51**: al publicar `('modo', X)` debe dar de baja las `manual` activas con ese slug: `('manual', X)` y las partidas `('manual', X#…)` (D2).
 - **#53**: los crudos de `supabase/seed/crudo/` son la entrada del extractor y `promociones.json` es la verdad contra la que se compara; los campos con fragmento en `fragmentosFuente` son los que salen de prosa.

@@ -110,7 +110,7 @@ Reglas de validación (las aplica `validar.ts` y las repite la base donde hay `c
 | `tarjetas` | `conditions.payment_methods.methods[]` | `debit_card` → `debito`, `credit_card` → `credito`; `issuer` = `Red` |
 | `vigencia.desde/hasta` | `conditions.schedule.start_date/stop_date` | Ya son fechas de Argentina (D13) |
 | `vigencia.dias` | `conditions.schedule.days_of_week` | `monday`→`lun` …; los 7 días ⇒ `null` |
-| `tope.monto` | `limits.period_cap.amount_by_period`, o `limits.transaction_cap.amount_by_transaction` | `0` ⇒ `null` |
+| `tope.monto` | `limits.period_cap.amount_by_period`, o `limits.transaction_cap.amount_by_transaction` | `0` ⇒ `null`; los dos mayores que `0` ⇒ exclusión `tope_no_representable` (`Tope` guarda uno solo) |
 | `tope.periodo` | `limits.period_cap.reset_by` | `month`→`mensual`, `week`→`semanal`; `day` y `promo` ⇒ exclusión `tope_no_representable` (D8); `monto = null` ⇒ `null` |
 | `tope.alcance`, `tope.grupoTopeId` | — | `null`; los completa la persona desde la letra chica (D5) |
 | `montoMinimo` | `offers[0].requirements.amount_range.min` | `0` ⇒ `null` |
@@ -121,7 +121,7 @@ Reglas de validación (las aplica `validar.ts` y las repite la base donde hay `c
 
 Lo que sale de la letra chica (`tope.alcance`, `grupoTopeId`, `jurisdiccion`, `acumulable`) lo carga una persona. El helper no infiere nada de la prosa: solo marca dónde mirar. Las pistas que salen de la prosa (las frases resaltadas y la fecha de cierre del legal) las muestra `corpus:borrador`; `mapear.ts` no lee la letra chica.
 
-Exclusiones que el mapeo **propone** (las confirma una persona): `vencida_en_la_fuente` (`real_status` distinto de `RUNNING`), `no_es_reintegro`, `banco_no_determinado`, `transversal` (más de tres categorías, solo si alguna es del dueño de la corrida), `nivel_de_cliente` («Selecta», «Platinum», «Black», «Signature», «Infinite» o «Nivel N» en el nombre, el rótulo del banco del listado o la descripción interna de la promo), `tope_no_representable` (`reset_by = promo`) y `otro` (más de una oferta, o solo redes que el contrato no representa).
+Exclusiones que el mapeo **propone** (las confirma una persona): `vencida_en_la_fuente` (`real_status` distinto de `RUNNING`), `no_es_reintegro`, `banco_no_determinado`, `transversal` (más de tres categorías, solo si alguna es del dueño de la corrida), `nivel_de_cliente` («Selecta», «Platinum», «Black», «Signature», «Infinite» o «Nivel N» en el nombre, el rótulo del banco del listado o la descripción interna de la promo), `tope_no_representable` (`reset_by` = `day` o `promo`, o tope por período más tope por transacción) y `otro` (más de una oferta, o solo redes que el contrato no representa).
 
 ## Transiciones de estado en la base
 

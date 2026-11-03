@@ -7,7 +7,8 @@
  * Es idempotente: cargar dos veces seguidas no cambia nada (el trigger de
  * `promociones` no mueve `actualizada_en` si no cambia ningún valor, así la app
  * no vuelve a bajar el corpus). Una promo manual que sale del archivo se da de
- * baja (`dada_de_baja_en`) y nunca se borra; si vuelve, se reactiva.
+ * baja (`dada_de_baja_en`) y nunca se borra; si vuelve, se reactiva. Una manual que
+ * ya existe como `modo` activa (mismo slug) tampoco se escribe, y si estaba activa se da de baja.
  *
  * Escribe con la service role key, que se lee solo del entorno de quien corre el
  * comando (constitución §IV): nunca va al repo ni se imprime. Escribe en lotes de
@@ -150,7 +151,12 @@ export async function cargarCorpus(
       resumen.promociones.sinCambios++;
     }
   }
-  const aDarDeBaja = [...manuales.values()].filter((f) => f.dada_de_baja_en === null && !enElArchivo.has(f.fuente_id));
+  // Se da de baja la manual que salió del archivo y también la que ya publicó la ingesta como `modo`:
+  // si no, las dos quedan activas y el motor ve dos promos iguales (research D2). Se compara por slug,
+  // porque una manual partida (`slug#b-…`) no comparte `fuente_id` con la de MODO.
+  const aDarDeBaja = [...manuales.values()].filter(
+    (f) => f.dada_de_baja_en === null && (!enElArchivo.has(f.fuente_id) || modoActivas.has(slugBase(f.fuente_id))),
+  );
   resumen.promociones.darDeBaja = aDarDeBaja.length;
 
   if (opciones.aplicar) {
