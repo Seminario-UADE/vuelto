@@ -60,6 +60,12 @@ describe("perfil del onboarding (FR-002 de la spec 006)", () => {
     expect(selectRecomendacion(s.getState())).toBeNull();
   });
 
+  it("un habitual con espacios o mayúsculas de más se reconoce como el del catálogo", () => {
+    const s = storeDePrueba();
+    s.dispatch(comerciosLeidos([{ id: "c1", nombre: "  ypf " }]));
+    expect(selectComerciosFrecuentes(s.getState())[0]?.categoriaId).not.toBeNull();
+  });
+
   it("si saltó los comercios, los frecuentes de ejemplo", () => {
     expect(selectComerciosFrecuentes(storeDePrueba().getState()).length).toBeGreaterThan(0);
   });

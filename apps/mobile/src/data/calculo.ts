@@ -38,7 +38,7 @@ import type {
   TopeMedio,
 } from "./contracts";
 import { catalogoComercios } from "./fixtures";
-import type { MedioDePago as MedioGuardado } from "../perfil/modelo";
+import { normalizarComercio, type MedioDePago as MedioGuardado } from "../perfil/modelo";
 import { medioDelMotor, medioVista } from "../perfil/vista";
 import { aVista } from "./vista-recomendacion";
 import { mediodia } from "../lib/reloj";
@@ -269,11 +269,15 @@ export function topesVista(entradas: EntradasMotor): ResumenTopes {
   };
 }
 
-/** Comercio del catálogo por nombre; fuera del catálogo, sin rubro (no se inventa). */
+/**
+ * Comercio del catálogo por nombre, con el criterio de repetidos del perfil («Coto» = « coto »);
+ * fuera del catálogo, sin rubro (no se inventa).
+ */
 export function comercioPorNombre(nombre: string): Comercio {
+  const n = normalizarComercio(nombre);
   return (
-    catalogoComercios.find((c) => c.nombre.toLowerCase() === nombre.toLowerCase()) ?? {
-      id: `libre-${nombre.toLowerCase()}`,
+    catalogoComercios.find((c) => normalizarComercio(c.nombre) === n) ?? {
+      id: `libre-${n}`,
       nombre,
       inicial: nombre.charAt(0).toUpperCase(),
       rubro: "otro",

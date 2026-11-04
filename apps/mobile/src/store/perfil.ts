@@ -47,6 +47,10 @@ export const perfil = createSlice({
     comerciosLeidos(s, a: PayloadAction<ComercioHabitual[]>) {
       s.comercios = a.payload;
     },
+    /** Los del onboarding: se suman a los que ya estaban. */
+    comerciosConfirmados(s, a: PayloadAction<ComercioHabitual[]>) {
+      s.comercios.push(...a.payload);
+    },
     comercioAgregado(s, a: PayloadAction<ComercioHabitual>) {
       s.comercios.push(a.payload);
     },
@@ -73,6 +77,7 @@ export const {
   medioSacado,
   cargaCambio,
   comerciosLeidos,
+  comerciosConfirmados,
   comercioAgregado,
   comercioSacado,
   onboardingTerminado,

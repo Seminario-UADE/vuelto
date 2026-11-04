@@ -1875,7 +1875,14 @@ arreglos y haz la opción A"):
   Asignarle categoría queda para #43.
 - Limitación conocida: el autocompletar sale del catálogo de ejemplo (12
   comercios), no del corpus real de MODO; queda pendiente para #43.
-- Verificación: lint, typecheck, build y tests en verde (app 460).
+- Segunda pasada de revisiones (prompt: "Arreglalo y subilo"): rules-guardian
+  sin hallazgos. Se ajustó que en el onboarding un comercio ya guardado no se
+  desmarque (se saca desde Perfil), que `comercioPorNombre` use el mismo criterio
+  de repetidos que la base, que uno escrito a mano no sea un botón que no hace
+  nada en Perfil y que el onboarding tenga su propia acción del slice
+  (`comerciosConfirmados`).
+- Verificación: lint, typecheck, build y tests en verde (motor 213, app 469,
+  supabase 40, ingesta 274). No se probó en Expo Go.
 
 ---
 

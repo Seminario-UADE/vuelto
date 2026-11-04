@@ -115,9 +115,16 @@ export function normalizarComercio(nombre: string): string {
 }
 
 /** «Coto», «coto» y « Coto » son el mismo comercio (el índice único de la base, #34). */
-export function comercioRepetido(comercios: readonly { nombre: string }[], nombre: string): boolean {
+export function nombreRepetido(nombres: readonly string[], nombre: string): boolean {
   const n = normalizarComercio(nombre);
-  return comercios.some((c) => normalizarComercio(c.nombre) === n);
+  return nombres.some((x) => normalizarComercio(x) === n);
+}
+
+export function comercioRepetido(comercios: readonly { nombre: string }[], nombre: string): boolean {
+  return nombreRepetido(
+    comercios.map((c) => c.nombre),
+    nombre,
+  );
 }
 
 export const MENSAJE_COMERCIO_REPETIDO = "Ese comercio ya está en tu perfil";

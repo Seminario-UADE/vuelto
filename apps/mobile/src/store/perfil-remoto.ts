@@ -8,6 +8,7 @@ import type { Resultado } from "../perfil/datos";
 import {
   comercioRepetido,
   esDuplicado,
+  nombreRepetido,
   MENSAJES_ERROR,
   puedeConfirmar,
   puedeSacar,
@@ -21,6 +22,7 @@ import {
   cargaCambio,
   comercioAgregado,
   comercioSacado,
+  comerciosConfirmados,
   comerciosLeidos,
   medioAgregado,
   medioSacado,
@@ -151,7 +153,7 @@ export function leerComercios(): AppThunk<Promise<void>> {
 function comerciosNuevos(nombres: readonly string[], guardados: readonly ComercioHabitual[]): string[] {
   const nuevos: string[] = [];
   for (const n of nombres) {
-    if (n.trim() === "" || comercioRepetido(guardados, n) || comercioRepetido(nuevos.map((nombre) => ({ nombre })), n)) continue;
+    if (n.trim() === "" || comercioRepetido(guardados, n) || nombreRepetido(nuevos, n)) continue;
     nuevos.push(n);
   }
   return nuevos;
@@ -164,7 +166,7 @@ export function confirmarComercios(nombres: readonly string[]): AppThunk<Promise
     if (nuevos.length === 0) return { ok: true, datos: getState().perfil.comercios };
     if (!perfilRemoto) return SIN_CONEXION;
     return escribir("comercios", dispatch, getState, () => perfilRemoto.confirmarComercios(nuevos), (d) =>
-      dispatch(comerciosLeidos([...getState().perfil.comercios, ...d])),
+      dispatch(comerciosConfirmados(d)),
     );
   };
 }

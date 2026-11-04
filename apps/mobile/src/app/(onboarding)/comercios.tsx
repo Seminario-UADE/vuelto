@@ -13,7 +13,7 @@ import type { Comercio, Rubro } from "@/data/contracts";
 import { useAsync } from "@/hooks/use-async";
 import { RUBROS } from "@/lib/rubros";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { comercioRepetido, MENSAJE_COMERCIO_REPETIDO, MENSAJES_ERROR } from "@/perfil/modelo";
+import { comercioRepetido, MENSAJE_COMERCIO_REPETIDO, MENSAJES_ERROR, nombreRepetido } from "@/perfil/modelo";
 import { confirmarComercios } from "@/store/perfil-remoto";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 
@@ -142,14 +142,14 @@ export default function Comercios() {
                 <Chip
                   key={c.id}
                   label={c.nombre}
-                  selected={comercioRepetido(elegidos.map((nombre) => ({ nombre })), c.nombre)}
-                  onPress={() =>
+                  selected={nombreRepetido(elegidos, c.nombre)}
+                  onPress={() => {
+                    // Uno ya guardado no se desmarca acá: se saca desde Perfil (acá solo se agrega).
+                    if (comercioRepetido(guardados, c.nombre)) return;
                     setElegidos((xs) =>
-                      comercioRepetido(xs.map((nombre) => ({ nombre })), c.nombre)
-                        ? xs.filter((x) => !comercioRepetido([{ nombre: x }], c.nombre))
-                        : [...xs, c.nombre],
-                    )
-                  }
+                      nombreRepetido(xs, c.nombre) ? xs.filter((x) => !nombreRepetido([x], c.nombre)) : [...xs, c.nombre],
+                    );
+                  }}
                 />
               ))}
             </View>

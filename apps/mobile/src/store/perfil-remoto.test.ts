@@ -268,6 +268,13 @@ describe("comercios habituales (issue #47)", () => {
     expect(s.getState().perfil.comercios).toEqual([{ id: "c9", nombre: "Coto" }]);
   });
 
+  it("confirmarComercios sin conexión: no guarda nada y el perfil pasa a solo lectura", async () => {
+    const s = armar(remoto({ confirmarComercios: { ok: false, error: "sin_conexion" } }));
+    expect(await s.dispatch(confirmarComercios(["Coto"]))).toEqual({ ok: false, error: "sin_conexion" });
+    expect(s.getState().perfil.comercios).toEqual([]);
+    expect(s.getState().perfil.carga).toBe("sin-conexion");
+  });
+
   it("sin conexión al guardar, el perfil pasa a solo lectura", async () => {
     const s = armar(remoto({ agregarComercio: { ok: false, error: "sin_conexion" } }));
     expect(await s.dispatch(agregarComercio("Coto"))).toEqual({ ok: false, error: "sin_conexion" });

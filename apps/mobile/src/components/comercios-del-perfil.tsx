@@ -60,13 +60,6 @@ export function ComerciosDelPerfil() {
     if (!r.ok) setError(MENSAJES_ERROR[r.error]);
   };
 
-  const abrir = (nombre: string) => {
-    const c = comercioPorNombre(nombre);
-    // Solo los del catálogo tienen pantalla de comercio. Uno escrito a mano no tiene rubro: no hay
-    // promos conocidas para él (en Inicio lo avisa) hasta que #43 le asigne categoría.
-    if (c.categoriaId !== null) router.push({ pathname: "/comercio/[id]", params: { id: c.id } });
-  };
-
   return (
     <View style={{ gap: space.md }}>
       <SectionHeader
@@ -95,16 +88,7 @@ export function ComerciosDelPerfil() {
               key={c.id}
               style={{ flexDirection: "row", alignItems: "center", gap: space.md, paddingVertical: space.sm, ...divisor(i) }}
             >
-              <Pressable
-                onPress={() => abrir(c.nombre)}
-                accessibilityRole="button"
-                accessibilityLabel={`Ver ${c.nombre}`}
-                style={{ flex: 1, minHeight: size.hit, justifyContent: "center" }}
-              >
-                <Text variant="bodyLg" weight="semibold">
-                  {c.nombre}
-                </Text>
-              </Pressable>
+              <NombreDeComercio nombre={c.nombre} />
               {!editable ? null : (
                 <Pressable
                   onPress={() => void sacar(c.id)}
@@ -171,5 +155,30 @@ export function ComerciosDelPerfil() {
         </Text>
       ) : null}
     </View>
+  );
+}
+
+/**
+ * Uno del catálogo abre su pantalla. Uno escrito a mano no tiene rubro ni promos conocidas (en
+ * Inicio lo avisa) hasta que #43 le asigne categoría: se muestra como texto, no como botón.
+ */
+function NombreDeComercio({ nombre }: { nombre: string }) {
+  const c = comercioPorNombre(nombre);
+  const texto = (
+    <Text variant="bodyLg" weight="semibold">
+      {nombre}
+    </Text>
+  );
+  const estilo = { flex: 1, minHeight: size.hit, justifyContent: "center" as const };
+  if (c.categoriaId === null) return <View style={estilo}>{texto}</View>;
+  return (
+    <Pressable
+      onPress={() => router.push({ pathname: "/comercio/[id]", params: { id: c.id } })}
+      accessibilityRole="button"
+      accessibilityLabel={`Ver ${nombre}`}
+      style={estilo}
+    >
+      {texto}
+    </Pressable>
   );
 }
