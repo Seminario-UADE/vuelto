@@ -39,27 +39,36 @@ export function CompraRow({ c, conFecha, onBorrar, marca }: Props) {
       >
         <Avatar icon={iconoDeRubro[c.comercio.rubro]} />
         <View style={{ flex: 1, gap: 2 }}>
-          <Text variant="bodyLg" weight="semibold">
-            {c.comercio.nombre}
-          </Text>
+          {/* Dos renglones (comercio · monto, medio) más el origen y el reintegro: el comercio usa todo el ancho
+              que le deja el monto y no se parte a mitad de palabra a 375 px. */}
+          <View style={{ flexDirection: "row", alignItems: "baseline", gap: space.sm }}>
+            <Text variant="bodyLg" weight="semibold" style={{ flex: 1, flexShrink: 1 }}>
+              {c.comercio.nombre}
+            </Text>
+            <Text variant="bodyLg" weight="semibold" tabular>
+              {pesos(c.monto)}
+            </Text>
+          </View>
           <Text variant="label" tone="inkSecondary">
             {conFecha ? `${fechaCorta(c.fecha)} · ` : ""}
             {c.medio.nombre}
           </Text>
-          <Badge label={etiquetaOrigen[c.origen]} />
-          {marca ? (
-            <Text variant="label" tone={marca === "no-se-pudo" ? "error" : "inkSecondary"}>
-              {TEXTO_MARCA[marca]}
+          <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: space.sm, rowGap: 2 }}>
+            <Badge label={etiquetaOrigen[c.origen]} />
+            {marca ? (
+              <Text variant="label" tone={marca === "no-se-pudo" ? "error" : "inkSecondary"}>
+                {TEXTO_MARCA[marca]}
+              </Text>
+            ) : null}
+            <Text
+              variant="bodyMd"
+              tabular
+              align="right"
+              style={{ flexGrow: 1, color: c.reintegro === null ? colors.inkSecondary : colors.accent }}
+            >
+              {c.reintegro === null ? "sin reintegro" : `${aprox(c.reintegro)} de vuelta`}
             </Text>
-          ) : null}
-        </View>
-        <View style={{ alignItems: "flex-end", gap: 2 }}>
-          <Text variant="bodyLg" weight="semibold" tabular>
-            {pesos(c.monto)}
-          </Text>
-          <Text variant="bodyMd" tabular style={{ color: c.reintegro === null ? colors.inkSecondary : colors.accent }}>
-            {c.reintegro === null ? "sin reintegro" : `${aprox(c.reintegro)} de vuelta`}
-          </Text>
+          </View>
         </View>
       </View>
       {onBorrar ? (

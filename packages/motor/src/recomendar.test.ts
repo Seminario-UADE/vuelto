@@ -366,12 +366,16 @@ describe("recomendar: promos acumulables (issue #37, US2)", () => {
         ahorroEstimado: 500,
         topeRestanteTrasCompra: 0,
         base: { comprasRegistradas: 1, comprasSinDescuentoInformado: 0 },
+        periodo: "mensual",
+        textoPromo: "20% en supermercados",
       },
       {
         promocionId: "B",
         ahorroEstimado: 1000,
         topeRestanteTrasCompra: null,
         base: null,
+        periodo: null,
+        textoPromo: "10% en supermercados",
       },
     ]);
   });
@@ -676,6 +680,13 @@ describe("recomendar: sin monto (issue #75)", () => {
     expect(r.mejor?.motivo).not.toContain("sin tope disponible");
   });
 
+  it("dentro de la combinada, las promos van por porcentaje y no por id", () => {
+    const promos = [conTope("A", 10, null, { acumulable: true }), conTope("B", 20, null, { acumulable: true })];
+    const r = recomendar(sinMonto(), perfil(), promos, [], AHORA);
+    expect(orden(r)).toEqual(["B+A"]);
+    expect(r.mejor?.motivo).toMatch(/^20% en supermercados .* \+ 10% en supermercados/);
+  });
+
   it("el orden es determinístico: no depende del orden de las listas", () => {
     const debito = medio({ id: "galicia-debito-visa", tipo: "debito" });
     const promos = [
@@ -703,5 +714,39 @@ describe("recomendar: sin monto (issue #75)", () => {
   it("con monto, el motivo no repite la compra mínima", () => {
     const r = recomendar(compra({ monto: 60000 }), perfil(), [promo({ montoMinimo: 50000 })], [], AHORA);
     expect(r.mejor?.motivo).not.toContain("compra mínima");
+  });
+});
+
+describe("recomendar: texto de la promo y período, aparte del tope (issue #46)", () => {
+  const mensual = { monto: 5000, periodo: "mensual", alcance: null, grupoTopeId: null } as const;
+
+  it("textoPromo es el comienzo del motivo, sin el tope", () => {
+    const compras = [compraRegistrada({ descuentoObtenido: 1000 })];
+    const r = recomendar(compra(), perfil(), [promo({ tope: mensual })], compras, AHORA);
+    expect(unica(r.mejor)).toMatchObject({ textoPromo: "20% en supermercados", periodo: "mensual" });
+    expect(r.mejor?.motivo).toBe(`${unica(r.mejor)?.textoPromo} · te quedan ≈$2.000 de tope, según 1 compra de octubre`);
+  });
+
+  it("sin monto, textoPromo conserva el aviso de compra mínima", () => {
+    const r = recomendar(compra({ monto: null }), perfil(), [promo({ montoMinimo: 20000 })], [], AHORA);
+    expect(unica(r.mejor)?.textoPromo).toBe("20% en supermercados · pide una compra mínima de $20.000");
+  });
+
+  it("un tope semanal informa su período", () => {
+    const semanal = promo({ tope: { ...mensual, periodo: "semanal" } });
+    expect(unica(recomendar(compra(), perfil(), [semanal], [], AHORA).mejor)?.periodo).toBe("semanal");
+  });
+
+  it("en la combinada, la que quedó sin saldo lo aclara en su textoPromo", () => {
+    const grupo = { monto: 1000, periodo: "mensual", alcance: "compartido", grupoTopeId: "g" } as const;
+    const promos = [
+      promo({ id: "A", acumulable: true, tope: grupo }),
+      promo({ id: "B", porcentaje: 10, acumulable: true, tope: grupo }),
+    ];
+    const r = recomendar(compra(), perfil(), promos, [], AHORA);
+    expect(r.mejor?.promociones.map((p) => p.textoPromo)).toEqual([
+      "20% en supermercados",
+      "10% en supermercados (sin tope disponible: lo usa otra promoción de este banco)",
+    ]);
   });
 });

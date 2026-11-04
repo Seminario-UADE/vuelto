@@ -1,11 +1,12 @@
 import { estimarTopes, fechaArgentina } from "@vuelto/motor";
+import { mediosDeEjemplo } from "../data/fixtures";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { comprasOctubre, promociones as promosDeEjemplo } from "../data/fixtures";
 import { RELOJ_EJEMPLO } from "../data/fixtures";
 import { guardadoEncolado } from "../store/cola";
 import { compraAgregada } from "../store/compras";
 import { sesionCerrada } from "../store/acciones";
-import { mediosElegidos } from "../store/perfil";
+import { mediosConfirmados } from "../store/perfil";
 import { storeDePrueba } from "../store/prueba";
 import { selectRecomendacion } from "../store/selectores";
 import { comercioElegido, montoCambiado } from "../store/simulacion";
@@ -354,7 +355,7 @@ describe("sincronizar con el motor real (US4, SC-002)", () => {
       compras: [compraDe(1, 1, 6000)],
     });
     const { store, avanzar } = armar(repo);
-    store.dispatch(mediosElegidos(["galicia-visa-credito"]));
+    store.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
     await store.dispatch(sincronizar("apertura"));
     expect(restante(store)).toBe(4000);
 
@@ -374,7 +375,7 @@ describe("sincronizar con el motor real (US4, SC-002)", () => {
   it("una promo vencida (o dada de baja) no se recomienda, aunque siga en el corpus", async () => {
     const repo = repositorioEnMemoria({ promociones: [compartida(1)], compras: [] });
     const { store, avanzar } = armar(repo);
-    store.dispatch(mediosElegidos(["galicia-visa-credito"]));
+    store.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
     store.dispatch(comercioElegido("coto"));
     store.dispatch(montoCambiado(10000));
     await store.dispatch(sincronizar("apertura"));
@@ -392,7 +393,7 @@ describe("sincronizar con el motor real (US4, SC-002)", () => {
   it("a una promo del corpus se le acorta la vigencia a ayer: deja de recomendarse", async () => {
     const repo = repositorioEnMemoria({ promociones: [compartida(1)] });
     const { store, avanzar } = armar(repo);
-    store.dispatch(mediosElegidos(["galicia-visa-credito"]));
+    store.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
     store.dispatch(comercioElegido("coto"));
     store.dispatch(montoCambiado(10000));
     await store.dispatch(sincronizar("apertura"));

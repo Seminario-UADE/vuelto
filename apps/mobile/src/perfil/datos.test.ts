@@ -93,10 +93,15 @@ describe("datos del perfil", () => {
     ]);
   });
 
-  it("sacarMedio: borra por id", async () => {
-    const { cliente, llamadas } = clienteFalso({ data: null, error: null, status: 204 });
+  it("sacarMedio: borra por id y pide la fila borrada", async () => {
+    const { cliente, llamadas } = clienteFalso({ data: [{ id: "m1" }], error: null, status: 200 });
     expect(await crearDatosPerfil(cliente).sacarMedio("m1")).toEqual({ ok: true, datos: null });
-    expect(llamadas).toEqual([["from", "medios_de_pago"], ["delete"], ["eq", "id", "m1"]]);
+    expect(llamadas).toEqual([["from", "medios_de_pago"], ["delete"], ["eq", "id", "m1"], ["select", "id"]]);
+  });
+
+  it("sacarMedio: si el RLS no borró ninguna fila, no es un éxito", async () => {
+    const { cliente } = clienteFalso({ data: [], error: null, status: 200 });
+    expect(await crearDatosPerfil(cliente).sacarMedio("m1")).toEqual({ ok: false, error: "otro" });
   });
 
   it("nunca manda user_id: lo pone la base con auth.uid()", async () => {

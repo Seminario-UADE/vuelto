@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { mediosDeEjemplo } from "../data/fixtures";
 import { promosConTopeCompartido } from "../data/compras/prueba";
 import { mediosDeclarados } from "../data/fixtures";
 import { escenarioElegido } from "./acciones";
 import { corpusInicial } from "./corpus";
-import { mediosElegidos } from "./perfil";
+import { mediosConfirmados } from "./perfil";
 import { storeDePrueba } from "./prueba";
 import { selectResumenCompras, selectTopes } from "./selectores";
 import { eliminarCompra, guardarCompra } from "./thunks";
@@ -12,7 +13,7 @@ import { eliminarCompra, guardarCompra } from "./thunks";
 
 function conMartin(estadoInicial: Parameters<typeof storeDePrueba>[0] = null) {
   const s = storeDePrueba(estadoInicial);
-  s.dispatch(mediosElegidos(mediosDeclarados.map((m) => m.id)));
+  s.dispatch(mediosConfirmados(mediosDeEjemplo(mediosDeclarados.map((m) => m.id))));
   return s;
 }
 

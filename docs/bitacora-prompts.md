@@ -1593,6 +1593,25 @@ la que no tiene dependencias (#75). Es una issue chica: va sin spec-kit.
 
 ---
 
+## 2026-11-03 — Fila de compra legible a 375 px
+
+**Herramienta:** Claude Code (Opus 5.5 / Sonnet 5.5), navegador integrado con `mobile-web`.
+
+**Objetivo:** que `CompraRow` no parta el nombre del comercio a mitad de palabra
+y se lea bien a 375 px, también con texto grande, sin cambiar lo que muestra.
+
+**Prompts principales:**
+1. «Arreglar el layout de `compra-row.tsx` a 375 px (Farmaci/ty, medio de pago en tres líneas), verificar con capturas antes y después.»
+
+**Resultado:**
+- Reproducido en «Mis compras» con viewport mobile. Causa: la columna derecha
+  (monto + reintegro) y el botón de borrar le dejaban poco ancho al bloque central.
+- Fila reorganizada: renglón 1 comercio + monto, renglón 2 medio de pago, renglón 3
+  origen (y marca de subida) + reintegro, que envuelve si no entra. Mismo contenido y
+  misma etiqueta de accesibilidad.
+- Verificado con texto escalado a 1,5× en el navegador. Lint, typecheck y tests en verde.
+- Errores de la IA: el primer intento dejó el medio de pago en tres líneas; se movió el
+  reintegro al renglón del origen.
 ## 2026-11-02 — Corpus de promociones sembrado a mano desde MODO (issue #35, parte de Supermercados y Farmacias)
 
 **Herramienta:** Claude Code (Sonnet 5.5), con spec-kit, el agente `spec-critic`, la CLI `gh`,
@@ -1762,17 +1781,154 @@ de MODO todos los días, sin nadie en el medio.
 
 ---
 
-## 2026-11-03 — Perfil: columnas de `bancos` y medios de la base en el slice (issue #41)
+## 2026-11-02 — Perfil: onboarding y Perfil conectados a Supabase (issue #41, fases 2b y 3)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** cerrar las fases 2b y 3 de la spec 001 ahora que la #81 (Redux) y
+la #40 (sesión) están en `main`, y antes revisar que nada contradiga ADR-010.
+
+**Prompts principales:**
+1. "Analizá #80 (ADR-010) y decime si hay algún cambio; si no, comenzá con las
+   fases 2b y 3."
+2. Ante el hallazgo de abajo, el PO eligió la opción A: el slice guarda el medio
+   completo.
+
+**Resultado:**
+- Hallazgo: el slice `perfil` guardaba solo ids del catálogo de ejemplo y el
+  motor, las vistas y las compras se apoyaban en ellos. Un medio real de
+  Supabase (UUID, banco de MODO) no se hubiera recomendado nunca.
+- `perfil.medios` pasa a ser la lista de `medios_de_pago` tal como la devuelve
+  Supabase (`id`, `bancoId`, `nombreBanco`, `tipo`, `red`). El motor la usa
+  directo (`medioDelMotor`) y las pantallas arman el nombre con `medioVista`
+  ("Galicia Visa crédito", "Crédito · Banco Galicia"). Sin catálogo aparte.
+- Los datos de ejemplo pasan a la misma forma (`mediosGuardados`), con los
+  mismos ids: las compras de ejemplo siguen coincidiendo y un test comprueba que
+  los textos no cambiaron. Lo guardado con ids viejos se migra una vez.
+- Thunks en `store/perfil-remoto.ts` (`leerMedios`, `confirmarMedios`,
+  `agregarMedio`, `sacarMedio`, `leerBancos`) sobre `perfil/datos.ts`, inyectado
+  en el store (`Extra.perfilRemoto`). Estado de la lectura (`carga`) en el
+  slice, sin persistir.
+- Onboarding: buscador de bancos, tipo y red; nada se guarda hasta «Confirmar»,
+  que manda todo en un pedido. Pestañas: si el celular no tiene medios, esperan
+  la lectura de Supabase y, si tampoco hay, mandan al onboarding.
+- Perfil: lista del slice, agregar, sacar (nunca el último) y modo solo lectura
+  sin conexión.
+- `Red` y `TipoTarjeta` salen del motor (T012).
+- Una compra con un medio que se sacó del perfil se sigue mostrando ("Medio que
+  sacaste de tu perfil"); antes desaparecía de «Mis compras».
+- Verificación: lint, typecheck, build y tests en verde (motor 192, app 222,
+  supabase 40). No se probó en Expo Go ni en el simulador.
+- Queda pendiente:
+  - T013: `rules-guardian`, `/code-review` y `test-runner`, y el PR.
+  - El seed de `bancos` tiene solo Galicia: los ~28 bancos los carga la ingesta
+    (#35), y faltan `imagen` y `on_hub_list` (US3).
+  - Un usuario que confirma sus medios y cierra la app antes de terminar el
+    onboarding, al volver salta comercios y primera respuesta (sus medios ya
+    están en Supabase).
+
+---
+
+## 2026-11-03 — "Queda poco" al 30% del tope, como pide el diseño
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** alinear el motor con el diseño nuevo de la app: un tope pasa
+a "queda poco" con el 30% o menos, no con el 20%.
+
+**Prompts principales:**
+1. "Analizá el PR #76 y fijate si nuestro motor encaja con eso. ¿Podés
+   mirar también las imágenes?" Se revisaron las capturas de la app y el
+   código que traduce la respuesta del motor. Aparecieron cuatro choques;
+   uno era que el diseño subió "queda poco" al 30% y el motor seguía en 20%.
+2. "Traete los últimos cambios del proyecto: ya debería estar el cambio de
+   que el motor corre en la app con Redux." Ya estaba (ADR-010 y los PRs
+   de la app de Joaquín), y el motor seguía en 20%.
+3. "Hacé el cambio al 30%."
+
+**Resultado:**
+- El motor marca "queda poco" con el 30% del tope o menos. El ejemplo de
+  Santander del diseño ($2.300 de $8.000) ahora sale bien, y deja de ser el
+  error que se había anotado en la issue #38.
+- Se actualizaron los tests del motor, la spec 005 y un test de la app que
+  esperaba el 20%. 193 tests del motor, 378 de la app y 40 de la Edge
+  Function en verde.
+
+---
+
+## 2026-11-03 — La pantalla muestra el porqué de cada medio de pago (issue #46)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** terminar la issue #46 ahora que existe la pantalla, y hacer
+los arreglos chicos que quedaron del monto opcional (PR #87, de jeqm0302).
+
+**Prompts principales:**
+1. "Revisemos el PR #87: ¿qué toca y afecta algo de lo que veníamos
+   charlando?" Ya estaba mergeado. Toca los textos del motor de la issue
+   #46, y el aviso nuevo de compra mínima se perdía porque la app corta el
+   texto del motor en el " · ".
+2. "¿Podemos hacer nosotros los arreglos chicos después de aprobarlo? ¿Bajo
+   qué issue?" Bajo la issue #46, que sigue abierta.
+3. "Revisá la pantalla." Mostraba el motivo y las otras tarjetas, pero no
+   las tarjetas sin ninguna promo, y podía mostrar promos de bancos que el
+   usuario no tiene.
+4. "Avanzá así": si una tarjeta ya es una opción, no repetir sus descartes;
+   si tiene dos promos descartadas, mostrar las dos.
+
+**Resultado:**
+- El motor manda, por cada promo, el texto de qué da y de qué período es su
+  tope. La app deja de cortar los textos del motor, así el aviso de compra
+  mínima llega al usuario y un tope semanal ya no dice "de octubre".
+- La app le pasa al motor el monto vacío, no un 0: sin monto, las opciones
+  se ordenan por porcentaje y las promos con compra mínima no se descartan.
+- En "Otras opciones", cada tarjeta del usuario dice por qué no conviene, o
+  "Sin promo para esta compra". Ya no aparecen promos de bancos que no
+  tenés, ni la tarjeta recomendada repetida.
+- Dentro de una opción con varias promos acumulables, van por porcentaje.
+- Se actualizaron los contratos y las specs 005 y 008. Las revisiones de
+  código no encontraron incumplimientos de reglas; se ajustaron nombres,
+  una conversión repetida y un lugar que deducía el período leyendo un
+  texto. 211 tests del motor, 385 de la app y 40 de la Edge Function en
+  verde.
+
+---
+
+## 2026-11-03 — PR #98 al día con main (conflictos con el perfil del PR #100)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** que el PR #98 se pueda mergear después de que entró a `main` el
+perfil con los medios guardados del usuario (PR #100).
+
+**Prompts principales:**
+1. "Traete los últimos cambios al repo."
+2. "Revisás mi PR 98, que al parecer tenía conflictos con lo que está ahora en main?"
+
+**Resultado:**
+- Chocaban tres archivos. En el cálculo de la app, el PR #98 había borrado la
+  lista de promociones que servía para adivinar el banco, y el PR #100 la había
+  adaptado a los medios del perfil. Quedó borrada, como quería el PR #98, y la
+  pantalla usa los medios que guardó el usuario, como quería el PR #100.
+- Ahora "Sin promo para esta compra" aparece para los medios reales del perfil
+  del usuario, no para los de ejemplo.
+- En la bitácora quedaron las dos entradas, en orden de fecha.
+- Tests en verde: 213 del motor, 447 de la app, 40 de la Edge Function y 274
+  de la ingesta. Lint y typecheck en verde.
+
+---
+
+## 2026-11-03 — Perfil: `on_hub_list` y logo en `bancos` (issue #41)
 
 **Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde la revisión del PR #88, con `supabase` CLI.
 
-**Objetivo:** cerrar los dos pendientes del review del PR #88: que `bancos` tenga `on_hub_list` y el
-logo, y que el slice `perfil` pueda guardar lo que devuelve `perfil/datos.ts`.
+**Objetivo:** cerrar los pendientes que dejó el review del PR #88: que `bancos` tenga `on_hub_list` y el
+logo, y que el slice `perfil` guarde lo que devuelve `perfil/datos.ts`.
 
 **Prompts principales:**
 1. "Sumá `on_hub_list` e `imagen` a `bancos` con su test pgTAP y hacé que `leerBancos` los pida."
-2. "Reconciliá el slice `perfil` (hoy `medios: string[]`) con `MedioDePago`, sin tocar selectores ni
-   conectar pantallas."
+2. "Reconciliá el slice `perfil` (hoy `medios: string[]`) con `MedioDePago`, sin conectar pantallas."
+3. "Resolvé los conflictos del PR contra `main`."
 
 **Resultado:**
 - Migración `20261103000008_bancos_hub.sql`: `on_hub_list boolean` y `logo_url text`, ambos nullables
@@ -1780,15 +1936,13 @@ logo, y que el slice `perfil` pueda guardar lo que devuelve `perfil/datos.ts`.
   (32 bancos en el hub de 82). `leerBancos` pide `on_hub_list`.
 - Error de la IA: la columna se llamó `imagen` y el test de estructura de RNF-06 ("ninguna columna
   guarda la imagen de un ticket") falló; se renombró `logo_url` en vez de aflojar el test.
-- Slice `perfil`: `mediosGuardados: MedioDePago[]` y `mediosGuardadosCargados`. Es aditivo: lo
-  persistido sin el campo entra con `[]`, un medio con tipo o red inválidos descarta el perfil (como
-  ya pasaba con los otros campos) y `sesionCerrada` lo vacía. `medios` y los selectores no cambian.
+- El slice `perfil` (`mediosGuardados`) se descartó al resolver los conflictos: mientras tanto el PR #100
+  ya había dejado `medios: MedioGuardado[]` y las pantallas conectadas, con la misma idea. Se tomó la
+  versión de `main` para todo `apps/mobile/src/store/`.
 - Verificado: lint, typecheck y tests de los 4 workspaces; `supabase db reset` y `supabase test db`
   (165 tests) en un Supabase local con puertos propios.
-- Queda pendiente:
-  - La ingesta no carga `on_hub_list` ni `logo_url` (`publicar.ts` escribe `id` y `nombre`): en el
-    proyecto alojado quedan `null` hasta que se haga.
-  - T008: mover `selectEntradasMotor` a `mediosGuardados` y conectar las pantallas, cuando cierre la #40.
+- Queda pendiente: la ingesta no carga `on_hub_list` ni `logo_url` (`publicar.ts` escribe `id` y
+  `nombre`); en el proyecto alojado quedan `null` hasta que se haga.
 
 ---
 

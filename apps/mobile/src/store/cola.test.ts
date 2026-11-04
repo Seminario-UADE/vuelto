@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { compraDePrueba } from "../data/compras/prueba";
+import { mediosDeEjemplo } from "../data/fixtures";
 import { CLAVE_COLA, colaCargada, guardadoEncolado, leerCola, operacionEnviando } from "./cola";
 import { sesionCerrada } from "./acciones";
 import { compraAgregada } from "./compras";
 import { CLAVE, rehidratar } from "./persistencia";
+import { mediosConfirmados } from "./perfil";
 import { esperar, memoria, storeDePrueba } from "./prueba";
 import { eliminarCompra, guardarCompra, iniciarCompras } from "./thunks";
 
@@ -21,6 +23,8 @@ const encolar = (n = 1) =>
 async function abrir(disco = memoria()) {
   const s = storeDePrueba(null, disco);
   await s.dispatch(rehidratar());
+  // Una compra se guarda con un medio del perfil (issue #41).
+  s.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
   await s.dispatch(iniciarCompras());
   return s;
 }

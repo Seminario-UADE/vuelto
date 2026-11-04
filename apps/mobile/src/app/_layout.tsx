@@ -16,11 +16,13 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
 import { Toast } from "@/components/toast";
 import { iniciarAuth } from "@/data/auth";
+import { usePerfilRemoto } from "@/hooks/use-perfil-remoto";
 import { useReloj } from "@/hooks/use-reloj";
 import { useSincronizacion } from "@/hooks/use-sincronizacion";
 import { useSubidaDeCompras } from "@/hooks/use-subida-de-compras";
 import { supabase } from "@/lib/supabase";
 import { headerNativo } from "@/navigation/opciones";
+import { crearDatosPerfil } from "@/perfil/datos";
 import { crearStore } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { rehidratar } from "@/store/persistencia";
@@ -32,13 +34,14 @@ void SplashScreen.preventAutoHideAsync();
 
 /**
  * Un solo store para toda la app (ADR-010). Lo guardado se lee una vez, al abrir. Sin variables de
- * Supabase no hay repositorio y la app no sincroniza (spec 009 FR-003).
+ * Supabase no hay repositorio y la app no sincroniza (spec 009 FR-003) ni lee el perfil (#41).
  */
 const store = crearStore({
   almacenamiento: AsyncStorage,
   estadoInicial: null,
   generarId: randomUUID,
   repositorio: supabase ? repositorioSupabase(supabase) : null,
+  perfilRemoto: supabase ? crearDatosPerfil(supabase) : null,
   reloj: () => new Date(),
 });
 void store.dispatch(rehidratar()).then(() => store.dispatch(iniciarCompras()));
@@ -78,6 +81,7 @@ function Raiz() {
   const hidratado = useAppSelector((s) => s.sesion.hidratado);
   const authLista = useAppSelector((s) => s.sesion.authLista);
   useReloj();
+  usePerfilRemoto();
   useSincronizacion();
   useSubidaDeCompras();
 

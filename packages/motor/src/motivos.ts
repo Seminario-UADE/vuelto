@@ -110,13 +110,25 @@ function textoMinimo(promo: Promocion, sinMonto: boolean): string {
 }
 
 /**
+ * Qué da la promo y lo que la condiciona, sin su tope: "20% en supermercados
+ * los miércoles · pide una compra mínima de $20.000". La pantalla lo muestra
+ * aparte del tope, sin cortar el motivo. `sinSaldo`: quedó en $0 porque otra
+ * promo de la misma opción agotó el tope compartido (FR-010).
+ */
+export function textoPromo(promo: Promocion, sinMonto: boolean, sinSaldo = false): string {
+  return sinSaldo
+    ? `${queDa(promo)} (sin tope disponible: lo usa otra promoción de este banco)`
+    : `${queDa(promo)}${textoMinimo(promo, sinMonto)}`;
+}
+
+/**
  * Ej.: "20% en supermercados los miércoles · te quedan ≈$1.600 de tope,
  * según 3 compras de octubre". `tope` es el saldo tras la compra, `null` si
  * la promo no tiene saldo. Sin monto (`sinMonto`), el saldo tras la compra
  * es el disponible: no se resta nada.
  */
 export function motivoOpcion(promo: Promocion, tope: TopeTrasCompra | null, sinMonto = false): string {
-  return `${queDa(promo)}${textoMinimo(promo, sinMonto)}${textoTope(promo, tope)}`;
+  return `${textoPromo(promo, sinMonto)}${textoTope(promo, tope)}`;
 }
 
 /** Una promo dentro de una opción combinada, con su saldo tras la compra. */
@@ -131,9 +143,7 @@ export interface ParteDelMotivo {
 export function motivoCombinado(partes: ParteDelMotivo[], sinMonto = false): string {
   return partes
     .map(({ promo, tope, sinSaldo }) =>
-      sinSaldo
-        ? `${queDa(promo)} (sin tope disponible: lo usa otra promoción de este banco)`
-        : motivoOpcion(promo, tope, sinMonto),
+      sinSaldo ? textoPromo(promo, sinMonto, true) : motivoOpcion(promo, tope, sinMonto),
     )
     .join(" + ");
 }

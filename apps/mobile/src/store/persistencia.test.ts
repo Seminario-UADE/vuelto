@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { comprasOctubre, promociones } from "../data/fixtures";
+import { comprasOctubre, mediosDeEjemplo, promociones } from "../data/fixtures";
 import { compraAgregada } from "./compras";
 import { contactoQuitado } from "./contactos";
 import { sesionCerrada, sincronizado } from "./acciones";
 import { CLAVE, CLAVE_CORPUS, CLAVE_VIEJA, CORPUS_VACIO, rehidratar } from "./persistencia";
-import { mediosElegidos, mediosGuardadosCargados, onboardingTerminado } from "./perfil";
+import { cargaCambio, mediosConfirmados, onboardingTerminado } from "./perfil";
 import { selectRecomendacion, selectTopes } from "./selectores";
 import { ahoraCambio, usuarioCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
@@ -23,7 +23,7 @@ describe("persistencia (US4)", () => {
   it("perfil y compras sobreviven a cerrar y abrir (el corpus de ejemplo no se guarda)", async () => {
     const disco = memoria();
     const a = await abrir(disco);
-    a.dispatch(mediosElegidos(["galicia-visa-credito"]));
+    a.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
     a.dispatch(onboardingTerminado());
     a.dispatch(compraAgregada(nueva));
     await esperar();
@@ -53,7 +53,7 @@ describe("persistencia (US4)", () => {
     const disco = memoria();
     const a = await abrir(disco);
     a.dispatch(usuarioCambio({ id: "u1", email: "ana@mail.com" }));
-    a.dispatch(mediosElegidos(["galicia-visa-credito"]));
+    a.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
     await esperar();
     expect(disco.datos.get(CLAVE)).not.toContain("ana@mail.com");
     const b = await abrir(disco);
@@ -79,7 +79,7 @@ describe("persistencia (US4)", () => {
   it("lo guardado no tiene nada derivado (FR-010)", async () => {
     const disco = memoria();
     const a = await abrir(disco);
-    a.dispatch(mediosElegidos(["galicia-visa-credito"]));
+    a.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
     a.dispatch(comercioElegido("coto"));
     a.dispatch(montoCambiado(10000));
     expect(selectRecomendacion(a.getState())).not.toBeNull();
@@ -140,6 +140,30 @@ describe("persistencia (US4)", () => {
     }
   });
 
+  it("los medios se guardan completos y el estado de la lectura en Supabase no (issue #41)", async () => {
+    const disco = memoria();
+    const a = await abrir(disco);
+    a.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
+    a.dispatch(cargaCambio("sin-conexion"));
+    await esperar();
+    const guardado = JSON.parse(disco.datos.get(CLAVE)!);
+    expect(guardado.perfil.medios).toEqual(mediosDeEjemplo(["galicia-visa-credito"]));
+    expect(guardado.perfil).not.toHaveProperty("carga");
+    const b = await abrir(disco);
+    expect(b.getState().perfil.medios).toEqual(mediosDeEjemplo(["galicia-visa-credito"]));
+    expect(b.getState().perfil.carga).toBe("sin-leer");
+  });
+
+  it("un perfil guardado con ids del catálogo viejo se migra; un medio con forma rota invalida el perfil", async () => {
+    const perfil = { nombre: null, onboardingCompleto: true, comercios: [], invitacionPendiente: null };
+    const viejo = JSON.stringify({ version: 1, perfil: { ...perfil, medios: ["macro-visa-debito", "no-existe"] } });
+    expect((await abrir(memoria({ [CLAVE]: viejo }))).getState().perfil.medios).toEqual(
+      mediosDeEjemplo(["macro-visa-debito"]),
+    );
+    const roto = JSON.stringify({ version: 1, perfil: { ...perfil, medios: [{ id: "m1", red: "visa" }] } });
+    expect((await abrir(memoria({ [CLAVE]: roto }))).getState().perfil.medios).toEqual([]);
+  });
+
   it("migra el perfil de perfil-local.ts y borra la clave vieja", async () => {
     const viejo = {
       onboardingCompleto: true,
@@ -152,7 +176,7 @@ describe("persistencia (US4)", () => {
     const b = await abrir(disco);
     expect(b.getState().perfil).toMatchObject({
       onboardingCompleto: true,
-      medios: ["galicia-visa-credito"],
+      medios: mediosDeEjemplo(["galicia-visa-credito"]),
       nombre: "Martín",
     });
     expect(b.getState().sesion.usuario).toBeNull();
@@ -191,33 +215,6 @@ describe("persistencia del corpus en su propia clave (spec 009 FR-017)", () => {
     expect(disco.datos.has(CLAVE_CORPUS)).toBe(false);
   });
 
-  it("los medios guardados de Supabase sobreviven a cerrar y abrir", async () => {
-    const disco = memoria();
-    const a = await abrir(disco);
-    a.dispatch(mediosGuardadosCargados([{ id: "m1", bancoId: "b1", nombreBanco: null, tipo: "debito", red: "cabal" }]));
-    await esperar();
-    const b = await abrir(disco);
-    expect(b.getState().perfil.mediosGuardados).toEqual(a.getState().perfil.mediosGuardados);
-  });
-
-  it("un guardado con un medio de red inventada descarta el perfil, no solo ese medio", async () => {
-    const malo = JSON.stringify({
-      version: 1,
-      perfil: {
-        nombre: null,
-        onboardingCompleto: true,
-        medios: [],
-        mediosGuardados: [{ id: "m1", bancoId: "b1", nombreBanco: null, tipo: "credito", red: "bitcoin" }],
-        comercios: [],
-        invitacionPendiente: null,
-      },
-      compras: { lista: [] },
-    });
-    const s = await abrir(memoria({ [CLAVE]: malo }));
-    expect(s.getState().perfil.onboardingCompleto).toBe(false);
-    expect(s.getState().perfil.mediosGuardados).toEqual([]);
-  });
-
   it("un guardado v1 anterior a la spec 009 (con corpus de ejemplo adentro y sin los campos nuevos) se lee como nunca sincronizado", async () => {
     const viejo = JSON.stringify({
       version: 1,
@@ -229,8 +226,7 @@ describe("persistencia del corpus en su propia clave (spec 009 FR-017)", () => {
     const s = await abrir(memoria({ [CLAVE]: viejo }));
     const e = s.getState();
     expect(e.perfil.onboardingCompleto).toBe(true);
-    expect(e.perfil.medios).toEqual(["galicia-visa-credito"]);
-    expect(e.perfil.mediosGuardados).toEqual([]); // el guardado no traía el campo
+    expect(e.perfil.medios).toEqual(mediosDeEjemplo(["galicia-visa-credito"]));
     expect(e.corpus.marca).toBeNull();
     expect(e.corpus.promociones).toHaveLength(promociones.length); // el de ejemplo, no el del guardado
     expect(e.compras.lista.map((c) => c.id)).toEqual(["c1"]);

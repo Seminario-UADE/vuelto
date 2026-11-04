@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { mediosDeEjemplo } from "../data/fixtures";
 import { comprasOctubre } from "../data/fixtures";
 import { escenarioElegido, sesionCerrada } from "./acciones";
 import { compraAgregada } from "./compras";
 import { contactoAgregado, contactoQuitado } from "./contactos";
-import { mediosElegidos, mediosGuardadosCargados, onboardingTerminado } from "./perfil";
+import { mediosConfirmados, onboardingTerminado } from "./perfil";
 import { avisoMostrado, usuarioCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
 import { storeDePrueba } from "./prueba";
@@ -70,13 +71,10 @@ describe("usuario autenticado", () => {
   });
 });
 
-const medioGuardado = { id: "m1", bancoId: "88d8705e-2dda-46f9-8411-bb4916af858e", nombreBanco: "Banco Galicia", tipo: "credito", red: "visa" } as const;
-
 describe("cerrar sesión", () => {
   it("vuelve todo al inicio salvo el reloj", () => {
     const s = storeDePrueba();
-    s.dispatch(mediosElegidos(["galicia-visa-credito"]));
-    s.dispatch(mediosGuardadosCargados([medioGuardado]));
+    s.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
     s.dispatch(onboardingTerminado());
     s.dispatch(usuarioCambio({ id: "u1", email: "martin@ejemplo.com" }));
     s.dispatch(avisoMostrado("hola"));
@@ -87,7 +85,6 @@ describe("cerrar sesión", () => {
     const e = s.getState();
     expect(e.perfil.onboardingCompleto).toBe(false);
     expect(e.perfil.medios).toEqual([]);
-    expect(e.perfil.mediosGuardados).toEqual([]);
     expect(e.sesion.usuario).toBeNull();
     expect(e.sesion.authLista).toBe(true);
     expect(e.sesion.aviso).toBeNull();

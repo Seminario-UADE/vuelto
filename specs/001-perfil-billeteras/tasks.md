@@ -6,7 +6,7 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
 
 **Input**: `spec.md` y `plan.md` de `specs/001-perfil-billeteras/`. Todo lo que dice "según plan" está detallado en `plan.md` §Decisiones y §Código de la app.
 
-> **Actualizado el 02/11/2026 por ADR-010.** El perfil vive en el slice `perfil` de Redux (#81), que también lo persiste: se cayó el cache propio de esta feature. Las fases 1 y 2a (modelo, buscador, acceso a Supabase y selector) se hacen ya; conectar las pantallas (fases 2b y 3) espera a la #40 (la #81 ya cerró y el slice ya tiene `mediosGuardados`).
+> **Actualizado el 02/11/2026 por ADR-010.** El perfil vive en el slice `perfil` de Redux (#81), que también lo persiste: se cayó el cache propio de esta feature. Las fases 1 y 2a (modelo, buscador, acceso a Supabase y selector) se hacen ya; conectar las pantallas (fases 2b y 3) quedó hecho el 03/11, con la #40 cerrada y el slice `perfil` guardando `MedioDePago`.
 
 **Tests**: test-first para las funciones puras de `apps/mobile/src/perfil/`: cada test se escribe antes y tiene que fallar primero. Las pantallas se prueban con los escenarios de aceptación de la spec.
 
@@ -52,28 +52,28 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
   - sin resultados: "Ese banco o emisor no está disponible en esta versión. Podés seguir con otro medio de pago." (US1-7);
   - devuelve el `MedioNuevo` por un callback y no guarda nada.
 
-## Phase 2b: User Story 1 — conectar el onboarding (P1) 🎯 MVP — **BLOQUEADA por #40**
+## Phase 2b: User Story 1 — conectar el onboarding (P1) 🎯 MVP
 
-- [ ] T008 [US1] En `apps/mobile/src/app/(onboarding)/medios.tsx`:
+- [x] T008 [US1] En `apps/mobile/src/app/(onboarding)/medios.tsx`:
   - reemplazar la lista fija de medios por `SelectorMedio` y mostrar la lista de agregados, que se pueden quitar antes de confirmar;
   - "Confirmar" deshabilitado si `!puedeConfirmar` (FR-007);
-  - "Confirmar" llama `confirmarOnboarding` en un solo pedido (FR-011) y guarda el resultado con `mediosGuardadosCargados` (slice `perfil`). Al conectar, `selectEntradasMotor` pasa a leer `mediosGuardados` en vez de `medios` (a verificar al conectar: las promos de `promociones.banco_id` referencian `bancos.id`, el mismo id de MODO que guarda el medio) y se retira `medios`;
+  - "Confirmar" llama `confirmarOnboarding` en un solo pedido (FR-011) y guarda el resultado en el slice `perfil`;
   - hasta confirmar, nada se guarda (FR-006);
   - errores según `clasificarError`.
-- [ ] T009 [US1] En el control de sesión que deja la #40, si `leerMisMedios()` devuelve `[]`, llevar al onboarding sin salida hasta confirmar. La ruta tiene que ser la misma a la que lleva la #43 cuando el motor lanza `PerfilSinMediosError`.
+- [x] T009 [US1] En el control de sesión que deja la #40, si `leerMisMedios()` devuelve `[]`, llevar al onboarding sin salida hasta confirmar. La ruta tiene que ser la misma a la que lleva la #43 cuando el motor lanza `PerfilSinMediosError`.
 
 **Checkpoint**: escenarios US1-1 a US1-7 de la spec OK en Expo Go.
 
 ---
 
-## Phase 3: User Story 2 — Editar desde Perfil (P2) — **BLOQUEADA por #40**
+## Phase 3: User Story 2 — Editar desde Perfil (P2)
 
-- [ ] T010 [US2] En `apps/mobile/src/app/(tabs)/perfil.tsx`:
+- [x] T010 [US2] En `apps/mobile/src/app/(tabs)/perfil.tsx`:
   - lista de medios del slice `perfil` con `nombreBanco`, tipo y etiqueta de red;
   - "Agregar" abre `SelectorMedio` y llama `agregarMedio`;
   - "Sacar" llama `sacarMedio` y queda deshabilitado si `!puedeSacar` (FR-009);
   - cada cambio exitoso actualiza el slice.
-- [ ] T011 [US2] Sin conexión (FR-010, FR-012, SC-003):
+- [x] T011 [US2] Sin conexión (FR-010, FR-012, SC-003):
   - si `leerMisMedios()` da `sin_conexion`, mostrar lo que tiene el slice con el aviso "Sin conexión: tu perfil se muestra como estaba la última vez. Para editarlo necesitás conexión." y deshabilitar agregar y sacar;
   - si el slice tampoco tiene nada, mostrar el error de conexión, nunca una carga infinita;
   - al cerrar sesión se vacía el slice (FR-013).
@@ -94,4 +94,4 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
 ## Orden
 
 - **Phase 1 y 2a**: ya. Son funciones puras y un componente que recibe todo por props.
-- **Phase 2b y 3**: cuando cierre la #40 (sesión). T008 y T010 reusan `SelectorMedio`.
+- **Phase 2b y 3**: hechas (03/11): la #40 cerró y el slice `perfil` guarda `MedioDePago`. T008 y T010 reusan `SelectorMedio`.

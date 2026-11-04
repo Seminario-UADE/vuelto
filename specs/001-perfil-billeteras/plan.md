@@ -15,10 +15,9 @@ RLS, sin Edge Function (ADR-009), y guarda el resultado en el slice `perfil` de 
 La integridad la garantiza la tabla. La lógica de la pantalla (buscador, duplicados, mínimo de un
 medio) va en funciones puras con tests.
 
-**Estado de las dependencias (02/11)**: #34 y #39 cerradas. La #81 cerró (store de Redux). Falta #40 (sesión). El slice `perfil` ya tiene `mediosGuardados: MedioDePago[]`
-(lo que devuelve `datos.ts`), al lado de `medios: string[]` (ids del catálogo fijo), que sigue siendo lo que lee el
-motor hasta T008. Lo que no depende de ellas (modelo, buscador, acceso a Supabase y
-selector de medio) se hace ya. Conectar las pantallas espera a esas dos.
+**Estado de las dependencias (03/11)**: #34, #39, #81 (store de Redux) y #40 (sesión) cerradas. El
+slice `perfil` ya guarda `MedioDePago` de la base en vez de ids de un catálogo fijo (T008), y las
+pantallas están conectadas (fases 2b y 3).
 
 ## Technical Context
 
@@ -57,8 +56,12 @@ ADR-010, RNF-02, ADR-009, contrato de tipos #33). La spec no cambia.
 3. **La integridad está en la base, no en la pantalla.** El `unique` de la tripleta (FR-004)
    también protege contra dos dispositivos o un doble toque. `not null` y `check` cubren FR-005
    y FR-011. La app no usa `update`: la spec solo pide agregar y sacar.
-4. **"Al menos un medio" lo controla la app** (FR-007, FR-009). Un trigger en la base frenaría
-   el borrado en cascada al eliminar la cuenta. Si el perfil igual queda vacío, el motor lanza
+4. **"Al menos un medio": la app lo evita y la base lo garantiza** (FR-007, FR-009). La app no
+   ofrece sacar el último, pero mira su copia local: con dos dispositivos se podría borrar. La
+   migración `20261103000001` agrega un trigger por sentencia (`VM001`) que rechaza un `DELETE`
+   que deje a un usuario sin medios, salvo que el usuario ya no exista, así que el borrado en
+   cascada al eliminar la cuenta pasa (cubierto en `medios_minimo_uno.test.sql`). Crear el primer
+   medio no lo toca: FR-007 sigue siendo de la app. Si el perfil igual queda vacío, el motor lanza
    `PerfilSinMediosError` en el selector de recomendación (#43) y la app lleva al onboarding.
 5. **El onboarding se guarda en un solo `insert` de varias filas** (FR-011): entra todo o nada.
    Desde Perfil, cada alta o baja es un pedido aparte.
@@ -83,11 +86,6 @@ ADR-010, RNF-02, ADR-009, contrato de tipos #33). La spec no cambia.
    (nullable, ver abajo) pero la ingesta todavía no lo carga. El modelo lo lleva como
    `boolean | null`: `null` = no se sabe, y el buscador lo ordena como no priorizado. Nunca se
    inventa un valor.
-10. **El slice `perfil` guarda los medios de la base al lado de los del catálogo fijo.** Se suma
-    `mediosGuardados: MedioDePago[]` (aditivo: lo persistido antes entra con `[]`, un medio con red
-    o tipo inválidos descarta el perfil). `medios: string[]` y los selectores no cambian: T008
-    mueve `selectEntradasMotor` a `mediosGuardados` y retira `medios` cuando conecte las pantallas.
-    Al cerrar sesión se vacía junto con el resto del slice.
 
 ## Lo que dejó la #34 (PR #84)
 

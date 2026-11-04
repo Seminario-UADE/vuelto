@@ -283,6 +283,12 @@ Compra de ejemplo: **Coto, miércoles, $24.500**.
 - Alternativas: Provincia Visa débito (hoy no aplica, la promo es los
   sábados); Santander Mastercard (sin promo en supermercados).
 
+> **Nota (2026-11-03):** Coto es un ejemplo de diseño. MODO sí tiene promos reales de Coto, Jumbo,
+> Disco, Vea, Día y La Anónima (`docs/product/alcance-mvp.md`, `docs/product/corpus-semilla.md`), pero
+> las de Coto son los lunes y los martes (25%), no los miércoles. Si el recorrido del pitch usa datos
+> reales, la compra de ejemplo tiene que caer un día con promo vigente; qué ejemplo muestra lo decide el
+> equipo.
+
 Contactos de Martín (ADR-008, nivel 1): **Lucía** y **Mateo**, vinculados
 por invitación. **Sofía** no tiene cuenta: se declara a mano en cada grupo.
 
