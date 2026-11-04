@@ -111,7 +111,11 @@ export type Recomendacion = {
   proximaPromo: string | null;
 };
 
+/** Qué saldo es, como lo agrupa el motor: el grupo si es compartido, la promo si es propio. */
+export type ClaveTope = `grupo:${string}` | `promo:${string}`;
+
 export type TopeMedio = {
+  clave: ClaveTope;
   medio: MedioDePago;
   rubro: Rubro;
   /** "20% en supermercados · miércoles" */
@@ -127,6 +131,10 @@ export type TopeMedio = {
   reinicio: string;
   /** Consejo del día con datos del usuario; uno por pantalla como máximo. */
   consejo: string | null;
+  /** Títulos de las promos vigentes que descuentan de este tope (las vencidas de un grupo no figuran). */
+  promociones: string[];
+  /** Las compras que lo consumieron, tal como las contó el motor (issue #45). */
+  compraIds: string[];
 };
 
 export type ResumenTopes = {
@@ -150,6 +158,12 @@ export type Compra = {
   origen: OrigenCompra;
   /** Texto que el extractor leyó del ticket (se guarda; la imagen no). `null` si no hubo ticket. */
   textoExtraido: string | null;
+};
+
+/** «Compras de un tope» (issue #45): el tope, con su base, y las compras que lo consumieron. */
+export type ComprasDeTope = {
+  tope: TopeMedio;
+  compras: Compra[];
 };
 
 export type ResumenCompras = {

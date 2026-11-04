@@ -25,6 +25,7 @@ describe("calcularSaldos: saldo propio", () => {
       consumido: 400000,
       restante: 100000,
       base: { comprasRegistradas: 2, comprasSinDescuentoInformado: 0 },
+      compraIds: ["c1", "c2"],
     });
   });
 
