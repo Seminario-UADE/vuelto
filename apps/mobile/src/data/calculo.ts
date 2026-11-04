@@ -307,12 +307,13 @@ export function comprasDeTopeVista(
 
 /**
  * Comercio del catálogo por nombre, con el criterio de repetidos del perfil («Coto» = « coto »);
- * fuera del catálogo, sin rubro (no se inventa).
+ * fuera del catálogo, sin rubro (no se inventa). Las pantallas pasan el catálogo del corpus
+ * (`selectCatalogoComercios`); las compras de ejemplo usan el de ejemplo.
  */
-export function comercioPorNombre(nombre: string): Comercio {
+export function comercioPorNombre(nombre: string, catalogo: readonly Comercio[] = catalogoComercios): Comercio {
   const n = normalizarComercio(nombre);
   return (
-    catalogoComercios.find((c) => normalizarComercio(c.nombre) === n) ?? {
+    catalogo.find((c) => normalizarComercio(c.nombre) === n) ?? {
       id: `libre-${n}`,
       nombre,
       inicial: nombre.charAt(0).toUpperCase(),

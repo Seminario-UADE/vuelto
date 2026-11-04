@@ -17,6 +17,7 @@ import {
 } from "../data/calculo";
 import { contarPendientes } from "../data/compras/operaciones";
 import type { Comercio, MedioDePago, Perfil } from "../data/contracts";
+import { comerciosDelCorpus } from "../data/comercios";
 import { catalogoComercios } from "../data/fixtures";
 import { medioVista } from "../perfil/vista";
 import type { RootState } from "./index";
@@ -46,18 +47,43 @@ export const selectEntradasMotor = createSelector(
   }),
 );
 
+/**
+ * Los comercios del buscador (FR-030): con un corpus sincronizado, los de sus promos vigentes;
+ * antes de la primera sincronización (`marca` `null`), el catálogo de ejemplo, que va con las
+ * promos de ejemplo (spec 009 FR-016).
+ */
+export const selectCatalogoComercios = createSelector(
+  [(s: RootState) => s.corpus.promociones, (s: RootState) => s.corpus.marca, selectHoy],
+  (promociones, marca, hoy): readonly Comercio[] =>
+    marca === null ? catalogoComercios : comerciosDelCorpus(promociones, hoy),
+);
+
 /** Los comercios que eligió el usuario; si saltó ese paso, los frecuentes de ejemplo. */
-export const selectComerciosFrecuentes = createSelector([(s: RootState) => s.perfil.comercios], (habituales): Comercio[] => {
-  // Del catálogo si lo conoce (con su rubro); si no, el comercio por su nombre, sin rubro inventado.
-  const elegidos = habituales.map((c) => comercioPorNombre(c.nombre));
-  return elegidos.length > 0 ? elegidos : catalogoComercios.filter((c) => c.frecuente);
-});
+export const selectComerciosFrecuentes = createSelector(
+  [(s: RootState) => s.perfil.comercios, selectCatalogoComercios],
+  (habituales, catalogo): Comercio[] => {
+    // Del catálogo si lo conoce (con su rubro); si no, el comercio por su nombre, sin rubro inventado.
+    if (habituales.length > 0) return habituales.map((c) => comercioPorNombre(c.nombre, catalogo));
+    // Los de ejemplo, con el rubro del corpus si está ahí; si no, con el suyo (sus promos de rubro).
+    return catalogoComercios.filter((c) => c.frecuente).map((c) => {
+      const delCorpus = comercioPorNombre(c.nombre, catalogo);
+      return delCorpus.categoriaId === null ? c : delCorpus;
+    });
+  },
+);
+
+/** Un comercio por id: del catálogo o uno de los accesos rápidos (un habitual escrito a mano). */
+export const selectBuscarComercioPorId = createSelector(
+  [selectCatalogoComercios, selectComerciosFrecuentes],
+  (catalogo, frecuentes) =>
+    (id: string | null): Comercio | null =>
+      id === null ? null : (catalogo.find((c) => c.id === id) ?? frecuentes.find((c) => c.id === id) ?? null),
+);
 
 /** El comercio que tocó: del catálogo o uno de sus habituales escritos a mano (sin rubro). */
 export const selectComercioSimulado = createSelector(
-  [(s: RootState) => s.simulacion.comercioId, selectComerciosFrecuentes],
-  (id, frecuentes): Comercio | null =>
-    catalogoComercios.find((c) => c.id === id) ?? frecuentes.find((c) => c.id === id) ?? null,
+  [(s: RootState) => s.simulacion.comercioId, selectBuscarComercioPorId],
+  (id, buscar): Comercio | null => buscar(id),
 );
 
 /** «¿Con qué pago?»: se recalcula con cada cambio del monto, sin red (US2). */

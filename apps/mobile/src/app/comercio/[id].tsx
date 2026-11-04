@@ -12,9 +12,9 @@ import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { Skeleton, SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
-import { RUBROS } from "@/lib/rubros";
+import { nombreDeRubro } from "@/data/comercios";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectRecomendacion } from "@/store/selectores";
+import { selectFrescura, selectRecomendacion } from "@/store/selectores";
 import { comercioElegido, montoCambiado } from "@/store/simulacion";
 import { colors, radius, space } from "@/theme";
 
@@ -38,6 +38,8 @@ export default function ConQuePagar() {
   const rec = useAppSelector(selectRecomendacion);
   const r = elegido === params.id ? rec : null;
   const sinPromo = r !== null && r.medio === null;
+  // "Promos actualizadas hace X", como en Inicio: solo con un corpus sincronizado (spec 009 FR-019).
+  const frescura = useAppSelector(selectFrescura);
 
   const usar = () => {
     if (!r?.medio) return;
@@ -69,7 +71,7 @@ export default function ConQuePagar() {
           <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
             <Avatar icon={iconoDeRubro[r.comercio.rubro]} />
             <Text variant="bodyMd" tone="inkSecondary" style={{ flex: 1 }}>
-              {RUBROS[r.comercio.rubro].titulo} · {r.dia}
+              {nombreDeRubro(r.comercio)} · {r.dia}
             </Text>
           </View>
         ) : null}
@@ -125,6 +127,12 @@ export default function ConQuePagar() {
           </Text>
           <Icon name="chevron" size={18} color={colors.inkSecondary} />
         </Pressable>
+
+        {frescura ? (
+          <Text variant="label" tone="inkSecondary" style={{ textAlign: "center" }}>
+            {frescura}
+          </Text>
+        ) : null}
       </Screen>
     </>
   );

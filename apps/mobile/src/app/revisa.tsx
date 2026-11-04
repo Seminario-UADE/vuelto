@@ -11,14 +11,13 @@ import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { SheetHeader } from "@/components/sheet-header";
 import { Text } from "@/components/text";
-import * as api from "@/data/api";
 import { comercioPorNombre, promoPropuesta } from "@/data/calculo";
+import { comercioDelCatalogo } from "@/data/comercios";
 import type { OrigenCompra } from "@/data/contracts";
-import { useAsync } from "@/hooks/use-async";
 import { aprox, fechaLarga, montoEditable, parseMonto } from "@/lib/format";
 import { hapticoExito, hapticoSeleccion } from "@/lib/haptics";
 import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
-import { selectEntradasMotor, selectHoy, selectPerfilVista } from "@/store/selectores";
+import { selectCatalogoComercios, selectEntradasMotor, selectHoy, selectPerfilVista } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { guardarCompra } from "@/store/thunks";
 import { colors, space } from "@/theme";
@@ -62,17 +61,16 @@ export default function Revisa() {
 
   const perfil = useAppSelector(selectPerfilVista);
   const comercioConocido = perfil.comercios.find((c) => c.nombre.toLowerCase() === comercio.trim().toLowerCase());
-  const busqueda = useAsync(() => api.buscarComercios(comercio), comercio);
-  const conocido =
-    comercioConocido ?? busqueda.datos?.find((c) => c.nombre.toLowerCase() === comercio.trim().toLowerCase());
+  const catalogo = useAppSelector(selectCatalogoComercios);
+  const conocido = comercioConocido ?? (comercio.trim() ? comercioDelCatalogo(comercio, catalogo) : undefined);
   // Qué dice el motor de cada medio para este comercio (solo para orientar; no preselecciona).
   const rec = useRecomendacionPara(conocido?.id ?? null, monto);
   // La promo que se propone y se guarda es la misma función, evaluada en la fecha de la compra
   // (FR-022): no la del día de hoy, que con un ticket de otro día mostraría otra cosa.
   const entradas = useAppSelector(selectEntradasMotor);
   const propuesta = useMemo(
-    () => (medioId && comercio.trim() ? promoPropuesta(entradas, comercioPorNombre(comercio.trim()), medioId, fecha, monto) : null),
-    [entradas, medioId, comercio, fecha, monto],
+    () => (medioId && comercio.trim() ? promoPropuesta(entradas, comercioPorNombre(comercio.trim(), catalogo), medioId, fecha, monto) : null),
+    [entradas, catalogo, medioId, comercio, fecha, monto],
   );
   const hayPromo = propuesta !== null && propuesta.promociones.length > 0;
 

@@ -2,9 +2,8 @@ import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { recomendacionVista } from "../data/calculo";
 import type { Recomendacion } from "../data/contracts";
-import { catalogoComercios } from "../data/fixtures";
 import type { AppDispatch, RootState } from "./index";
-import { selectEntradasMotor } from "./selectores";
+import { selectBuscarComercioPorId, selectEntradasMotor } from "./selectores";
 
 export const useAppSelector = useSelector.withTypes<RootState>();
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
@@ -16,8 +15,9 @@ export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
  */
 export function useRecomendacionPara(comercioId: string | null, monto: number | null): Recomendacion | null {
   const entradas = useAppSelector(selectEntradasMotor);
+  const buscar = useAppSelector(selectBuscarComercioPorId);
   return useMemo(() => {
-    const comercio = catalogoComercios.find((c) => c.id === comercioId);
+    const comercio = buscar(comercioId);
     return comercio ? recomendacionVista(entradas, comercio, monto) : null;
-  }, [entradas, comercioId, monto]);
+  }, [entradas, buscar, comercioId, monto]);
 }

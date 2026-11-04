@@ -2098,6 +2098,40 @@ logo, y que el slice `perfil` guarde lo que devuelve `perfil/datos.ts`.
 
 ---
 
+## 2026-11-04 — «¿Con qué pago?»: comercios del corpus y fecha de las promos (issue #43, parte A)
+
+**Herramienta:** Claude Code (Opus 5.5).
+
+**Objetivo:** dos de los criterios de #43 que el PR #95 dejó pendientes: el
+buscador con los comercios de las promos reales (no la lista de ejemplo) y la
+fecha de la última sincronización en la pantalla del comercio. Sin spec-kit: la
+spec ya existe (004, FR-030).
+
+**Prompts principales:**
+1. "Mira lo que me queda asignado y arma una ruta" → #43 en dos PRs (A: corpus
+   y fecha; B: categoría, presencial/online y descartadas plegadas), #56 al final.
+2. "Arranca".
+
+**Resultado:**
+- `data/comercios.ts` (funciones puras): `comerciosDelCorpus` arma los pares
+  únicos (comercio, rubro) de las promos con comercio que siguen vigentes; un
+  comercio en dos rubros sale dos veces y el chip lleva el rubro. Una categoría
+  de MODO sin rubro propio en la app conserva su id y se nombra como en MODO.
+- `selectCatalogoComercios` (ADR-010): con corpus sincronizado, esos comercios;
+  antes de la primera sincronización, el catálogo de ejemplo (va con las promos
+  de ejemplo). Lo usan el buscador de Inicio, el onboarding, Perfil, «Revisá tu
+  compra» y el gasto en grupo. `api.ts` ya no tiene `getCatalogoComercios`,
+  `buscarComercios` ni `getComercio`.
+- Buscador de Inicio: los habituales que coinciden van primero.
+- Onboarding: sin búsqueda, hasta 8 comercios por rubro (con el corpus real son
+  cientos).
+- Pantalla del comercio: «Promos actualizadas hace …», como en Inicio.
+- Resuelve el pendiente de #47 (autocompletar desde el corpus) y responde la
+  parte de comercios de #102.
+- Verificación: lint, typecheck, build y tests en verde. No se probó en Expo Go.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

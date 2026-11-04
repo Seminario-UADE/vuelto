@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { TextInput, View } from "react-native";
-import * as api from "@/data/api";
+import { buscarComercios, etiquetaDeComercio } from "@/data/comercios";
 import type { Comercio } from "@/data/contracts";
-import { useAsync } from "@/hooks/use-async";
 import { useAppSelector } from "@/store/hooks";
-import { selectComerciosFrecuentes } from "@/store/selectores";
+import { selectCatalogoComercios, selectComerciosFrecuentes } from "@/store/selectores";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 import { Chip } from "./chip";
 import { Icon } from "./icon";
@@ -17,12 +16,19 @@ type Props = {
   sobre?: "surface" | "canvas";
 };
 
-/** Buscador de comercios + chips de frecuentes. Tocar uno ya es la pregunta "¿dónde?". */
+/**
+ * Buscador de comercios + chips de frecuentes. Tocar uno ya es la pregunta "¿dónde?". Busca en
+ * los comercios del corpus guardado, sin red (#43); los habituales que coinciden van primero.
+ */
 export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Props) {
   const [q, setQ] = useState("");
   const frecuentes = useAppSelector(selectComerciosFrecuentes);
-  const resultados = useAsync(() => api.buscarComercios(q), q);
-  const lista = q.trim() ? (resultados.datos ?? []) : frecuentes;
+  const catalogo = useAppSelector(selectCatalogoComercios);
+  const lista = useMemo(() => {
+    if (!q.trim()) return frecuentes;
+    const propios = buscarComercios(frecuentes, q);
+    return [...propios, ...buscarComercios(catalogo, q).filter((c) => !propios.some((x) => x.id === c.id))].slice(0, 20);
+  }, [q, frecuentes, catalogo]);
   return (
     <View style={{ gap: space.md }}>
       <View
@@ -49,7 +55,7 @@ export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Pr
           style={{ flex: 1, minHeight: 44, fontFamily: fonts.regular, fontSize: escala.bodyLg.fontSize, color: colors.ink }}
         />
       </View>
-      {q.trim() && resultados.estado === "listo" && lista.length === 0 ? (
+      {q.trim() && lista.length === 0 ? (
         <Text variant="bodyMd" tone="inkSecondary">
           No encontramos “{q.trim()}”. Probá con otro nombre.
         </Text>
@@ -58,7 +64,7 @@ export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Pr
         {lista.map((c) => (
           <Chip
             key={c.id}
-            label={c.nombre}
+            label={etiquetaDeComercio(c, lista)}
             selected={seleccionado === c.id}
             accessibilityHint="Muestra con qué te conviene pagar"
             onPress={() => {
