@@ -6,6 +6,8 @@
  * (`fixtures.ts`). Los selectores del store las envuelven con `createSelector`.
  */
 import {
+  type Canal,
+  type CausaDescarte,
   diaArgentina,
   diaMesSinCeros,
   diaSiguiente,
@@ -39,8 +41,8 @@ import type {
   Rubro,
   TopeMedio,
 } from "./contracts";
-import { catalogoComercios } from "./fixtures";
-import { normalizarComercio, type MedioDePago as MedioGuardado } from "../perfil/modelo";
+import type { MedioDePago as MedioGuardado } from "../perfil/modelo";
+import { claveDeComercio, comercioDelCatalogo, esComercioDeRubro } from "./comercios";
 import { medioDelMotor, medioVista } from "../perfil/vista";
 import { aVista } from "./vista-recomendacion";
 import { mediodia } from "../lib/reloj";
@@ -121,13 +123,20 @@ function rubroDeCategoria(categoriaId: number): Rubro {
   return (par?.[0] as Rubro | undefined) ?? "otro";
 }
 
-/** La compra que se evalúa en un comercio del catálogo. La app siempre pregunta por presencial. */
-export function pedidoPresencial(comercio: Comercio & { categoriaId: number }, monto: number | null): PedidoRecomendar {
+/**
+ * La compra que se evalúa: el comercio (o solo su rubro, sin comercio: FR-001), el monto opcional
+ * y el canal (presencial por defecto, FR-001).
+ */
+export function pedidoDeCompra(
+  comercio: Comercio & { categoriaId: number },
+  monto: number | null,
+  canal: Canal = "presencial",
+): PedidoRecomendar {
   return {
-    comercio: comercio.nombre,
+    comercio: esComercioDeRubro(comercio) ? null : comercio.nombre,
     categoriaId: comercio.categoriaId,
     monto: monto !== null && monto > 0 ? monto : null,
-    canal: "presencial",
+    canal,
   };
 }
 
@@ -154,12 +163,15 @@ export function recomendacionVista(
   entradas: EntradasMotor,
   comercio: Comercio,
   monto: number | null,
+  canal: Canal = "presencial",
 ): Recomendacion | null {
   if (comercio.categoriaId === null) return null;
-  const pedido = pedidoPresencial({ ...comercio, categoriaId: comercio.categoriaId }, monto);
+  const pedido = pedidoDeCompra({ ...comercio, categoriaId: comercio.categoriaId }, monto, canal);
   const r = recomendarSeguro(pedido, entradas);
-  // Las promos de otro rubro no son una alternativa para esta compra (research R4).
-  const respuesta = { ...r, descartadas: r.descartadas.filter((d) => d.causa !== "categoria") };
+  // Las promos de otro rubro no son una alternativa para esta compra (research R4). Eligiendo
+  // solo el rubro, tampoco las de un comercio puntual: explicarlas sería listar promos (Principio I).
+  const ajenas = new Set<CausaDescarte>(esComercioDeRubro(comercio) ? ["categoria", "comercio"] : ["categoria"]);
+  const respuesta = { ...r, descartadas: r.descartadas.filter((d) => !ajenas.has(d.causa)) };
   const hoy = fechaArgentina(entradas.ahora);
   return aVista(pedido, respuesta, comercio, {
     medios: entradas.medios.map(medioVista),
@@ -294,6 +306,7 @@ export function comprasDeTopeVista(
   topes: ResumenTopes,
   compras: CompraMotor[],
   medios: readonly MedioGuardado[],
+  catalogo: readonly Comercio[],
   clave: string,
 ): ComprasDeTope | null {
   const tope = topes.medios.find((t) => t.clave === clave);
@@ -301,19 +314,19 @@ export function comprasDeTopeVista(
   const ids = new Set(tope.compraIds);
   return {
     tope: { ...tope, consejo: null },
-    compras: compras.filter((c) => ids.has(c.id)).map((c) => compraVista(c, medios)),
+    compras: compras.filter((c) => ids.has(c.id)).map((c) => compraVista(c, medios, catalogo)),
   };
 }
 
 /**
- * Comercio del catálogo por nombre, con el criterio de repetidos del perfil («Coto» = « coto »);
- * fuera del catálogo, sin rubro (no se inventa).
+ * Comercio del catálogo por nombre («Coto» = « coto »); fuera del catálogo, sin rubro (no se
+ * inventa). El catálogo es el de `selectCatalogoComercios`: el del corpus sincronizado o, antes,
+ * el de ejemplo.
  */
-export function comercioPorNombre(nombre: string): Comercio {
-  const n = normalizarComercio(nombre);
+export function comercioPorNombre(nombre: string, catalogo: readonly Comercio[]): Comercio {
   return (
-    catalogoComercios.find((c) => normalizarComercio(c.nombre) === n) ?? {
-      id: `libre-${n}`,
+    comercioDelCatalogo(nombre, catalogo) ?? {
+      id: `libre-${claveDeComercio(nombre).replace(/ /g, "-")}`,
       nombre,
       inicial: nombre.charAt(0).toUpperCase(),
       rubro: "otro",
@@ -323,12 +336,12 @@ export function comercioPorNombre(nombre: string): Comercio {
   );
 }
 
-function compraVista(c: CompraMotor, medios: readonly MedioGuardado[]): Compra {
+function compraVista(c: CompraMotor, medios: readonly MedioGuardado[], catalogo: readonly Comercio[]): Compra {
   const guardado = medios.find((m) => m.id === c.medioDePagoId);
   const medio = guardado ? medioVista(guardado) : medioQuitado(c.medioDePagoId);
   return {
     id: c.id,
-    comercio: comercioPorNombre(c.comercio),
+    comercio: comercioPorNombre(c.comercio, catalogo),
     fecha: c.fecha,
     monto: c.monto,
     medio,
@@ -343,7 +356,12 @@ function compraVista(c: CompraMotor, medios: readonly MedioGuardado[]): Compra {
  * ninguna compra que consume un tope queda sin poder verse o borrarse (spec 010, FR-003).
  * Lo gastado y lo devuelto siguen siendo los del mes en curso.
  */
-export function comprasVista(compras: CompraMotor[], ahora: Date, medios: readonly MedioGuardado[]): ResumenCompras {
+export function comprasVista(
+  compras: CompraMotor[],
+  ahora: Date,
+  medios: readonly MedioGuardado[],
+  catalogo: readonly Comercio[],
+): ResumenCompras {
   const hoy = fechaArgentina(ahora);
   const mes = nombreDelMes(hoy);
   const delMes = comprasDelMes(compras, hoy);
@@ -351,7 +369,7 @@ export function comprasVista(compras: CompraMotor[], ahora: Date, medios: readon
     mes,
     gastaste: delMes.reduce((s, c) => s + c.monto, 0),
     devolvieron: devolvieron(delMes, mes),
-    compras: comprasDelPeriodo(compras, hoy).map((c) => compraVista(c, medios)),
+    compras: comprasDelPeriodo(compras, hoy).map((c) => compraVista(c, medios, catalogo)),
   };
 }
 
@@ -377,10 +395,11 @@ export function promoPropuesta(
   medioId: string,
   fecha: string,
   monto: number | null,
+  canal: Canal = "presencial",
 ): PromoPropuesta {
   const vacia: PromoPropuesta = { medioId, fecha, promociones: [], reintegro: null, base: null };
   if (comercio.categoriaId === null) return vacia;
-  const pedido = pedidoPresencial({ ...comercio, categoriaId: comercio.categoriaId }, monto);
+  const pedido = pedidoDeCompra({ ...comercio, categoriaId: comercio.categoriaId }, monto, canal);
   const r = recomendarSeguro(pedido, { ...entradas, ahora: mediodia(fecha) });
   const opcion = [r.mejor, ...r.alternativas].find((o) => o?.medioDePagoId === medioId) ?? null;
   if (opcion === null || opcion.promociones.length === 0) return vacia;
@@ -405,11 +424,17 @@ export function promoPropuesta(
  * como reintegro esperado. `descuentoObtenido` queda `null`: el usuario no informó cuánto le
  * devolvieron.
  */
-export function compraParaGuardar(entradas: EntradasMotor, b: BorradorCompra, id: string): CompraMotor {
+export function compraParaGuardar(
+  entradas: EntradasMotor,
+  b: BorradorCompra,
+  id: string,
+  catalogo: readonly Comercio[],
+): CompraMotor {
   if (b.monto === null || b.medioId === null) throw new Error("Falta el monto o el medio de pago");
   if (!entradas.perfil.mediosDePago.some((m) => m.id === b.medioId)) throw new Error(`Medio desconocido: ${b.medioId}`);
-  const comercio = comercioPorNombre((b.comercio ?? "").trim() || "Compra");
-  const propuesta = b.usarPromo ? promoPropuesta(entradas, comercio, b.medioId, b.fecha, b.monto) : null;
+  // El mismo catálogo y el mismo canal con los que «Revisá tu compra» propuso la promo (FR-022).
+  const comercio = comercioPorNombre((b.comercio ?? "").trim() || "Compra", catalogo);
+  const propuesta = b.usarPromo ? promoPropuesta(entradas, comercio, b.medioId, b.fecha, b.monto, b.canal) : null;
   const tienePromo = propuesta !== null && propuesta.promociones.length > 0;
   return {
     id,

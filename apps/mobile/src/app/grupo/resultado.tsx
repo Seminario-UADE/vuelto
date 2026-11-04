@@ -14,6 +14,7 @@ import { useAsync } from "@/hooks/use-async";
 import { aprox, iniciales, pesos } from "@/lib/format";
 import { hapticoExito } from "@/lib/haptics";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectBuscarComercioPorId } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { radius, space } from "@/theme";
 
@@ -24,8 +25,10 @@ import { radius, space } from "@/theme";
 export default function GastoEnGrupo() {
   const dispatch = useAppDispatch();
   const pedido = useAppSelector((s) => s.contactos.grupo);
+  const buscarComercio = useAppSelector(selectBuscarComercioPorId);
+  const comercio = pedido ? buscarComercio(pedido.comercioId) : null;
   const r = useAsync(
-    () => (pedido ? api.recomendarGrupo(pedido) : Promise.resolve(null)),
+    () => (pedido ? api.recomendarGrupo(pedido, comercio ?? undefined) : Promise.resolve(null)),
     pedido ? JSON.stringify(pedido) : null,
   );
   const g = r.datos;

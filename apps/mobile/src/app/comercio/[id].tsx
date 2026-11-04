@@ -1,9 +1,10 @@
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
+import { Chip } from "@/components/chip";
 import { Icon, iconoDeRubro } from "@/components/icon";
 import { MontoInput } from "@/components/monto-input";
 import { AlternativaRow, RecomendacionCard } from "@/components/recomendacion";
@@ -12,10 +13,10 @@ import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { Skeleton, SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
-import { RUBROS } from "@/lib/rubros";
+import { nombreDeRubro } from "@/data/comercios";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectRecomendacion } from "@/store/selectores";
-import { comercioElegido, montoCambiado } from "@/store/simulacion";
+import { selectFrescura, selectRecomendacion } from "@/store/selectores";
+import { canalCambiado, comercioElegido, montoCambiado } from "@/store/simulacion";
 import { colors, radius, space } from "@/theme";
 
 
@@ -38,12 +39,19 @@ export default function ConQuePagar() {
   const rec = useAppSelector(selectRecomendacion);
   const r = elegido === params.id ? rec : null;
   const sinPromo = r !== null && r.medio === null;
+  // "Promos actualizadas hace X", como en Inicio: solo con un corpus sincronizado (spec 009 FR-019).
+  const frescura = useAppSelector(selectFrescura);
+  const canal = useAppSelector((s) => s.simulacion.canal);
+  // Las otras opciones se ven siempre; los medios sin promo, plegados (issue #43).
+  const [verDescartes, setVerDescartes] = useState(false);
+  const opciones = r?.alternativas.filter((a) => a.estado === "otra-opcion") ?? [];
+  const descartes = r?.alternativas.filter((a) => a.estado !== "otra-opcion") ?? [];
 
   const usar = () => {
     if (!r?.medio) return;
     router.push({
       pathname: "/revisa",
-      params: { modo: "excepcion", comercio: r.comercio.nombre, monto: monto ?? "", medio: r.medio.id },
+      params: { modo: "excepcion", comercio: r.comercio.nombre, monto: monto ?? "", medio: r.medio.id, canal },
     });
   };
 
@@ -69,10 +77,21 @@ export default function ConQuePagar() {
           <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
             <Avatar icon={iconoDeRubro[r.comercio.rubro]} />
             <Text variant="bodyMd" tone="inkSecondary" style={{ flex: 1 }}>
-              {RUBROS[r.comercio.rubro].titulo} · {r.dia}
+              {nombreDeRubro(r.comercio)} · {r.dia}
             </Text>
           </View>
         ) : null}
+
+        {/* Presencial por defecto (spec 004 FR-001): una promo online no sirve en el local. */}
+        <View style={{ flexDirection: "row", gap: space.sm }} accessibilityRole="radiogroup">
+          <Chip
+            label="En el local"
+            rol="radio"
+            selected={canal === "presencial"}
+            onPress={() => dispatch(canalCambiado("presencial"))}
+          />
+          <Chip label="Online" rol="radio" selected={canal === "online"} onPress={() => dispatch(canalCambiado("online"))} />
+        </View>
 
         {r ? <RecomendacionCard r={r} /> : <Skeleton height={220} r={radius.card} />}
 
@@ -87,18 +106,44 @@ export default function ConQuePagar() {
         </Card>
 
         {r ? (
-          r.alternativas.length > 0 ? (
-            <View style={{ gap: space.xs }}>
-              <SectionHeader title={r.medio ? "Otras opciones" : "Tus medios hoy"} />
-              <Card padding={space.lg} gap={0}>
-                {r.alternativas.map((a, i) => (
-                  <View key={`${a.titulo}-${i}`} style={divisor(i)}>
-                    <AlternativaRow a={a} />
-                  </View>
-                ))}
-              </Card>
-            </View>
-          ) : null
+          <>
+            {opciones.length > 0 ? (
+              <View style={{ gap: space.xs }}>
+                <SectionHeader title="Otras opciones" />
+                <Card padding={space.lg} gap={0}>
+                  {opciones.map((a, i) => (
+                    <View key={`${a.titulo}-${i}`} style={divisor(i)}>
+                      <AlternativaRow a={a} />
+                    </View>
+                  ))}
+                </Card>
+              </View>
+            ) : null}
+            {descartes.length > 0 ? (
+              <View style={{ gap: space.xs }}>
+                <Pressable
+                  onPress={() => setVerDescartes((x) => !x)}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: verDescartes }}
+                  style={{ flexDirection: "row", alignItems: "center", gap: space.xs, minHeight: 44 }}
+                >
+                  <Text variant="bodyMd" weight="semibold" style={{ flex: 1 }}>
+                    {r.medio ? "Por qué no los otros" : "Por qué no tus medios"} ({descartes.length})
+                  </Text>
+                  <Icon name="chevron" size={18} color={colors.inkSecondary} />
+                </Pressable>
+                {verDescartes ? (
+                  <Card padding={space.lg} gap={0}>
+                    {descartes.map((a, i) => (
+                      <View key={`${a.titulo}-${i}`} style={divisor(i)}>
+                        <AlternativaRow a={a} />
+                      </View>
+                    ))}
+                  </Card>
+                ) : null}
+              </View>
+            ) : null}
+          </>
         ) : (
           <SkeletonList rows={2} height={56} />
         )}
@@ -125,6 +170,12 @@ export default function ConQuePagar() {
           </Text>
           <Icon name="chevron" size={18} color={colors.inkSecondary} />
         </Pressable>
+
+        {frescura ? (
+          <Text variant="label" tone="inkSecondary" style={{ textAlign: "center" }}>
+            {frescura}
+          </Text>
+        ) : null}
       </Screen>
     </>
   );

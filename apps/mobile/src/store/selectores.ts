@@ -17,6 +17,7 @@ import {
 } from "../data/calculo";
 import { contarPendientes } from "../data/compras/operaciones";
 import type { Comercio, MedioDePago, Perfil } from "../data/contracts";
+import { comerciosConNombre, comerciosDelCorpus, RUBROS_DE_MODO } from "../data/comercios";
 import { catalogoComercios } from "../data/fixtures";
 import { medioVista } from "../perfil/vista";
 import type { RootState } from "./index";
@@ -46,24 +47,74 @@ export const selectEntradasMotor = createSelector(
   }),
 );
 
+/**
+ * Los comercios del buscador (FR-030): con un corpus sincronizado, los de sus promos vigentes;
+ * antes de la primera sincronización (`marca` `null`), el catálogo de ejemplo, que va con las
+ * promos de ejemplo (spec 009 FR-016).
+ */
+export const selectCatalogoComercios = createSelector(
+  [(s: RootState) => s.corpus.promociones, (s: RootState) => s.corpus.marca, selectHoy],
+  (promociones, marca, hoy): readonly Comercio[] =>
+    marca === null ? catalogoComercios : comerciosDelCorpus(promociones, hoy),
+);
+
+/**
+ * Para registrar y listar compras: los comercios y, además, los 13 rubros. Una compra que se
+ * hizo eligiendo un rubro se guarda con su nombre («Supermercados») y conserva su rubro.
+ */
+export const selectCatalogoParaCompras = createSelector([selectCatalogoComercios], (catalogo): readonly Comercio[] => [
+  ...catalogo,
+  ...RUBROS_DE_MODO,
+]);
+
 /** Los comercios que eligió el usuario; si saltó ese paso, los frecuentes de ejemplo. */
-export const selectComerciosFrecuentes = createSelector([(s: RootState) => s.perfil.comercios], (habituales): Comercio[] => {
-  // Del catálogo si lo conoce (con su rubro); si no, el comercio por su nombre, sin rubro inventado.
-  const elegidos = habituales.map((c) => comercioPorNombre(c.nombre));
-  return elegidos.length > 0 ? elegidos : catalogoComercios.filter((c) => c.frecuente);
-});
+export const selectComerciosFrecuentes = createSelector(
+  [(s: RootState) => s.perfil.comercios, selectCatalogoComercios],
+  (habituales, catalogo): Comercio[] => {
+    // Del catálogo si lo conoce (uno por rubro: el usuario elige cuál, spec 004); si no, el
+    // comercio por su nombre, sin rubro inventado.
+    if (habituales.length > 0) {
+      return habituales.flatMap((c) => {
+        const delCatalogo = comerciosConNombre(c.nombre, catalogo);
+        return delCatalogo.length > 0 ? delCatalogo : [comercioPorNombre(c.nombre, catalogo)];
+      });
+    }
+    // Los de ejemplo, con el rubro del corpus si está ahí; si no, con el suyo (sus promos de rubro).
+    return catalogoComercios.filter((c) => c.frecuente).map((c) => {
+      const delCorpus = comercioPorNombre(c.nombre, catalogo);
+      return delCorpus.categoriaId === null ? c : delCorpus;
+    });
+  },
+);
+
+/**
+ * Un comercio por id: del catálogo, de los accesos rápidos (un habitual escrito a mano) o, si
+ * no, del catálogo de ejemplo: un id elegido antes de la primera sincronización («coto») o el
+ * del grupo de ejemplo sigue andando con las promos de su rubro.
+ */
+export const selectBuscarComercioPorId = createSelector(
+  [selectCatalogoComercios, selectComerciosFrecuentes],
+  (catalogo, frecuentes) =>
+    (id: string | null): Comercio | null =>
+      id === null
+        ? null
+        : (catalogo.find((c) => c.id === id) ??
+          frecuentes.find((c) => c.id === id) ??
+          RUBROS_DE_MODO.find((c) => c.id === id) ??
+          catalogoComercios.find((c) => c.id === id) ??
+          null),
+);
 
 /** El comercio que tocó: del catálogo o uno de sus habituales escritos a mano (sin rubro). */
 export const selectComercioSimulado = createSelector(
-  [(s: RootState) => s.simulacion.comercioId, selectComerciosFrecuentes],
-  (id, frecuentes): Comercio | null =>
-    catalogoComercios.find((c) => c.id === id) ?? frecuentes.find((c) => c.id === id) ?? null,
+  [(s: RootState) => s.simulacion.comercioId, selectBuscarComercioPorId],
+  (id, buscar): Comercio | null => buscar(id),
 );
 
 /** «¿Con qué pago?»: se recalcula con cada cambio del monto, sin red (US2). */
 export const selectRecomendacion = createSelector(
-  [selectEntradasMotor, selectComercioSimulado, (s: RootState) => s.simulacion.monto],
-  (e, comercio, monto) => (comercio ? recomendacionVista(e, comercio, monto) : null),
+  [selectEntradasMotor, selectComercioSimulado, (s: RootState) => s.simulacion.monto, (s: RootState) => s.simulacion.canal],
+  (e, comercio, monto, canal) => (comercio ? recomendacionVista(e, comercio, monto, canal) : null),
 );
 
 export const selectTopes = createSelector([selectEntradasMotor], topesVista);
@@ -78,6 +129,7 @@ export const selectComprasDeTope = createSelector(
     selectTopes,
     (s: RootState) => s.compras.lista,
     (s: RootState) => s.perfil.medios,
+    selectCatalogoParaCompras,
     (_s: RootState, clave: string) => clave,
   ],
   comprasDeTopeVista,
@@ -90,7 +142,7 @@ export const selectFrescura = createSelector(
 );
 
 export const selectResumenCompras = createSelector(
-  [(s: RootState) => s.compras.lista, selectAhora, (s: RootState) => s.perfil.medios],
+  [(s: RootState) => s.compras.lista, selectAhora, (s: RootState) => s.perfil.medios, selectCatalogoParaCompras],
   comprasVista,
 );
 

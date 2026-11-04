@@ -12,11 +12,10 @@ import { SectionHeader } from "@/components/section-header";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import type { IntegranteGrupo } from "@/data/contracts";
-import { useAsync } from "@/hooks/use-async";
 import { fechaCorta, iniciales, parseMonto } from "@/lib/format";
 import { grupoArmado } from "@/store/contactos";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectHoy } from "@/store/selectores";
+import { selectBuscarComercioPorId, selectHoy } from "@/store/selectores";
 import { colors, fonts, radius, size, space, type as escala } from "@/theme";
 
 /**
@@ -34,7 +33,8 @@ export default function ArmarGrupo() {
   const fecha = desdeComercio ? hoy : ejemplo.fecha;
   const nombre = desdeComercio ? null : ejemplo.nombre;
 
-  const comercio = useAsync(() => api.getComercio(comercioId), comercioId);
+  // Del corpus guardado (o el del grupo de ejemplo), sin red (#43).
+  const comercio = useAppSelector(selectBuscarComercioPorId)(comercioId);
 
   const [monto, setMonto] = useState<number | null>(desdeComercio ? parseMonto(p.monto ?? "") : ejemplo.monto);
   const [excluidos, setExcluidos] = useState<string[]>([]);
@@ -75,15 +75,15 @@ export default function ArmarGrupo() {
         </>
       }
     >
-      {comercio.datos ? (
+      {comercio ? (
         <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
-          <Avatar icon={iconoDeRubro[comercio.datos.rubro]} />
+          <Avatar icon={iconoDeRubro[comercio.rubro]} />
           <View style={{ flex: 1 }}>
             <Text variant="bodyLg" weight="semibold">
-              {nombre ?? comercio.datos.nombre}
+              {nombre ?? comercio.nombre}
             </Text>
             <Text variant="label" tone="inkSecondary">
-              {nombre ? `${comercio.datos.nombre} · ` : ""}
+              {nombre ? `${comercio.nombre} · ` : ""}
               {fecha === hoy ? "hoy" : `sábado ${fechaCorta(fecha)}`}
             </Text>
           </View>

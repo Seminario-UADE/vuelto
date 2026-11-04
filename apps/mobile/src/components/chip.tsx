@@ -9,16 +9,18 @@ type Props = {
   selected?: boolean;
   icon?: IconName;
   accessibilityHint?: string;
+  /** `radio`: una opción de un grupo (canal); lo anuncia como marcado, no como seleccionado. */
+  rol?: "button" | "radio";
 };
 
 /** Chip de comercio, rubro o filtro. Activo: Verde Bosque con check (DESIGN.md §5). */
-export function Chip({ label, onPress, selected, icon, accessibilityHint }: Props) {
+export function Chip({ label, onPress, selected, icon, accessibilityHint, rol = "button" }: Props) {
   const tinta = selected ? colors.onDecision : colors.ink;
   return (
     <PressableScale
       onPress={onPress}
-      accessibilityRole="button"
-      accessibilityState={{ selected: Boolean(selected) }}
+      accessibilityRole={rol}
+      accessibilityState={rol === "radio" ? { checked: Boolean(selected) } : { selected: Boolean(selected) }}
       aria-selected={Boolean(selected)}
       accessibilityHint={accessibilityHint}
       hitSlop={{ top: 2, bottom: 2 }}

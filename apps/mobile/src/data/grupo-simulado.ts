@@ -18,7 +18,7 @@ import {
   mediosDelMotor,
   promociones,
 } from "./fixtures";
-import { pedidoPresencial, recomendarSeguro, textoDia } from "./calculo";
+import { pedidoDeCompra, recomendarSeguro, textoDia } from "./calculo";
 import { razonDe } from "./vista-recomendacion";
 import { aprox, fechaCorta } from "../lib/format";
 import { mediodia } from "../lib/reloj";
@@ -45,7 +45,7 @@ const usuarioEnElServidor = {
 
 function evaluar(medios: MedioMotor[], compras: CompraMotor[], comercio: Comercio, monto: number, fecha: string) {
   if (comercio.categoriaId === null) return null;
-  return recomendarSeguro(pedidoPresencial({ ...comercio, categoriaId: comercio.categoriaId }, monto), {
+  return recomendarSeguro(pedidoDeCompra({ ...comercio, categoriaId: comercio.categoriaId }, monto), {
     perfil: { nombreParaMostrar: null, mediosDePago: medios, comerciosHabituales: [] },
     promociones,
     compras,
