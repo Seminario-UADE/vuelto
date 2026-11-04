@@ -157,7 +157,7 @@ export interface CompraPropuesta {
   comercio: string | null;
   categoriaId: CategoriaId;
   /**
-   * `null` = el usuario todavía no escribió el monto (constitución 2.0.1:
+   * `null` = el usuario todavía no escribió el monto (constitución §I:
    * el monto es opcional). Si no es `null`, tiene que ser mayor a 0.
    */
   monto: number | null;
@@ -187,6 +187,13 @@ export interface PromocionAplicada {
   topeRestanteTrasCompra: number | null;
   /** `null` en los mismos casos que `topeRestanteTrasCompra`. */
   base: BaseEstimacion | null;
+  /** De qué período es `base`; `null` en los mismos casos (para "de octubre" o "de esta semana"). */
+  periodo: PeriodoAcumulable | null;
+  /**
+   * Qué da la promo, sin su tope: la parte de `motivo` que le corresponde,
+   * para mostrarla aparte de la cifra del tope sin cortar el texto (issue #46).
+   */
+  textoPromo: string;
 }
 
 export interface OpcionDePago {

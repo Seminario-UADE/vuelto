@@ -83,6 +83,8 @@ describe("ServicioRecomendacion: US1", () => {
         ahorroEstimado: 3000,
         topeRestanteTrasCompra: 7000,
         base: { comprasRegistradas: 2, comprasSinDescuentoInformado: 0 },
+        periodo: "mensual",
+        textoPromo: "20% en gastronomía",
       },
     ]);
   });

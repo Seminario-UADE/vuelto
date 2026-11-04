@@ -71,8 +71,8 @@ export function estimarTopes(
     .map((e) => e.estimacion);
 }
 
-/** "Queda poco" con el 20% del tope o menos (DESIGN.md §5, FR-008). */
-const PORCENTAJE_QUEDA_POCO = 20;
+/** "Queda poco" con el 30% del tope o menos (DESIGN.md §5, FR-008). */
+const PORCENTAJE_QUEDA_POCO = 30;
 
 /**
  * Estado, cifra y base de una estimación (FR-007 a FR-010), con los textos de

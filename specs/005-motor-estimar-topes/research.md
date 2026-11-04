@@ -40,10 +40,10 @@ Siguen vigentes las decisiones técnicas de las issues #36 y #37 (centavos, hora
 
 ## R5. Umbral y cifra en centavos
 
-- **Decisión**: el estado se calcula con `aCentavos` de restante y tope (`restante × 5 ≤ tope`);
+- **Decisión**: el estado se calcula con `aCentavos` de restante y tope (`restante × 5 ≤ tope`, el 20%; desde el 03/11, `restante × 100 ≤ tope × 30`, el 30% de `DESIGN.md` §5);
   la cifra con `Math.floor(restanteCentavos / 10000) × 100` pesos, formateada con el mismo
   `pesos()` de `motivos.ts` (que pasa a exportarse). Si da 0: "menos de $100".
-- **Rationale**: FR-008 y FR-009; evita que "≈$2.000" de $10.000 se lea como 20%.
+- **Rationale**: FR-008 y FR-009; evita que la cifra redondeada cambie el estado (ej. "≈$3.000" de $10.000 con $3.050 restantes).
 
 ## R6. Dónde viven las funciones nuevas
 

@@ -183,12 +183,16 @@ describe("formatearEstimacion (US2)", () => {
     });
   });
 
-  it("US2-2: exactamente el 20% es queda poco", () => {
-    expect(formatearEstimacion(estimacion(8000, 1600, 4))).toMatchObject({ estado: "queda_poco", cifra: "≈$1.600" });
+  it("US2-2: exactamente el 30% es queda poco", () => {
+    expect(formatearEstimacion(estimacion(8000, 2400, 4))).toMatchObject({ estado: "queda_poco", cifra: "≈$2.400" });
   });
 
   it("US2-3: el umbral se compara con el restante exacto, no con la cifra", () => {
-    expect(formatearEstimacion(estimacion(10000, 2050, 2))).toMatchObject({ estado: "disponible", cifra: "≈$2.000" });
+    expect(formatearEstimacion(estimacion(10000, 3050, 2))).toMatchObject({ estado: "disponible", cifra: "≈$3.000" });
+  });
+
+  it("el ejemplo de Santander de DESIGN.md §9 ($2.300 de $8.000, 29%) es queda poco", () => {
+    expect(formatearEstimacion(estimacion(8000, 2300, 4))).toMatchObject({ estado: "queda_poco", cifra: "≈$2.300" });
   });
 
   it("US2-4: agotado, sin cifra y con la fecha en que vuelve", () => {

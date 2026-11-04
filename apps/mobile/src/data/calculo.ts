@@ -33,7 +33,6 @@ import type {
   EstadoTope,
   MedioDePago,
   PedidoRecomendar,
-  PromocionCatalogo,
   Recomendacion,
   ResumenCompras,
   ResumenTopes,
@@ -46,7 +45,7 @@ import { medioDelMotor, medioVista } from "../perfil/vista";
 import { aVista } from "./vista-recomendacion";
 import { mediodia } from "../lib/reloj";
 import { RUBROS } from "../lib/rubros";
-import { textoBase } from "../lib/textos";
+import { periodoDeVista, textoBase } from "../lib/textos";
 
 /** Lo que el motor necesita para una persona, ya con su forma. */
 export type EntradasMotor = {
@@ -122,22 +121,6 @@ function rubroDeCategoria(categoriaId: number): Rubro {
   return (par?.[0] as Rubro | undefined) ?? "otro";
 }
 
-/** Nombre corto del banco ("Galicia") para un `bancoId` del motor, con los medios del usuario. */
-function nombreDeBanco(bancoId: string, medios: readonly MedioGuardado[]): string {
-  const medio = medios.find((m) => m.bancoId === bancoId);
-  return medio ? medioVista(medio).banco : bancoId;
-}
-
-/** Catálogo para nombrar lo que el motor devuelve por id (`aVista`). */
-function promocionesCatalogo(promociones: Promocion[], medios: readonly MedioGuardado[]): PromocionCatalogo[] {
-  return promociones.map((p) => ({
-    id: p.id,
-    titulo: p.titulo,
-    bancoId: nombreDeBanco(p.bancoId, medios),
-    categoriaId: p.categoriaId,
-  }));
-}
-
 /** La compra que se evalúa en un comercio del catálogo. La app siempre pregunta por presencial. */
 export function pedidoPresencial(comercio: Comercio & { categoriaId: number }, monto: number | null): PedidoRecomendar {
   return {
@@ -155,8 +138,8 @@ export function recomendarSeguro(
 ): RecomendacionMotor {
   const { perfil, promociones, compras, ahora } = entradas;
   try {
-    // Hasta #43 el motor exige monto: "sin monto" se consulta con 0 (spec 008, Assumptions).
-    return recomendar({ ...pedido, monto: pedido.monto ?? 0 }, perfil, promociones, compras, ahora);
+    // Sin monto, el motor ordena por porcentaje y tope disponible (issue #75).
+    return recomendar(pedido, perfil, promociones, compras, ahora);
   } catch (error) {
     if (error instanceof PerfilSinMediosError) return { mejor: null, alternativas: [], descartadas: [] };
     throw error;
@@ -180,7 +163,6 @@ export function recomendacionVista(
   const hoy = fechaArgentina(entradas.ahora);
   return aVista(pedido, respuesta, comercio, {
     medios: entradas.medios.map(medioVista),
-    promociones: promocionesCatalogo(entradas.promociones, entradas.medios),
     mes: nombreDelMes(hoy),
     dia: textoDia(hoy),
   });
@@ -210,7 +192,7 @@ function topeMedio(est: EstimacionTope, entradas: EntradasMotor, hoy: string): T
   if (!medio || !promo) return null;
   const texto = formatearEstimacion(est);
   const estado = ESTADO[texto.estado];
-  const periodo = est.periodo.tipo === "semanal" ? "semana" : "mes";
+  const periodo = periodoDeVista(est.periodo.tipo);
   const rubro = rubroDeCategoria(promo.categoriaId);
   const vuelve = diaMesSinCeros(diaSiguiente(est.periodo.hasta));
   // Agotado, la base del motor trae el reinicio pegado ("según 2 compras de octubre · vuelve
@@ -395,7 +377,7 @@ export function promoPropuesta(
   if (opcion === null || opcion.promociones.length === 0) return vacia;
   const catalogo = new Map(entradas.promociones.map((p) => [p.id, p]));
   const conBase = opcion.promociones.find((p) => p.base !== null);
-  const periodo = catalogo.get(conBase?.promocionId ?? "")?.tope.periodo === "semanal" ? "semana" : "mes";
+  const periodo = periodoDeVista(conBase?.periodo ?? null);
   return {
     medioId,
     fecha,
