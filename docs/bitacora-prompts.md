@@ -1953,6 +1953,34 @@ perfil con los medios guardados del usuario (PR #100).
 
 ---
 
+## 2026-11-03 — Perfil: `on_hub_list` y logo en `bancos` (issue #41)
+
+**Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde la revisión del PR #88, con `supabase` CLI.
+
+**Objetivo:** cerrar los pendientes que dejó el review del PR #88: que `bancos` tenga `on_hub_list` y el
+logo, y que el slice `perfil` guarde lo que devuelve `perfil/datos.ts`.
+
+**Prompts principales:**
+1. "Sumá `on_hub_list` e `imagen` a `bancos` con su test pgTAP y hacé que `leerBancos` los pida."
+2. "Reconciliá el slice `perfil` (hoy `medios: string[]`) con `MedioDePago`, sin conectar pantallas."
+3. "Resolvé los conflictos del PR contra `main`."
+
+**Resultado:**
+- Migración `20261103000008_bancos_hub.sql`: `on_hub_list boolean` y `logo_url text`, ambos nullables
+  (RLS y permisos sin cambios). El seed local los carga desde `docs/product/data/modo-bancos-raw.json`
+  (32 bancos en el hub de 82). `leerBancos` pide `on_hub_list`.
+- Error de la IA: la columna se llamó `imagen` y el test de estructura de RNF-06 ("ninguna columna
+  guarda la imagen de un ticket") falló; se renombró `logo_url` en vez de aflojar el test.
+- El slice `perfil` (`mediosGuardados`) se descartó al resolver los conflictos: mientras tanto el PR #100
+  ya había dejado `medios: MedioGuardado[]` y las pantallas conectadas, con la misma idea. Se tomó la
+  versión de `main` para todo `apps/mobile/src/store/`.
+- Verificado: lint, typecheck y tests de los 4 workspaces; `supabase db reset` y `supabase test db`
+  (165 tests) en un Supabase local con puertos propios.
+- Queda pendiente: la ingesta no carga `on_hub_list` ni `logo_url` (`publicar.ts` escribe `id` y
+  `nombre`); en el proyecto alojado quedan `null` hasta que se haga.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

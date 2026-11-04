@@ -58,5 +58,14 @@ select results_eq($$ select id, nombre from public.categorias where id <> 99 ord
   (14, 'Entretenimiento') $$, 'categorias tiene las 13 de CATEGORIAS_MODO');
 select ok(exists (select 1 from public.bancos where id = '88d8705e-2dda-46f9-8411-bb4916af858e'), 'bancos tiene a Galicia con su id real de MODO');
 
+select ok(
+  (select on_hub_list from public.bancos where id = '0330e59b-b6e3-43eb-9083-a88fcc61e845'),
+  'bancos guarda on_hub_list de MODO (Banco Nación figura en el hub)');
+select is_empty($$
+  select column_name from information_schema.columns
+  where table_schema = 'public' and table_name = 'bancos'
+    and column_name in ('on_hub_list', 'logo_url') and is_nullable = 'NO'
+$$, 'on_hub_list y logo_url admiten null: la ingesta puede no informarlos');
+
 select * from finish();
 rollback;

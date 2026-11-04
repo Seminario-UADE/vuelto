@@ -80,7 +80,7 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
 
 **Checkpoint**: escenarios US2-1 a US2-3 y la prueba de dos usuarios del plan §Cómo validar OK.
 
-> US3 (priorizar `on_hub_list`) no tiene fase propia: es parte de `buscar-bancos` (T004–T005). Con datos reales necesita que la tabla `bancos` sume `on_hub_list` (plan §Lo que dejó la #34).
+> US3 (priorizar `on_hub_list`) no tiene fase propia: es parte de `buscar-bancos` (T004–T005). La tabla `bancos` ya tiene `on_hub_list`; con datos reales necesita además que la ingesta lo cargue (pendiente, ver plan §Lo que dejó la #34).
 
 ---
 

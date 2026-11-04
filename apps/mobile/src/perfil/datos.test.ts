@@ -34,13 +34,23 @@ const nuevo: MedioNuevo = { bancoId: GALICIA, tipo: "credito", red: "visa" };
 const COLUMNAS = "id, banco_id, tipo, red, bancos(nombre)";
 
 describe("datos del perfil", () => {
-  it("leerBancos: solo id y nombre; on_hub_list queda null porque la base no lo tiene", async () => {
-    const { cliente, llamadas } = clienteFalso({ data: [{ id: GALICIA, nombre: "Banco Galicia" }], error: null, status: 200 });
+  it("leerBancos: trae on_hub_list y lo deja null si la base no lo informa", async () => {
+    const { cliente, llamadas } = clienteFalso({
+      data: [
+        { id: GALICIA, nombre: "Banco Galicia", on_hub_list: true },
+        { id: "b2", nombre: "Banco Chico", on_hub_list: null },
+      ],
+      error: null,
+      status: 200,
+    });
     expect(await crearDatosPerfil(cliente).leerBancos()).toEqual({
       ok: true,
-      datos: [{ id: GALICIA, nombre: "Banco Galicia", onHubList: null }],
+      datos: [
+        { id: GALICIA, nombre: "Banco Galicia", onHubList: true },
+        { id: "b2", nombre: "Banco Chico", onHubList: null },
+      ],
     });
-    expect(llamadas).toEqual([["from", "bancos"], ["select", "id, nombre"]]);
+    expect(llamadas).toEqual([["from", "bancos"], ["select", "id, nombre, on_hub_list"]]);
   });
 
   it("leerMisMedios: trae el nombre del banco en el mismo pedido, en orden de alta", async () => {
