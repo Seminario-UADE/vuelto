@@ -1,4 +1,3 @@
-import type { Canal } from "@vuelto/motor";
 import { router, useLocalSearchParams } from "expo-router";
 import { useId, useMemo, useState } from "react";
 import { View } from "react-native";
@@ -14,7 +13,7 @@ import { SheetHeader } from "@/components/sheet-header";
 import { Text } from "@/components/text";
 import { comercioPorNombre, promoPropuesta } from "@/data/calculo";
 import { comercioDelCatalogo } from "@/data/comercios";
-import type { OrigenCompra } from "@/data/contracts";
+import type { Canal, OrigenCompra } from "@/data/contracts";
 import { aprox, fechaLarga, montoEditable, parseMonto } from "@/lib/format";
 import { hapticoExito, hapticoSeleccion } from "@/lib/haptics";
 import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
