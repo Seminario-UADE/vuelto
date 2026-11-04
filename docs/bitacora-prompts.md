@@ -2098,7 +2098,7 @@ logo, y que el slice `perfil` guarde lo que devuelve `perfil/datos.ts`.
 
 ---
 
-## 2026-11-04 — «¿Con qué pago?»: comercios del corpus y fecha de las promos (issue #43, parte A)
+## 2026-11-04 — «¿Con qué pago?»: comercios del corpus, rubro, canal y descartadas plegadas (issue #43)
 
 **Herramienta:** Claude Code (Opus 5.5).
 
@@ -2142,6 +2142,20 @@ spec ya existe (004, FR-030).
   está en dos rubros, toma el primero.
 - Resuelve el pendiente de #47 (autocompletar desde el corpus) y responde la
   parte de comercios de #102.
+
+**Parte B, en el mismo PR #107** (prompt: "Podés hacer la parte B dentro del
+mismo PR #107, así tenemos todo en el mismo PR"):
+- Rubro sin comercio (FR-001): «¿No sabés el comercio? Elegí el rubro» despliega
+  las 13 categorías de MODO; también aparecen si la búsqueda no encuentra nada
+  (Edge Cases). El pedido al motor va sin comercio, así solo aplican las promos
+  de todo el rubro, y no se explican promos de un comercio puntual (Principio I).
+- Canal (FR-001): «En el local» / «Online» en la pantalla del comercio,
+  presencial por defecto (`simulacion.canal`); entra al selector.
+- Descartadas plegadas: las otras opciones se ven siempre; los medios sin promo
+  quedan detrás de «Por qué no los otros (N)».
+- El botón sigue siendo «Usar Galicia» (DESIGN.md §5) hasta que el equipo decida
+  contra el «Pagué con esto» de la issue.
+- Falta la verificación a mano en modo avión real (no hay dispositivo acá).
 - Verificación: lint, typecheck, build y tests en verde. No se probó en Expo Go.
 
 ---

@@ -17,7 +17,7 @@ import {
 } from "../data/calculo";
 import { contarPendientes } from "../data/compras/operaciones";
 import type { Comercio, MedioDePago, Perfil } from "../data/contracts";
-import { comerciosConNombre, comerciosDelCorpus } from "../data/comercios";
+import { comerciosConNombre, comerciosDelCorpus, RUBROS_DE_MODO } from "../data/comercios";
 import { catalogoComercios } from "../data/fixtures";
 import { medioVista } from "../perfil/vista";
 import type { RootState } from "./index";
@@ -91,6 +91,7 @@ export const selectBuscarComercioPorId = createSelector(
         ? null
         : (catalogo.find((c) => c.id === id) ??
           frecuentes.find((c) => c.id === id) ??
+          RUBROS_DE_MODO.find((c) => c.id === id) ??
           catalogoComercios.find((c) => c.id === id) ??
           null),
 );
@@ -103,8 +104,8 @@ export const selectComercioSimulado = createSelector(
 
 /** «¿Con qué pago?»: se recalcula con cada cambio del monto, sin red (US2). */
 export const selectRecomendacion = createSelector(
-  [selectEntradasMotor, selectComercioSimulado, (s: RootState) => s.simulacion.monto],
-  (e, comercio, monto) => (comercio ? recomendacionVista(e, comercio, monto) : null),
+  [selectEntradasMotor, selectComercioSimulado, (s: RootState) => s.simulacion.monto, (s: RootState) => s.simulacion.canal],
+  (e, comercio, monto, canal) => (comercio ? recomendacionVista(e, comercio, monto, canal) : null),
 );
 
 export const selectTopes = createSelector([selectEntradasMotor], topesVista);

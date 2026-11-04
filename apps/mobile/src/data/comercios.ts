@@ -94,3 +94,30 @@ export function comerciosConNombre(nombre: string, catalogo: readonly Comercio[]
 export function comercioDelCatalogo(nombre: string, catalogo: readonly Comercio[]): Comercio | undefined {
   return comerciosConNombre(nombre, catalogo)[0];
 }
+
+const PREFIJO_RUBRO = "rubro-";
+
+/**
+ * Elegir un rubro sin comercio (spec 004 FR-001): uno de los 13 de MODO. Se representa como un
+ * comercio con el nombre de la categoría; el pedido al motor va sin comercio, así solo aplican
+ * las promos de todo el rubro.
+ */
+export function comercioDeRubro(categoriaId: number): Comercio {
+  const nombre = CATEGORIAS_MODO.find((x) => x.id === categoriaId)?.nombre ?? RUBROS.otro.titulo;
+  return {
+    id: `${PREFIJO_RUBRO}${categoriaId}`,
+    nombre,
+    inicial: nombre.charAt(0).toUpperCase(),
+    rubro: RUBRO_DE_CATEGORIA.get(categoriaId) ?? "otro",
+    categoriaId,
+    frecuente: false,
+  };
+}
+
+/** Los 13 rubros de MODO, en su orden. */
+export const RUBROS_DE_MODO: readonly Comercio[] = CATEGORIAS_MODO.map((x) => comercioDeRubro(x.id));
+
+/** Se eligió un rubro, no un comercio. */
+export function esComercioDeRubro(c: Comercio): boolean {
+  return c.id.startsWith(PREFIJO_RUBRO);
+}

@@ -84,7 +84,7 @@ dispositivo (ADR-010, spec 008).
 | `corpus` | Promociones con la forma del motor, `marca` (la mayor `actualizada_en`, texto exacto del servidor), `sincronizadoEn` y `descartadas`. Sin sincronizar: las de ejemplo y `marca: null` | Sí, en su propia clave `vuelto.corpus.v1`, y solo el que viene de una sincronización |
 | `compras` | Compras con la forma del motor (`promocionId`, `descuentoObtenido`, `reintegroEsperado`) | Sí |
 | `cola` | Operaciones de guardar y borrar compras que la cuenta todavía no tiene, con dueño y estado (spec 010) | Sí, en su propia clave (`vuelto.cola.v1`) |
-| `simulacion` | Comercio elegido y monto opcional de «¿Con qué pago?» | No |
+| `simulacion` | Comercio (o rubro sin comercio, `rubro-N`) elegido, monto opcional y canal (presencial por defecto) de «¿Con qué pago?» | No |
 | `contactos` | Contactos (solo lo de ADR-008 §3) y grupo en armado | No |
 
 ```

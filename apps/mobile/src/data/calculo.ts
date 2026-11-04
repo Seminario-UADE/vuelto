@@ -6,6 +6,7 @@
  * (`fixtures.ts`). Los selectores del store las envuelven con `createSelector`.
  */
 import {
+  type Canal,
   diaArgentina,
   diaMesSinCeros,
   diaSiguiente,
@@ -40,7 +41,7 @@ import type {
   TopeMedio,
 } from "./contracts";
 import type { MedioDePago as MedioGuardado } from "../perfil/modelo";
-import { claveDeComercio, comercioDelCatalogo } from "./comercios";
+import { claveDeComercio, comercioDelCatalogo, esComercioDeRubro, RUBROS_DE_MODO } from "./comercios";
 import { medioDelMotor, medioVista } from "../perfil/vista";
 import { aVista } from "./vista-recomendacion";
 import { mediodia } from "../lib/reloj";
@@ -121,13 +122,20 @@ function rubroDeCategoria(categoriaId: number): Rubro {
   return (par?.[0] as Rubro | undefined) ?? "otro";
 }
 
-/** La compra que se evalúa en un comercio del catálogo. La app siempre pregunta por presencial. */
-export function pedidoPresencial(comercio: Comercio & { categoriaId: number }, monto: number | null): PedidoRecomendar {
+/**
+ * La compra que se evalúa: el comercio (o solo su rubro, sin comercio: FR-001), el monto opcional
+ * y el canal (presencial por defecto, FR-001).
+ */
+export function pedidoDeCompra(
+  comercio: Comercio & { categoriaId: number },
+  monto: number | null,
+  canal: Canal = "presencial",
+): PedidoRecomendar {
   return {
-    comercio: comercio.nombre,
+    comercio: esComercioDeRubro(comercio) ? null : comercio.nombre,
     categoriaId: comercio.categoriaId,
     monto: monto !== null && monto > 0 ? monto : null,
-    canal: "presencial",
+    canal,
   };
 }
 
@@ -154,12 +162,15 @@ export function recomendacionVista(
   entradas: EntradasMotor,
   comercio: Comercio,
   monto: number | null,
+  canal: Canal = "presencial",
 ): Recomendacion | null {
   if (comercio.categoriaId === null) return null;
-  const pedido = pedidoPresencial({ ...comercio, categoriaId: comercio.categoriaId }, monto);
+  const pedido = pedidoDeCompra({ ...comercio, categoriaId: comercio.categoriaId }, monto, canal);
   const r = recomendarSeguro(pedido, entradas);
-  // Las promos de otro rubro no son una alternativa para esta compra (research R4).
-  const respuesta = { ...r, descartadas: r.descartadas.filter((d) => d.causa !== "categoria") };
+  // Las promos de otro rubro no son una alternativa para esta compra (research R4). Eligiendo
+  // solo el rubro, tampoco las de un comercio puntual: explicarlas sería listar promos (Principio I).
+  const ajenas = new Set(esComercioDeRubro(comercio) ? ["categoria", "comercio"] : ["categoria"]);
+  const respuesta = { ...r, descartadas: r.descartadas.filter((d) => !ajenas.has(d.causa)) };
   const hoy = fechaArgentina(entradas.ahora);
   return aVista(pedido, respuesta, comercio, {
     medios: entradas.medios.map(medioVista),
@@ -313,7 +324,8 @@ export function comprasDeTopeVista(
  */
 export function comercioPorNombre(nombre: string, catalogo: readonly Comercio[]): Comercio {
   return (
-    comercioDelCatalogo(nombre, catalogo) ?? {
+    comercioDelCatalogo(nombre, catalogo) ??
+    comercioDelCatalogo(nombre, RUBROS_DE_MODO) ?? {
       id: `libre-${claveDeComercio(nombre).replace(/ /g, "-")}`,
       nombre,
       inicial: nombre.charAt(0).toUpperCase(),
@@ -386,7 +398,7 @@ export function promoPropuesta(
 ): PromoPropuesta {
   const vacia: PromoPropuesta = { medioId, fecha, promociones: [], reintegro: null, base: null };
   if (comercio.categoriaId === null) return vacia;
-  const pedido = pedidoPresencial({ ...comercio, categoriaId: comercio.categoriaId }, monto);
+  const pedido = pedidoDeCompra({ ...comercio, categoriaId: comercio.categoriaId }, monto);
   const r = recomendarSeguro(pedido, { ...entradas, ahora: mediodia(fecha) });
   const opcion = [r.mejor, ...r.alternativas].find((o) => o?.medioDePagoId === medioId) ?? null;
   if (opcion === null || opcion.promociones.length === 0) return vacia;

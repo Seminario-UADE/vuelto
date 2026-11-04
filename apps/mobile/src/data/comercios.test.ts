@@ -12,10 +12,18 @@ import {
   selectHoy,
   selectRecomendacion,
 } from "../store/selectores";
-import { comercioElegido } from "../store/simulacion";
-import { compraParaGuardar } from "./calculo";
-import { buscarComercios, comerciosDelCorpus, etiquetaDeComercio, idDeComercio, nombreDeRubro } from "./comercios";
-import { catalogoComercios, mediosDeEjemplo, promociones } from "./fixtures";
+import { canalCambiado, comercioElegido } from "../store/simulacion";
+import { comercioPorNombre, compraParaGuardar, pedidoDeCompra } from "./calculo";
+import {
+  buscarComercios,
+  comercioDeRubro,
+  comerciosDelCorpus,
+  etiquetaDeComercio,
+  idDeComercio,
+  nombreDeRubro,
+  RUBROS_DE_MODO,
+} from "./comercios";
+import { catalogoComercios, mediosDeclarados, mediosDeEjemplo, promociones } from "./fixtures";
 
 // Issue #43, spec 004 FR-030: el buscador sale de las promos del corpus, no de una lista a mano.
 // Las promos de prueba son las de ejemplo con otro comercio, rubro o vigencia.
@@ -145,6 +153,42 @@ describe("selectCatalogoComercios", () => {
       selectCatalogoComercios(estado),
     );
     expect(c.categoriaId).toBe(1);
+  });
+});
+
+describe("parte B de #43: rubro sin comercio y canal (spec 004 FR-001)", () => {
+  it("los 13 rubros de MODO; elegir uno pide al motor sin comercio", () => {
+    expect(RUBROS_DE_MODO).toHaveLength(13);
+    const s = comercioDeRubro(1);
+    expect(s).toMatchObject({ nombre: "Supermercados", categoriaId: 1, rubro: "supermercado" });
+    expect(pedidoDeCompra({ ...s, categoriaId: 1 }, null)).toEqual({ comercio: null, categoriaId: 1, monto: null, canal: "presencial" });
+  });
+
+  it("una compra guardada por rubro («Supermercados») conserva su rubro", () => {
+    expect(comercioPorNombre("supermercados", [])).toMatchObject({ categoriaId: 1 });
+  });
+
+  it("elegido un rubro, la recomendación no explica promos de un comercio puntual", () => {
+    const s = conCorpus([
+      promo("toda", { comercio: null, categoriaId: 1, canal: "ambos" }),
+      promo("solo-dia", { comercio: "DIA", categoriaId: 1, canal: "ambos" }),
+    ]);
+    s.dispatch(mediosConfirmados(mediosDeEjemplo(mediosDeclarados.map((m) => m.id))));
+    s.dispatch(comercioElegido("rubro-1"));
+    const r = selectRecomendacion(s.getState());
+    expect(r?.comercio.nombre).toBe("Supermercados");
+    expect(r?.alternativas.some((a) => a.motivo.includes("DIA"))).toBe(false);
+  });
+
+  it("el canal entra al pedido: una promo solo presencial no sirve online", () => {
+    const s = conCorpus([promo("local", { comercio: null, categoriaId: 1, canal: "presencial" })]);
+    s.dispatch(mediosConfirmados(mediosDeEjemplo(mediosDeclarados.map((m) => m.id))));
+    s.dispatch(comercioElegido("rubro-1"));
+    const enElLocal = selectRecomendacion(s.getState());
+    s.dispatch(canalCambiado("online"));
+    const online = selectRecomendacion(s.getState());
+    expect(enElLocal?.resultado).toBe("recomendado");
+    expect(online?.resultado).toBe("sin-promo");
   });
 });
 

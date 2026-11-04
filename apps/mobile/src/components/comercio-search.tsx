@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { TextInput, View } from "react-native";
-import { buscarComercios, etiquetaDeComercio, nombreDeRubro } from "@/data/comercios";
+import { Pressable, TextInput, View } from "react-native";
+import { buscarComercios, etiquetaDeComercio, nombreDeRubro, RUBROS_DE_MODO } from "@/data/comercios";
 import type { Comercio } from "@/data/contracts";
 import { useAppSelector } from "@/store/hooks";
 import { selectCatalogoComercios, selectComerciosFrecuentes } from "@/store/selectores";
@@ -22,6 +22,7 @@ type Props = {
  */
 export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Props) {
   const [q, setQ] = useState("");
+  const [porRubro, setPorRubro] = useState(false);
   const frecuentes = useAppSelector(selectComerciosFrecuentes);
   const catalogo = useAppSelector(selectCatalogoComercios);
   const lista = useMemo(() => {
@@ -29,6 +30,7 @@ export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Pr
     const propios = buscarComercios(frecuentes, q);
     return [...propios, ...buscarComercios(catalogo, q).filter((c) => !propios.some((x) => x.id === c.id))].slice(0, 20);
   }, [q, frecuentes, catalogo]);
+  const sinResultados = q.trim() !== "" && lista.length === 0;
   return (
     <View style={{ gap: space.md }}>
       <View
@@ -55,9 +57,9 @@ export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Pr
           style={{ flex: 1, minHeight: 44, fontFamily: fonts.regular, fontSize: escala.bodyLg.fontSize, color: colors.ink }}
         />
       </View>
-      {q.trim() && lista.length === 0 ? (
+      {sinResultados ? (
         <Text variant="bodyMd" tone="inkSecondary">
-          No encontramos “{q.trim()}”. Probá con otro nombre.
+          No encontramos “{q.trim()}”. Elegí el rubro y te decimos con qué pagar.
         </Text>
       ) : null}
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
@@ -75,6 +77,34 @@ export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Pr
           />
         ))}
       </View>
+      {/* O un rubro sin comercio (spec 004 FR-001): solo aplican las promos de todo el rubro. */}
+      {sinResultados || porRubro ? (
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
+          {RUBROS_DE_MODO.map((c) => (
+            <Chip
+              key={c.id}
+              label={c.nombre}
+              selected={seleccionado === c.id}
+              accessibilityHint="Muestra con qué te conviene pagar en ese rubro"
+              onPress={() => {
+                setQ("");
+                setPorRubro(false);
+                onElegir(c);
+              }}
+            />
+          ))}
+        </View>
+      ) : (
+        <Pressable
+          onPress={() => setPorRubro(true)}
+          accessibilityRole="button"
+          style={{ minHeight: 44, justifyContent: "center", alignSelf: "flex-start" }}
+        >
+          <Text variant="bodyMd" weight="semibold" tone="accent">
+            ¿No sabés el comercio? Elegí el rubro
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
 }
