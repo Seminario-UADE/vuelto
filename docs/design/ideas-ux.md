@@ -59,6 +59,9 @@ Cómo anotar: una entrada por idea, con estado (`idea` → `issue` → `hecha` o
   «¿Ya pagaste?») que no conoce la simulación y pide todo de nuevo.
 - **Cambio:** «Usar» deja una compra *pendiente* que no descuenta tope; el
   ticket se cruza con ella y recién ahí se confirma.
+- **Sin cámara:** la pendiente también se puede confirmar **a mano** si ya
+  pagaste (los datos vienen de la simulación y solo se revisan). No hay que
+  estar obligado a usar la cámara.
 - A resolver: vencimiento de las pendientes, criterio de cruce
   (comercio + monto), dónde se guarda y cómo se ve en Inicio y Mis compras.
   Es un cambio de producto (modelo de compras), no solo de pantallas.
