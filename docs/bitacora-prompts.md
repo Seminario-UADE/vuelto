@@ -1953,6 +1953,66 @@ perfil con los medios guardados del usuario (PR #100).
 
 ---
 
+## 2026-11-03 — «¿Con qué pago?» sin monto, con el motor en la app (issue #43)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI, el navegador integrado
+(`expo start --web`) y subagentes (`/code-review`, `test-runner`,
+`rules-guardian`).
+
+**Objetivo:** cerrar lo que faltaba de la #43 una vez mergeada la #75 (PR #87,
+`monto: null` en el motor). Es XS/S: va sin spec-kit.
+
+**Prompts principales:**
+1. "Leé CLAUDE.md, el ADR-010 y la issue #43. Trabajá en un branch nuevo desde
+   main (con #87 ya mergeado). Falta: `recomendarSeguro` sin el parche
+   `pedido.monto ?? 0`, pasando `null` al motor; el `MontoInput` de
+   `comercio/[id].tsx` siempre visible; verificar a mano cada criterio de
+   aceptación (dígito por dígito, inspector de red, modo avión, sin promo,
+   alternativas, «Pagué con esto»); test del selector contra `recomendar()`
+   directo. Después `/code-review`, `test-runner` y `rules-guardian`. PR con
+   «Closes #43» y entrada en la bitácora. Decime qué criterio no pudiste
+   verificar."
+
+**Resultado:**
+- La IA frenó antes de empezar: el PR #87 todavía no estaba mergeado (en
+  `main`, `monto` seguía siendo `number`). Se esperó a que el PO lo mergeara.
+- `recomendarSeguro` pasa el pedido tal cual: sin monto, el motor recibe
+  `null`, ordena por porcentaje y tope y no descarta por compra mínima.
+- `queDa` conservaba el aviso «pide una compra mínima de $X» que el motor
+  agrega sin monto. Al traer `main` quedó de más: con la #46 la razón sale de
+  `textoPromo` del motor (`razonDe`), que ya trae el aviso y no depende de
+  cortar el texto. Se tomó la versión de `main`.
+- El campo de monto se ve siempre, también sin promo; ahí no muestra el texto
+  "te decimos cuánto te devuelven", porque el monto no cambia la respuesta.
+- Tests nuevos: el selector con monto 10.000, 2.500 y `null` llama a
+  `recomendar()` con los mismos argumentos que una llamada directa armada
+  aparte y da lo mismo; compra mínima sin monto.
+- Verificación a mano en la web, con un usuario de prueba en un Supabase
+  local:
+  - Al elegir Coto aparece la recomendación sin monto: tope ≈$6.500 según 3
+    compras de octubre.
+  - Tipeando 10000 dígito por dígito, el tope después de la compra pasa por
+    $6.500, $6.498, $6.480 y $4.500, y queda «Te devuelven ≈$2.000».
+  - Ningún request de red al tipear (inspector de red).
+  - Sin red (`fetch` y XHR bloqueados y Metro apagado): YPF, Farmacity y Coto
+    siguen funcionando y «Usar Galicia» lleva a «Revisá tu compra» en modo
+    excepción, con cero intentos de red.
+  - No se probó en el simulador ni con modo avión real: no había simulador
+    booteado ni Expo Go instalado.
+- `rules-guardian`: sin violaciones. `/code-review` (estándares): sin
+  violaciones duras. La deuda que marcó (`queDa` dependía del texto del
+  motivo) desapareció al tomar `razonDe` de `main`.
+- `/code-review` (spec) marcó criterios de la #43 que el código todavía no
+  cumple: elegir categoría, presencial/online, autocompletar desde el corpus,
+  descartadas plegadas (DESIGN.md §6 pide lo contrario: visibles), el botón
+  dice «Usar Galicia» y no «Pagué con esto» (DESIGN.md §5) y la fecha de
+  sincronización no aparece en la pantalla del comercio.
+- Decisión del PO: el PR #95 queda con «Refs #43» y no cierra la issue
+  hasta resolver esos criterios.
+- Conflictos con `main` (#46, #97, #98, #100): `calculo.ts`, `contracts.ts` y
+  `vista-recomendacion.ts` quedaron como en `main`, que ya pasaba `null` al
+  motor. El test del selector se adaptó al perfil con medios guardados
+  (`mediosConfirmados`). En la bitácora quedaron todas las entradas, en orden.
 ## 2026-11-03 — Perfil: `on_hub_list` y logo en `bancos` (issue #41)
 
 **Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde la revisión del PR #88, con `supabase` CLI.
