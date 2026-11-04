@@ -70,6 +70,7 @@ cambiar el cuerpo de esa función.
 | Escribir y borrar compras (`public.compras`) | Supabase directo con RLS (ADR-009), desde la cola de subida (spec 010) | Repositorio escrito y probado contra Supabase local; **sin conectar** hasta #40, #41 y #42 |
 | Catálogos (`getCatalogoComercios`, `buscarComercios`, `getComercio`) | Supabase directo con RLS (ADR-009) | Fixtures |
 | Medios de pago y bancos (`perfil/datos.ts`, thunks de `store/perfil-remoto.ts`) | Supabase directo con RLS (ADR-009) | Implementado (issue #41) |
+| Comercios habituales (`comercios_habituales`, mismos archivos) | Supabase directo con RLS (ADR-009) | Implementado (issue #47) |
 | `recomendar`, `getTopes`, `getCompras`, `guardarCompra`, `getPerfil` | — | **Salieron de `api.ts`**: selectores y el thunk `guardarCompra` del store. La Edge Function `recomendar` queda fuera del camino de la app (ADR-010 §5); la sincronización de compras y corpus es #42 |
 | `crearInvitacion`, `verInvitacion`, `aceptarInvitacion` | Edge Function y RPC `security definer` (ADR-008 §4) | Mock |
 

@@ -6,7 +6,15 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { fechaArgentina } from "@vuelto/motor";
 import { textoFrescura } from "../lib/frescura";
-import { comprasDeTopeVista, comprasVista, perfilDelMotor, recomendacionVista, topesVista, type EntradasMotor } from "../data/calculo";
+import {
+  comercioPorNombre,
+  comprasDeTopeVista,
+  comprasVista,
+  perfilDelMotor,
+  recomendacionVista,
+  topesVista,
+  type EntradasMotor,
+} from "../data/calculo";
 import { contarPendientes } from "../data/compras/operaciones";
 import type { Comercio, MedioDePago, Perfil } from "../data/contracts";
 import { catalogoComercios } from "../data/fixtures";
@@ -38,9 +46,18 @@ export const selectEntradasMotor = createSelector(
   }),
 );
 
+/** Los comercios que eligió el usuario; si saltó ese paso, los frecuentes de ejemplo. */
+export const selectComerciosFrecuentes = createSelector([(s: RootState) => s.perfil.comercios], (habituales): Comercio[] => {
+  // Del catálogo si lo conoce (con su rubro); si no, el comercio por su nombre, sin rubro inventado.
+  const elegidos = habituales.map((c) => comercioPorNombre(c.nombre));
+  return elegidos.length > 0 ? elegidos : catalogoComercios.filter((c) => c.frecuente);
+});
+
+/** El comercio que tocó: del catálogo o uno de sus habituales escritos a mano (sin rubro). */
 export const selectComercioSimulado = createSelector(
-  [(s: RootState) => s.simulacion.comercioId],
-  (id): Comercio | null => catalogoComercios.find((c) => c.id === id) ?? null,
+  [(s: RootState) => s.simulacion.comercioId, selectComerciosFrecuentes],
+  (id, frecuentes): Comercio | null =>
+    catalogoComercios.find((c) => c.id === id) ?? frecuentes.find((c) => c.id === id) ?? null,
 );
 
 /** «¿Con qué pago?»: se recalcula con cada cambio del monto, sin red (US2). */
@@ -81,12 +98,6 @@ export const selectResumenCompras = createSelector(
 export const selectMediosDelUsuario = createSelector([(s: RootState) => s.perfil.medios], (medios): MedioDePago[] =>
   medios.map(medioVista),
 );
-
-/** Los comercios que eligió el usuario; si saltó ese paso, los frecuentes de ejemplo. */
-export const selectComerciosFrecuentes = createSelector([(s: RootState) => s.perfil.comercios], (ids): Comercio[] => {
-  const elegidos = catalogoComercios.filter((c) => ids.includes(c.id));
-  return elegidos.length > 0 ? elegidos : catalogoComercios.filter((c) => c.frecuente);
-});
 
 export const selectPerfilVista = createSelector(
   [(s: RootState) => s.perfil.nombre, selectMediosDelUsuario, selectComerciosFrecuentes],

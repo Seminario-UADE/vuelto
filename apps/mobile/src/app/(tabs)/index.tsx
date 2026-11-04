@@ -79,6 +79,12 @@ export default function Inicio() {
           </Text>
         </View>
         <ComercioSearch onElegir={elegir} seleccionado={comercio?.id ?? null} />
+        {comercio && comercio.categoriaId === null ? (
+          // Un habitual escrito a mano no tiene rubro: no se le pregunta al motor (issue #47).
+          <Text variant="bodyMd" tone="inkSecondary" accessibilityLiveRegion="polite">
+            No conocemos promos para {comercio.nombre}. Pagá con el medio que prefieras.
+          </Text>
+        ) : null}
       </Card>
 
       {r ? (

@@ -3,9 +3,9 @@
  */
 import { createAction } from "@reduxjs/toolkit";
 import type { Compra, Promocion } from "@vuelto/motor";
-import type { MedioDePago as MedioGuardado } from "../perfil/modelo";
+import type { ComercioHabitual, MedioDePago as MedioGuardado } from "../perfil/modelo";
 
-export type { MedioGuardado };
+export type { ComercioHabitual, MedioGuardado };
 
 /** Escenarios para probar estados vacíos y de error (solo desarrollo, en Perfil). */
 export type Escenario = "normal" | "mes-vacio" | "ticket-ilegible";
@@ -19,8 +19,8 @@ export type EstadoPerfil = {
    * motor los usa directo; las pantallas arman el nombre con `medioVista`.
    */
   medios: MedioGuardado[];
-  /** Ids del catálogo de comercios. */
-  comercios: string[];
+  /** Los de `comercios_habituales` del usuario (issue #47): se eligen con un toque en «¿Con qué pago?». */
+  comercios: ComercioHabitual[];
   /** Invitación abierta antes de terminar el onboarding (ADR-008 §1). */
   invitacionPendiente: string | null;
 };

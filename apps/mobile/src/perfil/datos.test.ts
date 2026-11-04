@@ -132,3 +132,39 @@ describe("datos del perfil", () => {
     await expect(crearDatosPerfil(cliente).leerMisMedios()).rejects.toThrow();
   });
 });
+
+describe("comercios habituales (issue #47)", () => {
+  const coto = { id: "c1", nombre: "Coto" };
+
+  it("leerMisComercios: id y nombre, en orden de alta", async () => {
+    const { cliente, llamadas } = clienteFalso({ data: [coto], error: null, status: 200 });
+    expect(await crearDatosPerfil(cliente).leerMisComercios()).toEqual({ ok: true, datos: [coto] });
+    expect(llamadas).toEqual([["from", "comercios_habituales"], ["select", "id, nombre"], ["order", "creado_en"]]);
+  });
+
+  it("confirmarComercios: un solo insert, con el nombre recortado y sin user_id", async () => {
+    const { cliente, llamadas } = clienteFalso({ data: [coto], error: null, status: 201 });
+    expect(await crearDatosPerfil(cliente).confirmarComercios([" Coto ", "Jumbo"])).toEqual({ ok: true, datos: [coto] });
+    expect(llamadas).toEqual([
+      ["from", "comercios_habituales"],
+      ["insert", [{ nombre: "Coto" }, { nombre: "Jumbo" }]],
+      ["select", "id, nombre"],
+    ]);
+  });
+
+  it("agregarComercio: un repetido (23505) vuelve como duplicado", async () => {
+    const { cliente } = clienteFalso({ data: null, error: { code: "23505", message: "dup" }, status: 409 });
+    expect(await crearDatosPerfil(cliente).agregarComercio("coto")).toEqual({ ok: false, error: "duplicado" });
+  });
+
+  it("sacarComercio: borra por id y pide la fila borrada", async () => {
+    const { cliente, llamadas } = clienteFalso({ data: [{ id: "c1" }], error: null, status: 200 });
+    expect(await crearDatosPerfil(cliente).sacarComercio("c1")).toEqual({ ok: true, datos: null });
+    expect(llamadas).toEqual([["from", "comercios_habituales"], ["delete"], ["eq", "id", "c1"], ["select", "id"]]);
+  });
+
+  it("sacarComercio: si el RLS no borró ninguna fila, no es un éxito", async () => {
+    const { cliente } = clienteFalso({ data: [], error: null, status: 200 });
+    expect(await crearDatosPerfil(cliente).sacarComercio("c1")).toEqual({ ok: false, error: "otro" });
+  });
+});

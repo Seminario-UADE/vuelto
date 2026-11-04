@@ -13,16 +13,23 @@ import type { Comercio, Rubro } from "@/data/contracts";
 import { useAsync } from "@/hooks/use-async";
 import { RUBROS } from "@/lib/rubros";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { comerciosElegidos } from "@/store/perfil";
+import { comercioRepetido, MENSAJE_COMERCIO_REPETIDO, MENSAJES_ERROR, nombreRepetido } from "@/perfil/modelo";
+import { confirmarComercios } from "@/store/perfil-remoto";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 
 
-/** Comercios habituales (onboarding 3/5, configuración 2 de 2). Opcional. */
+/**
+ * Comercios habituales (onboarding 3/5, configuración 2 de 2; issue #47). Opcional: «Saltar» no
+ * guarda nada; «Continuar» guarda los elegidos en `comercios_habituales` en un solo pedido.
+ */
 export default function Comercios() {
   const dispatch = useAppDispatch();
   const guardados = useAppSelector((s) => s.perfil.comercios);
   const catalogo = useAsync(() => api.getCatalogoComercios());
-  const [elegidos, setElegidos] = useState<string[]>(guardados);
+  // Por nombre, como los guarda la base. Los que ya estaban guardados no se vuelven a mandar.
+  const [elegidos, setElegidos] = useState<string[]>(guardados.map((c) => c.nombre));
+  const [enviando, setEnviando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [q, setQ] = useState("");
 
   const grupos = useMemo(() => {
@@ -33,8 +40,19 @@ export default function Comercios() {
     return [...por.entries()];
   }, [catalogo.datos, q]);
 
-  const seguir = (guardar: boolean) => {
-    if (guardar) dispatch(comerciosElegidos(elegidos));
+  const seguir = async (guardar: boolean) => {
+    if (guardar) {
+      setEnviando(true);
+      setError(null);
+      // El thunk descarta los ya guardados y los repetidos («coto» = «Coto»).
+      const r = await dispatch(confirmarComercios(elegidos));
+      setEnviando(false);
+      if (!r.ok) {
+        const motivo = r.error === "duplicado" ? MENSAJE_COMERCIO_REPETIDO : MENSAJES_ERROR[r.error];
+        setError(`${motivo}. Podés saltear este paso y agregarlos después desde Perfil.`);
+        return;
+      }
+    }
     router.push("/primera-respuesta");
   };
 
@@ -45,7 +63,7 @@ export default function Comercios() {
           headerTitle: () => <ProgressSegments total={2} actual={2} />,
           headerRight: () => (
             <Pressable
-              onPress={() => seguir(false)}
+              onPress={() => void seguir(false)}
               accessibilityRole="button"
               hitSlop={8}
               style={{ minHeight: 44, minWidth: 44, paddingHorizontal: space.sm, justifyContent: "center", alignItems: "center" }}
@@ -60,12 +78,17 @@ export default function Comercios() {
       <Screen
         footer={
           <>
+            {error ? (
+              <Text variant="label" tone="warning" align="center">
+                {error}
+              </Text>
+            ) : null}
             <Text variant="label" tone="inkSecondary" align="center">
               {elegidos.length === 0
                 ? "Podés seguir sin elegir ninguno"
                 : `${elegidos.length} ${elegidos.length === 1 ? "comercio elegido" : "comercios elegidos"}`}
             </Text>
-            <Button label="Continuar" onPress={() => seguir(true)} />
+            <Button label="Continuar" onPress={() => void seguir(true)} loading={enviando} disabled={enviando} />
           </>
         }
       >
@@ -119,10 +142,14 @@ export default function Comercios() {
                 <Chip
                   key={c.id}
                   label={c.nombre}
-                  selected={elegidos.includes(c.id)}
-                  onPress={() =>
-                    setElegidos((xs) => (xs.includes(c.id) ? xs.filter((x) => x !== c.id) : [...xs, c.id]))
-                  }
+                  selected={nombreRepetido(elegidos, c.nombre)}
+                  onPress={() => {
+                    // Uno ya guardado no se desmarca acá: se saca desde Perfil (acá solo se agrega).
+                    if (comercioRepetido(guardados, c.nombre)) return;
+                    setElegidos((xs) =>
+                      nombreRepetido(xs, c.nombre) ? xs.filter((x) => !nombreRepetido([x], c.nombre)) : [...xs, c.nombre],
+                    );
+                  }}
                 />
               ))}
             </View>

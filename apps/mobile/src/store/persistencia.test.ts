@@ -154,6 +154,14 @@ describe("persistencia (US4)", () => {
     expect(b.getState().perfil.carga).toBe("sin-leer");
   });
 
+  it("los comercios guardados como ids del catálogo viejo se migran a { id, nombre } (issue #47)", async () => {
+    const perfil = { nombre: null, onboardingCompleto: true, medios: [], invitacionPendiente: null };
+    const viejo = JSON.stringify({ version: 1, perfil: { ...perfil, comercios: ["coto", "no-existe"] } });
+    expect((await abrir(memoria({ [CLAVE]: viejo }))).getState().perfil.comercios).toEqual([{ id: "coto", nombre: "Coto" }]);
+    const nuevo = JSON.stringify({ version: 1, perfil: { ...perfil, comercios: [{ id: "c1", nombre: "Mi almacén" }] } });
+    expect((await abrir(memoria({ [CLAVE]: nuevo }))).getState().perfil.comercios).toEqual([{ id: "c1", nombre: "Mi almacén" }]);
+  });
+
   it("un perfil guardado con ids del catálogo viejo se migra; un medio con forma rota invalida el perfil", async () => {
     const perfil = { nombre: null, onboardingCompleto: true, comercios: [], invitacionPendiente: null };
     const viejo = JSON.stringify({ version: 1, perfil: { ...perfil, medios: ["macro-visa-debito", "no-existe"] } });

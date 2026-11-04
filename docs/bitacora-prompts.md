@@ -1864,6 +1864,63 @@ la #40 (sesión) están en `main`, y antes revisar que nada contradiga ADR-010.
 
 ---
 
+## 2026-11-02 — Perfil: comercios habituales (issue #47)
+
+**Herramienta:** Claude Code (Opus 5.5).
+
+**Objetivo:** que el usuario marque los comercios donde compra seguido y los
+elija con un toque en «¿Con qué pago?». Issue chica: sin spec-kit.
+
+**Prompts principales:**
+1. "Adelantá mis tickets" → se propuso #47 porque #41 la destrabó.
+2. "#47, terminalo y subilo."
+
+**Resultado:**
+- `perfil.comercios` pasa de ids del catálogo de ejemplo a las filas de
+  `comercios_habituales` (`{ id, nombre }`). Lo guardado con ids viejos se migra
+  con el nombre del catálogo.
+- `perfil/datos.ts` suma leer, confirmar (un solo insert), agregar y sacar, sin
+  mandar `user_id`. Thunks en `store/perfil-remoto.ts`; se leen al entrar, junto
+  con los medios. Si falla la lectura no se avisa: son opcionales (RF-02).
+- Repetidos: mismo criterio que el índice único de la base (sin mayúsculas ni
+  espacios de más; los acentos cuentan). Un repetido no llega a Supabase.
+- Onboarding: «Continuar» guarda los elegidos en un pedido; «Saltar» no guarda
+  nada; si falla, se puede saltear.
+- Perfil: lista con quitar, y agregar con autocompletar del catálogo o el nombre
+  escrito a mano. Uno del catálogo abre su pantalla; uno escrito a mano no
+  (no tiene rubro).
+- «¿Con qué pago?»: los habituales reemplazan a los frecuentes de ejemplo como
+  accesos rápidos (`selectComerciosFrecuentes`), armados por nombre.
+- Verificación: lint, typecheck, build y tests en verde (app 450, motor 192,
+  supabase 40). No se probó en Expo Go.
+
+**Ajustes del 2026-11-03** (después de integrar main con #41 cerrada, #92 y #93;
+prompts: "Terminemos el otro que tengo asignado", "sigue los pasos para los
+arreglos y haz la opción A"):
+- rules-guardian sin hallazgos; `/code-review` marcó que los comercios no seguían
+  los cuidados que #41 dejó para los medios. Se alinearon: las escrituras pasan
+  por `escribir` (cambio de cuenta, sin conexión → solo lectura), `leerComercios`
+  descarta una lectura que se cruzó con una escritura (contador propio por
+  lista), `sacarComercio` verifica la fila borrada y Perfil edita solo con
+  `carga === "lista"`.
+- Onboarding: los repetidos se comparan con `comercioRepetido` («coto» = «Coto»)
+  y un duplicado muestra el mensaje de comercios, no el de tarjetas.
+- Opción A (elegida por el usuario): un habitual escrito a mano se puede tocar en
+  Inicio y avisa «No conocemos promos para …» en vez de quedar en blanco.
+  Asignarle categoría queda para #43.
+- Limitación conocida: el autocompletar sale del catálogo de ejemplo (12
+  comercios), no del corpus real de MODO; queda pendiente para #43.
+- Segunda pasada de revisiones (prompt: "Arreglalo y subilo"): rules-guardian
+  sin hallazgos. Se ajustó que en el onboarding un comercio ya guardado no se
+  desmarque (se saca desde Perfil), que `comercioPorNombre` use el mismo criterio
+  de repetidos que la base, que uno escrito a mano no sea un botón que no hace
+  nada en Perfil y que el onboarding tenga su propia acción del slice
+  (`comerciosConfirmados`).
+- Verificación: lint, typecheck, build y tests en verde (motor 213, app 469,
+  supabase 40, ingesta 274). No se probó en Expo Go.
+
+---
+
 ## 2026-11-03 — "Queda poco" al 30% del tope, como pide el diseño
 
 **Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.

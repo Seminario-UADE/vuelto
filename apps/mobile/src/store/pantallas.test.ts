@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 import { mediosDeEjemplo } from "../data/fixtures";
 import { mediosDeclarados, ticketDeEjemplo } from "../data/fixtures";
 import { escenarioElegido } from "./acciones";
-import { comerciosElegidos, mediosConfirmados } from "./perfil";
+import { comerciosLeidos, mediosConfirmados } from "./perfil";
 import {
+  selectComercioSimulado,
   selectComerciosFrecuentes,
   selectPerfilVista,
   selectRecomendacion,
@@ -37,9 +38,32 @@ describe("perfil del onboarding (FR-002 de la spec 006)", () => {
   it("medios y comercios frecuentes salen de lo que eligió el usuario", () => {
     const s = storeDePrueba();
     s.dispatch(mediosConfirmados(mediosDeEjemplo(["bbva-visa-credito"])));
-    s.dispatch(comerciosElegidos(["ypf", "shell"]));
+    s.dispatch(
+      comerciosLeidos([
+        { id: "c1", nombre: "YPF" },
+        { id: "c2", nombre: "Shell" },
+      ]),
+    );
     expect(selectPerfilVista(s.getState()).medios.map((m) => m.nombreCorto)).toEqual(["BBVA"]);
     expect(selectComerciosFrecuentes(s.getState()).map((c) => c.nombre)).toEqual(["YPF", "Shell"]);
+  });
+
+  it("un habitual escrito a mano se puede tocar, sin rubro inventado ni recomendación", () => {
+    const s = storeDePrueba();
+    s.dispatch(mediosConfirmados(mediosDeEjemplo(["bbva-visa-credito"])));
+    s.dispatch(comerciosLeidos([{ id: "c1", nombre: "Panadería Juan" }]));
+    const [libre] = selectComerciosFrecuentes(s.getState());
+    expect(libre).toMatchObject({ nombre: "Panadería Juan", categoriaId: null });
+    s.dispatch(comercioElegido(libre!.id));
+    // Inicio avisa «No conocemos promos para…» en vez de quedar en blanco (issue #47).
+    expect(selectComercioSimulado(s.getState())?.nombre).toBe("Panadería Juan");
+    expect(selectRecomendacion(s.getState())).toBeNull();
+  });
+
+  it("un habitual con espacios o mayúsculas de más se reconoce como el del catálogo", () => {
+    const s = storeDePrueba();
+    s.dispatch(comerciosLeidos([{ id: "c1", nombre: "  ypf " }]));
+    expect(selectComerciosFrecuentes(s.getState())[0]?.categoriaId).not.toBeNull();
   });
 
   it("si saltó los comercios, los frecuentes de ejemplo", () => {

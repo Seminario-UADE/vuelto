@@ -103,3 +103,28 @@ export function clasificarError({ status, code }: Fallo): CasoDeError {
   if (status === 0) return "sin_conexion";
   return "otro";
 }
+
+// ─── Comercios habituales (issue #47) ───
+
+/** Una fila de `comercios_habituales`: solo el nombre, como lo escribió el usuario. */
+export type ComercioHabitual = { id: string; nombre: string };
+
+/** Igual que el índice único de la base: sin espacios de más y sin mayúsculas; los acentos cuentan. */
+export function normalizarComercio(nombre: string): string {
+  return nombre.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+/** «Coto», «coto» y « Coto » son el mismo comercio (el índice único de la base, #34). */
+export function nombreRepetido(nombres: readonly string[], nombre: string): boolean {
+  const n = normalizarComercio(nombre);
+  return nombres.some((x) => normalizarComercio(x) === n);
+}
+
+export function comercioRepetido(comercios: readonly { nombre: string }[], nombre: string): boolean {
+  return nombreRepetido(
+    comercios.map((c) => c.nombre),
+    nombre,
+  );
+}
+
+export const MENSAJE_COMERCIO_REPETIDO = "Ese comercio ya está en tu perfil";

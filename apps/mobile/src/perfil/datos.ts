@@ -7,7 +7,16 @@
  * la base con `auth.uid()` y el RLS no deja tocar medios de otro usuario.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { clasificarError, type Banco, type CasoDeError, type MedioDePago, type MedioNuevo, type Red, type TipoTarjeta } from "./modelo";
+import {
+  clasificarError,
+  type Banco,
+  type CasoDeError,
+  type ComercioHabitual,
+  type MedioDePago,
+  type MedioNuevo,
+  type Red,
+  type TipoTarjeta,
+} from "./modelo";
 
 export type Resultado<T> = { ok: true; datos: T } | { ok: false; error: CasoDeError };
 
@@ -23,6 +32,8 @@ type FilaMedio = {
 };
 
 type FilaBanco = { id: string; nombre: string; on_hub_list: boolean | null };
+
+const COLUMNAS_COMERCIO = "id, nombre";
 
 type Respuesta = {
   data: unknown;
@@ -54,6 +65,7 @@ async function ejecutar<T>(pedido: PromiseLike<Respuesta>, mapear: (data: unknow
 
 export function crearDatosPerfil(cliente: SupabaseClient) {
   const medios = () => cliente.from("medios_de_pago");
+  const comercios = () => cliente.from("comercios_habituales");
   return {
     /** `on_hub_list` queda `null` mientras la ingesta no lo informe (decisión 9). */
     leerBancos: (): Promise<Resultado<Banco[]>> =>
@@ -76,6 +88,32 @@ export function crearDatosPerfil(cliente: SupabaseClient) {
       const r = await ejecutar(medios().delete().eq("id", id).select("id"), (data) => (data as unknown[]).length);
       if (!r.ok) return r;
       // El RLS no avisa si no tocó ninguna fila: sin fila borrada no se da por sacado.
+      return r.datos > 0 ? { ok: true, datos: null } : { ok: false, error: "otro" };
+    },
+
+    // Comercios habituales (issue #47): solo el nombre; `user_id` lo pone la base.
+    leerMisComercios: (): Promise<Resultado<ComercioHabitual[]>> =>
+      ejecutar(comercios().select(COLUMNAS_COMERCIO).order("creado_en"), (data) => data as ComercioHabitual[]),
+
+    /** Los del onboarding, en un solo pedido: entran todos o ninguno. */
+    confirmarComercios: (nombres: readonly string[]): Promise<Resultado<ComercioHabitual[]>> =>
+      ejecutar(
+        comercios()
+          .insert(nombres.map((nombre) => ({ nombre: nombre.trim() })))
+          .select(COLUMNAS_COMERCIO),
+        (data) => data as ComercioHabitual[],
+      ),
+
+    agregarComercio: (nombre: string): Promise<Resultado<ComercioHabitual>> =>
+      ejecutar(
+        comercios().insert({ nombre: nombre.trim() }).select(COLUMNAS_COMERCIO).single(),
+        (data) => data as ComercioHabitual,
+      ),
+
+    sacarComercio: async (id: string): Promise<Resultado<null>> => {
+      const r = await ejecutar(comercios().delete().eq("id", id).select("id"), (data) => (data as unknown[]).length);
+      if (!r.ok) return r;
+      // Igual que `sacarMedio`: el RLS no avisa si no tocó ninguna fila.
       return r.datos > 0 ? { ok: true, datos: null } : { ok: false, error: "otro" };
     },
   };

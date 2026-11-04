@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   clasificarError,
+  comercioRepetido,
   esDuplicado,
   ETIQUETAS_RED,
   puedeConfirmar,
@@ -76,5 +77,16 @@ describe("etiquetas", () => {
     expect(ETIQUETAS_RED).toMatchObject({ master: "Mastercard", dinners_club: "Diners Club", tarjeta_sol: "Tarjeta Sol" });
     expect(REDES).toHaveLength(9);
     expect(TIPOS_TARJETA).toEqual(["debito", "credito"]);
+  });
+});
+
+describe("comercioRepetido (issue #47)", () => {
+  it("ignora mayúsculas y espacios de más, como el índice único de la base", () => {
+    expect(comercioRepetido([{ nombre: "Coto" }], "  coto ")).toBe(true);
+    expect(comercioRepetido([{ nombre: "Café  Martínez" }], "café martínez")).toBe(true);
+  });
+
+  it("los acentos cuentan: «Dia» y «Día» son distintos", () => {
+    expect(comercioRepetido([{ nombre: "Día" }], "Dia")).toBe(false);
   });
 });
