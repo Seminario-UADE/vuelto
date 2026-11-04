@@ -34,8 +34,7 @@ export default function ArmarGrupo() {
   const nombre = desdeComercio ? null : ejemplo.nombre;
 
   // Del corpus guardado (o el del grupo de ejemplo), sin red (#43).
-  const buscarComercio = useAppSelector(selectBuscarComercioPorId);
-  const comercio = { datos: buscarComercio(comercioId) };
+  const comercio = useAppSelector(selectBuscarComercioPorId)(comercioId);
 
   const [monto, setMonto] = useState<number | null>(desdeComercio ? parseMonto(p.monto ?? "") : ejemplo.monto);
   const [excluidos, setExcluidos] = useState<string[]>([]);
@@ -76,15 +75,15 @@ export default function ArmarGrupo() {
         </>
       }
     >
-      {comercio.datos ? (
+      {comercio ? (
         <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
-          <Avatar icon={iconoDeRubro[comercio.datos.rubro]} />
+          <Avatar icon={iconoDeRubro[comercio.rubro]} />
           <View style={{ flex: 1 }}>
             <Text variant="bodyLg" weight="semibold">
-              {nombre ?? comercio.datos.nombre}
+              {nombre ?? comercio.nombre}
             </Text>
             <Text variant="label" tone="inkSecondary">
-              {nombre ? `${comercio.datos.nombre} · ` : ""}
+              {nombre ? `${comercio.nombre} · ` : ""}
               {fecha === hoy ? "hoy" : `sábado ${fechaCorta(fecha)}`}
             </Text>
           </View>

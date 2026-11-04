@@ -2125,7 +2125,21 @@ spec ya existe (004, FR-030).
 - Buscador de Inicio: los habituales que coinciden van primero.
 - Onboarding: sin búsqueda, hasta 8 comercios por rubro (con el corpus real son
   cientos).
-- Pantalla del comercio: «Promos actualizadas hace …», como en Inicio.
+- Pantalla del comercio: «Promos actualizadas hace …», como en Inicio (lo pide
+  #43; spec 009 FR-019 solo lo pedía en Inicio).
+- Por sacar los catálogos de `api.ts` también cambian: el gasto en grupo
+  (`recomendarGrupo(pedido, comercio?)` recibe el comercio de la pantalla) y
+  las sugerencias de Perfil (un chip por nombre, porque el habitual se guarda
+  sin rubro).
+- Revisiones (rules-guardian sin hallazgos; `/code-review`): guardar una compra
+  y la lista de compras usan el mismo catálogo con el que se propuso la promo
+  (FR-022), sin catálogo por defecto; un id de antes de sincronizar o el del
+  grupo de ejemplo sigue encontrando su comercio; una sola clave para comparar
+  nombres (sin mayúsculas, acentos ni espacios de más, FR-002), así «Café» y
+  «Cafe» son el mismo comercio; buscando, cada resultado lleva su rubro; un
+  habitual que está en dos rubros da un acceso rápido por rubro.
+- Limitación: «Revisá tu compra» recibe el comercio como texto; si ese nombre
+  está en dos rubros, toma el primero.
 - Resuelve el pendiente de #47 (autocompletar desde el corpus) y responde la
   parte de comercios de #102.
 - Verificación: lint, typecheck, build y tests en verde. No se probó en Expo Go.

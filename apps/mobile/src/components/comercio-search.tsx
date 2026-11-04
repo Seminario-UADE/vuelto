@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { TextInput, View } from "react-native";
-import { buscarComercios, etiquetaDeComercio } from "@/data/comercios";
+import { buscarComercios, etiquetaDeComercio, nombreDeRubro } from "@/data/comercios";
 import type { Comercio } from "@/data/contracts";
 import { useAppSelector } from "@/store/hooks";
 import { selectCatalogoComercios, selectComerciosFrecuentes } from "@/store/selectores";
@@ -64,7 +64,8 @@ export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Pr
         {lista.map((c) => (
           <Chip
             key={c.id}
-            label={etiquetaDeComercio(c, lista)}
+            // Buscando, cada resultado con su rubro (FR-002); en los accesos rápidos, solo si se repite.
+            label={q.trim() ? `${c.nombre} · ${nombreDeRubro(c)}` : etiquetaDeComercio(c, lista)}
             selected={seleccionado === c.id}
             accessibilityHint="Muestra con qué te conviene pagar"
             onPress={() => {

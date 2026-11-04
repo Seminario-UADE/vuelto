@@ -1,18 +1,21 @@
 import type { Promocion } from "@vuelto/motor";
 import { describe, expect, it } from "vitest";
 import { sincronizado } from "../store/acciones";
-import { comerciosLeidos } from "../store/perfil";
+import { comerciosLeidos, mediosConfirmados } from "../store/perfil";
 import { storeDePrueba } from "../store/prueba";
 import {
+  selectBuscarComercioPorId,
   selectCatalogoComercios,
+  selectEntradasMotor,
   selectComercioSimulado,
   selectComerciosFrecuentes,
   selectHoy,
   selectRecomendacion,
 } from "../store/selectores";
 import { comercioElegido } from "../store/simulacion";
+import { compraParaGuardar } from "./calculo";
 import { buscarComercios, comerciosDelCorpus, etiquetaDeComercio, idDeComercio, nombreDeRubro } from "./comercios";
-import { catalogoComercios, promociones } from "./fixtures";
+import { catalogoComercios, mediosDeEjemplo, promociones } from "./fixtures";
 
 // Issue #43, spec 004 FR-030: el buscador sale de las promos del corpus, no de una lista a mano.
 // Las promos de prueba son las de ejemplo con otro comercio, rubro o vigencia.
@@ -60,14 +63,25 @@ describe("comerciosDelCorpus (FR-030)", () => {
   });
 });
 
+describe("identidad del comercio", () => {
+  it("«Café Martínez» y «Cafe  martinez» en el mismo rubro son uno solo", () => {
+    const r = comerciosDelCorpus(
+      [promo("a", { comercio: "Café Martínez", categoriaId: 2 }), promo("b", { comercio: "Cafe  martinez", categoriaId: 2 })],
+      HOY,
+    );
+    expect(r.map((c) => c.nombre)).toEqual(["Café Martínez"]);
+  });
+});
+
 describe("buscarComercios", () => {
   const catalogo = comerciosDelCorpus(
     [promo("a", { comercio: "FARMACITY", categoriaId: 4 }), promo("b", { comercio: "Café Martínez", categoriaId: 2 })],
     HOY,
   );
-  it("sin acentos ni mayúsculas; sin texto, nada", () => {
+  it("sin acentos, mayúsculas ni espacios de más; sin texto, nada", () => {
     expect(buscarComercios(catalogo, "farma").map((c) => c.nombre)).toEqual(["FARMACITY"]);
     expect(buscarComercios(catalogo, "cafe martinez").map((c) => c.nombre)).toEqual(["Café Martínez"]);
+    expect(buscarComercios(catalogo, " CAFÉ   martínez ").map((c) => c.nombre)).toEqual(["Café Martínez"]);
     expect(buscarComercios(catalogo, "  ")).toEqual([]);
   });
 });
@@ -104,4 +118,44 @@ describe("selectCatalogoComercios", () => {
     s.dispatch(comerciosLeidos([{ id: "c1", nombre: "coto" }]));
     expect(selectComerciosFrecuentes(s.getState())[0]).toMatchObject({ nombre: "Coto", categoriaId: 1 });
   });
+
+  it("un habitual que está en dos rubros del corpus da un acceso rápido por rubro", () => {
+    const s = conCorpus([
+      promo("a", { comercio: "Carrefour", categoriaId: 1 }),
+      promo("b", { comercio: "Carrefour", categoriaId: 10 }),
+    ]);
+    s.dispatch(comerciosLeidos([{ id: "c1", nombre: "carrefour" }]));
+    expect(selectComerciosFrecuentes(s.getState()).map((c) => c.categoriaId)).toEqual([1, 10]);
+  });
+
+  it("un id de antes de sincronizar («coto») sigue encontrando su comercio de ejemplo", () => {
+    const s = conCorpus([promo("a", { comercio: "DIA", categoriaId: 1 })]);
+    expect(selectBuscarComercioPorId(s.getState())("coto")).toMatchObject({ nombre: "Coto", categoriaId: 1 });
+  });
+
+  it("guardar una compra usa el mismo catálogo que la propuso: un comercio del corpus no queda sin rubro", () => {
+    const s = conCorpus([promo("a", { comercio: "DIA", categoriaId: 1 })]);
+    s.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
+    const estado = s.getState();
+    const medio = estado.perfil.medios[0]!;
+    const c = compraParaGuardar(
+      selectEntradasMotor(estado),
+      { modo: "manual", comercio: "dia", fecha: HOY, monto: 1000, medioId: medio.id, textoExtraido: null, usarPromo: true },
+      "n1",
+      selectCatalogoComercios(estado),
+    );
+    expect(c.categoriaId).toBe(1);
+  });
 });
+
+function conCorpus(promos: Promocion[]) {
+  const s = storeDePrueba();
+  s.dispatch(
+    sincronizado({
+      corpus: { promociones: promos, marca: "2026-11-04T09:00:00+00:00", sincronizadoEn: "2026-11-04T09:00:00.000Z", descartadas: 0 },
+      compras: [],
+      ahora: "2026-11-04T15:00:00.000Z",
+    }),
+  );
+  return s;
+}

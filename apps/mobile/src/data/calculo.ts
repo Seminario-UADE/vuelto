@@ -39,8 +39,8 @@ import type {
   Rubro,
   TopeMedio,
 } from "./contracts";
-import { catalogoComercios } from "./fixtures";
-import { normalizarComercio, type MedioDePago as MedioGuardado } from "../perfil/modelo";
+import type { MedioDePago as MedioGuardado } from "../perfil/modelo";
+import { claveDeComercio, comercioDelCatalogo } from "./comercios";
 import { medioDelMotor, medioVista } from "../perfil/vista";
 import { aVista } from "./vista-recomendacion";
 import { mediodia } from "../lib/reloj";
@@ -294,6 +294,7 @@ export function comprasDeTopeVista(
   topes: ResumenTopes,
   compras: CompraMotor[],
   medios: readonly MedioGuardado[],
+  catalogo: readonly Comercio[],
   clave: string,
 ): ComprasDeTope | null {
   const tope = topes.medios.find((t) => t.clave === clave);
@@ -301,20 +302,19 @@ export function comprasDeTopeVista(
   const ids = new Set(tope.compraIds);
   return {
     tope: { ...tope, consejo: null },
-    compras: compras.filter((c) => ids.has(c.id)).map((c) => compraVista(c, medios)),
+    compras: compras.filter((c) => ids.has(c.id)).map((c) => compraVista(c, medios, catalogo)),
   };
 }
 
 /**
- * Comercio del catálogo por nombre, con el criterio de repetidos del perfil («Coto» = « coto »);
- * fuera del catálogo, sin rubro (no se inventa). Las pantallas pasan el catálogo del corpus
- * (`selectCatalogoComercios`); las compras de ejemplo usan el de ejemplo.
+ * Comercio del catálogo por nombre («Coto» = « coto »); fuera del catálogo, sin rubro (no se
+ * inventa). El catálogo es el de `selectCatalogoComercios`: el del corpus sincronizado o, antes,
+ * el de ejemplo.
  */
-export function comercioPorNombre(nombre: string, catalogo: readonly Comercio[] = catalogoComercios): Comercio {
-  const n = normalizarComercio(nombre);
+export function comercioPorNombre(nombre: string, catalogo: readonly Comercio[]): Comercio {
   return (
-    catalogo.find((c) => normalizarComercio(c.nombre) === n) ?? {
-      id: `libre-${n}`,
+    comercioDelCatalogo(nombre, catalogo) ?? {
+      id: `libre-${claveDeComercio(nombre).replace(/ /g, "-")}`,
       nombre,
       inicial: nombre.charAt(0).toUpperCase(),
       rubro: "otro",
@@ -324,12 +324,12 @@ export function comercioPorNombre(nombre: string, catalogo: readonly Comercio[] 
   );
 }
 
-function compraVista(c: CompraMotor, medios: readonly MedioGuardado[]): Compra {
+function compraVista(c: CompraMotor, medios: readonly MedioGuardado[], catalogo: readonly Comercio[]): Compra {
   const guardado = medios.find((m) => m.id === c.medioDePagoId);
   const medio = guardado ? medioVista(guardado) : medioQuitado(c.medioDePagoId);
   return {
     id: c.id,
-    comercio: comercioPorNombre(c.comercio),
+    comercio: comercioPorNombre(c.comercio, catalogo),
     fecha: c.fecha,
     monto: c.monto,
     medio,
@@ -344,7 +344,12 @@ function compraVista(c: CompraMotor, medios: readonly MedioGuardado[]): Compra {
  * ninguna compra que consume un tope queda sin poder verse o borrarse (spec 010, FR-003).
  * Lo gastado y lo devuelto siguen siendo los del mes en curso.
  */
-export function comprasVista(compras: CompraMotor[], ahora: Date, medios: readonly MedioGuardado[]): ResumenCompras {
+export function comprasVista(
+  compras: CompraMotor[],
+  ahora: Date,
+  medios: readonly MedioGuardado[],
+  catalogo: readonly Comercio[],
+): ResumenCompras {
   const hoy = fechaArgentina(ahora);
   const mes = nombreDelMes(hoy);
   const delMes = comprasDelMes(compras, hoy);
@@ -352,7 +357,7 @@ export function comprasVista(compras: CompraMotor[], ahora: Date, medios: readon
     mes,
     gastaste: delMes.reduce((s, c) => s + c.monto, 0),
     devolvieron: devolvieron(delMes, mes),
-    compras: comprasDelPeriodo(compras, hoy).map((c) => compraVista(c, medios)),
+    compras: comprasDelPeriodo(compras, hoy).map((c) => compraVista(c, medios, catalogo)),
   };
 }
 
@@ -406,10 +411,16 @@ export function promoPropuesta(
  * como reintegro esperado. `descuentoObtenido` queda `null`: el usuario no informó cuánto le
  * devolvieron.
  */
-export function compraParaGuardar(entradas: EntradasMotor, b: BorradorCompra, id: string): CompraMotor {
+export function compraParaGuardar(
+  entradas: EntradasMotor,
+  b: BorradorCompra,
+  id: string,
+  catalogo: readonly Comercio[],
+): CompraMotor {
   if (b.monto === null || b.medioId === null) throw new Error("Falta el monto o el medio de pago");
   if (!entradas.perfil.mediosDePago.some((m) => m.id === b.medioId)) throw new Error(`Medio desconocido: ${b.medioId}`);
-  const comercio = comercioPorNombre((b.comercio ?? "").trim() || "Compra");
+  // El mismo catálogo con el que «Revisá tu compra» propuso la promo (FR-022).
+  const comercio = comercioPorNombre((b.comercio ?? "").trim() || "Compra", catalogo);
   const propuesta = b.usarPromo ? promoPropuesta(entradas, comercio, b.medioId, b.fecha, b.monto) : null;
   const tienePromo = propuesta !== null && propuesta.promociones.length > 0;
   return {

@@ -60,7 +60,7 @@ export default function Revisa() {
   const fecha = p.fecha || hoy;
 
   const perfil = useAppSelector(selectPerfilVista);
-  const comercioConocido = perfil.comercios.find((c) => c.nombre.toLowerCase() === comercio.trim().toLowerCase());
+  const comercioConocido = comercio.trim() ? comercioDelCatalogo(comercio, perfil.comercios) : undefined;
   const catalogo = useAppSelector(selectCatalogoComercios);
   const conocido = comercioConocido ?? (comercio.trim() ? comercioDelCatalogo(comercio, catalogo) : undefined);
   // Qué dice el motor de cada medio para este comercio (solo para orientar; no preselecciona).

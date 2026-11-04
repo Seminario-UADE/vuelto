@@ -15,9 +15,17 @@ const RUBRO_DE_CATEGORIA = new Map<number, Rubro>(
   ),
 );
 
+/**
+ * Clave para comparar nombres en el buscador (spec 004 FR-002): sin mayúsculas, acentos ni
+ * espacios de más. «Café  Martínez» y «cafe martinez» son el mismo comercio.
+ */
+export function claveDeComercio(nombre: string): string {
+  return normalizarComercio(nombre).normalize("NFD").replace(/\p{Diacritic}/gu, "");
+}
+
 /** El mismo comercio en el mismo rubro tiene siempre el mismo id, venga de la promo que venga. */
 export function idDeComercio(nombre: string, categoriaId: number): string {
-  return `${categoriaId}-${normalizarComercio(nombre).replace(/ /g, "-")}`;
+  return `${categoriaId}-${claveDeComercio(nombre).replace(/ /g, "-")}`;
 }
 
 /**
@@ -32,6 +40,7 @@ export function comerciosDelCorpus(promociones: readonly Promocion[], hoy: Fecha
     if (p.comercio === null || p.vigencia.hasta < hoy) continue;
     const nombre = p.comercio.trim().replace(/\s+/g, " ");
     if (nombre === "") continue;
+    // El mismo par con otra escritura («Café» / «Cafe») queda con el primer nombre que llegó.
     const id = idDeComercio(nombre, p.categoriaId);
     if (por.has(id)) continue;
     por.set(id, {
@@ -43,17 +52,17 @@ export function comerciosDelCorpus(promociones: readonly Promocion[], hoy: Fecha
       frecuente: false,
     });
   }
-  return [...por.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+  // Por nombre y, a igual nombre, por categoría: el orden no depende del orden de las promos.
+  return [...por.values()].sort(
+    (a, b) => a.nombre.localeCompare(b.nombre, "es") || (a.categoriaId ?? 0) - (b.categoriaId ?? 0),
+  );
 }
 
-/** Sin acentos ni mayúsculas: «farmacity» encuentra «FARMACITY» y «cafe» encuentra «Café». */
-const plano = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
-
-/** Los que contienen lo buscado; vacío si no se buscó nada. */
+/** Los que contienen lo buscado («farma» encuentra «FARMACITY»); vacío si no se buscó nada. */
 export function buscarComercios(catalogo: readonly Comercio[], q: string, limite = 20): Comercio[] {
-  const t = plano(q.trim());
+  const t = claveDeComercio(q);
   if (t === "") return [];
-  return catalogo.filter((c) => plano(c.nombre).includes(t)).slice(0, limite);
+  return catalogo.filter((c) => claveDeComercio(c.nombre).includes(t)).slice(0, limite);
 }
 
 /** El rubro para mostrar al lado del nombre: el de la app o, si no lo tiene, el de MODO. */
@@ -67,13 +76,21 @@ export function nombreDeRubro(c: Comercio): string {
  * ahí lleva el rubro para que el usuario elija cuál (spec 004, Edge Cases).
  */
 export function etiquetaDeComercio(c: Comercio, lista: readonly Comercio[]): string {
-  const n = normalizarComercio(c.nombre);
-  const repetido = lista.some((x) => x.id !== c.id && normalizarComercio(x.nombre) === n);
+  const n = claveDeComercio(c.nombre);
+  const repetido = lista.some((x) => x.id !== c.id && claveDeComercio(x.nombre) === n);
   return repetido ? `${c.nombre} · ${nombreDeRubro(c)}` : c.nombre;
 }
 
-/** El del catálogo con ese nombre («coto» = «COTO»), o `undefined`. */
+/** Todos los del catálogo con ese nombre («coto» = «COTO»): uno por rubro, en el orden del catálogo. */
+export function comerciosConNombre(nombre: string, catalogo: readonly Comercio[]): Comercio[] {
+  const n = claveDeComercio(nombre);
+  return catalogo.filter((c) => claveDeComercio(c.nombre) === n);
+}
+
+/**
+ * El del catálogo con ese nombre, o `undefined`. Si está en dos rubros, el primero (por
+ * categoría): solo para cuando no hay cómo preguntar cuál (un nombre escrito en un ticket).
+ */
 export function comercioDelCatalogo(nombre: string, catalogo: readonly Comercio[]): Comercio | undefined {
-  const n = normalizarComercio(nombre);
-  return catalogo.find((c) => normalizarComercio(c.nombre) === n);
+  return comerciosConNombre(nombre, catalogo)[0];
 }

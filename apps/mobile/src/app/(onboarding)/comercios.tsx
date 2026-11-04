@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { comercioRepetido, MENSAJE_COMERCIO_REPETIDO, MENSAJES_ERROR, nombreRepetido } from "@/perfil/modelo";
 import { confirmarComercios } from "@/store/perfil-remoto";
 import { selectCatalogoComercios } from "@/store/selectores";
+import { buscarComercios } from "@/data/comercios";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 
 
@@ -34,8 +35,7 @@ export default function Comercios() {
   const [q, setQ] = useState("");
 
   const grupos = useMemo(() => {
-    const norm = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
-    const lista = catalogo.filter((c) => norm(c.nombre).includes(norm(q.trim())));
+    const lista = q.trim() ? buscarComercios(catalogo, q, Infinity) : catalogo;
     const por = new Map<Rubro, Comercio[]>();
     for (const c of lista) por.set(c.rubro, [...(por.get(c.rubro) ?? []), c]);
     // Con el corpus real son cientos: sin búsqueda, unos pocos por rubro; el resto, buscando.

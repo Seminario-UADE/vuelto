@@ -17,7 +17,7 @@ import {
 } from "../data/calculo";
 import { contarPendientes } from "../data/compras/operaciones";
 import type { Comercio, MedioDePago, Perfil } from "../data/contracts";
-import { comerciosDelCorpus } from "../data/comercios";
+import { comerciosConNombre, comerciosDelCorpus } from "../data/comercios";
 import { catalogoComercios } from "../data/fixtures";
 import { medioVista } from "../perfil/vista";
 import type { RootState } from "./index";
@@ -62,8 +62,14 @@ export const selectCatalogoComercios = createSelector(
 export const selectComerciosFrecuentes = createSelector(
   [(s: RootState) => s.perfil.comercios, selectCatalogoComercios],
   (habituales, catalogo): Comercio[] => {
-    // Del catálogo si lo conoce (con su rubro); si no, el comercio por su nombre, sin rubro inventado.
-    if (habituales.length > 0) return habituales.map((c) => comercioPorNombre(c.nombre, catalogo));
+    // Del catálogo si lo conoce (uno por rubro: el usuario elige cuál, spec 004); si no, el
+    // comercio por su nombre, sin rubro inventado.
+    if (habituales.length > 0) {
+      return habituales.flatMap((c) => {
+        const delCatalogo = comerciosConNombre(c.nombre, catalogo);
+        return delCatalogo.length > 0 ? delCatalogo : [comercioPorNombre(c.nombre, catalogo)];
+      });
+    }
     // Los de ejemplo, con el rubro del corpus si está ahí; si no, con el suyo (sus promos de rubro).
     return catalogoComercios.filter((c) => c.frecuente).map((c) => {
       const delCorpus = comercioPorNombre(c.nombre, catalogo);
@@ -72,12 +78,21 @@ export const selectComerciosFrecuentes = createSelector(
   },
 );
 
-/** Un comercio por id: del catálogo o uno de los accesos rápidos (un habitual escrito a mano). */
+/**
+ * Un comercio por id: del catálogo, de los accesos rápidos (un habitual escrito a mano) o, si
+ * no, del catálogo de ejemplo: un id elegido antes de la primera sincronización («coto») o el
+ * del grupo de ejemplo sigue andando con las promos de su rubro.
+ */
 export const selectBuscarComercioPorId = createSelector(
   [selectCatalogoComercios, selectComerciosFrecuentes],
   (catalogo, frecuentes) =>
     (id: string | null): Comercio | null =>
-      id === null ? null : (catalogo.find((c) => c.id === id) ?? frecuentes.find((c) => c.id === id) ?? null),
+      id === null
+        ? null
+        : (catalogo.find((c) => c.id === id) ??
+          frecuentes.find((c) => c.id === id) ??
+          catalogoComercios.find((c) => c.id === id) ??
+          null),
 );
 
 /** El comercio que tocó: del catálogo o uno de sus habituales escritos a mano (sin rubro). */
@@ -104,6 +119,7 @@ export const selectComprasDeTope = createSelector(
     selectTopes,
     (s: RootState) => s.compras.lista,
     (s: RootState) => s.perfil.medios,
+    selectCatalogoComercios,
     (_s: RootState, clave: string) => clave,
   ],
   comprasDeTopeVista,
@@ -116,7 +132,7 @@ export const selectFrescura = createSelector(
 );
 
 export const selectResumenCompras = createSelector(
-  [(s: RootState) => s.compras.lista, selectAhora, (s: RootState) => s.perfil.medios],
+  [(s: RootState) => s.compras.lista, selectAhora, (s: RootState) => s.perfil.medios, selectCatalogoComercios],
   comprasVista,
 );
 
