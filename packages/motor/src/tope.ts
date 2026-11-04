@@ -7,6 +7,7 @@
 import { aCentavos, aCentesimosDePunto, aplicarPorcentaje } from "./dinero.ts";
 import { vigenteEn } from "./elegibilidad.ts";
 import { inicioDelPeriodo } from "./fecha.ts";
+import { compararIds } from "./orden.ts";
 import type { BaseEstimacion, Compra, FechaISO, PeriodoAcumulable, Promocion } from "./tipos.ts";
 
 /**
@@ -39,6 +40,8 @@ export interface Saldo {
   consumido: number;
   restante: number;
   base: BaseEstimacion;
+  /** Las compras que cuenta `base.comprasRegistradas`, en el orden de `compararIds`. */
+  compraIds: string[];
 }
 
 /** Agrupa una sola vez las compras por promo, para no recorrerlas por cada promo. */
@@ -69,11 +72,13 @@ function armarSaldo(
   let suma = 0;
   let registradas = 0;
   let sinDescuento = 0;
+  const compraIds: string[] = [];
   for (const promo of miembros) {
     const centesimos = aCentesimosDePunto(promo.porcentaje);
     for (const c of comprasDe.get(promo.id) ?? []) {
       if (c.fecha < inicio || c.fecha > hoy) continue;
       registradas++;
+      compraIds.push(c.id);
       if (c.descuentoObtenido === null) {
         sinDescuento++;
         suma += Math.min(aplicarPorcentaje(aCentavos(c.monto), centesimos), tope);
@@ -90,6 +95,7 @@ function armarSaldo(
     consumido,
     restante: tope - consumido,
     base: { comprasRegistradas: registradas, comprasSinDescuentoInformado: sinDescuento },
+    compraIds: compraIds.sort(compararIds),
   };
 }
 

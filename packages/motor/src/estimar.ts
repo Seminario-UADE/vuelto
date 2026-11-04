@@ -54,6 +54,7 @@ export function estimarTopes(
       consumido: aPesos(saldo.consumido),
       restante: aPesos(saldo.restante),
       base: saldo.base,
+      compraIds: saldo.compraIds,
       periodo: {
         tipo: saldo.periodo,
         desde: inicioDelPeriodo(saldo.periodo, hoy),

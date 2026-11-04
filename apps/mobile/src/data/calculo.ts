@@ -28,6 +28,8 @@ import type {
   BorradorCompra,
   Comercio,
   Compra,
+  ClaveTope,
+  ComprasDeTope,
   EstadoTope,
   MedioDePago,
   PedidoRecomendar,
@@ -178,6 +180,11 @@ function aplicaElDia(promo: Promocion, fecha: string): boolean {
   return dias === null || dias.includes(diaArgentina(mediodia(fecha)));
 }
 
+/** La clave del saldo de una estimación: la misma agrupación que hace `estimarTopes`. */
+export function claveDeTope(est: EstimacionTope): ClaveTope {
+  return est.grupoTopeId !== null ? `grupo:${est.grupoTopeId}` : `promo:${est.promocionIds[0] ?? ""}`;
+}
+
 function topeMedio(est: EstimacionTope, entradas: EntradasMotor, hoy: string): TopeMedio | null {
   const guardado = entradas.medios.find((m) => m.id === est.mediosDePagoIds[0]);
   const medio = guardado ? medioVista(guardado) : null;
@@ -192,6 +199,7 @@ function topeMedio(est: EstimacionTope, entradas: EntradasMotor, hoy: string): T
   // el 1/11"); la tarjeta los muestra por separado.
   const [segun = texto.base] = texto.base.split(" · ");
   return {
+    clave: claveDeTope(est),
     medio,
     rubro,
     promo: `${promo.porcentaje}% en ${RUBROS[rubro].enFrase} · ${textoDias(promo.vigencia.dias)}`,
@@ -214,6 +222,11 @@ function topeMedio(est: EstimacionTope, entradas: EntradasMotor, hoy: string): T
       (estado === "disponible" || estado === "queda-poco") && aplicaElDia(promo, hoy) && texto.cifra
         ? `Hoy es ${nombreDelDia(hoy)}: en ${RUBROS[rubro].enFrase}, con ${medio.nombreCorto} te quedan ${texto.cifra} de tope.`
         : null,
+    promociones: est.promocionIds.flatMap((id) => {
+      const p = entradas.promociones.find((x) => x.id === id);
+      return p ? [p.titulo] : [];
+    }),
+    compraIds: est.compraIds,
   };
 }
 
@@ -266,6 +279,29 @@ export function topesVista(entradas: EntradasMotor): ResumenTopes {
     mediosConTope: medios.filter((t) => t.estado === "disponible" || t.estado === "queda-poco").length,
     reinicioMensualEnDias: Math.round((Date.parse(reinicio) - Date.parse(hoy)) / 86_400_000),
     medios,
+  };
+}
+
+/**
+ * Las compras que consumieron un tope (issue #45). Son las que el motor contó en la base de la
+ * estimación (`compraIds`), así la lista y el "según N compras" salen del mismo cálculo; la app
+ * no decide qué compra pertenece a qué tope. En el orden de `compras` (como «Mis compras»); una
+ * con un medio que ya no está en el perfil se muestra igual, como en «Mis compras». Sin consejo:
+ * ya se vio en «Tus topes» y hay uno por pantalla (DESIGN.md §5). `null` si el tope ya no está
+ * (venció o se sacó el medio del perfil).
+ */
+export function comprasDeTopeVista(
+  topes: ResumenTopes,
+  compras: CompraMotor[],
+  medios: readonly MedioGuardado[],
+  clave: string,
+): ComprasDeTope | null {
+  const tope = topes.medios.find((t) => t.clave === clave);
+  if (!tope) return null;
+  const ids = new Set(tope.compraIds);
+  return {
+    tope: { ...tope, consejo: null },
+    compras: compras.filter((c) => ids.has(c.id)).map((c) => compraVista(c, medios)),
   };
 }
 

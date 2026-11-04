@@ -1593,6 +1593,41 @@ la que no tiene dependencias (#75). Es una issue chica: va sin spec-kit.
 
 ---
 
+## 2026-11-03 — Mis topes: tocar un tope muestra sus compras (issue #45)
+
+**Herramienta:** Claude Code (Opus 5.5), con `test-runner`, `rules-guardian`, `/code-review`, un Supabase
+local aislado (puertos 573xx) y el navegador integrado.
+
+**Objetivo:** el único criterio pendiente de la #45: "Tocar un tope muestra las compras que lo consumieron".
+Es S: sin spec-kit.
+
+**Prompts principales:**
+1. "Selector memoizado en apps/mobile/src/store/selectores.ts que, dado un tope (promo o grupo de tope
+   compartido), devuelva las compras del período que lo consumieron. Debe salir de lo mismo que usa
+   estimarTopes del motor; si el motor no expone qué compras consumió cada tope, NO dupliques la lógica en la
+   app: proponé el cambio mínimo en @vuelto/motor y avisame antes de tocarlo. […]"
+2. "ok" (aprobación del cambio en el motor)
+
+**Resultado:**
+- El motor no exponía las compras de cada saldo, y la app no podía derivarlas sin repetir su lógica: un grupo
+  cuenta las compras de miembros **vencidos** (que no están en `promocionIds`) y su período depende de los
+  miembros. Se propuso y aprobó `compraIds` en `EstimacionTope`, que se llena en el mismo loop que
+  `base.comprasRegistradas` (mismo largo, orden `compararIds`). `BaseEstimacion` y `recomendar()` no cambian.
+  Contrato y modelo de datos de la spec 005 actualizados.
+- App: `selectComprasDeTope(state, clave)` sale de `selectTopes` y solo cruza esos ids con `compras.lista`.
+  `TopeDetalle` es tocable y lleva a `/tope/[clave]`, que muestra el tope con su base, las promos de un tope
+  compartido y las compras (con `CompraRow`, que permite borrarlas).
+- `/code-review` y `rules-guardian` encontraron un caso: una compra con un medio fuera del catálogo contaba en
+  la base pero no se podía pintar, y la lista contradecía el "según N compras". Primero se avisó aparte; al
+  mergear #100 (que muestra esas compras como "medio que sacaste de tu perfil") el aviso sobró y se sacó: la
+  lista ahora siempre coincide con la base. También se tipó la clave del tope y el test la usa.
+- Verificado a mano en la web con un usuario de prueba y con Supabase apagado (sin red): registrar una compra
+  pasa el tope a "según 4 compras" y la suma a la lista; borrarla desde la pantalla del tope vuelve a 3, y el
+  estado sobrevive a recargar. Para eso hubo que apagar el REST de Supabase antes del login: la base local no
+  tiene promos y sus bancos son UUID, no los ids de la app (#41), así que el corpus de ejemplo solo queda si la
+  sincronización falla. El corpus de ejemplo no tiene topes compartidos: la agrupación se verificó solo con
+  tests. **No** se probó en el simulador de iOS.
+- Visto al pasar: `CompraRow` corta los nombres de comercio a 375 px ("Farmaci/ty"), también en «Mis compras».
 ## 2026-11-03 — Fila de compra legible a 375 px
 
 **Herramienta:** Claude Code (Opus 5.5 / Sonnet 5.5), navegador integrado con `mobile-web`.
