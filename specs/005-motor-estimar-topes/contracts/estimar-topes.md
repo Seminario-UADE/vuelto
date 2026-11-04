@@ -17,6 +17,9 @@ anterior. Ids únicos; datos validados.
   `grupoTopeId`, o por el id de la promo si el saldo es propio (FR-006).
 - `restante = tope − consumido`, con `0 ≤ restante ≤ tope`; importes en pesos con a lo sumo dos
   decimales.
+- `compraIds` son las compras que consumieron el saldo (issue #45): las del período, hasta la
+  fecha de la consulta, de cualquier miembro (también los vencidos de un grupo). Ordenadas con
+  `compararIds`; `compraIds.length === base.comprasRegistradas`.
 - Con `perfil === null`, `mediosDePagoIds` es `[]` y no se filtra. Con un perfil sin medios, la
   lista es `[]`.
 

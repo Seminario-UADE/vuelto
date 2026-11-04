@@ -8,6 +8,7 @@ import { fechaArgentina } from "@vuelto/motor";
 import { textoFrescura } from "../lib/frescura";
 import {
   comercioPorNombre,
+  comprasDeTopeVista,
   comprasVista,
   perfilDelMotor,
   recomendacionVista,
@@ -66,6 +67,21 @@ export const selectRecomendacion = createSelector(
 );
 
 export const selectTopes = createSelector([selectEntradasMotor], topesVista);
+
+/**
+ * Las compras que consumieron un tope (issue #45), por su `clave`. Sale de `selectTopes`: la
+ * misma llamada a `estimarTopes` que pinta la tarjeta, así guardar o borrar una compra cambia
+ * las dos a la vez, sin red.
+ */
+export const selectComprasDeTope = createSelector(
+  [
+    selectTopes,
+    (s: RootState) => s.compras.lista,
+    (s: RootState) => s.perfil.medios,
+    (_s: RootState, clave: string) => clave,
+  ],
+  comprasDeTopeVista,
+);
 
 /** "Promos actualizadas hace 2 horas", o `null` con los datos de ejemplo (spec 009 FR-019). */
 export const selectFrescura = createSelector(

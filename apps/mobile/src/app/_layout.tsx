@@ -104,6 +104,7 @@ function Raiz() {
           <Stack.Screen name="(onboarding)" />
           <Stack.Screen name="comercio/[id]" options={{ ...headerNativo, title: "" }} />
           <Stack.Screen name="mis-compras" options={{ ...headerNativo, title: "Mis compras" }} />
+          <Stack.Screen name="tope/[clave]" options={{ ...headerNativo, title: "Compras del tope" }} />
           <Stack.Screen name="contactos/index" options={{ ...headerNativo, title: "Contactos" }} />
           <Stack.Screen name="contactos/invitar" options={{ ...headerNativo, title: "Invitar a alguien" }} />
           <Stack.Screen name="grupo/armar" options={{ ...headerNativo, title: "Pagan entre varios" }} />

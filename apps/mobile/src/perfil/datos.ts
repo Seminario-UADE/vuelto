@@ -31,7 +31,7 @@ type FilaMedio = {
   bancos: { nombre: string } | null;
 };
 
-type FilaBanco = { id: string; nombre: string };
+type FilaBanco = { id: string; nombre: string; on_hub_list: boolean | null };
 
 const COLUMNAS_COMERCIO = "id, nombre";
 
@@ -67,10 +67,10 @@ export function crearDatosPerfil(cliente: SupabaseClient) {
   const medios = () => cliente.from("medios_de_pago");
   const comercios = () => cliente.from("comercios_habituales");
   return {
-    /** Sin `on_hub_list` hasta que la tabla lo tenga (decisión 9): queda `null`. */
+    /** `on_hub_list` queda `null` mientras la ingesta no lo informe (decisión 9). */
     leerBancos: (): Promise<Resultado<Banco[]>> =>
-      ejecutar(cliente.from("bancos").select("id, nombre"), (data) =>
-        (data as FilaBanco[]).map((b) => ({ id: b.id, nombre: b.nombre, onHubList: null })),
+      ejecutar(cliente.from("bancos").select("id, nombre, on_hub_list"), (data) =>
+        (data as FilaBanco[]).map((b) => ({ id: b.id, nombre: b.nombre, onHubList: b.on_hub_list })),
       ),
 
     leerMisMedios: (): Promise<Resultado<MedioDePago[]>> =>

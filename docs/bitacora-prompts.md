@@ -1593,6 +1593,41 @@ la que no tiene dependencias (#75). Es una issue chica: va sin spec-kit.
 
 ---
 
+## 2026-11-03 — Mis topes: tocar un tope muestra sus compras (issue #45)
+
+**Herramienta:** Claude Code (Opus 5.5), con `test-runner`, `rules-guardian`, `/code-review`, un Supabase
+local aislado (puertos 573xx) y el navegador integrado.
+
+**Objetivo:** el único criterio pendiente de la #45: "Tocar un tope muestra las compras que lo consumieron".
+Es S: sin spec-kit.
+
+**Prompts principales:**
+1. "Selector memoizado en apps/mobile/src/store/selectores.ts que, dado un tope (promo o grupo de tope
+   compartido), devuelva las compras del período que lo consumieron. Debe salir de lo mismo que usa
+   estimarTopes del motor; si el motor no expone qué compras consumió cada tope, NO dupliques la lógica en la
+   app: proponé el cambio mínimo en @vuelto/motor y avisame antes de tocarlo. […]"
+2. "ok" (aprobación del cambio en el motor)
+
+**Resultado:**
+- El motor no exponía las compras de cada saldo, y la app no podía derivarlas sin repetir su lógica: un grupo
+  cuenta las compras de miembros **vencidos** (que no están en `promocionIds`) y su período depende de los
+  miembros. Se propuso y aprobó `compraIds` en `EstimacionTope`, que se llena en el mismo loop que
+  `base.comprasRegistradas` (mismo largo, orden `compararIds`). `BaseEstimacion` y `recomendar()` no cambian.
+  Contrato y modelo de datos de la spec 005 actualizados.
+- App: `selectComprasDeTope(state, clave)` sale de `selectTopes` y solo cruza esos ids con `compras.lista`.
+  `TopeDetalle` es tocable y lleva a `/tope/[clave]`, que muestra el tope con su base, las promos de un tope
+  compartido y las compras (con `CompraRow`, que permite borrarlas).
+- `/code-review` y `rules-guardian` encontraron un caso: una compra con un medio fuera del catálogo contaba en
+  la base pero no se podía pintar, y la lista contradecía el "según N compras". Primero se avisó aparte; al
+  mergear #100 (que muestra esas compras como "medio que sacaste de tu perfil") el aviso sobró y se sacó: la
+  lista ahora siempre coincide con la base. También se tipó la clave del tope y el test la usa.
+- Verificado a mano en la web con un usuario de prueba y con Supabase apagado (sin red): registrar una compra
+  pasa el tope a "según 4 compras" y la suma a la lista; borrarla desde la pantalla del tope vuelve a 3, y el
+  estado sobrevive a recargar. Para eso hubo que apagar el REST de Supabase antes del login: la base local no
+  tiene promos y sus bancos son UUID, no los ids de la app (#41), así que el corpus de ejemplo solo queda si la
+  sincronización falla. El corpus de ejemplo no tiene topes compartidos: la agrupación se verificó solo con
+  tests. **No** se probó en el simulador de iOS.
+- Visto al pasar: `CompraRow` corta los nombres de comercio a 375 px ("Farmaci/ty"), también en «Mis compras».
 ## 2026-11-03 — Fila de compra legible a 375 px
 
 **Herramienta:** Claude Code (Opus 5.5 / Sonnet 5.5), navegador integrado con `mobile-web`.
@@ -1972,6 +2007,34 @@ perfil con los medios guardados del usuario (PR #100).
 - En la bitácora quedaron las dos entradas, en orden de fecha.
 - Tests en verde: 213 del motor, 447 de la app, 40 de la Edge Function y 274
   de la ingesta. Lint y typecheck en verde.
+
+---
+
+## 2026-11-03 — Perfil: `on_hub_list` y logo en `bancos` (issue #41)
+
+**Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde la revisión del PR #88, con `supabase` CLI.
+
+**Objetivo:** cerrar los pendientes que dejó el review del PR #88: que `bancos` tenga `on_hub_list` y el
+logo, y que el slice `perfil` guarde lo que devuelve `perfil/datos.ts`.
+
+**Prompts principales:**
+1. "Sumá `on_hub_list` e `imagen` a `bancos` con su test pgTAP y hacé que `leerBancos` los pida."
+2. "Reconciliá el slice `perfil` (hoy `medios: string[]`) con `MedioDePago`, sin conectar pantallas."
+3. "Resolvé los conflictos del PR contra `main`."
+
+**Resultado:**
+- Migración `20261103000008_bancos_hub.sql`: `on_hub_list boolean` y `logo_url text`, ambos nullables
+  (RLS y permisos sin cambios). El seed local los carga desde `docs/product/data/modo-bancos-raw.json`
+  (32 bancos en el hub de 82). `leerBancos` pide `on_hub_list`.
+- Error de la IA: la columna se llamó `imagen` y el test de estructura de RNF-06 ("ninguna columna
+  guarda la imagen de un ticket") falló; se renombró `logo_url` en vez de aflojar el test.
+- El slice `perfil` (`mediosGuardados`) se descartó al resolver los conflictos: mientras tanto el PR #100
+  ya había dejado `medios: MedioGuardado[]` y las pantallas conectadas, con la misma idea. Se tomó la
+  versión de `main` para todo `apps/mobile/src/store/`.
+- Verificado: lint, typecheck y tests de los 4 workspaces; `supabase db reset` y `supabase test db`
+  (165 tests) en un Supabase local con puertos propios.
+- Queda pendiente: la ingesta no carga `on_hub_list` ni `logo_url` (`publicar.ts` escribe `id` y
+  `nombre`); en el proyecto alojado quedan `null` hasta que se haga.
 
 ---
 
