@@ -6,6 +6,7 @@ import { storeDePrueba } from "../store/prueba";
 import {
   selectBuscarComercioPorId,
   selectCatalogoComercios,
+  selectCatalogoParaCompras,
   selectEntradasMotor,
   selectComercioSimulado,
   selectComerciosFrecuentes,
@@ -164,8 +165,33 @@ describe("parte B de #43: rubro sin comercio y canal (spec 004 FR-001)", () => {
     expect(pedidoDeCompra({ ...s, categoriaId: 1 }, null)).toEqual({ comercio: null, categoriaId: 1, monto: null, canal: "presencial" });
   });
 
-  it("una compra guardada por rubro («Supermercados») conserva su rubro", () => {
-    expect(comercioPorNombre("supermercados", [])).toMatchObject({ categoriaId: 1 });
+  it("una compra guardada por rubro («Supermercados») conserva su rubro; un habitual con ese nombre no", () => {
+    const s = storeDePrueba();
+    expect(comercioPorNombre("supermercados", selectCatalogoParaCompras(s.getState()))).toMatchObject({ categoriaId: 1 });
+    expect(comercioPorNombre("supermercados", selectCatalogoComercios(s.getState())).categoriaId).toBeNull();
+  });
+
+  it("otro comercio vuelve a presencial (Inicio no muestra el canal)", () => {
+    const s = storeDePrueba();
+    s.dispatch(comercioElegido("coto"));
+    s.dispatch(canalCambiado("online"));
+    s.dispatch(comercioElegido("coto"));
+    expect(s.getState().simulacion.canal).toBe("online");
+    s.dispatch(comercioElegido("ypf"));
+    expect(s.getState().simulacion.canal).toBe("presencial");
+  });
+
+  it("la compra se guarda con el canal con que se recomendó: online no toma una promo solo presencial", () => {
+    const s = conCorpus([promo("local", { comercio: null, categoriaId: 1, canal: "presencial" })]);
+    s.dispatch(mediosConfirmados(mediosDeEjemplo(mediosDeclarados.map((m) => m.id))));
+    s.dispatch(comercioElegido("rubro-1"));
+    const medio = selectRecomendacion(s.getState())?.medio;
+    expect(medio).toBeTruthy();
+    const estado = s.getState();
+    const borrador = { modo: "excepcion" as const, comercio: "Supermercados", fecha: HOY, monto: 1000, medioId: medio!.id, textoExtraido: null, usarPromo: true };
+    const catalogo = selectCatalogoParaCompras(estado);
+    expect(compraParaGuardar(selectEntradasMotor(estado), borrador, "n1", catalogo).promocionId).toBe("local");
+    expect(compraParaGuardar(selectEntradasMotor(estado), { ...borrador, canal: "online" }, "n2", catalogo).promocionId).toBeNull();
   });
 
   it("elegido un rubro, la recomendación no explica promos de un comercio puntual", () => {

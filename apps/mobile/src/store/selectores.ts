@@ -58,6 +58,15 @@ export const selectCatalogoComercios = createSelector(
     marca === null ? catalogoComercios : comerciosDelCorpus(promociones, hoy),
 );
 
+/**
+ * Para registrar y listar compras: los comercios y, además, los 13 rubros. Una compra que se
+ * hizo eligiendo un rubro se guarda con su nombre («Supermercados») y conserva su rubro.
+ */
+export const selectCatalogoParaCompras = createSelector([selectCatalogoComercios], (catalogo): readonly Comercio[] => [
+  ...catalogo,
+  ...RUBROS_DE_MODO,
+]);
+
 /** Los comercios que eligió el usuario; si saltó ese paso, los frecuentes de ejemplo. */
 export const selectComerciosFrecuentes = createSelector(
   [(s: RootState) => s.perfil.comercios, selectCatalogoComercios],
@@ -120,7 +129,7 @@ export const selectComprasDeTope = createSelector(
     selectTopes,
     (s: RootState) => s.compras.lista,
     (s: RootState) => s.perfil.medios,
-    selectCatalogoComercios,
+    selectCatalogoParaCompras,
     (_s: RootState, clave: string) => clave,
   ],
   comprasDeTopeVista,
@@ -133,7 +142,7 @@ export const selectFrescura = createSelector(
 );
 
 export const selectResumenCompras = createSelector(
-  [(s: RootState) => s.compras.lista, selectAhora, (s: RootState) => s.perfil.medios, selectCatalogoComercios],
+  [(s: RootState) => s.compras.lista, selectAhora, (s: RootState) => s.perfil.medios, selectCatalogoParaCompras],
   comprasVista,
 );
 

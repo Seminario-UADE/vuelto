@@ -1,3 +1,4 @@
+import type { Canal } from "@vuelto/motor";
 import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { recomendacionVista } from "../data/calculo";
@@ -13,11 +14,15 @@ export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
  * compra, Primera respuesta): misma función que `selectRecomendacion`, memoizada con las
  * mismas entradas del motor, sin tocar lo que la pantalla de abajo está simulando.
  */
-export function useRecomendacionPara(comercioId: string | null, monto: number | null): Recomendacion | null {
+export function useRecomendacionPara(
+  comercioId: string | null,
+  monto: number | null,
+  canal: Canal = "presencial",
+): Recomendacion | null {
   const entradas = useAppSelector(selectEntradasMotor);
   const buscar = useAppSelector(selectBuscarComercioPorId);
   return useMemo(() => {
     const comercio = buscar(comercioId);
-    return comercio ? recomendacionVista(entradas, comercio, monto) : null;
-  }, [entradas, buscar, comercioId, monto]);
+    return comercio ? recomendacionVista(entradas, comercio, monto, canal) : null;
+  }, [entradas, buscar, comercioId, monto, canal]);
 }

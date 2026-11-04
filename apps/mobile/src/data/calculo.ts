@@ -7,6 +7,7 @@
  */
 import {
   type Canal,
+  type CausaDescarte,
   diaArgentina,
   diaMesSinCeros,
   diaSiguiente,
@@ -41,7 +42,7 @@ import type {
   TopeMedio,
 } from "./contracts";
 import type { MedioDePago as MedioGuardado } from "../perfil/modelo";
-import { claveDeComercio, comercioDelCatalogo, esComercioDeRubro, RUBROS_DE_MODO } from "./comercios";
+import { claveDeComercio, comercioDelCatalogo, esComercioDeRubro } from "./comercios";
 import { medioDelMotor, medioVista } from "../perfil/vista";
 import { aVista } from "./vista-recomendacion";
 import { mediodia } from "../lib/reloj";
@@ -169,7 +170,7 @@ export function recomendacionVista(
   const r = recomendarSeguro(pedido, entradas);
   // Las promos de otro rubro no son una alternativa para esta compra (research R4). Eligiendo
   // solo el rubro, tampoco las de un comercio puntual: explicarlas sería listar promos (Principio I).
-  const ajenas = new Set(esComercioDeRubro(comercio) ? ["categoria", "comercio"] : ["categoria"]);
+  const ajenas = new Set<CausaDescarte>(esComercioDeRubro(comercio) ? ["categoria", "comercio"] : ["categoria"]);
   const respuesta = { ...r, descartadas: r.descartadas.filter((d) => !ajenas.has(d.causa)) };
   const hoy = fechaArgentina(entradas.ahora);
   return aVista(pedido, respuesta, comercio, {
@@ -324,8 +325,7 @@ export function comprasDeTopeVista(
  */
 export function comercioPorNombre(nombre: string, catalogo: readonly Comercio[]): Comercio {
   return (
-    comercioDelCatalogo(nombre, catalogo) ??
-    comercioDelCatalogo(nombre, RUBROS_DE_MODO) ?? {
+    comercioDelCatalogo(nombre, catalogo) ?? {
       id: `libre-${claveDeComercio(nombre).replace(/ /g, "-")}`,
       nombre,
       inicial: nombre.charAt(0).toUpperCase(),
@@ -395,10 +395,11 @@ export function promoPropuesta(
   medioId: string,
   fecha: string,
   monto: number | null,
+  canal: Canal = "presencial",
 ): PromoPropuesta {
   const vacia: PromoPropuesta = { medioId, fecha, promociones: [], reintegro: null, base: null };
   if (comercio.categoriaId === null) return vacia;
-  const pedido = pedidoDeCompra({ ...comercio, categoriaId: comercio.categoriaId }, monto);
+  const pedido = pedidoDeCompra({ ...comercio, categoriaId: comercio.categoriaId }, monto, canal);
   const r = recomendarSeguro(pedido, { ...entradas, ahora: mediodia(fecha) });
   const opcion = [r.mejor, ...r.alternativas].find((o) => o?.medioDePagoId === medioId) ?? null;
   if (opcion === null || opcion.promociones.length === 0) return vacia;
@@ -431,9 +432,9 @@ export function compraParaGuardar(
 ): CompraMotor {
   if (b.monto === null || b.medioId === null) throw new Error("Falta el monto o el medio de pago");
   if (!entradas.perfil.mediosDePago.some((m) => m.id === b.medioId)) throw new Error(`Medio desconocido: ${b.medioId}`);
-  // El mismo catálogo con el que «Revisá tu compra» propuso la promo (FR-022).
+  // El mismo catálogo y el mismo canal con los que «Revisá tu compra» propuso la promo (FR-022).
   const comercio = comercioPorNombre((b.comercio ?? "").trim() || "Compra", catalogo);
-  const propuesta = b.usarPromo ? promoPropuesta(entradas, comercio, b.medioId, b.fecha, b.monto) : null;
+  const propuesta = b.usarPromo ? promoPropuesta(entradas, comercio, b.medioId, b.fecha, b.monto, b.canal) : null;
   const tienePromo = propuesta !== null && propuesta.promociones.length > 0;
   return {
     id,

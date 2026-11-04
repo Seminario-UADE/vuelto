@@ -2155,6 +2155,13 @@ mismo PR #107, así tenemos todo en el mismo PR"):
   quedan detrás de «Por qué no los otros (N)».
 - El botón sigue siendo «Usar Galicia» (DESIGN.md §5) hasta que el equipo decida
   contra el «Pagué con esto» de la issue.
+- Revisiones de la parte B (rules-guardian sin hallazgos; `/code-review`): el
+  canal viaja a «Revisá tu compra» y a la compra guardada (`BorradorCompra.canal`,
+  FR-022); otro comercio vuelve a presencial (Inicio no muestra el canal); un
+  rubro se reconoce por nombre solo al registrar y listar compras
+  (`selectCatalogoParaCompras`), no en los habituales; el rubro elegido queda a la
+  vista en Inicio; los chips de canal se anuncian como opciones (`radio`).
+- El gasto en grupo sigue evaluando en presencial (fuera de #43).
 - Falta la verificación a mano en modo avión real (no hay dispositivo acá).
 - Verificación: lint, typecheck, build y tests en verde. No se probó en Expo Go.
 

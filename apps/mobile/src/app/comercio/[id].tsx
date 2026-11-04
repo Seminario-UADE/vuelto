@@ -4,9 +4,9 @@ import { Pressable, View } from "react-native";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
+import { Chip } from "@/components/chip";
 import { Icon, iconoDeRubro } from "@/components/icon";
 import { MontoInput } from "@/components/monto-input";
-import { Chip } from "@/components/chip";
 import { AlternativaRow, RecomendacionCard } from "@/components/recomendacion";
 import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
@@ -51,7 +51,7 @@ export default function ConQuePagar() {
     if (!r?.medio) return;
     router.push({
       pathname: "/revisa",
-      params: { modo: "excepcion", comercio: r.comercio.nombre, monto: monto ?? "", medio: r.medio.id },
+      params: { modo: "excepcion", comercio: r.comercio.nombre, monto: monto ?? "", medio: r.medio.id, canal },
     });
   };
 
@@ -84,8 +84,13 @@ export default function ConQuePagar() {
 
         {/* Presencial por defecto (spec 004 FR-001): una promo online no sirve en el local. */}
         <View style={{ flexDirection: "row", gap: space.sm }} accessibilityRole="radiogroup">
-          <Chip label="En el local" selected={canal === "presencial"} onPress={() => dispatch(canalCambiado("presencial"))} />
-          <Chip label="Online" selected={canal === "online"} onPress={() => dispatch(canalCambiado("online"))} />
+          <Chip
+            label="En el local"
+            rol="radio"
+            selected={canal === "presencial"}
+            onPress={() => dispatch(canalCambiado("presencial"))}
+          />
+          <Chip label="Online" rol="radio" selected={canal === "online"} onPress={() => dispatch(canalCambiado("online"))} />
         </View>
 
         {r ? <RecomendacionCard r={r} /> : <Skeleton height={220} r={radius.card} />}

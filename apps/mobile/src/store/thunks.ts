@@ -29,7 +29,7 @@ import {
 } from "./cola";
 import { compraAgregada, compraEliminada, comprasReconciliadas } from "./compras";
 import type { AppDispatch, AppThunk, RootState } from "./index";
-import { selectCatalogoComercios, selectEntradasMotor } from "./selectores";
+import { selectCatalogoParaCompras, selectEntradasMotor } from "./selectores";
 
 /** El usuario de la sesión de Supabase, o `null` si no hay (o la subida no está conectada). */
 const duenoDe = (subida: Subida | null): string | null => subida?.contexto().userId ?? null;
@@ -51,7 +51,7 @@ export function guardarCompra(b: BorradorCompra, intento: string | null = null):
       if (existente) return existente;
     }
     const estado = getState();
-    const compra = compraParaGuardar(selectEntradasMotor(estado), b, generarId(), selectCatalogoComercios(estado));
+    const compra = compraParaGuardar(selectEntradasMotor(estado), b, generarId(), selectCatalogoParaCompras(estado));
     dispatch(
       guardadoEncolado({ idOp: generarId(), compra, dueno: duenoDe(subida), ahora: estado.sesion.ahora, intento }),
     );

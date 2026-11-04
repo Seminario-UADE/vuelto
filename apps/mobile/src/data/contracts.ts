@@ -1,3 +1,4 @@
+import type { Canal } from "@vuelto/motor";
 /**
  * Forma de las respuestas que la app espera del servidor (Edge Functions y tablas con RLS).
  *
@@ -196,6 +197,8 @@ export type BorradorCompra = {
   textoExtraido: string | null;
   /** `false` = el usuario quitó la promo propuesta (spec 010, FR-024). Por defecto, `true`. */
   usarPromo: boolean;
+  /** El canal con el que se recomendó (#43); sin él, presencial. */
+  canal?: Canal;
 };
 
 /** Contacto vinculado: solo lo que ADR-008 §3 deja ver. Sin topes, compras ni medios. */

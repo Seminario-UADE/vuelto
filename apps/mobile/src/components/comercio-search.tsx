@@ -31,6 +31,8 @@ export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Pr
     return [...propios, ...buscarComercios(catalogo, q).filter((c) => !propios.some((x) => x.id === c.id))].slice(0, 20);
   }, [q, frecuentes, catalogo]);
   const sinResultados = q.trim() !== "" && lista.length === 0;
+  // Con un rubro elegido, los rubros quedan a la vista: se ve cuál es y se puede destocar.
+  const rubroElegido = RUBROS_DE_MODO.some((c) => c.id === seleccionado);
   return (
     <View style={{ gap: space.md }}>
       <View
@@ -78,7 +80,7 @@ export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Pr
         ))}
       </View>
       {/* O un rubro sin comercio (spec 004 FR-001): solo aplican las promos de todo el rubro. */}
-      {sinResultados || porRubro ? (
+      {sinResultados || porRubro || rubroElegido ? (
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
           {RUBROS_DE_MODO.map((c) => (
             <Chip
@@ -88,7 +90,6 @@ export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Pr
               accessibilityHint="Muestra con qué te conviene pagar en ese rubro"
               onPress={() => {
                 setQ("");
-                setPorRubro(false);
                 onElegir(c);
               }}
             />
