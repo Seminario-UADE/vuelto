@@ -2,105 +2,124 @@
 
 **Branch**: `feat/41-perfil-plan` | **Date**: 2026-10-25 | **Spec**: [spec.md](spec.md)
 
+> **Actualizado el 02/11/2026** por ADR-010 (motor en la app, Redux como fuente de verdad) y por
+> lo que dejó la #34 en `main`. Cambian las decisiones 2, 4 y 6, se suma la 9, la tabla de la #34
+> pasa a tener las columnas reales y lo que falta, y cambia el orden de las fases: el perfil vive
+> en el slice `perfil` del store de Redux (#81). La spec no cambia.
+
 ## Summary
 
 Onboarding y pestaña Perfil donde el usuario declara sus medios de pago (banco del catálogo de
 MODO + tipo de tarjeta + red). La app lee y escribe directo en Supabase con `supabase-js` y el
-RLS, sin Edge Function (ADR-009). La integridad la garantiza la tabla. La lógica de la pantalla
-(buscador, duplicados, mínimo de un medio) va en funciones puras con tests.
+RLS, sin Edge Function (ADR-009), y guarda el resultado en el slice `perfil` de Redux (ADR-010).
+La integridad la garantiza la tabla. La lógica de la pantalla (buscador, duplicados, mínimo de un
+medio) va en funciones puras con tests.
 
-**Bloqueada por**: #34 (crea las tablas), #39 (app base: navegación, cliente de Supabase, tests,
-almacenamiento local) y #40 (sesión).
+**Estado de las dependencias (03/11)**: #34, #39, #81 (store de Redux) y #40 (sesión) cerradas. El
+slice `perfil` ya guarda `MedioDePago` de la base en vez de ids de un catálogo fijo (T008), y las
+pantallas están conectadas (fases 2b y 3).
 
 ## Technical Context
 
-- **Stack**: TypeScript strict, Expo + Expo Router, `@supabase/supabase-js` (los instala la #39).
-  Sin `@vuelto/motor` en la app (RNF-02).
-- **Datos**: tablas `bancos` (lectura) y `medios_de_pago` (del dueño), de la #34. Cache local
-  para leer sin conexión.
-- **Tests**: funciones puras de `apps/mobile/src/perfil/` con el runner de la #39 (Vitest si no
-  deja otro). RLS: test de la #34. Pantallas: a mano en Expo Go.
+- **Stack**: TypeScript strict, Expo + Expo Router, `@supabase/supabase-js` (los instaló la #39).
+  Redux Toolkit y `@vuelto/motor` ya están en la app (#81, cerrada).
+- **Datos**: tablas `bancos` (lectura) y `medios_de_pago` (del dueño), de la #34. En la app, el
+  slice `perfil`, que la #81 persiste en el dispositivo: esa es la lectura sin conexión.
+- **Tests**: funciones puras de `apps/mobile/src/perfil/` con Vitest (`npm run test -w
+  @vuelto/mobile`). RLS: pgTAP de la #34. Pantallas: a mano en Expo Go.
 
 ## Constitution Check
 
 | Principio | Cómo se cumple | Estado |
 |---|---|---|
 | I. Decisión, no listado | No muestra promociones. Declara los medios con los que la #43 decide qué conviene | ✅ |
-| II. Motor determinístico | No usa ni importa el motor. No calcula nada en el dispositivo | ✅ |
-| III. Null explícito | Tipos sin `?:`; `imagen` del banco es `string \| null` | ✅ |
-| IV. Secretos y privacidad | Sin service role ni Gemini. RLS del dueño, creada por la #34 junto con la tabla. Cache por usuario, borrado al cerrar sesión | ✅ |
+| II. Motor determinístico | No calcula recomendaciones. Los medios que declara son la entrada del motor, que corre en la app (constitución 3.0.0, ADR-010) | ✅ |
+| III. Null explícito | Tipos sin `?:`; `onHubList` es `boolean \| null` (decisión 9) | ✅ |
+| IV. Secretos y privacidad | Sin service role ni Gemini. RLS del dueño, creada por la #34 junto con la tabla. Al cerrar sesión se vacía el slice | ✅ |
 | V. Topes con base | No muestra topes | N/A |
 | VI. Test-first | El motor no cambia; las funciones puras se escriben test-first | ✅ |
 
-Sin violaciones. `rules-guardian` antes del PR de implementación (usa una tabla con RLS).
+Sin violaciones. `rules-guardian` antes del PR que conecte las pantallas (usa una tabla con RLS).
 
 ## Decisiones
 
-La spec es del 13/10. Estas decisiones la cruzan con lo decidido después (constitución 2.0.0,
-ADR-001 §Actualización, RNF-02, ADR-009, contrato de tipos #33). La spec no cambia.
+La spec es del 13/10. Estas decisiones la cruzan con lo decidido después (constitución 3.0.0,
+ADR-010, RNF-02, ADR-009, contrato de tipos #33). La spec no cambia.
 
-1. **Sin Edge Function.** ADR-009 deja el perfil como CRUD directo con `supabase-js` y RLS. Una
-   función `perfil` haría lo mismo que una policy, con más código.
-2. **La app declara sus propios tipos.** RNF-02 pide 0 resultados al buscar `@vuelto/motor` en
-   `apps/mobile`, así que no se puede importar ni con `import type`. Los valores son los mismos
-   de `packages/motor/src/tipos.ts`, y el `check` de la tabla rechaza cualquier otro.
+1. **Sin Edge Function.** ADR-009 y ADR-010 dejan el perfil como CRUD directo con `supabase-js` y
+   RLS. Una función `perfil` haría lo mismo que una policy, con más código.
+2. **Los tipos de red y tarjeta son los del motor.** ADR-010 deja que la app importe
+   `@vuelto/motor` y la #81 ya lo sumó: `modelo.ts` hace `import type { Red, TipoTarjeta }` y
+   `ETIQUETAS_RED` / `ETIQUETAS_TIPO` son `Record<...>` sobre esos tipos, así que si el motor suma
+   un valor, la app no compila. `REDES` y `TIPOS_TARJETA` salen de las claves de esos mapas. El
+   `check` de la tabla rechaza cualquier otro valor.
 3. **La integridad está en la base, no en la pantalla.** El `unique` de la tripleta (FR-004)
    también protege contra dos dispositivos o un doble toque. `not null` y `check` cubren FR-005
-   y FR-011. Sin `update`: la spec solo pide agregar y sacar.
-4. **"Al menos un medio" lo controla la app** (FR-007, FR-009). Un trigger en la base frenaría
-   el borrado en cascada al eliminar la cuenta. Si el perfil igual queda vacío, `recomendar`
-   (#43) responde 422 `perfil_sin_medios` y la app lleva al onboarding.
+   y FR-011. La app no usa `update`: la spec solo pide agregar y sacar.
+4. **"Al menos un medio": la app lo evita y la base lo garantiza** (FR-007, FR-009). La app no
+   ofrece sacar el último, pero mira su copia local: con dos dispositivos se podría borrar. La
+   migración `20261103000001` agrega un trigger por sentencia (`VM001`) que rechaza un `DELETE`
+   que deje a un usuario sin medios, salvo que el usuario ya no exista, así que el borrado en
+   cascada al eliminar la cuenta pasa (cubierto en `medios_minimo_uno.test.sql`). Crear el primer
+   medio no lo toca: FR-007 sigue siendo de la app. Si el perfil igual queda vacío, el motor lanza
+   `PerfilSinMediosError` en el selector de recomendación (#43) y la app lleva al onboarding.
 5. **El onboarding se guarda en un solo `insert` de varias filas** (FR-011): entra todo o nada.
    Desde Perfil, cada alta o baja es un pedido aparte.
-6. **Se mantiene la lectura sin conexión** (FR-012, SC-003). La Actualización del 13/10 sacó del
-   celular el motor, el corpus y las compras, pero no el perfil. La constitución 2.0.0 deja
-   registrado que esta spec no depende del motor. El comentario de la #45 sobre "funciona
-   offline" se refiere a recomendación y topes. Si el equipo prefiere sacarlo, hay que cambiar
-   la spec antes de implementar.
+6. **La lectura sin conexión la da el store** (FR-012, SC-003). Con ADR-010 el perfil vive en el
+   slice `perfil` y la #81 lo persiste en el dispositivo; el motor lo necesita para recomendar
+   sin señal. No hace falta un cache propio de esta feature: `datos.ts` lee y escribe Supabase y
+   el slice guarda el resultado. Al cerrar sesión se vacía el slice (FR-013).
 7. **Buscador en el dispositivo.** Son 82 bancos: se bajan al abrir el buscador y se filtran en
    cada tecla.
    - **Normalización**, igual para el texto y el nombre:
      `toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/\s+/g, " ").trim()`.
    - **Coincidencia**: por substring.
-   - **Orden**: primero los `on_hub_list`, después por nombre normalizado y, si dos empatan, por
-     `id`. Se comparan códigos de carácter (`<` y `>`), no `localeCompare`, para que el orden
-     no dependa del idioma del dispositivo.
+   - **Orden**: primero los `onHubList === true`, después por nombre normalizado y, si dos
+     empatan, por `id`. Se comparan códigos de carácter (`<` y `>`), no `localeCompare`, para que
+     el orden no dependa del idioma del dispositivo.
    - **Sin resultados**: con texto vacío no se muestra nada. Con texto pero sin coincidencias,
      aparece el aviso de US1-7.
 8. **Los bancos no se borran del catálogo.** El sembrado hace upsert por `id`, y `banco_id` es FK
-   con `on delete restrict`. Así un medio ya declarado siempre tiene un banco que mostrar (Edge
-   Cases de la spec).
+   sin `on delete` (no deja borrar un banco con medios). Así un medio ya declarado siempre tiene
+   un banco que mostrar (Edge Cases de la spec).
+9. **`on_hub_list` puede faltar.** La tabla `bancos` de la #34 no lo tiene (ver abajo). El modelo
+   lo lleva como `boolean | null`: `null` = no se sabe, y el buscador lo ordena como no
+   priorizado. Nunca se inventa un valor.
 
-## Lo que necesita de la #34
+## Lo que dejó la #34 (PR #84)
 
-| Tabla | Requisito |
-|---|---|
-| `bancos` | `id` (id de MODO), `nombre` not null, `imagen` null, `on_hub_list` not null. `select` para `authenticated`; escribe solo la service role. El sembrado hace upsert y no borra |
-| `medios_de_pago` | `id` uuid default `gen_random_uuid()`. `usuario_id` default `auth.uid()`, FK `auth.users` `on delete cascade`. `banco_id` FK `bancos` `on delete restrict` (la FK también permite leer `bancos(nombre)` en el mismo pedido). `tipo` `check in ('debito','credito')`. `red` `check` con los 9 valores de `Red`. `creado` default `now()`. Todo `not null` |
-| `medios_de_pago` | `unique (usuario_id, banco_id, tipo, red)` |
-| `medios_de_pago` | Policies en la misma migración: `select` y `delete` con `usuario_id = auth.uid()`, `insert` con `with check (usuario_id = auth.uid())`, sin `update` |
-| Test de RLS | A no lee ni borra medios de B, y no inserta con `usuario_id` de B |
+| Tabla | Qué hay en `main` | Diferencia con lo pedido |
+|---|---|---|
+| `bancos` | `id` uuid (id de MODO), `nombre` not null. `select` para `authenticated`; escribe solo la service role | **Faltan `imagen` y `on_hub_list`.** Sin `on_hub_list`, US3 (FR-002) no se cumple con datos reales: hace falta una migración nueva y que la ingesta lo cargue |
+| `bancos` (seed) | Solo Galicia, con su id real | El resto lo carga la ingesta. Hasta entonces el buscador tiene un banco |
+| `medios_de_pago` | `id`, `user_id` default `auth.uid()` (cascade), `banco_id` FK, `tipo` y `red` con `check`, `creado_en`. `unique (user_id, banco_id, tipo, red)` | Las columnas son `user_id` y `creado_en` (el plan decía `usuario_id` y `creado`) |
+| `medios_de_pago` | Una policy `for all` del dueño | Permite `update`; la app no lo usa |
+| Test de RLS | pgTAP en `supabase/tests/database/rls.test.sql` | — |
 
-Es la misma tabla que lee `recomendar` (#43), mapeada a `MedioDePago` (`id`, `bancoId`, `tipo`,
-`red`).
+Es la misma tabla que el motor recibe como `perfil.mediosDePago`, mapeada a `MedioDePago` (`id`,
+`bancoId`, `tipo`, `red`).
 
 ## Código de la app
 
 ```text
-apps/mobile/
-├── app/onboarding/medios-de-pago.tsx   # US1 (ruta final según la navegación de la #39)
-├── app/(tabs)/perfil.tsx               # US2
-├── components/SelectorMedio.tsx        # banco → tipo → red; lo usan las dos pantallas
-└── src/perfil/                         # sin imports de React Native: se testea solo
-    ├── modelo.ts        # tipos, ETIQUETAS_RED, reglas y mensajes de error (todo puro)
+apps/mobile/src/
+├── app/(onboarding)/medios.tsx         # US1 (la pantalla ya existe desde la #39)
+├── app/(tabs)/perfil.tsx               # US2 (ídem)
+├── components/selector-medio.tsx       # banco → tipo → red; lo usan las dos pantallas
+└── perfil/                             # sin imports de React Native: se testea solo
+    ├── modelo.ts         # tipos, ETIQUETAS_RED, reglas y mensajes de error (todo puro)
     ├── modelo.test.ts
-    ├── buscarBancos.ts  # decisión 7
-    ├── buscarBancos.test.ts
-    └── datos.ts         # Supabase y cache local
+    ├── buscar-bancos.ts  # decisión 7
+    ├── buscar-bancos.test.ts
+    ├── datos.ts          # Supabase (recibe el cliente por parámetro)
+    └── datos.test.ts     # con un cliente falso
 ```
 
+Nombres en kebab-case, como el resto de `apps/mobile`. El slice `perfil` y su persistencia son de
+la #81.
+
 **`modelo.ts`**
-- `Red` (los 9 valores), `TipoTarjeta`, `Banco { id, nombre, imagen: string | null, onHubList }`,
+- `Red` (los 9 valores), `TipoTarjeta`, `Banco { id, nombre, onHubList: boolean | null }`,
   `MedioDePago { id, bancoId, nombreBanco, tipo, red }` y `MedioNuevo { bancoId, tipo, red }`.
   `nombreBanco` viene del mismo pedido que el medio (ver `leerMisMedios`).
 - `ETIQUETAS_RED` con la tabla de la spec.
@@ -117,35 +136,33 @@ apps/mobile/
   | `sin_conexion` | Falló el `fetch` o `status === 0` | "Necesitás conexión para editar tu perfil" |
   | `otro` | Cualquier otro | Genérico con "Reintentar" |
 
-**`datos.ts`** (recibe el cliente de Supabase de la #39)
+**`datos.ts`** (recibe el cliente de Supabase por parámetro)
 
 | Operación | Llamada |
 |---|---|
-| `leerBancos()` | `from("bancos").select("id, nombre, imagen, on_hub_list")` |
-| `leerMisMedios()` | `from("medios_de_pago").select("id, banco_id, tipo, red, bancos(nombre)").order("creado")` |
+| `leerBancos()` | `from("bancos").select("id, nombre")` (sin `on_hub_list` hasta que la base lo tenga) |
+| `leerMisMedios()` | `from("medios_de_pago").select("id, banco_id, tipo, red, bancos(nombre)").order("creado_en")` |
 | `confirmarOnboarding(nuevos)` | `insert([...]).select(<lo mismo que leerMisMedios>)`, un solo pedido (decisión 5) |
 | `agregarMedio(nuevo)` / `sacarMedio(id)` | `insert(...).select(...)` / `delete().eq("id", id)` |
 
-- Mapea `banco_id` ↔ `bancoId`, `bancos.nombre` ↔ `nombreBanco` y `on_hub_list` ↔ `onHubList`.
-  Con el nombre embebido, Perfil no necesita el catálogo para mostrar los medios.
-- Nunca manda ni filtra `usuario_id`: de eso se encargan el default y el RLS.
+- Mapea `banco_id` ↔ `bancoId` y `bancos.nombre` ↔ `nombreBanco`. Con el nombre embebido, Perfil
+  no necesita el catálogo para mostrar los medios.
+- Nunca manda ni filtra `user_id`: de eso se encargan el default y el RLS.
 - Cada función devuelve `{ ok: true, datos } | { ok: false, error: clasificarError(...) }`, sin
   lanzar.
-- **Cache**:
-  - Claves `perfil.medios.<usuarioId>` (con el `user.id` de la sesión) y `perfil.bancos`, en el
-    almacenamiento que deje la #39 (AsyncStorage si no deja otro).
-  - Se escribe después de cada lectura o cambio exitoso. Un valor corrupto se lee como `null`.
-  - `borrarCache()` se llama al cerrar sesión.
-- **Sin conexión**: si `leerMisMedios()` da `sin_conexion`, la pantalla usa el cache y entra en
-  modo solo lectura, con agregar y sacar deshabilitados. No hace falta detectar la red aparte.
+- **Sin cache propio** (decisión 6): el resultado de cada lectura o cambio exitoso entra al slice
+  `perfil`, que la #81 persiste. Al cerrar sesión se vacía el slice.
+- **Sin conexión**: si `leerMisMedios()` da `sin_conexion`, la pantalla muestra lo que tiene el
+  slice y entra en modo solo lectura, con agregar y sacar deshabilitados. No hace falta detectar
+  la red aparte.
 - **Onboarding**: hasta "Confirmar" no se guarda nada, ni el banco elegido ni los medios
   agregados (FR-006). Si el usuario cierra la app antes, empieza de cero.
 
 ## Cómo validar
 
-- **Tests** de `modelo.ts` y `buscarBancos.ts` en verde (`npm run test -w @vuelto/mobile`).
+- **Tests** de `modelo.ts`, `buscar-bancos.ts` y `datos.ts` en verde (`npm run test -w
+  @vuelto/mobile`).
 - **Escenarios de aceptación de la spec** (US1-1 a US1-7, US2-1 a US2-3, US3-1), a mano en Expo
   Go, con el esquema de la #34 sembrado.
-- **Dos usuarios**: al cerrar sesión con A y entrar con B, B no ve nada de A, ni siquiera del
-  cache (FR-013).
-- `grep -rn "@vuelto/motor" apps/mobile` → 0 resultados (RNF-02).
+- **Dos usuarios**: al cerrar sesión con A y entrar con B, B no ve nada de A, ni siquiera de lo
+  persistido en el dispositivo (FR-013).

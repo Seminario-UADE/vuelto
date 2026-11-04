@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Comercio, MedioDePago, PedidoRecomendar, RespuestaRecomendar } from "./contracts";
-import { aVista, baseDeMotor, queDa } from "./vista-recomendacion";
+import { aVista, baseDeMotor, razonDe, SIN_PROMO } from "./vista-recomendacion";
 
 // El adaptador recibe la respuesta tal como la devuelve la Edge Function (ejemplo 200 de
 // specs/004-recomendar-pantalla/contracts/recomendar.md) y no inventa cifras.
@@ -15,12 +15,17 @@ const galicia: MedioDePago = {
   conCobertura: true,
 };
 const kansas: Comercio = { id: "kansas", nombre: "Kansas", inicial: "K", rubro: "gastronomia", categoriaId: 2, frecuente: false };
+const santander: MedioDePago = {
+  id: "mp-santander-debito-master",
+  banco: "Santander",
+  nombre: "Santander Mastercard débito",
+  nombreCorto: "Santander",
+  detalle: "Débito · Banco Santander",
+  inicial: "S",
+  conCobertura: true,
+};
 const catalogos = {
   medios: [galicia],
-  promociones: [
-    { id: "promo-kansas-20", titulo: "Galicia: 20% en Kansas", bancoId: "Galicia", categoriaId: 2 },
-    { id: "promo-viernes", titulo: "Galicia: 15% los viernes", bancoId: "Galicia", categoriaId: 2 },
-  ],
   mes: "octubre",
   dia: "hoy miércoles",
 };
@@ -34,9 +39,11 @@ const ejemplo: RespuestaRecomendar = {
         ahorroEstimado: 3000,
         topeRestanteTrasCompra: 7000,
         base: { comprasRegistradas: 2, comprasSinDescuentoInformado: 0 },
+        periodo: "mensual",
+        textoPromo: "20% en Kansas",
       },
     ],
-    motivo: "20% en Kansas",
+    motivo: "20% en Kansas · te quedan ≈$7.000 de tope, según 2 compras de octubre",
   },
   alternativas: [],
   descartadas: [
@@ -61,15 +68,8 @@ describe("aVista", () => {
     expect(v.teSale).toBe(12000);
     expect(v.topeDespues).toEqual({ disponible: 7000 });
     expect(v.base?.texto).toBe("según 2 compras de octubre");
-    expect(v.alternativas).toEqual([
-      {
-        medioId: "mp-galicia-credito-visa",
-        titulo: "Galicia Visa crédito",
-        inicial: "G",
-        motivo: "Hoy no aplica, la promo es los viernes",
-        estado: "no-aplica",
-      },
-    ]);
+    // Galicia es la recomendada: su promo de los viernes no se repite como alternativa.
+    expect(v.alternativas).toEqual([]);
   });
 
   it("sin compras registradas no muestra ninguna cifra de tope (Principio V)", () => {
@@ -106,28 +106,97 @@ describe("aVista", () => {
     expect(v.proximaPromo).toBe("Galicia Visa crédito: la promo es los viernes");
   });
 
-  it("baseDeMotor", () => {
-    expect(baseDeMotor({ comprasRegistradas: 1, comprasSinDescuentoInformado: 0 }, "octubre")?.texto).toBe(
-      "según 1 compra de octubre",
-    );
-    expect(baseDeMotor(null, "octubre")).toBeNull();
+  it("baseDeMotor: con el período del tope", () => {
+    const una = { comprasRegistradas: 1, comprasSinDescuentoInformado: 0 };
+    expect(baseDeMotor(una, "mensual", "octubre")?.texto).toBe("según 1 compra de octubre");
+    expect(baseDeMotor(una, "semanal", "octubre")?.texto).toBe("según 1 compra esta semana");
+    expect(baseDeMotor(null, null, "octubre")).toBeNull();
+  });
+
+  it("un tope semanal dice su base de esta semana, no del mes", () => {
+    const semanal: RespuestaRecomendar = {
+      ...ejemplo,
+      mejor: { ...ejemplo.mejor!, promociones: [{ ...ejemplo.mejor!.promociones[0]!, periodo: "semanal" }] },
+    };
+    expect(aVista(pedido, semanal, kansas, catalogos).base?.texto).toBe("según 2 compras esta semana");
+  });
+
+  it("un medio del usuario sin ninguna promo aparece con 'Sin promo para esta compra'", () => {
+    const v = aVista(pedido, { ...ejemplo, mejor: null }, kansas, { ...catalogos, medios: [galicia, santander] });
+    expect(v.alternativas.map((a) => [a.titulo, a.motivo])).toEqual([
+      ["Galicia Visa crédito", "Hoy no aplica, la promo es los viernes"],
+      ["Santander Mastercard débito", SIN_PROMO],
+    ]);
+  });
+
+  it("una promo que no le sirve a ningún medio del usuario no se muestra", () => {
+    const otroBanco: RespuestaRecomendar = {
+      ...ejemplo,
+      descartadas: [
+        { promocionId: "promo-macro", causa: "medio_de_pago", mediosDePagoIds: [], base: null, motivo: "La promo es para un banco o una tarjeta que no tenés en tu perfil" },
+        { promocionId: "promo-macro-jueves", causa: "dia", mediosDePagoIds: [], base: null, motivo: "Hoy no aplica, la promo es los jueves" },
+      ],
+    };
+    const v = aVista(pedido, otroBanco, kansas, catalogos);
+    expect(v.alternativas).toEqual([]);
+    expect(aVista(pedido, { ...otroBanco, mejor: null }, kansas, catalogos).proximaPromo).toBeNull();
+  });
+
+  it("el medio recomendado no repite sus promos descartadas en '¿por qué no X?'", () => {
+    // En `ejemplo`, Galicia es la mejor opción y además tiene la promo de los viernes descartada.
+    const v = aVista(pedido, ejemplo, kansas, { ...catalogos, medios: [galicia, santander] });
+    expect(v.alternativas.map((a) => [a.titulo, a.motivo])).toEqual([["Santander Mastercard débito", SIN_PROMO]]);
+  });
+
+  it("un medio que es otra opción tampoco repite sus descartes", () => {
+    const santanderOpcion = { ...ejemplo.mejor!, medioDePagoId: santander.id, motivo: "10% en Kansas" };
+    const r: RespuestaRecomendar = {
+      ...ejemplo,
+      alternativas: [santanderOpcion],
+      descartadas: [{ ...ejemplo.descartadas[0]!, mediosDePagoIds: [santander.id] }],
+    };
+    const v = aVista(pedido, r, kansas, { ...catalogos, medios: [galicia, santander] });
+    expect(v.alternativas.map((a) => [a.titulo, a.estado])).toEqual([["Santander Mastercard débito", "otra-opcion"]]);
+  });
+
+  it("dos promos descartadas del mismo medio explican las dos", () => {
+    const r: RespuestaRecomendar = {
+      ...ejemplo,
+      mejor: null,
+      descartadas: [
+        { promocionId: "promo-agotada", causa: "tope_agotado", mediosDePagoIds: [galicia.id], base: null, motivo: "Tope agotado este mes, según 2 compras" },
+        ejemplo.descartadas[0]!,
+      ],
+    };
+    const v = aVista(pedido, r, kansas, catalogos);
+    expect(v.alternativas.map((a) => [a.titulo, a.estado])).toEqual([
+      ["Galicia Visa crédito", "agotado"],
+      ["Galicia Visa crédito", "no-aplica"],
+    ]);
+  });
+
+  it("una promo descartada que servía a dos medios explica a cada uno", () => {
+    const dos: RespuestaRecomendar = {
+      ...ejemplo,
+      mejor: null,
+      descartadas: [{ ...ejemplo.descartadas[0]!, mediosDePagoIds: [galicia.id, santander.id] }],
+    };
+    const v = aVista(pedido, dos, kansas, { ...catalogos, medios: [galicia, santander] });
+    expect(v.alternativas.map((a) => a.titulo)).toEqual(["Galicia Visa crédito", "Santander Mastercard débito"]);
   });
 });
 
-describe("queDa", () => {
-  it("saca el tope y la base que el motor agrega al motivo (la tarjeta los muestra aparte)", () => {
-    expect(queDa("20% en supermercados los miércoles · te quedan ≈$6.500 de tope, según 3 compras de octubre")).toBe(
-      "20% en supermercados los miércoles",
-    );
-    expect(queDa("10% en Coto · la promo no informa tope + 5% en supermercados · te quedan ≈$900 de tope, según 1 compra de octubre")).toBe(
-      "10% en Coto + 5% en supermercados",
-    );
-    expect(queDa("20% en Kansas")).toBe("20% en Kansas");
-  });
-
-  it("sin monto conserva el aviso de compra mínima del motor (#75)", () => {
-    expect(
-      queDa("20% en supermercados los miércoles · pide una compra mínima de $20.000 · te quedan ≈$6.500 de tope, según 3 compras de octubre"),
-    ).toBe("20% en supermercados los miércoles · pide una compra mínima de $20.000");
+describe("razonDe", () => {
+  it("une el texto de cada promo que arma el motor, sin cortar el motivo", () => {
+    const promo = ejemplo.mejor!.promociones[0]!;
+    const combinada = {
+      ...ejemplo.mejor!,
+      promociones: [
+        { ...promo, textoPromo: "20% en supermercados · pide una compra mínima de $20.000" },
+        { ...promo, textoPromo: "10% en Coto" },
+      ],
+    };
+    expect(razonDe(ejemplo.mejor!)).toBe("20% en Kansas");
+    expect(razonDe(combinada)).toBe("20% en supermercados · pide una compra mínima de $20.000 + 10% en Coto");
   });
 });

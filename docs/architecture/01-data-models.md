@@ -35,11 +35,20 @@ en `packages/motor/src/tipos.ts` (issue #33). Decisiones que fija:
 - **`bancoId`** es el `id` del catálogo de bancos de MODO
   (`GET /promos/api/rewards/banks`), un UUID string; no el nombre ni el
   `bcra_code`. Es la misma clave que usa el medio de pago del perfil
-  (`specs/001-perfil-billeteras/spec.md`). Las promos de MODO solo traen el
-  nombre del banco (`name_bank`): la ingesta y el seed lo traducen al `id`
-  comparando contra `name` del catálogo **normalizado** (minúsculas, sin
-  acentos, sin espacios de más). Si no matchea, `bancoId` queda `null` y la
-  promo no se publica.
+  (`specs/001-perfil-billeteras/spec.md`). El listado de MODO solo trae el
+  nombre del banco (`name_bank`), pero el **detalle** de cada promo
+  (`GET /promos/api/rewards/v2/benefit/<slug>`) lo trae por id en
+  `requirements.banks.list`: de ahí sale el `bancoId` cuando se puede.
+  Cuando hay que traducir un nombre (el extractor de #51 y el contraste que
+  hace la ingesta con el rótulo del listado), se compara contra `name` del catálogo **normalizado** (minúsculas,
+  sin acentos, sin espacios de más) **más una tabla de alias explícita**
+  (`ingesta/src/corpus/bancos-alias.ts`), porque la comparación normalizada
+  sola no alcanza: el listado dice "Banco Macro", "Banco Hipotecario" o "BNA"
+  donde el catálogo dice "Macro", "Hipotecario" y "Banco Nación". Nunca se
+  compara por coincidencia parcial. Si no resuelve o es ambiguo ("Ciudad /
+  Buepp" son dos bancos del catálogo; "Bancos adheridos" no es un banco),
+  `bancoId` queda `null` y la promo no se publica. Un nivel de cliente dentro
+  de un banco ("Macro Selecta") tampoco se resuelve: el perfil no lo distingue.
 - **Categorías como datos**: `categoriaId` es el id numérico de MODO y el
   catálogo vive en una tabla `categorias`, sembrada desde MODO como
   `bancos`. Una categoría nueva no requiere cambiar el motor.

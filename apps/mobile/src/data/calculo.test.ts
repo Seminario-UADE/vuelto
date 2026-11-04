@@ -10,17 +10,24 @@ import {
   type EntradasMotor,
 } from "./calculo";
 import type { Comercio } from "./contracts";
-import { RELOJ_EJEMPLO, catalogoComercios, comprasOctubre, mediosDeclarados, promociones } from "./fixtures";
+import { SIN_PROMO } from "./vista-recomendacion";
+import {
+  RELOJ_EJEMPLO,
+  catalogoComercios,
+  comprasOctubre,
+  mediosDeclarados,
+  mediosDeEjemplo,
+  promociones,
+} from "./fixtures";
 
 // Spec 008, SC-001: las respuestas de US1 con el motor real sobre los datos de ejemplo
 // (data-model.md §Datos de ejemplo), con el reloj del miércoles 14/10/2026 al mediodía.
 
 const ahora = new Date(RELOJ_EJEMPLO);
+const mediosDeMartin = mediosDeEjemplo(mediosDeclarados.map((m) => m.id));
 const entradas: EntradasMotor = {
-  perfil: perfilDelMotor(
-    mediosDeclarados.map((m) => m.id),
-    "Martín",
-  ),
+  perfil: perfilDelMotor(mediosDeMartin, "Martín"),
+  medios: mediosDeMartin,
   promociones,
   compras: comprasOctubre,
   ahora,
@@ -43,20 +50,26 @@ describe("recomendacionVista (US1)", () => {
     expect(r?.dia).toBe("hoy miércoles");
   });
 
-  it("las promos de otro rubro no aparecen como alternativa (research R4)", () => {
-    expect(recomendacionVista(entradas, comercio("coto"), 10000)?.alternativas).toEqual([]);
+  it("las promos de otro rubro no aparecen como alternativa (research R4): los demás medios, sin promo", () => {
+    const alternativas = recomendacionVista(entradas, comercio("coto"), 10000)?.alternativas ?? [];
+    expect(alternativas.length).toBeGreaterThan(0);
+    expect(alternativas.every((a) => a.motivo === SIN_PROMO)).toBe(true);
   });
 
   it("Farmacity: sin recomendación y Macro agotado con su base", () => {
     const r = recomendacionVista(entradas, comercio("farmacity"), 10000);
     expect(r?.resultado).toBe("sin-promo");
-    expect(r?.alternativas).toEqual([
+    const [primera, ...resto] = r?.alternativas ?? [];
+    expect(primera).toEqual(
       expect.objectContaining({
         medioId: "macro-visa-debito",
         estado: "agotado",
         motivo: "Tope agotado este mes, según 2 compras",
       }),
-    ]);
+    );
+    // "¿Por qué no X?" también para los medios sin ninguna promo en farmacias (issue #46).
+    expect(resto.map((a) => a.motivo)).toEqual(resto.map(() => SIN_PROMO));
+    expect(resto.length).toBeGreaterThan(0);
   });
 
   it("YPF un miércoles: no aplica hoy y dice cuándo sí", () => {
@@ -85,9 +98,9 @@ describe("recomendacionVista (US1)", () => {
     expect(recomendacionVista(conMinimo, comercio("coto"), 10000)?.resultado).toBe("sin-promo");
   });
 
-  it("perfil sin medios evaluables (solo Mercado Pago): sin promo, sin error", () => {
+  it("perfil sin medios: sin promo, sin error", () => {
     const r = recomendacionVista(
-      { ...entradas, perfil: perfilDelMotor(["mercado-pago"], null) },
+      { ...entradas, perfil: perfilDelMotor([], null), medios: [] },
       comercio("coto"),
       10000,
     );
@@ -122,7 +135,7 @@ describe("topesVista", () => {
       reinicio: "se reinicia el 1/11",
       promo: "20% en supermercados · los miércoles",
     });
-    expect(de("santander-mastercard-credito")).toMatchObject({ estado: "disponible", cifra: "≈$2.300" });
+    expect(de("santander-mastercard-credito")).toMatchObject({ estado: "queda-poco", cifra: "≈$2.300" });
     expect(de("macro-visa-debito")).toMatchObject({
       estado: "agotado",
       cifra: null,
@@ -216,9 +229,15 @@ describe("compraParaGuardar (FR-008)", () => {
 });
 
 describe("comprasVista y textoDias", () => {
+  it("una compra con un medio que ya no está en el perfil se sigue mostrando, sin inventar su nombre", () => {
+    const r = comprasVista([comprasOctubre[0]!], ahora, []);
+    expect(r.compras).toHaveLength(1);
+    expect(r.compras[0]?.medio.nombre).toBe("Medio que sacaste de tu perfil");
+  });
+
   it("solo las del mes en curso, con el reintegro del banco o el esperado", () => {
     const vieja = { ...comprasOctubre[0]!, id: "sept", fecha: "2026-09-30" };
-    const r = comprasVista([vieja, ...comprasOctubre], ahora);
+    const r = comprasVista([vieja, ...comprasOctubre], ahora, mediosDeMartin);
     expect(r.compras.map((c) => c.id)).not.toContain("sept");
     expect(r.gastaste).toBe(101500);
   });
@@ -230,7 +249,7 @@ describe("comprasVista y textoDias", () => {
     const del29 = { ...base, id: "nov29", fecha: "2026-11-29", monto: 1000 };
     const del30 = { ...base, id: "nov30", fecha: "2026-11-30", monto: 2000 };
     const del1 = { ...base, id: "dic1", fecha: "2026-12-01", monto: 4000 };
-    const r = comprasVista([del29, del30, del1], hoy);
+    const r = comprasVista([del29, del30, del1], hoy, mediosDeMartin);
     expect(r.compras.map((c) => c.id).sort()).toEqual(["dic1", "nov30"]);
     expect(r.gastaste).toBe(4000);
   });

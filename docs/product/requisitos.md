@@ -73,7 +73,7 @@ prioridad del MVP.
 | RF-15 | Cada campo extraído trae el fragmento textual de la fuente. | S | ADR-005 |
 | RF-16 | Ninguna promoción llega al motor sin haber completado el esquema (validación automática de campos obligatorios; sin persona en el circuito). | M | ADR-005, `CLAUDE.md` |
 | RF-17 | Un chequeo de salud marca y avisa cuando una fuente devuelve cero resultados o contenido irreconocible. | S | `04-infrastructure.md` paso 5, `riesgos.md` |
-| RF-18 | Hay un corpus sembrado a mano suficiente para correr el motor sin depender de la ingesta. | M | ADR-005 §Consecuencias |
+| RF-18 | Hay un corpus de promociones real y al día para correr el motor: lo publica la ingesta automática todos los días, y si una corrida falla la base conserva la anterior. Nunca se carga a mano. | M | ADR-011 |
 
 **Criterios de aceptación**
 - RF-14: campo ausente en la fuente se guarda `null` explícito; el esquema es `{"type": ["string", "null"]}`, sin campos opcionales.
@@ -126,8 +126,8 @@ No se dan por chequeados hasta resolver el pendiente que los frena
 
 | Requisito | Qué falta | Issue |
 |---|---|---|
-| RF-18 | Tamaño del corpus sembrado a mano: el alcance ya está definido (`alcance-mvp.md`) pero falta verificar sucursales reales de las cadenas | #8 |
-| RF-13, RNF-13 | Dónde corre el cron de ingesta (relevamiento de fuentes ya resuelto, ver `fuentes-promos.md`) | `pendientes.md` |
+| RF-18 | Cargar los secrets del repo y confirmar la primera corrida de `ingesta.yml` contra el proyecto alojado | #35 |
+| RF-13, RNF-13 | ~~Dónde corre el cron de ingesta~~: GitHub Actions, una vez por día (ADR-011) | — |
 | RF-08, RNF-09 | Proveedor/modelo del extractor y precisión sobre tickets reales | #10 |
 | RF-05 | Cómo se dispara el momento de uso (notificación / geolocalización) | `pendientes.md` |
 | RF-19, RF-20 | Promoción de débito y redondeo de la división | `pendientes.md` |

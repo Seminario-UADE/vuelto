@@ -80,7 +80,7 @@ dispositivo (ADR-010, spec 008).
 | Slice | Qué guarda | Se persiste |
 |---|---|---|
 | `sesion` | `usuario` (Supabase Auth) y `authLista`, `ahora` (reloj del cálculo), aviso pendiente, escenario de desarrollo, `hidratado`, `epoca` (sube con cada cierre de sesión) | No: la sesión la guarda el cliente de Supabase |
-| `perfil` | Nombre, onboarding completo, medios y comercios elegidos, invitación pendiente | Sí |
+| `perfil` | Nombre, onboarding completo, medios de pago tal como los devuelve `medios_de_pago` (issue #41), comercios elegidos, invitación pendiente y `carga` (cómo quedó la última lectura en Supabase) | Sí, salvo `carga` |
 | `corpus` | Promociones con la forma del motor, `marca` (la mayor `actualizada_en`, texto exacto del servidor), `sincronizadoEn` y `descartadas`. Sin sincronizar: las de ejemplo y `marca: null` | Sí, en su propia clave `vuelto.corpus.v1`, y solo el que viene de una sincronización |
 | `compras` | Compras con la forma del motor (`promocionId`, `descuentoObtenido`, `reintegroEsperado`) | Sí |
 | `cola` | Operaciones de guardar y borrar compras que la cuenta todavía no tiene, con dueño y estado (spec 010) | Sí, en su propia clave (`vuelto.cola.v1`) |
@@ -160,9 +160,9 @@ selectMarcasDeSubida = cola → qué compras están «Sin subir» o «Solo en es
   `autoRefreshToken`, refresco atado a `AppState`, como en la guía de Supabase para Expo).
 - Contraseña de al menos 8 caracteres (Supabase local exige 6). El mensaje de cada error está en
   `lib/auth.ts`. Si el proyecto exige confirmar el email, el registro avisa y manda a Entrar.
-- **Pendiente hasta que el perfil se lea del servidor (#34/#42):** `perfil` (medios y comercios) vive
-  solo en el dispositivo, así que quien vuelve a entrar con una cuenta existente rehace el
-  onboarding. Cuando se lea por RLS, entrar con medios guardados irá directo a Inicio.
+- **Perfil desde el servidor (#41):** al entrar, la app lee los medios de `medios_de_pago` por RLS.
+  Sin medios guardados en el celular, las pestañas esperan esa lectura: con medios, va directo a
+  Inicio; sin medios, al onboarding. Los comercios todavía viven solo en el dispositivo (#47).
 
 ## Capa de datos
 

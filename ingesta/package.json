@@ -1,5 +1,26 @@
 {
   "name": "@vuelto/ingesta",
   "version": "0.0.0",
-  "private": true
+  "private": true,
+  "description": "Ingesta automática de Vuelto: baja las promociones vigentes de MODO, las mapea y valida, y las publica en Supabase todos los días (issue #35, ADR-011).",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage",
+    "ingestar": "node src/corpus/ingestar.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
+    "@vuelto/motor": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@vitest/coverage-v8": "~5.0.4",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.4"
+  }
 }

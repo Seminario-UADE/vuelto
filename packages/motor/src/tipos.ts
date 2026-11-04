@@ -14,9 +14,12 @@ export type FechaISO = string;
 
 /**
  * Id del banco en el catálogo de MODO (`GET /promos/api/rewards/banks`):
- * un UUID string, no el nombre ni el `bcra_code`. Las promos de MODO solo
- * traen el nombre (`name_bank`); la ingesta lo traduce a este id comparando
- * normalizado (minúsculas, sin acentos, sin espacios de más). Si no matchea,
+ * un UUID string, no el nombre ni el `bcra_code`. El listado de MODO solo
+ * trae el nombre (`name_bank`), pero el detalle de cada promo trae el banco
+ * por id (`requirements.banks.list`). Cuando hay que traducir un nombre, la
+ * ingesta lo compara normalizado (minúsculas, sin acentos, sin espacios de
+ * más) y, para las diferencias que no son de formato ("Banco Macro" frente a
+ * "Macro"), con una tabla de alias explícita. Si no resuelve o es ambiguo,
  * queda `null` y el borrador no se publica.
  */
 export type BancoId = string;
@@ -154,7 +157,7 @@ export interface CompraPropuesta {
   comercio: string | null;
   categoriaId: CategoriaId;
   /**
-   * `null` = el usuario todavía no escribió el monto (constitución 2.0.1:
+   * `null` = el usuario todavía no escribió el monto (constitución §I:
    * el monto es opcional). Si no es `null`, tiene que ser mayor a 0.
    */
   monto: number | null;
@@ -184,6 +187,13 @@ export interface PromocionAplicada {
   topeRestanteTrasCompra: number | null;
   /** `null` en los mismos casos que `topeRestanteTrasCompra`. */
   base: BaseEstimacion | null;
+  /** De qué período es `base`; `null` en los mismos casos (para "de octubre" o "de esta semana"). */
+  periodo: PeriodoAcumulable | null;
+  /**
+   * Qué da la promo, sin su tope: la parte de `motivo` que le corresponde,
+   * para mostrarla aparte de la cifra del tope sin cortar el texto (issue #46).
+   */
+  textoPromo: string;
 }
 
 export interface OpcionDePago {

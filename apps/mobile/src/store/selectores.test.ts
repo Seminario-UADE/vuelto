@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { mediosDeEjemplo } from "../data/fixtures";
 import * as motor from "@vuelto/motor";
 import { catalogoComercios, mediosDeclarados, mediosDelMotor } from "../data/fixtures";
-import { mediosElegidos } from "./perfil";
+import { mediosConfirmados } from "./perfil";
 import { sincronizado } from "./acciones";
 import { selectEntradasMotor, selectFrescura, selectRecomendacion, selectTopes } from "./selectores";
 import { ahoraCambio } from "./sesion";
@@ -18,7 +19,7 @@ afterEach(() => {
 
 function conMartin() {
   const s = storeDePrueba();
-  s.dispatch(mediosElegidos(mediosDeclarados.map((m) => m.id)));
+  s.dispatch(mediosConfirmados(mediosDeEjemplo(mediosDeclarados.map((m) => m.id))));
   return s;
 }
 
@@ -53,7 +54,7 @@ describe("selectRecomendacion (US1, US2)", () => {
         { comercio: coto.nombre, categoriaId: coto.categoriaId, monto, canal: "presencial" },
         {
           nombreParaMostrar: null,
-          mediosDePago: estado.perfil.medios.flatMap((id) => {
+          mediosDePago: estado.perfil.medios.flatMap(({ id }) => {
             const m = mediosDelMotor[id];
             return m ? [m] : [];
           }),

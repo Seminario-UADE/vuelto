@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "@vuelto/motor": ["../packages/motor/src/index.ts"]
+    }
+  },
+  "include": ["src"]
+}

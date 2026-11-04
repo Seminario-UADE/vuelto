@@ -1,5 +1,6 @@
--- Datos iniciales de los catálogos (solo `supabase db reset`). Idempotente.
--- En producción el catálogo completo lo siembra la ingesta con la service role.
+-- Datos iniciales de las categorías (solo `supabase db reset`). Idempotente.
+-- En el proyecto alojado el seed no corre: las categorías, los bancos y las promociones
+-- los publica todos los días la ingesta automática (`.github/workflows/ingesta.yml`, ADR-011).
 
 -- Las 13 categorías de MODO (CATEGORIAS_MODO en packages/motor/src/categorias.ts).
 insert into public.categorias (id, nombre) values
@@ -18,8 +19,6 @@ insert into public.categorias (id, nombre) values
   (14, 'Entretenimiento')
 on conflict (id) do update set nombre = excluded.nombre;
 
--- Bancos: solo Galicia tiene su id real de MODO en el repo. El resto lo carga la
--- ingesta desde GET /promos/api/rewards/banks; no se inventan ids.
-insert into public.bancos (id, nombre) values
-  ('88d8705e-2dda-46f9-8411-bb4916af858e', 'Banco Galicia')
-on conflict (id) do update set nombre = excluded.nombre;
+-- Los bancos (el catálogo completo de MODO, con sus ids reales) están en `seed/bancos.sql`,
+-- que `config.toml` carga a continuación. Las promociones no se siembran: en una base local
+-- se cargan corriendo la ingesta contra ella (ver `ingesta/src/corpus/ingestar.ts`).

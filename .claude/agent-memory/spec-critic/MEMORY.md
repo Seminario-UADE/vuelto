@@ -12,4 +12,5 @@
 - [Esquema RLS: borrados y sync](patron_esquema_rls_borrados_y_sync.md) — FK salta RLS, ON DELETE que borra base del tope, sync sin bajas/no-ops, seed con ids inventados.
 - [Sync al store: obligaciones heredadas](patron_sync_cliente_obligaciones_heredadas.md) — margen delegado por 007 y perdido, fixtures que sobreviven, reloj de ejemplo, poda que borra base del tope.
 - [Cola offline / outbox](patron_cola_offline_outbox.md) — ids de la app que no entran en la fila (promo uuid, Mercado Pago), dueño de la cola, envío en vuelo, códigos de error, FIFO bloqueante.
+- [Corpus/seed manual](patron_corpus_seed_manual.md) — validador sobrevendido, null→sin_tope/mensual, seed JSON vs db reset, demo alojada, manual+modo duplicados, pba≠AMBA.
 - [Capa servidor sobre el motor](patron_capa_servidor_sobre_motor.md) — prefiltro que duplica reglas, test de equivalencia tautológico, errores HTTP sin forma, anon key como sesión.

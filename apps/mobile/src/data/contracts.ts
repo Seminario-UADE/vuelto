@@ -30,7 +30,7 @@ export type Base =
   | { tipo: "sin-compras"; texto: string }
   | { tipo: "contacto"; texto: string };
 
-/** Lo decide el motor (`formatearEstimacion`): `queda-poco` con ≤20% del tope (DESIGN.md §5). */
+/** Lo decide el motor (`formatearEstimacion`): `queda-poco` con ≤30% del tope (DESIGN.md §5). */
 export type EstadoTope = "disponible" | "queda-poco" | "agotado" | "sin-base";
 
 export type MedioDePago = {
@@ -68,23 +68,12 @@ export type {
   Recomendacion as RespuestaRecomendar,
 } from "@vuelto/motor";
 
-/**
- * La compra que se evalúa, con el monto opcional (constitución §I): `null` llega tal cual al
- * motor (`CompraPropuesta.monto`, issue #75).
- */
+/** La compra que se evalúa, con el monto opcional (constitución §I, issue #75). */
 export type PedidoRecomendar = {
   comercio: string | null;
   categoriaId: number;
   monto: number | null;
   canal: "presencial" | "online";
-};
-
-/** Promoción del catálogo (lectura con RLS), para nombrar lo que el motor devuelve por id. */
-export type PromocionCatalogo = {
-  id: string;
-  titulo: string;
-  bancoId: string;
-  categoriaId: number;
 };
 
 // ─── Vista: lo que pintan las pantallas ───────────────────────────────────────
