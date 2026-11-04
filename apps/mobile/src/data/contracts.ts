@@ -164,8 +164,6 @@ export type Compra = {
 export type ComprasDeTope = {
   tope: TopeMedio;
   compras: Compra[];
-  /** Las que el motor contó pero no se pueden mostrar (medio fuera del catálogo): la base las incluye. */
-  sinMostrar: number;
 };
 
 export type ResumenCompras = {

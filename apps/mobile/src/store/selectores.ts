@@ -57,7 +57,12 @@ export const selectTopes = createSelector([selectEntradasMotor], topesVista);
  * las dos a la vez, sin red.
  */
 export const selectComprasDeTope = createSelector(
-  [selectTopes, (s: RootState) => s.compras.lista, (_s: RootState, clave: string) => clave],
+  [
+    selectTopes,
+    (s: RootState) => s.compras.lista,
+    (s: RootState) => s.perfil.medios,
+    (_s: RootState, clave: string) => clave,
+  ],
   comprasDeTopeVista,
 );
 

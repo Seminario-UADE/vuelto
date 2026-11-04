@@ -1617,9 +1617,10 @@ Es S: sin spec-kit.
 - App: `selectComprasDeTope(state, clave)` sale de `selectTopes` y solo cruza esos ids con `compras.lista`.
   `TopeDetalle` es tocable y lleva a `/tope/[clave]`, que muestra el tope con su base, las promos de un tope
   compartido y las compras (con `CompraRow`, que permite borrarlas).
-- `/code-review` y `rules-guardian` encontraron un caso que se corrigió: una compra con un medio fuera del
-  catálogo cuenta en la base pero no se puede pintar; ahora se avisa aparte para que la lista no contradiga el
-  "según N compras". También se tipó la clave del tope y el test la usa en vez de desarmarla.
+- `/code-review` y `rules-guardian` encontraron un caso: una compra con un medio fuera del catálogo contaba en
+  la base pero no se podía pintar, y la lista contradecía el "según N compras". Primero se avisó aparte; al
+  mergear #100 (que muestra esas compras como "medio que sacaste de tu perfil") el aviso sobró y se sacó: la
+  lista ahora siempre coincide con la base. También se tipó la clave del tope y el test la usa.
 - Verificado a mano en la web con un usuario de prueba y con Supabase apagado (sin red): registrar una compra
   pasa el tope a "según 4 compras" y la suma a la lista; borrarla desde la pantalla del tope vuelve a 3, y el
   estado sobrevive a recargar. Para eso hubo que apagar el REST de Supabase antes del login: la base local no

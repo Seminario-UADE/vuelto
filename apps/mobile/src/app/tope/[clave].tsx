@@ -35,7 +35,7 @@ export default function ComprasDelTope() {
     );
   }
 
-  const { tope, compras, sinMostrar } = datos;
+  const { tope, compras } = datos;
 
   return (
     <Screen>
@@ -60,11 +60,11 @@ export default function ComprasDelTope() {
         <Text variant="label" weight="semibold" tone="inkSecondary" accessibilityRole="header">
           Compras que lo consumieron
         </Text>
-        {compras.length === 0 && sinMostrar === 0 ? (
+        {compras.length === 0 ? (
           <Text variant="bodyMd" tone="inkSecondary">
             Ninguna compra registrada {estePeriodo(tope.periodo)} con {tope.clave.startsWith("grupo:") ? "estas promos" : "esta promo"}.
           </Text>
-        ) : compras.length === 0 ? null : (
+        ) : (
           <Card padding={space.lg} gap={0}>
             {compras.map((c, i) => (
               <View key={c.id} style={divisor(i)}>
@@ -80,12 +80,6 @@ export default function ComprasDelTope() {
             ))}
           </Card>
         )}
-        {sinMostrar > 0 ? (
-          <Text variant="label" tone="inkSecondary">
-            {sinMostrar === 1 ? "Una compra" : `${sinMostrar} compras`} con un medio de pago que todavía no podemos mostrar
-            también {sinMostrar === 1 ? "cuenta" : "cuentan"} para este tope.
-          </Text>
-        ) : null}
       </View>
 
       <View style={{ flexDirection: "row", gap: space.sm }}>

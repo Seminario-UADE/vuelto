@@ -285,19 +285,24 @@ export function topesVista(entradas: EntradasMotor): ResumenTopes {
 /**
  * Las compras que consumieron un tope (issue #45). Son las que el motor contó en la base de la
  * estimación (`compraIds`), así la lista y el "según N compras" salen del mismo cálculo; la app
- * no decide qué compra pertenece a qué tope. En el orden de `compras` (como «Mis compras»).
- * Sin consejo: ya se vio en «Tus topes» y hay uno por pantalla (DESIGN.md §5). `null` si el
- * tope ya no está (venció o se sacó el medio del perfil).
+ * no decide qué compra pertenece a qué tope. En el orden de `compras` (como «Mis compras»); una
+ * con un medio que ya no está en el perfil se muestra igual, como en «Mis compras». Sin consejo:
+ * ya se vio en «Tus topes» y hay uno por pantalla (DESIGN.md §5). `null` si el tope ya no está
+ * (venció o se sacó el medio del perfil).
  */
-export function comprasDeTopeVista(topes: ResumenTopes, compras: CompraMotor[], clave: string): ComprasDeTope | null {
+export function comprasDeTopeVista(
+  topes: ResumenTopes,
+  compras: CompraMotor[],
+  medios: readonly MedioGuardado[],
+  clave: string,
+): ComprasDeTope | null {
   const tope = topes.medios.find((t) => t.clave === clave);
   if (!tope) return null;
   const ids = new Set(tope.compraIds);
-  const vistas = compras.flatMap((c) => {
-    const v = ids.has(c.id) ? compraVista(c) : null;
-    return v ? [v] : [];
-  });
-  return { tope: { ...tope, consejo: null }, compras: vistas, sinMostrar: tope.compraIds.length - vistas.length };
+  return {
+    tope: { ...tope, consejo: null },
+    compras: compras.filter((c) => ids.has(c.id)).map((c) => compraVista(c, medios)),
+  };
 }
 
 /** Comercio del catálogo por nombre; fuera del catálogo, sin rubro (no se inventa). */

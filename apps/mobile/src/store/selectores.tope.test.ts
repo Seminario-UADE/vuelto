@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { estimarTopes } from "@vuelto/motor";
 import { claveDeTope } from "../data/calculo";
 import { promosConTopeCompartido } from "../data/compras/prueba";
-import { mediosDeclarados } from "../data/fixtures";
+import { mediosDeclarados, mediosDeEjemplo } from "../data/fixtures";
 import { escenarioElegido } from "./acciones";
 import { corpusInicial } from "./corpus";
-import { mediosElegidos } from "./perfil";
+import { mediosConfirmados } from "./perfil";
 import { storeDePrueba } from "./prueba";
 import { selectComprasDeTope, selectEntradasMotor, selectTopes } from "./selectores";
 import { eliminarCompra, guardarCompra } from "./thunks";
@@ -14,7 +14,7 @@ import { eliminarCompra, guardarCompra } from "./thunks";
 
 function conMartin(estadoInicial: Parameters<typeof storeDePrueba>[0] = null) {
   const s = storeDePrueba(estadoInicial);
-  s.dispatch(mediosElegidos(mediosDeclarados.map((m) => m.id)));
+  s.dispatch(mediosConfirmados(mediosDeEjemplo(mediosDeclarados.map((m) => m.id))));
   return s;
 }
 
@@ -40,8 +40,7 @@ describe("selectComprasDeTope", () => {
       const r = selectComprasDeTope(s.getState(), t.clave);
       expect(r?.compras.map((c) => c.id).sort()).toEqual(est?.compraIds);
       // La lista y el "según N compras" de la tarjeta salen del mismo cálculo (Principio V).
-      if (t.base.tipo === "compras") expect((r?.compras.length ?? 0) + (r?.sinMostrar ?? 0)).toBe(t.base.cantidad);
-      expect(r?.sinMostrar).toBe(0);
+      if (t.base.tipo === "compras") expect(r?.compras).toHaveLength(t.base.cantidad);
       expect(r?.tope.consejo).toBeNull();
     }
   });
@@ -85,14 +84,14 @@ describe("selectComprasDeTope", () => {
     expect(selectComprasDeTope(s.getState(), "grupo:galicia-mensual")?.compras).toEqual([]);
   });
 
-  it("una compra que el motor cuenta pero con un medio fuera del catálogo se informa aparte", () => {
+  it("una compra con un medio que ya no está en el perfil se lista igual: la lista nunca contradice la base", () => {
     const s = conMartin({ corpus: { ...corpusInicial, promociones: promosConTopeCompartido() } });
     s.dispatch(escenarioElegido("mes-vacio"));
     const compra = s.dispatch(guardarCompra(borrador));
     const rara = { ...compra, id: "medio-desconocido", medioDePagoId: "uuid-de-un-medio-sin-mapear" };
     const r = selectComprasDeTope(storeDePrueba({ ...s.getState(), compras: { lista: [compra, rara] } }).getState(), "grupo:galicia-mensual");
-    expect(r?.compras.map((c) => c.id)).toEqual([compra.id]);
-    expect(r?.sinMostrar).toBe(1);
+    expect(r?.compras.map((c) => c.id)).toEqual([compra.id, rara.id]);
+    expect(r?.compras[1]?.medio.nombre).toBe("Medio que sacaste de tu perfil");
     expect(r?.tope.base).toMatchObject({ tipo: "compras", cantidad: 2 });
   });
 
