@@ -196,7 +196,7 @@
 
 ## Phase 8: Polish
 
-- [ ] T051 [P] Marcar como `issue` en `docs/design/ideas-ux.md` las entradas de la barra inferior y del flujo, con el número de cada issue.
+- [x] T051 [P] Marcar como `issue` en `docs/design/ideas-ux.md` las entradas de la barra inferior y del flujo, con el número de cada issue.
 - [ ] T052 [P] Actualizar `docs/architecture/03-frontend.md` y ADR-006 con el flujo «por confirmar» (pendiente de #105).
 - [ ] T053 Correr el quickstart completo, `/code-review` y `test-runner`, y registrar la sesión en `docs/bitacora-prompts.md`.
 

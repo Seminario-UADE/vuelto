@@ -157,12 +157,12 @@ docs/design/ideas-ux.md                     # estado: issue
 
 | Orden | Issue | US | Depende de | Tamaño |
 |---|---|---|---|---|
-| 1 | Compra por confirmar: modelo, «Usar» y confirmar a mano | US1 | — | M |
-| 2 | Confirmar la compra por confirmar con el ticket | US2 | 1 | S |
-| 3 | Navegación de tres tabs, Perfil desde el avatar y zonas seguras | US3 | 1 (para la tab Compras) | M |
-| 4 | Primera respuesta interactiva y nombre del usuario | US4 | — | M |
-| 5 | Probar antes de crear la cuenta | US5 | 4 | L |
-| 6 | Rehacer la UI en Stitch con el flujo directo | diseño | — (guía a 1, 3 y 4) | S |
+| 1 | #109 Compra por confirmar: modelo, «Usar» y confirmar a mano | US1 | — | M |
+| 2 | #110 Confirmar la compra por confirmar con el ticket | US2 | 1 | S |
+| 3 | #103 Navegación de tres tabs, Perfil desde el avatar y zonas seguras | US3 | 1 (para la tab Compras) | M |
+| 4 | #111 Primera respuesta interactiva y nombre del usuario | US4 | — | M |
+| 5 | #112 Probar antes de crear la cuenta | US5 | 4 | L |
+| 6 | #113 Rehacer la UI en Stitch con el flujo directo | diseño | — (guía a 1, 3 y 4) | S |
 
 Las issues 1 y 4 pueden ir en paralelo. Las issues 3 y 4 tocan `(tabs)/index.tsx` y `_layout.tsx`, así que van una después de la otra o con coordinación.
 

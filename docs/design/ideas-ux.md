@@ -18,7 +18,7 @@ Cómo anotar: una entrada por idea, con estado (`idea` → `issue` → `hecha` o
 
 ## Barra de navegación inferior
 
-- **Estado:** idea
+- **Estado:** issue (#103, spec 012 US3)
 - **Hoy** (`apps/mobile/src/app/(tabs)/_layout.tsx`): cuatro tabs en este
   orden, Inicio · Comprar · Topes · Perfil. La pestaña activa se distingue
   solo por el ícono relleno y por pasar de gris (`inkSecondary`) a tinta
@@ -69,7 +69,7 @@ Cómo anotar: una entrada por idea, con estado (`idea` → `issue` → `hecha` o
 
 ## Flujo de usuario nuevo y de compra
 
-- **Estado:** idea (auditoría del 05/11/2026, sobre el código de `main`)
+- **Estado:** issue (spec `specs/012-flujo-directo/`: #109, #110, #111, #112, #113 y #103). Auditoría del 05/11/2026, sobre el código de `main`.
 - **Hoy:** Bienvenida → Crear cuenta → Medios («paso 1 de 2») → Comercios
   («paso 2 de 2», se puede saltar) → Primera respuesta → Inicio, con cuatro
   tabs.
