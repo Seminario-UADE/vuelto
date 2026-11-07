@@ -29,7 +29,7 @@ El mapa de rutas de Expo Router después de la feature: qué existe, qué parám
 - **`PorConfirmarCard`**: comercio, «Pagá con [medio]», monto si lo hay y antigüedad («hace 10 min»). Acciones: «Ya pagué» (primario), «Escanear ticket» (secundario) y «Descartar» (texto). Se usa en Inicio y en Compras.
 - **`RecomendacionCard`**: suma un footer con «Usar [medio]» (primario sobre la tarjeta de decisión) cuando `r.medio` no es `null`.
 - **`SelectorComercios`**: búsqueda y chips agrupados por rubro, extraídos de `comercios.tsx`. Lo usan la primera respuesta y Perfil.
-- **Tab bar**: tres ítems y foco Salvia (research R6).
+- **Tab bar**: nativa (o la JS actual si `NativeTabs` no es estable), con tres ítems y el `tint` del acento del tema (research R6, DESIGN.md v6 §5).
 - **`AvatarBoton`**: el avatar con la inicial (o un ícono genérico sin nombre), de 44 pt, en el encabezado de Inicio.
 
 ## Avisos (toast)

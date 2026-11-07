@@ -43,15 +43,17 @@ Decisiones técnicas para cumplir la spec sobre el código de `main` del 05/11/2
   - Cinco tabs con un botón central: suma una tab sin contenido propio.
   - Perfil como cuarta tab: vuelve a dejar un número par, sin centro.
 
-## R6. Foco de color de la tab activa
+## R6. Tab bar y foco de la tab activa (actualizado con DESIGN.md v6)
 
-- **Decision**: la tab activa muestra el ícono en Salvia (`#4A6B53`) sobre una píldora Salvia clara (`#DCE6DD`) de 56×32 pt detrás del ícono, y la etiqueta en Verde Bosque/tinta con peso 600. La inactiva queda como hoy (gris `inkSecondary`). `accessibilityState.selected` ya lo da React Navigation.
-- **Rationale**: `DESIGN.md` §2 pide un solo acento (Salvia), y el texto Salvia solo desde 15 px. La etiqueta mide 12 px, así que no puede ir en Salvia. El ícono y la píldora sí, y el par Salvia/Salvia clara supera 3:1 (contraste no textual AA, WCAG 1.4.11). Se verifica en una tarea.
-- **Alternatives considered**: la etiqueta en Salvia (rompe la regla de 15 px) o Champán (prohibido sobre fondo claro).
+- **Decision**: usar la tab bar **nativa** (`NativeTabs` de `expo-router`) con el `tint` del acento del tema: Oliva `#1A422F` en claro y Salvia clara `#8EB69B` en oscuro. En iOS 26 es la píldora flotante de vidrio del sistema y en Android la barra Material 3. La primera tarea de #103 verifica si la API sigue `unstable` en el SDK 58. Si sigue, se queda la tab bar JS actual con el `tint` nuevo, sin dibujar una píldora propia.
+- **Rationale**: `impeccable/ios` rechaza las barras de navegación dibujadas a mano (*«No custom global nav»*), y la tab bar del sistema ya trae el foco, la accesibilidad (`selected`) y el vidrio. Contraste del `tint`: 9.5:1 en claro y 6.7:1 sobre `#0B2B26` en oscuro.
+- **Alternatives considered**:
+  - una píldora flotante propia con el activo en un cuadrado relleno: era la primera versión de la dirección v6, y se descartó por la regla de arriba;
+  - la píldora Salvia clara detrás del ícono en la tab bar JS: queda solo si `NativeTabs` no está estable.
 
 ## R7. Barra de estado y márgenes
 
-- **Decision**: con Expo SDK 58, Android es *edge-to-edge* por defecto: la barra de estado es transparente y muestra lo que pinta la app debajo. Por eso alcanza con que la raíz pinte `canvas` debajo del inset superior (ya lo hace `_layout.tsx` con `backgroundColor: colors.canvas`) y que ninguna pantalla pinte otro color en esa franja. En iOS pasa lo mismo. Abajo, `Screen` suma `insets.bottom` solo cuando no hay tab bar (`aboveTabBar`), y la tab bar usa la altura con inset que da React Navigation. Hay que revisar los dos casos que hoy suman el inset dos veces o ninguna, y probar en los tres dispositivos de SC-007.
+- **Decision**: la `StatusBar` usa `style="auto"`, que acompaña al tema (DESIGN.md v6). Con Expo SDK 58, Android es *edge-to-edge* por defecto: la barra de estado es transparente y muestra lo que pinta la app debajo. Por eso alcanza con que la raíz pinte `canvas` debajo del inset superior (ya lo hace `_layout.tsx` con `backgroundColor: colors.canvas`) y que ninguna pantalla pinte otro color en esa franja. En iOS pasa lo mismo. Abajo, `Screen` suma `insets.bottom` solo cuando no hay tab bar (`aboveTabBar`), y la tab bar usa la altura con inset que da React Navigation. Hay que revisar los dos casos que hoy suman el inset dos veces o ninguna, y probar en los tres dispositivos de SC-007.
 - **Rationale**: `StatusBar backgroundColor` no tiene efecto con *edge-to-edge*. Lo que manda es el fondo.
 
 ## R8. El nombre del usuario

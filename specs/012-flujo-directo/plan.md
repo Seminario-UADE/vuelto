@@ -15,7 +15,7 @@ Este plan cambia el flujo de la app sin tocar el motor ni la forma de una compra
    - «Usar [medio]» en la tarjeta de Inicio;
    - la tarjeta `PorConfirmarCard`;
    - los cambios en `revisa` y `escanear`.
-2. **Tres tabs (US3, P2)**: Compras · Inicio · Topes; Perfil pasa a ruta de stack con avatar; se borra Comprar; foco Salvia; zonas seguras y barra de estado.
+2. **Tres tabs (US3, P2)**: Compras · Inicio · Topes; Perfil pasa a ruta de stack con avatar; se borra Comprar; tab bar nativa con el `tint` del acento; zonas seguras y barra de estado. El diseño visual sigue `DESIGN.md` v6, y sus temas se implementan en #115, que va antes de la parte visual.
 3. **Primera respuesta y nombre (US4, P2)**:
    - el componente `SelectorComercios`;
    - `primera-respuesta` interactiva y se borra `comercios`;
@@ -101,7 +101,7 @@ apps/mobile/src/
 ├── app/
 │   ├── _layout.tsx                      # rutas nuevas: perfil, descartar-por-confirmar, confirmar-email
 │   ├── (tabs)/
-│   │   ├── _layout.tsx                  # Compras · Inicio · Topes, foco Salvia
+│   │   ├── _layout.tsx                  # Compras · Inicio · Topes, NativeTabs (o JS) con tint del acento
 │   │   ├── compras.tsx                  # NUEVA (ex mis-compras + por confirmar + acciones)
 │   │   ├── index.tsx                    # avatar, PorConfirmarCard, «Usar», sin fila de escanear
 │   │   ├── topes.tsx                    # enlaces a /compras

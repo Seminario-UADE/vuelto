@@ -2,7 +2,7 @@
 
 **Input**: `specs/012-flujo-directo/`: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md), [contracts/rutas.md](contracts/rutas.md) y [quickstart.md](quickstart.md).
 
-**Prerequisites**: `main` con las specs 008, 009 y 010 (store, sincronización y cola de compras).
+**Prerequisites**: `main` con las specs 008, 009 y 010 (store, sincronización y cola de compras). Para la parte visual (tarjetas, hero, tab bar), #115: los temas de `DESIGN.md` v6.
 
 **Tests**: se piden. La constitución §VI pide test-first en el núcleo, y SC-003 y SC-008 se verifican con tests. Cada tarea de implementación va después del test que la cubre.
 
@@ -125,7 +125,7 @@
 - [ ] T028 [US3] Mover `src/app/(tabs)/perfil.tsx` a `src/app/perfil.tsx`, registrarlo con `headerNativo` en `src/app/_layout.tsx` y crear `src/components/avatar-boton.tsx` en el encabezado de Inicio.
 - [ ] T029 [US3] En `src/app/(tabs)/_layout.tsx`:
   - las tabs Compras · Inicio · Topes, con `unstable_settings.initialRouteName = "index"`;
-  - el foco: ícono Salvia, píldora Salvia clara detrás y etiqueta en tinta con peso 600 (research R6).
+  - primero, verificar si `NativeTabs` es estable en el SDK 58. Si lo es, usar la tab bar nativa con el `tint` del acento del tema; si no, la tab bar JS actual con el mismo `tint`, sin dibujar una propia (research R6).
 
   Verificar con una herramienta de contraste: indicador ≥ 3:1 y etiqueta ≥ 4.5:1 (FR-019).
 - [ ] T030 [US3] Revisar las zonas seguras en `src/components/screen.tsx` y en la tab bar: que el inset de abajo no se sume dos veces ni falte, y que la barra de estado deje ver `canvas` (research R7). Probar en iPhone con notch, Android con gestos y Android con tres botones.

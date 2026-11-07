@@ -52,7 +52,7 @@ Con `npx expo start` en `apps/mobile`.
    - Al guardar, el origen es «Ticket».
 4. **US2, cruce desde Compras**: con una compra por confirmar en Coto, escanear desde Compras. Aparece la pregunta «¿Es tu compra por confirmar en Coto?».
 5. **US3**:
-   - Las tabs están en el orden Compras · Inicio · Topes, con foco Salvia.
+   - Las tabs están en el orden Compras · Inicio · Topes, con el foco en el color del acento, en los dos temas.
    - El avatar abre Perfil, y Comprar ya no existe.
    - Capturas de antes y después en los tres dispositivos (SC-007).
 6. **US4**:

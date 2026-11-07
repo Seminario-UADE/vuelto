@@ -17,9 +17,10 @@
   1. «Usar [medio]» deja una **compra por confirmar**, que no cuenta para los topes, en lugar de guardar la compra antes de pagar.
   2. La navegación pasa a **tres tabs** (Compras · Inicio · Topes), Perfil se abre desde un avatar en Inicio y la tab Comprar desaparece.
   3. El onboarding pierde la pantalla Comercios, su primera respuesta deja de estar fija en Coto, pide el nombre y, como meta (US5), deja la cuenta para el final.
-  4. Los ajustes de #103: foco de color en la tab activa, márgenes con la zona inferior del teléfono y barra de estado del color de la app.
+  4. Los ajustes de #103: foco de color en la tab activa (tab bar nativa), márgenes con la zona inferior del teléfono y barra de estado del color de la app.
 - **Vocabulario**: esta spec dice **«por confirmar»** para una compra simulada que todavía no se pagó. «Pendiente» y «Sin subir» siguen siendo, como en la spec 010, operaciones de la cola que no llegaron al servidor. Son cosas distintas y la UI nunca las llama igual.
-- **Fuera de alcance**: el cambio del estilo visual general (tipografía, paleta, tarjetas), que sigue `docs/design/DESIGN.md`; el gasto en grupo (#54) y la lectura real del ticket con la cámara (#48, #49). Esta spec define qué hace el escaneo con una compra por confirmar, no cómo se lee el ticket.
+- **Diseño visual**: las pantallas siguen `docs/design/DESIGN.md` **v6** (esmeralda, en claro y en oscuro, con la decisión como única superficie invertida). Implementar los temas y los componentes base es la issue [#115](https://github.com/Seminario-UADE/vuelto/issues/115), que va antes de la parte visual de esta spec.
+- **Fuera de alcance**: el gasto en grupo (#54) y la lectura real del ticket con la cámara (#48, #49). Esta spec define qué hace el escaneo con una compra por confirmar, no cómo se lee el ticket.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -179,7 +180,7 @@ Sofía toca «Empezar» en Bienvenida sin crear cuenta. Elige sus medios, ve su 
 **Navegación**
 
 - **FR-018**: La barra inferior MUST tener tres tabs en este orden: Compras, Inicio, Topes. Inicio MUST ser la tab inicial.
-- **FR-019**: La tab activa MUST distinguirse con un indicador de color (contraste ≥ 3:1 contra el fondo de la barra) además del ícono. Su etiqueta MUST tener contraste ≥ 4.5:1. Todo dentro de la paleta de `DESIGN.md` §2.
+- **FR-019**: La tab activa MUST distinguirse por el color del acento del tema (el `tint` de la tab bar) además del ícono, con contraste ≥ 3:1 contra el fondo de la barra en los dos temas. Su etiqueta MUST tener contraste ≥ 4.5:1. La tab bar es la nativa de la plataforma si su API es estable en el SDK de la app; si no, la actual, sin dibujar una propia (`DESIGN.md` v6 §5).
 - **FR-020**: La tab Comprar MUST eliminarse, y todo lo que ofrecía MUST seguir disponible: elegir comercio (Inicio), escanear y cargar a mano (Compras) y pagar entre varios (detalle del comercio).
 - **FR-021**: La tab Compras MUST contener las compras por confirmar, «Escanear ticket», «Cargar a mano» y el historial del período con su resumen, filtros y borrado. Las marcas de la cola de la spec 010 («Sin subir», «No se pudo subir») se mantienen en el historial con esos mismos textos.
 - **FR-022**: Perfil MUST abrirse desde un avatar en el encabezado de Inicio y conservar todo su contenido actual. Todo enlace que hoy lleva a Comprar o a «Mis compras» MUST llevar a la tab Compras.
@@ -234,4 +235,4 @@ Sofía toca «Empezar» en Bienvenida sin crear cuenta. Elige sus medios, ve su 
 - **Las compras por confirmar no afectan la recomendación**: es a propósito. No se sabe si se pagaron, y la recomendación usa solo compras confirmadas, como hoy.
 - **El lector de tickets sigue simulado**: esta spec cambia solo que devuelva la fecha de hoy, para que el cruce se pueda probar. Además se suma un escenario de demo «sin red» para probar el camino sin conexión.
 - **US5 depende de** que se habilite la lectura sin cuenta de bancos, categorías y promociones vigentes (FR-032). Son datos públicos de MODO y no hay datos de usuarios en esas tablas. Si el plan concluye que no se puede, US5 se posterga y el onboarding queda así: Bienvenida → cuenta (con nombre) → medios → primera respuesta.
-- **El estilo visual no cambia**: tokens, tipografía y componentes de `DESIGN.md`. El «más directo» de esta spec sale de quitar pasos y pantallas, no de un rediseño visual.
+- **Diseño visual**: el «más directo» de esta spec sale de quitar pasos y pantallas. La forma la da `DESIGN.md` v6 (`docs/design/direccion-visual-v6.md`), y los temas se implementan en #115.

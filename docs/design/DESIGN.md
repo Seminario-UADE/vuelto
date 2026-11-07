@@ -1,246 +1,280 @@
-# Design System: Vuelto
+# Design System: Vuelto (v6)
 
-> Fuente de verdad para generar y editar pantallas de Vuelto en Stitch.
-> Deriva de `docs/product/marca.md` (paleta), `docs/product/requisitos.md`
-> (RF-07, RF-10, RF-19) y de la auditoría `docs/design/auditoria-stitch-v2.md`.
+> Fuente de verdad para diseñar y generar pantallas de Vuelto (Stitch y la
+> app). La v6 (07/11/2026) reemplaza a `DESIGN-v5.md`, y su razonamiento está
+> en `direccion-visual-v6.md`. Deriva de `docs/product/marca.md`, de
+> `docs/product/requisitos.md` (RF-07, RF-10, RF-19), del flujo de la spec
+> 012 y de las skills de diseño del proyecto (`impeccable`, `apple-design`,
+> `expo-native-ui`).
 > App mobile (iOS/Android, Expo), viewport de referencia 390×844 pt.
+>
+> **Estado de implementación**: la app implementa la v5 hasta que se cierre
+> la issue de temas. Los comentarios del código que citan secciones de este
+> archivo se actualizan con esa issue.
 
 ## 1. Tema visual y atmósfera
 
-Vuelto se usa **parado en la caja, con apuro y una mano**. La interfaz es una
-herramienta de decisión, no una vidriera de promociones: tranquila, cálida y
-seria, como una libreta de cuentas bien llevada. Fondo hueso, tinta verde
-bosque, un solo acento salvia.
+Vuelto se usa **parado en la caja, con apuro y una mano**: en la fila del
+súper, bajo tubos fluorescentes, o en la estación de servicio a pleno sol.
+Es una herramienta de decisión, no una vidriera de promociones: tranquila,
+cálida y seria, como una libreta de cuentas bien llevada.
+
+**Dos luces, una marca.** La app sigue la apariencia del sistema y tiene
+dos temas compuestos:
+- un **claro** en crema y tinta esmeralda;
+- un **oscuro** en bosque profundo y crema.
+
+Ninguno es la inversión mecánica del otro: el oscuro tiene su propia escala
+de elevación.
 
 - **Densidad: 5/10 — app diaria, equilibrada.** Una respuesta por pantalla,
-  con su razón; el detalle se despliega a pedido.
-- **Variación: 3/10 — predecible.** Layouts de una columna, alineados a la
-  izquierda, iguales entre pantallas. La sorpresa no ayuda en la caja.
-- **Movimiento: 3/10 — contenido.** Feedback inmediato al tocar y
-  transiciones cortas. Nada se mueve solo.
+  con su razón. El detalle se despliega a pedido.
+- **Variación: 3/10 — predecible.** Una columna, alineada a la izquierda,
+  igual entre pantallas. La sorpresa no ayuda en la caja.
+- **Movimiento: 3/10 — contenido.** Feedback inmediato y transiciones del
+  sistema. Nada se mueve solo.
 
 Principio rector: **la cifra primero, la razón al lado, la base siempre.**
-Ninguna pantalla muestra "promociones" como fin; muestran qué medio de pago
-usar y cuánto tope queda.
 
-**Calma no es vacío.** Cada pantalla tiene una pieza con carácter (la
-tarjeta oscura) y detalles que la hacen reconocible: íconos por rubro en
-círculos tintados, iniciales de comercio y banco con su color, el ahorro
-del mes a la vista, la cuenta regresiva hasta que se reinician los topes,
-el ticket dibujado. Lo que se evita es el ruido que no ayuda a decidir
-(badges de estado del sistema, rótulos en mayúsculas en cada bloque), no la
-personalidad.
+**Una sola superficie invertida marca la decisión**:
+- en el tema claro, la tarjeta de decisión es bosque oscuro;
+- en el oscuro, es crema.
+
+Es la pieza con carácter de la app, y va solo donde hay una decisión.
 
 ## 2. Paleta y roles
 
-Todos los pares de texto cumplen WCAG 2.1 AA (≥4.5:1) sobre su fondo
-indicado. Ratios medidos.
+Los roles son los de `apps/mobile/src/theme.ts`. Cada rol tiene un valor por
+tema. Ratios WCAG 2.1 medidos.
 
-| Token | Hex | Rol |
-|---|---|---|
-| **Blanco Hueso** (canvas) | `#F7F4EB` | Fondo de todas las pantallas. Texto sobre fondos oscuros. |
-| **Lino** (surface) | `#EFEBE0` | Relleno de tarjetas y listas agrupadas. |
-| **Gris Cálido** (surface-strong) | `#E8E4D8` | Chips, campos, tarjeta seleccionada, filas alternas. |
-| **Divisor** | `#DDD8CB` | Líneas divisorias y bordes decorativos. **Nunca** como único borde de un control. |
-| **Verde Bosque** (ink) | `#14281D` | Texto principal, íconos, tarjeta de decisión oscura. 14:1 sobre canvas. |
-| **Musgo** (ink-secondary) | `#52635A` | Texto secundario, descripciones, metadatos. 5.8:1 canvas / 5.0:1 sobre `#E8E4D8`. |
-| **Borde de control** | `#6A7A70` | Bordes de radios, checkboxes, inputs no seleccionados. ≥3.5:1 en fondos claros. |
-| **Salvia** (accent) | `#4A6B53` | Único acento: botón primario, selección, progreso, links. Texto salvia solo ≥15px. |
-| **Champán** (accent-on-dark) | `#C5A059` | Detalles **solo sobre Verde Bosque** (6.3:1). Nunca sobre fondo claro (2.2:1). |
-| **Ocre** (warning text) | `#83591A` | Texto de advertencia: tope casi agotado, promo de otro día. 4.9:1 sobre `#E8E4D8`. |
-| **Ocre claro** (warning bg) | `#F3E6C8` | Fondo de badge de advertencia, siempre con texto Ocre. |
-| **Óxido** (error) | `#8C4843` | Tope agotado, error de lectura. 5.3:1 sobre `#E8E4D8`. |
-| **Salvia clara** (success bg) | `#DCE6DD` | Fondo de confirmación, siempre con texto Verde Bosque. |
+| Rol | Claro | Oscuro | Uso | Contraste (claro / oscuro) |
+|---|---|---|---|---|
+| `canvas` | `#F3EBD6` Crema | `#051F20` Bosque profundo | Fondo de las pantallas | — |
+| `surface` | `#EAE1C8` Lino | `#0B2B26` Pino | Hero de Inicio, listas agrupadas, tarjetas | — |
+| `surfaceStrong` | `#DFD5B9` Arena | `#163832` Musgo oscuro | Chips, campos, círculos de comercio, fila seleccionada | — |
+| `divider` | `#D3C8A8` | `#235347` Helecho | Divisores. Nunca el único borde de un control | decorativo |
+| `ink` | `#02110C` Esmeralda negro | `#F3EBD6` Crema | Texto principal e íconos | 16.2 / 14.4 sobre canvas |
+| `inkSecondary` | `#4E6656` | `#A3B5A8` Liquen | Texto secundario, bases, metadatos | 5.3 / 8.0 sobre canvas |
+| `controlBorder` | `#6A7A70` | `#5E8A70` | Radios, checkboxes, inputs sin seleccionar | 3.8 / 4.4 |
+| `accent` | `#1A422F` Oliva | `#8EB69B` Salvia clara | **Único acento**: primario, selección, tab activa, progreso, links | 9.5 / 7.6 |
+| `onAccent` | `#F3EBD6` | `#02110C` | Texto e íconos sobre el acento | 9.5 / 8.6 |
+| `warning` | `#83591A` | `#E2B65E` | Queda poco, promo de otro día | 5.2 / 9.1 |
+| `warningBg` | `#F1DFB4` | `#2B2410` | Fondo de aviso, siempre con `warning` | — |
+| `error` | `#8C4843` | `#EE8F84` | Tope agotado, error de lectura | 5.7 / 7.3 |
+| `successBg` | `#D9E6D8` | `#1A422F` | Confirmación, píldora de ahorro (con `ink` / Crema) | — |
+| `decisionBg` | `#051F20` | `#F3EBD6` | Tarjeta de decisión (superficie invertida) | — |
+| `onDecision` | `#F3EBD6` | `#02110C` | Texto sobre la decisión | 14.4 / 16.2 |
+| `onDecisionMuted` | `#A3B5A8` | `#4E6656` | Razón y base sobre la decisión | 7.7 / 5.3 |
+| `onDecisionAccent` | `#8EB69B` (texto `#02110C`) | `#1A422F` (texto `#F3EBD6`) | El botón «Usar [medio]» dentro de la decisión | 8.6 / 9.5 |
 
 Reglas:
-- **Un acento.** Salvia es el único color de acción. Champán es decoración
-  sobre oscuro, no un segundo acento.
-- **Una sola familia de grises, cálida.** No mezclar con grises fríos de
-  Tailwind (`slate`, `zinc`, `gray`) ni con `amber-*` / `orange-*`.
-- **El color nunca es la única señal.** Todo estado (agotado, hoy no aplica,
-  pendiente) lleva texto o ícono además del color.
-- **Sin negro puro**, sin degradés, sin brillos, sin sombras oscuras.
-- **La superficie oscura marca la decisión, y solo la decisión** (auditoría
-  v5 P1 #2): la respuesta en Inicio cuando hay un comercio elegido, Con qué
-  pagar, Primera respuesta y Gasto en grupo. Topes, Mis compras, Perfil,
-  Invitar, Armar grupo, el onboarding y los sheets usan Lino con el número
-  en display. Si todo es hero, nada lo es.
-- **Solo modo claro.** La app declara `userInterfaceStyle: "light"`. En
-  código los colores se usan siempre como tokens semánticos
-  (`apps/mobile/src/theme.ts`), nunca como hex sueltos.
+
+- **Un acento.** Oliva en el tema claro y Salvia clara en el oscuro, solo
+  para la acción, la selección y el estado activo. Gana fuerza porque se usa
+  poco. Champán salió en la v6.
+- **En el tema claro, el texto secundario va sobre `canvas` o `surface`.**
+  Sobre `surfaceStrong` baja a 4.3:1, y ahí el texto va en `ink`.
+- **El color nunca es la única señal.** Todo estado lleva texto o ícono.
+- **La superficie invertida, y solo ella, marca la decisión**: la respuesta
+  en Inicio con un comercio elegido, Con qué pagar, la primera respuesta del
+  onboarding y Gasto en grupo. En ningún otro lado.
+- **Sin negro ni blanco puros**, sin degradés, sin brillos, sin
+  glassmorphism propio. El único vidrio es el del sistema (tab bar, hojas).
+- **Apariencia**: `userInterfaceStyle: "automatic"`. El tema se resuelve una
+  vez (`useColorScheme`) y la `StatusBar` acompaña. En código los colores
+  van siempre por rol, nunca como hex.
+- Verificar los contrastes en los dos temas (`theme.test.ts`).
 
 ## 3. Tipografía
 
-- **Familia única: Hanken Grotesk** (títulos, cuerpo, etiquetas). Pesos 400,
-  500, 600 y 700; la jerarquía sale del peso y el color, no del tamaño.
-- **Montos siempre con cifras tabulares** (`tabular-nums`), para que no
-  "bailen" al tipear ni desalineen columnas.
+- **Hanken Grotesk** en pesos 400, 500, 600 y 700. La jerarquía sale del
+  peso y del color.
+- **Pendiente de decidir** (`direccion-visual-v6.md`): `impeccable/ios`
+  recomienda la fuente del sistema para el cuerpo, y la de marca solo para
+  títulos y cifras. Hasta que se decida, sigue Hanken en todo.
+- **Montos con cifras tabulares** (`tabular-nums`).
 
 | Nivel | Tamaño / interlineado | Peso | Uso |
 |---|---|---|---|
-| display | 40/44 px, tracking −0.02em | 700 | Monto en Nueva Compra, monto de la decisión |
-| title-lg | 28/32 px, −0.01em | 700 | Título de pantalla |
-| title-md | 20/26 px | 600 | Nombre del medio recomendado, títulos de tarjeta |
-| body-lg | 17/24 px | 400–500 | Texto principal, filas de lista |
-| body-md | 15/22 px | 400 | Descripciones, razones |
-| label | 13/18 px | 500–600 | Etiquetas, metadatos, base del estimado |
-| caption | 12/16 px | 500 | Mínimo absoluto. Badges. |
+| display | 40/44, tracking −0.02em | 700 | La cifra de la decisión («Te devuelven ≈$4.900»). Única por pantalla |
+| title-lg | 28/32, −0.01em | 700 | Título de pantalla (large title) |
+| title-md | 20/26 | 600 | Medio recomendado, títulos de sección |
+| body-lg | 17/24 | 400–500 | Texto principal, filas |
+| body-md | 15/22 | 400 | Razones, descripciones |
+| label | 13/18 | 500–600 | Bases del estimado, metadatos |
+| caption | 12/16 | 500 | Mínimo absoluto. Badges |
 
-- **Mínimo 12 px.** Nada informativo por debajo.
-- **Sentence case** en títulos, secciones y botones. Mayúsculas solo en
-  badges de una o dos palabras, con tracking +0.04em. No usar rótulos en
-  mayúsculas ("TOPES Y DISPONIBILIDAD") como encabezado de cada bloque.
-- Prohibidas: Inter, Roboto, serifas.
+- **Mínimo 12 pt**, con Dynamic Type: los tamaños escalan con la letra del sistema.
+- **Sentence case** siempre. Sin rótulos en mayúsculas encima de los títulos.
 
 ## 4. Forma, espacio y elevación
 
-- **Grilla de 4 pt.** Márgenes laterales 20 pt. Separación entre secciones
-  24–32 pt; dentro de una tarjeta 12–16 pt.
-- **Radios:** tarjetas 20 pt, filas y campos 14 pt, chips y botones 999 (píldora),
-  badges 8 pt. Radio interior = radio exterior − padding.
-- **Elevación casi nula.** Las tarjetas se separan por color de superficie
-  (Lino sobre Hueso), no por sombra. Única sombra permitida: elementos
-  flotantes (tab bar, sheet) con `0 8px 24px rgba(20,40,29,0.08)`.
-- **Áreas táctiles ≥ 44×44 pt**, aunque el visual sea más chico.
+- **Grilla de 4 pt.** Márgenes laterales de 20 pt. Entre secciones, 24 a
+  32 pt. Dentro de un grupo, 12 a 16 pt.
+- **Radios**:
+  - tarjetas y listas agrupadas: **16 pt**;
+  - filas y campos: 12 pt;
+  - hojas: el radio del sistema;
+  - píldoras (999) solo en botones, chips y círculos de comercio.
+- **Elevación por tono, no por sombra.** En el claro, las superficies se
+  separan por color. En el oscuro, **lo elevado es más claro**
+  (`canvas` → `surface` → `surfaceStrong`). Se declara una sola cosa: borde
+  o sombra, nunca las dos.
+- **Nunca una tarjeta dentro de otra.** El hero de Inicio es un fondo
+  (`surface` de borde a borde), no una tarjeta.
+- **Áreas táctiles de 44×44 pt o más.**
 
 ## 5. Componentes
 
-**Tarjeta de decisión** (la pieza central del producto)
-Fondo Verde Bosque, texto Blanco Hueso, detalles Champán. Contiene, en este
-orden: etiqueta "Te conviene", nombre del medio (title-md), la cifra
-"Te devuelven ≈$4.900" (display) y **una línea de razón** ("20% en
-supermercados los miércoles · te quedan ≈$6.500 de tope"). Debajo, la base
-del estimado en label. Una por pantalla, nunca más.
+**Navegación**: tab bar **nativa** (`NativeTabs` de Expo Router; si en el
+SDK 58 sigue *unstable*, la tab bar JS actual, sin dibujar una propia).
+- Tres secciones, en este orden: **Compras · Inicio · Topes**. Inicio queda
+  al centro y es la inicial.
+- El foco es el `tint` del acento.
+- En iOS 26 la barra es la píldora flotante de vidrio del sistema, y en
+  Android la barra Material 3.
+- Perfil no es una pestaña: se abre desde el avatar de Inicio. Grupo
+  tampoco: se entra desde el detalle del comercio.
+- El contenido reserva el alto de la barra más la zona segura.
 
-**Indicador de tope** (RF-07 — obligatorio en cualquier pantalla con topes)
-- Cifra siempre con **≈** y su base en la línea de abajo:
-  "≈$6.500 de tope disponible" / "según 3 compras de octubre".
-- Sin compras registradas: no mostrar cifra. Texto: "Sin compras
-  registradas este mes: todavía no podemos estimar cuánto te queda."
-- La barra de progreso termina en un **tramo rayado** (no sólido) para marcar
-  que el valor es estimado. Nunca porcentajes sueltos ("74% libre").
-- Estados: disponible (Salvia), casi agotado ≤30% del tope (Ocre + texto
-  "Queda poco"), agotado (Óxido + texto "Tope agotado"). El estado lo decide
-  el servidor.
-- **Nunca un total agregado de topes** ("Te quedan ≈$8.800", "Tope total
-  del mes"): los topes son por medio y por promo, y no se pueden sumar
-  (auditoría v5 P1 #4). Como resumen sirve "2 medios con tope disponible".
-- La cuenta regresiva dice a qué periodo aplica: "Los mensuales se
-  reinician en 18 días"; los semanales, en su fila ("se reinicia el lunes").
+**Hero de Inicio** (fondo `surface`, de borde a borde):
+1. «Hola, Martín» (title-lg) y «Hoy es miércoles 11 de noviembre» en
+   `inkSecondary`, con el avatar de 44 pt a la derecha.
+2. «¿Dónde vas a comprar?» en title-md y la **fila de comercios**.
+3. Al elegir un comercio, la tarjeta de decisión aparece debajo de la fila.
 
-**Botón primario**
-Píldora Salvia `#4A6B53`, texto Blanco Hueso 17 px/600, alto mínimo 56 pt
-(crece con el texto grande), ancho completo, **una sola línea** ("Usar
-Galicia", no "Usar Galicia Visa crédito" con un chip adentro). **Uno solo
-por pantalla**, en un pie fijo que reserva su alto al final del contenido:
-nada queda tapado. Al tocar: escala 0.98 y vuelve. Texto con verbo y resultado
-("Confirmar compra", "Ver con qué pagar"). Nunca "Pagar": Vuelto no procesa
-pagos.
+**Fila de comercios** (acciones rápidas):
+- Círculos de 56 pt en `surfaceStrong`, con la inicial del comercio en
+  `ink` y el nombre debajo, en label.
+- Al final, «Buscar» con lupa.
+- El elegido va con fondo del acento y la letra en `onAccent`.
+- Scroll horizontal con un fade al final si no entran.
+- Son los habituales del usuario. Sin habituales, los frecuentes del
+  catálogo.
 
-**Botón secundario**: texto Salvia sin relleno, o píldora con borde
-`#6A7A70`. Nunca dos botones rellenos juntos.
+**Tarjeta de decisión** (la superficie invertida). Una por pantalla, nunca más:
+- fondo `decisionBg`;
+- «Te conviene» en label `onDecisionMuted`;
+- el medio en title-md, con su inicial en un círculo `onDecisionAccent`;
+- «Te devuelven ≈$4.900» en display;
+- **una línea de razón** («20% en supermercados los miércoles · te quedan
+  ≈$6.500 de tope») y la base en label;
+- el campo de monto opcional;
+- **«Usar Galicia»** de ancho completo, en `onDecisionAccent`;
+- el link «Ver detalle y otras opciones ›».
 
-**Fila de medio de pago / opción**
-Fondo Lino, radio 14 pt, alto ≥ 64 pt. Ícono en círculo de `#E8E4D8`,
-nombre en body-lg/600, detalle en label Musgo, control a la derecha.
-Seleccionada: fondo `#E8E4D8` + borde 2 pt Salvia + radio relleno.
-No seleccionada: radio con borde `#6A7A70` (nunca `#DDD8CB`).
+**Tarjeta por confirmar**:
+- fondo `surface`, con borde de 1.5 pt del acento;
+- «Coto · $24.500» en body-lg/600 y «Pagá con Galicia Visa crédito · hace
+  2 min» en `inkSecondary`;
+- la línea «No cuenta para tus topes hasta que la confirmes»;
+- acciones: «Ya pagué» (primario, ancho completo), «Escanear ticket»
+  (secundario con borde) y «Descartar» (texto).
 
-**Chips** (comercio, rubro, montos rápidos)
-Píldora `#E8E4D8`, texto Verde Bosque 15 px/500, alto ≥ 40 pt visual / 44 táctil.
-Activo: fondo Verde Bosque, texto Blanco Hueso, check.
+**Indicador de tope** (RF-07, obligatorio en cualquier pantalla con topes):
+- cifra con **≈** y su base debajo: «≈$6.500 de tope disponible» / «según
+  3 compras de noviembre»;
+- sin compras, no hay cifra: «Sin compras registradas este mes: todavía no
+  podemos estimar cuánto te queda.»;
+- **barra** horizontal que termina en un **tramo rayado** (estimado). Sin
+  anillos y sin porcentajes sueltos;
+- estados: disponible (acento), queda poco, 30 % o menos (`warning` + «Queda
+  poco»), agotado (`error` + «Tope agotado»);
+- **nunca un total sumado de topes**;
+- la cuenta regresiva va como chip: «Los mensuales se reinician en 20 días».
 
-**Badges**: solo cuando cambian una decisión ("Mejor opción", "Hoy no
-aplica", "Tope agotado"). Máximo uno por fila. Nada de badges decorativos
-("Activo", "Cálculo dinámico", "1-Tap rápido", "Sincronizado").
+**Listas agrupadas** (últimas compras, historial, medios, Perfil):
+- una tarjeta `surface` de 16 pt con filas de 56 a 64 pt y divisores
+  `divider`, insetados desde el texto;
+- cada fila: ícono de rubro o inicial en un círculo `surfaceStrong`, título
+  en body-lg, detalle en label `inkSecondary` y el valor o control a la
+  derecha;
+- **no** se usan pilas de tarjetas sueltas.
 
-**Elementos de personalidad** (sí van, y son los que distinguen a Vuelto):
-- *Íconos por rubro* en círculo Gris Cálido `#E8E4D8` con ícono Verde
-  Bosque, siempre el mismo ícono para el mismo rubro. Sin tintes de color
-  por rubro.
-- *Iniciales de comercio y banco* en círculo **neutro**: fondo `#E8E4D8`,
-  letra Verde Bosque. El medio recomendado o seleccionado va en Salvia con
-  letra Blanco Hueso; sobre la tarjeta oscura, círculo Champán con letra
-  Verde Bosque. **Nunca colores de marca de bancos o comercios** (rojo,
-  naranja, azul…): la identidad la da la letra, no el color. Nunca logos
-  reales.
-- *El color comunica, no decora*: Salvia = recomendado/activo, Ocre =
-  queda poco, Óxido = agotado/error, Champán = detalle sobre oscuro. Nada
-  más lleva color.
-- *Píldora de ahorro*: "≈$4.900" junto al título o en la tarjeta, en
-  Salvia clara con texto Verde Bosque. Nunca dentro del botón primario.
-- *Cuenta regresiva*: "Se reinician en 17 días" como chip junto a los topes.
-- *Ticket dibujado*: miniatura ilustrada (líneas) del ticket escaneado.
-- *Consejo del día* (opcional, uno por pantalla): una frase que ayuda a
-  decidir con datos del usuario ("Si vas al súper, esperá al miércoles:
-  con Galicia te quedan ≈$6.500 de tope"). Nunca una promo genérica.
+**Botón primario**: píldora del `accent`, texto `onAccent` de 17 pt/600, alto
+mínimo de 56 pt, ancho completo y **una sola línea** («Usar Galicia»).
+**Uno solo por pantalla**, en un pie fijo que reserva su alto. Texto con
+verbo y resultado. Nunca «Pagar».
 
-**Campos editables** (ticket): etiqueta arriba en label Musgo, valor en
-body-lg, ícono de lápiz a la derecha. Error debajo en Óxido con qué pasó y
-cómo seguir.
+**Botón secundario**: texto del acento sin relleno, o píldora con borde
+`controlBorder`. Nunca dos botones rellenos juntos.
 
-**Bottom sheet**: fondo Blanco Hueso, radio superior 28 pt, manija
-36×5 pt `#DDD8CB`, cerrar con "X" de 44 pt. Cuando hay sheet abierto, la
-tab bar no se ve.
+**Fila de opción** (medio de pago en Revisá): alto de 64 pt o más, radio a la
+derecha.
+- Seleccionada: fondo `surfaceStrong` y borde de 2 pt del acento.
+- Sin seleccionar: radio con borde `controlBorder`.
+- La sugerencia («El que elegiste al simular») es una etiqueta y **no**
+  selecciona.
 
-**Tab bar** (idéntica en todas las pantallas)
-Cuatro ítems, en este orden y con estos nombres: **Inicio · Comprar ·
-Topes · Perfil**. Fondo Blanco Hueso con la sombra flotante, ítem activo en
-Verde Bosque con ícono relleno, inactivos en Musgo. Sin botón central
-elevado. "Grupo" no es una pestaña: se entra desde Comprar ("¿Pagan entre
-varios?"). El contenido scrollea por **encima** de la tab bar: padding
-inferior = alto de la tab bar + safe area. Nada queda tapado.
+**Chips**: píldora `surfaceStrong`, texto `ink` de 15 pt/500, 40 pt visibles
+y 44 táctiles. Activo: fondo del acento, texto `onAccent` y check. Si se
+puede desmarcar, lleva una × de 44 pt táctiles.
 
-**Íconos**: SF Symbols en iOS y Material en Android, detrás de un único
-componente `<Icon>` con nombres semánticos (auditoría v5 P1 #6). 24 pt. Todo
-botón de solo ícono lleva etiqueta accesible. Las pantallas hijas usan el
-header nativo del stack: back y swipe del sistema.
+**Control segmentado**: el nativo (`@react-native-segmented-control`), con el
+`tint` del acento. Para los filtros de Compras y Mensual/Semanal en Topes.
 
-**Inicio**: sin campana de notificaciones hasta que exista la feature. Al
-tocar un comercio, la respuesta aparece en la misma pantalla; el monto es
-opcional y solo refina el estimado (auditoría v5 P1 #1).
+**Badges**: solo si cambian una decisión («Hoy no aplica», «Tope agotado»,
+«Sin subir»). Máximo uno por fila. Nada decorativo.
 
-**Estados vacíos**: qué es + por qué está vacío + cómo empezar, con un
-botón. Ej. Inicio sin compras: "Todavía no registraste compras. Cuando
-registres la primera, vas a ver cuánto tope te queda." → "Registrar compra".
+**Iniciales de comercio y banco**: en un círculo `surfaceStrong` con la
+letra en `ink`. El medio recomendado o seleccionado va en el acento. **Nunca
+colores de marca ni logos.**
 
-**Carga**: esqueletos con la forma del contenido. Sin spinners circulares.
+**Píldora de ahorro**: «≈$4.900» en `successBg`. Nunca dentro del botón.
 
-**Error**: inline, en Óxido, con salida. Ej. ticket ilegible: "No pudimos
-leer el ticket. Probá con más luz o cargá el monto a mano."
+**Campos editables**: etiqueta arriba en label `inkSecondary`, valor en
+body-lg sobre `surfaceStrong` y lápiz a la derecha. El error va debajo, en
+`error`, con qué pasó y cómo seguir.
+
+**Hojas**: las del sistema (page sheet / form sheet), con manija y cerrar de
+44 pt. Con una hoja abierta no se ve la tab bar.
+
+**Íconos**: SF Symbols en iOS y Material en Android, detrás de `<Icon>`, de
+24 pt. Todo botón de solo ícono lleva etiqueta accesible.
+
+**Estados vacíos**: qué es, por qué está vacío y cómo empezar. Ejemplo de
+Inicio sin compras: «Todavía no confirmaste compras. Cuando confirmes la
+primera, vas a ver cuánto tope te queda.», sin botón a otra pestaña.
+
+**Carga**: esqueletos con la forma del contenido. **Error**: inline, en
+`error` y con una salida.
 
 ## 6. Layout
 
-- Una columna, alineada a la izquierda. Sin grillas de 3 columnas iguales.
-  Grilla de 2 columnas permitida solo para resúmenes de topes cortos.
-- Orden de lectura fijo en pantallas de decisión: **pregunta → respuesta →
-  razón → alternativas → acción**.
-- Las alternativas descartadas son visibles sin scroll largo, como lista
-  compacta con su motivo ("Provincia Visa débito · hoy no aplica, la promo es
-  los sábados").
-- Título de pantalla a la izquierda, acción secundaria (cerrar, info) a la
-  derecha. Flecha de volver a la izquierda en pantallas hijas.
-- Ningún elemento flotante tapa a otro. Máximo una capa flotante además de la
-  tab bar.
+- Una columna, alineada a la izquierda. Grilla de dos columnas solo para
+  resúmenes cortos, y una sola columna con `fontScale > 1.2`.
+- Las pantallas de nivel superior llevan large title nativo (colapsa al
+  scrollear). Las hijas, título inline y back del sistema.
+- **Inicio**:
+  - **hero** (`surface`): saludo, avatar, pregunta, fila de comercios y decisión;
+  - en `canvas`: por confirmar, «Tus topes» y últimas compras.
+- **Compras**:
+  - large title y por confirmar;
+  - «Escanear ticket» y «Cargar a mano» (filas de acción);
+  - el resumen del mes en una línea con su base, el segmentado y el
+    historial agrupado por día.
+- **Topes**: large title, chip de reinicio, «Te devolvieron ≈$15.200 ·
+  según 9 compras» y una fila por medio con su barra.
+- Orden fijo en las pantallas de decisión: **pregunta → respuesta → razón →
+  alternativas → acción**. Las alternativas se ven sin scroll largo.
+- Ningún elemento flotante tapa a otro.
 
 ## 7. Movimiento e interacción
 
-- Respuesta al toque inmediata (escala 0.98, 100 ms). Háptico leve al
-  confirmar una compra y al elegir un medio.
-- Transiciones de pantalla nativas; sheets con resorte (rigidez 300,
-  amortiguación 30). Sin rebote exagerado.
-- La cifra recomendada se actualiza en vivo al tipear el monto, con un
-  cruce de opacidad corto (150 ms), sin contadores animados.
-- **Nada se mueve solo**: sin pulsos, brillos, shimmer decorativo ni loops.
-  Respetar "reducir movimiento" del sistema.
-- Animar solo `transform` y `opacity`.
+- Respuesta al toque inmediata (escala 0.98, 100 ms). Háptico leve al elegir
+  un comercio, al crear una compra por confirmar y al confirmar una compra.
+- Transiciones y hojas del sistema.
+- La tarjeta de decisión entra con opacidad y un desplazamiento de 8 pt
+  (220 ms, ease-out). La cifra se actualiza en vivo al tipear el monto, con
+  un fundido de 150 ms.
+- **Nada se mueve solo.** Respetar «reducir movimiento». Cambiar de tema
+  sigue al sistema, sin animación propia.
 
 ## 8. Voz y textos
 
-Rioplatense, de vos, directo. Frases cortas; la cifra antes que la
+Rioplatense, de vos, directo. Frases cortas, y la cifra antes que la
 explicación. Sin jerga técnica ni financiera.
 
-Glosario fijo:
 | Usar | No usar |
 |---|---|
 | **tope** | cupo, cupo remanente, capacidad de ahorro, disponibilidad |
@@ -248,106 +282,84 @@ Glosario fijo:
 | **te sale ≈$X** | pago neto final |
 | **medio de pago** | tarjeta (cuando incluye billeteras) |
 | **Te conviene** | Decisión del algoritmo, Mejor opción al momento |
+| **por confirmar** (compra simulada, todavía sin pagar) | pendiente (ya significa una compra sin subir) |
+| **Ya pagué** | Confirmar pago, Registrar |
 | **Revisá tu compra** | Confirmar ticket, Escaneo inteligente verificado |
 | **¿Con qué pagaste?** | Elegí el medio utilizado |
 
-- Toda cifra estimada lleva **≈** y su base: reintegro, "te sale", tope
-  disponible, "te devolvieron" y la parte de cada uno en un grupo. No llevan
-  ≈ los montos de compra, los topes nominales ni lo que cargó el usuario.
-  Donde no hay reintegro se dice en texto ("sin promo", "sin reintegro"),
-  nunca "$0" ni "≈$0".
-- "Te devolvieron ≈$X" va en Topes y en Mis compras, no en todas las
-  pantallas.
-- Nunca porcentajes de confianza ("OCR 98%") ni promesas ("verificado",
-  "óptimo garantizado", "+42% de retorno").
-- Sin emojis. Sin clichés ("inteligente", "potenciá", "maximizá").
+- Toda cifra estimada lleva **≈** y su base. No llevan ≈ los montos de
+  compra, los topes nominales ni lo que cargó el usuario. Donde no hay
+  reintegro se dice en texto («sin promo»), nunca «$0».
+- «Te devolvieron ≈$X» va en Topes y en Compras.
+- Nunca porcentajes de confianza ni promesas. Sin emojis ni clichés.
 
 ## 9. Datos de ejemplo (únicos para todas las pantallas)
 
-Mes en curso: **octubre de 2026**; "hoy" es el **miércoles 14/10** (el 15
-es jueves) y los topes mensuales se reinician el 1/11, en 18 días.
-Usuario: **Martín**. Zona: CABA. Todas las promos vienen de MODO. "Te
-devolvieron ≈$15.200" se basa en 10 compras de octubre (9 con reintegro).
+Mes en curso: **noviembre de 2026**. «Hoy» es el **miércoles 11/11**, y los
+topes mensuales se reinician el 1/12, en 20 días. Usuario: **Martín**. Zona:
+CABA. Todas las promos vienen de MODO. «Te devolvieron ≈$15.200» se basa en
+9 compras de noviembre.
 
-Medios declarados:
 | Medio | Promo de ejemplo | Tope | Estado del tope |
 |---|---|---|---|
-| Galicia Visa crédito | 20% en supermercados, miércoles | $10.000 / mes | ≈$6.500 disponible, según 3 compras de octubre |
-| Santander Mastercard crédito | 15% en combustibles, jueves | $8.000 / mes | ≈$2.300 disponible, según 4 compras (queda poco: 29%) |
+| Galicia Visa crédito | 20% en supermercados, miércoles | $10.000 / mes | ≈$6.500 disponible, según 3 compras de noviembre |
+| Santander Mastercard crédito | 15% en combustibles, jueves | $8.000 / mes | ≈$2.300 disponible, según 4 compras (queda poco) |
 | Provincia Visa débito | 25% en gastronomía, sábados | $5.000 / semana | Sin compras registradas esta semana |
 | Macro Visa débito | 15% en farmacias, todos los días | $6.000 / mes | Tope agotado, según 2 compras |
 
+Comercios habituales: Coto, Día, Farmacity, YPF.
+
 Compra de ejemplo: **Coto, miércoles, $24.500**.
-- Te conviene: Galicia Visa crédito → te devuelven ≈$4.900 → te sale ≈$19.600.
-- Después de la compra: ≈$1.600 de tope disponible en Galicia.
+- Te conviene Galicia Visa crédito: te devuelven ≈$4.900 y te sale ≈$19.600.
+- Por confirmar: «Coto · $24.500 · Pagá con Galicia · hace 2 min».
+- El ticket dice «COTO C.I.C.S.A.», $23.870 y no trae el medio de pago.
 - Alternativas: Provincia Visa débito (hoy no aplica, la promo es los
-  sábados); Santander Mastercard (sin promo en supermercados).
+  sábados) y Santander Mastercard (sin promo en supermercados).
 
-> **Nota (2026-11-03):** Coto es un ejemplo de diseño. MODO sí tiene promos reales de Coto, Jumbo,
-> Disco, Vea, Día y La Anónima (`docs/product/alcance-mvp.md`, `docs/product/corpus-semilla.md`), pero
-> las de Coto son los lunes y los martes (25%), no los miércoles. Si el recorrido del pitch usa datos
-> reales, la compra de ejemplo tiene que caer un día con promo vigente; qué ejemplo muestra lo decide el
-> equipo.
+> Coto es un ejemplo de diseño. En MODO, las promos reales de Coto son los
+> lunes y los martes. Si el pitch usa datos reales, la compra tiene que
+> caer un día con promo vigente.
 
-Contactos de Martín (ADR-008, nivel 1): **Lucía** y **Mateo**, vinculados
-por invitación. **Sofía** no tiene cuenta: se declara a mano en cada grupo.
-
-Gasto en grupo: **Cena del sábado, $41.000, 4 personas** (Martín, Lucía,
-Mateo, Sofía).
-- Que pague Mateo con su Provincia Visa débito → les devuelven ≈$5.000,
-  "según las compras que registró Mateo" → cada uno pone ≈$9.000.
-- Lucía: "Sin reintegro en esta compra · Lucía no tiene compras
-  registradas: sin base" (sin nombrar sus medios ni su rubro).
-- Sofía: "Sin cuenta: no conocemos su tope".
-- Martín (vos): "Tu Provincia Visa débito: 25% los sábados, sin base esta
-  semana" (los medios propios sí se muestran). Pierde el desempate contra
-  Mateo porque el estimado de Mateo tiene base.
-- La fila propia dice "Vos", sin inicial (no se confunde con Mateo).
-
-Invitación de ejemplo: la genera Martín; link `vuelto.app/i/…` + QR,
-"Vence en 24 h · sirve una sola vez".
+Contactos de Martín (ADR-008, nivel 1): **Lucía** y **Mateo**. **Sofía** no
+tiene cuenta y se declara a mano en cada grupo. Gasto en grupo: **Cena del
+sábado, $41.000, 4 personas**. Que pague Mateo con su Provincia Visa débito:
+les devuelven ≈$5.000 y cada uno pone ≈$9.000.
 
 ## 9b. Reglas de contactos y grupo (ADR-008)
 
-- De un contacto se muestra: nombre para mostrar, **solo el medio que se
+- De un contacto se muestra el nombre para mostrar, **solo el medio que se
   recomienda usar**, el reintegro estimado de esta compra y la base **en
-  palabras** ("según las compras que registró Ana" / "Ana no tiene compras
-  registradas: sin base"). Nunca su tope, la cantidad de compras, sus
-  compras ni sus otros medios.
-- Integrante sin cuenta: se dice "no conocemos su tope".
-- La pantalla de aceptación dice quién invita, qué se comparte (tabla del
-  ADR) y lo que se puede inferir ("puede deducir cuánto reintegro te queda
-  en una promo a partir de la recomendación"). Dos botones: aceptar y no
-  ahora; ninguno preseleccionado por defecto ni con trampa visual.
+  palabras**. Nunca su tope, la cantidad de compras, sus compras ni sus
+  otros medios.
+- Integrante sin cuenta: «no conocemos su tope».
+- La pantalla de aceptación dice quién invita, qué se comparte y lo que se
+  puede inferir. Tiene dos botones, ninguno preseleccionado.
 - Quitar un contacto pide confirmación y dice que se rompe para los dos.
-- No hay buscador de usuarios en ninguna pantalla.
+- No hay buscador de usuarios.
 
 Medio sin cobertura (solo en onboarding): Mercado Pago, con la nota
-"Todavía no tenemos promos de este medio".
+«Todavía no tenemos promos de este medio».
 
 ## 10. Prohibido
 
 - Mostrar un tope sin ≈ y sin su base, o porcentajes de tope sueltos.
-- Preseleccionar el medio de pago al registrar un ticket. Si el ticket no lo
-  trae, ningún medio marcado y se pregunta "¿Con qué pagaste?".
-- Mostrar el tope, la cantidad de compras, las compras o los medios no
-  recomendados de un contacto (ADR-008 §3).
-- Buscador de usuarios por nombre o email.
-- Estados de cobro ("Pendiente", "Recibe de…") en gasto en grupo: la
-  división se muestra, no se gestiona.
-- Planificación entre varios días ("estrategia semanal") en el MVP.
-- Botones que digan "Pagar".
-- Más de un botón primario por pantalla; dos CTAs flotantes apilados.
-- Contenido o botones tapados por la tab bar.
-- Texto menor a 12 px; texto secundario en `#65786C` u ocre `#B37D28`.
-- Champán sobre fondo claro.
-- Grises fríos, `amber-*`/`orange-*` de Tailwind, negro puro, degradés,
-  brillos, sombras oscuras, glassmorphism.
-- Cualquier color fuera de la tabla de la sección 2: colores de marca de
-  bancos o comercios, azules, rojos, rosas, celestes, fondos pastel.
-- Emojis, Inter, serifas, fechas viejas ("Mayo 2024", "14/10/2024").
-- Campana de notificaciones; total agregado de topes; encabezados en
-  mayúsculas ("TE CONVIENE QUE PAGUE").
-- Medios sin promos en el corpus (Mercado Pago) mostrando topes o reintegros.
-- Badges decorativos y rótulos en mayúsculas encabezando cada bloque.
-- Teclado numérico con letras (ABC, DEF).
+- Anillos de progreso, sparklines, tarjetas de «número grande + etiqueta +
+  estadísticas» y gráficos sin una serie real que mostrar.
+- Preseleccionar el medio de pago al registrar un ticket.
+- Llamar «pendiente» a la compra por confirmar.
+- Mostrar el tope, las compras o los medios no recomendados de un contacto.
+- Buscador de usuarios.
+- Botones que digan «Pagar». Más de un primario por pantalla.
+- Una tab bar o una barra de navegación dibujadas a mano. Una tarjeta dentro
+  de otra. Pilas de tarjetas sueltas para contenido de lista.
+- Contenido o botones tapados por la tab bar o por el pie.
+- Texto menor a 12 pt.
+- Negro o blanco puros, degradés, brillos, glow, neón, glassmorphism propio.
+- Violetas, azules, rosas, colores de marca de bancos o comercios, y
+  cualquier color fuera de la tabla de la sección 2.
+- Un tema que sea la inversión mecánica del otro.
+- Emojis, Inter, serifas, fechas viejas.
+- Campana de notificaciones. Total sumado de topes. Encabezados en
+  mayúsculas.
+- Medios sin promos en el corpus mostrando topes o reintegros.
+- Teclado numérico con letras.
