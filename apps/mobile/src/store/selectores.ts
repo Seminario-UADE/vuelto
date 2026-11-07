@@ -117,6 +117,15 @@ export const selectRecomendacion = createSelector(
   (e, comercio, monto, canal) => (comercio ? recomendacionVista(e, comercio, monto, canal) : null),
 );
 
+/**
+ * La de Inicio: siempre presencial. Inicio no muestra el canal, así que no puede heredar el
+ * «Online» que quedó elegido en la pantalla del comercio.
+ */
+export const selectRecomendacionEnElLocal = createSelector(
+  [selectEntradasMotor, selectComercioSimulado, (s: RootState) => s.simulacion.monto],
+  (e, comercio, monto) => (comercio ? recomendacionVista(e, comercio, monto, "presencial") : null),
+);
+
 export const selectTopes = createSelector([selectEntradasMotor], topesVista);
 
 /**

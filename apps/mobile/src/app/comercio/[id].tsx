@@ -51,7 +51,15 @@ export default function ConQuePagar() {
     if (!r?.medio) return;
     router.push({
       pathname: "/revisa",
-      params: { modo: "excepcion", comercio: r.comercio.nombre, monto: monto ?? "", medio: r.medio.id, canal },
+      params: {
+        modo: "excepcion",
+        comercio: r.comercio.nombre,
+        // El rubro exacto: un comercio en dos rubros no se guarda en el otro.
+        ...(r.comercio.categoriaId !== null ? { categoriaId: String(r.comercio.categoriaId) } : {}),
+        monto: monto ?? "",
+        medio: r.medio.id,
+        canal,
+      },
     });
   };
 

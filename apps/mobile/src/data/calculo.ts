@@ -42,7 +42,7 @@ import type {
   TopeMedio,
 } from "./contracts";
 import type { MedioDePago as MedioGuardado } from "../perfil/modelo";
-import { claveDeComercio, comercioDelCatalogo, esComercioDeRubro } from "./comercios";
+import { claveDeComercio, comercioDelCatalogo, comerciosConNombre, esComercioDeRubro } from "./comercios";
 import { medioDelMotor, medioVista } from "../perfil/vista";
 import { aVista } from "./vista-recomendacion";
 import { mediodia } from "../lib/reloj";
@@ -323,9 +323,9 @@ export function comprasDeTopeVista(
  * inventa). El catálogo es el de `selectCatalogoComercios`: el del corpus sincronizado o, antes,
  * el de ejemplo.
  */
-export function comercioPorNombre(nombre: string, catalogo: readonly Comercio[]): Comercio {
+export function comercioPorNombre(nombre: string, catalogo: readonly Comercio[], categoriaId?: number): Comercio {
   return (
-    comercioDelCatalogo(nombre, catalogo) ?? {
+    comercioDelCatalogo(nombre, catalogo, categoriaId) ?? {
       id: `libre-${claveDeComercio(nombre).replace(/ /g, "-")}`,
       nombre,
       inicial: nombre.charAt(0).toUpperCase(),
@@ -336,12 +336,23 @@ export function comercioPorNombre(nombre: string, catalogo: readonly Comercio[])
   );
 }
 
+/**
+ * El comercio de una compra ya guardada. Manda el rubro con el que se guardó: si el comercio
+ * ya no está en el corpus (sus promos vencieron) o está en otro rubro, la compra conserva el
+ * suyo, con el ícono que le corresponde, en vez de pasar a «otro».
+ */
+function comercioDeCompra(c: CompraMotor, catalogo: readonly Comercio[]): Comercio {
+  if (c.categoriaId === null) return comercioPorNombre(c.comercio, catalogo);
+  const guardado = comerciosConNombre(c.comercio, catalogo).find((x) => x.categoriaId === c.categoriaId);
+  return guardado ?? { ...comercioPorNombre(c.comercio, []), rubro: rubroDeCategoria(c.categoriaId), categoriaId: c.categoriaId };
+}
+
 function compraVista(c: CompraMotor, medios: readonly MedioGuardado[], catalogo: readonly Comercio[]): Compra {
   const guardado = medios.find((m) => m.id === c.medioDePagoId);
   const medio = guardado ? medioVista(guardado) : medioQuitado(c.medioDePagoId);
   return {
     id: c.id,
-    comercio: comercioPorNombre(c.comercio, catalogo),
+    comercio: comercioDeCompra(c, catalogo),
     fecha: c.fecha,
     monto: c.monto,
     medio,
@@ -433,7 +444,7 @@ export function compraParaGuardar(
   if (b.monto === null || b.medioId === null) throw new Error("Falta el monto o el medio de pago");
   if (!entradas.perfil.mediosDePago.some((m) => m.id === b.medioId)) throw new Error(`Medio desconocido: ${b.medioId}`);
   // El mismo catálogo y el mismo canal con los que «Revisá tu compra» propuso la promo (FR-022).
-  const comercio = comercioPorNombre((b.comercio ?? "").trim() || "Compra", catalogo);
+  const comercio = comercioPorNombre((b.comercio ?? "").trim() || "Compra", catalogo, b.categoriaId ?? undefined);
   const propuesta = b.usarPromo ? promoPropuesta(entradas, comercio, b.medioId, b.fecha, b.monto, b.canal) : null;
   const tienePromo = propuesta !== null && propuesta.promociones.length > 0;
   return {

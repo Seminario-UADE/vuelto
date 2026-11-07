@@ -199,6 +199,8 @@ export type BorradorCompra = {
   usarPromo: boolean;
   /** El canal con el que se recomendó (#43); sin él, presencial. */
   canal?: Canal;
+  /** El rubro con el que se recomendó: desambigua un comercio que está en dos rubros (#43). */
+  categoriaId?: number | null;
 };
 
 /** Contacto vinculado: solo lo que ADR-008 §3 deja ver. Sin topes, compras ni medios. */

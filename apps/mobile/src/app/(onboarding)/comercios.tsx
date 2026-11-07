@@ -7,13 +7,12 @@ import { Icon, iconoDeRubro } from "@/components/icon";
 import { ProgressSegments } from "@/components/progress-segments";
 import { Screen } from "@/components/screen";
 import { Text } from "@/components/text";
-import type { Comercio, Rubro } from "@/data/contracts";
-import { RUBROS } from "@/lib/rubros";
+import type { Comercio } from "@/data/contracts";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { comercioRepetido, MENSAJE_COMERCIO_REPETIDO, MENSAJES_ERROR, nombreRepetido } from "@/perfil/modelo";
 import { confirmarComercios } from "@/store/perfil-remoto";
 import { selectCatalogoComercios } from "@/store/selectores";
-import { buscarComercios } from "@/data/comercios";
+import { buscarComercios, nombreDeRubro } from "@/data/comercios";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 
 
@@ -36,10 +35,14 @@ export default function Comercios() {
 
   const grupos = useMemo(() => {
     const lista = q.trim() ? buscarComercios(catalogo, q, Infinity) : catalogo;
-    const por = new Map<Rubro, Comercio[]>();
-    for (const c of lista) por.set(c.rubro, [...(por.get(c.rubro) ?? []), c]);
+    // Por categoría de MODO, no por rubro de la app: varias categorías son «otro» y no deben
+    // juntarse bajo un solo encabezado.
+    const por = new Map<number, Comercio[]>();
+    for (const c of lista) por.set(c.categoriaId ?? 99, [...(por.get(c.categoriaId ?? 99) ?? []), c]);
     // Con el corpus real son cientos: sin búsqueda, unos pocos por rubro; el resto, buscando.
-    return [...por.entries()].map(([rubro, xs]) => [rubro, q.trim() ? xs : xs.slice(0, POR_RUBRO)] as const);
+    return [...por.entries()]
+      .sort(([a], [b]) => a - b)
+      .map(([categoria, xs]) => ({ categoria, muestra: xs[0]!, lista: q.trim() ? xs : xs.slice(0, POR_RUBRO) }));
   }, [catalogo, q]);
 
   const seguir = async (guardar: boolean) => {
@@ -125,17 +128,17 @@ export default function Comercios() {
             style={{ flex: 1, minHeight: 44, fontFamily: fonts.regular, fontSize: escala.bodyLg.fontSize, color: colors.ink }}
           />
         </View>
-        {grupos.length === 0 ? (
+        {q.trim() && grupos.length === 0 ? (
           <Text variant="bodyMd" tone="inkSecondary">
             No encontramos “{q}”. Probá con otro nombre.
           </Text>
         ) : null}
-        {grupos.map(([rubro, lista]) => (
-          <View key={rubro} style={{ gap: space.md }}>
+        {grupos.map(({ categoria, muestra, lista }) => (
+          <View key={categoria} style={{ gap: space.md }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
-              <Icon name={iconoDeRubro[rubro]} size={18} color={colors.inkSecondary} />
+              <Icon name={iconoDeRubro[muestra.rubro]} size={18} color={colors.inkSecondary} />
               <Text variant="bodyMd" weight="semibold" tone="inkSecondary">
-                {RUBROS[rubro].titulo}
+                {nombreDeRubro(muestra)}
               </Text>
             </View>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>

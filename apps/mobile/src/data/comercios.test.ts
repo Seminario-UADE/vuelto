@@ -9,12 +9,13 @@ import {
   selectCatalogoParaCompras,
   selectEntradasMotor,
   selectComercioSimulado,
+  selectRecomendacionEnElLocal,
   selectComerciosFrecuentes,
   selectHoy,
   selectRecomendacion,
 } from "../store/selectores";
 import { canalCambiado, comercioElegido } from "../store/simulacion";
-import { comercioPorNombre, compraParaGuardar, pedidoDeCompra } from "./calculo";
+import { comercioPorNombre, compraParaGuardar, comprasVista, pedidoDeCompra } from "./calculo";
 import {
   buscarComercios,
   comercioDeRubro,
@@ -215,6 +216,56 @@ describe("parte B de #43: rubro sin comercio y canal (spec 004 FR-001)", () => {
     const online = selectRecomendacion(s.getState());
     expect(enElLocal?.resultado).toBe("recomendado");
     expect(online?.resultado).toBe("sin-promo");
+  });
+});
+
+describe("auditoría del PR #107", () => {
+  it("Inicio sigue en presencial aunque la pantalla del comercio haya dejado «Online»", () => {
+    const s = conCorpus([promo("local", { comercio: null, categoriaId: 1, canal: "presencial" })]);
+    s.dispatch(mediosConfirmados(mediosDeEjemplo(mediosDeclarados.map((m) => m.id))));
+    s.dispatch(comercioElegido("rubro-1"));
+    s.dispatch(canalCambiado("online"));
+    expect(selectRecomendacion(s.getState())?.resultado).toBe("sin-promo");
+    expect(selectRecomendacionEnElLocal(s.getState())?.resultado).toBe("recomendado");
+  });
+
+  it("un comercio en dos rubros se guarda en el que se eligió, no en el primero", () => {
+    const s = conCorpus([
+      promo("a", { comercio: "Carrefour", categoriaId: 1 }),
+      promo("b", { comercio: "Carrefour", categoriaId: 10 }),
+    ]);
+    s.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
+    const estado = s.getState();
+    const borrador = {
+      modo: "excepcion" as const,
+      comercio: "Carrefour",
+      fecha: HOY,
+      monto: 1000,
+      medioId: estado.perfil.medios[0]!.id,
+      textoExtraido: null,
+      usarPromo: true,
+    };
+    const catalogo = selectCatalogoParaCompras(estado);
+    const guardar = (categoriaId?: number) =>
+      compraParaGuardar(selectEntradasMotor(estado), { ...borrador, categoriaId }, "n1", catalogo);
+    expect(guardar(10).categoriaId).toBe(10);
+    expect(guardar(1).categoriaId).toBe(1);
+    // Sin rubro (un nombre escrito a mano) sigue yendo al primero.
+    expect(guardar().categoriaId).toBe(1);
+  });
+
+  it("una compra conserva su rubro e ícono cuando el comercio ya no está en el corpus", () => {
+    const s = conCorpus([promo("a", { comercio: "DIA", categoriaId: 1 })]);
+    s.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
+    const estado = s.getState();
+    const compra = compraParaGuardar(
+      selectEntradasMotor(estado),
+      { modo: "manual", comercio: "DIA", fecha: HOY, monto: 1000, medioId: estado.perfil.medios[0]!.id, textoExtraido: null, usarPromo: false },
+      "n1",
+      selectCatalogoParaCompras(estado),
+    );
+    const sinCorpus = comprasVista([compra], new Date("2026-11-04T15:00:00.000Z"), estado.perfil.medios, []);
+    expect(sinCorpus.compras[0]?.comercio).toMatchObject({ rubro: "supermercado", categoriaId: 1 });
   });
 });
 

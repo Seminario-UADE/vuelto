@@ -42,11 +42,17 @@ export default function Revisa() {
     fecha?: string;
     texto?: string;
     canal?: string;
+    categoriaId?: string;
   }>();
   // El canal con el que se recomendó (#43): la promo propuesta y la guardada son las mismas.
   const canal: Canal = p.canal === "online" ? "online" : "presencial";
   const modo: OrigenCompra = p.modo === "ticket" || p.modo === "excepcion" ? p.modo : "manual";
   const [comercio, setComercio] = useState(p.comercio ?? "");
+  // El rubro con el que se recomendó vale mientras el comercio siga siendo ese: si lo cambia a
+  // mano, se busca por nombre como siempre.
+  const categoriaElegida = Number(p.categoriaId);
+  const categoriaId =
+    Number.isInteger(categoriaElegida) && comercio.trim() === (p.comercio ?? "").trim() ? categoriaElegida : undefined;
   const [monto, setMonto] = useState<number | null>(parseMonto(p.monto ?? ""));
   // Excepción: el usuario eligió el medio al tocar "Usar…". Ticket: solo si el ticket lo dice.
   // Manual: nunca preseleccionado.
@@ -63,18 +69,18 @@ export default function Revisa() {
   const fecha = p.fecha || hoy;
 
   const perfil = useAppSelector(selectPerfilVista);
-  const comercioConocido = comercio.trim() ? comercioDelCatalogo(comercio, perfil.comercios) : undefined;
+  const comercioConocido = comercio.trim() ? comercioDelCatalogo(comercio, perfil.comercios, categoriaId) : undefined;
   // Comercios y rubros: «Usar…» desde un rubro llega con su nombre («Supermercados»).
   const catalogo = useAppSelector(selectCatalogoParaCompras);
-  const conocido = comercioConocido ?? (comercio.trim() ? comercioDelCatalogo(comercio, catalogo) : undefined);
+  const conocido = comercioConocido ?? (comercio.trim() ? comercioDelCatalogo(comercio, catalogo, categoriaId) : undefined);
   // Qué dice el motor de cada medio para este comercio (solo para orientar; no preselecciona).
   const rec = useRecomendacionPara(conocido?.id ?? null, monto, canal);
   // La promo que se propone y se guarda es la misma función, evaluada en la fecha de la compra
   // (FR-022): no la del día de hoy, que con un ticket de otro día mostraría otra cosa.
   const entradas = useAppSelector(selectEntradasMotor);
   const propuesta = useMemo(
-    () => (medioId && comercio.trim() ? promoPropuesta(entradas, comercioPorNombre(comercio.trim(), catalogo), medioId, fecha, monto, canal) : null),
-    [entradas, catalogo, medioId, comercio, fecha, monto, canal],
+    () => (medioId && comercio.trim() ? promoPropuesta(entradas, comercioPorNombre(comercio.trim(), catalogo, categoriaId), medioId, fecha, monto, canal) : null),
+    [entradas, catalogo, medioId, comercio, categoriaId, fecha, monto, canal],
   );
   const hayPromo = propuesta !== null && propuesta.promociones.length > 0;
 
@@ -112,6 +118,7 @@ export default function Revisa() {
           textoExtraido: modo === "ticket" ? (p.texto ?? null) : null,
           usarPromo: !quitoLaPromo,
           canal,
+          categoriaId: categoriaId ?? null,
         }, intento),
       );
       hapticoExito();

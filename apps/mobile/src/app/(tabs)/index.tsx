@@ -22,7 +22,7 @@ import {
   selectComercioSimulado,
   selectFrescura,
   selectHoy,
-  selectRecomendacion,
+  selectRecomendacionEnElLocal,
   selectResumenCompras,
   selectTopes,
 } from "@/store/selectores";
@@ -38,7 +38,7 @@ export default function Inicio() {
   const comercio = useAppSelector(selectComercioSimulado);
   const monto = useAppSelector((s) => s.simulacion.monto);
   // Derivada con el motor en el dispositivo: cambia con cada tecla del monto, sin red (ADR-010).
-  const r = useAppSelector(selectRecomendacion);
+  const r = useAppSelector(selectRecomendacionEnElLocal);
   const nombre = useAppSelector((s) => s.perfil.nombre);
   const hoy = useAppSelector(selectHoy);
   const topes = useAppSelector(selectTopes);

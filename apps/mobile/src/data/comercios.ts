@@ -88,11 +88,17 @@ export function comerciosConNombre(nombre: string, catalogo: readonly Comercio[]
 }
 
 /**
- * El del catálogo con ese nombre, o `undefined`. Si está en dos rubros, el primero (por
- * categoría): solo para cuando no hay cómo preguntar cuál (un nombre escrito en un ticket).
+ * El del catálogo con ese nombre, o `undefined`. Si está en dos rubros, el de `categoriaId` (el
+ * que eligió el usuario) o, sin él, el primero por categoría: solo para cuando no hay cómo
+ * preguntar cuál (un nombre escrito en un ticket).
  */
-export function comercioDelCatalogo(nombre: string, catalogo: readonly Comercio[]): Comercio | undefined {
-  return comerciosConNombre(nombre, catalogo)[0];
+export function comercioDelCatalogo(
+  nombre: string,
+  catalogo: readonly Comercio[],
+  categoriaId?: number,
+): Comercio | undefined {
+  const mismos = comerciosConNombre(nombre, catalogo);
+  return (categoriaId === undefined ? undefined : mismos.find((c) => c.categoriaId === categoriaId)) ?? mismos[0];
 }
 
 const PREFIJO_RUBRO = "rubro-";
