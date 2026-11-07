@@ -1,5 +1,7 @@
 # Prompts de Stitch: flujo directo (spec 012) con el diseño v6
 
+> **En pausa (07/11/2026):** el equipo decidió implementar el diseño v6 directo en la app, sin mocks (#113 cerrada). Estos prompts quedan como referencia del layout de cada pantalla y su lista de control sirve para revisar las capturas de la app.
+
 > Para generar en Stitch las pantallas del flujo directo
 > (`specs/012-flujo-directo/`) con la dirección visual v6: esmeralda, en
 > claro y en oscuro (`docs/design/DESIGN.md`, `direccion-visual-v6.md`).
