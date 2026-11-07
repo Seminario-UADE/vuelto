@@ -8,9 +8,10 @@
 > `expo-native-ui`).
 > App mobile (iOS/Android, Expo), viewport de referencia 390×844 pt.
 >
-> **Estado de implementación**: la app implementa la v5 hasta que se cierre
-> la issue de temas. Los comentarios del código que citan secciones de este
-> archivo se actualizan con esa issue.
+> **Estado de implementación**: la app implementa la paleta, los dos temas y
+> los radios de la v6 (issue #115). La fila de comercios y la lista agrupada
+> existen como componentes base (`fila-comercios.tsx`, `lista-agrupada.tsx`)
+> y se conectan a Inicio con la spec 012.
 
 ## 1. Tema visual y atmósfera
 

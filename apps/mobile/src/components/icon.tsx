@@ -1,6 +1,7 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { SymbolView } from "expo-symbols";
 import type { ComponentProps } from "react";
+import type { ColorValue } from "react-native";
 import type { SFSymbol } from "sf-symbols-typescript";
 import type { Rubro } from "@/data/contracts";
 import { colors, size as tamanos } from "@/theme";
@@ -70,7 +71,7 @@ export const iconoDeRubro: Record<Rubro, IconName> = {
 type Props = {
   name: IconName;
   size?: number;
-  color?: string;
+  color?: ColorValue;
   /** Variante rellena (ítem activo de la tab bar). */
   activo?: boolean;
   /** Etiqueta para lectores de pantalla. Sin etiqueta, el ícono es decorativo. */
@@ -86,5 +87,5 @@ export function Icon({ name, size = tamanos.icon, color = colors.ink, activo, la
     const sf = activo && "sfActivo" in def ? def.sfActivo : def.sf;
     return <SymbolView name={sf} size={size} tintColor={color} weight="regular" {...a11y} />;
   }
-  return <MaterialIcons name={def.md} size={size} color={color} {...a11y} />;
+  return <MaterialIcons name={def.md} size={size} color={color as ComponentProps<typeof MaterialIcons>["color"]} {...a11y} />;
 }

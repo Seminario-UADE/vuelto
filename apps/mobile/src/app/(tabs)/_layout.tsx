@@ -24,7 +24,7 @@ const tab = (title: string, icon: IconName) => ({
 
 /**
  * Inicio · Comprar · Topes · Perfil (DESIGN.md §5). Tabs JS con el estilo de DESIGN.md:
- * fondo Blanco Hueso con sombra flotante, activo en Verde Bosque (research R2).
+ * fondo `canvas` con sombra flotante, activo en `ink` (research R2). La tab bar nativa va en #103.
  */
 export default function TabsLayout() {
   const usuario = useAppSelector((s) => s.sesion.usuario);

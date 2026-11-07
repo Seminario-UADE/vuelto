@@ -9,7 +9,7 @@ import { Text } from "./text";
 type Props = {
   /** "Te conviene" + quién/qué, en una sola línea de encabezado (sin rótulo aparte). */
   titulo: string;
-  /** Inicial del medio o de quien paga (círculo Champán). */
+  /** Inicial del medio o de quien paga (círculo `onDecisionAccent`). */
   inicial?: string | null;
   /** Una línea de razón ("20% en supermercados los miércoles"). */
   razon?: string | null;
@@ -28,8 +28,8 @@ type Props = {
 };
 
 /**
- * La tarjeta de decisión: la única superficie oscura de la app y solo donde hay una
- * decisión (auditoría P1 #2). Orden fijo: respuesta → razón → cifra → tope → base.
+ * La tarjeta de decisión: la única superficie invertida de la app (bosque en claro, crema en
+ * oscuro; DESIGN.md §5) y solo donde hay una decisión (auditoría P1 #2). Orden fijo: respuesta → razón → cifra → tope → base.
  */
 export function DecisionCard({ titulo, inicial, razon, razonIcon = "checkCirculo", cifra, secundaria, tope, base, children, accessibilityLabel }: Props) {
   return (

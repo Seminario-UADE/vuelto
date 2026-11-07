@@ -6,15 +6,15 @@
     "scheme": "vuelto",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "backgroundColor": "#F7F4EB",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#F3EBD6",
     "ios": {
       "supportsTablet": false,
-      "userInterfaceStyle": "light",
+      "userInterfaceStyle": "automatic",
       "bundleIdentifier": "ar.edu.uade.vuelto"
     },
     "android": {
-      "userInterfaceStyle": "light",
+      "userInterfaceStyle": "automatic",
       "package": "ar.edu.uade.vuelto",
       "adaptiveIcon": {
         "backgroundColor": "#14281D",
@@ -46,7 +46,11 @@
         {
           "image": "./assets/splash-icon.png",
           "imageWidth": 120,
-          "backgroundColor": "#F7F4EB"
+          "backgroundColor": "#F3EBD6",
+          "dark": {
+            "image": "./assets/splash-icon.png",
+            "backgroundColor": "#051F20"
+          }
         }
       ],
       "expo-image"

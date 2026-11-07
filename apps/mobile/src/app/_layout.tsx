@@ -9,11 +9,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { randomUUID } from "expo-crypto";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
+import { TemaProvider } from "@/components/tema-provider";
 import { Toast } from "@/components/toast";
 import { iniciarAuth } from "@/data/auth";
 import { usePerfilRemoto } from "@/hooks/use-perfil-remoto";
@@ -48,20 +48,6 @@ void store.dispatch(rehidratar()).then(() => store.dispatch(iniciarCompras()));
 
 export const unstable_settings = { anchor: "(tabs)" };
 
-const pageSheet = {
-  presentation: "modal" as const,
-  headerShown: false,
-  contentStyle: { backgroundColor: colors.canvas },
-};
-
-const sheet = {
-  presentation: "formSheet" as const,
-  headerShown: false,
-  sheetGrabberVisible: true,
-  sheetCornerRadius: 28,
-  contentStyle: { backgroundColor: colors.canvas },
-};
-
 export default function RootLayout() {
   return (
     <Provider store={store}>
@@ -95,36 +81,51 @@ function Raiz() {
 
   if (!listo) return null;
 
+  // Se arman en el render (no al cargar el módulo): en Android y web el color sale del tema activo.
+  const pageSheet = {
+    presentation: "modal" as const,
+    headerShown: false,
+    contentStyle: { backgroundColor: colors.canvas },
+  };
+  const sheet = {
+    presentation: "formSheet" as const,
+    headerShown: false,
+    sheetGrabberVisible: true,
+    sheetCornerRadius: 28,
+    contentStyle: { backgroundColor: colors.canvas },
+  };
+
   return (
     <SafeAreaProvider>
-      <View style={{ flex: 1, backgroundColor: colors.canvas }}>
-        <StatusBar style="dark" />
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.canvas } }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="(onboarding)" />
-          <Stack.Screen name="comercio/[id]" options={{ ...headerNativo, title: "" }} />
-          <Stack.Screen name="mis-compras" options={{ ...headerNativo, title: "Mis compras" }} />
-          <Stack.Screen name="tope/[clave]" options={{ ...headerNativo, title: "Compras del tope" }} />
-          <Stack.Screen name="contactos/index" options={{ ...headerNativo, title: "Contactos" }} />
-          <Stack.Screen name="contactos/invitar" options={{ ...headerNativo, title: "Invitar a alguien" }} />
-          <Stack.Screen name="grupo/armar" options={{ ...headerNativo, title: "Pagan entre varios" }} />
-          <Stack.Screen name="grupo/resultado" options={{ ...headerNativo, title: "Quién conviene que pague" }} />
-          <Stack.Screen
-            name="escanear"
-            options={{ presentation: "fullScreenModal", headerShown: false, contentStyle: { backgroundColor: colors.scrim } }}
-          />
-          {/* Revisá tu compra y Guardar perfil tienen scroll: page sheet nativo (modal). El formSheet
-              con detents no pinta un ScrollView en iOS 27 (verificado en el simulador). */}
-          <Stack.Screen name="revisa" options={pageSheet} />
-          <Stack.Screen name="contactos/quitar" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
-          <Stack.Screen name="cerrar-sesion" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
-          <Stack.Screen name="borrar-compra" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
-          <Stack.Screen name="(auth)/login" options={pageSheet} />
-          <Stack.Screen name="(auth)/registro" options={pageSheet} />
-          <Stack.Screen name="i/[token]" options={{ ...headerNativo, title: "Invitación" }} />
-        </Stack>
-        <Toast />
-      </View>
+      <TemaProvider>
+        <View style={{ flex: 1, backgroundColor: colors.canvas }}>
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.canvas } }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="(onboarding)" />
+            <Stack.Screen name="comercio/[id]" options={{ ...headerNativo, title: "" }} />
+            <Stack.Screen name="mis-compras" options={{ ...headerNativo, title: "Mis compras" }} />
+            <Stack.Screen name="tope/[clave]" options={{ ...headerNativo, title: "Compras del tope" }} />
+            <Stack.Screen name="contactos/index" options={{ ...headerNativo, title: "Contactos" }} />
+            <Stack.Screen name="contactos/invitar" options={{ ...headerNativo, title: "Invitar a alguien" }} />
+            <Stack.Screen name="grupo/armar" options={{ ...headerNativo, title: "Pagan entre varios" }} />
+            <Stack.Screen name="grupo/resultado" options={{ ...headerNativo, title: "Quién conviene que pague" }} />
+            <Stack.Screen
+              name="escanear"
+              options={{ presentation: "fullScreenModal", headerShown: false, contentStyle: { backgroundColor: colors.scrim } }}
+            />
+            {/* Revisá tu compra y Guardar perfil tienen scroll: page sheet nativo (modal). El formSheet
+                con detents no pinta un ScrollView en iOS 27 (verificado en el simulador). */}
+            <Stack.Screen name="revisa" options={pageSheet} />
+            <Stack.Screen name="contactos/quitar" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
+            <Stack.Screen name="cerrar-sesion" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
+            <Stack.Screen name="borrar-compra" options={{ ...sheet, sheetAllowedDetents: "fitToContents" }} />
+            <Stack.Screen name="(auth)/login" options={pageSheet} />
+            <Stack.Screen name="(auth)/registro" options={pageSheet} />
+            <Stack.Screen name="i/[token]" options={{ ...headerNativo, title: "Invitación" }} />
+          </Stack>
+          <Toast />
+        </View>
+      </TemaProvider>
     </SafeAreaProvider>
   );
 }
