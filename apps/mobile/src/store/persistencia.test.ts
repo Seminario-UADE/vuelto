@@ -185,7 +185,8 @@ describe("persistencia (US4)", () => {
     expect(b.getState().perfil).toMatchObject({
       onboardingCompleto: true,
       medios: mediosDeEjemplo(["galicia-visa-credito"]),
-      nombre: "Martín",
+      // El perfil viejo no tenía nombre: no se inventa uno (spec 012, FR-029).
+      nombre: null,
     });
     expect(b.getState().sesion.usuario).toBeNull();
     await esperar();

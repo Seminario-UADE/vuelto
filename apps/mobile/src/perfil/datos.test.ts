@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
 import { crearDatosPerfil } from "./datos";
-import type { MedioNuevo } from "./modelo";
+import { NOMBRE_MAXIMO, validarNombre, type MedioNuevo } from "./modelo";
 
 type Respuesta = { data: unknown; error: { code?: string; message: string } | null; status: number };
 type Llamada = [metodo: string, ...args: unknown[]];
@@ -10,7 +10,7 @@ type Llamada = [metodo: string, ...args: unknown[]];
 function clienteFalso(respuesta: Respuesta | Error) {
   const llamadas: Llamada[] = [];
   const pedido: Record<string, unknown> = {};
-  for (const metodo of ["select", "order", "insert", "delete", "eq", "single"]) {
+  for (const metodo of ["select", "order", "insert", "upsert", "delete", "eq", "single", "maybeSingle"]) {
     pedido[metodo] = (...args: unknown[]) => {
       llamadas.push([metodo, ...args]);
       return pedido;
@@ -166,5 +166,61 @@ describe("comercios habituales (issue #47)", () => {
   it("sacarComercio: si el RLS no borró ninguna fila, no es un éxito", async () => {
     const { cliente } = clienteFalso({ data: [], error: null, status: 200 });
     expect(await crearDatosPerfil(cliente).sacarComercio("c1")).toEqual({ ok: false, error: "otro" });
+  });
+});
+
+describe("nombre del usuario (spec 012, FR-027)", () => {
+  const USUARIO = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+
+  it("validarNombre: de 1 a 40 caracteres, sin contar los espacios de los costados", () => {
+    expect(NOMBRE_MAXIMO).toBe(40);
+    expect(validarNombre("  Sofía  ")).toEqual({ ok: true, nombre: "Sofía" });
+    expect(validarNombre("a".repeat(40))).toEqual({ ok: true, nombre: "a".repeat(40) });
+    expect(validarNombre(`  ${"a".repeat(40)}  `)).toEqual({ ok: true, nombre: "a".repeat(40) });
+    expect(validarNombre("a".repeat(41)).ok).toBe(false);
+    expect(validarNombre("").ok).toBe(false);
+    expect(validarNombre("   ").ok).toBe(false);
+  });
+
+  it("validarNombre: el error dice qué falta", () => {
+    expect(validarNombre(" ")).toEqual({ ok: false, mensaje: "Escribí tu nombre" });
+    expect(validarNombre("a".repeat(41))).toEqual({ ok: false, mensaje: "Hasta 40 caracteres" });
+  });
+
+  it("leerNombre: lee nombre_para_mostrar de la fila propia (el RLS filtra)", async () => {
+    const { cliente, llamadas } = clienteFalso({ data: { nombre_para_mostrar: "Sofía" }, error: null, status: 200 });
+    expect(await crearDatosPerfil(cliente).leerNombre()).toEqual({ ok: true, datos: "Sofía" });
+    expect(llamadas).toEqual([["from", "perfiles"], ["select", "nombre_para_mostrar"], ["maybeSingle"]]);
+  });
+
+  it("leerNombre: sin fila o sin nombre devuelve null, sin inventarlo", async () => {
+    const sinFila = clienteFalso({ data: null, error: null, status: 200 });
+    expect(await crearDatosPerfil(sinFila.cliente).leerNombre()).toEqual({ ok: true, datos: null });
+    const sinNombre = clienteFalso({ data: { nombre_para_mostrar: null }, error: null, status: 200 });
+    expect(await crearDatosPerfil(sinNombre.cliente).leerNombre()).toEqual({ ok: true, datos: null });
+  });
+
+  it("guardarNombre: upsert de la fila propia con el nombre recortado", async () => {
+    const { cliente, llamadas } = clienteFalso({ data: { nombre_para_mostrar: "Sofía" }, error: null, status: 201 });
+    expect(await crearDatosPerfil(cliente).guardarNombre(USUARIO, "  Sofía ")).toEqual({ ok: true, datos: "Sofía" });
+    expect(llamadas).toEqual([
+      ["from", "perfiles"],
+      ["upsert", { id: USUARIO, nombre_para_mostrar: "Sofía" }, { onConflict: "id" }],
+      ["select", "nombre_para_mostrar"],
+      ["single"],
+    ]);
+  });
+
+  it("guardarNombre: un nombre inválido no llega a la base", async () => {
+    for (const nombre of ["  ", "a".repeat(41)]) {
+      const { cliente, llamadas } = clienteFalso({ data: null, error: null, status: 201 });
+      expect(await crearDatosPerfil(cliente).guardarNombre(USUARIO, nombre)).toEqual({ ok: false, error: "otro" });
+      expect(llamadas).toEqual([]);
+    }
+  });
+
+  it("guardarNombre: sin conexión no lanza", async () => {
+    const { cliente } = clienteFalso(new TypeError("Network request failed"));
+    expect(await crearDatosPerfil(cliente).guardarNombre(USUARIO, "Sofía")).toEqual({ ok: false, error: "sin_conexion" });
   });
 });

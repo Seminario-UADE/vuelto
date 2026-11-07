@@ -33,10 +33,9 @@ detrás de un selector.
 | Ruta | Pantalla | Presentación |
 |---|---|---|
 | `(onboarding)/bienvenida` | Bienvenida: Crear cuenta / Ya tengo cuenta | Stack, sin header |
-| `(onboarding)/medios` | Tus medios de pago | Stack, header nativo con barra de 2 pasos |
-| `(onboarding)/comercios` | Comercios habituales | Stack, "Saltar" en el header |
-| `(onboarding)/primera-respuesta` | Primera respuesta; "Empezar" cierra el onboarding | Stack |
-| `(auth)/registro` | Crear cuenta (email y contraseña) | Page sheet (`modal`) |
+| `(onboarding)/medios` | Tus medios de pago (paso 1 de 2) | Stack, header nativo con barra de 2 pasos |
+| `(onboarding)/primera-respuesta` | «¿Dónde comprás seguido?»: tocar un comercio lo marca como habitual y muestra la respuesta del motor; "Seguir" cierra el onboarding (paso 2 de 2, spec 012) | Stack |
+| `(auth)/registro` | Crear cuenta (nombre, email y contraseña) | Page sheet (`modal`) |
 | `(auth)/login` | Entrar (email y contraseña) | Page sheet (`modal`) |
 | `(tabs)/index` | Inicio (respuesta inline) | Pestaña |
 | `(tabs)/comprar` | Nueva compra | Pestaña |

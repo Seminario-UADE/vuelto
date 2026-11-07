@@ -62,7 +62,7 @@ export default function Inicio() {
     <Screen kind="tab" aboveTabBar>
       <View style={{ gap: space.xs }}>
         <Text variant="titleLg" accessibilityRole="header">
-          Hola, {nombre ?? "Martín"}
+          {nombre ? `Hola, ${nombre}` : "Hola"}
         </Text>
         <Text variant="bodyMd" tone="inkSecondary">
           Hoy es {fechaLarga(hoy)}

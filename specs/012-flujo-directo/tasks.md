@@ -20,8 +20,8 @@
 
 ## Phase 2: Foundational (bloquea a US1, US2 y US4)
 
-- [ ] T003 Cambiar `perfilInicial.nombre` a `null` en `src/store/perfil.ts`. Hacer que el escenario de demo de `src/store/acciones.ts` y Perfil (solo en desarrollo) cargue «Martín» a propósito. Actualizar los tests de `src/store/*.test.ts` que esperaban «Martín» (FR-029, SC-005).
-- [ ] T004 Sacar los respaldos `?? "Martín"` de `src/app/(tabs)/index.tsx` y `src/app/(tabs)/perfil.tsx`: sin nombre, Inicio saluda «Hola» y Perfil muestra «Cargá tu nombre».
+- [x] T003 Cambiar `perfilInicial.nombre` a `null` en `src/store/perfil.ts`. Hacer que el escenario de demo de `src/store/acciones.ts` y Perfil (solo en desarrollo) cargue «Martín» a propósito. Actualizar los tests de `src/store/*.test.ts` que esperaban «Martín» (FR-029, SC-005).
+- [x] T004 Sacar los respaldos `?? "Martín"` de `src/app/(tabs)/index.tsx` y `src/app/(tabs)/perfil.tsx`: sin nombre, Inicio saluda «Hola» y Perfil muestra «Cargá tu nombre».
 - [ ] T005 [P] Hacer que el ticket de ejemplo de `src/data/fixtures.ts` y `src/data/api.ts` (`leerTicket`) devuelva la fecha de hoy, recibida como parámetro desde `sesion.ahora`. Sumar el escenario `"sin-red"` a `Escenario`, que hace fallar `leerTicket` con el error de conexión (research R12).
 
 **Checkpoint**: la línea de base sigue en verde y ninguna pantalla dice «Martín» sin el escenario de demo.
@@ -143,23 +143,23 @@
 
 ### Tests
 
-- [ ] T032 [P] [US4] Sumar a `src/perfil/datos.test.ts` `guardarNombre` y `leerNombre` sobre `perfiles.nombre_para_mostrar`, con el validador de 1 a 40 caracteres sin contar los espacios de los costados.
-- [ ] T033 [P] [US4] Sumar a `src/store/perfil-remoto.test.ts` que `leerMedios` también carga el nombre y que `cambiarNombre` lo guarda y actualiza el store.
-- [ ] T034 [P] [US4] Escribir `supabase/tests/database/perfiles_nombre_largo.test.sql`: se rechaza un nombre de 41 caracteres y se acepta uno de 40.
+- [x] T032 [P] [US4] Sumar a `src/perfil/datos.test.ts` `guardarNombre` y `leerNombre` sobre `perfiles.nombre_para_mostrar`, con el validador de 1 a 40 caracteres sin contar los espacios de los costados.
+- [x] T033 [P] [US4] Sumar a `src/store/perfil-remoto.test.ts` que `leerMedios` también carga el nombre y que `cambiarNombre` lo guarda y actualiza el store.
+- [x] T034 [P] [US4] Escribir `supabase/tests/database/perfiles_nombre_largo.test.sql`: se rechaza un nombre de 41 caracteres y se acepta uno de 40.
 
 ### Implementation
 
-- [ ] T035 [US4] Crear la migración `supabase/migrations/20261105000001_perfiles_nombre_largo.sql` con el check de largo. Tiene que pasar T034.
-- [ ] T036 [US4] Sumar `guardarNombre` y `leerNombre` a `src/perfil/datos.ts` y el thunk `cambiarNombre` a `src/store/perfil-remoto.ts`. Tiene que pasar T032 y T033.
-- [ ] T037 [US4] En `src/components/formulario-cuenta.tsx`, sumar el campo nombre al modo registro (validado) y guardarlo con `cambiarNombre` después de crear la cuenta.
-- [ ] T038 [US4] En `src/app/perfil.tsx`, hacer el nombre editable (FR-028).
-- [ ] T039 [US4] Extraer `src/components/selector-comercios.tsx` de `src/app/(onboarding)/comercios.tsx`, con búsqueda, chips agrupados por rubro, tocar para marcar y ver, y × para desmarcar (FR-025). Usarlo también en `src/components/comercios-del-perfil.tsx` si encaja sin cambiar su comportamiento.
-- [ ] T040 [US4] Rehacer `src/app/(onboarding)/primera-respuesta.tsx`:
+- [x] T035 [US4] Crear la migración `supabase/migrations/20261105000001_perfiles_nombre_largo.sql` con el check de largo. Tiene que pasar T034.
+- [x] T036 [US4] Sumar `guardarNombre` y `leerNombre` a `src/perfil/datos.ts` y el thunk `cambiarNombre` a `src/store/perfil-remoto.ts`. Tiene que pasar T032 y T033.
+- [x] T037 [US4] En `src/components/formulario-cuenta.tsx`, sumar el campo nombre al modo registro (validado) y guardarlo con `cambiarNombre` después de crear la cuenta.
+- [x] T038 [US4] En `src/app/perfil.tsx`, hacer el nombre editable (FR-028).
+- [x] T039 [US4] Extraer `src/components/selector-comercios.tsx` de `src/app/(onboarding)/comercios.tsx`, con búsqueda, chips agrupados por rubro, tocar para marcar y ver, y × para desmarcar (FR-025). Usarlo también en `src/components/comercios-del-perfil.tsx` si encaja sin cambiar su comportamiento.
+- [x] T040 [US4] Rehacer `src/app/(onboarding)/primera-respuesta.tsx`:
   - `SelectorComercios`;
   - `useRecomendacionPara(ultimoTocado, null)` con el `DecisionCard`;
   - el texto para un comercio sin promo;
   - «Seguir» guarda con `confirmarComercios` y «Seguir sin elegir» sigue sin guardar.
-- [ ] T041 [US4] Borrar `src/app/(onboarding)/comercios.tsx`, hacer que `medios.tsx` lleve a `/primera-respuesta` y ajustar `ProgressSegments` a 2 pasos reales (FR-030).
+- [x] T041 [US4] Borrar `src/app/(onboarding)/comercios.tsx`, hacer que `medios.tsx` lleve a `/primera-respuesta` y ajustar `ProgressSegments` a 2 pasos reales (FR-030).
 
 **Checkpoint**: un usuario nuevo ve una recomendación real para un comercio que eligió, y nadie se llama Martín.
 

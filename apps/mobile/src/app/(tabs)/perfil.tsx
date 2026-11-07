@@ -7,6 +7,7 @@ import { Chip } from "@/components/chip";
 import { divisor } from "@/components/lista";
 import { ComerciosDelPerfil } from "@/components/comercios-del-perfil";
 import { MediosDelPerfil } from "@/components/medios-del-perfil";
+import { NombreDelPerfil } from "@/components/nombre-del-perfil";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { Text } from "@/components/text";
@@ -36,7 +37,6 @@ export default function Perfil() {
 
   const medios = perfil.medios;
   const comercios = perfil.comercios;
-  const nombre = perfil.nombre ?? "Martín";
 
   const pendientes = useAppSelector(selectPendientesAlCerrarSesion);
   const cerrarSesion = async () => {
@@ -56,17 +56,7 @@ export default function Perfil() {
   return (
     <Screen kind="tab" aboveTabBar>
       <Card padding={space.xl} gap={space.lg}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: space.lg }}>
-          <Avatar letras={nombre.charAt(0)} tone="activo" size={56} />
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text variant="titleLg" accessibilityRole="header">
-              {nombre}
-            </Text>
-            <Text variant="label" tone="inkSecondary">
-              Nombre que ven tus contactos
-            </Text>
-          </View>
-        </View>
+        <NombreDelPerfil />
         {perfil.carga !== "leyendo" ? (
           <Text variant="bodyMd" tone="inkSecondary">
             {medios.length} {medios.length === 1 ? "medio" : "medios"} · {comercios.length}{" "}

@@ -12,6 +12,7 @@ import {
   MENSAJES_ERROR,
   puedeConfirmar,
   puedeSacar,
+  validarNombre,
   type Banco,
   type ComercioHabitual,
   type MedioDePago,
@@ -28,6 +29,7 @@ import {
   medioSacado,
   mediosConfirmados,
   mediosLeidos,
+  nombreCambiado,
 } from "./perfil";
 
 const SIN_CONEXION = { ok: false, error: "sin_conexion" } as const;
@@ -36,7 +38,7 @@ const SIN_CONEXION = { ok: false, error: "sin_conexion" } as const;
  * Cuenta las escrituras que empezaron, por lista. Una lectura que salió antes de una escritura trae
  * datos viejos: si el contador de su lista cambió mientras volaba, su resultado se descarta.
  */
-const escrituras = { medios: 0, comercios: 0 };
+const escrituras = { medios: 0, comercios: 0, nombre: 0 };
 type Lista = keyof typeof escrituras;
 
 const usuarioActual = (getState: () => RootState) => getState().sesion.usuario?.id ?? null;
@@ -44,6 +46,7 @@ const usuarioActual = (getState: () => RootState) => getState().sesion.usuario?.
 /**
  * Lee los medios del usuario y reemplaza los locales. Sin medios, las pestañas llevan al onboarding
  * (T009); sin conexión, queda lo guardado en modo solo lectura (FR-010).
+ * En paralelo lee el nombre de la cuenta (spec 012): si falla, queda el que había.
  */
 export function leerMedios(): AppThunk<Promise<void>> {
   return async (dispatch, getState, { perfilRemoto }) => {
@@ -55,10 +58,13 @@ export function leerMedios(): AppThunk<Promise<void>> {
       return;
     }
     const escrituraAlSalir = escrituras.medios;
+    const nombreAlSalir = escrituras.nombre;
     dispatch(cargaCambio("leyendo"));
-    const r = await perfilRemoto.leerMisMedios();
+    const [r, nombre] = await Promise.all([perfilRemoto.leerMisMedios(), perfilRemoto.leerNombre()]);
     // Se cerró la sesión o entró otra cuenta mientras volaba el pedido: no es de este usuario.
     if (usuarioActual(getState) !== usuarioId) return;
+    // Un nombre guardado mientras volaba la lectura es más nuevo que el leído.
+    if (nombre.ok && escrituras.nombre === nombreAlSalir) dispatch(nombreCambiado(nombre.datos));
     if (escrituras.medios !== escrituraAlSalir) {
       // Una escritura se cruzó: esta lectura puede ser anterior. La escritura ya dejó el slice al día.
       if (getState().perfil.carga === "leyendo") dispatch(cargaCambio("lista"));
@@ -118,6 +124,22 @@ export function sacarMedio(id: string): AppThunk<Promise<Resultado<null>>> {
     // Si no se pudo sacar porque la fila ya no estaba o no era del usuario, el slice puede estar viejo.
     if (!r.ok && (r.error === "otro" || r.error === "ultimo_medio")) void dispatch(leerMedios());
     return r;
+  };
+}
+
+/**
+ * Guarda el nombre para mostrar en la cuenta (spec 012, FR-027 y FR-028): al registrarse y desde
+ * Perfil. Un nombre inválido no llega a Supabase; el store cambia solo con lo que devolvió la base.
+ */
+export function cambiarNombre(nombre: string): AppThunk<Promise<Resultado<string>>> {
+  return async (dispatch, getState, { perfilRemoto }) => {
+    const v = validarNombre(nombre);
+    const usuarioId = usuarioActual(getState);
+    if (!v.ok || usuarioId === null) return { ok: false, error: "otro" };
+    if (!perfilRemoto) return SIN_CONEXION;
+    return escribir("nombre", dispatch, getState, () => perfilRemoto.guardarNombre(usuarioId, v.nombre), (d) =>
+      dispatch(nombreCambiado(d)),
+    );
   };
 }
 
