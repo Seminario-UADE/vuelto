@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { createContext, Fragment, use, type ReactNode } from "react";
 import { useColorScheme } from "react-native";
+import { temas, type Tema } from "@/theme";
 import { fijarEsquema, temaSeResuelveSolo, type Esquema } from "@/theme-color";
 
 const EsquemaContext = createContext<Esquema>("claro");
@@ -28,4 +29,13 @@ export function TemaProvider({ children }: { children: ReactNode }) {
 /** El esquema activo, para lo que no se puede expresar con un rol (p. ej., la barra de estado). */
 export function useEsquema(): Esquema {
   return use(EsquemaContext);
+}
+
+/**
+ * El tema activo con valores concretos (hex), para lo que consume el sistema una sola vez y no
+ * sigue a un color dinámico: opciones del navegador (header, fondos de escena, tab bar). Re-renderiza
+ * al cambiar la apariencia. Lo demás sigue leyendo `colors` de `@/theme`.
+ */
+export function useTema(): Tema {
+  return temas[useEsquema()];
 }

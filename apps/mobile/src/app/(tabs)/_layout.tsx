@@ -4,6 +4,7 @@ import { Text, View } from "react-native";
 import { Icon, type IconName } from "@/components/icon";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { leerMedios } from "@/store/perfil-remoto";
+import { useTema } from "@/components/tema-provider";
 import { colors, floatingShadow, fonts } from "@/theme";
 
 const tab = (title: string, icon: IconName) => ({
@@ -27,6 +28,7 @@ const tab = (title: string, icon: IconName) => ({
  * fondo `canvas` con sombra flotante, activo en `ink` (research R2). La tab bar nativa va en #103.
  */
 export default function TabsLayout() {
+  const t = useTema();
   const usuario = useAppSelector((s) => s.sesion.usuario);
   const perfil = useAppSelector((s) => s.perfil);
   const dispatch = useAppDispatch();
@@ -57,16 +59,16 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.ink,
-        tabBarInactiveTintColor: colors.inkSecondary,
+        tabBarActiveTintColor: t.ink,
+        tabBarInactiveTintColor: t.inkSecondary,
         tabBarLabelStyle: { fontFamily: fonts.medium, fontSize: 12, lineHeight: 16 },
         tabBarAllowFontScaling: true,
         tabBarStyle: {
-          backgroundColor: colors.canvas,
+          backgroundColor: t.canvas,
           borderTopWidth: 0,
           boxShadow: floatingShadow,
         },
-        sceneStyle: { backgroundColor: colors.canvas },
+        sceneStyle: { backgroundColor: t.canvas },
       }}
     >
       <Tabs.Screen name="index" options={tab("Inicio", "inicio")} />
