@@ -13,6 +13,7 @@ import { Text } from "@/components/text";
 import { cerrarSesion as salir } from "@/data/auth";
 import { escenarioElegido, type Escenario } from "@/store/acciones";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectPorConfirmarVigentes } from "@/store/por-confirmar";
 import { selectPendientesAlCerrarSesion } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { space } from "@/theme";
@@ -39,9 +40,10 @@ export default function Perfil() {
   const nombre = perfil.nombre ?? "Martín";
 
   const pendientes = useAppSelector(selectPendientesAlCerrarSesion);
+  const porConfirmar = useAppSelector(selectPorConfirmarVigentes).length;
   const cerrarSesion = async () => {
-    // Con compras sin subir, primero se avisa cuántas se pierden (spec 010, FR-016).
-    if (pendientes.guardados + pendientes.borrados > 0) {
+    // Con compras sin subir o por confirmar, primero se avisa cuántas se pierden (spec 010 FR-016, spec 012 FR-014).
+    if (pendientes.guardados + pendientes.borrados + porConfirmar > 0) {
       router.push("/cerrar-sesion");
       return;
     }

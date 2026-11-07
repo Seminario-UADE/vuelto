@@ -12,6 +12,7 @@ import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { Skeleton, SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
+import { useUsarRecomendacion } from "@/hooks/use-usar-recomendacion";
 import { RUBROS } from "@/lib/rubros";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectRecomendacion } from "@/store/selectores";
@@ -22,7 +23,7 @@ import { colors, radius, space } from "@/theme";
 /**
  * Con qué pagar: pregunta → respuesta → razón → monto → alternativas → grupo → acción
  * (DESIGN.md §6). Un solo primario de una línea ("Usar Galicia", auditoría P2 #8) en un pie
- * fijo que no tapa contenido (P2 #7).
+ * fijo que no tapa contenido (P2 #7). «Usar» deja una compra por confirmar, no la registra.
  */
 export default function ConQuePagar() {
   const params = useLocalSearchParams<{ id: string }>();
@@ -39,12 +40,11 @@ export default function ConQuePagar() {
   const r = elegido === params.id ? rec : null;
   const sinPromo = r !== null && r.medio === null;
 
+  const usarRecomendacion = useUsarRecomendacion();
+  // Igual que desde Inicio: deja la compra por confirmar y vuelve a Inicio (spec 012, FR-002).
   const usar = () => {
     if (!r?.medio) return;
-    router.push({
-      pathname: "/revisa",
-      params: { modo: "excepcion", comercio: r.comercio.nombre, monto: monto ?? "", medio: r.medio.id },
-    });
+    if (usarRecomendacion(r.medio.nombre)) router.dismissTo("/");
   };
 
   return (

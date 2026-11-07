@@ -31,14 +31,15 @@ export default function Escanear() {
   const insets = useSafeAreaInsets();
   const [leyendo, setLeyendo] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const ilegible = useAppSelector((s) => s.sesion.escenario === "ticket-ilegible");
+  const escenario = useAppSelector((s) => s.sesion.escenario);
+  const falla = escenario === "ticket-ilegible" ? "ilegible" : escenario === "sin-red" ? "sin-red" : null;
   const hoy = useAppSelector(selectHoy);
 
   const disparar = async () => {
     hapticoLeve();
     setLeyendo(true);
     setError(null);
-    const t = await api.leerTicket({ ilegible });
+    const t = await api.leerTicket({ hoy, falla });
     setLeyendo(false);
     if (!t.ok) {
       setError(t.error);

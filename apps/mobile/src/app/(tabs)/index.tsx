@@ -7,6 +7,7 @@ import { CompraRow } from "@/components/compra-row";
 import { EmptyState } from "@/components/empty-state";
 import { Icon } from "@/components/icon";
 import { MontoInput } from "@/components/monto-input";
+import { PorConfirmarCard } from "@/components/por-confirmar-card";
 import { RecomendacionCard } from "@/components/recomendacion";
 import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
@@ -15,9 +16,11 @@ import { Text } from "@/components/text";
 import { TopeResumen } from "@/components/tope-card";
 import type { Comercio } from "@/data/contracts";
 import { useColumns } from "@/hooks/use-columns";
+import { useUsarRecomendacion } from "@/hooks/use-usar-recomendacion";
 import { fechaLarga } from "@/lib/format";
 import { hapticoSeleccion } from "@/lib/haptics";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { selectPorConfirmarVigentes } from "@/store/por-confirmar";
 import {
   selectComercioSimulado,
   selectFrescura,
@@ -27,11 +30,12 @@ import {
   selectTopes,
 } from "@/store/selectores";
 import { comercioElegido, montoCambiado } from "@/store/simulacion";
-import { colors, radius, space } from "@/theme";
+import { colors, space } from "@/theme";
 
 /**
  * Inicio: "¿Dónde vas a comprar?" con la respuesta en la misma tarjeta al tocar un
- * comercio (auditoría P1 #1). Sin campana (P2 #14) y sin "Te devolvieron" (P2 #13).
+ * comercio (auditoría P1 #1). Sin campana (P2 #14) y sin "Te devolvieron" (P2 #13). Arriba,
+ * las compras por confirmar; «Usar [medio]» deja una nueva sin tocar los topes (spec 012).
  */
 export default function Inicio() {
   const dispatch = useAppDispatch();
@@ -46,6 +50,8 @@ export default function Inicio() {
   // "Promos actualizadas hace X": solo con un corpus sincronizado (spec 009 FR-019).
   const frescura = useAppSelector(selectFrescura);
   const columnas = useColumns();
+  const porConfirmar = useAppSelector(selectPorConfirmarVigentes);
+  const usar = useUsarRecomendacion();
 
   const elegir = (c: Comercio) => {
     hapticoSeleccion();
@@ -69,6 +75,12 @@ export default function Inicio() {
         </Text>
       </View>
 
+      {porConfirmar.map((c) => (
+        <Animated.View key={c.id} entering={FadeInDown.duration(220)}>
+          <PorConfirmarCard c={c} />
+        </Animated.View>
+      ))}
+
       <Card gap={space.lg} padding={space.xl}>
         <View style={{ gap: space.xs }}>
           <Text variant="titleMd" accessibilityRole="header">
@@ -89,7 +101,7 @@ export default function Inicio() {
 
       {r ? (
         <Animated.View entering={FadeInDown.duration(220)}>
-          <RecomendacionCard r={r}>
+          <RecomendacionCard r={r} onUsar={r.medio ? () => usar(r.medio?.nombre ?? "") : undefined}>
             {r.resultado === "recomendado" ? (
               <MontoInput
                 value={monto}
@@ -113,36 +125,11 @@ export default function Inicio() {
         </Animated.View>
       ) : null}
 
-      <Pressable
-        onPress={() => router.push("/escanear")}
-        accessibilityRole="button"
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: space.md,
-          minHeight: 64,
-          paddingHorizontal: space.lg,
-          borderRadius: radius.row,
-          backgroundColor: colors.surface,
-        }}
-      >
-        <Icon name="camara" size={22} />
-        <View style={{ flex: 1 }}>
-          <Text variant="bodyLg" weight="semibold">
-            ¿Ya compraste? Escaneá el ticket
-          </Text>
-          <Text variant="label" tone="inkSecondary">
-            Así tus topes quedan al día
-          </Text>
-        </View>
-        <Icon name="chevron" size={18} color={colors.inkSecondary} />
-      </Pressable>
-
       {sinCompras ? (
+        // Sin mandar a otra tab (FR-035): los topes aparecen al confirmar la primera compra.
         <EmptyState
-          title="Todavía no registraste compras"
-          body="Cuando registres la primera, vas a ver cuánto tope te queda."
-          action={{ label: "Registrar compra", onPress: () => router.navigate("/comprar") }}
+          title="Todavía no confirmaste compras"
+          body="Cuando confirmes la primera, vas a ver acá cuánto tope te queda."
         />
       ) : (
         <>
