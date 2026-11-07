@@ -1,6 +1,6 @@
 import { router } from "expo-router";
-import { useRef, useState, type ComponentRef, type Ref } from "react";
-import { TextInput, View, type TextInputProps } from "react-native";
+import { useRef, useState, type ComponentRef } from "react";
+import { TextInput, View } from "react-native";
 import { entrarCuenta, registrarCuenta } from "@/data/auth";
 import { NOMBRE_MAXIMO, validarNombre } from "@/perfil/modelo";
 import { useAppDispatch } from "@/store/hooks";
@@ -9,8 +9,9 @@ import { avisoMostrado } from "@/store/sesion";
 import { hapticoExito } from "@/lib/haptics";
 import type { ErrorAuth } from "@/lib/auth";
 import { CLAVE_MINIMA } from "@/lib/auth";
-import { colors, fonts, radius, space, type as escala } from "@/theme";
+import { colors, space } from "@/theme";
 import { Button } from "./button";
+import { Campo } from "./campo";
 import { Icon } from "./icon";
 import { Screen } from "./screen";
 import { SheetHeader } from "./sheet-header";
@@ -34,40 +35,6 @@ const TEXTOS = {
     rutaCambio: "/registro",
   },
 } as const;
-
-export function Campo({ label, error, ...props }: TextInputProps & { label: string; error?: string; ref?: Ref<ComponentRef<typeof TextInput>> }) {
-  return (
-    <View style={{ gap: space.xs }}>
-      <Text variant="label" tone="inkSecondary">
-        {label}
-      </Text>
-      <TextInput
-        accessibilityLabel={label}
-        placeholderTextColor={colors.inkSecondary}
-        selectionColor={colors.accent}
-        autoCapitalize="none"
-        autoCorrect={false}
-        {...props}
-        style={{
-          minHeight: 52,
-          paddingHorizontal: space.lg,
-          borderRadius: radius.row,
-          borderWidth: 1.5,
-          borderColor: error ? colors.error : colors.controlBorder,
-          backgroundColor: colors.canvas,
-          fontFamily: fonts.regular,
-          fontSize: escala.bodyLg.fontSize,
-          color: colors.ink,
-        }}
-      />
-      {error ? (
-        <Text variant="label" tone="error" accessibilityLiveRegion="polite">
-          {error}
-        </Text>
-      ) : null}
-    </View>
-  );
-}
 
 /**
  * Sheet de login y de registro (`(auth)/login` y `(auth)/registro`): mismo formulario,

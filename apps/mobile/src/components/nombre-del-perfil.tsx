@@ -7,7 +7,7 @@ import { cambiarNombre } from "@/store/perfil-remoto";
 import { colors, space } from "@/theme";
 import { Avatar } from "./avatar";
 import { Button } from "./button";
-import { Campo } from "./formulario-cuenta";
+import { Campo } from "./campo";
 import { Icon } from "./icon";
 import { Text } from "./text";
 
