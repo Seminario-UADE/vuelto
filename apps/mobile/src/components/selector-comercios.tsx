@@ -102,7 +102,7 @@ export function SelectorComercios({ marcados, activo, onTocar, onQuitar }: Props
 
 /**
  * Un comercio marcado: el nombre (tocar muestra su respuesta) y la × para desmarcarlo, con su propia
- * área de toque de 44 pt. El de la respuesta lleva un borde de acento.
+ * área de toque de 44 pt. Activo = fondo del acento con check (DESIGN.md §5); el de la respuesta lleva además un borde `ink`.
  */
 function ChipMarcado({
   comercio,
@@ -122,9 +122,9 @@ function ChipMarcado({
         flexDirection: "row",
         alignItems: "center",
         borderRadius: radius.pill,
-        backgroundColor: colors.decisionBg,
+        backgroundColor: colors.accent,
         borderWidth: 2,
-        borderColor: activo ? colors.accent : colors.decisionBg,
+        borderColor: activo ? colors.ink : colors.accent,
       }}
     >
       <PressableScale
@@ -142,8 +142,8 @@ function ChipMarcado({
           paddingRight: space.xs,
         }}
       >
-        <Icon name="check" size={16} color={colors.onDecision} />
-        <Text variant="bodyMd" weight="medium" style={{ color: colors.onDecision }}>
+        <Icon name="check" size={16} color={colors.onAccent} />
+        <Text variant="bodyMd" weight="medium" style={{ color: colors.onAccent }}>
           {comercio.nombre}
         </Text>
       </PressableScale>
@@ -159,7 +159,7 @@ function ChipMarcado({
           justifyContent: "center",
         }}
       >
-        <Icon name="cerrar" size={16} color={colors.onDecision} />
+        <Icon name="cerrar" size={16} color={colors.onAccent} />
       </Pressable>
     </View>
   );
