@@ -2098,6 +2098,37 @@ logo, y que el slice `perfil` guarde lo que devuelve `perfil/datos.ts`.
 
 ---
 
+## 2026-11-06 — Build de EAS de respaldo para el pitch (issue #56)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI y `eas-cli`.
+
+**Objetivo:** dejar listo el APK de respaldo del pitch. Es S: va sin spec-kit.
+
+**Prompts principales:**
+1. "Mirá mis tickets asignados y decime qué puedo adelantar hoy."
+2. "Arrancá con #56."
+
+**Resultado:**
+- `apps/mobile/eas.json`: el perfil `preview` ya existía (#39, APK interno);
+  se le sumó `"environment": "preview"` para que tome
+  `EXPO_PUBLIC_SUPABASE_URL` y `EXPO_PUBLIC_SUPABASE_ANON_KEY` del entorno de
+  EAS, porque el `.env` local no se sube al build (está en `.gitignore`).
+- `docs/presentacion/build-respaldo.md`: requisitos (ingesta con promos,
+  sesión en `joaconzs-team`, variables en EAS), comando del build, checklist
+  de prueba en Android y tabla para el link de descarga.
+- La issue citaba "corpus sembrado e ingesta apagada (RF-18)", que dejó de
+  existir con ADR-011: el APK baja las promos de Supabase al abrir.
+- Hallazgo: la ingesta diaria falla desde el 2026-11-03 con
+  `permission denied for table promociones`; sin promos publicadas el APK
+  no tiene qué recomendar. Resuelto el 2026-11-08 (secret corregido, corrida
+  manual con 3088 promociones publicadas; chequeo de acceso en #117).
+- 2026-11-08: se sube la config y la guía en un PR aparte, sin cerrar #56. El
+  build espera al merge de #107 para no gastar dos builds del free tier.
+- Queda pendiente: login en EAS, variables en EAS, el build en sí, la prueba
+  en un Android real y el link en la tabla.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

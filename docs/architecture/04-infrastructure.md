@@ -114,4 +114,7 @@ pendiente, y cómo quedan:
 ## Distribución para el pitch
 
 Expo Go (QR, sin compilar) como camino principal. Respaldo: build de EAS,
-por si el servidor de desarrollo falla el día del pitch.
+por si el servidor de desarrollo falla el día del pitch. Perfil `preview` de
+`apps/mobile/eas.json` (APK, distribución interna), con las variables
+públicas tomadas del entorno `preview` de EAS. Pasos, link de descarga y
+prueba en Android: `docs/presentacion/build-respaldo.md` (issue #56).
