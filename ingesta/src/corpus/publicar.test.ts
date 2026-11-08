@@ -2,7 +2,7 @@ import { CATEGORIAS_MODO } from "@vuelto/motor";
 import { describe, expect, it } from "vitest";
 import { aFila } from "./filas.ts";
 import type { FilaPromocion } from "./filas.ts";
-import { MINIMO_PARA_RESGUARDO, TAMANO_DE_LOTE, leerEntorno, publicar } from "./publicar.ts";
+import { MINIMO_PARA_RESGUARDO, TAMANO_DE_LOTE, comprobarAcceso, leerEntorno, publicar } from "./publicar.ts";
 import type { Captura, ClienteBase, Cosecha } from "./publicar.ts";
 import { BANCO_GALICIA, BANCO_ICBC, promocion } from "./test/fabricas.ts";
 import type { PromocionIngestada } from "./tipos.ts";
@@ -277,6 +277,66 @@ describe("publicar — consistencia", () => {
   });
 });
 
+
+describe("comprobarAcceso", () => {
+  it("lee categorías, bancos y promociones, sin escribir nada", async () => {
+    const base = baseFalsa();
+    const leidas: string[] = [];
+    const cliente: ClienteBase = {
+      ...base.cliente,
+      leerCategorias: async () => {
+        leidas.push("categorias");
+        return base.cliente.leerCategorias();
+      },
+      leerBancos: async () => {
+        leidas.push("bancos");
+        return base.cliente.leerBancos();
+      },
+      leerPromociones: async () => {
+        leidas.push("promociones");
+        return base.cliente.leerPromociones();
+      },
+    };
+    await expect(comprobarAcceso(cliente)).resolves.toBeUndefined();
+    expect(leidas).toEqual(["categorias", "bancos", "promociones"]);
+    expect(base.llamadas).toEqual([]);
+  });
+
+  it("si lo que falla no es un Error, igual lo muestra", async () => {
+    const base = baseFalsa();
+    const cliente: ClienteBase = {
+      ...base.cliente,
+      leerBancos: async () => {
+        throw "sin red";
+      },
+    };
+    await expect(comprobarAcceso(cliente)).rejects.toThrow(/Sin acceso a la base: sin red/);
+  });
+
+  it("con una clave sin permisos, falla con un mensaje que dice qué revisar", async () => {
+    const base = baseFalsa();
+    const cliente: ClienteBase = {
+      ...base.cliente,
+      leerPromociones: async () => {
+        throw new Error("leer promociones: permission denied for table promociones");
+      },
+    };
+    const intento = comprobarAcceso(cliente);
+    await expect(intento).rejects.toThrow(/permission denied for table promociones/);
+    await expect(intento).rejects.toThrow(/SUPABASE_SERVICE_ROLE_KEY.*no la anon/);
+  });
+
+  it("falla con la primera tabla que no se puede leer", async () => {
+    const base = baseFalsa();
+    const cliente: ClienteBase = {
+      ...base.cliente,
+      leerCategorias: async () => {
+        throw new Error("leer categorias: permission denied for table categorias");
+      },
+    };
+    await expect(comprobarAcceso(cliente)).rejects.toThrow(/categorias/);
+  });
+});
 
 describe("leerEntorno", () => {
   it("devuelve la URL y la clave", () => {

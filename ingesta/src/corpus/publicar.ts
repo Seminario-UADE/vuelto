@@ -197,6 +197,32 @@ export async function publicar(
   return { ok: true, aplicado: opciones.aplicar, motivo: null, resumen };
 }
 
+// ---------- Acceso a la base ----------
+
+/**
+ * Lee categorías, bancos y promociones antes de bajar nada de MODO: si la clave no
+ * sirve, la corrida falla en segundos y no después de casi una hora de pedidos. Cubre
+ * el caso de una clave anon o publishable, que no puede leer ninguna de las tablas de
+ * la ingesta; una clave que lee pero no escribe recién falla al publicar. La lectura
+ * completa de promociones es a propósito: `publicar` la repite después de la cosecha
+ * para el resguardo, y con unas miles de filas son pocos segundos.
+ */
+export async function comprobarAcceso(cliente: ClienteBase): Promise<void> {
+  try {
+    await cliente.leerCategorias();
+    await cliente.leerBancos();
+    await cliente.leerPromociones();
+  } catch (error) {
+    const detalle = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Sin acceso a la base: ${detalle}. Si es un «permission denied», revisá que ` +
+        "SUPABASE_SERVICE_ROLE_KEY sea la service role (o la secret key) del mismo proyecto que " +
+        "SUPABASE_URL, no la anon ni la publishable.",
+      { cause: error },
+    );
+  }
+}
+
 // ---------- Entorno ----------
 
 /**

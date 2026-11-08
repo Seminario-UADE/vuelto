@@ -23,7 +23,7 @@ import type { ResumenListado } from "./listado.ts";
 import { intentarMapear } from "./mapear.ts";
 import { crearClienteMODO, urlDetalle } from "./modo.ts";
 import type { ClienteMODO } from "./modo.ts";
-import { crearClienteSupabase, leerEntorno, publicar } from "./publicar.ts";
+import { comprobarAcceso, crearClienteSupabase, leerEntorno, publicar } from "./publicar.ts";
 import type { Cosecha, ResumenPublicacion } from "./publicar.ts";
 import type { BancoCatalogo, Descarte, MotivoDescarte } from "./tipos.ts";
 import { validarPromocion } from "./validar.ts";
@@ -154,16 +154,19 @@ export function opcionesDeArgumentos(argv: readonly string[]): { aplicar: boolea
 /* v8 ignore start */
 async function main(argv: readonly string[]): Promise<void> {
   const { aplicar, pausaMs } = opcionesDeArgumentos(argv);
-  // El entorno se lee antes de pedir nada a MODO: sin credenciales no tiene sentido bajar cientos de detalles.
+  // El entorno y el acceso a la base se prueban antes de pedir nada a MODO: sin credenciales que
+  // sirvan no tiene sentido bajar cientos de detalles.
   const { url, clave } = leerEntorno(process.env);
   console.log(`Base: ${new URL(url).host} — ${aplicar ? "se va a ESCRIBIR" : "modo de prueba (no escribe)"}`);
+  const clienteBase = crearClienteSupabase(url, clave);
+  await comprobarAcceso(clienteBase);
   const clienteMODO = crearClienteMODO({
     fetch,
     pausaMs,
     esperar: (ms) => new Promise((resolver) => setTimeout(resolver, ms)),
   });
   const { cosecha, resumen } = await cosechar(clienteMODO, hoyEnArgentina());
-  const publicacion = await publicar(cosecha, crearClienteSupabase(url, clave), {
+  const publicacion = await publicar(cosecha, clienteBase, {
     aplicar,
     ahora: () => new Date().toISOString(),
   });

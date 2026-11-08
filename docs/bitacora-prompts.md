@@ -2098,6 +2098,43 @@ logo, y que el slice `perfil` guarde lo que devuelve `perfil/datos.ts`.
 
 ---
 
+## 2026-11-08 — La ingesta diaria no publicaba: clave equivocada y chequeo de acceso al arranque
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** entender por qué la ingesta de `ingesta.yml` fallaba todos los días desde su primera
+corrida (2026-11-03) y que no vuelva a tardar 40 minutos en avisar.
+
+**Prompts principales:**
+1. "Leé por completo el git y dame un resumen de lo que está y lo que falta en el MVP."
+2. "Sí, investigalo" (sobre la ingesta en rojo).
+3. "Sí, pero que todas las pruebas queden acá en la compu, nada en el git sin mi aprobación."
+4. "Creá en el git un PR explicando todo lo que hicimos para que esto funcionara."
+
+**Resultado:**
+- Diagnóstico: las 5 corridas (3/11 al 7/11) fallaban igual, `leer promociones: permission denied
+  for table promociones`, en la primera consulta a la base y después de ~40 minutos bajando MODO.
+  Las migraciones le dan todo a `service_role` y le sacan todo a `anon`
+  (`20261101000006_promociones.sql`), así que el error es el de una clave `anon`/publishable cargada
+  como `SUPABASE_SERVICE_ROLE_KEY`.
+- Arreglo (a mano, fuera del repo): se reemplazó el secret `SUPABASE_SERVICE_ROLE_KEY` (y se
+  reconfirmó `SUPABASE_URL`) por la service role del proyecto. La IA no vio ni manejó la clave.
+- Verificado: la corrida manual #6 terminó bien en 43 min: 1779 candidatas, 3088 filas de
+  promociones, 82 bancos, 13 categorías y 1776 capturas crudas; 0 errores de detalle y 0 formatos
+  desconocidos; 743 descartes automáticos (690 por nivel de cliente).
+- Código: `comprobarAcceso` en `publicar.ts` lee `categorias`, `bancos` y `promociones` antes de
+  pedir nada a MODO; `ingestar.ts` la llama al arrancar. Con una clave anon o publishable la
+  corrida falla en segundos (en la primera tabla, `categorias`), con un mensaje que dice qué revisar
+  y sin imprimir la clave. Una clave que lee pero no escribe sigue fallando recién al publicar.
+  4 tests nuevos. Revisado con rules-guardian, /code-review (Standards y Spec) y test-runner.
+- Hallazgo: GitHub arranca las corridas programadas (09:00 UTC = 06:00 ART) con 6 a 8 horas de
+  atraso; es comportamiento de GitHub Actions, no de la configuración. Queda para decidir con el
+  equipo si se adelanta el cron.
+- Queda pendiente: alias de bancos que el mapeo no reconoce («Macro Business», «Galicia Éminent»)
+  y actualizar `actions/checkout` y `actions/setup-node` (aviso de Node 20).
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
