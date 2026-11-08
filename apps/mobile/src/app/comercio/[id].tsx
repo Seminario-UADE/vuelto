@@ -44,7 +44,7 @@ export default function ConQuePagar() {
   // Igual que desde Inicio: deja la compra por confirmar y vuelve a Inicio (spec 012, FR-002).
   const usar = () => {
     if (!r?.medio) return;
-    if (usarRecomendacion(r.medio.nombre)) router.dismissTo("/");
+    if (usarRecomendacion()) router.dismissTo("/");
   };
 
   return (

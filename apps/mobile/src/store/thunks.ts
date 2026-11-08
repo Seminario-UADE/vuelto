@@ -75,7 +75,7 @@ export function guardarCompra(b: BorradorCompra, intento: string | null = null, 
  * compra, así que no toca topes (FR-003). Devuelve si reemplazó la del mismo comercio
  * (FR-012), o `null` si no hay un medio recomendado o no hay usuario.
  */
-export function usarRecomendacion(): AppThunk<{ porConfirmar: CompraPorConfirmar; reemplazo: boolean } | null> {
+export function usarRecomendacion(): AppThunk<{ porConfirmar: CompraPorConfirmar; medioNombre: string; reemplazo: boolean } | null> {
   return (dispatch, getState, { generarId }) => {
     const estado = getState();
     const r = selectRecomendacion(estado);
@@ -93,7 +93,7 @@ export function usarRecomendacion(): AppThunk<{ porConfirmar: CompraPorConfirmar
     const reemplazo = selectPorConfirmarVigentes(estado).some((c) => c.comercioId === porConfirmar.comercioId);
     dispatch(porConfirmarCreada(porConfirmar));
     dispatch(comercioElegido(null));
-    return { porConfirmar, reemplazo };
+    return { porConfirmar, medioNombre: r.medio.nombre, reemplazo };
   };
 }
 

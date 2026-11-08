@@ -112,7 +112,7 @@ export default function Inicio() {
               />
             ) : null}
             {r.medio ? (
-              <Button label={`Usar ${r.medio.nombreCorto}`} onPress={() => usar(r.medio?.nombre ?? "")} />
+              <Button label={`Usar ${r.medio.nombreCorto}`} onPress={() => usar()} />
             ) : null}
             <Pressable
               onPress={() => router.push({ pathname: "/comercio/[id]", params: { id: r.comercio.id } })}

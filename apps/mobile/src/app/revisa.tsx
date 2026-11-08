@@ -152,7 +152,8 @@ export default function Revisa() {
         </>
       }
     >
-      <SheetHeader title="Revisá tu compra" subtitle={SUBTITULO[modo]} />
+      {/* Desde una compra por confirmar el origen final lo decide el thunk (FR-006): el subtítulo no lo adelanta. */}
+      <SheetHeader title="Revisá tu compra" subtitle={desde ? "Confirmá los datos de la compra que pagaste." : SUBTITULO[modo]} />
 
       {modo === "ticket" ? (
         <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
