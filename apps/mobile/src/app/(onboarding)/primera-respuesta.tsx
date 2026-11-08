@@ -1,6 +1,6 @@
 import { router, Stack } from "expo-router";
 import { useRef, useState } from "react";
-import { View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
@@ -12,6 +12,7 @@ import { SelectorComercios } from "@/components/selector-comercios";
 import { Text } from "@/components/text";
 import type { Recomendacion } from "@/data/contracts";
 import { hapticoSeleccion } from "@/lib/haptics";
+import { esPantallaBaja } from "@/lib/pantalla-baja";
 import { RUBROS } from "@/lib/rubros";
 import { quitarComercio, SELECCION_VACIA, tocarComercio } from "@/lib/seleccion-comercios";
 import { MENSAJES_ERROR } from "@/perfil/modelo";
@@ -36,6 +37,7 @@ export default function PrimeraRespuesta() {
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const r = useRecomendacionPara(seleccion.activo, null);
+  const compacta = esPantallaBaja(useWindowDimensions().height);
 
   const terminar = () => {
     dispatch(onboardingTerminado());
@@ -64,7 +66,7 @@ export default function PrimeraRespuesta() {
       <Screen
         footer={
           <>
-            {r ? <Respuesta r={r} /> : null}
+            {r ? <Respuesta r={r} compacta={compacta} /> : null}
             {error ? (
               <Text variant="label" tone="warning" align="center" accessibilityLiveRegion="polite">
                 {error}
@@ -112,27 +114,35 @@ export default function PrimeraRespuesta() {
  * La respuesta del motor para el comercio tocado, fija arriba de los botones para que se vea al
  * tocar aunque la lista de comercios esté scrolleada. Sin promo, lo dice y sugiere probar otro.
  */
-function Respuesta({ r }: { r: Recomendacion }) {
+function Respuesta({ r, compacta }: { r: Recomendacion; compacta: boolean }) {
   const conPromo = r.medio !== null;
   return (
     <Animated.View key={r.comercio.id} entering={FadeIn.duration(150)} style={{ gap: space.sm }}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
-        <Avatar icon={iconoDeRubro[r.comercio.rubro]} />
-        <View style={{ flex: 1 }}>
-          <Text variant="bodyLg" weight="semibold">
-            {r.comercio.nombre}
-          </Text>
-          <Text variant="label" tone="inkSecondary">
-            {RUBROS[r.comercio.rubro].titulo} · {r.dia}
-          </Text>
-        </View>
-      </View>
+      {compacta ? null : <CabeceraComercio r={r} />}
       <DecisionCard
         titulo={conPromo ? `Te conviene ${r.medio?.nombre}` : "Hoy no hay promo con tus medios"}
         inicial={r.medio?.inicial}
         razon={conPromo ? r.razon : [r.proximaPromo, "Probá con otro comercio"].filter(Boolean).join(". ")}
         razonIcon={conPromo ? "checkCirculo" : "info"}
+        compacta={compacta}
       />
     </Animated.View>
+  );
+}
+
+/** Quién es el comercio y qué día es; en pantallas bajas se omite (la tarjeta ya dice qué hacer). */
+function CabeceraComercio({ r }: { r: Recomendacion }) {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
+      <Avatar icon={iconoDeRubro[r.comercio.rubro]} />
+      <View style={{ flex: 1 }}>
+        <Text variant="bodyLg" weight="semibold">
+          {r.comercio.nombre}
+        </Text>
+        <Text variant="label" tone="inkSecondary">
+          {RUBROS[r.comercio.rubro].titulo} · {r.dia}
+        </Text>
+      </View>
+    </View>
   );
 }

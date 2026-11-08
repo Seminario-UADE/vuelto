@@ -23,6 +23,8 @@ type Props = {
   tope?: { texto: string; quedaPoco?: boolean } | null;
   /** Base del estimado, siempre visible si hay cifra estimada (Principio V). */
   base?: string | null;
+  /** Versión baja para el pie de pantallas chicas: menos relleno y la razón en una sola línea. */
+  compacta?: boolean;
   children?: ReactNode;
   accessibilityLabel?: string;
 };
@@ -31,15 +33,15 @@ type Props = {
  * La tarjeta de decisión: la única superficie oscura de la app y solo donde hay una
  * decisión (auditoría P1 #2). Orden fijo: respuesta → razón → cifra → tope → base.
  */
-export function DecisionCard({ titulo, inicial, razon, razonIcon = "checkCirculo", cifra, secundaria, tope, base, children, accessibilityLabel }: Props) {
+export function DecisionCard({ titulo, inicial, razon, razonIcon = "checkCirculo", cifra, secundaria, tope, base, compacta, children, accessibilityLabel }: Props) {
   return (
     <View
       style={{
         backgroundColor: colors.decisionBg,
         borderRadius: radius.card,
         borderCurve: "continuous",
-        padding: space.xl,
-        gap: space.lg,
+        padding: compacta ? space.lg : space.xl,
+        gap: compacta ? space.md : space.lg,
       }}
     >
       <View
@@ -58,7 +60,7 @@ export function DecisionCard({ titulo, inicial, razon, razonIcon = "checkCirculo
         {razon ? (
           <View style={{ flexDirection: "row", alignItems: "flex-start", gap: space.sm }}>
             <Icon name={razonIcon} size={20} color={colors.onDecisionAccent} />
-            <Text variant="bodyMd" style={{ flex: 1, color: colors.onDecision }}>
+            <Text variant="bodyMd" style={{ flex: 1, color: colors.onDecision }} numberOfLines={compacta ? 1 : undefined}>
               {razon}
             </Text>
           </View>
