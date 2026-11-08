@@ -12,7 +12,7 @@ import * as api from "@/data/api";
 import { useAsync } from "@/hooks/use-async";
 import { useAppDispatch } from "@/store/hooks";
 import { avisoMostrado } from "@/store/sesion";
-import { colors, radius, space } from "@/theme";
+import { colors, qrColors, radius, space } from "@/theme";
 
 const SI = ["Qué medio suyo conviene en cada compra del grupo", "El reintegro estimado de esa compra", "Su nombre para mostrar"];
 const NO = ["Nunca sus compras, montos ni comercios", "Nunca cuánto tope le queda", "Nunca sus otros medios de pago"];
@@ -54,8 +54,8 @@ export default function Invitar() {
       <Card padding={space.xl} gap={space.lg}>
         <View style={{ alignItems: "center", gap: space.md }}>
           {link ? (
-            <View style={{ padding: space.md, backgroundColor: colors.canvas, borderRadius: radius.row }}>
-              <QRCode value={`https://${link}`} size={180} color={colors.ink} backgroundColor={colors.canvas} />
+            <View style={{ padding: space.md, backgroundColor: qrColors.fondo, borderRadius: radius.row }}>
+              <QRCode value={`https://${link}`} size={180} color={qrColors.ink} backgroundColor={qrColors.fondo} />
             </View>
           ) : (
             <Skeleton height={204} width={204} />

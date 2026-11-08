@@ -12,7 +12,8 @@ type Props = {
 /** Badge solo cuando cambia una decisión ("Queda poco", "Tope agotado"). Mínimo 12 pt. */
 export function Badge({ label, tone = "neutral", icon }: Props) {
   const estilo = {
-    neutral: { bg: colors.surfaceStrong, fg: colors.inkSecondary },
+    // En claro, `inkSecondary` sobre `surfaceStrong` da 4,3:1 (DESIGN.md §2): ahí va `ink`.
+    neutral: { bg: colors.surfaceStrong, fg: colors.ink },
     warning: { bg: colors.warningBg, fg: colors.warning },
     error: { bg: colors.surfaceStrong, fg: colors.error },
     success: { bg: colors.successBg, fg: colors.ink },

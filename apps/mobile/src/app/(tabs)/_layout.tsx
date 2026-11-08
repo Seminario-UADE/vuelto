@@ -4,6 +4,7 @@ import { Text, View } from "react-native";
 import { Icon, type IconName } from "@/components/icon";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { leerMedios } from "@/store/perfil-remoto";
+import { useTema } from "@/components/tema-provider";
 import { colors, floatingShadow, fonts } from "@/theme";
 
 const tab = (title: string, icon: IconName) => ({
@@ -23,10 +24,11 @@ const tab = (title: string, icon: IconName) => ({
 });
 
 /**
- * Inicio · Comprar · Topes · Perfil (DESIGN.md §5). Tabs JS con el estilo de DESIGN.md:
- * fondo Blanco Hueso con sombra flotante, activo en Verde Bosque (research R2).
+ * Inicio · Comprar · Topes · Perfil. La estructura de DESIGN.md §5 (Compras · Inicio · Topes, nativa) llega con #103 y la spec 012. Tabs JS con el estilo de DESIGN.md:
+ * fondo `canvas` con sombra flotante, activo en `ink` (research R2). La tab bar nativa va en #103.
  */
 export default function TabsLayout() {
+  const t = useTema();
   const usuario = useAppSelector((s) => s.sesion.usuario);
   const perfil = useAppSelector((s) => s.perfil);
   const dispatch = useAppDispatch();
@@ -57,16 +59,16 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.ink,
-        tabBarInactiveTintColor: colors.inkSecondary,
+        tabBarActiveTintColor: t.ink,
+        tabBarInactiveTintColor: t.inkSecondary,
         tabBarLabelStyle: { fontFamily: fonts.medium, fontSize: 12, lineHeight: 16 },
         tabBarAllowFontScaling: true,
         tabBarStyle: {
-          backgroundColor: colors.canvas,
+          backgroundColor: t.canvas,
           borderTopWidth: 0,
           boxShadow: floatingShadow,
         },
-        sceneStyle: { backgroundColor: colors.canvas },
+        sceneStyle: { backgroundColor: t.canvas },
       }}
     >
       <Tabs.Screen name="index" options={tab("Inicio", "inicio")} />

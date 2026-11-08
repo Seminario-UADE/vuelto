@@ -8,9 +8,10 @@
 > `expo-native-ui`).
 > App mobile (iOS/Android, Expo), viewport de referencia 390×844 pt.
 >
-> **Estado de implementación**: la app implementa la v5 hasta que se cierre
-> la issue de temas. Los comentarios del código que citan secciones de este
-> archivo se actualizan con esa issue.
+> **Estado de implementación**: la app implementa la paleta, los dos temas y
+> los radios de la v6 (issue #115). La fila de comercios y la lista agrupada
+> existen como componentes base (`fila-comercios.tsx`, `lista-agrupada.tsx`)
+> y se conectan a Inicio con la spec 012.
 
 ## 1. Tema visual y atmósfera
 
@@ -66,6 +67,13 @@ tema. Ratios WCAG 2.1 medidos.
 | `onDecision` | `#F3EBD6` | `#02110C` | Texto sobre la decisión | 14.4 / 16.2 |
 | `onDecisionMuted` | `#A3B5A8` | `#4E6656` | Razón y base sobre la decisión | 7.7 / 5.3 |
 | `onDecisionAccent` | `#8EB69B` (texto `#02110C`) | `#1A422F` (texto `#F3EBD6`) | El botón «Usar [medio]» dentro de la decisión | 8.6 / 9.5 |
+
+Roles técnicos fuera de la tabla (no son paleta nueva, derivan de los
+valores de arriba): `decisionSurface` (campo de monto y pista de barra dentro
+de la decisión), `scrim`, `scrimOverlay`, `scrimSurface`, `onScrim` y
+`onScrimMuted` (visor de cámara de Escanear, oscuro en los dos temas),
+`backdrop` (velo de hojas en web) y `qrColors` (el QR de invitación va oscuro
+sobre claro en los dos temas, porque muchos lectores no leen un QR invertido).
 
 Reglas:
 

@@ -1,4 +1,5 @@
 import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -63,6 +64,8 @@ export default function Escanear() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.scrim, paddingTop: insets.top, paddingBottom: insets.bottom }}>
+      {/* El visor es oscuro en los dos temas: la barra de estado va clara. */}
+      <StatusBar style="light" />
       <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: space.lg, minHeight: 56 }}>
         <Pressable
           onPress={() => router.back()}
@@ -72,14 +75,14 @@ export default function Escanear() {
             width: size.hit,
             height: size.hit,
             borderRadius: radius.pill,
-            backgroundColor: colors.decisionSurface,
+            backgroundColor: colors.scrimSurface,
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <Icon name="cerrar" size={18} color={colors.onDecision} />
+          <Icon name="cerrar" size={18} color={colors.onScrim} />
         </Pressable>
-        <Text variant="titleMd" align="center" accessibilityRole="header" style={{ flex: 1, color: colors.onDecision }}>
+        <Text variant="titleMd" align="center" accessibilityRole="header" style={{ flex: 1, color: colors.onScrim }}>
           Escaneá el ticket
         </Text>
         <View style={{ width: size.hit }} />
@@ -92,7 +95,7 @@ export default function Escanear() {
         <View
           accessible
           accessibilityLabel="Visor con un ticket de ejemplo de Coto por 24.500 pesos"
-          style={{ padding: space.lg, borderRadius: radius.row, borderWidth: 2, borderColor: colors.onDecisionAccent }}
+          style={{ padding: space.lg, borderRadius: radius.row, borderWidth: 2, borderColor: colors.onScrimMuted }}
         >
           <View style={{ backgroundColor: colors.canvas, borderRadius: radius.badge, padding: space.lg, gap: space.xs }}>
             <Text variant="bodyMd" weight="bold" align="center">
@@ -154,7 +157,7 @@ export default function Escanear() {
                 La foto no se guarda: leemos los datos y la descartamos
               </Text>
             </View>
-            <Text variant="label" align="center" style={{ color: colors.onDecisionMuted }}>
+            <Text variant="label" align="center" style={{ color: colors.onScrimMuted }}>
               {leyendo ? "Leyendo el ticket…" : "Modo demo: usamos un ticket de ejemplo, sin cámara"}
             </Text>
           </View>
@@ -175,8 +178,8 @@ export default function Escanear() {
           accessibilityRole="button"
           style={{ alignItems: "center", gap: space.xs, minWidth: 88, minHeight: size.hit }}
         >
-          <Icon name="teclado" size={24} color={colors.onDecision} />
-          <Text variant="label" style={{ color: colors.onDecision }}>
+          <Icon name="teclado" size={24} color={colors.onScrim} />
+          <Text variant="label" style={{ color: colors.onScrim }}>
             Cargar a mano
           </Text>
         </Pressable>
@@ -191,7 +194,7 @@ export default function Escanear() {
             height: 76,
             borderRadius: radius.pill,
             borderWidth: 4,
-            borderColor: colors.onDecision,
+            borderColor: colors.onScrim,
             alignItems: "center",
             justifyContent: "center",
             opacity: leyendo ? 0.5 : 1,
