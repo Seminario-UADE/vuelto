@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import { Pressable, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { ComercioSearch } from "@/components/comercio-search";
 import { CompraRow } from "@/components/compra-row";
@@ -101,7 +102,7 @@ export default function Inicio() {
 
       {r ? (
         <Animated.View entering={FadeInDown.duration(220)}>
-          <RecomendacionCard r={r} onUsar={r.medio ? () => usar(r.medio?.nombre ?? "") : undefined}>
+          <RecomendacionCard r={r}>
             {r.resultado === "recomendado" ? (
               <MontoInput
                 value={monto}
@@ -109,6 +110,9 @@ export default function Inicio() {
                 onDecision
                 hint="Con el monto te decimos cuánto te devuelven."
               />
+            ) : null}
+            {r.medio ? (
+              <Button label={`Usar ${r.medio.nombreCorto}`} onPress={() => usar(r.medio?.nombre ?? "")} />
             ) : null}
             <Pressable
               onPress={() => router.push({ pathname: "/comercio/[id]", params: { id: r.comercio.id } })}

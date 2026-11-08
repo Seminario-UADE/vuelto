@@ -4,24 +4,15 @@ import type { Alternativa, Recomendacion } from "@/data/contracts";
 import { aprox } from "@/lib/format";
 import { colors, space } from "@/theme";
 import { Avatar } from "./avatar";
-import { Button } from "./button";
 import { DecisionCard } from "./decision-card";
 import { Text } from "./text";
 
 /**
  * Pinta una `Recomendacion` tal como llega del servidor: la app no calcula nada, solo
- * elige qué texto mostrar. Sin monto no hay "Te devuelven" (auditoría P1 #1). Con `onUsar` y
- * un medio recomendado, suma el pie «Usar [medio]» (spec 012, FR-001); sin medio no hay «Usar».
+ * elige qué texto mostrar. Sin monto no hay "Te devuelven" (auditoría P1 #1). El «Usar [medio]»
+ * (spec 012, FR-001) lo pone la pantalla en `children`, entre el monto y el link de detalle.
  */
-export function RecomendacionCard({
-  r,
-  children,
-  onUsar,
-}: {
-  r: Recomendacion;
-  children?: ReactNode;
-  onUsar?: () => void;
-}) {
+export function RecomendacionCard({ r, children }: { r: Recomendacion; children?: ReactNode }) {
   if (r.resultado === "sin-promo" || !r.medio) {
     const agotado = r.alternativas.find((a) => a.estado === "agotado");
     return (
@@ -69,7 +60,6 @@ export function RecomendacionCard({
       base={r.base?.texto ?? null}
     >
       {children}
-      {onUsar ? <Button label={`Usar ${r.medio.nombreCorto}`} onPress={onUsar} /> : null}
     </DecisionCard>
   );
 }

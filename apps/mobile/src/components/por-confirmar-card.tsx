@@ -4,11 +4,13 @@ import { antiguedad, type CompraPorConfirmar } from "@/data/por-confirmar";
 import { pesos } from "@/lib/format";
 import { useAppSelector } from "@/store/hooks";
 import { selectMediosDelUsuario } from "@/store/selectores";
-import { space } from "@/theme";
+import { colors, space } from "@/theme";
 import { Avatar } from "./avatar";
 import { Button } from "./button";
 import { Card } from "./card";
 import { Text } from "./text";
+
+const NOTA = "No cuenta para tus topes hasta que la confirmes";
 
 /**
  * Una compra por confirmar (spec 012, FR-005): comercio, «Pagá con [medio]», monto si lo hay y
@@ -21,23 +23,26 @@ export function PorConfirmarCard({ c }: { c: CompraPorConfirmar }) {
   const ahora = useAppSelector((s) => s.sesion.ahora);
   const medio = medios.find((m) => m.id === c.medioId);
   const pagaCon = medio ? `Pagá con ${medio.nombre}` : "Pagá con el medio que elegiste";
-  const detalle = [c.monto !== null ? pesos(c.monto) : null, antiguedad(c, ahora)].filter(Boolean).join(" · ");
+  const titulo = [c.comercioNombre, c.monto !== null ? pesos(c.monto) : null].filter(Boolean).join(" · ");
+  const detalle = `${pagaCon} · ${antiguedad(c, ahora)}`;
 
   return (
-    <Card gap={space.lg} padding={space.xl}>
+    <Card gap={space.lg} padding={space.xl} style={{ borderWidth: 1.5, borderColor: colors.accent }}>
       <View
         accessible
-        accessibilityLabel={`Compra por confirmar en ${c.comercioNombre}. ${pagaCon}. ${detalle}.`}
+        accessibilityLabel={`Compra por confirmar. ${titulo}. ${detalle}. ${NOTA}.`}
         style={{ flexDirection: "row", alignItems: "center", gap: space.md }}
       >
         <Avatar letras={medio?.inicial ?? c.comercioNombre.charAt(0)} tone="activo" />
         <View style={{ flex: 1, gap: space.xs }}>
-          <Text variant="label" tone="inkSecondary">
-            Por confirmar · {c.comercioNombre}
+          <Text variant="bodyLg" weight="semibold" tabular>
+            {titulo}
           </Text>
-          <Text variant="titleMd">{pagaCon}</Text>
-          <Text variant="bodyMd" tone="inkSecondary" tabular>
+          <Text variant="bodyMd" tone="inkSecondary">
             {detalle}
+          </Text>
+          <Text variant="label" tone="inkSecondary">
+            {NOTA}
           </Text>
         </View>
       </View>
