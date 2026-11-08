@@ -2120,12 +2120,52 @@ logo, y que el slice `perfil` guarde lo que devuelve `perfil/datos.ts`.
   existir con ADR-011: el APK baja las promos de Supabase al abrir.
 - Hallazgo: la ingesta diaria falla desde el 2026-11-03 con
   `permission denied for table promociones`; sin promos publicadas el APK
-  no tiene qué recomendar. Resuelto el 2026-11-08 (secret corregido, corrida
-  manual con 3088 promociones publicadas; chequeo de acceso en #117).
-- 2026-11-08: se sube la config y la guía en un PR aparte, sin cerrar #56. El
-  build espera al merge de #107 para no gastar dos builds del free tier.
+  no tiene qué recomendar.
 - Queda pendiente: login en EAS, variables en EAS, el build en sí, la prueba
   en un Android real y el link en la tabla.
+
+---
+
+## 2026-11-08 — Build de respaldo: config y guía listas, el build espera a #107 (issue #56)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI; subagentes `rules-guardian`,
+`/code-review` y `test-runner`.
+
+**Objetivo:** retomar la #56 ahora que la ingesta publica promos reales (#117) y
+dejarla lista hasta el último paso, sin gastar un build del free tier antes de
+tiempo.
+
+**Prompts principales:**
+1. "¿Qué tickets de jeqm0302 se pueden terminar ya?" Quedaban dos: #43 (PR #107,
+   con cuatro observaciones de la auditoría de Joaconz) y #56 (sin bloqueo desde
+   que la base tiene promos).
+2. "¿En qué orden conviene cerrarlos?" Primero #107; la #56 se adelanta en
+   paralelo, pero el build espera al merge para que el APK traiga la pantalla
+   del comercio y no gastar dos builds de los 15 por mes.
+3. "Prepará el PR de la #56 con la config y la guía, sin cerrar la issue." Va
+   como `Refs #56`: falta el build y la prueba en un Android real.
+
+**Resultado:**
+- `apps/mobile/eas.json` y `docs/presentacion/build-respaldo.md` de la sesión del
+  2026-11-06, sin cambios de fondo. El bloqueo que anotaba esa sesión (la
+  ingesta fallaba con `permission denied`) quedó resuelto: secret corregido y
+  corrida manual con 3088 promociones publicadas.
+- El criterio de la issue "corpus sembrado e ingesta apagada (RF-18)" se
+  reinterpreta según ADR-011: la prueba en Android se hace con las promos de la
+  ingesta automática.
+- Revisiones: `rules-guardian` sin violaciones (a EAS van solo la URL y la anon
+  key; no hay valores de claves en ningún archivo). `/code-review` sin
+  violaciones, con un ajuste.
+- Error de la IA: la checklist de prueba nombraba «¿Con qué pago?» y «Mis
+  topes», que la app no muestra; se cambió por los rótulos reales, pestaña
+  «Comprar» y pestaña «Topes».
+- Verificado: lint, typecheck y tests de los 4 workspaces (1015 en verde);
+  `eas.json` es JSON válido.
+- Queda pendiente:
+  - Login en EAS y variables del entorno `preview`: los carga el responsable,
+    con su cuenta.
+  - El build, después del merge de #107; la prueba en un Android real con la
+    checklist, y el link y el modelo de celular en la tabla de la guía.
 
 ---
 
