@@ -17,7 +17,7 @@
       "userInterfaceStyle": "automatic",
       "package": "ar.edu.uade.vuelto",
       "adaptiveIcon": {
-        "backgroundColor": "#14281D",
+        "backgroundColor": "#051F20",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },

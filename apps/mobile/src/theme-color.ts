@@ -8,7 +8,8 @@ import type { ColorValue } from "react-native";
  * Sin React Native a propósito, para que los tests de Vitest (Node) puedan importar el tema.
  */
 
-export type Esquema = "claro" | "oscuro";
+import type { Esquema } from "./theme-esquema";
+export type { Esquema };
 
 let esquemaActual: Esquema = "claro";
 

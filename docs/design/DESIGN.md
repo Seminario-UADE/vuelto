@@ -68,6 +68,13 @@ tema. Ratios WCAG 2.1 medidos.
 | `onDecisionMuted` | `#A3B5A8` | `#4E6656` | Razón y base sobre la decisión | 7.7 / 5.3 |
 | `onDecisionAccent` | `#8EB69B` (texto `#02110C`) | `#1A422F` (texto `#F3EBD6`) | El botón «Usar [medio]» dentro de la decisión | 8.6 / 9.5 |
 
+Roles técnicos fuera de la tabla (no son paleta nueva, derivan de los
+valores de arriba): `decisionSurface` (campo de monto y pista de barra dentro
+de la decisión), `scrim`, `scrimOverlay`, `scrimSurface`, `onScrim` y
+`onScrimMuted` (visor de cámara de Escanear, oscuro en los dos temas),
+`backdrop` (velo de hojas en web) y `qrColors` (el QR de invitación va oscuro
+sobre claro en los dos temas, porque muchos lectores no leen un QR invertido).
+
 Reglas:
 
 - **Un acento.** Oliva en el tema claro y Salvia clara en el oscuro, solo

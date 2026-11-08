@@ -5,7 +5,8 @@ import { DynamicColorIOS, type ColorValue } from "react-native";
  * al cambiarla, aun en estilos ya montados o calculados una vez. Nada que volver a montar.
  */
 
-export type Esquema = "claro" | "oscuro";
+import type { Esquema } from "./theme-esquema";
+export type { Esquema };
 
 /** No hace falta: el sistema resuelve los colores dinámicos. */
 export const fijarEsquema: (esquema: Esquema) => void = () => {};
