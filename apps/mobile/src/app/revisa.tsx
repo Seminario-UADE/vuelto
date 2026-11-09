@@ -49,13 +49,20 @@ export default function Revisa() {
     fecha?: string;
     texto?: string;
     porConfirmar?: string;
+    /** Abierta desde el flujo de compra: al guardar sigue a «Compra guardada». */
+    flujo?: string;
   }>();
   const hoy = useAppSelector(selectHoy);
   // La compra por confirmar se lee una vez, al abrir: si vence con la hoja abierta, igual se guarda.
   const listaPorConfirmar = useAppSelector((s) => s.porConfirmar.lista);
   const [desde] = useState(() => {
     const pc = p.porConfirmar ? listaPorConfirmar.find((c) => c.id === p.porConfirmar) : undefined;
-    return pc ? { pc, ...borradorDesdePorConfirmar(pc, null, hoy) } : null;
+    // Con ticket (escaneo desde el paso 4): manda lo del ticket y lo que falta sale de la compra (FR-007).
+    const ticket =
+      p.modo === "ticket"
+        ? { monto: parseMonto(p.monto ?? ""), fecha: p.fecha || null, medioId: p.medio || null, textoExtraido: p.texto ?? null }
+        : null;
+    return pc ? { pc, ...borradorDesdePorConfirmar(pc, ticket, hoy) } : null;
   });
   const modo: OrigenCompra = desde
     ? desde.borrador.modo
@@ -66,7 +73,7 @@ export default function Revisa() {
   const [monto, setMonto] = useState<number | null>(desde ? desde.borrador.monto : parseMonto(p.monto ?? ""));
   // Excepción: el usuario eligió el medio al tocar "Usar…". Ticket: solo si el ticket lo dice.
   // Manual: nunca preseleccionado.
-  const medioDelTicket = modo === "ticket" && p.medio ? p.medio : null;
+  const medioDelTicket = modo === "ticket" ? (desde ? desde.borrador.medioId : p.medio || null) : null;
   const [medioId, setMedioId] = useState<string | null>(
     desde ? desde.borrador.medioId : modo === "excepcion" ? p.medio || null : medioDelTicket,
   );
@@ -126,12 +133,17 @@ export default function Revisa() {
         fecha,
         monto,
         medioId,
-        textoExtraido: modo === "ticket" ? (p.texto ?? null) : null,
+        textoExtraido: modo === "ticket" ? (desde?.borrador.textoExtraido ?? p.texto ?? null) : null,
         usarPromo: !quitoLaPromo,
       };
       // Desde una compra por confirmar, el origen lo decide `origenAlConfirmar` en el thunk.
-      dispatch(desde ? confirmarPorConfirmar(desde.pc.id, borrador, intento) : guardarCompra(borrador, intento));
+      const compra = dispatch(desde ? confirmarPorConfirmar(desde.pc.id, borrador, intento) : guardarCompra(borrador, intento));
       hapticoExito();
+      if (p.flujo) {
+        // Desde el flujo de compra, el cierre es su propia pantalla (auditoría v7).
+        router.replace({ pathname: "/compra-guardada", params: { id: compra.id } });
+        return;
+      }
       dispatch(avisoMostrado(desde ? "Compra guardada. Tus topes están al día." : "Compra guardada · la ves en Mis compras"));
       router.back();
     } catch (e) {
@@ -153,7 +165,10 @@ export default function Revisa() {
       }
     >
       {/* Desde una compra por confirmar el origen final lo decide el thunk (FR-006): el subtítulo no lo adelanta. */}
-      <SheetHeader title="Revisá tu compra" subtitle={desde ? "Confirmá los datos de la compra que pagaste." : SUBTITULO[modo]} />
+      <SheetHeader
+        title="Revisá tu compra"
+        subtitle={desde ? (modo === "ticket" ? SUBTITULO.ticket : "Confirmá los datos de la compra que pagaste.") : SUBTITULO[modo]}
+      />
 
       {modo === "ticket" ? (
         <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
@@ -214,12 +229,21 @@ export default function Revisa() {
             </View>
           </Card>
         ) : null}
+        {desde && desde.avisos.length > 0 ? (
+          <Text variant="bodyMd" tone="warning">
+            {desde.avisos
+              .map((a) => (a === "monto-distinto" ? "El monto del ticket es distinto al que simulaste." : "El ticket dice otro medio de pago."))
+              .join(" ")}{" "}
+            Usamos lo del ticket.
+          </Text>
+        ) : null}
         <View accessibilityRole="radiogroup" style={{ gap: space.md }}>
           {perfil.medios.map((m) => (
             <OptionRow
               key={m.id}
               title={m.nombre}
               detail={detalleDe(m.id)}
+              note={desde?.medioSugerido === m.id && medioId === null ? "El que elegiste al simular" : null}
               selected={medioId === m.id}
               onPress={() => {
                 hapticoSeleccion();
@@ -232,7 +256,16 @@ export default function Revisa() {
         </View>
       </View>
 
-      {hayPromo && propuesta ? (
+      {p.flujo && hayPromo && propuesta ? (
+        // Desde el flujo ya se vio la promo en el paso 3: queda solo el control para quitarla (auditoría v7).
+        <Button
+          label={quitoLaPromo ? "Usar la promo" : "No usé la promo"}
+          variant="text"
+          onPress={() => setQuitoLaPromo((v) => !v)}
+        />
+      ) : null}
+
+      {!p.flujo && hayPromo && propuesta ? (
         <View style={{ gap: space.md }}>
           <SectionHeader title="Promo aplicada" />
           <Card padding={space.lg} gap={space.sm}>

@@ -71,7 +71,7 @@ export function TopeResumen({ t }: { t: TopeMedio }) {
  * Fila completa para la pestaña Topes. Con `onPress` es tocable y lleva a las compras que lo
  * consumieron (issue #45); sin él, es el encabezado de esa pantalla.
  */
-export function TopeDetalle({ t, onPress }: { t: TopeMedio; onPress?: () => void }) {
+export function TopeDetalle({ t, onPress, conConsejo = true }: { t: TopeMedio; onPress?: () => void; conConsejo?: boolean }) {
   const Contenedor = onPress ? PressableScale : View;
   return (
     <Contenedor
@@ -95,7 +95,7 @@ export function TopeDetalle({ t, onPress }: { t: TopeMedio; onPress?: () => void
           style={{
             width: 40,
             height: 40,
-            borderRadius: radius.pill,
+            borderRadius: radius.row,
             backgroundColor: colors.surfaceStrong,
             alignItems: "center",
             justifyContent: "center",
@@ -139,7 +139,7 @@ export function TopeDetalle({ t, onPress }: { t: TopeMedio; onPress?: () => void
           </Text>
         </View>
       )}
-      {t.consejo ? (
+      {conConsejo && t.consejo ? (
         <View
           style={{
             flexDirection: "row",

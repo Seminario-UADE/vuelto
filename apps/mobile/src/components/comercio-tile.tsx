@@ -1,0 +1,57 @@
+import { useWindowDimensions, View } from "react-native";
+import type { Comercio } from "@/data/contracts";
+import { hapticoLeve } from "@/lib/haptics";
+import { colors, ONE_COLUMN_FONT_SCALE, radius, space } from "@/theme";
+import { Icon, iconoDeRubro } from "./icon";
+import { PressableScale } from "./pressable-scale";
+import { Text } from "./text";
+
+/**
+ * Grilla de comercios en cuadrados redondeados (DESIGN.md v7 §5, como los accesos rápidos de
+ * las referencias): ícono del rubro en un cuadrado `surface` y el nombre debajo. Cuatro por fila;
+ * tres con texto grande. Tocar uno es elegirlo.
+ */
+export function GrillaComercios({
+  comercios,
+  onElegir,
+}: {
+  comercios: readonly Comercio[];
+  onElegir: (c: Comercio) => void;
+}) {
+  const { width, fontScale } = useWindowDimensions();
+  const columnas = fontScale > ONE_COLUMN_FONT_SCALE ? 3 : 4;
+  const ancho = Math.floor((width - space.gutter * 2 - space.md * (columnas - 1)) / columnas);
+  return (
+    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.md }}>
+      {comercios.map((c) => (
+        <PressableScale
+          key={c.id}
+          onPress={() => {
+            hapticoLeve();
+            onElegir(c);
+          }}
+          accessibilityRole="button"
+          accessibilityLabel={c.nombre}
+          style={{ width: ancho, alignItems: "center", gap: space.sm }}
+        >
+          <View
+            style={{
+              width: ancho,
+              aspectRatio: 1,
+              borderRadius: radius.tile,
+              borderCurve: "continuous",
+              backgroundColor: colors.surface,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Icon name={iconoDeRubro[c.rubro]} size={28} color={colors.ink} />
+          </View>
+          <Text variant="label" align="center" numberOfLines={1} maxFontSizeMultiplier={1.4} importantForAccessibility="no">
+            {c.nombre}
+          </Text>
+        </PressableScale>
+      ))}
+    </View>
+  );
+}

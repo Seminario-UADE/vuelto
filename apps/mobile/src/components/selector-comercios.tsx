@@ -49,7 +49,7 @@ export function SelectorComercios({ marcados, activo, onTocar, onQuitar }: Props
           gap: space.sm,
           minHeight: 48,
           paddingHorizontal: space.lg,
-          borderRadius: radius.pill,
+          borderRadius: radius.control,
           backgroundColor: colors.surfaceStrong,
         }}
       >
@@ -121,7 +121,7 @@ function ChipMarcado({
         minHeight: size.chip,
         flexDirection: "row",
         alignItems: "center",
-        borderRadius: radius.pill,
+        borderRadius: radius.control,
         backgroundColor: colors.accent,
         borderWidth: 2,
         borderColor: activo ? colors.ink : colors.accent,

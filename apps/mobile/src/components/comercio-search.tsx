@@ -32,7 +32,7 @@ export function ComercioSearch({ onElegir, seleccionado, sobre = "surface" }: Pr
           gap: space.sm,
           minHeight: 48,
           paddingHorizontal: space.lg,
-          borderRadius: radius.pill,
+          borderRadius: radius.control,
           backgroundColor: sobre === "surface" ? colors.canvas : colors.surfaceStrong,
         }}
       >

@@ -54,7 +54,7 @@ export function Button({ label, onPress, variant = "primary", disabled, loading,
       aria-disabled={Boolean(inactivo)}
       style={{
         minHeight: variant === "text" ? size.hit : size.primaryButton,
-        borderRadius: radius.pill,
+        borderRadius: radius.control,
         borderCurve: "continuous",
         backgroundColor: inactivo && relleno ? colors.surfaceStrong : fondo,
         borderWidth: variant === "secondary" ? 1.5 : 0,

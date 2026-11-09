@@ -1,122 +1,62 @@
 import { router } from "expo-router";
-import { useState } from "react";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 import { Button } from "@/components/button";
-import { Card } from "@/components/card";
-import { Chip } from "@/components/chip";
 import { EmptyState } from "@/components/empty-state";
-import { Icon, iconoDeRubro } from "@/components/icon";
+import { Icon } from "@/components/icon";
 import { Screen } from "@/components/screen";
 import { Text } from "@/components/text";
 import { TopeDetalle } from "@/components/tope-card";
-import type { Rubro } from "@/data/contracts";
 import { aprox } from "@/lib/format";
-import { RUBROS } from "@/lib/rubros";
 import { useAppSelector } from "@/store/hooks";
 import { selectTopes } from "@/store/selectores";
 import { colors, space } from "@/theme";
 
 /**
- * Tus topes: cuánto queda por medio, con ≈ y su base. Sin total agregado de topes
-
- * (auditoría P1 #4) y sin tarjeta oscura: no hay una decisión acá (P1 #2).
+ * Tus topes (DESIGN.md v7): cuánto queda por medio, con ≈ y su base, y nada más. Sin total
+ * agregado de topes (auditoría P1 #4), sin chips ni consejos: lo que conviene hoy lo dice el «+».
  */
 export default function Topes() {
   // Derivados con el motor sobre las compras del store: una compra guardada los cambia al instante.
   const datos = useAppSelector(selectTopes);
-  const [rubro, setRubro] = useState<Rubro | null>(null);
-  const lista = datos.medios.filter((m) => rubro === null || m.rubro === rubro);
   const vacio = datos.devolvieron.monto === 0 && datos.medios.every((m) => m.disponible === null);
 
   return (
     <Screen kind="tab" aboveTabBar>
       <View style={{ gap: space.xs }}>
-        <Text variant="label" tone="inkSecondary">
-          {datos.mes.replace(/^./, (c) => c.toUpperCase())}
-        </Text>
         <Text variant="titleLg" accessibilityRole="header">
           Tus topes
         </Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: space.xs }}>
+          <Icon name="calendario" size={16} color={colors.inkSecondary} />
+          <Text variant="label" tone="inkSecondary">
+            {datos.mes.replace(/^./, (c) => c.toUpperCase())} · los mensuales se reinician en {datos.reinicioMensualEnDias} días
+          </Text>
+        </View>
       </View>
 
       {vacio ? (
         <EmptyState
           title="Todavía no registraste compras"
-          body="Cuando registres la primera, vas a ver cuánto tope te queda en cada medio."
-          action={{ label: "Registrar compra", onPress: () => router.navigate("/comprar") }}
+          body="Cuando registres la primera, vas a ver cuánto tope te queda en cada medio. Tocá + cuando estés por pagar."
         />
       ) : (
         <>
-          <Card padding={space.xl} gap={space.lg}>
-            <View
-              accessible
-              accessibilityLabel={`Este mes te devolvieron aproximadamente ${aprox(datos.devolvieron.monto).slice(1)}, ${datos.devolvieron.base.texto}`}
-              style={{ gap: space.xs }}
-            >
-              <View style={{ flexDirection: "row", alignItems: "center", gap: space.xs }}>
-                <Icon name="devolvieron" size={16} color={colors.inkSecondary} />
-                <Text variant="label" tone="inkSecondary">
-                  Este mes te devolvieron
-                </Text>
-              </View>
-              <Text variant="display" tabular>
-                {aprox(datos.devolvieron.monto)}
-              </Text>
-              <Text variant="label" tone="inkSecondary">
-                {datos.devolvieron.base.texto}
-              </Text>
-            </View>
-            <View style={{ height: 1, backgroundColor: colors.divider }} />
-            <View style={{ gap: space.sm }}>
-              <Text variant="bodyMd" weight="semibold">
-                {datos.mediosConTope}{" "}
-                {datos.mediosConTope === 1 ? "medio con tope disponible" : "medios con tope disponible"}
-              </Text>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: space.xs }}>
-                <Icon name="calendario" size={16} color={colors.inkSecondary} />
-                <Text variant="label" tone="inkSecondary">
-                  Los mensuales se reinician en {datos.reinicioMensualEnDias} días
-                </Text>
-              </View>
-            </View>
-          </Card>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={{ marginHorizontal: -space.gutter }}
-            contentContainerStyle={{ gap: space.sm, paddingHorizontal: space.gutter }}
-          >
-            <Chip label="Todos" selected={rubro === null} onPress={() => setRubro(null)} />
-            {datos.medios.map((m) => (
-              <Chip
-                key={m.rubro}
-                label={RUBROS[m.rubro].corto}
-                icon={iconoDeRubro[m.rubro]}
-                selected={rubro === m.rubro}
-                onPress={() => setRubro(rubro === m.rubro ? null : m.rubro)}
-              />
-            ))}
-          </ScrollView>
-
           <View style={{ gap: space.md }}>
-            {lista.map((m) => (
+            {datos.medios.map((m) => (
               <TopeDetalle
                 key={m.clave}
                 t={m}
+                conConsejo={false}
                 onPress={() => router.push({ pathname: "/tope/[clave]", params: { clave: m.clave } })}
               />
             ))}
           </View>
 
-          <View style={{ flexDirection: "row", gap: space.sm }}>
-            <Icon name="info" size={18} color={colors.inkSecondary} />
-            <Text variant="label" tone="inkSecondary" style={{ flex: 1 }}>
-              Los topes son estimados: los calculamos con las compras que registrás. Una compra sin guardar no cambia
-              ningún tope.
-            </Text>
-          </View>
-          <Button label="Ver mis compras" variant="secondary" onPress={() => router.push("/mis-compras")} />
+          <Text variant="label" tone="inkSecondary" align="center">
+            Estimados según las compras que registrás. Este mes te devolvieron {aprox(datos.devolvieron.monto)},{" "}
+            {datos.devolvieron.base.texto}.
+          </Text>
+          <Button label="Ver mis compras" variant="text" onPress={() => router.push("/mis-compras")} />
         </>
       )}
     </Screen>

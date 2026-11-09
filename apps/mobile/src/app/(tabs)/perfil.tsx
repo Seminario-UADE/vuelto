@@ -1,11 +1,10 @@
 import { router } from "expo-router";
 import { View } from "react-native";
-import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { Chip } from "@/components/chip";
 import { divisor } from "@/components/lista";
-import { ComerciosDelPerfil } from "@/components/comercios-del-perfil";
+import { FilaAccion } from "@/components/fila-accion";
 import { MediosDelPerfil } from "@/components/medios-del-perfil";
 import { NombreDelPerfil } from "@/components/nombre-del-perfil";
 import { Screen } from "@/components/screen";
@@ -26,18 +25,15 @@ const ESCENARIOS: { id: Escenario; label: string }[] = [
 ];
 
 /**
- * Perfil: medios, comercios, contactos y cuenta. Superficie clara (auditoría P1 #2) y sin
- * "Te devolvieron" (P2 #13).
+ * Perfil (DESIGN.md v7): tu nombre, tus medios de pago y dos filas, Mis compras y Contactos.
+ * Los comercios tienen su pestaña. Sin contadores ni textos explicativos.
  */
 export default function Perfil() {
   const dispatch = useAppDispatch();
-  const perfil = useAppSelector((s) => s.perfil);
   const usuario = useAppSelector((s) => s.sesion.usuario);
   const contactos = useAppSelector((s) => s.contactos.lista);
   const escenario = useAppSelector((s) => s.sesion.escenario);
 
-  const medios = perfil.medios;
-  const comercios = perfil.comercios;
 
   const pendientes = useAppSelector(selectPendientesAlCerrarSesion);
   const porConfirmar = useAppSelector(selectPorConfirmarVigentes).length;
@@ -59,64 +55,25 @@ export default function Perfil() {
     <Screen kind="tab" aboveTabBar>
       <Card padding={space.xl} gap={space.lg}>
         <NombreDelPerfil />
-        {perfil.carga !== "leyendo" ? (
-          <Text variant="bodyMd" tone="inkSecondary">
-            {medios.length} {medios.length === 1 ? "medio" : "medios"} · {comercios.length}{" "}
-            {comercios.length === 1 ? "comercio" : "comercios"}
-            {` · ${contactos.length} contactos`}
-          </Text>
-        ) : null}
       </Card>
 
       <MediosDelPerfil />
 
-      <ComerciosDelPerfil />
+      <Card padding={space.lg} gap={0} style={{ paddingVertical: space.xs }}>
+        <FilaAccion leading="ticket" titulo="Mis compras" onPress={() => router.push("/mis-compras")} />
+        <View style={divisor(1)}>
+          <FilaAccion
+            leading="grupo"
+            titulo="Contactos"
+            valor={contactos.length > 0 ? String(contactos.length) : null}
+            onPress={() => router.push("/contactos")}
+          />
+        </View>
+      </Card>
 
-      <View style={{ gap: space.md }}>
-        <SectionHeader
-          title="Contactos"
-          action={{ label: "Ver todos", onPress: () => router.push("/contactos") }}
-        />
-        <Text variant="bodyMd" tone="inkSecondary">
-          Con tus contactos, Vuelto decide quién de ustedes conviene que pague.
-        </Text>
-        {contactos.length > 0 ? (
-          <Card padding={space.lg} gap={0}>
-            {contactos.map((c, i) => (
-              <View
-                key={c.id}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: space.md,
-                  paddingVertical: space.md,
-                  ...divisor(i),
-                }}
-              >
-                <Avatar letras={c.iniciales} />
-                <Text variant="bodyLg" weight="semibold" style={{ flex: 1 }}>
-                  {c.nombre}
-                </Text>
-                <Text variant="label" tone="inkSecondary">
-                  Vinculado
-                </Text>
-              </View>
-            ))}
-          </Card>
-        ) : null}
-        <Button label="Invitar a alguien" variant="secondary" icon="invitar" onPress={() => router.push("/contactos/invitar")} />
-      </View>
-
-      <View style={{ gap: space.md }}>
-        <SectionHeader title="Cuenta" />
-        <Card>
-          <Text variant="bodyMd" tone="inkSecondary">
-            No pedimos claves ni números de tarjeta. Las fotos de tickets no se guardan: se leen y se descartan. Los
-            topes son estimados con las compras que registrás.
-          </Text>
-        </Card>
+      <View style={{ gap: space.xs }}>
         {usuario?.email ? (
-          <Text variant="bodyMd" tone="inkSecondary">
+          <Text variant="label" tone="inkSecondary" align="center">
             Entraste como {usuario.email}
           </Text>
         ) : null}

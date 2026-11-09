@@ -198,7 +198,7 @@ export default function ArmarGrupo() {
               minHeight: 48,
               minWidth: 48,
               paddingHorizontal: space.md,
-              borderRadius: radius.pill,
+              borderRadius: radius.control,
               backgroundColor: colors.surfaceStrong,
               alignItems: "center",
               justifyContent: "center",

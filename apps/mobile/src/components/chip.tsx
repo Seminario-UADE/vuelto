@@ -29,7 +29,7 @@ export function Chip({ label, onPress, selected, icon, accessibilityHint }: Prop
         gap: space.xs,
         paddingHorizontal: space.lg,
         paddingVertical: space.sm,
-        borderRadius: radius.pill,
+        borderRadius: radius.control,
         backgroundColor: selected ? colors.accent : colors.surfaceStrong,
       }}
     >

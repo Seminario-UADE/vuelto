@@ -1,4 +1,4 @@
-# Design System: Vuelto (v6)
+# Design System: Vuelto (v7)
 
 > Fuente de verdad para diseñar y generar pantallas de Vuelto (Stitch y la
 > app). La v6 (07/11/2026) reemplaza a `DESIGN-v5.md`, y su razonamiento está
@@ -7,6 +7,12 @@
 > 012 y de las skills de diseño del proyecto (`impeccable`, `apple-design`,
 > `expo-native-ui`).
 > App mobile (iOS/Android, Expo), viewport de referencia 390×844 pt.
+>
+> **v7 (09/11/2026)**: cambia la estructura, no la paleta. El **claro es el
+> modo de referencia** (se diseña y verifica primero en claro). Barra con el
+> «+» al centro, comprar en un paso por pantalla y una sola familia de
+> rectángulos redondeados en vez de píldoras. Plan y auditoría:
+> `plan-rediseno-v7.md`.
 >
 > **Estado de implementación**: la app implementa la paleta, los dos temas y
 > los radios de la v6 (issue #115). La fila de comercios y la lista agrupada
@@ -119,11 +125,15 @@ Reglas:
 
 - **Grilla de 4 pt.** Márgenes laterales de 20 pt. Entre secciones, 24 a
   32 pt. Dentro de un grupo, 12 a 16 pt.
-- **Radios**:
-  - tarjetas y listas agrupadas: **16 pt**;
-  - filas y campos: 12 pt;
+- **Radios (v7)**: una sola familia de rectángulos redondeados, como en las
+  referencias:
+  - tarjetas, listas agrupadas y tarjeta de decisión: **20 pt**;
+  - cuadrados de comercio: 16 pt;
+  - botones, campos, buscador, chips y teclas: **14 pt** (`radius.control`);
+  - filas e íconos en cuadrado: 12 pt;
   - hojas: el radio del sistema;
-  - píldoras (999) solo en botones, chips y círculos de comercio.
+  - la píldora (999) queda solo para la cápsula de la barra y lo que es un
+    círculo (avatares, radios, barras de progreso).
 - **Elevación por tono, no por sombra.** En el claro, las superficies se
   separan por color. En el oscuro, **lo elevado es más claro**
   (`canvas` → `surface` → `surfaceStrong`). Se declara una sola cosa: borde
@@ -134,31 +144,39 @@ Reglas:
 
 ## 5. Componentes
 
-**Navegación**: tab bar **nativa** (`NativeTabs` de Expo Router; si en el
-SDK 58 sigue *unstable*, la tab bar JS actual, sin dibujar una propia).
-- Tres secciones, en este orden: **Compras · Inicio · Topes**. Inicio queda
-  al centro y es la inicial.
-- El foco es el `tint` del acento.
-- En iOS 26 la barra es la píldora flotante de vidrio del sistema, y en
-  Android la barra Material 3.
-- Perfil no es una pestaña: se abre desde el avatar de Inicio. Grupo
-  tampoco: se entra desde el detalle del comercio.
-- El contenido reserva el alto de la barra más la zona segura.
+**Navegación (v7)**: una **cápsula flotante propia** (`tab-bar.tsx`), porque
+la nativa no admite un botón central destacado.
+- En este orden: **Inicio · Topes · ( + ) · Comercios · Perfil**. Inicio es
+  la inicial.
+- El **«+»** es la acción principal (comprar): un círculo de 60 pt en el
+  acento, más alto que la cápsula, con la etiqueta accesible «Comprar». Abre
+  el flujo de compra; no es una pestaña.
+- La activa va en el acento, con el ícono relleno. Rol de pestaña y estado
+  seleccionado para el lector de pantalla; 44 pt táctiles; se oculta con el
+  teclado.
 
-**Hero de Inicio** (fondo `surface`, de borde a borde):
-1. «Hola, Martín» (title-lg) y «Hoy es miércoles 11 de noviembre» en
-   `inkSecondary`, con el avatar de 44 pt a la derecha.
-2. «¿Dónde vas a comprar?» en title-md y la **fila de comercios**.
-3. Al elegir un comercio, la tarjeta de decisión aparece debajo de la fila.
+**Flujo de compra** (pantalla completa, un paso por pantalla):
+1. «¿Dónde estás comprando?»: buscador y tus comercios en cuadrados. Tocar
+   uno avanza solo.
+2. «¿Cuánto vas a pagar?»: la cifra grande y un teclado numérico propio. El
+   botón dice «Seguir sin el monto» mientras no haya monto.
+3. «Pagá con Galicia»: la tarjeta de decisión sola. «Voy a pagar con
+   Galicia» en el pie; «Otras opciones» y «¿Pagan entre varios?» plegadas
+   en una lista agrupada.
+4. «Pagá con Galicia»: el medio grande en la superficie invertida, para
+   mirarlo en la caja. Pie: «Escanear ticket» (principal), «Cargar a mano» y
+   «Lo confirmo después». Reemplaza al paso 3: no se vuelve, solo se cierra.
+5. «Compra guardada»: «Te van a devolver ≈$6.125» en display y «Te quedan
+   ≈$13.800 de tope en Galicia» con su base. Sin barra de avance.
 
-**Fila de comercios** (acciones rápidas):
-- Círculos de 56 pt en `surfaceStrong`, con la inicial del comercio en
-  `ink` y el nombre debajo, en label.
-- Al final, «Buscar» con lupa.
-- El elegido va con fondo del acento y la letra en `onAccent`.
-- Scroll horizontal con un fade al final si no entran.
-- Son los habituales del usuario. Sin habituales, los frecuentes del
-  catálogo.
+Arriba de cada paso: volver (‹), la barra de avance de 4 segmentos y cerrar
+(×), en cuadrados de 44 pt. Entrando a mitad de camino, los pasos anteriores
+se ven completos.
+
+**Inicio (v7)**: el saludo y un bloque en la superficie invertida con
+«Este mes te devolvieron ≈$6.125» y su base. Sin compras: «Todavía no
+registraste compras · Tocá + cuando estés por pagar». Si hay compras por
+confirmar, una lista agrupada «Por confirmar». Nada más.
 
 **Tarjeta de decisión** (la superficie invertida). Una por pantalla, nunca más:
 - fondo `decisionBg`;
@@ -171,13 +189,9 @@ SDK 58 sigue *unstable*, la tab bar JS actual, sin dibujar una propia).
 - **«Usar Galicia»** de ancho completo, en `onDecisionAccent`;
 - el link «Ver detalle y otras opciones ›».
 
-**Tarjeta por confirmar**:
-- fondo `surface`, con borde de 1.5 pt del acento;
-- «Coto · $24.500» en body-lg/600 y «Pagá con Galicia Visa crédito · hace
-  2 min» en `inkSecondary`;
-- la línea «No cuenta para tus topes hasta que la confirmes»;
-- acciones: «Ya pagué» (primario, ancho completo), «Escanear ticket»
-  (secundario con borde) y «Descartar» (texto).
+**Fila por confirmar (v7)**: en la lista agrupada de Inicio, la inicial del
+medio en el acento, «Coto · $24.500», «Con Galicia · hace 2 min» y
+«Confirmar ›». Abre el paso 4 del flujo.
 
 **Indicador de tope** (RF-07, obligatorio en cualquier pantalla con topes):
 - cifra con **≈** y su base debajo: «≈$6.500 de tope disponible» / «según
@@ -199,12 +213,12 @@ SDK 58 sigue *unstable*, la tab bar JS actual, sin dibujar una propia).
   derecha;
 - **no** se usan pilas de tarjetas sueltas.
 
-**Botón primario**: píldora del `accent`, texto `onAccent` de 17 pt/600, alto
+**Botón primario**: rectángulo de 14 pt del `accent`, texto `onAccent` de 17 pt/600, alto
 mínimo de 56 pt, ancho completo y **una sola línea** («Usar Galicia»).
 **Uno solo por pantalla**, en un pie fijo que reserva su alto. Texto con
 verbo y resultado. Nunca «Pagar».
 
-**Botón secundario**: texto del acento sin relleno, o píldora con borde
+**Botón secundario**: texto del acento sin relleno, o rectángulo de 14 pt con borde
 `controlBorder`. Nunca dos botones rellenos juntos.
 
 **Fila de opción** (medio de pago en Revisá): alto de 64 pt o más, radio a la
@@ -214,7 +228,7 @@ derecha.
 - La sugerencia («El que elegiste al simular») es una etiqueta y **no**
   selecciona.
 
-**Chips**: píldora `surfaceStrong`, texto `ink` de 15 pt/500, 40 pt visibles
+**Chips**: rectángulo de 14 pt `surfaceStrong`, texto `ink` de 15 pt/500, 40 pt visibles
 y 44 táctiles. Activo: fondo del acento, texto `onAccent` y check. Si se
 puede desmarcar, lleva una × de 44 pt táctiles.
 
@@ -253,16 +267,13 @@ primera, vas a ver cuánto tope te queda.», sin botón a otra pestaña.
   resúmenes cortos, y una sola columna con `fontScale > 1.2`.
 - Las pantallas de nivel superior llevan large title nativo (colapsa al
   scrollear). Las hijas, título inline y back del sistema.
-- **Inicio**:
-  - **hero** (`surface`): saludo, avatar, pregunta, fila de comercios y decisión;
-  - en `canvas`: por confirmar, «Tus topes» y últimas compras.
-- **Compras**:
-  - large title y por confirmar;
-  - «Escanear ticket» y «Cargar a mano» (filas de acción);
-  - el resumen del mes en una línea con su base, el segmentado y el
-    historial agrupado por día.
-- **Topes**: large title, chip de reinicio, «Te devolvieron ≈$15.200 ·
-  según 9 compras» y una fila por medio con su barra.
+- **Inicio**: saludo, el bloque de «Te devolvieron» y, si hay, «Por
+  confirmar».
+- **Topes**: título, «Noviembre · los mensuales se reinician en 22 días»,
+  una tarjeta por medio con su barra y una línea al pie con los estimados.
+- **Comercios**: tus comercios en cuadrados; «Editar» para agregar o sacar.
+- **Perfil**: nombre, medios de pago y una lista agrupada con Mis compras y
+  Contactos.
 - Orden fijo en las pantallas de decisión: **pregunta → respuesta → razón →
   alternativas → acción**. Las alternativas se ven sin scroll largo.
 - Ningún elemento flotante tapa a otro.

@@ -73,26 +73,59 @@ export type BorradorPorConfirmar = {
   avisos: AvisoPorConfirmar[];
 };
 
+/** Lo que leyó el ticket, para cruzarlo con la compra por confirmar. `null` en lo que no trae. */
+export type TicketParaConfirmar = {
+  monto: number | null;
+  fecha: string | null;
+  medioId: string | null;
+  textoExtraido: string | null;
+};
+
 /**
- * Lo que precarga «Revisá tu compra» desde una compra por confirmar (FR-006, FR-017). Esta es
- * la rama sin ticket («Ya pagué»): el medio va elegido porque el usuario lo eligió al tocar
- * «Usar». La rama con ticket (FR-007 a FR-009) la suma la issue #110 (spec 012, T022).
+ * Lo que precarga «Revisá tu compra» desde una compra por confirmar (FR-006 a FR-009, FR-017).
+ * Sin ticket («Cargar a mano»): el medio va elegido porque el usuario lo eligió al tocar «Voy a
+ * pagar con…». Con ticket: manda lo del ticket (FR-009) y lo que no trae sale de la compra por
+ * confirmar; si no dice el medio, no se preselecciona y se sugiere el de la simulación (FR-008).
  */
-export function borradorDesdePorConfirmar(c: CompraPorConfirmar, ticket: null, hoy: string): BorradorPorConfirmar {
-  void ticket;
+export function borradorDesdePorConfirmar(
+  c: CompraPorConfirmar,
+  ticket: TicketParaConfirmar | null,
+  hoy: string,
+): BorradorPorConfirmar {
   const dia = diaDeLaSimulacion(c);
+  if (ticket === null) {
+    return {
+      borrador: {
+        modo: "excepcion",
+        comercio: c.comercioNombre,
+        fecha: dia,
+        monto: c.monto,
+        medioId: c.medioId,
+        textoExtraido: null,
+        usarPromo: true,
+      },
+      medioSugerido: null,
+      fechasPosibles: hoy === dia ? [dia] : [dia, hoy],
+      avisos: [],
+    };
+  }
+  const avisos: AvisoPorConfirmar[] = [];
+  // El aviso de monto solo si se simuló con monto (FR-009).
+  if (ticket.monto !== null && c.monto !== null && ticket.monto !== c.monto) avisos.push("monto-distinto");
+  if (ticket.medioId !== null && ticket.medioId !== c.medioId) avisos.push("medio-distinto");
+  const fecha = ticket.fecha ?? dia;
   return {
     borrador: {
-      modo: "excepcion",
+      modo: "ticket",
       comercio: c.comercioNombre,
-      fecha: dia,
-      monto: c.monto,
-      medioId: c.medioId,
-      textoExtraido: null,
+      fecha,
+      monto: ticket.monto ?? c.monto,
+      medioId: ticket.medioId,
+      textoExtraido: ticket.textoExtraido,
       usarPromo: true,
     },
-    medioSugerido: null,
-    fechasPosibles: hoy === dia ? [dia] : [dia, hoy],
-    avisos: [],
+    medioSugerido: ticket.medioId === null ? c.medioId : null,
+    fechasPosibles: [fecha],
+    avisos,
   };
 }

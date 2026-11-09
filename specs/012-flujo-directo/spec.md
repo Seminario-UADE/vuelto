@@ -15,7 +15,7 @@
 - **Ya está** (specs 006, 008 y 010): Inicio con el buscador de comercios y la respuesta en la misma tarjeta, el detalle «Con qué pagar», la hoja «Revisá tu compra» con los orígenes `excepcion` / `manual` / `ticket`, «Escanear ticket» (con el lector simulado), «Mis compras», los topes derivados de las compras confirmadas y la cola de subida de la spec 010, con su estado «Sin subir». **Esta spec no cambia el motor ni la forma de una compra confirmada.**
 - **Esta spec cambia**:
   1. «Usar [medio]» deja una **compra por confirmar**, que no cuenta para los topes, en lugar de guardar la compra antes de pagar.
-  2. La navegación pasa a **tres tabs** (Compras · Inicio · Topes), Perfil se abre desde un avatar en Inicio y la tab Comprar desaparece.
+  2. La navegación pasa a **Inicio · Topes · «+» · Comercios · Perfil**, con el «+» (comprar) al centro, y comprar es un flujo de un paso por pantalla (rediseño v7, US3). La tab Comprar desaparece.
   3. El onboarding pierde la pantalla Comercios, su primera respuesta deja de estar fija en Coto, pide el nombre y, como meta (US5), deja la cuenta para el final.
   4. Los ajustes de #103: foco de color en la tab activa (tab bar nativa), márgenes con la zona inferior del teléfono y barra de estado del color de la app.
 - **Vocabulario**: esta spec dice **«por confirmar»** para una compra simulada que todavía no se pagó. «Pendiente» y «Sin subir» siguen siendo, como en la spec 010, operaciones de la cola que no llegaron al servidor. Son cosas distintas y la UI nunca las llama igual.
@@ -72,24 +72,27 @@ Lucía pagó en Carrefour con la tarjeta que le recomendó la app. Toca «Escane
 
 ---
 
-### User Story 3 - Tres tabs con Inicio al centro (Priority: P2)
+### User Story 3 - Comprar al centro y un paso por pantalla (Priority: P2)
 
-El usuario abre la app y ve tres tabs: Compras, Inicio (al centro y seleccionada) y Topes. La activa se distingue por color, no solo por el ícono. Su perfil se abre tocando su avatar arriba a la derecha en Inicio. En Compras están sus compras por confirmar, «Escanear ticket», «Cargar a mano» y el historial del mes.
+> Reescrita el 09/11/2026 (rediseño v7, `docs/design/plan-rediseno-v7.md`). Reemplaza «Tres tabs con Inicio al centro»: el usuario vio la v6 y pidió que comprar sea la acción principal, al centro, y que cada pantalla tenga un solo propósito.
 
-**Why this priority**: hoy Inicio y Comprar repiten el buscador, el escaneo y las últimas compras, y la compra por confirmar necesita un lugar fijo. No bloquea la US1: la tarjeta arriba de Inicio funciona con la navegación de hoy.
+El usuario abre la app y ve una barra flotante con Inicio, Topes, un botón «+» más grande y verde al centro, Comercios y Perfil. Toca «+» y compra en cuatro pasos, uno por pantalla, con una barra de avance: elige el comercio, pone el monto (o sigue sin él), ve con qué pagar y, después de pagar, confirma la compra escaneando el ticket o cargándola a mano.
 
-**Independent Test**: abrir la app con sesión y verificar el orden y el foco de las tabs, que Comprar ya no existe, que cada acción que tenía Comprar se alcanza en 2 toques o menos, y que Perfil se abre desde el avatar.
+**Why this priority**: la app apilaba demasiada información en cada pantalla y el usuario se perdía navegando. No bloquea la US1: la compra por confirmar es la misma.
+
+**Independent Test**: abrir la app con sesión, verificar el orden de la barra, hacer una compra completa desde «+» y verificar que Inicio y Topes se actualizan.
 
 **Acceptance Scenarios**:
 
-1. **Given** la app abierta con sesión y el onboarding completo, **Then** la barra inferior muestra, en este orden, Compras · Inicio · Topes, con Inicio seleccionada.
-2. **Given** cualquier tab activa, **Then** se distingue por un indicador de color además del ícono relleno, y el lector de pantalla la anuncia como seleccionada.
-3. **Given** Inicio, **When** toca el avatar del encabezado, **Then** se abre Perfil con todo lo que tiene hoy (medios, comercios, contactos, cuenta) y su botón de volver.
-4. **Given** la tab Compras, **Then** muestra, en este orden: las compras por confirmar (si hay), las acciones «Escanear ticket» y «Cargar a mano», y el historial del período con su resumen, filtros y borrado (lo que hoy es «Mis compras»).
-5. **Given** los enlaces que hoy llevan a Comprar o a «Mis compras» (los estados vacíos de Topes, «Ver todas», «Ver mis compras»), **Then** llevan a la tab Compras.
-6. **Given** Inicio, **Then** no muestra un acceso suelto a «Escanear ticket»: se escanea desde la tarjeta de una compra por confirmar o desde Compras.
-7. **Given** «¿Pagan entre varios?», **Then** se ofrece solo en el detalle del comercio.
-8. **Given** los dispositivos de FR-023, **Then** ni el contenido ni la barra de tabs se superponen con las zonas del sistema, ni abajo ni arriba, y la barra de estado se ve como indica FR-023.
+1. **Given** la app abierta con sesión y el onboarding completo, **Then** la barra inferior muestra, en este orden, Inicio · Topes · «+» · Comercios · Perfil, con Inicio seleccionada, y el «+» se distingue como acción principal.
+2. **Given** cualquier pestaña activa, **Then** se distingue por el color del acento además del ícono relleno, y el lector de pantalla la anuncia como pestaña seleccionada. El «+» se anuncia como «Comprar».
+3. **Given** el «+», **When** lo toca, **Then** se abre el flujo de compra en el paso 1 («¿Dónde estás comprando?»), con volver, cerrar y la barra de avance de 4 pasos.
+4. **Given** el paso 1, **When** toca un comercio, **Then** pasa al paso 2 («¿Cuánto vas a pagar?»), donde puede escribir el monto con el teclado numérico o seguir sin él.
+5. **Given** el paso 3, **Then** ve solo la respuesta: con qué pagar, cuánto le devuelven (≈, con su base) y una razón. «Otras opciones» y «¿Pagan entre varios?» están plegadas.
+6. **Given** el paso 3, **When** toca «Voy a pagar con [medio]», **Then** se crea la compra por confirmar (FR-002) y el paso 3 se reemplaza por el paso 4 («Pagá con [medio]»): desde ahí no se puede volver, solo cerrar.
+7. **Given** el paso 4, **Then** tiene una sola decisión: «Escanear ticket» (principal), «Cargar a mano» o «Lo confirmo después». Al guardar, ve «Compra guardada» con cuánto le van a devolver y cuánto tope le queda en ese medio, con su base.
+8. **Given** Comercios, **When** toca uno de sus comercios, **Then** se abre el flujo en el paso 2 con ese comercio elegido.
+9. **Given** los dispositivos de FR-023, **Then** ni el contenido ni la barra se superponen con las zonas del sistema.
 
 ---
 
@@ -159,11 +162,11 @@ Sofía toca «Empezar» en Bienvenida sin crear cuenta. Elige sus medios, ve su 
 
 **Compra por confirmar**
 
-- **FR-001**: La tarjeta de recomendación de Inicio MUST ofrecer «Usar [medio]» cuando hay un medio recomendado, además de «Ver detalle y otras opciones».
+- **FR-001** *(v7)*: La recomendación MUST mostrarse sola en el paso 3 del flujo de compra, con «Voy a pagar con [medio]» cuando hay un medio recomendado, y «Otras opciones» y «¿Pagan entre varios?» plegadas. Inicio no muestra recomendaciones.
 - **FR-002**: «Usar [medio]», desde Inicio o desde el detalle del comercio, MUST crear una compra por confirmar y MUST NOT crear una compra confirmada. La compra por confirmar guarda el usuario, el comercio (del catálogo), el medio elegido, el monto (si lo había) y el momento de creación. Después, la simulación de Inicio se limpia.
 - **FR-003**: Una compra por confirmar MUST NOT modificar ningún tope, base de estimado, total ni recomendación.
 - **FR-004**: Al crear una compra por confirmar, la app MUST mostrar un aviso breve: «Pagá con [medio]».
-- **FR-005**: Cada compra por confirmar vigente MUST mostrarse arriba de Inicio y al principio de Compras, con el comercio, el medio elegido, el monto si lo hay y tres acciones: «Ya pagué», «Escanear ticket» y «Descartar».
+- **FR-005** *(v7)*: Cada compra por confirmar vigente MUST mostrarse en Inicio como una fila (comercio, monto si lo hay, medio y antigüedad). Tocarla abre el paso 4 («Pagá con [medio]»), que tiene una sola decisión: «Escanear ticket», «Cargar a mano» o «Lo confirmo después».
 - **FR-006**: «Ya pagué» MUST abrir «Revisá tu compra» con los datos de la compra por confirmar cargados y editables. El origen MUST ser `excepcion` si el medio y el comercio finales son los de la compra por confirmar, y `manual` en cualquier otro caso.
 - **FR-007**: «Escanear ticket» desde una compra por confirmar MUST abrir el escaneo y, si la lectura sale bien, «Revisá tu compra» con los datos del ticket y, donde el ticket no traiga un dato, los de la compra por confirmar. Guardar MUST registrar la compra con origen `ticket`.
 - **FR-008**: Si el ticket no identifica el medio, la pregunta «¿Con qué pagaste?» MUST arrancar sin medio seleccionado y MUST destacar el medio de la simulación como sugerencia. «Guardar compra» MUST quedar deshabilitado hasta que el usuario toque un medio.
@@ -179,11 +182,11 @@ Sofía toca «Empezar» en Bienvenida sin crear cuenta. Elige sus medios, ve su 
 
 **Navegación**
 
-- **FR-018**: La barra inferior MUST tener tres tabs en este orden: Compras, Inicio, Topes. Inicio MUST ser la tab inicial.
-- **FR-019**: La tab activa MUST distinguirse por el color del acento del tema (el `tint` de la tab bar) además del ícono, con contraste ≥ 3:1 contra el fondo de la barra en los dos temas. Su etiqueta MUST tener contraste ≥ 4.5:1. La tab bar es la nativa de la plataforma si su API es estable en el SDK de la app; si no, la actual, sin dibujar una propia (`DESIGN.md` v6 §5).
-- **FR-020**: La tab Comprar MUST eliminarse, y todo lo que ofrecía MUST seguir disponible: elegir comercio (Inicio), escanear y cargar a mano (Compras) y pagar entre varios (detalle del comercio).
-- **FR-021**: La tab Compras MUST contener las compras por confirmar, «Escanear ticket», «Cargar a mano» y el historial del período con su resumen, filtros y borrado. Las marcas de la cola de la spec 010 («Sin subir», «No se pudo subir») se mantienen en el historial con esos mismos textos.
-- **FR-022**: Perfil MUST abrirse desde un avatar en el encabezado de Inicio y conservar todo su contenido actual. Todo enlace que hoy lleva a Comprar o a «Mis compras» MUST llevar a la tab Compras.
+- **FR-018** *(v7)*: La barra inferior MUST tener, en este orden: Inicio, Topes, «+» (comprar), Comercios y Perfil. Inicio MUST ser la pestaña inicial. El «+» no es una pestaña: abre el flujo de compra.
+- **FR-019** *(v7)*: La pestaña activa MUST distinguirse por el color del acento además del ícono, con contraste ≥ 3:1 contra la barra en los dos temas, y su etiqueta ≥ 4.5:1. El «+» MUST ser más grande que las pestañas, en el acento, con la etiqueta accesible «Comprar». La barra es propia (una cápsula flotante), porque la nativa no admite un botón central destacado; MUST anunciarse como pestañas, tener áreas táctiles de 44 pt o más y ocultarse con el teclado.
+- **FR-020** *(v7)*: La tab Comprar MUST eliminarse. Lo que ofrecía MUST seguir disponible: elegir comercio, escanear y cargar a mano (flujo del «+»), pagar entre varios (paso 3) y las últimas compras (Perfil › Mis compras y Topes).
+- **FR-021** *(v7)*: El flujo de compra MUST tener un paso por pantalla con barra de avance de 4 pasos: comercio, monto (opcional), recomendación y «Pagá con [medio]». Si se entra a mitad de camino (desde Comercios o desde Inicio), los pasos anteriores se ven completos.
+- **FR-022** *(v7)*: Perfil MUST ser una pestaña con el nombre, los medios de pago, Mis compras y Contactos. Los comercios habituales MUST tener su pestaña, Comercios, donde tocar uno abre el flujo en el paso del monto.
 - **FR-023**: El contenido y la barra inferior MUST respetar las zonas seguras de arriba y abajo. La barra de estado MUST mostrar el fondo de la app (`canvas`) en iOS con notch, en Android con navegación por gestos y en Android con tres botones (Android 15 o más, *edge-to-edge*). En Android anterior a 15, donde no se dibuja debajo de la barra, MAY quedar el color del sistema.
 
 **Onboarding y perfil**
@@ -202,8 +205,8 @@ Sofía toca «Empezar» en Bienvenida sin crear cuenta. Elige sus medios, ve su 
 
 **Estados vacíos y privacidad**
 
-- **FR-035**: Sin compras confirmadas, Inicio MUST explicar que los topes aparecen al confirmar la primera compra, sin mandar a otra tab.
-- **FR-036**: Sin compras ni compras por confirmar, Compras MUST explicar cómo se registra una compra: simular desde Inicio y confirmar, escanear o cargar a mano.
+- **FR-035** *(v7)*: Sin compras confirmadas, Inicio MUST decir que todavía no hay compras y que se empieza con el «+».
+- **FR-036** *(v7)*: Sin compras, Topes y Mis compras MUST decir que se empieza con el «+».
 - **FR-037**: `docs/product/privacidad.md` MUST declarar los datos locales nuevos (las compras por confirmar y el borrador del onboarding): qué guardan, dónde y por cuánto tiempo.
 
 ### Key Entities
