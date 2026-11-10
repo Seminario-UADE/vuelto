@@ -65,7 +65,7 @@ Lo que devuelve es lo que ya espera la app (`LecturaTicket` en
 - **Se enmiendan en el PR que introduce este ADR:** la constitución (3.0.1,
   principios III y IV y el stack), `CLAUDE.md` (stack y reglas de la key y de
   las imágenes), RNF-04 de `requisitos.md` (la key de ningún extractor va en la
-  app), `privacidad.md` (Groq como proveedor y su registro de hasta 30 días),
+  app), `privacidad.md` (Groq como proveedor, con «Zero Data Retention» activado),
   `04-infrastructure.md` (servicios y tabla de secrets), `rules-guardian` (busca
   también la key de Groq) y los comentarios de la app que nombraban a Gemini.
   La issue #48 (proveedor y contrato) se ajusta al implementarla.
@@ -79,7 +79,7 @@ Lo que devuelve es lo que ya espera la app (`LecturaTicket` en
 | Riesgo | Cómo se resuelve |
 |---|---|
 | La documentación no muestra imagen y esquema estricto en el mismo pedido | Probarlo con un ticket al empezar #48; si no anda, modo `json_object` y la validación propia contra el esquema (ya prevista en #48) |
-| Groq guarda hasta 30 días los registros para investigar abusos | Activar «Zero Data Retention» en la consola si el plan gratis lo permite; si no, queda documentado en `privacidad.md` |
+| Sin «Zero Data Retention», Groq puede guardar pedidos y respuestas hasta 30 días por confiabilidad y cumplimiento | **Resuelto (10/11/2026):** activado en la organización de Groq, también en el plan gratis. Tiene que seguir activado; si se crea otra cuenta u organización, se activa antes de generar la key |
 | Límites del plan gratis del modelo de imágenes (no están en la página pública) | Verlos en la consola. Un ticket ronda los 3.000 tokens (la imagen cuenta 2.048). Las pruebas de #10 se mandan espaciadas |
 | Fotos pesadas (el pedido admite hasta 20 MB) | Achicar la imagen en el celular antes de mandarla |
 | La precisión no alcanza | Se mide en #10. Respaldo: leer el texto en el celular y mandar a Gemini solo el texto sin datos personales |

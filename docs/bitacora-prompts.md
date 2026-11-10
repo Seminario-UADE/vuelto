@@ -2488,6 +2488,10 @@ proveedor que cuide la privacidad sin costo.
    cómo se sacan." Lo más seguro es hacer todo desde las páginas web, sin
    archivos ni terminal. Se corrigió la issue #85, que sugería guardar la key
    en un archivo dentro del repo.
+9. "Arranquemos con Groq." Se armó la cuenta sin tarjeta, se activó «Zero
+   Data Retention» (se pudo, aunque el contrato lo reservaba a ciertos
+   clientes) y se cargó la key en Supabase desde la web, con vencimiento a los 90 días
+   (8/2/2027). La IA no la vio.
 
 **Resultado:**
 - ADR-012 (propuesto): los tickets los lee Groq; la letra chica de las
@@ -2505,8 +2509,11 @@ proveedor que cuide la privacidad sin costo.
   secrets: cuentas gratis sin tarjeta, no hacer upgrade en Groq, un proyecto de
   Google sin facturación, cargarlas desde la web y revocarlas en el proveedor
   cuando ya no hagan falta.
-- Queda pendiente: que el PO apruebe el ADR, cargar las dos keys (issue #85) y
-  ajustar la issue #48 al implementarla.
+- La key de Groq quedó cargada en Supabase, con «Zero Data Retention»
+  activado: Groq no guarda los tickets. La política de privacidad y el ADR lo
+  dicen.
+- Queda pendiente: que el PO apruebe el ADR, cargar la key de Gemini en
+  GitHub (issue #85) y ajustar la issue #48 al implementarla.
 - Errores de la IA en el proceso: al principio propuso combinar el celular
   con Groq, cuando si el celular ya quita los datos personales, Gemini
   alcanza; lo marcó el usuario y se separaron los dos planes. Además, la

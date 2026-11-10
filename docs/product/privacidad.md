@@ -115,10 +115,11 @@ Detalle y razonamiento en ADR-008.
 ## Terceros
 
 - **Groq (API)**: lee la imagen del ticket para extraer sus datos. Por
-  contrato no entrena modelos con lo que recibe ni lo guarda, salvo un
-  registro de hasta 30 días si investiga un abuso o una falla del servicio
-  (Groq Services Agreement, sección 4.2; «Your Data»). Es un proveedor de
-  servicio, no un tercero al que se le entregan datos para otro fin.
+  contrato no entrena modelos con lo que recibe (Groq Services Agreement,
+  sección 4.2). La organización tiene activado «Zero Data Retention», así que
+  tampoco guarda los pedidos ni las respuestas: sin esa opción podría
+  guardarlos hasta 30 días por confiabilidad y cumplimiento. Es un proveedor
+  de servicio, no un tercero al que se le entregan datos para otro fin.
 - **Google (Gemini API)**: procesa la letra chica de las promociones, que son
   datos públicos de MODO. No recibe ningún dato de los usuarios.
 - **Supabase**: aloja la base de datos y la autenticación. Mismo criterio:
