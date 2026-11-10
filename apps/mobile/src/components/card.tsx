@@ -10,7 +10,7 @@ type Props = {
   style?: StyleProp<ViewStyle>;
 };
 
-/** Tarjeta clara (Lino). Se separa del fondo por color, no por sombra (DESIGN.md §4). */
+/** Tarjeta `surface` de 16 pt. Se separa del fondo por tono, no por sombra (DESIGN.md §4). */
 export function Card({ children, tone = "surface", padding = space.lg, gap = space.md, style }: Props) {
   const fondo = {
     surface: colors.surface,

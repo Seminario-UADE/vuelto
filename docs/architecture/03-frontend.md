@@ -191,8 +191,12 @@ selectMarcasDeSubida = cola → qué compras están «Sin subir» o «Solo en es
 
 - `src/theme.ts` define roles (`canvas`, `surface`, `ink`, `accent`, `decisionBg`…) con los valores
   de DESIGN.md §2. ESLint y un test fallan si aparece un color escrito a mano en otro archivo.
-- **Solo modo claro** (`userInterfaceStyle: "light"`). Los tokens son semánticos: una apariencia
-  oscura futura cambia solo `theme.ts`.
+- **Claro y oscuro** (`userInterfaceStyle: "automatic"`, DESIGN.md v6, issue #115): cada rol tiene
+  un valor por tema (`temas.claro` / `temas.oscuro`) y las pantallas siguen leyendo `colors.<rol>`
+  sin hooks. En iOS cada rol es un `DynamicColorIOS` (`theme-color.ios.ts`) que el sistema cambia
+  solo; en Android y web `TemaProvider` fija el esquema con `useColorScheme()` y vuelve a montar el
+  árbol si cambia (`theme-color.ts`). La `StatusBar` la pone el provider. Lo que necesita un color
+  fijo en los dos temas usa sus propios roles (`scrim`/`onScrim` del visor, `qrColors`).
 - **Hanken Grotesk** (400–700) con `@expo-google-fonts/hanken-grotesk`, cargada en el layout raíz
   con el splash retenido. `<Text>` mapea peso → familia y usa `tabular-nums` en montos.
 - **Dynamic Type**: nada bloquea `allowFontScaling`; cada nivel tiene un tope de escala

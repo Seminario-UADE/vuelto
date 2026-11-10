@@ -11,9 +11,9 @@ type Props = {
   accessibilityHint?: string;
 };
 
-/** Chip de comercio, rubro o filtro. Activo: Verde Bosque con check (DESIGN.md §5). */
+/** Chip de comercio, rubro o filtro. Activo: fondo del acento con check (DESIGN.md §5). */
 export function Chip({ label, onPress, selected, icon, accessibilityHint }: Props) {
-  const tinta = selected ? colors.onDecision : colors.ink;
+  const tinta = selected ? colors.onAccent : colors.ink;
   return (
     <PressableScale
       onPress={onPress}
@@ -30,7 +30,7 @@ export function Chip({ label, onPress, selected, icon, accessibilityHint }: Prop
         paddingHorizontal: space.lg,
         paddingVertical: space.sm,
         borderRadius: radius.pill,
-        backgroundColor: selected ? colors.decisionBg : colors.surfaceStrong,
+        backgroundColor: selected ? colors.accent : colors.surfaceStrong,
       }}
     >
       {selected ? <Icon name="check" size={16} color={tinta} /> : icon ? <Icon name={icon} size={18} color={tinta} /> : null}
