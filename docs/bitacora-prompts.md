@@ -2200,6 +2200,74 @@ Esta entrada cubre solo la parte visual.
 
 ---
 
+## 2026-11-06 — Build de EAS de respaldo para el pitch (issue #56)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI y `eas-cli`.
+
+**Objetivo:** dejar listo el APK de respaldo del pitch. Es S: va sin spec-kit.
+
+**Prompts principales:**
+1. "Mirá mis tickets asignados y decime qué puedo adelantar hoy."
+2. "Arrancá con #56."
+
+**Resultado:**
+- `apps/mobile/eas.json`: el perfil `preview` ya existía (#39, APK interno);
+  se le sumó `"environment": "preview"` para que tome
+  `EXPO_PUBLIC_SUPABASE_URL` y `EXPO_PUBLIC_SUPABASE_ANON_KEY` del entorno de
+  EAS, porque el `.env` local no se sube al build (está en `.gitignore`).
+- `docs/presentacion/build-respaldo.md`: requisitos (ingesta con promos,
+  sesión en `joaconzs-team`, variables en EAS), comando del build, checklist
+  de prueba en Android y tabla para el link de descarga.
+- La issue citaba "corpus sembrado e ingesta apagada (RF-18)", que dejó de
+  existir con ADR-011: el APK baja las promos de Supabase al abrir.
+- Hallazgo: la ingesta diaria falla desde el 2026-11-03 con
+  `permission denied for table promociones`; sin promos publicadas el APK
+  no tiene qué recomendar.
+- Queda pendiente: login en EAS, variables en EAS, el build en sí, la prueba
+  en un Android real y el link en la tabla.
+
+---
+
+## 2026-11-08 — Build de respaldo: config y guía listas, el build espera a #107 (issue #56)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI; subagentes `rules-guardian`,
+`/code-review` y `test-runner`.
+
+**Objetivo:** retomar la #56 ahora que la ingesta publica promos reales (#117) y
+dejarla lista hasta el último paso, sin gastar un build del free tier antes de
+tiempo.
+
+**Prompts principales:**
+1. "¿Qué tickets de jeqm0302 se pueden terminar ya?" Quedaban dos: #43 (PR #107,
+   con cuatro observaciones de la auditoría de Joaconz) y #56 (sin bloqueo desde
+   que la base tiene promos).
+2. "¿En qué orden conviene cerrarlos?" Primero #107; la #56 se adelanta en
+   paralelo, pero el build espera al merge para que el APK traiga la pantalla
+   del comercio y no gastar dos builds de los 15 por mes.
+3. "Prepará el PR de la #56 con la config y la guía, sin cerrar la issue." Va
+   como `Refs #56`: falta el build y la prueba en un Android real.
+
+**Resultado:**
+- `apps/mobile/eas.json` y `docs/presentacion/build-respaldo.md` de la sesión del
+  2026-11-06, sin cambios de fondo. El bloqueo que anotaba esa sesión (la
+  ingesta fallaba con `permission denied`) quedó resuelto: secret corregido y
+  corrida manual con 3088 promociones publicadas.
+- El criterio de la issue "corpus sembrado e ingesta apagada (RF-18)" se
+  reinterpreta según ADR-011: la prueba en Android se hace con las promos de la
+  ingesta automática.
+- Revisiones: `rules-guardian` sin violaciones (a EAS van solo la URL y la anon
+  key; no hay valores de claves en ningún archivo). `/code-review` sin
+  violaciones, con un ajuste.
+- Error de la IA: la checklist de prueba nombraba «¿Con qué pago?» y «Mis
+  topes», que la app no muestra; se cambió por los rótulos reales, pestaña
+  «Comprar» y pestaña «Topes».
+- Verificado: lint, typecheck y tests de los 4 workspaces (1015 en verde);
+  `eas.json` es JSON válido.
+- Queda pendiente:
+  - Login en EAS y variables del entorno `preview`: los carga el responsable,
+    con su cuenta.
+  - El build, después del merge de #107; la prueba en un Android real con la
+    checklist, y el link y el modelo de celular en la tabla de la guía.
 ## 2026-11-04 — «¿Con qué pago?»: comercios del corpus, rubro, canal y descartadas plegadas (issue #43)
 
 **Herramienta:** Claude Code (Opus 5.5).
