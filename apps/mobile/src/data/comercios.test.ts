@@ -9,7 +9,6 @@ import {
   selectCatalogoParaCompras,
   selectEntradasMotor,
   selectComercioSimulado,
-  selectRecomendacionEnElLocal,
   selectComerciosFrecuentes,
   selectHoy,
   selectRecomendacion,
@@ -220,15 +219,6 @@ describe("parte B de #43: rubro sin comercio y canal (spec 004 FR-001)", () => {
 });
 
 describe("auditoría del PR #107", () => {
-  it("Inicio sigue en presencial aunque la pantalla del comercio haya dejado «Online»", () => {
-    const s = conCorpus([promo("local", { comercio: null, categoriaId: 1, canal: "presencial" })]);
-    s.dispatch(mediosConfirmados(mediosDeEjemplo(mediosDeclarados.map((m) => m.id))));
-    s.dispatch(comercioElegido("rubro-1"));
-    s.dispatch(canalCambiado("online"));
-    expect(selectRecomendacion(s.getState())?.resultado).toBe("sin-promo");
-    expect(selectRecomendacionEnElLocal(s.getState())?.resultado).toBe("recomendado");
-  });
-
   it("un comercio en dos rubros se guarda en el que se eligió, no en el primero", () => {
     const s = conCorpus([
       promo("a", { comercio: "Carrefour", categoriaId: 1 }),

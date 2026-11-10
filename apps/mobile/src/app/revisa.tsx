@@ -5,6 +5,7 @@ import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { Field } from "@/components/field";
+import { Chip } from "@/components/chip";
 import { Icon } from "@/components/icon";
 import { OptionRow } from "@/components/option-row";
 import { Screen } from "@/components/screen";
@@ -14,12 +15,13 @@ import { Text } from "@/components/text";
 import { comercioPorNombre, promoPropuesta } from "@/data/calculo";
 import { comercioDelCatalogo } from "@/data/comercios";
 import type { Canal, OrigenCompra } from "@/data/contracts";
+import { borradorDesdePorConfirmar } from "@/data/por-confirmar";
 import { aprox, fechaLarga, montoEditable, parseMonto } from "@/lib/format";
 import { hapticoExito, hapticoSeleccion } from "@/lib/haptics";
 import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
 import { selectCatalogoParaCompras, selectEntradasMotor, selectHoy, selectPerfilVista } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
-import { guardarCompra } from "@/store/thunks";
+import { confirmarPorConfirmar, guardarCompra } from "@/store/thunks";
 import { colors, space } from "@/theme";
 
 const SUBTITULO: Record<OrigenCompra, string> = {
@@ -32,6 +34,10 @@ const SUBTITULO: Record<OrigenCompra, string> = {
  * Revisá tu compra (sheet). Ticket y manual: ningún medio preseleccionado y se pregunta
  * "¿Con qué pagaste?" (RF-10). Recomendación: el medio va marcado porque el usuario lo
  * eligió al tocar "Usar…". Pie fijo con un único "Guardar compra" (auditoría P1 #3).
+ *
+ * Con `porConfirmar` («Ya pagué», spec 012 FR-006): precarga la compra por confirmar, deja
+ * elegir entre el día de la simulación y hoy si cambió el día (FR-017) y guarda con su mismo
+ * id, así confirmar dos veces deja una sola compra (FR-016).
  */
 export default function Revisa() {
   const p = useLocalSearchParams<{
@@ -43,21 +49,43 @@ export default function Revisa() {
     texto?: string;
     canal?: string;
     categoriaId?: string;
+    porConfirmar?: string;
+    /** Abierta desde el flujo de compra: al guardar sigue a «Compra guardada». */
+    flujo?: string;
   }>();
+  const hoy = useAppSelector(selectHoy);
+  // La compra por confirmar se lee una vez, al abrir: si vence con la hoja abierta, igual se guarda.
+  const listaPorConfirmar = useAppSelector((s) => s.porConfirmar.lista);
+  const [desde] = useState(() => {
+    const pc = p.porConfirmar ? listaPorConfirmar.find((c) => c.id === p.porConfirmar) : undefined;
+    // Con ticket (escaneo desde el paso 4): manda lo del ticket y lo que falta sale de la compra (FR-007).
+    const ticket =
+      p.modo === "ticket"
+        ? { monto: parseMonto(p.monto ?? ""), fecha: p.fecha || null, medioId: p.medio || null, textoExtraido: p.texto ?? null }
+        : null;
+    return pc ? { pc, ...borradorDesdePorConfirmar(pc, ticket, hoy) } : null;
+  });
   // El canal con el que se recomendó (#43): la promo propuesta y la guardada son las mismas.
-  const canal: Canal = p.canal === "online" ? "online" : "presencial";
-  const modo: OrigenCompra = p.modo === "ticket" || p.modo === "excepcion" ? p.modo : "manual";
-  const [comercio, setComercio] = useState(p.comercio ?? "");
+  const canal: Canal = (desde ? desde.borrador.canal : p.canal) === "online" ? "online" : "presencial";
+  const modo: OrigenCompra = desde
+    ? desde.borrador.modo
+    : p.modo === "ticket" || p.modo === "excepcion"
+      ? p.modo
+      : "manual";
+  const comercioInicial = desde?.borrador.comercio ?? p.comercio ?? "";
+  const [comercio, setComercio] = useState(comercioInicial);
   // El rubro con el que se recomendó vale mientras el comercio siga siendo ese: si lo cambia a
   // mano, se busca por nombre como siempre.
-  const categoriaElegida = Number(p.categoriaId);
+  const categoriaElegida = desde ? (desde.borrador.categoriaId ?? NaN) : Number(p.categoriaId);
   const categoriaId =
-    Number.isInteger(categoriaElegida) && comercio.trim() === (p.comercio ?? "").trim() ? categoriaElegida : undefined;
-  const [monto, setMonto] = useState<number | null>(parseMonto(p.monto ?? ""));
+    Number.isInteger(categoriaElegida) && comercio.trim() === comercioInicial.trim() ? categoriaElegida : undefined;
+  const [monto, setMonto] = useState<number | null>(desde ? desde.borrador.monto : parseMonto(p.monto ?? ""));
   // Excepción: el usuario eligió el medio al tocar "Usar…". Ticket: solo si el ticket lo dice.
   // Manual: nunca preseleccionado.
-  const medioDelTicket = modo === "ticket" && p.medio ? p.medio : null;
-  const [medioId, setMedioId] = useState<string | null>(modo === "excepcion" ? p.medio || null : medioDelTicket);
+  const medioDelTicket = modo === "ticket" ? (desde ? desde.borrador.medioId : p.medio || null) : null;
+  const [medioId, setMedioId] = useState<string | null>(
+    desde ? desde.borrador.medioId : modo === "excepcion" ? p.medio || null : medioDelTicket,
+  );
   const [guardando, setGuardando] = useState(false);
   /** El usuario quitó la promo propuesta (spec 010, FR-023). Cambiar de medio la vuelve a proponer. */
   const [quitoLaPromo, setQuitoLaPromo] = useState(false);
@@ -65,8 +93,8 @@ export default function Revisa() {
   const intento = useId();
   const [error, setError] = useState<string | null>(null);
   const dispatch = useAppDispatch();
-  const hoy = useAppSelector(selectHoy);
-  const fecha = p.fecha || hoy;
+  const [fechaElegida, setFechaElegida] = useState<string | null>(desde?.borrador.fecha ?? null);
+  const fecha = fechaElegida ?? (p.fecha || hoy);
 
   const perfil = useAppSelector(selectPerfilVista);
   const comercioConocido = comercio.trim() ? comercioDelCatalogo(comercio, perfil.comercios, categoriaId) : undefined;
@@ -108,21 +136,26 @@ export default function Revisa() {
     setGuardando(true);
     setError(null);
     try {
-      dispatch(
-        guardarCompra({
-          modo,
-          comercio: comercio.trim(),
-          fecha,
-          monto,
-          medioId,
-          textoExtraido: modo === "ticket" ? (p.texto ?? null) : null,
-          usarPromo: !quitoLaPromo,
-          canal,
-          categoriaId: categoriaId ?? null,
-        }, intento),
-      );
+      const borrador = {
+        modo,
+        comercio: comercio.trim(),
+        fecha,
+        monto,
+        medioId,
+        textoExtraido: modo === "ticket" ? (desde?.borrador.textoExtraido ?? p.texto ?? null) : null,
+        usarPromo: !quitoLaPromo,
+        canal,
+        categoriaId: categoriaId ?? null,
+      };
+      // Desde una compra por confirmar, el origen lo decide `origenAlConfirmar` en el thunk.
+      const compra = dispatch(desde ? confirmarPorConfirmar(desde.pc.id, borrador, intento) : guardarCompra(borrador, intento));
       hapticoExito();
-      dispatch(avisoMostrado("Compra guardada · la ves en Mis compras"));
+      if (p.flujo) {
+        // Desde el flujo de compra, el cierre es su propia pantalla (auditoría v7).
+        router.replace({ pathname: "/compra-guardada", params: { id: compra.id } });
+        return;
+      }
+      dispatch(avisoMostrado(desde ? "Compra guardada. Tus topes están al día." : "Compra guardada · la ves en Mis compras"));
       router.back();
     } catch (e) {
       setGuardando(false);
@@ -142,7 +175,11 @@ export default function Revisa() {
         </>
       }
     >
-      <SheetHeader title="Revisá tu compra" subtitle={SUBTITULO[modo]} />
+      {/* Desde una compra por confirmar el origen final lo decide el thunk (FR-006): el subtítulo no lo adelanta. */}
+      <SheetHeader
+        title="Revisá tu compra"
+        subtitle={desde ? (modo === "ticket" ? SUBTITULO.ticket : "Confirmá los datos de la compra que pagaste.") : SUBTITULO[modo]}
+      />
 
       {modo === "ticket" ? (
         <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
@@ -164,9 +201,31 @@ export default function Revisa() {
           keyboardType="number-pad"
           tabular
         />
-        <Text variant="label" tone="inkSecondary">
-          {fechaLarga(fecha).replace(/^./, (c) => c.toUpperCase())}
-        </Text>
+        {desde && desde.fechasPosibles.length > 1 ? (
+          // Cambió el día desde la simulación: se elige entre ese día y hoy (FR-017).
+          <View style={{ gap: space.sm }}>
+            <Text variant="label" tone="inkSecondary">
+              ¿Cuándo pagaste?
+            </Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
+              {desde.fechasPosibles.map((f) => (
+                <Chip
+                  key={f}
+                  label={`${f === hoy ? "Hoy" : "El día que simulaste"}, ${fechaLarga(f)}`}
+                  selected={fecha === f}
+                  onPress={() => {
+                    hapticoSeleccion();
+                    setFechaElegida(f);
+                  }}
+                />
+              ))}
+            </View>
+          </View>
+        ) : (
+          <Text variant="label" tone="inkSecondary">
+            {fechaLarga(fecha).replace(/^./, (c) => c.toUpperCase())}
+          </Text>
+        )}
       </View>
 
       <View style={{ gap: space.md }}>
@@ -181,12 +240,21 @@ export default function Revisa() {
             </View>
           </Card>
         ) : null}
+        {desde && desde.avisos.length > 0 ? (
+          <Text variant="bodyMd" tone="warning">
+            {desde.avisos
+              .map((a) => (a === "monto-distinto" ? "El monto del ticket es distinto al que simulaste." : "El ticket dice otro medio de pago."))
+              .join(" ")}{" "}
+            Usamos lo del ticket.
+          </Text>
+        ) : null}
         <View accessibilityRole="radiogroup" style={{ gap: space.md }}>
           {perfil.medios.map((m) => (
             <OptionRow
               key={m.id}
               title={m.nombre}
               detail={detalleDe(m.id)}
+              note={desde?.medioSugerido === m.id && medioId === null ? "El que elegiste al simular" : null}
               selected={medioId === m.id}
               onPress={() => {
                 hapticoSeleccion();
@@ -199,7 +267,16 @@ export default function Revisa() {
         </View>
       </View>
 
-      {hayPromo && propuesta ? (
+      {p.flujo && hayPromo && propuesta ? (
+        // Desde el flujo ya se vio la promo en el paso 3: queda solo el control para quitarla (auditoría v7).
+        <Button
+          label={quitoLaPromo ? "Usar la promo" : "No usé la promo"}
+          variant="text"
+          onPress={() => setQuitoLaPromo((v) => !v)}
+        />
+      ) : null}
+
+      {!p.flujo && hayPromo && propuesta ? (
         <View style={{ gap: space.md }}>
           <SectionHeader title="Promo aplicada" />
           <Card padding={space.lg} gap={space.sm}>

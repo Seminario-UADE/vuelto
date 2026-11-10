@@ -117,14 +117,20 @@ export const selectRecomendacion = createSelector(
   (e, comercio, monto, canal) => (comercio ? recomendacionVista(e, comercio, monto, canal) : null),
 );
 
+const MAX_CONVIENE_HOY = 6;
+
 /**
- * La de Inicio: siempre presencial. Inicio no muestra el canal, así que no puede heredar el
- * «Online» que quedó elegido en la pantalla del comercio.
+ * «Hoy te conviene» de la pestaña Comercios (v7): la recomendación sin monto para tus comercios
+ * y, hasta completar seis, los más usados del catálogo; el mismo motor que el «+». La
+ * recomendación es `null` si el comercio no tiene rubro conocido.
  */
-export const selectRecomendacionEnElLocal = createSelector(
-  [selectEntradasMotor, selectComercioSimulado, (s: RootState) => s.simulacion.monto],
-  (e, comercio, monto) => (comercio ? recomendacionVista(e, comercio, monto, "presencial") : null),
-);
+export const selectConvieneHoy = createSelector([selectEntradasMotor, selectComerciosFrecuentes], (e, tuyos) => {
+  const nombres = new Set(tuyos.map((c) => c.nombre.toLowerCase()));
+  const masUsados = catalogoComercios.filter((c) => c.frecuente && !nombres.has(c.nombre.toLowerCase()));
+  return [...tuyos, ...masUsados]
+    .slice(0, Math.max(tuyos.length, MAX_CONVIENE_HOY))
+    .map((comercio) => ({ comercio, recomendacion: recomendacionVista(e, comercio, null) }));
+});
 
 export const selectTopes = createSelector([selectEntradasMotor], topesVista);
 

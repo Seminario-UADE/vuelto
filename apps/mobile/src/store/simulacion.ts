@@ -18,8 +18,8 @@ export const simulacion = createSlice({
   initialState: inicial,
   reducers: {
     /**
-     * Otro comercio borra el monto y vuelve a presencial (Inicio no muestra el canal); el mismo
-     * los conserva (Inicio → Con qué pagar).
+     * Otro comercio borra el monto y vuelve a presencial (spec 004 FR-001); el mismo los
+     * conserva (volver del paso 3 al 2 en el flujo de compra).
      */
     comercioElegido(s, a: PayloadAction<string | null>) {
       if (a.payload !== s.comercioId) {

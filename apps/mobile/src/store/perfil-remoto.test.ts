@@ -2,10 +2,11 @@ import { describe, expect, it } from "vitest";
 import type { DatosPerfil, Resultado } from "../perfil/datos";
 import type { MedioDePago, MedioNuevo } from "../perfil/modelo";
 import { sesionCerrada } from "./acciones";
-import { mediosConfirmados } from "./perfil";
+import { mediosConfirmados, nombreCambiado } from "./perfil";
 import {
   agregarComercio,
   agregarMedio,
+  cambiarNombre,
   confirmarComercios,
   confirmarMedios,
   leerComercios,
@@ -49,6 +50,10 @@ function remoto(respuestas: Partial<{ [K in keyof DatosPerfil]: Awaited<ReturnTy
       llamadas.push(`agregarComercio:${nombre}`), respuestas.agregarComercio ?? ok({ id: "c9", nombre })
     ),
     sacarComercio: async (id) => (llamadas.push(`sacarComercio:${id}`), respuestas.sacarComercio ?? ok(null)),
+    leerNombre: async () => (llamadas.push("leerNombre"), respuestas.leerNombre ?? ok(null)),
+    guardarNombre: async (usuarioId, nombre) => (
+      llamadas.push(`guardarNombre:${usuarioId}:${nombre}`), respuestas.guardarNombre ?? ok(nombre.trim())
+    ),
   };
   return { datos, llamadas };
 }
@@ -294,5 +299,74 @@ describe("comercios habituales (issue #47)", () => {
     await s.dispatch(agregarComercio("Coto"));
     expect((await s.dispatch(sacarComercio("c9"))).ok).toBe(true);
     expect(s.getState().perfil.comercios).toEqual([]);
+  });
+});
+
+describe("nombre del usuario (spec 012, T033)", () => {
+  it("leerMedios también trae el nombre de la cuenta", async () => {
+    const r = remoto({ leerMisMedios: ok([guardado("m1")]), leerNombre: ok("Sofía") });
+    const s = armar(r);
+    await s.dispatch(leerMedios());
+    expect(r.llamadas).toContain("leerNombre");
+    expect(s.getState().perfil.nombre).toBe("Sofía");
+  });
+
+  it("una cuenta sin nombre (anterior a la spec 012) queda sin nombre: nada inventado", async () => {
+    const s = armar(remoto({ leerNombre: ok(null) }));
+    s.dispatch(nombreCambiado("Martín"));
+    await s.dispatch(leerMedios());
+    expect(s.getState().perfil.nombre).toBeNull();
+  });
+
+  it("si leer el nombre falla, queda el que había y los medios se leen igual", async () => {
+    const s = armar(remoto({ leerMisMedios: ok([guardado("m1")]), leerNombre: { ok: false, error: "otro" } }));
+    s.dispatch(nombreCambiado("Sofía"));
+    await s.dispatch(leerMedios());
+    expect(s.getState().perfil.nombre).toBe("Sofía");
+    expect(s.getState().perfil.medios).toEqual([guardado("m1")]);
+  });
+
+  it("cambiarNombre guarda el nombre recortado en la cuenta y actualiza el store", async () => {
+    const r = remoto();
+    const s = armar(r);
+    expect(await s.dispatch(cambiarNombre("  Sofía "))).toEqual({ ok: true, datos: "Sofía" });
+    expect(r.llamadas).toEqual(["guardarNombre:u1:Sofía"]);
+    expect(s.getState().perfil.nombre).toBe("Sofía");
+  });
+
+  it("cambiarNombre con un nombre inválido no pide nada ni cambia el store", async () => {
+    const r = remoto();
+    const s = armar(r);
+    expect((await s.dispatch(cambiarNombre("a".repeat(41)))).ok).toBe(false);
+    expect((await s.dispatch(cambiarNombre("   "))).ok).toBe(false);
+    expect(r.llamadas).toEqual([]);
+    expect(s.getState().perfil.nombre).toBeNull();
+  });
+
+  it("si falla, el nombre no cambia", async () => {
+    const s = armar(remoto({ guardarNombre: { ok: false, error: "sin_conexion" } }));
+    expect(await s.dispatch(cambiarNombre("Sofía"))).toEqual({ ok: false, error: "sin_conexion" });
+    expect(s.getState().perfil.nombre).toBeNull();
+  });
+
+  it("sin usuario o sin Supabase no pide nada", async () => {
+    const r = remoto();
+    expect((await armar(r, false).dispatch(cambiarNombre("Sofía"))).ok).toBe(false);
+    expect(r.llamadas).toEqual([]);
+    const sinRemoto = storeDePrueba(null, memoria(), { perfilRemoto: null });
+    sinRemoto.dispatch(usuarioCambio({ id: "u1", email: "ana@mail.com" }));
+    expect(await sinRemoto.dispatch(cambiarNombre("Sofía"))).toEqual({ ok: false, error: "sin_conexion" });
+  });
+
+  it("una lectura que salió antes de cambiar el nombre no lo pisa", async () => {
+    let soltar: (v: Resultado<string | null>) => void = () => {};
+    const r = remoto();
+    r.datos.leerNombre = () => new Promise((res) => (soltar = res));
+    const s = armar(r);
+    const lectura = s.dispatch(leerMedios());
+    await s.dispatch(cambiarNombre("Sofía"));
+    soltar(ok(null));
+    await lectura;
+    expect(s.getState().perfil.nombre).toBe("Sofía");
   });
 });

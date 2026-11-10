@@ -46,24 +46,35 @@ const HOY_EN_EL_SERVIDOR = fechaArgentina(new Date(RELOJ_EJEMPLO));
 // Los comercios del buscador ya no son un pedido: se derivan del corpus del store
 // (`selectCatalogoComercios`, issue #43).
 
+/** Las fallas que se pueden forzar con los escenarios de desarrollo. */
+export type FallaTicket = "ilegible" | "sin-red";
+
 /**
  * Lee el ticket. En esta feature no recibe imagen: no hay captura real (spec 006 FR-015).
  * El endpoint real recibe la imagen, la manda a Gemini y la descarta (Principio IV).
+ * `hoy` viene del reloj del store (`sesion.ahora`), nunca de `new Date()` (spec 012 R12).
  */
-export async function leerTicket(opciones: { ilegible: boolean }): Promise<LecturaTicket> {
-  if (opciones.ilegible) {
+export async function leerTicket(opciones: { hoy: string; falla?: FallaTicket | null }): Promise<LecturaTicket> {
+  if (opciones.falla === "ilegible") {
     return red({
       ok: false,
       error: "No pudimos leer el ticket. Probá con más luz o cargá el monto a mano.",
     });
   }
+  if (opciones.falla === "sin-red") {
+    return red({
+      ok: false,
+      error: "Sin conexión no podemos leer el ticket. Probá de nuevo cuando tengas internet o cargá la compra a mano.",
+    });
+  }
+  const t = ticketDeEjemplo(opciones.hoy);
   return red({
     ok: true,
-    comercio: ticketDeEjemplo.comercio,
-    fecha: ticketDeEjemplo.fecha,
-    monto: ticketDeEjemplo.monto,
+    comercio: t.comercio,
+    fecha: t.fecha,
+    monto: t.monto,
     medio: null,
-    textoExtraido: ticketDeEjemplo.textoExtraido,
+    textoExtraido: t.textoExtraido,
   });
 }
 

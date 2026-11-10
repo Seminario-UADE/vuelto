@@ -19,8 +19,8 @@ type Props = {
 };
 
 /**
- * Fila de medio de pago u opción (DESIGN.md §5). Seleccionada: Gris Cálido con borde
- * Salvia de 2 pt. El control no seleccionado usa el borde de control, nunca el divisor.
+ * Fila de medio de pago u opción (DESIGN.md §5). Seleccionada: `surfaceStrong` con borde
+ * del acento de 2 pt. El control no seleccionado usa el borde de control, nunca el divisor.
  */
 export function OptionRow({ title, detail, note, leading, selected, onPress, kind = "radio", disabled }: Props) {
   return (

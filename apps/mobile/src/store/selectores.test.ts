@@ -4,7 +4,7 @@ import * as motor from "@vuelto/motor";
 import { catalogoComercios, mediosDeclarados, mediosDelMotor } from "../data/fixtures";
 import { mediosConfirmados } from "./perfil";
 import { sincronizado } from "./acciones";
-import { selectEntradasMotor, selectFrescura, selectRecomendacion, selectTopes } from "./selectores";
+import { selectConvieneHoy, selectEntradasMotor, selectFrescura, selectRecomendacion, selectTopes } from "./selectores";
 import { ahoraCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
 import { guardarCompra } from "./thunks";
@@ -22,6 +22,18 @@ function conMartin() {
   s.dispatch(mediosConfirmados(mediosDeEjemplo(mediosDeclarados.map((m) => m.id))));
   return s;
 }
+
+describe("selectConvieneHoy (Comercios, v7)", () => {
+  it("sin comercios propios: los más usados del catálogo, cada uno con la recomendación sin monto del motor", () => {
+    const s = conMartin();
+    const filas = selectConvieneHoy(s.getState());
+    const nombres = filas.map((f) => f.comercio.nombre);
+    expect(nombres).toEqual(catalogoComercios.filter((c) => c.frecuente).map((c) => c.nombre));
+    expect(new Set(nombres).size).toBe(nombres.length);
+    const coto = filas.find((f) => f.comercio.id === "coto");
+    expect(coto?.recomendacion).toMatchObject({ medio: { id: "galicia-visa-credito" }, monto: null });
+  });
+});
 
 describe("selectRecomendacion (US1, US2)", () => {
   it("SC-001 sobre el store: Coto con $10.000 → Galicia, $2.000, ≈$4.500 después", () => {

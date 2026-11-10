@@ -1,4 +1,5 @@
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -28,17 +29,24 @@ const LINEAS = [
  * se crea (spec 006 FR-015, Principio IV).
  */
 export default function Escanear() {
+  // Desde el paso 4 del flujo: la lectura confirma esa compra por confirmar (FR-007).
+  const desde = useLocalSearchParams<{ porConfirmar?: string; flujo?: string }>();
+  const extra = {
+    ...(desde.porConfirmar ? { porConfirmar: desde.porConfirmar } : {}),
+    ...(desde.flujo ? { flujo: desde.flujo } : {}),
+  };
   const insets = useSafeAreaInsets();
   const [leyendo, setLeyendo] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const ilegible = useAppSelector((s) => s.sesion.escenario === "ticket-ilegible");
+  const escenario = useAppSelector((s) => s.sesion.escenario);
+  const falla = escenario === "ticket-ilegible" ? "ilegible" : escenario === "sin-red" ? "sin-red" : null;
   const hoy = useAppSelector(selectHoy);
 
   const disparar = async () => {
     hapticoLeve();
     setLeyendo(true);
     setError(null);
-    const t = await api.leerTicket({ ilegible });
+    const t = await api.leerTicket({ hoy, falla });
     setLeyendo(false);
     if (!t.ok) {
       setError(t.error);
@@ -54,14 +62,18 @@ export default function Escanear() {
         // Solo si el ticket lo dice; si no, revisa pregunta (RF-10).
         medio: t.medio?.id ?? "",
         texto: t.textoExtraido,
+        ...extra,
       },
     });
   };
 
-  const aMano = () => router.replace({ pathname: "/revisa", params: { modo: "manual" } });
+  const aMano = () =>
+    router.replace({ pathname: "/revisa", params: desde.porConfirmar ? extra : { modo: "manual", ...extra } });
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.scrim, paddingTop: insets.top, paddingBottom: insets.bottom }}>
+      {/* El visor es oscuro en los dos temas: la barra de estado va clara. */}
+      <StatusBar style="light" />
       <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: space.lg, minHeight: 56 }}>
         <Pressable
           onPress={() => router.back()}
@@ -71,14 +83,14 @@ export default function Escanear() {
             width: size.hit,
             height: size.hit,
             borderRadius: radius.pill,
-            backgroundColor: colors.decisionSurface,
+            backgroundColor: colors.scrimSurface,
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <Icon name="cerrar" size={18} color={colors.onDecision} />
+          <Icon name="cerrar" size={18} color={colors.onScrim} />
         </Pressable>
-        <Text variant="titleMd" align="center" accessibilityRole="header" style={{ flex: 1, color: colors.onDecision }}>
+        <Text variant="titleMd" align="center" accessibilityRole="header" style={{ flex: 1, color: colors.onScrim }}>
           Escaneá el ticket
         </Text>
         <View style={{ width: size.hit }} />
@@ -91,7 +103,7 @@ export default function Escanear() {
         <View
           accessible
           accessibilityLabel="Visor con un ticket de ejemplo de Coto por 24.500 pesos"
-          style={{ padding: space.lg, borderRadius: radius.row, borderWidth: 2, borderColor: colors.onDecisionAccent }}
+          style={{ padding: space.lg, borderRadius: radius.row, borderWidth: 2, borderColor: colors.onScrimMuted }}
         >
           <View style={{ backgroundColor: colors.canvas, borderRadius: radius.badge, padding: space.lg, gap: space.xs }}>
             <Text variant="bodyMd" weight="bold" align="center">
@@ -153,7 +165,7 @@ export default function Escanear() {
                 La foto no se guarda: leemos los datos y la descartamos
               </Text>
             </View>
-            <Text variant="label" align="center" style={{ color: colors.onDecisionMuted }}>
+            <Text variant="label" align="center" style={{ color: colors.onScrimMuted }}>
               {leyendo ? "Leyendo el ticket…" : "Modo demo: usamos un ticket de ejemplo, sin cámara"}
             </Text>
           </View>
@@ -174,8 +186,8 @@ export default function Escanear() {
           accessibilityRole="button"
           style={{ alignItems: "center", gap: space.xs, minWidth: 88, minHeight: size.hit }}
         >
-          <Icon name="teclado" size={24} color={colors.onDecision} />
-          <Text variant="label" style={{ color: colors.onDecision }}>
+          <Icon name="teclado" size={24} color={colors.onScrim} />
+          <Text variant="label" style={{ color: colors.onScrim }}>
             Cargar a mano
           </Text>
         </Pressable>
@@ -190,7 +202,7 @@ export default function Escanear() {
             height: 76,
             borderRadius: radius.pill,
             borderWidth: 4,
-            borderColor: colors.onDecision,
+            borderColor: colors.onScrim,
             alignItems: "center",
             justifyContent: "center",
             opacity: leyendo ? 0.5 : 1,

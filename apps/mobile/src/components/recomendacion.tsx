@@ -9,7 +9,8 @@ import { Text } from "./text";
 
 /**
  * Pinta una `Recomendacion` tal como llega del servidor: la app no calcula nada, solo
- * elige qué texto mostrar. Sin monto no hay "Te devuelven" (auditoría P1 #1).
+ * elige qué texto mostrar. Sin monto no hay "Te devuelven" (auditoría P1 #1). El «Usar [medio]»
+ * (spec 012, FR-001) lo pone la pantalla en `children`, entre el monto y el link de detalle.
  */
 export function RecomendacionCard({ r, children }: { r: Recomendacion; children?: ReactNode }) {
   if (r.resultado === "sin-promo" || !r.medio) {

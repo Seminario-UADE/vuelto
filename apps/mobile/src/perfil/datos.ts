@@ -16,6 +16,7 @@ import {
   type MedioNuevo,
   type Red,
   type TipoTarjeta,
+  validarNombre,
 } from "./modelo";
 
 export type Resultado<T> = { ok: true; datos: T } | { ok: false; error: CasoDeError };
@@ -115,6 +116,31 @@ export function crearDatosPerfil(cliente: SupabaseClient) {
       if (!r.ok) return r;
       // Igual que `sacarMedio`: el RLS no avisa si no tocó ninguna fila.
       return r.datos > 0 ? { ok: true, datos: null } : { ok: false, error: "otro" };
+    },
+
+    // Nombre para mostrar (spec 012, FR-027): `perfiles.nombre_para_mostrar`, una fila por cuenta.
+    /** `null` si la fila no existe o no tiene nombre (cuentas anteriores): nunca uno inventado. */
+    leerNombre: (): Promise<Resultado<string | null>> =>
+      ejecutar(
+        cliente.from("perfiles").select("nombre_para_mostrar").maybeSingle(),
+        (data) => (data as { nombre_para_mostrar: string | null } | null)?.nombre_para_mostrar ?? null,
+      ),
+
+    /**
+     * Crea o actualiza la fila propia. Acá sí va el id: es la clave de `perfiles`, y el RLS solo
+     * acepta el de `auth.uid()`. Un nombre inválido no llega a la base.
+     */
+    guardarNombre: async (usuarioId: string, nombre: string): Promise<Resultado<string>> => {
+      const v = validarNombre(nombre);
+      if (!v.ok) return { ok: false, error: "otro" };
+      return ejecutar(
+        cliente
+          .from("perfiles")
+          .upsert({ id: usuarioId, nombre_para_mostrar: v.nombre }, { onConflict: "id" })
+          .select("nombre_para_mostrar")
+          .single(),
+        (data) => (data as { nombre_para_mostrar: string }).nombre_para_mostrar,
+      );
     },
   };
 }

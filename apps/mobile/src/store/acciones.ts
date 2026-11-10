@@ -8,7 +8,7 @@ import type { ComercioHabitual, MedioDePago as MedioGuardado } from "../perfil/m
 export type { ComercioHabitual, MedioGuardado };
 
 /** Escenarios para probar estados vacíos y de error (solo desarrollo, en Perfil). */
-export type Escenario = "normal" | "mes-vacio" | "ticket-ilegible";
+export type Escenario = "normal" | "mes-vacio" | "ticket-ilegible" | "sin-red";
 
 export type EstadoPerfil = {
   /** Lo elige el usuario; nunca es el email (ADR-008). */

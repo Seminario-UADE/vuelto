@@ -1,32 +1,21 @@
-import { Redirect, Tabs } from "expo-router";
+import { Redirect } from "expo-router";
+import { Tabs } from "expo-router/js-tabs";
+import { View } from "react-native";
 import { EmptyState } from "@/components/empty-state";
-import { Text, View } from "react-native";
-import { Icon, type IconName } from "@/components/icon";
+import { RUTA_COMPRAR, TabBar } from "@/components/tab-bar";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { leerMedios } from "@/store/perfil-remoto";
-import { colors, floatingShadow, fonts } from "@/theme";
-
-const tab = (title: string, icon: IconName) => ({
-  title,
-  // Como la tab bar del sistema: la etiqueta casi no escala (se cortaría con texto grande).
-  tabBarLabel: ({ focused }: { focused: boolean }) => (
-    <Text
-      maxFontSizeMultiplier={1.15}
-      style={{ fontFamily: fonts.medium, fontSize: 12, lineHeight: 16, color: focused ? colors.ink : colors.inkSecondary }}
-    >
-      {title}
-    </Text>
-  ),
-  tabBarIcon: ({ focused }: { focused: boolean }) => (
-    <Icon name={icon} activo={focused} color={focused ? colors.ink : colors.inkSecondary} />
-  ),
-});
+import { useTema } from "@/components/tema-provider";
+import { colors } from "@/theme";
 
 /**
- * Inicio · Comprar · Topes · Perfil (DESIGN.md §5). Tabs JS con el estilo de DESIGN.md:
- * fondo Blanco Hueso con sombra flotante, activo en Verde Bosque (research R2).
+ * Inicio · Compras · ( + ) · Comercios · Perfil (DESIGN.md v7 §5, spec 012 FR-018). Topes se
+ * abre desde Inicio. La barra es
+ * propia (`TabBar`): la nativa no admite un botón central destacado. El «+» no es una pestaña:
+ * su ruta ficticia abre el flujo de compra.
  */
 export default function TabsLayout() {
+  const t = useTema();
   const usuario = useAppSelector((s) => s.sesion.usuario);
   const perfil = useAppSelector((s) => s.perfil);
   const dispatch = useAppDispatch();
@@ -55,24 +44,18 @@ export default function TabsLayout() {
   if (sinMedios) return <Redirect href="/medios" />;
   return (
     <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.ink,
-        tabBarInactiveTintColor: colors.inkSecondary,
-        tabBarLabelStyle: { fontFamily: fonts.medium, fontSize: 12, lineHeight: 16 },
-        tabBarAllowFontScaling: true,
-        tabBarStyle: {
-          backgroundColor: colors.canvas,
-          borderTopWidth: 0,
-          boxShadow: floatingShadow,
-        },
-        sceneStyle: { backgroundColor: colors.canvas },
-      }}
+      tabBar={(props) => <TabBar {...props} />}
+      screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: t.canvas } }}
     >
-      <Tabs.Screen name="index" options={tab("Inicio", "inicio")} />
-      <Tabs.Screen name="comprar" options={tab("Comprar", "comprar")} />
-      <Tabs.Screen name="topes" options={tab("Topes", "topes")} />
-      <Tabs.Screen name="perfil" options={tab("Perfil", "perfil")} />
+      <Tabs.Screen name="index" options={{ title: "Inicio" }} />
+      <Tabs.Screen name="compras" options={{ title: "Compras" }} />
+      <Tabs.Screen
+        name={RUTA_COMPRAR}
+        options={{ title: "Comprar" }}
+        listeners={{ tabPress: (e) => e.preventDefault() }}
+      />
+      <Tabs.Screen name="comercios" options={{ title: "Comercios" }} />
+      <Tabs.Screen name="perfil" options={{ title: "Perfil" }} />
     </Tabs>
   );
 }

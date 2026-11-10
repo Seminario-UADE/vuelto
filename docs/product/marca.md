@@ -28,6 +28,25 @@ oscuras).
 | 4 | Dorado Suave / Champán | `#C5A059` | Acento secundario: segundo dato de un gráfico, detalles puntuales |
 | — | Verde Bosque / Cazador | `#14281D` | Base: texto principal e ícono, fondo de las slides oscuras |
 
+### Paleta de la app (v6, desde el 07/11/2026)
+
+La app usa una evolución de esta paleta: la misma dupla bosque + crema, más
+profunda y más cálida, en dos temas que siguen la apariencia del sistema.
+Detalle en `docs/design/DESIGN.md` §2 y razonamiento en
+`docs/design/direccion-visual-v6.md`.
+
+| Color | Hex | Uso en la app |
+|---|---|---|
+| Bosque profundo | `#051F20` | Fondo del tema oscuro; tarjeta de decisión del tema claro |
+| Esmeralda negro | `#02110C` | Texto del tema claro |
+| Pino / Musgo oscuro | `#0B2B26` / `#163832` | Superficies elevadas del tema oscuro |
+| Oliva | `#1A422F` | Acento del tema claro |
+| Salvia clara | `#8EB69B` | Acento del tema oscuro |
+| Crema | `#F3EBD6` | Fondo del tema claro; texto y tarjeta de decisión del tema oscuro |
+
+La presentación sigue con la paleta de arriba hasta que se regeneren sus
+mockups. Champán no se usa en la app.
+
 ## Pendiente
 
 - Validar el nombre y el logo con la cátedra / verificar disponibilidad de

@@ -65,6 +65,16 @@ usuario vuelve a fotografiar el ticket.
     otra sesión. Se descartan las de compras de más de 90 días y se vacía al
     cerrar sesión (la app avisa antes cuántas compras quedarían sin subir). Con
     la subida desconectada, la cola solo acumula en el teléfono.
+  - **Las compras por confirmar** (spec 012, issue #109) usan otra clave,
+    `vuelto.por-confirmar.v1`: lo que deja «Usar [medio]» antes de pagar. Cada
+    una guarda el id de la cuenta que la creó, el comercio del catálogo, el
+    medio elegido, el monto si se cargó y el momento de creación. No tiene
+    texto de ticket ni imagen. **No sale del teléfono**: no se sube a la cuenta
+    ni cuenta para los topes hasta que el usuario confirma que pagó, y ahí se
+    registra como una compra más (con su retención de 90 días). **Vence a las
+    48 h** de creada: deja de mostrarse y se borra al abrir la app. También se
+    borran al cerrar sesión (la app avisa antes cuántas se pierden) y cuando
+    entra otra cuenta en el mismo teléfono.
 - **Perfil** (medios de pago, comercios): se guarda mientras la cuenta
   exista.
 - **Aislamiento entre usuarios**: cada tabla lleva row-level security desde

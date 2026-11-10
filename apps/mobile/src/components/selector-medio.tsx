@@ -60,7 +60,7 @@ export function SelectorMedio({ bancos, medios, onAgregar }: Props) {
             gap: space.sm,
             minHeight: 48,
             paddingHorizontal: space.lg,
-            borderRadius: radius.pill,
+            borderRadius: radius.control,
             backgroundColor: colors.surfaceStrong,
           }}
         >

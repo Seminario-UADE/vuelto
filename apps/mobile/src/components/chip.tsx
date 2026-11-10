@@ -13,9 +13,9 @@ type Props = {
   rol?: "button" | "radio";
 };
 
-/** Chip de comercio, rubro o filtro. Activo: Verde Bosque con check (DESIGN.md §5). */
+/** Chip de comercio, rubro o filtro. Activo: fondo del acento con check (DESIGN.md §5). */
 export function Chip({ label, onPress, selected, icon, accessibilityHint, rol = "button" }: Props) {
-  const tinta = selected ? colors.onDecision : colors.ink;
+  const tinta = selected ? colors.onAccent : colors.ink;
   return (
     <PressableScale
       onPress={onPress}
@@ -31,8 +31,8 @@ export function Chip({ label, onPress, selected, icon, accessibilityHint, rol = 
         gap: space.xs,
         paddingHorizontal: space.lg,
         paddingVertical: space.sm,
-        borderRadius: radius.pill,
-        backgroundColor: selected ? colors.decisionBg : colors.surfaceStrong,
+        borderRadius: radius.control,
+        backgroundColor: selected ? colors.accent : colors.surfaceStrong,
       }}
     >
       {selected ? <Icon name="check" size={16} color={tinta} /> : icon ? <Icon name={icon} size={18} color={tinta} /> : null}

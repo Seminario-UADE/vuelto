@@ -1,5 +1,6 @@
 import { Redirect, Stack, useSegments } from "expo-router";
 import { useAppSelector } from "@/store/hooks";
+import { useTema } from "@/components/tema-provider";
 import { headerNativo } from "@/navigation/opciones";
 
 export const unstable_settings = { anchor: "bienvenida" };
@@ -16,11 +17,11 @@ export default function OnboardingLayout() {
 }
 
 function Onboarding() {
+  const t = useTema();
   return (
-    <Stack screenOptions={{ ...headerNativo, title: "" }}>
+    <Stack screenOptions={{ ...headerNativo(t), title: "" }}>
       <Stack.Screen name="bienvenida" options={{ headerShown: false }} />
       <Stack.Screen name="medios" />
-      <Stack.Screen name="comercios" />
       <Stack.Screen name="primera-respuesta" />
     </Stack>
   );

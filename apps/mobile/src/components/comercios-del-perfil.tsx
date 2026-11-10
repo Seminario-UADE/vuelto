@@ -4,6 +4,7 @@ import { Pressable, TextInput, View } from "react-native";
 import { comercioPorNombre } from "@/data/calculo";
 import { buscarComercios } from "@/data/comercios";
 import { comercioRepetido, MENSAJE_COMERCIO_REPETIDO, MENSAJES_ERROR } from "@/perfil/modelo";
+import { comercioElegido } from "@/store/simulacion";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { agregarComercio, sacarComercio } from "@/store/perfil-remoto";
 import { selectCatalogoComercios } from "@/store/selectores";
@@ -63,7 +64,7 @@ export function ComerciosDelPerfil() {
   return (
     <View style={{ gap: space.md }}>
       <SectionHeader
-        title="Comercios donde comprás"
+        title="Editar tus comercios"
         action={
           !editable
             ? undefined
@@ -120,7 +121,7 @@ export function ComerciosDelPerfil() {
               gap: space.sm,
               minHeight: 48,
               paddingHorizontal: space.lg,
-              borderRadius: radius.pill,
+              borderRadius: radius.control,
               backgroundColor: colors.surfaceStrong,
             }}
           >
@@ -159,10 +160,11 @@ export function ComerciosDelPerfil() {
 }
 
 /**
- * Uno del catálogo abre su pantalla. Uno escrito a mano no tiene rubro ni promos conocidas (en
+ * Uno del catálogo arranca la compra ahí. Uno escrito a mano no tiene rubro ni promos conocidas (en
  * Inicio lo avisa) hasta que #43 le asigne categoría: se muestra como texto, no como botón.
  */
 function NombreDeComercio({ nombre }: { nombre: string }) {
+  const dispatch = useAppDispatch();
   const catalogo = useAppSelector(selectCatalogoComercios);
   const c = comercioPorNombre(nombre, catalogo);
   const texto = (
@@ -174,9 +176,13 @@ function NombreDeComercio({ nombre }: { nombre: string }) {
   if (c.categoriaId === null) return <View style={estilo}>{texto}</View>;
   return (
     <Pressable
-      onPress={() => router.push({ pathname: "/comercio/[id]", params: { id: c.id } })}
+      onPress={() => {
+        // Arranca la compra en el paso del monto, con este comercio ya elegido.
+        dispatch(comercioElegido(c.id));
+        router.push("/comprar/monto");
+      }}
       accessibilityRole="button"
-      accessibilityLabel={`Ver ${nombre}`}
+      accessibilityLabel={`Comprar en ${nombre}`}
       style={estilo}
     >
       {texto}

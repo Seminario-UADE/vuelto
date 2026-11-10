@@ -6,6 +6,7 @@ import { compraAFila } from "../data/compras/fila";
 import { descartarViejas, reconciliar, siguienteLote, type Operacion } from "../data/compras/operaciones";
 import { PLAZO_DE_ENVIO_MS, type ResultadoEnvio, type Subida } from "../data/compras/repositorio";
 import type { BorradorCompra } from "../data/contracts";
+import { origenAlConfirmar, type CompraPorConfirmar } from "../data/por-confirmar";
 import {
   CLAVE_COLA,
   borradoEncolado,
@@ -29,7 +30,9 @@ import {
 } from "./cola";
 import { compraAgregada, compraEliminada, comprasReconciliadas } from "./compras";
 import type { AppDispatch, AppThunk, RootState } from "./index";
-import { selectCatalogoParaCompras, selectEntradasMotor } from "./selectores";
+import { porConfirmarCreada, porConfirmarDescartada, selectPorConfirmarVigentes } from "./por-confirmar";
+import { selectCatalogoParaCompras, selectEntradasMotor, selectRecomendacion } from "./selectores";
+import { comercioElegido } from "./simulacion";
 
 /** El usuario de la sesión de Supabase, o `null` si no hay (o la subida no está conectada). */
 const duenoDe = (subida: Subida | null): string | null => subida?.contexto().userId ?? null;
@@ -41,23 +44,88 @@ const duenoDe = (subida: Subida | null): string | null => subida?.contexto().use
  * agregar la compra (spec 010, R2) y pide subirla.
  *
  * `intento` identifica la apertura de la hoja: un segundo toque con el mismo intento no
- * duplica la compra (FR-005).
+ * duplica la compra (FR-005). `id`, si viene, es el de la compra (spec 012, FR-016): si ya
+ * existe una compra con ese id, se devuelve esa y no se registra otra.
  */
-export function guardarCompra(b: BorradorCompra, intento: string | null = null): AppThunk<Compra> {
+export function guardarCompra(b: BorradorCompra, intento: string | null = null, id?: string): AppThunk<Compra> {
   return (dispatch, getState, { generarId, subida }) => {
+    if (id !== undefined) {
+      const existente = getState().compras.lista.find((c) => c.id === id);
+      if (existente) return existente;
+    }
     const previa = intento === null ? undefined : getState().cola.intentos[intento];
     if (previa !== undefined) {
       const existente = getState().compras.lista.find((c) => c.id === previa);
       if (existente) return existente;
     }
     const estado = getState();
-    const compra = compraParaGuardar(selectEntradasMotor(estado), b, generarId(), selectCatalogoParaCompras(estado));
+    const compra = compraParaGuardar(selectEntradasMotor(estado), b, id ?? generarId(), selectCatalogoParaCompras(estado));
     dispatch(
       guardadoEncolado({ idOp: generarId(), compra, dueno: duenoDe(subida), ahora: estado.sesion.ahora, intento }),
     );
     dispatch(compraAgregada(compra));
     void dispatch(vaciarCola());
     return compra;
+  };
+}
+
+/**
+ * «Usar [medio]» desde Inicio o desde el detalle del comercio (spec 012, FR-002): deja una
+ * compra por confirmar con lo que se está simulando y limpia la simulación. No crea ninguna
+ * compra, así que no toca topes (FR-003). Devuelve si reemplazó la del mismo comercio
+ * (FR-012), o `null` si no hay un medio recomendado o no hay usuario.
+ */
+export function usarRecomendacion(): AppThunk<{ porConfirmar: CompraPorConfirmar; medioNombre: string; reemplazo: boolean } | null> {
+  return (dispatch, getState, { generarId }) => {
+    const estado = getState();
+    const r = selectRecomendacion(estado);
+    const usuarioId = estado.sesion.usuario?.id ?? null;
+    if (r === null || r.medio === null || usuarioId === null) return null;
+    const porConfirmar: CompraPorConfirmar = {
+      id: generarId(),
+      usuarioId,
+      comercioId: r.comercio.id,
+      comercioNombre: r.comercio.nombre,
+      medioId: r.medio.id,
+      monto: estado.simulacion.monto,
+      creadaEn: estado.sesion.ahora,
+      canal: estado.simulacion.canal,
+      categoriaId: r.comercio.categoriaId,
+    };
+    const reemplazo = selectPorConfirmarVigentes(estado).some((c) => c.comercioId === porConfirmar.comercioId);
+    dispatch(porConfirmarCreada(porConfirmar));
+    dispatch(comercioElegido(null));
+    return { porConfirmar, medioNombre: r.medio.nombre, reemplazo };
+  };
+}
+
+/**
+ * «Guardar compra» en Revisá abierta desde una compra por confirmar (spec 012, FR-006, FR-016).
+ * La compra usa el id de la compra por confirmar, y `compraAgregada` la saca de la lista en la
+ * misma acción. Si la compra ya existe (doble toque, o la app se cerró entre las dos
+ * escrituras), devuelve esa y solo saca la por confirmar. Falla como `guardarCompra` si falta
+ * el monto o el medio, y entonces la compra por confirmar queda.
+ */
+export function confirmarPorConfirmar(id: string, b: BorradorCompra, intento: string | null = null): AppThunk<Compra> {
+  return (dispatch, getState) => {
+    const existente = getState().compras.lista.find((c) => c.id === id);
+    if (existente) {
+      dispatch(porConfirmarDescartada(id));
+      return existente;
+    }
+    const pc = getState().porConfirmar.lista.find((c) => c.id === id);
+    // Vencida con la hoja abierta igual se guarda (Edge Cases); si ya no está, con el modo del borrador.
+    const modo = pc ? origenAlConfirmar(pc, b, b.modo === "ticket", selectCatalogoParaCompras(getState())) : b.modo;
+    return dispatch(guardarCompra({ ...b, modo }, intento, id));
+  };
+}
+
+/** «Descartar» (FR-010): la saca sin otro efecto. Devuelve la descartada, o `null` si no estaba. */
+export function descartarPorConfirmar(id: string): AppThunk<CompraPorConfirmar | null> {
+  return (dispatch, getState) => {
+    const pc = getState().porConfirmar.lista.find((c) => c.id === id) ?? null;
+    if (pc !== null) dispatch(porConfirmarDescartada(id));
+    return pc;
   };
 }
 
