@@ -1,13 +1,12 @@
 import { useMemo, useState } from "react";
-import { Pressable, TextInput, View } from "react-native";
+import { TextInput, View } from "react-native";
 import * as api from "@/data/api";
 import type { Comercio, Rubro } from "@/data/contracts";
 import { useAsync } from "@/hooks/use-async";
 import { RUBROS } from "@/lib/rubros";
-import { colors, fonts, radius, size, space, type as escala } from "@/theme";
-import { Chip } from "./chip";
+import { colors, fonts, radius, space, type as escala } from "@/theme";
+import { GrillaComercios } from "./comercio-tile";
 import { Icon, iconoDeRubro } from "./icon";
-import { PressableScale } from "./pressable-scale";
 import { SkeletonList } from "./skeleton";
 import { Text } from "./text";
 
@@ -25,7 +24,7 @@ type Props = {
 const norm = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
 
 /**
- * Los comercios del catálogo para marcar (spec 012, FR-025): buscador y chips agrupados por rubro.
+ * Los comercios del catálogo para marcar (spec 012, FR-025): buscador y cuadrados agrupados por rubro.
  * Tocar marca y muestra; desmarcar es la × del comercio marcado, un control aparte para que tocar
  * de nuevo para volver a ver la respuesta no lo saque. Lo usa la primera respuesta del onboarding.
  */
@@ -79,88 +78,9 @@ export function SelectorComercios({ marcados, activo, onTocar, onQuitar }: Props
               {RUBROS[rubro].titulo}
             </Text>
           </View>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
-            {lista.map((c) =>
-              marcados.includes(c.id) ? (
-                <ChipMarcado
-                  key={c.id}
-                  comercio={c}
-                  activo={activo === c.id}
-                  onTocar={() => onTocar(c)}
-                  onQuitar={() => onQuitar(c)}
-                />
-              ) : (
-                <Chip key={c.id} label={c.nombre} icon="agregar" onPress={() => onTocar(c)} />
-              ),
-            )}
-          </View>
+          <GrillaComercios comercios={lista} onElegir={onTocar} marcados={marcados} activo={activo} onQuitar={onQuitar} />
         </View>
       ))}
-    </View>
-  );
-}
-
-/**
- * Un comercio marcado: el nombre (tocar muestra su respuesta) y la × para desmarcarlo, con su propia
- * área de toque de 44 pt. Activo = fondo del acento con check (DESIGN.md §5); el de la respuesta lleva además un borde `ink`.
- */
-function ChipMarcado({
-  comercio,
-  activo,
-  onTocar,
-  onQuitar,
-}: {
-  comercio: Comercio;
-  activo: boolean;
-  onTocar: () => void;
-  onQuitar: () => void;
-}) {
-  return (
-    <View
-      style={{
-        minHeight: size.chip,
-        flexDirection: "row",
-        alignItems: "center",
-        borderRadius: radius.control,
-        backgroundColor: colors.accent,
-        borderWidth: 2,
-        borderColor: activo ? colors.ink : colors.accent,
-      }}
-    >
-      <PressableScale
-        onPress={onTocar}
-        accessibilityRole="button"
-        accessibilityState={{ selected: true }}
-        accessibilityLabel={`${comercio.nombre}, marcado`}
-        accessibilityHint="Muestra con qué te conviene pagar"
-        style={{
-          minHeight: size.chip,
-          flexDirection: "row",
-          alignItems: "center",
-          gap: space.xs,
-          paddingLeft: space.lg,
-          paddingRight: space.xs,
-        }}
-      >
-        <Icon name="check" size={16} color={colors.onAccent} />
-        <Text variant="bodyMd" weight="medium" style={{ color: colors.onAccent }}>
-          {comercio.nombre}
-        </Text>
-      </PressableScale>
-      <Pressable
-        onPress={onQuitar}
-        accessibilityRole="button"
-        accessibilityLabel={`Desmarcar ${comercio.nombre}`}
-        hitSlop={4}
-        style={{
-          width: size.hit,
-          minHeight: size.chip,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Icon name="cerrar" size={16} color={colors.onAccent} />
-      </Pressable>
     </View>
   );
 }

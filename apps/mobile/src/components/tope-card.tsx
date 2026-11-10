@@ -2,7 +2,7 @@ import { View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import type { TopeMedio } from "@/data/contracts";
 import { pesos } from "@/lib/format";
-import { colors, radius, space, topeColors } from "@/theme";
+import { colors, radius, rubroColors, space, topeColors } from "@/theme";
 import { Avatar } from "./avatar";
 import { Icon, iconoDeRubro } from "./icon";
 import { PressableScale } from "./pressable-scale";
@@ -55,7 +55,7 @@ function AnilloTope({ t, diametro = 64 }: { t: TopeMedio; diametro?: number }) {
           />
         ) : null}
       </Svg>
-      <Icon name={iconoDeRubro[t.rubro]} size={22} color={colors.ink} />
+      <Icon name={iconoDeRubro[t.rubro]} size={22} color={rubroColors[t.rubro].fg} />
     </View>
   );
 }

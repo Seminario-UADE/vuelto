@@ -2,24 +2,32 @@ import { router } from "expo-router";
 import { View } from "react-native";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
-import { Chip } from "@/components/chip";
 import { FilaAccion } from "@/components/fila-accion";
 import { MediosDelPerfil } from "@/components/medios-del-perfil";
 import { NombreDelPerfil } from "@/components/nombre-del-perfil";
 import { Screen } from "@/components/screen";
+import { Segmentado } from "@/components/segmentado";
 import { SectionHeader } from "@/components/section-header";
 import { Text } from "@/components/text";
 import { cerrarSesion as salir } from "@/data/auth";
+import type { PreferenciaTema } from "@/lib/apariencia";
 import { escenarioElegido, type Escenario } from "@/store/acciones";
+import { preferenciaCambiada } from "@/store/apariencia";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectPorConfirmarVigentes } from "@/store/por-confirmar";
 import { selectPendientesAlCerrarSesion } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { space } from "@/theme";
 
+const TEMAS: { valor: PreferenciaTema; label: string }[] = [
+  { valor: "sistema", label: "Sistema" },
+  { valor: "claro", label: "Claro" },
+  { valor: "oscuro", label: "Oscuro" },
+];
+
 const ESCENARIOS: { id: Escenario; label: string }[] = [
   { id: "normal", label: "Normal" },
-  { id: "mes-vacio", label: "Mes sin compras" },
+  { id: "mes-vacio", label: "Sin compras" },
   { id: "ticket-ilegible", label: "Ticket ilegible" },
 ];
 
@@ -33,6 +41,7 @@ export default function Perfil() {
   const usuario = useAppSelector((s) => s.sesion.usuario);
   const contactos = useAppSelector((s) => s.contactos.lista);
   const escenario = useAppSelector((s) => s.sesion.escenario);
+  const preferenciaTema = useAppSelector((s) => s.apariencia.preferencia);
 
 
   const pendientes = useAppSelector(selectPendientesAlCerrarSesion);
@@ -68,6 +77,16 @@ export default function Perfil() {
         />
       </Card>
 
+      <View style={{ gap: space.md }}>
+        <SectionHeader title="Apariencia" />
+        <Segmentado
+          opciones={TEMAS}
+          valor={preferenciaTema}
+          onChange={(v) => dispatch(preferenciaCambiada(v))}
+          accessibilityLabel="Apariencia de la app"
+        />
+      </View>
+
       <View style={{ gap: space.xs }}>
         {usuario?.email ? (
           <Text variant="label" tone="inkSecondary" align="center">
@@ -80,16 +99,12 @@ export default function Perfil() {
       {__DEV__ ? (
         <View style={{ gap: space.md }}>
           <SectionHeader title="Datos de ejemplo (solo desarrollo)" />
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
-            {ESCENARIOS.map((e) => (
-              <Chip
-                key={e.id}
-                label={e.label}
-                selected={escenario === e.id}
-                onPress={() => dispatch(escenarioElegido(e.id))}
-              />
-            ))}
-          </View>
+          <Segmentado
+            opciones={ESCENARIOS.map((e) => ({ valor: e.id, label: e.label }))}
+            valor={escenario}
+            onChange={(id) => dispatch(escenarioElegido(id))}
+            accessibilityLabel="Datos de ejemplo"
+          />
           <Button
             label="Abrir una invitación de ejemplo"
             variant="text"

@@ -2,7 +2,7 @@ import { View } from "react-native";
 import type { Compra } from "@/data/contracts";
 import { aprox, fechaCorta, pesos } from "@/lib/format";
 import type { MarcaDeSubida } from "@/store/selectores";
-import { colors, size, space } from "@/theme";
+import { colors, rubroColors, size, space } from "@/theme";
 import { Avatar } from "./avatar";
 import { Icon, iconoDeRubro } from "./icon";
 import { PressableScale } from "./pressable-scale";
@@ -36,7 +36,7 @@ export function CompraRow({ c, conFecha, onBorrar, marca }: Props) {
         }${marca ? `. ${TEXTO_MARCA[marca]}` : ""}`}
         style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: space.md, paddingVertical: space.md }}
       >
-        <Avatar icon={iconoDeRubro[c.comercio.rubro]} forma="cuadrado" />
+        <Avatar icon={iconoDeRubro[c.comercio.rubro]} forma="cuadrado" rubro={rubroColors[c.comercio.rubro]} />
         <View style={{ flex: 1, gap: 2 }}>
           {/* Comercio y monto arriba; medio y lo que vuelve abajo. El origen solo lo lee el lector de pantalla (v7: menos información). */}
           <View style={{ flexDirection: "row", alignItems: "baseline", gap: space.sm }}>

@@ -19,7 +19,7 @@ import { MENSAJES_ERROR } from "@/perfil/modelo";
 import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
 import { invitacionGuardada, onboardingTerminado } from "@/store/perfil";
 import { confirmarComercios } from "@/store/perfil-remoto";
-import { space } from "@/theme";
+import { rubroColors, space } from "@/theme";
 
 /**
  * Primera respuesta (onboarding, paso 2 de 2; spec 012, US4): «¿Dónde comprás seguido?». Tocar un
@@ -134,7 +134,7 @@ function Respuesta({ r, compacta }: { r: Recomendacion; compacta: boolean }) {
 function CabeceraComercio({ r }: { r: Recomendacion }) {
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
-      <Avatar icon={iconoDeRubro[r.comercio.rubro]} />
+      <Avatar icon={iconoDeRubro[r.comercio.rubro]} rubro={rubroColors[r.comercio.rubro]} />
       <View style={{ flex: 1 }}>
         <Text variant="bodyLg" weight="semibold">
           {r.comercio.nombre}

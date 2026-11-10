@@ -2098,6 +2098,46 @@ logo, y que el slice `perfil` guarde lo que devuelve `perfil/datos.ts`.
 
 ---
 
+## 2026-11-10 — Rediseño v8: sin píldoras, profundidad, tema elegible e Inicio nuevo
+
+**Herramienta:** Claude Code (Opus 5.5 para el plan, Sonnet 5.5 para la implementación), con el navegador integrado
+para las capturas. Dos sesiones aparte (revisión del gasto compartido y arreglos de la ingesta) salieron del
+mismo plan y tienen su propia entrada.
+
+**Objetivo:** cinco pendientes de la lista del equipo: sin píldoras y rediseño de Inicio, modo oscuro, mejor
+colorimetría (la app quedaba plana), confirmar el flujo de gasto compartido y revisar el script de ingesta.
+Esta entrada cubre solo la parte visual.
+
+**Prompts principales:**
+1. "Corré estas cosas pendientes en sesiones o como prefieras, hagamos un plan primero." (modo plan, con
+   tres exploraciones en paralelo: UI y tema, gasto compartido, ingesta).
+2. "Implementá el plan."
+
+**Resultado:**
+- El modo oscuro ya existía (#115): faltaba elegirlo. Perfil → Apariencia (Sistema, Claro, Oscuro) con el
+  slice `apariencia`, guardado en `vuelto.apariencia.v1`; en iOS se le pasa a `Appearance.setColorScheme`.
+  En la web ese método no existe, así que `TemaProvider` resuelve el esquema con la preferencia.
+- DESIGN.md v8: el claro se veía plano porque `canvas`, `surface` y `surfaceStrong` estaban a pasos
+  mínimos y las tarjetas no tenían sombra. Ahora la tarjeta es lo más claro y lleva sombra suave, lo hundido
+  es lo más oscuro, y en el oscuro sigue la elevación por tono. Se suma un segundo acento (Lago, solo
+  información), `success`, la banda `heroBg` y cinco colores por rubro. `theme.test.ts` valida los
+  contrastes de los roles nuevos en los dos temas.
+- Inicio: banda a todo el ancho con el monto estimado y su base, cada tope en su tarjeta.
+- Sin píldoras: la tab bar pasó de cápsula a rectángulo redondeado; los chips de tipo y red de la
+  tarjeta, y los escenarios de desarrollo, a un control segmentado (`segmentado.tsx`); la fecha de
+  Revisá y los comercios sugeridos a filas; los comercios del onboarding a cuadrados marcables. Se
+  borraron `chip.tsx`, `badge.tsx` y `comercio-search.tsx`, que no se usaban.
+- Decisión del equipo antes de implementar: se pidió ver capturas antes de tocar las píldoras y se
+  eligieron tab bar rectangular, segmentado más filas y el Inicio con banda.
+- Para sacar las capturas sin cuenta real (no hay `.env` de Supabase) se usó un acceso temporal al store
+  desde el navegador, que no se commiteó.
+- Verificado: lint, typecheck y tests; la web en claro y oscuro (Inicio, Compras, Comercios, Perfil,
+  Topes, primera respuesta, primer paso de comprar). **No verificado:** el selector de tema en iOS (no se
+  probó en un simulador), el selector de tipo y red (la lista de bancos necesita Supabase), Revisá,
+  contactos y grupo en oscuro.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

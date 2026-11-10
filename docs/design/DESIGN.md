@@ -1,4 +1,4 @@
-# Design System: Vuelto (v7)
+# Design System: Vuelto (v8)
 
 > Fuente de verdad para diseñar y generar pantallas de Vuelto (Stitch y la
 > app). La v6 (07/11/2026) reemplaza a `DESIGN-v5.md`, y su razonamiento está
@@ -13,6 +13,14 @@
 > «+» al centro, comprar en un paso por pantalla y una sola familia de
 > rectángulos redondeados en vez de píldoras. Plan y auditoría:
 > `plan-rediseno-v7.md`.
+>
+> **v8 (10/11/2026)**: la app se veía plana, sobre todo en claro, y todavía
+> tenía píldoras. Cambia la **profundidad** y el **color**, no la identidad:
+> tarjetas más claras que el fondo y con una sombra suave en el claro, un
+> segundo acento (lago), color por rubro, la cabecera de Inicio como banda a
+> todo el ancho, la barra como rectángulo redondeado y los chips de selección
+> reemplazados por controles segmentados, filas con check y cuadrados.
+> Modo oscuro: sigue al sistema, o se fija en Perfil → Apariencia.
 >
 > **Estado de implementación**: la app implementa la paleta, los dos temas y
 > los radios de la v6 (issue #115). La fila de comercios y la lista agrupada
@@ -56,23 +64,42 @@ tema. Ratios WCAG 2.1 medidos.
 
 | Rol | Claro | Oscuro | Uso | Contraste (claro / oscuro) |
 |---|---|---|---|---|
-| `canvas` | `#F3EBD6` Crema | `#051F20` Bosque profundo | Fondo de las pantallas | — |
-| `surface` | `#EAE1C8` Lino | `#0B2B26` Pino | Hero de Inicio, listas agrupadas, tarjetas | — |
-| `surfaceStrong` | `#DFD5B9` Arena | `#163832` Musgo oscuro | Chips, campos, círculos de comercio, fila seleccionada | — |
-| `divider` | `#D3C8A8` | `#235347` Helecho | Divisores. Nunca el único borde de un control | decorativo |
-| `ink` | `#02110C` Esmeralda negro | `#F3EBD6` Crema | Texto principal e íconos | 16.2 / 14.4 sobre canvas |
-| `inkSecondary` | `#4E6656` | `#A3B5A8` Liquen | Texto secundario, bases, metadatos | 5.3 / 8.0 sobre canvas |
-| `controlBorder` | `#6A7A70` | `#5E8A70` | Radios, checkboxes, inputs sin seleccionar | 3.8 / 4.4 |
-| `accent` | `#1A422F` Oliva | `#8EB69B` Salvia clara | **Único acento**: primario, selección, tab activa, progreso, links | 9.5 / 7.6 |
+| `canvas` | `#F1E8D0` Crema honda | `#051F20` Bosque profundo | Fondo de las pantallas | — |
+| `surface` | `#FBF7EA` Marfil | `#0B2B26` Pino | Tarjetas y listas agrupadas. En el claro es lo más claro y lleva sombra | — |
+| `surfaceStrong` | `#E6DCC0` Hueso | `#163832` Musgo oscuro | Segmentos, campos, fila seleccionada. En el claro es lo hundido | — |
+| `divider` | `#D8CDAE` | `#235347` Helecho | Divisores. Nunca el único borde de un control | decorativo |
+| `ink` | `#02110C` Esmeralda negro | `#F3EBD6` Crema | Texto principal e íconos | 15.8 / 14.4 sobre canvas |
+| `inkSecondary` | `#4E6656` | `#A3B5A8` Liquen | Texto secundario, bases, metadatos | 5.1 / 8.0 sobre canvas |
+| `controlBorder` | `#6A7A70` | `#5E8A70` | Radios, checkboxes, inputs sin seleccionar | 3.7 / 4.4 |
+| `accent` | `#1A422F` Oliva | `#8EB69B` Salvia clara | **Acento de acción**: primario, selección, tab activa, progreso, links | 9.2 / 7.6 |
 | `onAccent` | `#F3EBD6` | `#02110C` | Texto e íconos sobre el acento | 9.5 / 8.6 |
-| `warning` | `#83591A` | `#E2B65E` | Queda poco, promo de otro día | 5.2 / 9.1 |
+| `warning` | `#83591A` | `#E2B65E` | Queda poco, promo de otro día | 5.0 / 9.1 |
 | `warningBg` | `#F1DFB4` | `#2B2410` | Fondo de aviso, siempre con `warning` | — |
-| `error` | `#8C4843` | `#EE8F84` | Tope agotado, error de lectura | 5.7 / 7.3 |
-| `successBg` | `#D9E6D8` | `#1A422F` | Confirmación, píldora de ahorro (con `ink` / Crema) | — |
+| `error` | `#8C4843` | `#EE8F84` | Tope agotado, error de lectura | 5.5 / 7.3 |
+| `successBg` | `#D9E6D8` | `#1A422F` | Confirmación y fondo del ahorro (con `ink` / Crema) | — |
+| `success` | `#2E6B3B` Hoja | `#8FD1A0` | Texto de lo que se ganó o se devolvió | 5.2 / 9.6 |
+| `accent2` | `#1E6B73` Lago | `#7CC4CB` | Segundo acento (v8): información y estimaciones; nunca en acciones | 5.0 / 8.7 |
+| `accent2Bg` | `#D5E7E5` | `#17484C` | Fondo del segundo acento, siempre con `accent2` | — |
+| `heroBg` | `#1A422F` Oliva | `#0F3A34` | Banda de cabecera de Inicio (v8) | — |
+| `onHero` | `#F3EBD6` | `#F3EBD6` | Texto sobre la banda | 9.5 / 10.5 |
+| `onHeroMuted` | `#C4D4C6` | `#A3B5A8` | Base y fecha sobre la banda | 7.3 / 5.8 |
 | `decisionBg` | `#051F20` | `#F3EBD6` | Tarjeta de decisión (superficie invertida) | — |
 | `onDecision` | `#F3EBD6` | `#02110C` | Texto sobre la decisión | 14.4 / 16.2 |
 | `onDecisionMuted` | `#A3B5A8` | `#4E6656` | Razón y base sobre la decisión | 7.7 / 5.3 |
 | `onDecisionAccent` | `#8EB69B` (texto `#02110C`) | `#1A422F` (texto `#F3EBD6`) | El botón «Usar [medio]» dentro de la decisión | 8.6 / 9.5 |
+
+**Color por rubro (v8).** Cinco pares ícono/fondo para el cuadrado de cada
+comercio (`rubroColors` en `theme.ts`). El rubro es una ayuda para reconocer el
+comercio, nunca la única señal: el nombre va siempre al lado.
+
+| Rubro | Claro (ícono / fondo) | Oscuro (ícono / fondo) |
+|---|---|---|
+| Supermercado | `#2F6B3F` / `#DCE9D5` | `#9CCB9F` / `#1F4A36` |
+| Farmacia | `#1E6B73` / `#D5E7E5` | `#7CC4CB` / `#17484C` |
+| Combustible | `#9A4F1F` / `#F3DCC6` | `#F0A66B` / `#4A2F1A` |
+| Gastronomía | `#8C3F52` / `#EFD6D9` | `#E79AAB` / `#4A2531` |
+| Hogar e indumentaria | `#4A5E86` / `#D9DEEA` | `#A5B8E0` / `#27345A` |
+| Otro | `inkSecondary` / `surfaceStrong` | ídem |
 
 Roles técnicos fuera de la tabla (no son paleta nueva, derivan de los
 valores de arriba): `decisionSurface` (campo de monto y pista de barra dentro
@@ -83,9 +110,11 @@ sobre claro en los dos temas, porque muchos lectores no leen un QR invertido).
 
 Reglas:
 
-- **Un acento.** Oliva en el tema claro y Salvia clara en el oscuro, solo
-  para la acción, la selección y el estado activo. Gana fuerza porque se usa
-  poco. Champán salió en la v6.
+- **Un acento de acción.** Oliva en el tema claro y Salvia clara en el
+  oscuro, solo para la acción, la selección y el estado activo. Gana fuerza
+  porque se usa poco. Champán salió en la v6. Desde la v8 hay además un
+  segundo acento (Lago) **solo para información**: estimaciones y datos, no
+  botones ni selección.
 - **En el tema claro, el texto secundario va sobre `canvas` o `surface`.**
   Sobre `surfaceStrong` baja a 4.3:1, y ahí el texto va en `ink`.
 - **El color nunca es la única señal.** Todo estado lleva texto o ícono.
@@ -93,9 +122,12 @@ Reglas:
   en Inicio con un comercio elegido, Con qué pagar, la primera respuesta del
   onboarding y Gasto en grupo. En ningún otro lado.
 - **Sin negro ni blanco puros**, sin degradés, sin brillos, sin
-  glassmorphism propio. El único vidrio es el del sistema (tab bar, hojas).
-- **Apariencia**: `userInterfaceStyle: "automatic"`. El tema se resuelve una
-  vez (`useColorScheme`) y la `StatusBar` acompaña. En código los colores
+  glassmorphism propio. La v8 no los suma: la profundidad sale del tono y de
+  la sombra. El único vidrio es el del sistema (tab bar, hojas).
+- **Apariencia**: sigue al sistema (`userInterfaceStyle: "automatic"`) o queda
+  fijo en claro u oscuro desde Perfil (`apariencia` en el store, guardado en
+  el dispositivo y no en la cuenta). El tema se resuelve una vez en
+  `TemaProvider` y la `StatusBar` acompaña. En código los colores
   van siempre por rol, nunca como hex.
 - Verificar los contrastes en los dos temas (`theme.test.ts`).
 
@@ -132,26 +164,28 @@ Reglas:
   - botones, campos, buscador, chips y teclas: **14 pt** (`radius.control`);
   - filas e íconos en cuadrado: 12 pt;
   - hojas: el radio del sistema;
-  - la píldora (999) queda solo para la cápsula de la barra y lo que es un
-    círculo (avatares, radios, barras de progreso).
-- **Elevación por tono, no por sombra.** En el claro, las superficies se
-  separan por color. En el oscuro, **lo elevado es más claro**
-  (`canvas` → `surface` → `surfaceStrong`). Se declara una sola cosa: borde
-  o sombra, nunca las dos.
-- **Nunca una tarjeta dentro de otra.** El hero de Inicio es un fondo
-  (`surface` de borde a borde), no una tarjeta.
+  - la píldora (999) queda solo para lo que es un círculo (avatares, radios,
+    barras de progreso). **La barra de pestañas ya no es una cápsula** (v8).
+- **Elevación (v8).** En el **claro**, las tarjetas (`surface`, la más clara)
+  se despegan del fondo con una sombra suave (`sombras.claro.tarjeta`) y lo
+  hundido (`surfaceStrong`) es lo más oscuro: campos y segmentos. En el
+  **oscuro** no hay sombra: **lo elevado es más claro** (`canvas` →
+  `surface` → `surfaceStrong`). Nunca borde y sombra a la vez.
+- **Nunca una tarjeta dentro de otra.** La cabecera de Inicio no es una
+  tarjeta: es una banda `heroBg` de borde a borde, con las esquinas de abajo
+  de 28 pt y su propia sombra en el claro.
 - **Áreas táctiles de 44×44 pt o más.**
 
 ## 5. Componentes
 
-**Navegación (v7)**: una **cápsula flotante propia** (`tab-bar.tsx`), porque
-la nativa no admite un botón central destacado.
+**Navegación (v8)**: una **barra propia de rectángulo redondeado de 20 pt**
+(`tab-bar.tsx`), porque la nativa no admite un botón central destacado.
 - En este orden: **Inicio · Compras · ( + ) · Comercios · Perfil**. Inicio es
   la inicial. Topes no es pestaña: se abre desde Inicio («Ver todos») y desde
   Compras.
-- El **«+»** es la acción principal (comprar): un círculo de 60 pt en el
-  acento, más alto que la cápsula, con la etiqueta accesible «Comprar». Abre
-  el flujo de compra; no es una pestaña.
+- El **«+»** es la acción principal (comprar): un cuadrado redondeado de
+  60 pt (radio 20) en el acento, más alto que la barra, con la etiqueta
+  accesible «Comprar». Abre el flujo de compra; no es una pestaña.
 - La activa va en el acento, con el ícono relleno. Rol de pestaña y estado
   seleccionado para el lector de pantalla; 44 pt táctiles; se oculta con el
   teclado.
@@ -174,10 +208,11 @@ Arriba de cada paso: volver (‹), la barra de avance de 4 segmentos y cerrar
 (×), en cuadrados de 44 pt. Entrando a mitad de camino, los pasos anteriores
 se ven completos.
 
-**Inicio (v7)**: el saludo y un bloque en la superficie invertida con
-«Este mes te devolvieron ≈$6.125» y su base. Sin compras: «Todavía no
-registraste compras · Tocá + cuando estés por pagar». Si hay compras por
-confirmar, una lista agrupada «Por confirmar». Nada más.
+**Inicio (v8)**: una banda `heroBg` de borde a borde con el saludo, la fecha
+y «Este mes te devolvieron ≈$15.200» con su base y lo gastado en una línea
+(«según 10 compras de octubre · gastaste $101.500»). Sin compras: «Todavía no
+registraste compras · Tocá + cuando estés por pagar». Debajo, «Por confirmar»
+si hay, cada tope en su tarjeta y las últimas compras.
 
 **Tarjeta de decisión** (la superficie invertida). Una por pantalla, nunca más:
 - fondo `decisionBg`;
@@ -229,12 +264,18 @@ derecha.
 - La sugerencia («El que elegiste al simular») es una etiqueta y **no**
   selecciona.
 
-**Chips**: rectángulo de 14 pt `surfaceStrong`, texto `ink` de 15 pt/500, 40 pt visibles
-y 44 táctiles. Activo: fondo del acento, texto `onAccent` y check. Si se
-puede desmarcar, lleva una × de 44 pt táctiles.
+**Sin chips (v8).** Elegir entre pocas opciones es un **control segmentado**;
+entre varias, filas con radio o check; entre comercios, cuadrados.
 
-**Control segmentado**: el nativo (`@react-native-segmented-control`), con el
-`tint` del acento. Para los filtros de Compras y Mensual/Semanal en Topes.
+**Control segmentado** (`segmentado.tsx`): rectángulo de 14 pt `surfaceStrong`
+con segmentos de 12 pt; el activo en `accent` con texto `onAccent`. Para tipo
+y red de la tarjeta, Apariencia (Sistema · Claro · Oscuro) y los datos de
+ejemplo. Los filtros de Compras y Mensual/Semanal en Topes siguen con el
+nativo (`@react-native-segmented-control`).
+
+**Cuadrado de comercio marcable**: el de la grilla, con borde de 2 pt en
+`accent` cuando está marcado (`ink` el que muestra su respuesta) y una × de
+24 pt en la esquina que lo desmarca.
 
 **Badges**: solo si cambian una decisión («Hoy no aplica», «Tope agotado»,
 «Sin subir»). Máximo uno por fila. Nada decorativo.
@@ -268,11 +309,10 @@ primera, vas a ver cuánto tope te queda.», sin botón a otra pestaña.
   resúmenes cortos, y una sola columna con `fontScale > 1.2`.
 - Las pantallas de nivel superior llevan large title nativo (colapsa al
   scrollear). Las hijas, título inline y back del sistema.
-- **Inicio** (de arriba abajo, como las referencias): saludo y fecha; el
-  bloque oscuro con «Este mes te devolvieron ≈X», su base y, abajo, Gastaste
-  y Compras; «Por confirmar» si hay; «Tus topes» (los primeros tres, con
-  barra y base; «Ver todos» abre Topes) y «Últimas compras» (tres; «Ver
-  todas» va a Compras).
+- **Inicio** (de arriba abajo): la banda de borde a borde con saludo, fecha y
+  «Este mes te devolvieron ≈X» con su base; «Por confirmar» si hay; «Tus
+  topes» (los primeros tres, cada uno en su tarjeta con barra y base; «Ver
+  todos» abre Topes) y «Últimas compras» (tres; «Ver todas» va a Compras).
 - **Compras** (pestaña): «Gastaste este mes» con un gráfico de barras por
   tramo de 7 días (el de hoy en el acento), una fila «Te devolvieron ≈X» que
   abre Topes y las compras agrupadas por día. Sin filtros ni badges.
@@ -383,12 +423,14 @@ Medio sin cobertura (solo en onboarding): Mercado Pago, con la nota
 - Buscador de usuarios.
 - Botones que digan «Pagar». Más de un primario por pantalla.
 - Una tab bar o una barra de navegación dibujadas a mano. Una tarjeta dentro
-  de otra. Pilas de tarjetas sueltas para contenido de lista.
+  de otra. Pilas de tarjetas sueltas para filas de lista (la excepción son los
+  topes de Inicio: cada uno es un dato con su barra).
+- Chips y píldoras para elegir: se usa un segmentado, filas o cuadrados.
 - Contenido o botones tapados por la tab bar o por el pie.
 - Texto menor a 12 pt.
 - Negro o blanco puros, degradés, brillos, glow, neón, glassmorphism propio.
-- Violetas, azules, rosas, colores de marca de bancos o comercios, y
-  cualquier color fuera de la tabla de la sección 2.
+- Violetas, neón, colores de marca de bancos o comercios, y cualquier color
+  fuera de la tabla de la sección 2 (los de rubro están ahí).
 - Un tema que sea la inversión mecánica del otro.
 - Emojis, Inter, serifas, fechas viejas.
 - Campana de notificaciones. Total sumado de topes. Encabezados en

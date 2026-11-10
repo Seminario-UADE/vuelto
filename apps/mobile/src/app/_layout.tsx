@@ -16,6 +16,7 @@ import { Provider } from "react-redux";
 import { TemaProvider, useTema } from "@/components/tema-provider";
 import { Toast } from "@/components/toast";
 import { iniciarAuth } from "@/data/auth";
+import { useApariencia } from "@/hooks/use-apariencia";
 import { usePerfilRemoto } from "@/hooks/use-perfil-remoto";
 import { useReloj } from "@/hooks/use-reloj";
 import { useSincronizacion } from "@/hooks/use-sincronizacion";
@@ -70,6 +71,7 @@ function Raiz() {
   const dispatch = useAppDispatch();
   const hidratado = useAppSelector((s) => s.sesion.hidratado);
   const authLista = useAppSelector((s) => s.sesion.authLista);
+  const aparienciaLista = useApariencia();
   useReloj();
   usePerfilRemoto();
   useSincronizacion();
@@ -78,7 +80,7 @@ function Raiz() {
   // Lee la sesión guardada de Supabase y sigue sus cambios (issue #40).
   useEffect(() => dispatch(iniciarAuth()), [dispatch]);
 
-  const listo = fuentes && hidratado && authLista;
+  const listo = fuentes && hidratado && authLista && aparienciaLista;
   useEffect(() => {
     if (listo) void SplashScreen.hideAsync();
   }, [listo]);

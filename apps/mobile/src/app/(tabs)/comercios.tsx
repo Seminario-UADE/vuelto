@@ -15,7 +15,7 @@ import type { Comercio } from "@/data/contracts";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectComerciosFrecuentes, selectConvieneHoy } from "@/store/selectores";
 import { comercioElegido } from "@/store/simulacion";
-import { colors, radius, space } from "@/theme";
+import { colors, radius, rubroColors, space } from "@/theme";
 
 /**
  * Comercios (DESIGN.md v7 §6): un buscador que abre el «+», tus comercios en cuadrados (tocar uno
@@ -81,7 +81,7 @@ export default function Comercios() {
             {conviene.map(({ comercio, recomendacion: r }, i) => (
               <View key={comercio.id} style={divisor(i)}>
                 <FilaAccion
-                  leading={<Avatar icon={iconoDeRubro[comercio.rubro]} forma="cuadrado" />}
+                  leading={<Avatar icon={iconoDeRubro[comercio.rubro]} forma="cuadrado" rubro={rubroColors[comercio.rubro]} />}
                   titulo={comercio.nombre}
                   detalle={
                     r === null
