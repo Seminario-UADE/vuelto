@@ -2526,6 +2526,50 @@ proveedor que cuide la privacidad sin costo.
 
 ---
 
+## 2026-11-10 — Spec de la lectura del ticket con Groq (issue #48)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit, `spec-critic` y `gh` CLI.
+
+**Objetivo:** escribir la spec del servicio que lee la foto de un ticket y
+devuelve sus datos, ya con Groq (ADR-012), para que después la app de
+Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
+
+**Prompts principales:**
+1. "Arrancá la issue #48 sobre el PR #126." Se acordó el alcance: solo el
+   servicio y su contrato; la cámara y la pantalla son de la issue #49.
+2. "¿Cómo serían las reglas de código para tapar datos personales, si no
+   todos los tickets los tienen en el mismo lugar?" Las reglas buscan por la
+   forma del dato (tarjeta, CUIT con dígito verificador, DNI anunciado), no
+   por su lugar. Los nombres no tienen forma fija: se le pide a Groq que los
+   tape, y las reglas quedan como red de seguridad. "Con las dos capas,
+   arrancá."
+3. "No entendí: ¿quién definió el formato que espera la app? ¿El descuento se
+   puede sacar del ticket o se calcula después?" El formato lo armó Joaquín
+   para un lector de mentira. Se decidió que el servicio devuelva el medio de
+   pago tal como lo dice el ticket (la app lo cruza con las tarjetas del
+   perfil) y no leer el descuento: casi ninguna promo bancaria aparece en el
+   ticket, y el reintegro ya lo calcula el motor al confirmar.
+4. "El ticket va a ser de un solo pago" y "que haga falta tener cuenta".
+5. "Pasala por spec-critic y corregí el ADR-012."
+
+**Resultado:**
+- Spec 013: qué recibe y qué devuelve el servicio, qué datos personales
+  tapa en el texto del ticket, un código distinto para cada error y una
+  prueba manual con fotos reales antes de escribir el código.
+- Groq devuelve los datos tal como están impresos y nuestro código los
+  convierte, así se puede probar que nunca se deduce nada (por ejemplo, la
+  red por los dígitos de la tarjeta).
+- Dos pasadas de spec-critic: la primera encontró que el contrato no
+  coincidía con lo que espera la app y que no estaba claro qué era el
+  descuento; la segunda, detalles técnicos que se resolvieron.
+- El ADR-012 se corrigió en el PR #126: ya no promete el formato del lector
+  simulado de la app.
+- Queda pendiente: el plan, las tareas y la implementación; avisarle a
+  Joaquín que la issue #49 tiene que adaptar su formato y que el campo de
+  descuento no viene del ticket.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
