@@ -4,7 +4,7 @@ import { Button } from "@/components/button";
 import { Paso } from "@/components/paso";
 import { TecladoNumerico } from "@/components/teclado-numerico";
 import { Text } from "@/components/text";
-import { nombreDeRubro } from "@/data/comercios";
+import { esComercioDeRubro, nombreDeRubro } from "@/data/comercios";
 import { pesos } from "@/lib/format";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectComercioSimulado } from "@/store/selectores";
@@ -25,7 +25,13 @@ export default function PasoMonto() {
     <Paso
       paso={2}
       titulo="¿Cuánto vas a pagar?"
-      subtitulo={comercio ? `En ${comercio.nombre} · ${nombreDeRubro(comercio).toLowerCase()}` : undefined}
+      subtitulo={
+        !comercio
+          ? undefined
+          : esComercioDeRubro(comercio)
+            ? `En ${comercio.nombre}`
+            : `En ${comercio.nombre} · ${nombreDeRubro(comercio).toLowerCase()}`
+      }
       footer={<Button label={monto === null ? "Seguir sin el monto" : "Seguir"} onPress={seguir} />}
     >
       <View

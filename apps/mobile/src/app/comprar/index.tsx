@@ -83,7 +83,7 @@ export default function PasoComercio() {
               {habituales > 0 ? "Tus comercios y los más usados" : "Los más usados"}
             </Text>
           ) : null}
-          <GrillaComercios comercios={lista} onElegir={elegir} />
+          <GrillaComercios comercios={lista} onElegir={elegir} conRubro={buscando} />
         </View>
       )}
 
