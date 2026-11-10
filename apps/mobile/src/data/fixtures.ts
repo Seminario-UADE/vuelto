@@ -311,13 +311,19 @@ export const grupoDeEjemplo = {
   fecha: "2026-10-17",
 };
 
-export const ticketDeEjemplo = {
-  comercio: "Coto",
-  fecha: "2026-10-14",
-  monto: 24500,
-  textoExtraido:
-    "COTO C.I.C.S.A. · SUC. 112 ALMAGRO\n14/10/2026 18:42\nVARIOS SUPERMERCADO\nTOTAL $ 24.500,00\nGRACIAS POR SU COMPRA",
-};
+/**
+ * El ticket que devuelve el lector simulado, con la fecha de `hoy` (del reloj del store, spec 012
+ * R12): con una fecha fija, el ticket caía en otro mes y no se veía que los topes cambian.
+ */
+export function ticketDeEjemplo(hoy: string) {
+  const [a, m, d] = hoy.split("-");
+  return {
+    comercio: "Coto",
+    fecha: hoy,
+    monto: 24500,
+    textoExtraido: `COTO C.I.C.S.A. · SUC. 112 ALMAGRO\n${d}/${m}/${a} 18:42\nVARIOS SUPERMERCADO\nTOTAL $ 24.500,00\nGRACIAS POR SU COMPRA`,
+  };
+}
 
 export const invitacionPropia = {
   link: "vuelto.app/i/k7Qm2x",

@@ -15,14 +15,14 @@
 
 ## Phase 1: Setup
 
-- [ ] T001 Correr `npm ci` y confirmar la línea de base: `npm run lint && npm run typecheck && npm run test` pasan en `main` antes de tocar nada.
+- [x] T001 Correr `npm ci` y confirmar la línea de base: `npm run lint && npm run typecheck && npm run test` pasan en `main` antes de tocar nada.
 - [ ] T002 [P] Sacar las capturas «antes» de Inicio, Comprar, Mis compras, Perfil y del onboarding completo en el simulador de iOS y en Android, y guardarlas en `docs/design/capturas-app/antes-012/` (SC-007).
 
 ## Phase 2: Foundational (bloquea a US1, US2 y US4)
 
 - [ ] T003 Cambiar `perfilInicial.nombre` a `null` en `src/store/perfil.ts`. Hacer que el escenario de demo de `src/store/acciones.ts` y Perfil (solo en desarrollo) cargue «Martín» a propósito. Actualizar los tests de `src/store/*.test.ts` que esperaban «Martín» (FR-029, SC-005).
 - [ ] T004 Sacar los respaldos `?? "Martín"` de `src/app/(tabs)/index.tsx` y `src/app/(tabs)/perfil.tsx`: sin nombre, Inicio saluda «Hola» y Perfil muestra «Cargá tu nombre».
-- [ ] T005 [P] Hacer que el ticket de ejemplo de `src/data/fixtures.ts` y `src/data/api.ts` (`leerTicket`) devuelva la fecha de hoy, recibida como parámetro desde `sesion.ahora`. Sumar el escenario `"sin-red"` a `Escenario`, que hace fallar `leerTicket` con el error de conexión (research R12).
+- [x] T005 [P] Hacer que el ticket de ejemplo de `src/data/fixtures.ts` y `src/data/api.ts` (`leerTicket`) devuelva la fecha de hoy, recibida como parámetro desde `sesion.ahora`. Sumar el escenario `"sin-red"` a `Escenario`, que hace fallar `leerTicket` con el error de conexión (research R12).
 
 **Checkpoint**: la línea de base sigue en verde y ninguna pantalla dice «Martín» sin el escenario de demo.
 
@@ -36,45 +36,45 @@
 
 ### Tests
 
-- [ ] T006 [P] [US1] Escribir `src/data/por-confirmar.test.ts` para `origenAlConfirmar`, la tabla de `data-model.md` (`excepcion` solo con el medio y el comercio sin cambios), y para `borradorDesdePorConfirmar` sin ticket: precarga, `fechasPosibles` con el mismo día y con otro día (FR-017).
-- [ ] T007 [P] [US1] Escribir `src/store/por-confirmar.test.ts`:
+- [x] T006 [P] [US1] Escribir `src/data/por-confirmar.test.ts` para `origenAlConfirmar`, la tabla de `data-model.md` (`excepcion` solo con el medio y el comercio sin cambios), y para `borradorDesdePorConfirmar` sin ticket: precarga, `fechasPosibles` con el mismo día y con otro día (FR-017).
+- [x] T007 [P] [US1] Escribir `src/store/por-confirmar.test.ts`:
   - `porConfirmarCreada` reemplaza por `comercioId`;
   - `selectPorConfirmarVigentes` oculta las vencidas (48 h con el reloj del store) y las de otro usuario;
   - `porConfirmarPurgadas` saca las vencidas, las de otro dueño y las que ya están en `compras`;
   - `sesionCerrada` vacía la lista;
   - los seis casos de SC-003 dejan `selectTopes`, `selectResumenCompras` y `selectRecomendacion` exactamente iguales.
-- [ ] T008 [P] [US1] Sumar a `src/store/persistencia.test.ts` la clave `vuelto.por-confirmar.v1`: ida y vuelta, una entrada inválida se descarta y las demás quedan.
-- [ ] T009 [P] [US1] Sumar a `src/store/thunks.compras.test.ts`:
+- [x] T008 [P] [US1] Sumar a `src/store/persistencia.test.ts` la clave `vuelto.por-confirmar.v1`: ida y vuelta, una entrada inválida se descarta y las demás quedan.
+- [x] T009 [P] [US1] Sumar a `src/store/thunks.compras.test.ts`:
   - `guardarCompra(b, intento, id)` con un id existente devuelve la compra existente sin duplicar;
   - `confirmarPorConfirmar` deja una sola compra con el id de la compra por confirmar y la saca de la lista, incluso si se llama dos veces (SC-008).
 
 ### Implementation
 
-- [ ] T010 [P] [US1] Crear `src/data/por-confirmar.ts` con el tipo `CompraPorConfirmar`, `VENCIMIENTO_POR_CONFIRMAR_MS`, `origenAlConfirmar` y `borradorDesdePorConfirmar` (con la rama sin ticket). Tiene que pasar T006.
-- [ ] T011 [US1] Crear `src/store/por-confirmar.ts`:
+- [x] T010 [P] [US1] Crear `src/data/por-confirmar.ts` con el tipo `CompraPorConfirmar`, `VENCIMIENTO_POR_CONFIRMAR_MS`, `origenAlConfirmar` y `borradorDesdePorConfirmar` (con la rama sin ticket). Tiene que pasar T006.
+- [x] T011 [US1] Crear `src/store/por-confirmar.ts`:
   - el slice con las acciones de `data-model.md`;
   - que escuche `compraAgregada` y `sesionCerrada`;
   - `selectPorConfirmarVigentes`;
   - la persistencia en su propia clave con su listener y su lectura al arrancar, como `src/store/cola.ts`.
 
   Registrarlo en `src/store/index.ts` y en el arranque de `src/app/_layout.tsx`. Tiene que pasar T007 y T008.
-- [ ] T012 [US1] En `src/store/thunks.ts`:
+- [x] T012 [US1] En `src/store/thunks.ts`:
   - `guardarCompra` suma el parámetro opcional `id`;
   - nuevos thunks `usarRecomendacion()`, que crea la compra por confirmar desde `simulacion`, la limpia y devuelve si hubo reemplazo; `confirmarPorConfirmar(id, borrador)` y `descartarPorConfirmar(id)`.
 
   Tiene que pasar T009.
-- [ ] T013 [P] [US1] Crear `src/components/por-confirmar-card.tsx`: comercio, «Pagá con [medio]», monto y antigüedad, con «Ya pagué» (primario), «Escanear ticket» y «Descartar». Áreas de 44 pt y orden de lectura correcto.
-- [ ] T014 [P] [US1] Crear `src/app/descartar-por-confirmar.tsx` (form sheet, `fitToContents`) y registrarlo en `src/app/_layout.tsx`.
-- [ ] T015 [US1] Sumar el footer «Usar [medio]» a `src/components/recomendacion.tsx` cuando `r.medio` no es `null`. En `src/app/(tabs)/index.tsx`: las `PorConfirmarCard` arriba, «Usar» → `usarRecomendacion` → toast (los textos de `contracts/rutas.md`).
-- [ ] T016 [US1] Cambiar `usar` en `src/app/comercio/[id].tsx` para que llame a `usarRecomendacion`, muestre el toast y vuelva a Inicio (en lugar de abrir `revisa` en modo `excepcion`).
-- [ ] T017 [US1] En `src/app/revisa.tsx`:
+- [x] T013 [P] [US1] Crear `src/components/por-confirmar-card.tsx`: comercio, «Pagá con [medio]», monto y antigüedad, con «Ya pagué» (primario), «Escanear ticket» y «Descartar». Áreas de 44 pt y orden de lectura correcto.
+- [x] T014 [P] [US1] Crear `src/app/descartar-por-confirmar.tsx` (form sheet, `fitToContents`) y registrarlo en `src/app/_layout.tsx`.
+- [x] T015 [US1] Sumar el footer «Usar [medio]» a `src/components/recomendacion.tsx` cuando `r.medio` no es `null`. En `src/app/(tabs)/index.tsx`: las `PorConfirmarCard` arriba, «Usar» → `usarRecomendacion` → toast (los textos de `contracts/rutas.md`).
+- [x] T016 [US1] Cambiar `usar` en `src/app/comercio/[id].tsx` para que llame a `usarRecomendacion`, muestre el toast y vuelva a Inicio (en lugar de abrir `revisa` en modo `excepcion`).
+- [x] T017 [US1] En `src/app/revisa.tsx`:
   - aceptar el parámetro `porConfirmar` y precargar con `borradorDesdePorConfirmar`;
   - si cambió el día, mostrar la elección entre «el día de la simulación» y «hoy»;
   - guardar con `confirmarPorConfirmar` y el origen que da `origenAlConfirmar`;
   - deshabilitar «Guardar» sin monto, con la razón a la vista.
-- [ ] T018 [US1] Estado vacío de Inicio sin enlace a otra tab (FR-035). Sacar la fila «¿Ya compraste? Escaneá el ticket» de `src/app/(tabs)/index.tsx`.
-- [ ] T019 [US1] En `src/app/cerrar-sesion.tsx`, el aviso dice cuántas compras por confirmar se van a perder (FR-014).
-- [ ] T020 [P] [US1] Declarar en `docs/product/privacidad.md` la clave `vuelto.por-confirmar.v1`: qué guarda, que no sale del teléfono y su vencimiento de 48 h (FR-037).
+- [x] T018 [US1] Estado vacío de Inicio sin enlace a otra tab (FR-035). Sacar la fila «¿Ya compraste? Escaneá el ticket» de `src/app/(tabs)/index.tsx`.
+- [x] T019 [US1] En `src/app/cerrar-sesion.tsx`, el aviso dice cuántas compras por confirmar se van a perder (FR-014).
+- [x] T020 [P] [US1] Declarar en `docs/product/privacidad.md` la clave `vuelto.por-confirmar.v1`: qué guarda, que no sale del teléfono y su vencimiento de 48 h (FR-037).
 
 **Checkpoint**: US1 completa. «Usar» ya no descuenta tope y el quickstart 1 y 2 pasan.
 

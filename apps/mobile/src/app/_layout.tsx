@@ -26,6 +26,7 @@ import { crearDatosPerfil } from "@/perfil/datos";
 import { crearStore } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { rehidratar } from "@/store/persistencia";
+import { iniciarPorConfirmar } from "@/store/por-confirmar";
 import { iniciarCompras } from "@/store/thunks";
 import { repositorioSupabase } from "@/sync/repositorio-supabase";
 
@@ -43,7 +44,11 @@ const store = crearStore({
   perfilRemoto: supabase ? crearDatosPerfil(supabase) : null,
   reloj: () => new Date(),
 });
-void store.dispatch(rehidratar()).then(() => store.dispatch(iniciarCompras()));
+// Las compras por confirmar se leen después de las compras: la purga saca las ya confirmadas (spec 012).
+void store
+  .dispatch(rehidratar())
+  .then(() => store.dispatch(iniciarCompras()))
+  .then(() => store.dispatch(iniciarPorConfirmar()));
 
 export const unstable_settings = { anchor: "(tabs)" };
 
@@ -164,6 +169,10 @@ function Navegacion() {
           />
           <Stack.Screen
             name="borrar-compra"
+            options={{ ...sheet, sheetAllowedDetents: "fitToContents" }}
+          />
+          <Stack.Screen
+            name="descartar-por-confirmar"
             options={{ ...sheet, sheetAllowedDetents: "fitToContents" }}
           />
           <Stack.Screen name="(auth)/login" options={pageSheet} />

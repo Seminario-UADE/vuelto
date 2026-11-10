@@ -98,7 +98,7 @@ describe("compras", () => {
 
   it("la compra por ticket guarda el texto extraído, nunca la imagen", () => {
     const s = conMartin();
-    s.dispatch(guardarCompra({ ...borrador, modo: "ticket", textoExtraido: ticketDeEjemplo.textoExtraido }));
+    s.dispatch(guardarCompra({ ...borrador, modo: "ticket", textoExtraido: ticketDeEjemplo("2026-10-14").textoExtraido }));
     expect(s.getState().compras.lista[0]?.textoExtraido).toContain("TOTAL");
     expect(JSON.stringify(s.getState().compras)).not.toMatch(/imagen|image|base64|uri/i);
   });

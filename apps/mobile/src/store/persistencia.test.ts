@@ -9,6 +9,7 @@ import { selectRecomendacion, selectTopes } from "./selectores";
 import { ahoraCambio, usuarioCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
 import { esperar, memoria, storeDePrueba } from "./prueba";
+import { CLAVE_POR_CONFIRMAR, iniciarPorConfirmar, porConfirmarCreada } from "./por-confirmar";
 import { eliminarCompra } from "./thunks";
 
 const nueva = { ...comprasOctubre[0]!, id: "n11", fecha: "2026-10-14" };
@@ -274,5 +275,106 @@ describe("persistencia del corpus en su propia clave (spec 009 FR-017)", () => {
     expect(disco.datos.has(CLAVE_CORPUS)).toBe(false);
     const b = await abrir(disco);
     expect(b.getState().corpus.marca).toBeNull();
+  });
+});
+
+describe("persistencia de las compras por confirmar en su propia clave (spec 012, FR-014)", () => {
+  const compraPC = (cambios: Record<string, unknown> = {}) => ({
+    id: "00000000-0000-4000-8000-0000000000aa",
+    usuarioId: "u1",
+    comercioId: "coto",
+    comercioNombre: "Coto",
+    medioId: "galicia-visa-credito",
+    monto: 24500,
+    creadaEn: "2026-10-14T15:00:00.000Z",
+    ...cambios,
+  });
+
+  async function abrirConPorConfirmar(almacenamiento = memoria()) {
+    const s = storeDePrueba(null, almacenamiento);
+    s.dispatch(ahoraCambio("2026-10-14T16:00:00.000Z"));
+    await s.dispatch(rehidratar());
+    await s.dispatch(iniciarPorConfirmar());
+    return s;
+  }
+
+  it("ida y vuelta: sobrevive a cerrar y abrir la app", async () => {
+    const almacenamiento = memoria();
+    const a = await abrirConPorConfirmar(almacenamiento);
+    a.dispatch(porConfirmarCreada(compraPC()));
+    await esperar();
+    expect(JSON.parse(almacenamiento.datos.get(CLAVE_POR_CONFIRMAR)!)).toEqual({ version: 1, lista: [compraPC()] });
+
+    const b = await abrirConPorConfirmar(almacenamiento);
+    expect(b.getState().porConfirmar.lista).toEqual([compraPC()]);
+  });
+
+  it("no va a la clave del store: vuelto.store.v1 no cambia de forma", async () => {
+    const almacenamiento = memoria();
+    const a = await abrirConPorConfirmar(almacenamiento);
+    a.dispatch(porConfirmarCreada(compraPC()));
+    a.dispatch(mediosConfirmados(mediosDeEjemplo(["galicia-visa-credito"])));
+    await esperar();
+    expect(Object.keys(JSON.parse(almacenamiento.datos.get(CLAVE)!))).toEqual(["version", "perfil", "compras"]);
+  });
+
+  it("no escribe antes de leer lo guardado (no lo pisa)", async () => {
+    const guardado = JSON.stringify({ version: 1, lista: [compraPC()] });
+    const almacenamiento = memoria({ [CLAVE_POR_CONFIRMAR]: guardado });
+    const s = storeDePrueba(null, almacenamiento);
+    s.dispatch(porConfirmarCreada(compraPC({ id: "otra", comercioId: "jumbo" })));
+    await esperar();
+    expect(almacenamiento.datos.get(CLAVE_POR_CONFIRMAR)).toBe(guardado);
+  });
+
+  it("una entrada inválida se descarta y las demás quedan", async () => {
+    const almacenamiento = memoria({
+      [CLAVE_POR_CONFIRMAR]: JSON.stringify({
+        version: 1,
+        lista: [
+          compraPC(),
+          compraPC({ id: "sin-medio", comercioId: "jumbo", medioId: 3 }),
+          compraPC({ id: "monto-negativo", comercioId: "dia", monto: -5 }),
+          compraPC({ id: "fecha-rota", comercioId: "carrefour", creadaEn: "ayer" }),
+          "basura",
+        ],
+      }),
+    });
+    const s = await abrirConPorConfirmar(almacenamiento);
+    expect(s.getState().porConfirmar.lista.map((c) => c.id)).toEqual([compraPC().id]);
+  });
+
+  it("JSON inválido u otra versión: arranca vacía sin romperse", async () => {
+    for (const raw of ["{no es json", JSON.stringify({ version: 2, lista: [compraPC()] })]) {
+      const s = await abrirConPorConfirmar(memoria({ [CLAVE_POR_CONFIRMAR]: raw }));
+      expect(s.getState().porConfirmar.lista).toEqual([]);
+    }
+  });
+
+  it("al abrir se purgan las vencidas y las que ya están en compras (FR-011, SC-008)", async () => {
+    const almacenamiento = memoria({
+      [CLAVE_POR_CONFIRMAR]: JSON.stringify({
+        version: 1,
+        lista: [
+          compraPC(),
+          compraPC({ id: "vencida", comercioId: "jumbo", creadaEn: "2026-10-12T15:00:00.000Z" }),
+          compraPC({ id: nueva.id, comercioId: "dia" }),
+        ],
+      }),
+    });
+    const a = await abrir(almacenamiento);
+    a.dispatch(compraAgregada(nueva));
+    await esperar();
+    const s = await abrirConPorConfirmar(almacenamiento);
+    expect(s.getState().porConfirmar.lista.map((c) => c.id)).toEqual([compraPC().id]);
+  });
+
+  it("cerrar sesión deja la clave vacía", async () => {
+    const almacenamiento = memoria();
+    const s = await abrirConPorConfirmar(almacenamiento);
+    s.dispatch(porConfirmarCreada(compraPC()));
+    s.dispatch(sesionCerrada());
+    await esperar();
+    expect(JSON.parse(almacenamiento.datos.get(CLAVE_POR_CONFIRMAR)!).lista).toEqual([]);
   });
 });
