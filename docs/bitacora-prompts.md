@@ -2551,6 +2551,12 @@ Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
    ticket, y el reintegro ya lo calcula el motor al confirmar.
 4. "El ticket va a ser de un solo pago" y "que haga falta tener cuenta".
 5. "Pasala por spec-critic y corregí el ADR-012."
+6. "Commiteá ambos y seguí con el plan." El plan define cómo se arma el
+   servicio (igual que el de recomendar), que Groq devuelve los datos tal
+   como están impresos y nuestro código los convierte, el contrato para la
+   app de Joaquín con un mensaje sugerido para cada error, y una prueba con 3
+   fotos reales que corre el usuario fuera de la sesión de IA antes de
+   escribir el servicio.
 
 **Resultado:**
 - Spec 013: qué recibe y qué devuelve el servicio, qué datos personales
