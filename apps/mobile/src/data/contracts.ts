@@ -136,6 +136,22 @@ export type TopeMedio = {
   promociones: string[];
   /** Las compras que lo consumieron, tal como las contó el motor (issue #45). */
   compraIds: string[];
+  /** Hoy aplica alguna de sus promos (día de la semana y vigencia): lo que muestra Inicio (v9). */
+  aplicaHoy: boolean;
+};
+
+/**
+ * Cuánto tope te queda, sumando todos tus topes (Inicio, v9): el gráfico de torta. Estimado como
+ * cada tope, con su base (Principio V).
+ */
+export type UsoDeTopes = {
+  nominal: number;
+  disponible: number;
+  /** De 0 a 1: la parte del tope total que todavía queda. */
+  queda: number;
+  topes: number;
+  /** "según 4 compras de octubre" o, sin compras, "sin compras registradas este mes". */
+  base: string;
 };
 
 export type ResumenTopes = {

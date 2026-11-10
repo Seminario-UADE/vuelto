@@ -13,6 +13,7 @@ import {
   perfilDelMotor,
   recomendacionVista,
   topesVista,
+  usoDeTopes,
   type EntradasMotor,
 } from "../data/calculo";
 import { contarPendientes } from "../data/compras/operaciones";
@@ -120,19 +121,27 @@ export const selectRecomendacion = createSelector(
 const MAX_CONVIENE_HOY = 6;
 
 /**
- * «Hoy te conviene» de la pestaña Comercios (v7): la recomendación sin monto para tus comercios
- * y, hasta completar seis, los más usados del catálogo; el mismo motor que el «+». La
- * recomendación es `null` si el comercio no tiene rubro conocido.
+ * «Hoy te conviene» de la pestaña Comercios (v7): con qué pagar hoy, sin monto, en tus comercios
+ * y en los más usados del catálogo; el mismo motor que el «+». Solo los que tienen promo hoy con
+ * tus medios (v9): un comercio sin promo hoy no ayuda a decidir y carga la pantalla. Hasta seis,
+ * o todos los tuyos si tenés más.
  */
 export const selectConvieneHoy = createSelector([selectEntradasMotor, selectComerciosFrecuentes], (e, tuyos) => {
   const nombres = new Set(tuyos.map((c) => c.nombre.toLowerCase()));
   const masUsados = catalogoComercios.filter((c) => c.frecuente && !nombres.has(c.nombre.toLowerCase()));
   return [...tuyos, ...masUsados]
-    .slice(0, Math.max(tuyos.length, MAX_CONVIENE_HOY))
-    .map((comercio) => ({ comercio, recomendacion: recomendacionVista(e, comercio, null) }));
+    .map((comercio) => ({ comercio, recomendacion: recomendacionVista(e, comercio, null) }))
+    .filter(
+      (f): f is { comercio: Comercio; recomendacion: NonNullable<typeof f.recomendacion> } =>
+        f.recomendacion !== null && f.recomendacion.resultado === "recomendado" && f.recomendacion.medio !== null,
+    )
+    .slice(0, Math.max(tuyos.length, MAX_CONVIENE_HOY));
 });
 
 export const selectTopes = createSelector([selectEntradasMotor], topesVista);
+
+/** Inicio (v9): todos tus topes sumados, para el gráfico de torta. */
+export const selectUsoDeTopes = createSelector([selectTopes], usoDeTopes);
 
 /**
  * Las compras que consumieron un tope (issue #45), por su `clave`. Sale de `selectTopes`: la

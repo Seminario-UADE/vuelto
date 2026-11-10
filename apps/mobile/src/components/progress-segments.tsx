@@ -10,11 +10,14 @@ export function ProgressSegments({
   actual,
   contexto = "Configuración",
   ancho = 120,
+  sobrePanel,
 }: {
   total: number;
   actual: number;
   contexto?: string;
   ancho?: number;
+  /** Sobre el panel de decisión (superficie invertida). */
+  sobrePanel?: boolean;
 }) {
   return (
     <View
@@ -30,7 +33,9 @@ export function ProgressSegments({
             flex: 1,
             height: 4,
             borderRadius: radius.pill,
-            backgroundColor: i < actual ? colors.accent : colors.divider,
+            backgroundColor: sobrePanel
+              ? i < actual ? colors.onDecisionAccent : colors.decisionSurface
+              : i < actual ? colors.accent : colors.divider,
           }}
         />
       ))}

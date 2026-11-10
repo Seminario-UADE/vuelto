@@ -24,19 +24,17 @@ type NombreTema = keyof typeof temas;
 type Par = [nombre: string, frente: ColorToken, fondo: ColorToken];
 
 /**
- * Pares de DESIGN.md §2 que llevan texto (WCAG 2.1 AA, ≥ 4,5:1), por tema. En el claro,
- * `inkSecondary` no va sobre `surfaceStrong` (4,3:1): ahí el texto va en `ink`.
+ * Pares de DESIGN.md §2 que llevan texto (WCAG 2.1 AA, ≥ 4,5:1), por tema. Desde la v9 los dos
+ * temas comparten todos los pares (en el claro, `inkSecondary` ya pasa sobre `surfaceStrong`).
  */
-const textos: Record<NombreTema, Par[]> = {
-  claro: [],
-  oscuro: [["inkSecondary / surfaceStrong", "inkSecondary", "surfaceStrong"]],
-};
+const textos: Record<NombreTema, Par[]> = { claro: [], oscuro: [] };
 const textosComunes: Par[] = [
   ["ink / canvas", "ink", "canvas"],
   ["ink / surface", "ink", "surface"],
   ["ink / surfaceStrong", "ink", "surfaceStrong"],
   ["inkSecondary / canvas", "inkSecondary", "canvas"],
   ["inkSecondary / surface", "inkSecondary", "surface"],
+  ["inkSecondary / surfaceStrong", "inkSecondary", "surfaceStrong"],
   ["accent / canvas (links)", "accent", "canvas"],
   ["accent / surface (links)", "accent", "surface"],
   ["onAccent / accent", "onAccent", "accent"],

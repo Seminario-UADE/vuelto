@@ -20,7 +20,8 @@ import { colors, radius, rubroColors, space } from "@/theme";
 /**
  * Comercios (DESIGN.md v7 §6): un buscador que abre el «+», tus comercios en cuadrados (tocar uno
  * arranca la compra en el paso del monto) y «Hoy te conviene»: con qué pagar hoy en cada uno, la
- * misma recomendación del motor que da el «+», sin monto. Agregar y sacar, detrás de «Editar».
+ * misma recomendación del motor que da el «+», sin monto, y solo en los que tienen promo hoy (v9).
+ * Agregar y sacar, detrás de «Editar».
  */
 export default function Comercios() {
   const dispatch = useAppDispatch();
@@ -74,7 +75,7 @@ export default function Comercios() {
         )}
       </View>
 
-      {!editando && conviene.length > 0 ? (
+      {editando ? null : conviene.length > 0 ? (
         <View style={{ gap: space.sm }}>
           <SectionHeader title="Hoy te conviene" />
           <Card padding={space.lg} gap={0} style={{ paddingVertical: space.xs }}>
@@ -83,13 +84,7 @@ export default function Comercios() {
                 <FilaAccion
                   leading={<Avatar icon={iconoDeRubro[comercio.rubro]} forma="cuadrado" rubro={rubroColors[comercio.rubro]} />}
                   titulo={comercio.nombre}
-                  detalle={
-                    r === null
-                      ? "Sin datos de promos para este comercio"
-                      : r.medio && r.resultado === "recomendado"
-                        ? `Con ${r.medio.nombre}${r.razon ? ` · ${r.razon}` : ""}`
-                        : (r.proximaPromo ?? "Hoy sin promo con tus medios")
-                  }
+                  detalle={`Con ${r.medio?.nombre ?? ""}${r.razon ? ` · ${r.razon}` : ""}`}
                   onPress={() => comprarEn(comercio)}
                 />
               </View>
@@ -99,7 +94,14 @@ export default function Comercios() {
             Según las promos de hoy y tus topes estimados. Con el monto, te decimos cuánto te devuelven.
           </Text>
         </View>
-      ) : null}
+      ) : (
+        <View style={{ gap: space.sm }}>
+          <SectionHeader title="Hoy te conviene" />
+          <Text variant="bodyMd" tone="inkSecondary">
+            Hoy ningún comercio tuyo tiene reintegro con tus medios. Igual podés buscar uno arriba.
+          </Text>
+        </View>
+      )}
     </Screen>
   );
 }
