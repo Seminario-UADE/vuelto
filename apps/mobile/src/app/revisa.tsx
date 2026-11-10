@@ -5,7 +5,6 @@ import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { Field } from "@/components/field";
-import { Chip } from "@/components/chip";
 import { Icon } from "@/components/icon";
 import { OptionRow } from "@/components/option-row";
 import { Screen } from "@/components/screen";
@@ -196,11 +195,12 @@ export default function Revisa() {
             <Text variant="label" tone="inkSecondary">
               ¿Cuándo pagaste?
             </Text>
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
+            <View style={{ gap: space.sm }}>
               {desde.fechasPosibles.map((f) => (
-                <Chip
+                <OptionRow
                   key={f}
-                  label={`${f === hoy ? "Hoy" : "El día que simulaste"}, ${fechaLarga(f)}`}
+                  title={f === hoy ? "Hoy" : "El día que simulaste"}
+                  detail={fechaLarga(f).replace(/^./, (c) => c.toUpperCase())}
                   selected={fecha === f}
                   onPress={() => {
                     hapticoSeleccion();

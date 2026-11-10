@@ -1,6 +1,8 @@
 import { StatusBar } from "expo-status-bar";
 import { createContext, Fragment, use, type ReactNode } from "react";
 import { useColorScheme } from "react-native";
+import { esquemaEfectivo } from "@/lib/apariencia";
+import { useAppSelector } from "@/store/hooks";
 import { temas, type Tema } from "@/theme";
 import { fijarEsquema, temaSeResuelveSolo, type Esquema } from "@/theme-color";
 
@@ -8,7 +10,8 @@ const EsquemaContext = createContext<Esquema>("claro");
 
 /**
  * Único lugar que resuelve el tema (DESIGN.md §2, Apariencia): sigue al sistema con
- * `useColorScheme()` y la `StatusBar` lo acompaña. Las pantallas siguen leyendo `colors` de
+ * `useColorScheme()`, salvo que el usuario haya fijado claro u oscuro en Perfil, y la `StatusBar`
+ * lo acompaña. Las pantallas siguen leyendo `colors` de
  * `@/theme`, sin hooks.
  *
  * En iOS los colores son dinámicos y el sistema los cambia solo. En Android y web el esquema se
@@ -16,7 +19,8 @@ const EsquemaContext = createContext<Esquema>("claro");
  * ningún estilo quede con el tema anterior.
  */
 export function TemaProvider({ children }: { children: ReactNode }) {
-  const esquema: Esquema = useColorScheme() === "dark" ? "oscuro" : "claro";
+  const delSistema: Esquema = useColorScheme() === "dark" ? "oscuro" : "claro";
+  const esquema = esquemaEfectivo(useAppSelector((s) => s.apariencia.preferencia), delSistema);
   fijarEsquema(esquema);
   return (
     <EsquemaContext value={esquema}>
