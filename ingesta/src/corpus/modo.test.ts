@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { crearClienteMODO } from "./modo.ts";
+import { crearClienteMODO, esperaDe429 } from "./modo.ts";
 
 interface Pedido {
   url: string;
@@ -102,6 +102,114 @@ describe("crearClienteMODO — reintentos", () => {
     const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} });
     expect(await cliente.detalle("x")).toBeNull();
     expect(fn).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("crearClienteMODO — 400 transitorio, 429 y timeout", () => {
+  /** Responde con la secuencia dada, una por pedido; la última se repite. `fn` guarda lo que se le pidió. */
+  function secuencia(respuestas: ({ estado: number; cuerpo: string; cabeceras?: Record<string, string> } | "timeout")[]) {
+    let n = 0;
+    const init: (RequestInit | undefined)[] = [];
+    const fn = vi.fn(async (_url: string | URL | Request, opciones?: RequestInit) => {
+      init.push(opciones);
+      const r = respuestas[Math.min(n++, respuestas.length - 1)]!;
+      if (r === "timeout") throw new DOMException("The operation was aborted due to timeout", "TimeoutError");
+      return new Response(r.cuerpo, { status: r.estado, headers: r.cabeceras });
+    });
+    return { fn: fn as unknown as typeof fetch, init, llamadas: fn };
+  }
+
+  it("un 400 del detalle que no se repite se recupera: la promo no se toma por inexistente", async () => {
+    const { fn, llamadas } = secuencia([{ estado: 400, cuerpo: "Bad Request" }, json({ slug: "x" })]);
+    const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} });
+    expect(await cliente.detalle("x")).toEqual({ slug: "x" });
+    expect(llamadas).toHaveBeenCalledTimes(2);
+  });
+
+  it("reintentos400 en 0 deja el comportamiento anterior: un 400 es null enseguida", async () => {
+    const { fn, llamadas } = secuencia([{ estado: 400, cuerpo: "Bad Request" }]);
+    const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {}, reintentos400: 0 });
+    expect(await cliente.detalle("x")).toBeNull();
+    expect(llamadas).toHaveBeenCalledTimes(1);
+  });
+
+  it("un 429 se reintenta esperando lo que pide Retry-After (si es más que el backoff)", async () => {
+    const { fn, llamadas } = secuencia([{ estado: 429, cuerpo: "", cabeceras: { "Retry-After": "7" } }, json({ slug: "x" })]);
+    const esperar = vi.fn(async () => {});
+    const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar });
+    expect(await cliente.detalle("x")).toEqual({ slug: "x" });
+    expect(llamadas).toHaveBeenCalledTimes(2);
+    expect(esperar).toHaveBeenCalledTimes(1);
+    expect(esperar).toHaveBeenCalledWith(7000);
+  });
+
+  it("un 429 sin Retry-After usa backoff exponencial, cada vez más largo", async () => {
+    const { fn } = secuencia([{ estado: 429, cuerpo: "" }, { estado: 429, cuerpo: "" }, { estado: 429, cuerpo: "" }, json({ slug: "x" })]);
+    const esperas: number[] = [];
+    const esperar = async (ms: number) => void esperas.push(ms);
+    const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar });
+    await cliente.detalle("x");
+    expect(esperas).toEqual([2000, 4000, 8000]);
+  });
+
+  it("un 429 que no cede lanza un error con la URL, después de sus propios reintentos", async () => {
+    const { fn, llamadas } = secuencia([{ estado: 429, cuerpo: "" }]);
+    const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {}, reintentos429: 2 });
+    await expect(cliente.detalle("x")).rejects.toThrow(/429.*benefit\/x.*3 intentos/);
+    expect(llamadas).toHaveBeenCalledTimes(3);
+  });
+
+  it("los 429 no gastan los reintentos de los errores de servidor", async () => {
+    const { fn } = secuencia([{ estado: 429, cuerpo: "" }, { estado: 500, cuerpo: "" }, { estado: 429, cuerpo: "" }, { estado: 500, cuerpo: "" }, json({ slug: "x" })]);
+    const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {}, reintentos: 2 });
+    expect(await cliente.detalle("x")).toEqual({ slug: "x" });
+  });
+
+  it("un 429 en el listado también se reintenta, no aborta la corrida", async () => {
+    const { fn } = secuencia([{ estado: 429, cuerpo: "" }, json([])]);
+    const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} });
+    expect(await cliente.bancos()).toEqual([]);
+  });
+
+  it("cada pedido lleva un AbortSignal con timeout", async () => {
+    const { fn, init } = secuencia([json([])]);
+    await crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).bancos();
+    expect(init[0]!.signal).toBeInstanceOf(AbortSignal);
+    expect(init[0]!.signal!.aborted).toBe(false);
+  });
+
+  it("un pedido que se pasa del tiempo se reintenta como un corte de red", async () => {
+    const { fn, llamadas } = secuencia(["timeout", json({ slug: "x" })]);
+    const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} });
+    expect(await cliente.detalle("x")).toEqual({ slug: "x" });
+    expect(llamadas).toHaveBeenCalledTimes(2);
+  });
+
+  it("si se pasa del tiempo en todos los intentos, el error dice cuánto era el máximo", async () => {
+    const { fn } = secuencia(["timeout"]);
+    const cliente = crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {}, timeoutMs: 5000, reintentos: 1 });
+    await expect(cliente.detalle("x")).rejects.toThrow(/5000 ms.*benefit\/x|benefit\/x.*5000 ms/);
+  });
+});
+
+describe("esperaDe429", () => {
+  it("toma el mayor entre Retry-After y el backoff", () => {
+    expect(esperaDe429("1", 1, 1000)).toBe(2000);
+    expect(esperaDe429("10", 1, 1000)).toBe(10_000);
+  });
+
+  it("entiende Retry-After como fecha HTTP", () => {
+    const ahora = () => Date.parse("2026-11-10T12:00:00Z");
+    expect(esperaDe429("Tue, 10 Nov 2026 12:00:20 GMT", 1, 1000, ahora)).toBe(20_000);
+    expect(esperaDe429("Tue, 10 Nov 2026 11:00:00 GMT", 1, 1000, ahora)).toBe(2000); // fecha pasada: el backoff
+  });
+
+  it("ignora un Retry-After que no se entiende y respeta el tope de un minuto", () => {
+    expect(esperaDe429("pronto", 2, 1000)).toBe(4000);
+    expect(esperaDe429("", 1, 1000)).toBe(2000);
+    expect(esperaDe429(null, 1, 1000)).toBe(2000);
+    expect(esperaDe429("3600", 1, 1000)).toBe(60_000);
+    expect(esperaDe429(null, 10, 1200)).toBe(60_000);
   });
 });
 
@@ -227,11 +335,12 @@ describe("crearClienteMODO — detalle y bancos", () => {
     expect(detalle).toBeNull();
   });
 
-  it("un 400 del detalle también devuelve null, sin reintentar", async () => {
+  it("un 400 del detalle que no se corrige devuelve null después de un solo reintento", async () => {
+    // Los slugs de ICBC que MODO rechaza siempre: cuestan un pedido de más, no tres, y no hacen fallar la corrida.
     const { fn, pedidos } = fetchSimulado(() => ({ estado: 400, cuerpo: "Bad Request" }));
     const detalle = await crearClienteMODO({ fetch: fn, pausaMs: 1000, esperar: async () => {} }).detalle("2608-icbc");
     expect(detalle).toBeNull();
-    expect(pedidos).toHaveLength(1);
+    expect(pedidos).toHaveLength(2);
   });
 
   it("un 400 fuera del detalle sigue siendo un error", async () => {

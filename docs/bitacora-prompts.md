@@ -2098,6 +2098,36 @@ logo, y que el slice `perfil` guarde lo que devuelve `perfil/datos.ts`.
 
 ---
 
+## 2026-11-10 — Ingesta: que una promo que no se pudo leer no se dé de baja
+
+**Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde un plan de pendientes de varias partes
+(visual, gasto compartido e ingesta); esta es la parte de ingesta.
+
+**Objetivo:** revisar `ingesta/` y arreglar los riesgos que podían dar de baja promos vigentes por un
+problema pasajero o de lectura, sin tocar el motor ni correr nada contra una base real.
+
+**Prompts principales:**
+1. "Revisá el script de consumir promociones" (exploración previa, solo lectura).
+2. "Arreglá, cada uno con su test: formato desconocido y no publicable sin baja, 400 con reintento,
+   429 con backoff y `Retry-After`, y timeout en cada pedido."
+
+**Resultado:**
+- `ingestar.ts`: un formato desconocido o una promo que no pasa la validación (banco fuera del
+  catálogo, valor fuera de rango) agrega a `slugsSinDatos` el slug del listado y el del detalle
+  (el `fuenteId` sale de `detalle.slug`), así `publicar` no la da de baja. Antes solo lo hacía un
+  detalle caído y el único resguardo era el de la mitad de las promos.
+- `modo.ts`: timeout de 30 s por pedido (`AbortSignal.timeout`, cuenta como corte de red); 429
+  reintentado hasta 4 veces con el mayor entre `Retry-After` y un backoff exponencial (tope 60 s),
+  sin gastar los reintentos de los 5xx; un 400 del detalle se reintenta una vez (los slugs de ICBC
+  que siempre dan 400 cuestan un pedido más cada uno).
+- ADR-011 ajustado en la línea de los resguardos. Tests nuevos en `modo.test.ts` e `ingestar.test.ts`.
+- No se corrió `--aplicar` ni el workflow: todo se probó con Vitest sin red.
+- Queda sin arreglar (va en la descripción del PR): escrituras no transaccionales, `max_rows` supuesto
+  en 1000, sin índice en `capturas_crudas.origen`, sin resumen de GitHub, listado por categoría que
+  corta con menos de 100, workflow sin tests previos y duraciones inconsistentes.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

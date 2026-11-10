@@ -9,7 +9,8 @@
  * y nunca se borra; si vuelve, se reactiva.
  *
  * Dos resguardos para que una corrida rota no vacíe el corpus:
- * - una promo cuyo detalle no se pudo bajar (error de red o de servidor) no se toca;
+ * - una promo que no se pudo leer (el detalle falló, el mapeo no reconoce su formato o no pasa
+ *   la validación) no se toca: no se da de baja por no haber podido leerla;
  * - si la corrida publicaría menos de la mitad de las promos activas, no escribe nada.
  *
  * Escribe con la service role key, que se lee solo del entorno (constitución §IV):
@@ -65,7 +66,7 @@ export interface Cosecha {
   capturas: Captura[];
   /** Las promos que pasaron el mapeo y la validación, con el origen de su captura. */
   publicables: { promocion: PromocionIngestada; origen: string }[];
-  /** Slugs cuyo detalle falló: no se sabe si siguen vigentes, así que sus filas no se tocan. */
+  /** Slugs que no se pudieron leer (detalle caído, formato desconocido, no publicable): no se sabe si siguen vigentes, así que sus filas no se tocan. */
   slugsSinDatos: ReadonlySet<string>;
 }
 
