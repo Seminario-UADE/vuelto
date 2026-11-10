@@ -2479,6 +2479,15 @@ proveedor que cuide la privacidad sin costo.
 6. "Armá el PR del ADR-012." Al revisarlo, el revisor de reglas avisó que
    varias reglas seguirían diciendo "Gemini" para el ticket. "Sumá las
    enmiendas y mostrame los textos."
+7. "¿Las keys se suben o cada uno las tiene en su computadora? ¿Qué es más
+   seguro?" Nunca se suben: cada una vive solo donde corre el código que la
+   usa (la de Groq en Supabase, la de Gemini en GitHub) y, una vez cargada,
+   nadie puede volver a leerla.
+8. "Revisá bien cómo se crean las keys: que sea costo 0, si hace falta una
+   cuenta, cómo se cargan de forma segura sin que las lea la IA, si vencen y
+   cómo se sacan." Lo más seguro es hacer todo desde las páginas web, sin
+   archivos ni terminal. Se corrigió la issue #85, que sugería guardar la key
+   en un archivo dentro del repo.
 
 **Resultado:**
 - ADR-012 (propuesto): los tickets los lee Groq; la letra chica de las
@@ -2492,11 +2501,17 @@ proveedor que cuide la privacidad sin costo.
   digan cosas distintas: la constitución (3.0.1), CLAUDE.md, los requisitos,
   la política de privacidad y el revisor de reglas, que ahora busca también la
   key de Groq en la app.
-- Queda pendiente: que el PO apruebe el ADR, cargar la key de Groq (issue
-  #85) y ajustar la issue #48 al implementarla.
-- Error de la IA en el proceso: al principio propuso combinar el celular con
-  Groq, cuando si el celular ya quita los datos personales, Gemini alcanza.
-  Lo marcó el usuario y se separaron los dos planes.
+- La guía para crear y cargar las keys quedó en la issue #85 y en la tabla de
+  secrets: cuentas gratis sin tarjeta, no hacer upgrade en Groq, un proyecto de
+  Google sin facturación, cargarlas desde la web y revocarlas en el proveedor
+  cuando ya no hagan falta.
+- Queda pendiente: que el PO apruebe el ADR, cargar las dos keys (issue #85) y
+  ajustar la issue #48 al implementarla.
+- Errores de la IA en el proceso: al principio propuso combinar el celular
+  con Groq, cuando si el celular ya quita los datos personales, Gemini
+  alcanza; lo marcó el usuario y se separaron los dos planes. Además, la
+  primera guía de la issue #85 sugería guardar la key en un archivo dentro
+  del repo, donde la IA la podría leer; se corrigió por la carga desde la web.
 
 ---
 

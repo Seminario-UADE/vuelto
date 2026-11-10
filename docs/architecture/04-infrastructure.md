@@ -30,8 +30,8 @@ Los nombres están en `apps/mobile/.env.example` y `supabase/.env.example`
 |---|---|---|---|
 | `EXPO_PUBLIC_SUPABASE_URL` | App mobile | `apps/mobile/.env` (local); variable de entorno del perfil en EAS | No es secreta (URL pública del proyecto). Cambia solo si se crea otro proyecto |
 | `EXPO_PUBLIC_SUPABASE_ANON_KEY` | App mobile | `apps/mobile/.env` (local); variable del perfil en EAS (`eas env:create`) | Es pública por diseño: la protege RLS, no el secreto. Rotar en Supabase (Settings → API Keys) y reconstruir la app con la nueva |
-| `GEMINI_API_KEY` | Script de ingesta (letra chica, #51) | Secret del repo en GitHub Actions (¹); local: `supabase/.env`. No va en las Edge Functions (ADR-012) | Generar key nueva en Google AI Studio → actualizar el secret del repo → revocar la vieja |
-| `GROQ_API_KEY` | Edge Function del ticket (#48, ADR-012) | `supabase secrets set` (hace falta ser Owner o Administrator de la organización); local: `supabase/.env` | Generar key nueva en la consola de Groq → `supabase secrets set` (las funciones la leen al instante, sin redeploy) → revocar la vieja |
+| `GEMINI_API_KEY` | Script de ingesta (letra chica, #51) | Secret del repo en GitHub Actions (¹), cargado desde la web (Settings → Secrets and variables → Actions); local: `supabase/.env`. No va en las Edge Functions (ADR-012) | Generar key nueva en Google AI Studio (proyecto sin facturación) → actualizar el secret del repo → revocar la vieja |
+| `GROQ_API_KEY` | Edge Function del ticket (#48, ADR-012) | Secrets de las Edge Functions, cargado desde el panel de Supabase (Edge Functions → Secrets; hace falta ser Owner o Administrator de la organización); local: `supabase/.env` | Generar key nueva en la consola de Groq → reemplazar el secret en el panel (las funciones la leen al instante, sin redeploy) → revocar la vieja |
 | `SUPABASE_SERVICE_ROLE_KEY` | Solo el proceso de ingesta (RNF-05) | Secret del repo en GitHub Actions (¹); local: `supabase/.env`. Nunca en EAS ni en la app. En las Edge Functions Supabase ya inyecta la suya: no se setea a mano | Crear una key nueva en Supabase (Settings → API Keys) y actualizar el lugar donde corre la ingesta en el mismo momento; revocar la vieja. Con las keys JWT legacy, rotar el JWT secret invalida también la anon key y obliga a reconstruir la app |
 
 ¹ La ingesta corre en GitHub Actions (ADR-011, «Dónde corre el cron»): los
@@ -53,6 +53,9 @@ Reglas (RNF-04, RNF-05):
   `git grep` / historial, 0 resultados.
 - Si una key se filtró (commit, log, captura), se rota primero y se limpia
   después: el historial de git no se considera borrado.
+- Las keys de los extractores se cargan **desde la web** (panel de Supabase y
+  configuración del repo en GitHub): van de una pestaña a otra sin pasar por un
+  archivo del repo, el historial de la terminal ni una sesión de IA.
 
 > **Excepción acotada**: la prueba de integración de la sincronización de la app
 > (`npm run test:integracion -w @vuelto/mobile`) usa la clave de servicio de **demo** de un Supabase **local**
