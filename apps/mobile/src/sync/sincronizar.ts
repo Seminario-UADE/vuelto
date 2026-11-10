@@ -4,8 +4,8 @@
  * fallo (sin red, página caída, timeout) deja el store como estaba y la leyenda sigue mostrando la
  * última sincronización exitosa (FR-003, FR-005).
  *
- * Sin sesión también baja el corpus (spec 012 FR-032, issue #112): la base deja leer las promos
- * vigentes sin cuenta, así la primera respuesta del onboarding sale de promos reales. Las compras
+ * Sin sesión también baja el corpus (spec 012 FR-032, issue #112): la base deja leer todas las
+ * promociones sin cuenta, así la primera respuesta del onboarding sale de promos reales. Las compras
  * son de la cuenta: sin sesión no se piden y quedan solo las pendientes sin dueño de la cola.
  */
 import type { AppThunk } from "../store";

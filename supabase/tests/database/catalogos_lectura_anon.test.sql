@@ -27,8 +27,8 @@ select set_config('request.jwt.claims', '', true);
 set local role anon;
 
 -- Catálogos: los lee enteros.
-select ok((select count(*) from public.bancos where id = '00000000-0000-4000-8000-0000000000b1') = 1, 'anon lee bancos');
-select ok((select count(*) from public.categorias where id = 990) = 1, 'anon lee categorias');
+select is((select count(*)::int from public.bancos where id = '00000000-0000-4000-8000-0000000000b1'), 1, 'anon lee bancos');
+select is((select count(*)::int from public.categorias where id = 990), 1, 'anon lee categorias');
 
 -- Promos: todas, también la vencida (la sincronización con cuenta la necesita para los topes).
 select results_eq(

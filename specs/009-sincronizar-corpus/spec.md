@@ -166,9 +166,9 @@ Antes de fijar el tamaño del corpus en el dispositivo, el equipo tiene el instr
 
 **Disparo**
 
-- **FR-001**: La app MUST sincronizar al abrirse (después de rehidratar el store) y al volver a primer plano, solo si hay cliente de Supabase y sesión. "Sin red" significa que el pedido falla o vence; no se agrega detección previa de red.
+- **FR-001**: La app MUST sincronizar al abrirse (después de rehidratar el store) y al volver a primer plano, solo si hay cliente de Supabase. Sin sesión baja solo el corpus y no pide compras (spec 012 FR-032, issue #112: la base deja leer bancos, categorías y promociones sin cuenta). "Sin red" significa que el pedido falla o vence; no se agrega detección previa de red.
 - **FR-002**: La espera de 5 minutos entre sincronizaciones al volver a primer plano MUST medirse con el reloj del sistema, desde el inicio del último intento; la de apertura no tiene espera. MUST haber una sola sincronización en vuelo; un disparo durante otra se ignora. Cada pedido MUST tener un timeout de 15 segundos y vencido cuenta como falla.
-- **FR-003**: Sin sesión, sin cliente o sin red, la app MUST NOT mostrar error ni tocar el store.
+- **FR-003**: Sin cliente o sin red, la app MUST NOT mostrar error ni tocar el store. *Cambio de la spec 012 (issue #112):* sin sesión ya no es un caso aparte. Baja el corpus como con sesión, las compras quedan solo con las pendientes sin dueño de la cola y el reloj pasa al real. Así la primera respuesta del onboarding sale de promos reales, también después de cerrar sesión. La demo con escenarios sigue disponible: está en Perfil, que exige sesión.
 
 **Corpus**
 

@@ -205,6 +205,22 @@ describe("sincronizar: disparo, espera y exclusión (FR-001 a FR-003)", () => {
     expect(store.getState().compras.lista.map((c) => c.id)).toEqual([compra.id]);
   });
 
+  it("sin sesión y después con cuenta: la segunda trae las compras y conserva las promos vencidas del período", async () => {
+    // Vencida el 1/11: dentro del período (empieza el 1/11), fuera de lo vigente hoy (2/11).
+    const vencida = { ...fila(2), vigencia_hasta: "2026-11-01" };
+    const repo = repositorioEnMemoria({ promociones: [fila(1), vencida], compras: [filaCompra(1)], usuario: null });
+    const { store, avanzar } = armar(repo);
+    await store.dispatch(sincronizar("apertura"));
+    expect(ids(store)).toEqual([ID(1), ID(2)]);
+    expect(store.getState().compras.lista).toEqual([]);
+
+    repo.usuario = "usuario-1";
+    avanzar(ESPERA_MS);
+    await store.dispatch(sincronizar("apertura"));
+    expect(ids(store)).toEqual([ID(1), ID(2)]);
+    expect(store.getState().compras.lista.map((c) => c.id)).toEqual([ID(1001)]);
+  });
+
   it("si entra una cuenta mientras vuela la sincronización sin sesión, el resultado se descarta", async () => {
     const repo = repositorioEnMemoria({ promociones: [fila(1)], usuario: null });
     const { store } = armar(repo);

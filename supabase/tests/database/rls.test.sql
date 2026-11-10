@@ -97,7 +97,7 @@ select throws_ok($$ delete from public.categorias $$, '42501', null, 'A no borra
 reset role;
 
 -- ===== Rol anónimo: nada de datos de usuarios =====
--- Bancos, categorías y promos vigentes sí los lee (issue #112): catalogos_lectura_anon.test.sql.
+-- Bancos, categorías y promociones sí los lee (issue #112): catalogos_lectura_anon.test.sql.
 select set_config('request.jwt.claims', '', true);
 set local role anon;
 select throws_ok($$ select * from public.perfiles $$, '42501', null, 'anon no lee perfiles');
