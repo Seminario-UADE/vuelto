@@ -1,183 +1,155 @@
 import { router } from "expo-router";
-import { Pressable, View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
-import { Button } from "@/components/button";
+import { View } from "react-native";
 import { Card } from "@/components/card";
-import { ComercioSearch } from "@/components/comercio-search";
 import { CompraRow } from "@/components/compra-row";
-import { EmptyState } from "@/components/empty-state";
-import { Icon } from "@/components/icon";
-import { MontoInput } from "@/components/monto-input";
-import { PorConfirmarCard } from "@/components/por-confirmar-card";
-import { RecomendacionCard } from "@/components/recomendacion";
 import { divisor } from "@/components/lista";
+import { PorConfirmarFila } from "@/components/por-confirmar-fila";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { Text } from "@/components/text";
-import { TopeResumen } from "@/components/tope-card";
-import type { Comercio } from "@/data/contracts";
-import { useColumns } from "@/hooks/use-columns";
-import { useUsarRecomendacion } from "@/hooks/use-usar-recomendacion";
-import { fechaLarga } from "@/lib/format";
-import { hapticoSeleccion } from "@/lib/haptics";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { TopeFila } from "@/components/tope-card";
+import { aprox, fechaLarga, pesos } from "@/lib/format";
+import { useAppSelector } from "@/store/hooks";
 import { selectPorConfirmarVigentes } from "@/store/por-confirmar";
-import {
-  selectComercioSimulado,
-  selectFrescura,
-  selectHoy,
-  selectRecomendacion,
-  selectResumenCompras,
-  selectTopes,
-} from "@/store/selectores";
-import { comercioElegido, montoCambiado } from "@/store/simulacion";
-import { colors, space } from "@/theme";
+import { selectHoy, selectResumenCompras, selectTopes } from "@/store/selectores";
+import { colors, radius, space } from "@/theme";
+
+const TOPES_EN_INICIO = 3;
+const COMPRAS_EN_INICIO = 3;
 
 /**
- * Inicio: "¿Dónde vas a comprar?" con la respuesta en la misma tarjeta al tocar un
- * comercio (auditoría P1 #1). Sin campana (P2 #14) y sin "Te devolvieron" (P2 #13). Arriba,
- * las compras por confirmar; «Usar [medio]» deja una nueva sin tocar los topes (spec 012).
+ * Inicio (DESIGN.md v7 §6), de arriba abajo como las referencias: el bloque oscuro con lo que te
+ * devolvieron (≈ y su base) y lo gastado; las compras por confirmar, si hay; tus topes (los
+ * primeros tres, «Ver todos» abre Topes) y las últimas compras («Ver todas» va a Compras).
+ * Comprar está en el «+».
  */
 export default function Inicio() {
-  const dispatch = useAppDispatch();
-  const comercio = useAppSelector(selectComercioSimulado);
-  const monto = useAppSelector((s) => s.simulacion.monto);
-  // Derivada con el motor en el dispositivo: cambia con cada tecla del monto, sin red (ADR-010).
-  const r = useAppSelector(selectRecomendacion);
   const nombre = useAppSelector((s) => s.perfil.nombre);
   const hoy = useAppSelector(selectHoy);
   const topes = useAppSelector(selectTopes);
   const compras = useAppSelector(selectResumenCompras);
-  // "Promos actualizadas hace X": solo con un corpus sincronizado (spec 009 FR-019).
-  const frescura = useAppSelector(selectFrescura);
-  const columnas = useColumns();
   const porConfirmar = useAppSelector(selectPorConfirmarVigentes);
-  const usar = useUsarRecomendacion();
-
-  const elegir = (c: Comercio) => {
-    hapticoSeleccion();
-    dispatch(comercioElegido(comercio?.id === c.id ? null : c.id));
-  };
-  const setMonto = (m: number | null) => dispatch(montoCambiado(m));
-
   const sinCompras = compras.compras.length === 0;
-  const medios = topes.medios;
-  const filas: (typeof medios)[] = [];
-  for (let i = 0; i < medios.length; i += columnas) filas.push(medios.slice(i, i + columnas));
+  const { monto, base } = topes.devolvieron;
+  const ultimas = [...compras.compras].sort((a, b) => b.fecha.localeCompare(a.fecha)).slice(0, COMPRAS_EN_INICIO);
 
   return (
-    <Screen kind="tab" aboveTabBar>
-      <View style={{ gap: space.xs }}>
+    <Screen kind="tab" aboveTabBar gap={space.xl}>
+      <View style={{ gap: 2 }}>
         <Text variant="titleLg" accessibilityRole="header">
-          Hola, {nombre ?? "Martín"}
+          {nombre ? `Hola, ${nombre}` : "Hola"}
         </Text>
         <Text variant="bodyMd" tone="inkSecondary">
-          Hoy es {fechaLarga(hoy)}
+          {fechaLarga(hoy).replace(/^./, (c) => c.toUpperCase())}
         </Text>
       </View>
 
-      {porConfirmar.map((c) => (
-        <Animated.View key={c.id} entering={FadeInDown.duration(220)}>
-          <PorConfirmarCard c={c} />
-        </Animated.View>
-      ))}
-
-      <Card gap={space.lg} padding={space.xl}>
-        <View style={{ gap: space.xs }}>
-          <Text variant="titleMd" accessibilityRole="header">
-            ¿Dónde vas a comprar?
-          </Text>
-          <Text variant="bodyMd" tone="inkSecondary">
-            Tocá el comercio y te decimos con qué pagar.
-          </Text>
-        </View>
-        <ComercioSearch onElegir={elegir} seleccionado={comercio?.id ?? null} />
-        {comercio && comercio.categoriaId === null ? (
-          // Un habitual escrito a mano no tiene rubro: no se le pregunta al motor (issue #47).
-          <Text variant="bodyMd" tone="inkSecondary" accessibilityLiveRegion="polite">
-            No conocemos promos para {comercio.nombre}. Pagá con el medio que prefieras.
-          </Text>
-        ) : null}
-      </Card>
-
-      {r ? (
-        <Animated.View entering={FadeInDown.duration(220)}>
-          <RecomendacionCard r={r}>
-            {r.resultado === "recomendado" ? (
-              <MontoInput
-                value={monto}
-                onChange={setMonto}
-                onDecision
-                hint="Con el monto te decimos cuánto te devuelven."
-              />
-            ) : null}
-            {r.medio ? (
-              <Button label={`Usar ${r.medio.nombreCorto}`} variant="decision" onPress={() => usar()} />
-            ) : null}
-            <Pressable
-              onPress={() => router.push({ pathname: "/comercio/[id]", params: { id: r.comercio.id } })}
-              accessibilityRole="button"
-              accessibilityLabel={`Ver detalle de ${r.comercio.nombre}`}
-              style={{ flexDirection: "row", alignItems: "center", gap: space.xs, minHeight: 44 }}
+      <View
+        accessible
+        accessibilityLabel={
+          sinCompras
+            ? "Todavía no registraste compras. Tocá el botón Comprar cuando estés por pagar."
+            : `Este mes te devolvieron aproximadamente ${pesos(monto)}, ${base.texto}. Gastaste ${pesos(compras.gastaste)} en ${compras.cantidadDelMes} compras.`
+        }
+        style={{
+          backgroundColor: colors.decisionBg,
+          borderRadius: radius.card,
+          borderCurve: "continuous",
+          padding: space.xl,
+          gap: space.sm,
+        }}
+      >
+        {sinCompras ? (
+          <View style={{ gap: space.sm, minHeight: 120, justifyContent: "flex-end" }}>
+            <Text variant="titleMd" style={{ color: colors.onDecision }}>
+              Todavía no registraste compras
+            </Text>
+            <Text variant="bodyLg" style={{ color: colors.onDecisionMuted }}>
+              Tocá + cuando estés por pagar y te decimos con qué.
+            </Text>
+          </View>
+        ) : (
+          <>
+            <Text variant="label" style={{ color: colors.onDecisionMuted }}>
+              Este mes te devolvieron
+            </Text>
+            <Text variant="display" tabular style={{ color: colors.onDecision, fontSize: 44, lineHeight: 50 }}>
+              {aprox(monto)}
+            </Text>
+            <Text variant="label" style={{ color: colors.onDecisionMuted }}>
+              {base.texto}
+            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: space.md,
+                paddingTop: space.lg,
+                borderTopWidth: 1,
+                borderColor: colors.decisionSurface,
+              }}
             >
-              <Text variant="bodyMd" weight="semibold" style={{ color: colors.onDecision, flex: 1 }}>
-                Ver detalle y otras opciones
-              </Text>
-              <Icon name="chevron" size={18} color={colors.onDecision} />
-            </Pressable>
-          </RecomendacionCard>
-        </Animated.View>
-      ) : null}
-
-      {sinCompras ? (
-        // Sin mandar a otra tab (FR-035): los topes aparecen al confirmar la primera compra.
-        <EmptyState
-          title="Todavía no confirmaste compras"
-          body="Cuando confirmes la primera, vas a ver acá cuánto tope te queda."
-        />
-      ) : (
-        <>
-          <View style={{ gap: space.md }}>
-            <SectionHeader
-              title="Tus topes"
-              action={{ label: "Ver todos", onPress: () => router.navigate("/topes") }}
-            />
-            <View style={{ flexDirection: "row", alignItems: "center", gap: space.xs }}>
-              <Icon name="calendario" size={16} color={colors.inkSecondary} />
-              <Text variant="label" tone="inkSecondary">
-                Los mensuales se reinician en {topes.reinicioMensualEnDias} días
-              </Text>
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text variant="label" style={{ color: colors.onDecisionMuted }}>
+                  Gastaste
+                </Text>
+                <Text variant="titleMd" weight="bold" tabular style={{ color: colors.onDecision }}>
+                  {pesos(compras.gastaste)}
+                </Text>
+              </View>
+              <View style={{ width: 1, backgroundColor: colors.decisionSurface, marginHorizontal: space.lg }} />
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text variant="label" style={{ color: colors.onDecisionMuted }}>
+                  Compras
+                </Text>
+                <Text variant="titleMd" weight="bold" tabular style={{ color: colors.onDecision }}>
+                  {compras.cantidadDelMes}
+                </Text>
+              </View>
             </View>
-            {filas.map((fila, i) => (
-              <View key={i} style={{ flexDirection: "row", gap: space.md }}>
-                {fila.map((t) => (
-                  <TopeResumen key={t.medio.id} t={t} />
-                ))}
-                {fila.length < columnas ? <View style={{ flex: 1 }} /> : null}
+          </>
+        )}
+      </View>
+
+      {porConfirmar.length > 0 ? (
+        <View style={{ gap: space.sm }}>
+          <SectionHeader title="Por confirmar" />
+          <Card padding={space.lg} gap={0} style={{ paddingVertical: space.xs }}>
+            {porConfirmar.map((c, i) => (
+              <View key={c.id} style={divisor(i)}>
+                <PorConfirmarFila c={c} />
               </View>
             ))}
-          </View>
+          </Card>
+        </View>
+      ) : null}
 
-          <View style={{ gap: space.sm }}>
-            <SectionHeader
-              title="Últimas compras"
-              action={{ label: "Ver todas", onPress: () => router.push("/mis-compras") }}
-            />
-            <Card padding={space.lg} gap={0}>
-              {compras.compras.slice(0, 3).map((c, i) => (
-                <View key={c.id} style={divisor(i)}>
-                  <CompraRow c={c} />
-                </View>
-              ))}
-            </Card>
-          </View>
-        </>
-      )}
+      {topes.medios.length > 0 ? (
+        <View style={{ gap: space.sm }}>
+          <SectionHeader title="Tus topes" action={{ label: "Ver todos", onPress: () => router.push("/topes") }} />
+          <Card padding={space.lg} gap={0} style={{ paddingVertical: space.xs }}>
+            {topes.medios.slice(0, TOPES_EN_INICIO).map((t, i) => (
+              <View key={t.clave} style={divisor(i)}>
+                <TopeFila
+                  t={t}
+                  onPress={() => router.push({ pathname: "/tope/[clave]", params: { clave: t.clave } })}
+                />
+              </View>
+            ))}
+          </Card>
+        </View>
+      ) : null}
 
-      {frescura ? (
-        <Text variant="label" tone="inkSecondary" style={{ textAlign: "center" }}>
-          {frescura}
-        </Text>
+      {ultimas.length > 0 ? (
+        <View style={{ gap: space.sm }}>
+          <SectionHeader title="Últimas compras" action={{ label: "Ver todas", onPress: () => router.navigate("/compras") }} />
+          <Card padding={space.lg} gap={0} style={{ paddingVertical: space.xs }}>
+            {ultimas.map((c, i) => (
+              <View key={c.id} style={divisor(i)}>
+                <CompraRow c={c} conFecha />
+              </View>
+            ))}
+          </Card>
+        </View>
       ) : null}
     </Screen>
   );

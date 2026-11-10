@@ -124,3 +124,37 @@ describe("antiguedad (la tarjeta «por confirmar», contracts/rutas.md)", () => 
     expect(antiguedad(enCoto, desde(ms))).toBe(texto);
   });
 });
+
+describe("borradorDesdePorConfirmar con ticket (FR-007 a FR-009)", () => {
+  const ticket = { monto: 24500, fecha: "2026-10-14", medioId: "galicia-visa-credito", textoExtraido: "COTO 24500" };
+
+  it("guarda como ticket, con los datos del ticket y el comercio de la compra por confirmar", () => {
+    const r = borradorDesdePorConfirmar(enCoto, ticket, "2026-10-14");
+    expect(r.borrador).toMatchObject({ modo: "ticket", comercio: "Coto", monto: 24500, medioId: "galicia-visa-credito", textoExtraido: "COTO 24500" });
+    expect(r.avisos).toEqual([]);
+    expect(r.medioSugerido).toBeNull();
+  });
+
+  it("lo que el ticket no trae sale de la compra por confirmar", () => {
+    const r = borradorDesdePorConfirmar(enCoto, { ...ticket, monto: null, fecha: null }, "2026-10-15");
+    expect(r.borrador.monto).toBe(24500);
+    expect(r.borrador.fecha).toBe("2026-10-14");
+  });
+
+  it("si el ticket no dice el medio, no lo preselecciona y sugiere el de la simulación (FR-008)", () => {
+    const r = borradorDesdePorConfirmar(enCoto, { ...ticket, medioId: null }, "2026-10-14");
+    expect(r.borrador.medioId).toBeNull();
+    expect(r.medioSugerido).toBe("galicia-visa-credito");
+  });
+
+  it("avisa si el monto o el medio del ticket difieren (FR-009)", () => {
+    const r = borradorDesdePorConfirmar(enCoto, { ...ticket, monto: 25000, medioId: "macro-visa-debito" }, "2026-10-14");
+    expect(r.borrador).toMatchObject({ monto: 25000, medioId: "macro-visa-debito" });
+    expect(r.avisos).toEqual(["monto-distinto", "medio-distinto"]);
+  });
+
+  it("sin monto simulado no avisa diferencia de monto", () => {
+    const r = borradorDesdePorConfirmar({ ...enCoto, monto: null }, { ...ticket, monto: 9000 }, "2026-10-14");
+    expect(r.avisos).toEqual([]);
+  });
+});

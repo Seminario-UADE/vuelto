@@ -10,13 +10,15 @@ type Props = {
   /** neutral: iniciales de comercio/banco · activo: recomendado o seleccionado · decision: sobre la tarjeta oscura. */
   tone?: "neutral" | "activo" | "decision";
   size?: number;
+  /** `cuadrado`: el ícono en un cuadrado redondeado, como las filas de las referencias (v7). */
+  forma?: "circulo" | "cuadrado";
 };
 
 /**
  * Círculo con iniciales o ícono de rubro. Nunca colores de marca de bancos o comercios:
  * la identidad la da la letra (DESIGN.md §5).
  */
-export function Avatar({ letras, icon, tone = "neutral", size = tamanos.avatar }: Props) {
+export function Avatar({ letras, icon, tone = "neutral", size = tamanos.avatar, forma = "circulo" }: Props) {
   const fondo = { neutral: colors.surfaceStrong, activo: colors.accent, decision: colors.onDecisionAccent }[tone];
   const tinta = tone === "activo" ? colors.onAccent : colors.ink;
   return (
@@ -26,7 +28,8 @@ export function Avatar({ letras, icon, tone = "neutral", size = tamanos.avatar }
       style={{
         width: size,
         height: size,
-        borderRadius: radius.pill,
+        borderRadius: forma === "cuadrado" ? radius.row : radius.pill,
+        borderCurve: "continuous",
         backgroundColor: fondo,
         alignItems: "center",
         justifyContent: "center",

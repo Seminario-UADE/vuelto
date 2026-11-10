@@ -237,9 +237,15 @@ export const space = {
   gutter: 20,
 } as const;
 
-/** DESIGN.md §4: tarjetas y listas agrupadas 16, filas y campos 12, píldoras solo en botones y chips. */
+/**
+ * DESIGN.md v7 §4: una sola familia de rectángulos redondeados (referencias 14, 17, 19 y 26).
+ * Tarjetas 20, cuadrados de comercio 16, botones, campos y chips 14, filas 12. La píldora queda
+ * solo para la cápsula de la tab bar y lo que es un círculo (avatares, radios, barras).
+ */
 export const radius = {
-  card: 16,
+  card: 20,
+  tile: 16,
+  control: 14,
   row: 12,
   badge: 8,
   sheet: 28,

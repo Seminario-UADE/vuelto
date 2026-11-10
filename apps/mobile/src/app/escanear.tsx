@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
@@ -29,6 +29,12 @@ const LINEAS = [
  * se crea (spec 006 FR-015, Principio IV).
  */
 export default function Escanear() {
+  // Desde el paso 4 del flujo: la lectura confirma esa compra por confirmar (FR-007).
+  const desde = useLocalSearchParams<{ porConfirmar?: string; flujo?: string }>();
+  const extra = {
+    ...(desde.porConfirmar ? { porConfirmar: desde.porConfirmar } : {}),
+    ...(desde.flujo ? { flujo: desde.flujo } : {}),
+  };
   const insets = useSafeAreaInsets();
   const [leyendo, setLeyendo] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,11 +62,13 @@ export default function Escanear() {
         // Solo si el ticket lo dice; si no, revisa pregunta (RF-10).
         medio: t.medio?.id ?? "",
         texto: t.textoExtraido,
+        ...extra,
       },
     });
   };
 
-  const aMano = () => router.replace({ pathname: "/revisa", params: { modo: "manual" } });
+  const aMano = () =>
+    router.replace({ pathname: "/revisa", params: desde.porConfirmar ? extra : { modo: "manual", ...extra } });
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.scrim, paddingTop: insets.top, paddingBottom: insets.bottom }}>

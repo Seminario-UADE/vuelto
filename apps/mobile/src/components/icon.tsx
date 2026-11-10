@@ -15,6 +15,7 @@ type Material = ComponentProps<typeof MaterialIcons>["name"];
 const ICONOS = {
   inicio: { sf: "house", sfActivo: "house.fill", md: "home" },
   comprar: { sf: "bag", sfActivo: "bag.fill", md: "shopping-bag" },
+  compras: { sf: "list.bullet.rectangle", sfActivo: "list.bullet.rectangle.fill", md: "receipt-long" },
   topes: { sf: "chart.pie", sfActivo: "chart.pie.fill", md: "pie-chart" },
   perfil: { sf: "person", sfActivo: "person.fill", md: "person" },
   supermercado: { sf: "cart", md: "shopping-cart" },
@@ -47,13 +48,15 @@ const ICONOS = {
   link: { sf: "link", md: "link" },
   salir: { sf: "rectangle.portrait.and.arrow.right", md: "logout" },
   flecha: { sf: "arrow.right", md: "arrow-forward" },
-  comercio: { sf: "storefront", md: "storefront" },
+  comercio: { sf: "storefront", sfActivo: "storefront.fill", md: "storefront" },
   privacidad: { sf: "lock.shield", md: "privacy-tip" },
   recargar: { sf: "arrow.clockwise", md: "refresh" },
   galeria: { sf: "photo.on.rectangle", md: "photo-library" },
   ticket: { sf: "doc.text", md: "receipt-long" },
   devolvieron: { sf: "arrow.up.right", md: "north-east" },
   quitar: { sf: "minus.circle", md: "remove-circle-outline" },
+  atras: { sf: "chevron.left", md: "chevron-left" },
+  borrar: { sf: "delete.left", md: "backspace" },
 } as const satisfies Record<string, { sf: SFSymbol; sfActivo?: SFSymbol; md: Material }>;
 
 export type IconName = keyof typeof ICONOS;

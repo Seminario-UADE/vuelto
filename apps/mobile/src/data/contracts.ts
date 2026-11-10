@@ -170,8 +170,22 @@ export type ResumenCompras = {
   mes: string;
   /** Total gastado en el mes (lo suma el servidor). */
   gastaste: number;
+  /** Cuántas compras hay en el mes en curso (las de `gastaste`). */
+  cantidadDelMes: number;
+  /** Lo gastado en el mes por tramos de 7 días (1–7, 8–14…), para el gráfico de Compras (v7). */
+  semanas: GastoSemana[];
   devolvieron: { monto: number; base: Base };
   compras: Compra[];
+};
+
+export type GastoSemana = {
+  /** "1–7" */
+  etiqueta: string;
+  monto: number;
+  /** El tramo de hoy. */
+  actual: boolean;
+  /** Un tramo que todavía no empezó. */
+  futuro: boolean;
 };
 
 /** Lectura del ticket. Nunca contiene la imagen (Principio IV). */

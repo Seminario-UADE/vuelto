@@ -110,26 +110,20 @@
 
 ---
 
-## Phase 5: User Story 3 - Tres tabs con Inicio al centro (P2)
+## Phase 5: User Story 3 - Comprar al centro y un paso por pantalla (P2)
 
-**Goal**: Compras · Inicio · Topes, con Perfil desde el avatar y zonas seguras correctas.
+> Reescrita el 09/11/2026 con el rediseño v7 (`docs/design/plan-rediseno-v7.md`).
 
-**Independent Test**: el recorrido 5 del quickstart y las capturas de SC-007.
+**Goal**: Inicio · Compras · «+» · Comercios · Perfil (Topes desde Inicio), y el flujo de compra en cuatro pasos.
 
-- [ ] T026 [US3] Crear `src/app/(tabs)/compras.tsx` con:
-  - las `PorConfirmarCard`;
-  - las `ActionRow` «Escanear ticket» y «Cargar a mano»;
-  - el contenido de `src/app/mis-compras.tsx` (resumen, filtros, historial, borrado y marcas de la cola de 010);
-  - el estado vacío de FR-036.
-- [ ] T027 [US3] Convertir `src/app/mis-compras.tsx` en una redirección a `/compras` y borrar `src/app/(tabs)/comprar.tsx`. Cambiar los enlaces de `src/app/(tabs)/topes.tsx`, `src/app/(tabs)/index.tsx` y `src/app/tope/[clave].tsx` a `/compras` (FR-022).
-- [ ] T028 [US3] Mover `src/app/(tabs)/perfil.tsx` a `src/app/perfil.tsx`, registrarlo con `headerNativo` en `src/app/_layout.tsx` y crear `src/components/avatar-boton.tsx` en el encabezado de Inicio.
-- [ ] T029 [US3] En `src/app/(tabs)/_layout.tsx`:
-  - las tabs Compras · Inicio · Topes, con `unstable_settings.initialRouteName = "index"`;
-  - primero, verificar si `NativeTabs` es estable en el SDK 58. Si lo es, usar la tab bar nativa con el `tint` del acento del tema; si no, la tab bar JS actual con el mismo `tint`, sin dibujar una propia (research R6).
+**Independent Test**: una compra completa desde el «+» y las capturas en claro y en oscuro.
 
-  Verificar con una herramienta de contraste: indicador ≥ 3:1 y etiqueta ≥ 4.5:1 (FR-019).
-- [ ] T030 [US3] Revisar las zonas seguras en `src/components/screen.tsx` y en la tab bar: que el inset de abajo no se sume dos veces ni falte, y que la barra de estado deje ver `canvas` (research R7). Probar en iPhone con notch, Android con gestos y Android con tres botones.
-- [ ] T031 [P] [US3] Sacar las capturas «después» en `docs/design/capturas-app/despues-012/` y adjuntarlas al PR junto con las de T002 (SC-007).
+- [x] T026 [US3] Barra propia `src/components/tab-bar.tsx` (cápsula con «+» central) y `src/app/(tabs)/_layout.tsx` con Inicio · Compras · nueva · Comercios · Perfil (FR-018, FR-019).
+- [x] T027 [US3] Flujo `src/app/comprar/`: `index` (comercio), `monto`, `recomendacion`, `pagar` y `src/app/compra-guardada.tsx`. Borrar `src/app/(tabs)/comprar.tsx` y `src/app/comercio/[id].tsx` (FR-001, FR-020, FR-021).
+- [x] T028 [US3] Inicio mínimo, fila por confirmar (`por-confirmar-fila.tsx`), pestaña Comercios y Perfil sin comercios (FR-005, FR-022, FR-035).
+- [x] T029 [US3] Escaneo desde el paso 4: `escanear.tsx` reenvía `porConfirmar` y `borradorDesdePorConfirmar` cruza el ticket con la compra (FR-007 a FR-009).
+- [ ] T030 [US3] Revisar zonas seguras en Android con gestos y con tres botones (iPhone verificado en el simulador).
+- [ ] T031 [P] [US3] Capturas antes y después en el PR (SC-007).
 
 **Checkpoint**: la navegación nueva cumple #103.
 

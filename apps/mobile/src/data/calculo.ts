@@ -34,6 +34,7 @@ import type {
   MedioDePago,
   PedidoRecomendar,
   Recomendacion,
+  GastoSemana,
   ResumenCompras,
   ResumenTopes,
   Rubro,
@@ -350,9 +351,36 @@ export function comprasVista(compras: CompraMotor[], ahora: Date, medios: readon
   return {
     mes,
     gastaste: delMes.reduce((s, c) => s + c.monto, 0),
+    cantidadDelMes: delMes.length,
+    semanas: gastoPorSemana(delMes, hoy),
     devolvieron: devolvieron(delMes, mes),
     compras: comprasDelPeriodo(compras, hoy).map((c) => compraVista(c, medios)),
   };
+}
+
+/**
+ * Lo gastado en el mes por tramos fijos de 7 días (1–7, 8–14, 15–21, 22–28 y 29 al fin de
+ * mes). Los tramos que no llegaron todavía van con `futuro` y monto 0, así el gráfico tiene
+ * siempre el mismo ancho.
+ */
+export function gastoPorSemana(delMes: readonly { fecha: string; monto: number }[], hoy: string): GastoSemana[] {
+  const diaHoy = Number(hoy.slice(8, 10));
+  const [anio, mes] = [Number(hoy.slice(0, 4)), Number(hoy.slice(5, 7))];
+  const ultimo = new Date(Date.UTC(anio, mes, 0)).getUTCDate();
+  const tramoHoy = Math.min(4, Math.floor((diaHoy - 1) / 7));
+  const semanas: GastoSemana[] = [];
+  for (let i = 0; i <= 4; i++) {
+    const desde = i * 7 + 1;
+    const hasta = i === 4 ? ultimo : desde + 6;
+    const monto = delMes
+      .filter((c) => {
+        const d = Number(c.fecha.slice(8, 10));
+        return d >= desde && d <= hasta;
+      })
+      .reduce((s, c) => s + c.monto, 0);
+    semanas.push({ etiqueta: `${desde}–${hasta}`, monto, actual: i === tramoHoy, futuro: i > tramoHoy });
+  }
+  return semanas;
 }
 
 /**

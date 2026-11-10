@@ -120,13 +120,15 @@ function Navegacion() {
         >
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="(onboarding)" />
+          {/* Flujo de compra del «+» (DESIGN.md v7 §5): pantalla completa, un paso por pantalla. */}
+          <Stack.Screen name="comprar" options={{ presentation: "fullScreenModal", headerShown: false, contentStyle: { backgroundColor: t.canvas } }} />
           <Stack.Screen
-            name="comercio/[id]"
-            options={{ ...header, title: "" }}
+            name="compra-guardada"
+            options={{ presentation: "fullScreenModal", headerShown: false, contentStyle: { backgroundColor: t.canvas } }}
           />
           <Stack.Screen
-            name="mis-compras"
-            options={{ ...header, title: "Mis compras" }}
+            name="topes"
+            options={{ ...header, title: "Tus topes" }}
           />
           <Stack.Screen
             name="tope/[clave]"

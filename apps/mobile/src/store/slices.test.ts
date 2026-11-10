@@ -4,7 +4,7 @@ import { comprasOctubre } from "../data/fixtures";
 import { escenarioElegido, sesionCerrada } from "./acciones";
 import { compraAgregada } from "./compras";
 import { contactoAgregado, contactoQuitado } from "./contactos";
-import { mediosConfirmados, onboardingTerminado } from "./perfil";
+import { mediosConfirmados, nombreCambiado, onboardingTerminado } from "./perfil";
 import { avisoMostrado, usuarioCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
 import { storeDePrueba } from "./prueba";
@@ -39,6 +39,32 @@ describe("escenarios de desarrollo (FR-014)", () => {
     expect(s.getState().sesion.escenario).toBe("mes-vacio");
     s.dispatch(escenarioElegido("normal"));
     expect(s.getState().compras.lista).toEqual(comprasOctubre);
+  });
+});
+
+describe("nombre del usuario (spec 012, FR-029, SC-005)", () => {
+  it("el estado inicial no trae ningún nombre", () => {
+    expect(storeDePrueba().getState().perfil.nombre).toBeNull();
+  });
+
+  it("un escenario de demo carga «Martín» a propósito si no había nombre", () => {
+    const s = storeDePrueba();
+    s.dispatch(escenarioElegido("normal"));
+    expect(s.getState().perfil.nombre).toBe("Martín");
+  });
+
+  it("un escenario de demo no pisa un nombre que el usuario cargó", () => {
+    const s = storeDePrueba();
+    s.dispatch(nombreCambiado("Sofía"));
+    s.dispatch(escenarioElegido("mes-vacio"));
+    expect(s.getState().perfil.nombre).toBe("Sofía");
+  });
+
+  it("cerrar sesión borra el nombre", () => {
+    const s = storeDePrueba();
+    s.dispatch(nombreCambiado("Sofía"));
+    s.dispatch(sesionCerrada());
+    expect(s.getState().perfil.nombre).toBeNull();
   });
 });
 

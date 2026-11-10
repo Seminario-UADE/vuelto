@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { usuario } from "../data/fixtures";
-import { rehidratado, sesionCerrada, type ComercioHabitual, type EstadoPerfil, type MedioGuardado } from "./acciones";
+import { escenarioElegido, rehidratado, sesionCerrada, type ComercioHabitual, type EstadoPerfil, type MedioGuardado } from "./acciones";
 
 /**
  * Cómo quedó la última lectura de los medios en Supabase (issue #41). No se persiste: al abrir la
@@ -12,7 +12,8 @@ export type CargaPerfil = "sin-leer" | "leyendo" | "lista" | "sin-conexion" | "e
 export type EstadoPerfilSlice = EstadoPerfil & { carga: CargaPerfil };
 
 export const perfilInicial: EstadoPerfilSlice = {
-  nombre: usuario.nombre,
+  // Nadie se llama como la demo por defecto (FR-029): el nombre lo carga el usuario.
+  nombre: null,
   onboardingCompleto: false,
   medios: [],
   comercios: [],
@@ -60,6 +61,10 @@ export const perfil = createSlice({
     onboardingTerminado(s) {
       s.onboardingCompleto = true;
     },
+    /** El de la cuenta, leído o recién guardado. `null` = la cuenta no tiene (FR-029). */
+    nombreCambiado(s, a: PayloadAction<string | null>) {
+      s.nombre = a.payload;
+    },
     invitacionGuardada(s, a: PayloadAction<string | null>) {
       s.invitacionPendiente = a.payload;
     },
@@ -67,6 +72,10 @@ export const perfil = createSlice({
   extraReducers: (b) => {
     b.addCase(rehidratado, (s, a) => (a.payload.perfil ? { ...a.payload.perfil, carga: s.carga } : s));
     b.addCase(sesionCerrada, () => perfilInicial);
+    // La demo (solo desarrollo) carga «Martín» a propósito, sin pisar un nombre que el usuario cargó.
+    b.addCase(escenarioElegido, (s) => {
+      s.nombre ??= usuario.nombre;
+    });
   },
 });
 
@@ -81,5 +90,6 @@ export const {
   comercioAgregado,
   comercioSacado,
   onboardingTerminado,
+  nombreCambiado,
   invitacionGuardada,
 } = perfil.actions;

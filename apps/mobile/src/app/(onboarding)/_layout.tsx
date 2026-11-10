@@ -22,7 +22,6 @@ function Onboarding() {
     <Stack screenOptions={{ ...headerNativo(t), title: "" }}>
       <Stack.Screen name="bienvenida" options={{ headerShown: false }} />
       <Stack.Screen name="medios" />
-      <Stack.Screen name="comercios" />
       <Stack.Screen name="primera-respuesta" />
     </Stack>
   );

@@ -5,25 +5,17 @@ import { avisoMostrado } from "@/store/sesion";
 import { usarRecomendacion } from "@/store/thunks";
 
 /**
- * «Usar [medio]» desde Inicio o desde el detalle del comercio (spec 012, FR-002, FR-004): deja
- * la compra por confirmar y avisa con los textos de `contracts/rutas.md`. Devuelve si la creó.
+ * «Voy a pagar con [medio]» (spec 012, FR-002): deja la compra por confirmar y devuelve su id,
+ * o `null` si no se pudo crear. Solo avisa si reemplazó otra en el mismo comercio (FR-012): el
+ * paso siguiente ya dice con qué pagar.
  */
-export function useUsarRecomendacion(): () => boolean {
+export function useUsarRecomendacion(): () => string | null {
   const dispatch = useAppDispatch();
-  return useCallback(
-    () => {
-      const r = dispatch(usarRecomendacion());
-      if (r === null) return false;
-      hapticoExito();
-      dispatch(
-        avisoMostrado(
-          r.reemplazo
-            ? `Actualizamos tu compra en ${r.porConfirmar.comercioNombre}.`
-            : `Pagá con ${r.medioNombre}. Cuando pagues, confirmala.`,
-        ),
-      );
-      return true;
-    },
-    [dispatch],
-  );
+  return useCallback(() => {
+    const r = dispatch(usarRecomendacion());
+    if (r === null) return null;
+    hapticoExito();
+    if (r.reemplazo) dispatch(avisoMostrado(`Actualizamos tu compra en ${r.porConfirmar.comercioNombre}.`));
+    return r.porConfirmar.id;
+  }, [dispatch]);
 }
