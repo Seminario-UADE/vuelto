@@ -1,13 +1,13 @@
 import { router } from "expo-router";
 import { useState } from "react";
 import { Pressable, TextInput, View } from "react-native";
-import * as api from "@/data/api";
 import { comercioPorNombre } from "@/data/calculo";
-import { useAsync } from "@/hooks/use-async";
+import { buscarComercios } from "@/data/comercios";
 import { comercioRepetido, MENSAJE_COMERCIO_REPETIDO, MENSAJES_ERROR } from "@/perfil/modelo";
 import { comercioElegido } from "@/store/simulacion";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { agregarComercio, sacarComercio } from "@/store/perfil-remoto";
+import { selectCatalogoComercios } from "@/store/selectores";
 import { colors, fonts, radius, size, space, type as escala } from "@/theme";
 import { Card } from "./card";
 import { FilaAccion } from "./fila-accion";
@@ -30,13 +30,13 @@ export function ComerciosDelPerfil() {
   const [busqueda, setBusqueda] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const sugerencias = useAsync(
-    () => (busqueda.trim() ? api.buscarComercios(busqueda) : Promise.resolve([])),
-    busqueda,
-  );
+  const catalogo = useAppSelector(selectCatalogoComercios);
 
   const texto = busqueda.trim();
-  const opciones = (sugerencias.datos ?? []).filter((c) => !comercioRepetido(comercios, c.nombre)).slice(0, 5);
+  // Un nombre por chip: el habitual se guarda por nombre, sin rubro.
+  const opciones = buscarComercios(catalogo, busqueda)
+    .filter((c, i, xs) => !comercioRepetido(comercios, c.nombre) && !comercioRepetido(xs.slice(0, i), c.nombre))
+    .slice(0, 5);
   const ofrecerTexto =
     texto !== "" && !comercioRepetido(comercios, texto) && !opciones.some((c) => comercioRepetido([c], texto));
 
@@ -171,7 +171,8 @@ export function ComerciosDelPerfil() {
  */
 function NombreDeComercio({ nombre }: { nombre: string }) {
   const dispatch = useAppDispatch();
-  const c = comercioPorNombre(nombre);
+  const catalogo = useAppSelector(selectCatalogoComercios);
+  const c = comercioPorNombre(nombre, catalogo);
   const texto = (
     <Text variant="bodyLg" weight="semibold">
       {nombre}

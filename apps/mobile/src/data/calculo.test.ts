@@ -177,7 +177,7 @@ describe("compraParaGuardar (FR-008)", () => {
   };
 
   it("con el medio recomendado: promo de Galicia, $1.000 esperados, sin descuento informado", () => {
-    const c = compraParaGuardar(entradas, borrador, "n1");
+    const c = compraParaGuardar(entradas, borrador, "n1", catalogoComercios);
     expect(c).toMatchObject({
       promocionId: "promo-galicia-super-mie",
       reintegroEsperado: 1000,
@@ -190,23 +190,23 @@ describe("compraParaGuardar (FR-008)", () => {
   });
 
   it("con un medio sin promo para el rubro: sin promo ni reintegro", () => {
-    const c = compraParaGuardar(entradas, { ...borrador, medioId: "macro-visa-debito" }, "n1");
+    const c = compraParaGuardar(entradas, { ...borrador, medioId: "macro-visa-debito" }, "n1", catalogoComercios);
     expect(c.promocionId).toBeNull();
     expect(c.reintegroEsperado).toBeNull();
   });
 
   it("un ticket del jueves se evalúa con ese día: la promo de los miércoles no aplica", () => {
-    const c = compraParaGuardar(entradas, { ...borrador, fecha: "2026-10-15" }, "n1");
+    const c = compraParaGuardar(entradas, { ...borrador, fecha: "2026-10-15" }, "n1", catalogoComercios);
     expect(c.promocionId).toBeNull();
   });
 
   it("comercio fuera del catálogo: sin rubro ni reintegro inventado", () => {
-    const c = compraParaGuardar(entradas, { ...borrador, comercio: "Kiosco Pepe" }, "n1");
+    const c = compraParaGuardar(entradas, { ...borrador, comercio: "Kiosco Pepe" }, "n1", catalogoComercios);
     expect(c).toMatchObject({ categoriaId: null, promocionId: null, reintegroEsperado: null });
   });
 
   it("con usarPromo en false la compra queda sin promo ni reintegro y no consume ningún tope (spec 010, SC-006)", () => {
-    const sin = compraParaGuardar(entradas, { ...borrador, usarPromo: false }, "n1");
+    const sin = compraParaGuardar(entradas, { ...borrador, usarPromo: false }, "n1", catalogoComercios);
     expect(sin).toMatchObject({ promocionId: null, reintegroEsperado: null, descuentoObtenido: null });
     const antes = topesVista(entradas);
     const despues = topesVista({ ...entradas, compras: [sin, ...comprasOctubre] });
@@ -218,14 +218,14 @@ describe("compraParaGuardar (FR-008)", () => {
     const hoyJueves = { ...entradas, ahora: new Date("2026-10-15T15:00:00.000Z") };
     for (const fecha of ["2026-10-14", "2026-10-15"]) {
       const propuesta = promoPropuesta(hoyJueves, comercio("coto"), "galicia-visa-credito", fecha, 5000);
-      const guardada = compraParaGuardar(hoyJueves, { ...borrador, fecha }, "n1");
+      const guardada = compraParaGuardar(hoyJueves, { ...borrador, fecha }, "n1", catalogoComercios);
       expect(guardada.promocionId).toBe(propuesta.promociones[0]?.promocionId ?? null);
       expect(guardada.reintegroEsperado).toBe(propuesta.promociones.length > 0 ? propuesta.reintegro : null);
     }
   });
 
   it("sin monto o sin medio falla", () => {
-    expect(() => compraParaGuardar(entradas, { ...borrador, monto: null }, "n1")).toThrow("Falta el monto");
+    expect(() => compraParaGuardar(entradas, { ...borrador, monto: null }, "n1", catalogoComercios)).toThrow("Falta el monto");
   });
 });
 
@@ -257,14 +257,14 @@ describe("gastoPorSemana", () => {
 
 describe("comprasVista y textoDias", () => {
   it("una compra con un medio que ya no está en el perfil se sigue mostrando, sin inventar su nombre", () => {
-    const r = comprasVista([comprasOctubre[0]!], ahora, []);
+    const r = comprasVista([comprasOctubre[0]!], ahora, [], catalogoComercios);
     expect(r.compras).toHaveLength(1);
     expect(r.compras[0]?.medio.nombre).toBe("Medio que sacaste de tu perfil");
   });
 
   it("solo las del mes en curso, con el reintegro del banco o el esperado", () => {
     const vieja = { ...comprasOctubre[0]!, id: "sept", fecha: "2026-09-30" };
-    const r = comprasVista([vieja, ...comprasOctubre], ahora, mediosDeMartin);
+    const r = comprasVista([vieja, ...comprasOctubre], ahora, mediosDeMartin, catalogoComercios);
     expect(r.compras.map((c) => c.id)).not.toContain("sept");
     expect(r.gastaste).toBe(101500);
   });
@@ -276,7 +276,7 @@ describe("comprasVista y textoDias", () => {
     const del29 = { ...base, id: "nov29", fecha: "2026-11-29", monto: 1000 };
     const del30 = { ...base, id: "nov30", fecha: "2026-11-30", monto: 2000 };
     const del1 = { ...base, id: "dic1", fecha: "2026-12-01", monto: 4000 };
-    const r = comprasVista([del29, del30, del1], hoy, mediosDeMartin);
+    const r = comprasVista([del29, del30, del1], hoy, mediosDeMartin, catalogoComercios);
     expect(r.compras.map((c) => c.id).sort()).toEqual(["dic1", "nov30"]);
     expect(r.gastaste).toBe(4000);
   });

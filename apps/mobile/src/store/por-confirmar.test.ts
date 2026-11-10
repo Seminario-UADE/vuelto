@@ -133,8 +133,17 @@ describe("usarRecomendacion (FR-002, FR-004, FR-012)", () => {
       monto: 10000,
       creadaEn: AHORA,
     });
-    expect(s.getState().simulacion).toEqual({ comercioId: null, monto: null });
+    expect(s.getState().simulacion).toEqual({ comercioId: null, monto: null, canal: "presencial" });
     expect(selectPorConfirmarVigentes(s.getState())).toHaveLength(1);
+  });
+
+  it("guarda el canal y el rubro con los que se recomendó (#43)", () => {
+    const s = conMartin();
+    s.dispatch(comercioElegido("coto"));
+    const categoria = selectRecomendacion(s.getState())?.comercio.categoriaId;
+    const r = s.dispatch(usarRecomendacion());
+    expect(r?.porConfirmar.canal).toBe("presencial");
+    expect(r?.porConfirmar.categoriaId).toBe(categoria);
   });
 
   it("otra vez en el mismo comercio avisa que reemplazó", () => {

@@ -1,34 +1,43 @@
 import { router } from "expo-router";
-import { useState } from "react";
-import { TextInput, View } from "react-native";
+import { useMemo, useState } from "react";
+import { Pressable, TextInput, View } from "react-native";
 import { GrillaComercios } from "@/components/comercio-tile";
 import { Icon } from "@/components/icon";
 import { Paso } from "@/components/paso";
 import { Text } from "@/components/text";
-import * as api from "@/data/api";
+import { buscarComercios, RUBROS_DE_MODO } from "@/data/comercios";
 import type { Comercio } from "@/data/contracts";
-import { useAsync } from "@/hooks/use-async";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectComerciosFrecuentes, selectFrescura } from "@/store/selectores";
+import { selectCatalogoComercios, selectComerciosFrecuentes, selectFrescura } from "@/store/selectores";
 import { comercioElegido } from "@/store/simulacion";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 
-/** Paso 1: ¿Dónde estás comprando? Buscador y tus comercios; tocar uno avanza solo. */
+/**
+ * Paso 1: ¿Dónde estás comprando? Buscador y tus comercios; tocar uno avanza solo. Busca en los
+ * comercios del corpus guardado, sin red (#43). Sin comercio, se elige el rubro (spec 004 FR-001).
+ */
 export default function PasoComercio() {
   const dispatch = useAppDispatch();
   const [q, setQ] = useState("");
   const frecuentes = useAppSelector(selectComerciosFrecuentes);
   const frescura = useAppSelector(selectFrescura);
   const habituales = useAppSelector((st) => st.perfil.comercios.length);
-  const resultados = useAsync(() => api.buscarComercios(q), q);
-  const catalogo = useAsync(() => api.getCatalogoComercios(), "catalogo");
+  const catalogo = useAppSelector(selectCatalogoComercios);
+  const [porRubro, setPorRubro] = useState(false);
   const buscando = q.trim() !== "";
-  // Primero tus comercios; después, hasta completar 8, los más usados del catálogo.
-  const sugeridos = [
-    ...frecuentes,
-    ...(catalogo.datos ?? []).filter((c) => c.frecuente && !frecuentes.some((f) => f.id === c.id)),
-  ].slice(0, Math.max(8, frecuentes.length));
-  const lista = buscando ? (resultados.datos ?? []) : sugeridos;
+  const lista = useMemo(() => {
+    if (buscando) {
+      // Los habituales que coinciden van primero.
+      const propios = buscarComercios(frecuentes, q);
+      return [...propios, ...buscarComercios(catalogo, q).filter((c) => !propios.some((x) => x.id === c.id))].slice(0, 20);
+    }
+    // Primero tus comercios; después, hasta completar 8, los más usados del catálogo.
+    return [...frecuentes, ...catalogo.filter((c) => c.frecuente && !frecuentes.some((f) => f.id === c.id))].slice(
+      0,
+      Math.max(8, frecuentes.length),
+    );
+  }, [buscando, q, frecuentes, catalogo]);
+  const sinResultados = buscando && lista.length === 0;
 
   const elegir = (c: Comercio) => {
     dispatch(comercioElegido(c.id));
@@ -63,9 +72,9 @@ export default function PasoComercio() {
         />
       </View>
 
-      {buscando && resultados.estado === "listo" && lista.length === 0 ? (
+      {sinResultados ? (
         <Text variant="bodyMd" tone="inkSecondary">
-          No encontramos “{q.trim()}”. Probá con otro nombre.
+          No encontramos “{q.trim()}”. Elegí el rubro y te decimos con qué pagar.
         </Text>
       ) : (
         <View style={{ gap: space.md }}>
@@ -74,8 +83,28 @@ export default function PasoComercio() {
               {habituales > 0 ? "Tus comercios y los más usados" : "Los más usados"}
             </Text>
           ) : null}
-          <GrillaComercios comercios={lista} onElegir={elegir} />
+          <GrillaComercios comercios={lista} onElegir={elegir} conRubro={buscando} />
         </View>
+      )}
+
+      {/* O un rubro sin comercio: solo aplican las promos de todo el rubro. */}
+      {sinResultados || porRubro ? (
+        <View style={{ gap: space.md }}>
+          <Text variant="label" tone="inkSecondary">
+            Rubros
+          </Text>
+          <GrillaComercios comercios={RUBROS_DE_MODO} onElegir={elegir} />
+        </View>
+      ) : (
+        <Pressable
+          onPress={() => setPorRubro(true)}
+          accessibilityRole="button"
+          style={{ minHeight: 44, justifyContent: "center", alignSelf: "flex-start" }}
+        >
+          <Text variant="bodyMd" weight="semibold" tone="accent">
+            ¿No sabés el comercio? Elegí el rubro
+          </Text>
+        </Pressable>
       )}
 
       {frescura ? (

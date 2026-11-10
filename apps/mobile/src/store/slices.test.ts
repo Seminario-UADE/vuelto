@@ -26,9 +26,9 @@ describe("simulacion", () => {
     s.dispatch(comercioElegido("coto"));
     s.dispatch(montoCambiado(5000));
     s.dispatch(comercioElegido("coto"));
-    expect(s.getState().simulacion).toEqual({ comercioId: "coto", monto: 5000 });
+    expect(s.getState().simulacion).toEqual({ comercioId: "coto", monto: 5000, canal: "presencial" });
     s.dispatch(comercioElegido("ypf"));
-    expect(s.getState().simulacion).toEqual({ comercioId: "ypf", monto: null });
+    expect(s.getState().simulacion).toEqual({ comercioId: "ypf", monto: null, canal: "presencial" });
   });
 });
 

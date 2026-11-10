@@ -99,7 +99,9 @@ function entradaValida(x: unknown): x is CompraPorConfirmar {
     esTexto(x.medioId) &&
     (x.monto === null || (typeof x.monto === "number" && Number.isFinite(x.monto) && x.monto > 0)) &&
     esTexto(x.creadaEn) &&
-    !Number.isNaN(Date.parse(x.creadaEn))
+    !Number.isNaN(Date.parse(x.creadaEn)) &&
+    (x.canal === undefined || x.canal === "presencial" || x.canal === "online") &&
+    (x.categoriaId === undefined || x.categoriaId === null || Number.isInteger(x.categoriaId))
   );
 }
 

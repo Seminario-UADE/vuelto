@@ -43,19 +43,8 @@ function comercioPorId(id: string): Comercio {
 /** "Hoy" para el servidor de ejemplo (el reloj de los fixtures). */
 const HOY_EN_EL_SERVIDOR = fechaArgentina(new Date(RELOJ_EJEMPLO));
 
-export async function getCatalogoComercios(): Promise<Comercio[]> {
-  return red(catalogoComercios);
-}
-
-export async function buscarComercios(q: string): Promise<Comercio[]> {
-  const t = q.trim().toLocaleLowerCase("es");
-  const normal = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
-  return red(t === "" ? [] : catalogoComercios.filter((c) => normal(c.nombre).includes(normal(t))));
-}
-
-export async function getComercio(id: string): Promise<Comercio> {
-  return red(comercioPorId(id));
-}
+// Los comercios del buscador ya no son un pedido: se derivan del corpus del store
+// (`selectCatalogoComercios`, issue #43).
 
 /** Las fallas que se pueden forzar con los escenarios de desarrollo. */
 export type FallaTicket = "ilegible" | "sin-red";
@@ -150,12 +139,13 @@ export function getGrupoDeEjemplo(): Omit<PedidoGrupo, "integrantes"> {
   return { ...grupoDeEjemplo };
 }
 
-export async function recomendarGrupo(pedido: PedidoGrupo): Promise<RecomendacionGrupo> {
+/** `comercio`: el que eligió la pantalla (puede ser del corpus); sin él, el del grupo de ejemplo. */
+export async function recomendarGrupo(pedido: PedidoGrupo, comercio?: Comercio): Promise<RecomendacionGrupo> {
   return red(
     grupoEnElServidor(
       {
         nombre: pedido.nombre,
-        comercio: comercioPorId(pedido.comercioId),
+        comercio: comercio ?? comercioPorId(pedido.comercioId),
         monto: pedido.monto,
         fecha: pedido.fecha,
         integrantes: pedido.integrantes,

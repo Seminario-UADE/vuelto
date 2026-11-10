@@ -31,7 +31,7 @@ import {
 import { compraAgregada, compraEliminada, comprasReconciliadas } from "./compras";
 import type { AppDispatch, AppThunk, RootState } from "./index";
 import { porConfirmarCreada, porConfirmarDescartada, selectPorConfirmarVigentes } from "./por-confirmar";
-import { selectEntradasMotor, selectRecomendacion } from "./selectores";
+import { selectCatalogoParaCompras, selectEntradasMotor, selectRecomendacion } from "./selectores";
 import { comercioElegido } from "./simulacion";
 
 /** El usuario de la sesión de Supabase, o `null` si no hay (o la subida no está conectada). */
@@ -59,7 +59,7 @@ export function guardarCompra(b: BorradorCompra, intento: string | null = null, 
       if (existente) return existente;
     }
     const estado = getState();
-    const compra = compraParaGuardar(selectEntradasMotor(estado), b, id ?? generarId());
+    const compra = compraParaGuardar(selectEntradasMotor(estado), b, id ?? generarId(), selectCatalogoParaCompras(estado));
     dispatch(
       guardadoEncolado({ idOp: generarId(), compra, dueno: duenoDe(subida), ahora: estado.sesion.ahora, intento }),
     );
@@ -89,6 +89,8 @@ export function usarRecomendacion(): AppThunk<{ porConfirmar: CompraPorConfirmar
       medioId: r.medio.id,
       monto: estado.simulacion.monto,
       creadaEn: estado.sesion.ahora,
+      canal: estado.simulacion.canal,
+      categoriaId: r.comercio.categoriaId,
     };
     const reemplazo = selectPorConfirmarVigentes(estado).some((c) => c.comercioId === porConfirmar.comercioId);
     dispatch(porConfirmarCreada(porConfirmar));
@@ -113,7 +115,7 @@ export function confirmarPorConfirmar(id: string, b: BorradorCompra, intento: st
     }
     const pc = getState().porConfirmar.lista.find((c) => c.id === id);
     // Vencida con la hoja abierta igual se guarda (Edge Cases); si ya no está, con el modo del borrador.
-    const modo = pc ? origenAlConfirmar(pc, b, b.modo === "ticket") : b.modo;
+    const modo = pc ? origenAlConfirmar(pc, b, b.modo === "ticket", selectCatalogoParaCompras(getState())) : b.modo;
     return dispatch(guardarCompra({ ...b, modo }, intento, id));
   };
 }

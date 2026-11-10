@@ -2200,6 +2200,75 @@ Esta entrada cubre solo la parte visual.
 
 ---
 
+## 2026-11-04 — «¿Con qué pago?»: comercios del corpus, rubro, canal y descartadas plegadas (issue #43)
+
+**Herramienta:** Claude Code (Opus 5.5).
+
+**Objetivo:** dos de los criterios de #43 que el PR #95 dejó pendientes: el
+buscador con los comercios de las promos reales (no la lista de ejemplo) y la
+fecha de la última sincronización en la pantalla del comercio. Sin spec-kit: la
+spec ya existe (004, FR-030).
+
+**Prompts principales:**
+1. "Mira lo que me queda asignado y arma una ruta" → #43 en dos PRs (A: corpus
+   y fecha; B: categoría, presencial/online y descartadas plegadas), #56 al final.
+2. "Arranca".
+
+**Resultado:**
+- `data/comercios.ts` (funciones puras): `comerciosDelCorpus` arma los pares
+  únicos (comercio, rubro) de las promos con comercio que siguen vigentes; un
+  comercio en dos rubros sale dos veces y el chip lleva el rubro. Una categoría
+  de MODO sin rubro propio en la app conserva su id y se nombra como en MODO.
+- `selectCatalogoComercios` (ADR-010): con corpus sincronizado, esos comercios;
+  antes de la primera sincronización, el catálogo de ejemplo (va con las promos
+  de ejemplo). Lo usan el buscador de Inicio, el onboarding, Perfil, «Revisá tu
+  compra» y el gasto en grupo. `api.ts` ya no tiene `getCatalogoComercios`,
+  `buscarComercios` ni `getComercio`.
+- Buscador de Inicio: los habituales que coinciden van primero.
+- Onboarding: sin búsqueda, hasta 8 comercios por rubro (con el corpus real son
+  cientos).
+- Pantalla del comercio: «Promos actualizadas hace …», como en Inicio (lo pide
+  #43; spec 009 FR-019 solo lo pedía en Inicio).
+- Por sacar los catálogos de `api.ts` también cambian: el gasto en grupo
+  (`recomendarGrupo(pedido, comercio?)` recibe el comercio de la pantalla) y
+  las sugerencias de Perfil (un chip por nombre, porque el habitual se guarda
+  sin rubro).
+- Revisiones (rules-guardian sin hallazgos; `/code-review`): guardar una compra
+  y la lista de compras usan el mismo catálogo con el que se propuso la promo
+  (FR-022), sin catálogo por defecto; un id de antes de sincronizar o el del
+  grupo de ejemplo sigue encontrando su comercio; una sola clave para comparar
+  nombres (sin mayúsculas, acentos ni espacios de más, FR-002), así «Café» y
+  «Cafe» son el mismo comercio; buscando, cada resultado lleva su rubro; un
+  habitual que está en dos rubros da un acceso rápido por rubro.
+- Limitación: «Revisá tu compra» recibe el comercio como texto; si ese nombre
+  está en dos rubros, toma el primero.
+- Resuelve el pendiente de #47 (autocompletar desde el corpus) y responde la
+  parte de comercios de #102.
+
+**Parte B, en el mismo PR #107** (prompt: "Podés hacer la parte B dentro del
+mismo PR #107, así tenemos todo en el mismo PR"):
+- Rubro sin comercio (FR-001): «¿No sabés el comercio? Elegí el rubro» despliega
+  las 13 categorías de MODO; también aparecen si la búsqueda no encuentra nada
+  (Edge Cases). El pedido al motor va sin comercio, así solo aplican las promos
+  de todo el rubro, y no se explican promos de un comercio puntual (Principio I).
+- Canal (FR-001): «En el local» / «Online» en la pantalla del comercio,
+  presencial por defecto (`simulacion.canal`); entra al selector.
+- Descartadas plegadas: las otras opciones se ven siempre; los medios sin promo
+  quedan detrás de «Por qué no los otros (N)».
+- El botón sigue siendo «Usar Galicia» (DESIGN.md §5) hasta que el equipo decida
+  contra el «Pagué con esto» de la issue.
+- Revisiones de la parte B (rules-guardian sin hallazgos; `/code-review`): el
+  canal viaja a «Revisá tu compra» y a la compra guardada (`BorradorCompra.canal`,
+  FR-022); otro comercio vuelve a presencial (Inicio no muestra el canal); un
+  rubro se reconoce por nombre solo al registrar y listar compras
+  (`selectCatalogoParaCompras`), no en los habituales; el rubro elegido queda a la
+  vista en Inicio; los chips de canal se anuncian como opciones (`radio`).
+- El gasto en grupo sigue evaluando en presencial (fuera de #43).
+- Falta la verificación a mano en modo avión real (no hay dispositivo acá).
+- Verificación: lint, typecheck, build y tests en verde. No se probó en Expo Go.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

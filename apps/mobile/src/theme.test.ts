@@ -139,7 +139,8 @@ describe("el cálculo vive en el motor, detrás de la capa de datos (ADR-010)", 
     for (const f of readdirSync(dir)) {
       const p = join(dir, f);
       if (statSync(p).isDirectory()) recorrer(p);
-      else if (/\.tsx?$/.test(f) && !/\.test\.ts$/.test(f)) todos.push(p);
+      // Con barras `/` también en Windows: si no, las expresiones de abajo no matchean nada.
+      else if (/\.tsx?$/.test(f) && !/\.test\.ts$/.test(f)) todos.push(p.replace(/\\/g, "/"));
     }
   };
   recorrer(raiz);
