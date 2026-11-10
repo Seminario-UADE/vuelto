@@ -2557,6 +2557,9 @@ Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
    app de Joaquín con un mensaje sugerido para cada error, y una prueba con 3
    fotos reales que corre el usuario fuera de la sesión de IA antes de
    escribir el servicio.
+7. "Commiteá y seguí con las tasks." 28 tareas en 3 etapas. La primera
+   termina con la prueba de Groq con fotos reales, que corre el usuario: si
+   no pasa, no se sigue. Los tests van antes que el código, sin red ni key.
 
 **Resultado:**
 - Spec 013: qué recibe y qué devuelve el servicio, qué datos personales
