@@ -96,16 +96,14 @@ select throws_ok($$ delete from public.categorias $$, '42501', null, 'A no borra
 
 reset role;
 
--- ===== Rol anónimo: nada en ninguna tabla =====
+-- ===== Rol anónimo: nada de datos de usuarios =====
+-- Bancos, categorías y promociones sí los lee (issue #112): catalogos_lectura_anon.test.sql.
 select set_config('request.jwt.claims', '', true);
 set local role anon;
 select throws_ok($$ select * from public.perfiles $$, '42501', null, 'anon no lee perfiles');
 select throws_ok($$ select * from public.medios_de_pago $$, '42501', null, 'anon no lee medios_de_pago');
 select throws_ok($$ select * from public.comercios_habituales $$, '42501', null, 'anon no lee comercios_habituales');
 select throws_ok($$ select * from public.compras $$, '42501', null, 'anon no lee compras');
-select throws_ok($$ select * from public.promociones $$, '42501', null, 'anon no lee promociones');
-select throws_ok($$ select * from public.bancos $$, '42501', null, 'anon no lee bancos');
-select throws_ok($$ select * from public.categorias $$, '42501', null, 'anon no lee categorias');
 select throws_ok($$ select * from public.capturas_crudas $$, '42501', null, 'anon no lee capturas_crudas');
 select throws_ok($$ insert into public.compras (user_id, fecha, monto, comercio, medio_de_pago_id, origen) values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', '2026-11-01', 5, 'X', 'a1000000-0000-4000-8000-000000000001', 'manual') $$, '42501', null, 'anon no inserta compras');
 reset role;

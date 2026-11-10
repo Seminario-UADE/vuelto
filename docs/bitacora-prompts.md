@@ -2378,6 +2378,35 @@ corrida (2026-11-03) y que no vuelva a tardar 40 minutos en avisar.
 
 ---
 
+## 2026-11-10 — Lectura sin cuenta de catálogos y promos (issue #112, PR A)
+
+**Herramienta:** Claude Code (Opus 5.5), con Docker Desktop y la CLI de Supabase 2.113.0 instalados en la sesión.
+
+**Objetivo:** la parte de backend de #112 (spec 012 US5, T042 y T045): que la app pueda leer bancos,
+categorías y promociones sin cuenta, para dar la primera respuesta antes de crear la cuenta.
+
+**Prompts principales:**
+1. "Mirá si me asignaron algo del back; si no, decime qué podemos hacer."
+2. "Asignate la #112 y armá el plan."
+3. "Instalá Docker Desktop y todo lo necesario para que anden los tests antes del PR A."
+
+**Resultado:**
+- Migración `20261110000001_catalogos_lectura_anon.sql`: `select` para `anon` sobre `bancos`,
+  `categorias` y `promociones`, con sus policies. Ninguna tabla con datos de usuarios cambia.
+- pgTAP nuevo `catalogos_lectura_anon.test.sql`; `rls.test.sql` y `estructura.test.sql` pasan de
+  "anon no lee nada" a "anon solo lee los tres catálogos".
+- Error en el plan de la spec: research R10 decía que la sincronización ya andaba sin sesión, pero
+  `sincronizar.ts` cortaba con `usuario === null`. Ahora baja el corpus sin sesión y saltea las compras.
+- Decisión del equipo (de jeqm0302, a propuesta de la IA): sin cuenta se leen todas las promos y no solo
+  las vigentes, porque al entrar a una cuenta la sincronización incremental no traería las vencidas del
+  período y el tope quedaría subestimado. Se corrigieron FR-032, R10 y T042.
+- Errores de la IA en los tests SQL (tipos `uuid` sin castear y una comparación de texto sin collation),
+  encontrados al correr `supabase test db` local antes de subir.
+- Verificado: `supabase db reset` dos veces y `supabase test db` (198 tests), integración de la app contra
+  Supabase local (8 tests, uno nuevo sin sesión), lint, typecheck y tests de los 4 workspaces.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

@@ -47,6 +47,8 @@ describe.skipIf(!esLocal)("repositorioSupabase contra un Supabase local", () => 
   const admin = esLocal ? createClient(URL!, SERVICIO!, { auth: { persistSession: false } }) : null!;
   const usuario = esLocal ? createClient(URL!, ANON!, { auth: { persistSession: false } }) : null!;
   const otro = esLocal ? createClient(URL!, ANON!, { auth: { persistSession: false } }) : null!;
+  /** Sin sesión: solo la clave pública (issue #112). */
+  const anonimo = esLocal ? createClient(URL!, ANON!, { auth: { persistSession: false } }) : null!;
   const sembradas = {
     nula: promo("jurisdiccion nula", { jurisdiccion: null }),
     nacional: promo("nacional"),
@@ -81,8 +83,8 @@ describe.skipIf(!esLocal)("repositorioSupabase contra un Supabase local", () => 
 
   const propias = (filas: FilaPromocion[]) => filas.filter((f) => ids.includes(f.id));
 
-  async function leerPromos(f: { desde: string | null; vigenteDesde: string | null }, tamano = 2) {
-    const repo = repositorioSupabase(usuario);
+  async function leerPromos(f: { desde: string | null; vigenteDesde: string | null }, tamano = 2, cliente = usuario) {
+    const repo = repositorioSupabase(cliente);
     return leerTodo<FilaPromocion>(
       (cursor: Cursor) =>
         repo.promociones({ ...f, cursor, limite: tamano, signal: new AbortController().signal }),
@@ -162,7 +164,32 @@ describe.skipIf(!esLocal)("repositorioSupabase contra un Supabase local", () => 
 
   it("usuarioId sale de la sesión guardada", async () => {
     expect(await repositorioSupabase(usuario).usuarioId()).toBe(uid);
-    const anonimo = createClient(URL!, ANON!, { auth: { persistSession: false } });
     expect(await repositorioSupabase(anonimo).usuarioId()).toBeNull();
+  });
+
+  const idsPropios = (filas: FilaPromocion[]) => propias(filas).map((f) => f.id).sort();
+
+  it.each([
+    ["la primera", { desde: null, vigenteDesde: "2026-11-01" }],
+    ["la incremental", { desde: "2000-01-01T00:00:00.000Z", vigenteDesde: null }],
+  ])("sin sesión, %s lectura trae las mismas promos que con cuenta (issue #112)", async (_n, f) => {
+    expect(idsPropios(await leerPromos(f, 2, anonimo))).toEqual(idsPropios(await leerPromos(f)));
+  });
+
+  it("sin sesión, los ids del período son los mismos que con cuenta", async () => {
+    const signal = new AbortController().signal;
+    const deAnonimo = (await repositorioSupabase(anonimo).idsDePromociones("2026-11-01", signal)).filter((i) => ids.includes(i));
+    const delUsuario = (await repositorioSupabase(usuario).idsDePromociones("2026-11-01", signal)).filter((i) => ids.includes(i));
+    expect(deAnonimo.sort()).toEqual(delUsuario.sort());
+  });
+
+  it("sin sesión no se leen compras", async () => {
+    const pedido = repositorioSupabase(anonimo).compras({ desde: "2026-11-01", cursor: null, limite: 2, signal: new AbortController().signal });
+    await expect(pedido).rejects.toMatchObject({ code: "42501" });
+  });
+
+  it("sin sesión no se escribe en promociones (42501)", async () => {
+    const { error } = await anonimo.from("promociones").insert(promo("y"));
+    expect(error?.code).toBe("42501");
   });
 });

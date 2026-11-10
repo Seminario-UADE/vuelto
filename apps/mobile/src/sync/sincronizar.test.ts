@@ -182,13 +182,53 @@ describe("sincronizar: disparo, espera y exclusión (FR-001 a FR-003)", () => {
     expect(store.getState()).toBe(antes);
   });
 
-  it("sin sesión no hace nada ni pide más", async () => {
+  it("sin sesión baja el corpus y pasa al reloj real, pero no pide compras (issue #112)", async () => {
+    const repo = repositorioEnMemoria({ promociones: [fila(1), fila(2)], compras: [filaCompra(1)], usuario: null });
+    const { store } = armar(repo);
+    await store.dispatch(sincronizar("apertura"));
+    const s = store.getState();
+    expect(ids(store)).toEqual([ID(1), ID(2)]);
+    expect(s.corpus.marca).toBe(fila(2).actualizada_en);
+    expect(s.sesion.ahora).toBe(AHORA.toISOString());
+    // Las compras son de la cuenta: sin sesión ni se piden, y las de ejemplo no sobreviven.
+    expect(repo.pedidos.map((p) => p.tipo)).not.toContain("compras");
+    expect(s.compras.lista).toEqual([]);
+  });
+
+  it("sin sesión, una compra pendiente sin dueño sobrevive a la sincronización", async () => {
+    const repo = repositorioEnMemoria({ promociones: [fila(1)], usuario: null });
+    const { store } = armar(repo);
+    const compra = filaACompra(filaCompra(7))!;
+    store.dispatch(guardadoEncolado({ idOp: "op-1", compra, dueno: null, ahora: AHORA.toISOString(), intento: null }));
+    store.dispatch(compraAgregada(compra));
+    await store.dispatch(sincronizar("apertura"));
+    expect(store.getState().compras.lista.map((c) => c.id)).toEqual([compra.id]);
+  });
+
+  it("sin sesión y después con cuenta: la segunda trae las compras y conserva las promos vencidas del período", async () => {
+    // Vencida el 1/11: dentro del período (empieza el 1/11), fuera de lo vigente hoy (2/11).
+    const vencida = { ...fila(2), vigencia_hasta: "2026-11-01" };
+    const repo = repositorioEnMemoria({ promociones: [fila(1), vencida], compras: [filaCompra(1)], usuario: null });
+    const { store, avanzar } = armar(repo);
+    await store.dispatch(sincronizar("apertura"));
+    expect(ids(store)).toEqual([ID(1), ID(2)]);
+    expect(store.getState().compras.lista).toEqual([]);
+
+    repo.usuario = "usuario-1";
+    avanzar(ESPERA_MS);
+    await store.dispatch(sincronizar("apertura"));
+    expect(ids(store)).toEqual([ID(1), ID(2)]);
+    expect(store.getState().compras.lista.map((c) => c.id)).toEqual([ID(1001)]);
+  });
+
+  it("si entra una cuenta mientras vuela la sincronización sin sesión, el resultado se descarta", async () => {
     const repo = repositorioEnMemoria({ promociones: [fila(1)], usuario: null });
     const { store } = armar(repo);
     const antes = store.getState();
-    await store.dispatch(sincronizar("apertura"));
+    const pedido = store.dispatch(sincronizar("apertura"));
+    repo.usuario = "usuario-1";
+    await pedido;
     expect(store.getState()).toBe(antes);
-    expect(repo.pedidos.map((p) => p.tipo)).toEqual(["usuario"]);
   });
 });
 

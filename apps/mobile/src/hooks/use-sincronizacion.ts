@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 /**
  * Dispara la sincronización (spec 009 FR-001): al abrir la app, una vez rehidratado el store, y cada
  * vez que vuelve a primer plano. La espera de 5 minutos, la exclusión mutua y el timeout viven en el
- * thunk. Sin sesión de Supabase o sin red no hace nada y no muestra error.
+ * thunk. Sin sesión baja solo el corpus (issue #112); sin red no hace nada y no muestra error.
  */
 export function useSincronizacion(): void {
   const dispatch = useAppDispatch();

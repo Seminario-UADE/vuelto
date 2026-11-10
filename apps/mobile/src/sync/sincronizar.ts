@@ -3,6 +3,10 @@
  * núcleo funcional necesita y despacha UNA acción con el resultado. Nunca lanza hacia la UI: un
  * fallo (sin red, página caída, timeout) deja el store como estaba y la leyenda sigue mostrando la
  * última sincronización exitosa (FR-003, FR-005).
+ *
+ * Sin sesión también baja el corpus (spec 012 FR-032, issue #112): la base deja leer todas las
+ * promociones sin cuenta, así la primera respuesta del onboarding sale de promos reales. Las compras
+ * son de la cuenta: sin sesión no se piden y quedan solo las pendientes sin dueño de la cola.
  */
 import type { AppThunk } from "../store";
 import { sincronizado } from "../store/acciones";
@@ -63,7 +67,6 @@ export function sincronizar(motivo: Motivo): AppThunk<Promise<void>> {
     try {
       const epoca = getState().sesion.epoca;
       const usuario = await conTimeout(() => repositorio.usuarioId());
-      if (usuario === null) return;
 
       // Los parámetros salen del reloj real, nunca de `sesion.ahora` (FR-016): con los datos de
       // ejemplo ese reloj está fijo en el 14/10.
@@ -71,10 +74,13 @@ export function sincronizar(motivo: Motivo): AppThunk<Promise<void>> {
       const marca = getState().corpus.marca;
       const piso = marca === null ? null : pisoDeRelectura(marca);
 
-      const compras = await leerTodo<FilaCompra>(
-        (cursor: Cursor) => conTimeout((signal) => repositorio.compras({ desde, cursor, limite: TAMANO_PAGINA, signal })),
-        (f) => ({ valor: f.creada_en, id: f.id }),
-      );
+      const compras =
+        usuario === null
+          ? []
+          : await leerTodo<FilaCompra>(
+              (cursor: Cursor) => conTimeout((signal) => repositorio.compras({ desde, cursor, limite: TAMANO_PAGINA, signal })),
+              (f) => ({ valor: f.creada_en, id: f.id }),
+            );
       const promociones = await leerTodo<FilaPromocion>(
         (cursor: Cursor) =>
           conTimeout((signal) =>

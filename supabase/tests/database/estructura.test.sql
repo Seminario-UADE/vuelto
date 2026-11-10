@@ -32,10 +32,13 @@ select is_empty($$
   where n.nspname = 'public' and p.prosecdef
 $$, 'ninguna función security definer en public');
 
-select is_empty($$
-  select table_name, privilege_type from information_schema.role_table_grants
+-- anon solo lee los catálogos públicos de MODO (issue #112): ni otra tabla ni otro privilegio.
+select is((
+  select string_agg(table_name || ':' || privilege_type, ',' order by table_name, privilege_type)
+  from information_schema.role_table_grants
   where table_schema = 'public' and grantee = 'anon'
-$$, 'anon no tiene privilegios sobre ninguna tabla de public');
+), 'bancos:SELECT,categorias:SELECT,promociones:SELECT',
+'anon solo tiene SELECT sobre bancos, categorias y promociones');
 
 select is_empty($$
   select table_name, privilege_type from information_schema.role_table_grants

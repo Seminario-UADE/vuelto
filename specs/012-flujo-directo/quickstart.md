@@ -34,7 +34,7 @@ Lo que tiene que pasar:
   - `ticketCoincide`: «COTO C.I.C.S.A.» coincide con Coto, «Cotolengo» no, y no coincide con fecha anterior;
   - `borradorDesdePorConfirmar`: medio `null` y sugerido cuando el ticket no trae medio; sin aviso de monto si no se simuló con monto; fechas posibles cuando cambió el día.
 - `store/thunks.compras.test.ts`: confirmar dos veces la misma compra deja una sola (SC-008).
-- pgTAP: un nombre de 41 caracteres se rechaza; `anon` lee `bancos`, `categorias` y las promos vigentes, y no lee ni escribe tablas de usuarios (US5).
+- pgTAP: un nombre de 41 caracteres se rechaza; `anon` lee `bancos`, `categorias` y las promociones, y no lee ni escribe tablas de usuarios (US5).
 
 ## Recorrido manual
 
