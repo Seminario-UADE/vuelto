@@ -162,7 +162,7 @@ docs/design/ideas-ux.md                     # estado: issue
 | 3 | #103 Navegación de tres tabs, Perfil desde el avatar y zonas seguras | US3 | 1 (para la tab Compras) | M |
 | 4 | #111 Primera respuesta interactiva y nombre del usuario | US4 | — | M |
 | 5 | #112 Probar antes de crear la cuenta | US5 | 4 | L |
-| 6 | #113 Rehacer la UI en Stitch con el flujo directo | diseño | — (guía a 1, 3 y 4) | S |
+| 6 | ~~#113 Rehacer la UI en Stitch~~ (cerrada: el diseño v6 se implementa directo, con los temas en #115) | diseño | — (guía a 1, 3 y 4) | S |
 
 Las issues 1 y 4 pueden ir en paralelo. Las issues 3 y 4 tocan `(tabs)/index.tsx` y `_layout.tsx`, así que van una después de la otra o con coordinación.
 

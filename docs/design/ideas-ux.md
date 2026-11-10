@@ -69,7 +69,7 @@ Cómo anotar: una entrada por idea, con estado (`idea` → `issue` → `hecha` o
 
 ## Flujo de usuario nuevo y de compra
 
-- **Estado:** issue (spec `specs/012-flujo-directo/`: #109, #110, #111, #112, #113 y #103; diseño v6 en #115). Auditoría del 05/11/2026, sobre el código de `main`.
+- **Estado:** issue (spec `specs/012-flujo-directo/`: #109, #110, #111, #112 y #103; diseño v6 en #115, sin pasar por Stitch). Auditoría del 05/11/2026, sobre el código de `main`.
 - **Hoy:** Bienvenida → Crear cuenta → Medios («paso 1 de 2») → Comercios
   («paso 2 de 2», se puede saltar) → Primera respuesta → Inicio, con cuatro
   tabs.
