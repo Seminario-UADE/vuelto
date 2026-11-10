@@ -4,7 +4,11 @@ import { Icon, type IconName } from "./icon";
 import { PressableScale } from "./pressable-scale";
 import { Text } from "./text";
 
-type Variant = "primary" | "secondary" | "text" | "destructive";
+/**
+ * `decision`: el botón «Usar [medio]» dentro de la tarjeta de decisión, en `onDecisionAccent`
+ * con texto `ink` (DESIGN.md §2 y §5). Solo ahí.
+ */
+type Variant = "primary" | "secondary" | "text" | "destructive" | "decision";
 
 type Props = {
   label: string;
@@ -19,14 +23,25 @@ type Props = {
 };
 
 /**
- * Botón primario: píldora Salvia, 56 pt de alto mínimo, una sola línea de texto que crece
+ * Botón primario: botón del acento, 56 pt de alto mínimo, una sola línea de texto que crece
  * en alto si el texto del sistema es grande (DESIGN.md §5). Uno solo por pantalla.
  */
 export function Button({ label, onPress, variant = "primary", disabled, loading, icon, hint }: Props) {
-  const relleno = variant === "primary" || variant === "destructive";
-  const fondo =
-    variant === "primary" ? colors.accent : variant === "destructive" ? colors.error : colors.transparent;
-  const tinta = relleno ? colors.onAccent : variant === "secondary" ? colors.ink : colors.accent;
+  const relleno = variant === "primary" || variant === "destructive" || variant === "decision";
+  const fondo = {
+    primary: colors.accent,
+    destructive: colors.error,
+    decision: colors.onDecisionAccent,
+    secondary: colors.transparent,
+    text: colors.transparent,
+  }[variant];
+  const tinta = {
+    primary: colors.onAccent,
+    destructive: colors.onAccent,
+    decision: colors.ink,
+    secondary: colors.ink,
+    text: colors.accent,
+  }[variant];
   const inactivo = disabled || loading;
   return (
     <PressableScale
@@ -39,7 +54,7 @@ export function Button({ label, onPress, variant = "primary", disabled, loading,
       aria-disabled={Boolean(inactivo)}
       style={{
         minHeight: variant === "text" ? size.hit : size.primaryButton,
-        borderRadius: radius.pill,
+        borderRadius: radius.control,
         borderCurve: "continuous",
         backgroundColor: inactivo && relleno ? colors.surfaceStrong : fondo,
         borderWidth: variant === "secondary" ? 1.5 : 0,

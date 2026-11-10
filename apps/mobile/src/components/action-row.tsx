@@ -11,7 +11,7 @@ type Props = {
   onPress: () => void;
 };
 
-/** Fila de acción secundaria (Lino, ícono, título, detalle y chevron). */
+/** Fila de acción secundaria (`surface`, ícono, título, detalle y chevron). */
 export function ActionRow({ icon, title, detail, onPress }: Props) {
   return (
     <PressableScale

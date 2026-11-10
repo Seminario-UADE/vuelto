@@ -2,16 +2,26 @@ import { View } from "react-native";
 import { colors, radius, space } from "@/theme";
 
 /**
- * Barra de pasos sin texto visible: cuenta solo los pasos de configuración
- * (auditoría P2 #18). El lector de pantalla anuncia "Configuración, paso N de M".
+ * Barra de pasos sin texto visible: los pasos hasta `actual` van completos, aunque se haya
+ * entrado a mitad de camino (auditoría v7). El lector de pantalla anuncia "<contexto>, paso N de M".
  */
-export function ProgressSegments({ total, actual }: { total: number; actual: number }) {
+export function ProgressSegments({
+  total,
+  actual,
+  contexto = "Configuración",
+  ancho = 120,
+}: {
+  total: number;
+  actual: number;
+  contexto?: string;
+  ancho?: number;
+}) {
   return (
     <View
       accessible
       accessibilityRole="progressbar"
-      accessibilityLabel={`Configuración, paso ${actual} de ${total}`}
-      style={{ flexDirection: "row", gap: space.xs, width: 120 }}
+      accessibilityLabel={`${contexto}, paso ${actual} de ${total}`}
+      style={{ flexDirection: "row", gap: space.xs, width: ancho }}
     >
       {Array.from({ length: total }, (_, i) => (
         <View

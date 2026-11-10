@@ -85,6 +85,25 @@ describe("cosechar", () => {
     expect(resumen.descartes).toEqual({ formato_desconocido: 1 });
   });
 
+  it("un formato desconocido marca el slug del listado y el del detalle para no darlos de baja", async () => {
+    const raro = detalleDe("otro-slug", (d) => (d.conditions.schedule.days_of_week = ["someday"]));
+    const { cosecha } = await cosechar(modo([tarjeta("raro")], { raro }), HOY);
+    expect([...cosecha.slugsSinDatos].sort()).toEqual(["otro-slug", "raro"]);
+  });
+
+  it("una promo que no pasa la validación (banco fuera del catálogo) tampoco se da de baja", async () => {
+    const BANCO_FUERA = "00000000-0000-4000-8000-000000000000";
+    const d = detalleDe("mixta", (x) => (x.offers[0].requirements.banks.list = ["bcfcac03-6f79-4995-bfab-7b8916b0747a", BANCO_FUERA]));
+    const { cosecha } = await cosechar(modo([tarjeta("mixta"), tarjeta("a")], { mixta: d }), HOY);
+    expect([...cosecha.slugsSinDatos]).toEqual(["mixta"]);
+    expect(cosecha.publicables.map((p) => p.promocion.fuenteId)).toEqual(["a"]);
+  });
+
+  it("una promo descartada a propósito por el mapeo sí puede darse de baja", async () => {
+    const { cosecha } = await cosechar(modo([tarjeta("a"), tarjeta("b")], { b: null }), HOY);
+    expect([...cosecha.slugsSinDatos]).toEqual([]);
+  });
+
   it("una promo que no pasa la validación se descarta entera, con todas sus partes", async () => {
     const BANCO_FUERA = "00000000-0000-4000-8000-000000000000";
     const d = detalleDe("mixta", (x) => (x.offers[0].requirements.banks.list = ["bcfcac03-6f79-4995-bfab-7b8916b0747a", BANCO_FUERA]));

@@ -18,7 +18,7 @@ Cómo anotar: una entrada por idea, con estado (`idea` → `issue` → `hecha` o
 
 ## Barra de navegación inferior
 
-- **Estado:** idea
+- **Estado:** issue (#103, spec 012 US3)
 - **Hoy** (`apps/mobile/src/app/(tabs)/_layout.tsx`): cuatro tabs en este
   orden, Inicio · Comprar · Topes · Perfil. La pestaña activa se distingue
   solo por el ícono relleno y por pasar de gris (`inkSecondary`) a tinta
@@ -27,9 +27,10 @@ Cómo anotar: una entrada por idea, con estado (`idea` → `issue` → `hecha` o
   - Inicio va **al centro** de la barra.
   - La sección en la que estamos se marca con **otro color** (un foco más
     claro que hoy), no solo con el relleno del ícono.
+- Propuesta para el centro: **Compras · Inicio · Topes**, tres tabs, con
+  Perfil como avatar arriba a la derecha de Inicio. Detalle en «Flujo de
+  usuario nuevo y de compra».
 - A resolver:
-  - Con cuatro tabs no hay centro: ¿se suma una quinta (por ejemplo, un
-    botón central destacado para Inicio) o se reordena a tres + Inicio?
   - Qué color de foco, sin romper la paleta de `DESIGN.md` §2 (un solo
     acento salvia) y manteniendo contraste AA.
 
@@ -65,6 +66,89 @@ Cómo anotar: una entrada por idea, con estado (`idea` → `issue` → `hecha` o
 - A resolver: vencimiento de las pendientes, criterio de cruce
   (comercio + monto), dónde se guarda y cómo se ve en Inicio y Mis compras.
   Es un cambio de producto (modelo de compras), no solo de pantallas.
+
+## Flujo de usuario nuevo y de compra
+
+- **Estado:** issue (spec `specs/012-flujo-directo/`: #109, #110, #111, #112 y #103; diseño v6 en #115, sin pasar por Stitch). Auditoría del 05/11/2026, sobre el código de `main`.
+- **Hoy:** Bienvenida → Crear cuenta → Medios («paso 1 de 2») → Comercios
+  («paso 2 de 2», se puede saltar) → Primera respuesta → Inicio, con cuatro
+  tabs.
+
+### Problemas encontrados
+
+1. **La cuenta se pide antes de dar valor.** Es al revés de lo que la
+   auditoría v5 marcaba como fortaleza. Si Supabase pide confirmar el email,
+   el registro manda a Login y el onboarding queda cortado
+   (`apps/mobile/src/components/formulario-cuenta.tsx`).
+2. **Nunca se pide el nombre.** Inicio y Perfil usan `"Martín"` por defecto:
+   todo usuario nuevo ve «Hola, Martín», y Perfil lo muestra como el «nombre
+   que ven tus contactos» (`(tabs)/index.tsx`, `(tabs)/perfil.tsx`).
+3. **La primera respuesta está fija en Coto**
+   (`(onboarding)/primera-respuesta.tsx`). Si la persona no compra ahí, o sus
+   medios no tienen promo, la primera impresión es «Hoy no hay promo».
+4. **El paso Comercios aporta poco.** Sin habituales, el buscador de Inicio
+   usa igual los frecuentes del catálogo (`selectComerciosFrecuentes`).
+5. **El indicador de pasos no cuenta los pasos reales:** dice «de 2», y son 5.
+6. **Inicio y Comprar se pisan.** Las dos tienen el buscador de comercio,
+   escanear y las últimas compras. El estado vacío de Inicio manda a Comprar,
+   que vuelve a preguntar el comercio.
+7. **La compra pendiente (#105) no tiene dónde vivir.**
+8. **La tarjeta de Inicio solo tiene «Ver detalle»,** sin «Usar». Hacen falta
+   dos toques más para la acción principal.
+9. **«¿Pagan entre varios?» aparece en Comprar** y en el detalle del
+   comercio. Para un usuario nuevo, sin contactos, es un callejón.
+
+### Propuesta
+
+**Onboarding (de 5 pantallas a 4, la cuenta al final):**
+
+```
+Bienvenida («Empezar» · «Ya tengo cuenta»)
+→ ¿Con qué pagás? (medios, igual que hoy)
+→ Primera respuesta interactiva: «¿Dónde comprás seguido?» con chips;
+   tocar uno muestra la respuesta real y lo guarda como habitual
+→ Guardá tu perfil: nombre + email + contraseña
+→ Inicio
+```
+
+- Costo: los medios viven en el store local hasta crear la cuenta y se suben
+  después con `confirmarMedios`. Verificar que `leerBancos` funcione sin
+  sesión (RLS de lectura con la clave anon).
+- Plan mínimo si no entra en el cuatrimestre: dejar la cuenta primero, pero
+  pedir el nombre y hacer interactiva la primera respuesta.
+
+**Tabs (de 4 a 3, Inicio al centro):** Compras · Inicio · Topes, con Perfil
+como avatar en el header de Inicio. Cada tab es un momento: Inicio = ahora
+(con qué pago), Compras = después (confirmar y registrar), Topes = cuánto
+queda.
+
+**Compra, con la pendiente de #105:**
+
+```
+Inicio: tocás Coto → respuesta en la tarjeta → [Usar Galicia]
+→ queda una compra PENDIENTE (no descuenta tope) + toast «Pagá con Galicia»
+→ tarjeta «Compra en Coto pendiente» arriba de Inicio y en Compras:
+     [Ya pagué]        → Revisá tu compra con los datos de la simulación
+     [Escanear ticket] → Escanear → Revisá (se cruza con la pendiente)
+     [Descartar]
+```
+
+- El estado vacío de Inicio no manda a otra tab: «Tus topes aparecen cuando
+  confirmes tu primera compra».
+
+### Resumen de cambios
+
+| Acción | Pantalla |
+|---|---|
+| Sacar | Tab Comprar, onboarding Comercios |
+| Unir | Comercios + Primera respuesta (deja de estar fija en Coto) |
+| Mover | Mis compras → tab · Perfil → avatar en el header · Crear cuenta → después de la primera respuesta |
+| Agregar | Nombre en el registro · tarjeta de compra pendiente · «Usar» en Inicio · `modo: "pendiente"` en Revisá |
+| Arreglar | «Hola, Martín», el indicador «paso X de 2», la confirmación de email sin salida |
+
+Lo que más rinde por menos trabajo: el nombre en el registro, la primera
+respuesta interactiva y sacar la tab Comprar. La pendiente y la cuenta al
+final cambian el modelo y conviene llevarlas con spec-kit.
 
 ## Ideas sueltas
 

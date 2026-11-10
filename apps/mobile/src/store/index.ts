@@ -12,12 +12,14 @@ import {
 import type { Subida } from "../data/compras/repositorio";
 import type { DatosPerfil } from "../perfil/datos";
 import type { RepositorioSincronizacion } from "../sync/contratos";
+import { apariencia } from "./apariencia";
 import { cola, escucharPersistenciaCola } from "./cola";
 import { compras } from "./compras";
 import { contactos } from "./contactos";
 import { corpus } from "./corpus";
 import { escucharPersistencia, type Almacenamiento } from "./persistencia";
 import { perfil } from "./perfil";
+import { escucharPersistenciaPorConfirmar, porConfirmar } from "./por-confirmar";
 import { sesion } from "./sesion";
 import { simulacion } from "./simulacion";
 
@@ -27,8 +29,10 @@ const reducer = combineReducers({
   corpus: corpus.reducer,
   compras: compras.reducer,
   cola: cola.reducer,
+  porConfirmar: porConfirmar.reducer,
   simulacion: simulacion.reducer,
   contactos: contactos.reducer,
+  apariencia: apariencia.reducer,
 });
 
 export type RootState = ReturnType<typeof reducer>;
@@ -80,6 +84,8 @@ export function crearStore(opciones: {
   // La cola va primero: su setItem tiene que salir antes que el de `compras` (spec 010, R2).
   escucharPersistenciaCola(listener, opciones.almacenamiento);
   escucharPersistencia(listener, opciones.almacenamiento);
+  // Las compras por confirmar, al final: su escritura sale después de la de `compras` (spec 012, FR-016).
+  escucharPersistenciaPorConfirmar(listener, opciones.almacenamiento);
   return store;
 }
 

@@ -1,82 +1,306 @@
+import type { ColorValue } from "react-native";
+import { colorPorTema } from "./theme-color";
+
 /**
  * Tema de Vuelto: el ÚNICO archivo de la app con colores escritos a mano.
  *
- * Valores de docs/design/DESIGN.md §2–§4. Los nombres son roles (semánticos), no
- * colores: una apariencia oscura futura cambiaría solo este archivo. Hoy la app
- * declara apariencia solo clara (`userInterfaceStyle: "light"`, spec 006 FR-030).
+ * Valores de docs/design/DESIGN.md v8 §2–§4. Los nombres son roles (semánticos), no colores:
+ * cada rol tiene un valor en el tema claro y otro en el oscuro, compuestos por separado (el oscuro
+ * no es la inversión del claro). La app sigue la apariencia del sistema
+ * (`userInterfaceStyle: "automatic"`).
+ *
+ * Las pantallas leen `colors.<rol>` como siempre. En iOS cada rol es un `DynamicColorIOS`: el
+ * sistema lo resuelve y lo cambia solo al pasar a oscuro, sin re-render. En Android y web el valor
+ * sale del esquema que fija `TemaProvider` (ver `theme-color.ts`).
  */
 
-const palette = {
-  blancoHueso: "#F7F4EB",
-  lino: "#EFEBE0",
-  grisCalido: "#E8E4D8",
-  divisor: "#DDD8CB",
-  verdeBosque: "#14281D",
-  musgo: "#52635A",
-  bordeControl: "#6A7A70",
-  salvia: "#4A6B53",
-  champan: "#C5A059",
+const paleta = {
+  // Claro
+  crema: "#F3EBD6",
+  /** Fondo de pantalla del claro (v8): un punto más hondo que `crema` para que las tarjetas se despeguen. */
+  cremaHonda: "#F1E8D0",
+  /** Tarjetas y listas del claro (v8): la superficie más clara, elevada con sombra. */
+  marfil: "#FBF7EA",
+  /** Campos, segmentos y filas seleccionadas del claro (v8): hundidos respecto del fondo. */
+  hueso: "#E6DCC0",
+  divisorClaro: "#D8CDAE",
+  esmeraldaNegro: "#02110C",
+  musgo: "#4E6656",
+  bordeControlClaro: "#6A7A70",
+  oliva: "#1A422F",
   ocre: "#83591A",
-  ocreClaro: "#F3E6C8",
+  ocreClaro: "#F1DFB4",
   oxido: "#8C4843",
-  salviaClara: "#DCE6DD",
+  salviaPalida: "#D9E6D8",
+  // v8: segundo acento (lago), éxito y color por rubro. Claro
+  lago: "#1E6B73",
+  lagoPalido: "#D5E7E5",
+  hoja: "#2E6B3B",
+  rubroSuperClaro: "#2F6B3F",
+  rubroSuperFondoClaro: "#DCE9D5",
+  rubroCombustibleClaro: "#9A4F1F",
+  rubroCombustibleFondoClaro: "#F3DCC6",
+  rubroGastroClaro: "#8C3F52",
+  rubroGastroFondoClaro: "#EFD6D9",
+  rubroHogarClaro: "#4A5E86",
+  rubroHogarFondoClaro: "#D9DEEA",
+  heroClaro: "#1A422F",
+  heroTextoSuaveClaro: "#C4D4C6",
+  /** Centro del degradé del panel de Inicio: tono sobre tono con `heroBg`, un paso más claro. */
+  heroAltoClaro: "#2A5C44",
+  // Oscuro
+  bosqueProfundo: "#051F20",
+  pino: "#0B2B26",
+  musgoOscuro: "#163832",
+  helecho: "#235347",
+  liquen: "#A3B5A8",
+  bordeControlOscuro: "#5E8A70",
+  salviaClara: "#8EB69B",
+  ambar: "#E2B65E",
+  ambarOscuro: "#2B2410",
+  coral: "#EE8F84",
+  // v8, oscuro
+  lagoClaro: "#7CC4CB",
+  lagoOscuro: "#17484C",
+  hojaClara: "#8FD1A0",
+  rubroSuperOscuro: "#9CCB9F",
+  rubroSuperFondoOscuro: "#1F4A36",
+  rubroCombustibleOscuro: "#F0A66B",
+  rubroCombustibleFondoOscuro: "#4A2F1A",
+  rubroGastroOscuro: "#E79AAB",
+  rubroGastroFondoOscuro: "#4A2531",
+  rubroHogarOscuro: "#A5B8E0",
+  rubroHogarFondoOscuro: "#27345A",
+  heroOscuro: "#0F3A34",
+  heroAltoOscuro: "#145048",
+  heroTextoSuaveOscuro: "#B4C4B8",
 } as const;
 
-export const colors = {
+type Rol =
+  | "canvas"
+  | "surface"
+  | "surfaceStrong"
+  | "divider"
+  | "ink"
+  | "inkSecondary"
+  | "controlBorder"
+  | "accent"
+  | "onAccent"
+  | "warning"
+  | "warningBg"
+  | "error"
+  | "successBg"
+  | "success"
+  | "accent2"
+  | "accent2Bg"
+  | "heroBg"
+  | "heroBgHi"
+  | "heroSurface"
+  | "onHero"
+  | "onHeroMuted"
+  | "rubroSuper"
+  | "rubroSuperBg"
+  | "rubroFarmacia"
+  | "rubroFarmaciaBg"
+  | "rubroCombustible"
+  | "rubroCombustibleBg"
+  | "rubroGastro"
+  | "rubroGastroBg"
+  | "rubroHogar"
+  | "rubroHogarBg"
+  | "decisionBg"
+  | "onDecision"
+  | "onDecisionMuted"
+  | "onDecisionAccent"
+  | "decisionSurface"
+  | "scrim"
+  | "scrimOverlay"
+  | "scrimSurface"
+  | "onScrim"
+  | "onScrimMuted"
+  | "backdrop"
+  | "transparent";
+
+export type Tema = Readonly<Record<Rol, string>>;
+
+/** Tema claro: crema y tinta esmeralda. La decisión va en bosque profundo. */
+const claro: Tema = {
   /** Fondo de todas las pantallas. */
-  canvas: palette.blancoHueso,
-  /** Tarjetas y listas agrupadas. */
-  surface: palette.lino,
-  /** Chips, campos, tarjeta seleccionada. */
-  surfaceStrong: palette.grisCalido,
+  canvas: paleta.cremaHonda,
+  /** Tarjetas y listas agrupadas: más claras que el fondo y con sombra (v8). */
+  surface: paleta.marfil,
+  /** Campos, segmentos, círculos de comercio, fila seleccionada: hundidos respecto del fondo. */
+  surfaceStrong: paleta.hueso,
   /** Líneas divisorias. Nunca como único borde de un control. */
-  divider: palette.divisor,
+  divider: paleta.divisorClaro,
   /** Texto principal e íconos. */
-  ink: palette.verdeBosque,
-  /** Texto secundario y metadatos. */
-  inkSecondary: palette.musgo,
+  ink: paleta.esmeraldaNegro,
+  /** Texto secundario y metadatos. En claro, sobre `canvas` o `surface` (no `surfaceStrong`). */
+  inkSecondary: paleta.musgo,
   /** Borde de radios, checkboxes e inputs no seleccionados. */
-  controlBorder: palette.bordeControl,
-  /** Único color de acción: primario, selección, progreso, links. */
-  accent: palette.salvia,
+  controlBorder: paleta.bordeControlClaro,
+  /** Único acento: primario, selección, tab activa, progreso, links. */
+  accent: paleta.oliva,
   /** Texto e íconos sobre `accent`. */
-  onAccent: palette.blancoHueso,
-  /** Advertencia (queda poco, otro día). */
-  warning: palette.ocre,
-  warningBg: palette.ocreClaro,
+  onAccent: paleta.crema,
+  /** Advertencia (queda poco, otro día). Siempre con texto o ícono. */
+  warning: paleta.ocre,
+  warningBg: paleta.ocreClaro,
   /** Agotado, error de lectura. */
-  error: palette.oxido,
-  /** Confirmación y píldora de ahorro (con texto `ink`). */
-  successBg: palette.salviaClara,
-  /** Tarjeta de decisión: la única superficie oscura. */
-  decisionBg: palette.verdeBosque,
-  onDecision: palette.blancoHueso,
-  /** Detalles sobre la tarjeta de decisión. Nunca sobre fondo claro. */
-  onDecisionAccent: palette.champan,
-  /** Superficie secundaria dentro de la tarjeta de decisión. */
-  decisionSurface: "rgba(247,244,235,0.10)",
-  /** Texto secundario sobre la tarjeta de decisión (blanco hueso al 78%). */
-  onDecisionMuted: "rgba(247,244,235,0.78)",
-  /** Fondo del visor de cámara (Escanear ticket). */
-  scrim: palette.verdeBosque,
-  scrimOverlay: "rgba(20,40,29,0.55)",
+  error: paleta.oxido,
+  /** Confirmación y fondo del ahorro (con texto `ink`). */
+  successBg: paleta.salviaPalida,
+  /** Texto de lo que se ganó o se devolvió (v8). */
+  success: paleta.hoja,
+  /** Segundo acento (v8): información y estimaciones; nunca reemplaza a `accent` en acciones. */
+  accent2: paleta.lago,
+  accent2Bg: paleta.lagoPalido,
+  /** Panel de Inicio (v8): superficie con degradé tono sobre tono (`heroBg` → `heroBgHi`) y el monto del mes. */
+  heroBg: paleta.heroClaro,
+  heroBgHi: paleta.heroAltoClaro,
+  heroSurface: "rgba(243,235,214,0.10)",
+  onHero: paleta.crema,
+  onHeroMuted: paleta.heroTextoSuaveClaro,
+  /** Color por rubro (v8): ícono y fondo del cuadrado de comercio. */
+  rubroSuper: paleta.rubroSuperClaro,
+  rubroSuperBg: paleta.rubroSuperFondoClaro,
+  rubroFarmacia: paleta.lago,
+  rubroFarmaciaBg: paleta.lagoPalido,
+  rubroCombustible: paleta.rubroCombustibleClaro,
+  rubroCombustibleBg: paleta.rubroCombustibleFondoClaro,
+  rubroGastro: paleta.rubroGastroClaro,
+  rubroGastroBg: paleta.rubroGastroFondoClaro,
+  rubroHogar: paleta.rubroHogarClaro,
+  rubroHogarBg: paleta.rubroHogarFondoClaro,
+  /** Tarjeta de decisión: la única superficie invertida. */
+  decisionBg: paleta.bosqueProfundo,
+  onDecision: paleta.crema,
+  /** Razón y base sobre la decisión. */
+  onDecisionMuted: paleta.liquen,
+  /** Botón «Usar [medio]», inicial del medio y detalles sobre la decisión (texto encima: `ink`). */
+  onDecisionAccent: paleta.salviaClara,
+  /** Superficie secundaria dentro de la decisión (campo de monto, pista de la barra). */
+  decisionSurface: "rgba(243,235,214,0.10)",
+  /** Visor de cámara (Escanear ticket): oscuro en los dos temas. */
+  scrim: paleta.bosqueProfundo,
+  scrimOverlay: "rgba(5,31,32,0.55)",
+  scrimSurface: "rgba(243,235,214,0.12)",
+  onScrim: paleta.crema,
+  onScrimMuted: paleta.liquen,
   /** Velo detrás de los sheets (lo dibuja el sistema; se usa en web). */
-  backdrop: "rgba(20,40,29,0.35)",
+  backdrop: "rgba(2,17,12,0.35)",
   transparent: "transparent",
-} as const;
+};
 
-export type ColorToken = keyof typeof colors;
+/** Tema oscuro: bosque profundo y crema. Lo elevado es más claro; la decisión va en crema. */
+const oscuro: Tema = {
+  canvas: paleta.bosqueProfundo,
+  surface: paleta.pino,
+  surfaceStrong: paleta.musgoOscuro,
+  divider: paleta.helecho,
+  ink: paleta.crema,
+  inkSecondary: paleta.liquen,
+  controlBorder: paleta.bordeControlOscuro,
+  accent: paleta.salviaClara,
+  onAccent: paleta.esmeraldaNegro,
+  warning: paleta.ambar,
+  warningBg: paleta.ambarOscuro,
+  error: paleta.coral,
+  successBg: paleta.oliva,
+  success: paleta.hojaClara,
+  accent2: paleta.lagoClaro,
+  accent2Bg: paleta.lagoOscuro,
+  heroBg: paleta.heroOscuro,
+  heroBgHi: paleta.heroAltoOscuro,
+  heroSurface: "rgba(243,235,214,0.10)",
+  onHero: paleta.crema,
+  onHeroMuted: paleta.heroTextoSuaveOscuro,
+  rubroSuper: paleta.rubroSuperOscuro,
+  rubroSuperBg: paleta.rubroSuperFondoOscuro,
+  rubroFarmacia: paleta.lagoClaro,
+  rubroFarmaciaBg: paleta.lagoOscuro,
+  rubroCombustible: paleta.rubroCombustibleOscuro,
+  rubroCombustibleBg: paleta.rubroCombustibleFondoOscuro,
+  rubroGastro: paleta.rubroGastroOscuro,
+  rubroGastroBg: paleta.rubroGastroFondoOscuro,
+  rubroHogar: paleta.rubroHogarOscuro,
+  rubroHogarBg: paleta.rubroHogarFondoOscuro,
+  decisionBg: paleta.crema,
+  onDecision: paleta.esmeraldaNegro,
+  onDecisionMuted: paleta.musgo,
+  onDecisionAccent: paleta.oliva,
+  decisionSurface: "rgba(2,17,12,0.07)",
+  scrim: paleta.bosqueProfundo,
+  scrimOverlay: "rgba(5,31,32,0.55)",
+  scrimSurface: "rgba(243,235,214,0.12)",
+  onScrim: paleta.crema,
+  onScrimMuted: paleta.liquen,
+  backdrop: "rgba(2,17,12,0.6)",
+  transparent: "transparent",
+};
+
+/** Los dos temas como valores planos (los usan los tests de contraste). */
+export const temas = { claro, oscuro } as const;
+
+/**
+ * Colores por rol. Cada lectura devuelve el valor del tema activo (en iOS, un color dinámico que
+ * resuelve el sistema).
+ */
+export const colors: Readonly<Record<Rol, ColorValue>> = Object.defineProperties(
+  {},
+  Object.fromEntries(
+    (Object.keys(claro) as Rol[]).map((rol) => [
+      rol,
+      { enumerable: true, get: () => colorPorTema(rol, claro[rol], oscuro[rol]) },
+    ]),
+  ),
+) as Record<Rol, ColorValue>;
+
+export type ColorToken = Rol;
+
+/**
+ * Colores fijos del QR de invitación: oscuro sobre claro en los dos temas, porque muchos lectores
+ * no leen un QR invertido.
+ */
+export const qrColors = { ink: claro.ink, fondo: claro.canvas } as const;
+
+type EstadoTope = "disponible" | "queda-poco" | "agotado" | "sin-base";
 
 /** Estado del tope → color de barra y de texto (DESIGN.md §5, indicador de tope). */
-export const topeColors = {
-  disponible: { bar: colors.accent, text: colors.inkSecondary },
-  "queda-poco": { bar: colors.warning, text: colors.warning },
-  agotado: { bar: colors.error, text: colors.error },
-  "sin-base": { bar: colors.divider, text: colors.inkSecondary },
+export const topeColors: Readonly<Record<EstadoTope, { readonly bar: ColorValue; readonly text: ColorValue }>> = {
+  disponible: { get bar() { return colors.accent; }, get text() { return colors.inkSecondary; } },
+  "queda-poco": { get bar() { return colors.warning; }, get text() { return colors.warning; } },
+  agotado: { get bar() { return colors.error; }, get text() { return colors.error; } },
+  "sin-base": { get bar() { return colors.divider; }, get text() { return colors.inkSecondary; } },
+};
+
+/** Sombra de lo que flota (tab bar, toast). En oscuro casi no se ve: ahí separa el tono. */
+export const floatingShadow = "0 8px 24px rgba(2,17,12,0.10)";
+
+/**
+ * Elevación (DESIGN.md v8 §4). En el claro las tarjetas se despegan del fondo con una sombra suave;
+ * en el oscuro lo elevado es más claro y no lleva sombra. Nunca borde y sombra juntos.
+ */
+export const sombras = {
+  claro: {
+    tarjeta: "0 1px 2px rgba(58,44,12,0.06), 0 6px 16px rgba(58,44,12,0.08)",
+    cabecera: "0 10px 24px rgba(26,66,47,0.22)",
+  },
+  oscuro: { tarjeta: undefined, cabecera: undefined },
 } as const;
 
-/** Única sombra permitida: elementos flotantes (tab bar, sheet). */
-export const floatingShadow = "0 8px 24px rgba(20,40,29,0.08)";
+type RubroDeColor = "supermercado" | "gastronomia" | "indumentaria" | "farmacia" | "combustible" | "hogar" | "otro";
+
+/** Rubro → color del ícono y de su cuadrado (v8). `otro` queda neutro: ni gris ni de color. */
+export const rubroColors: Readonly<Record<RubroDeColor, { readonly fg: ColorValue; readonly bg: ColorValue }>> = {
+  supermercado: { get fg() { return colors.rubroSuper; }, get bg() { return colors.rubroSuperBg; } },
+  gastronomia: { get fg() { return colors.rubroGastro; }, get bg() { return colors.rubroGastroBg; } },
+  indumentaria: { get fg() { return colors.rubroHogar; }, get bg() { return colors.rubroHogarBg; } },
+  farmacia: { get fg() { return colors.rubroFarmacia; }, get bg() { return colors.rubroFarmaciaBg; } },
+  combustible: { get fg() { return colors.rubroCombustible; }, get bg() { return colors.rubroCombustibleBg; } },
+  hogar: { get fg() { return colors.rubroHogar; }, get bg() { return colors.rubroHogarBg; } },
+  otro: { get fg() { return colors.inkSecondary; }, get bg() { return colors.surfaceStrong; } },
+};
 
 export const fonts = {
   regular: "HankenGrotesk_400Regular",
@@ -131,9 +355,16 @@ export const space = {
   gutter: 20,
 } as const;
 
+/**
+ * DESIGN.md v8 §4: una sola familia de rectángulos redondeados. Tarjetas y barra de pestañas 20,
+ * cuadrados de comercio 16, botones, campos y segmentos 14, filas 12, cabecera de Inicio 28 (`sheet`).
+ * La píldora queda solo para lo que es un círculo (avatares, radios, barras de progreso).
+ */
 export const radius = {
   card: 20,
-  row: 14,
+  tile: 16,
+  control: 14,
+  row: 12,
   badge: 8,
   sheet: 28,
   pill: 999,
@@ -145,6 +376,8 @@ export const size = {
   primaryButton: 56,
   chip: 40,
   rowMin: 64,
+  /** Círculo de la fila de comercios de Inicio (DESIGN.md §5). */
+  comercio: 56,
   avatar: 40,
   icon: 24,
 } as const;

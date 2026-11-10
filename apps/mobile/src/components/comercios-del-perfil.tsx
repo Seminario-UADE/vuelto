@@ -5,11 +5,12 @@ import * as api from "@/data/api";
 import { comercioPorNombre } from "@/data/calculo";
 import { useAsync } from "@/hooks/use-async";
 import { comercioRepetido, MENSAJE_COMERCIO_REPETIDO, MENSAJES_ERROR } from "@/perfil/modelo";
+import { comercioElegido } from "@/store/simulacion";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { agregarComercio, sacarComercio } from "@/store/perfil-remoto";
 import { colors, fonts, radius, size, space, type as escala } from "@/theme";
 import { Card } from "./card";
-import { Chip } from "./chip";
+import { FilaAccion } from "./fila-accion";
 import { Icon } from "./icon";
 import { divisor } from "./lista";
 import { SectionHeader } from "./section-header";
@@ -63,7 +64,7 @@ export function ComerciosDelPerfil() {
   return (
     <View style={{ gap: space.md }}>
       <SectionHeader
-        title="Comercios donde comprás"
+        title="Editar tus comercios"
         action={
           !editable
             ? undefined
@@ -120,7 +121,7 @@ export function ComerciosDelPerfil() {
               gap: space.sm,
               minHeight: 48,
               paddingHorizontal: space.lg,
-              borderRadius: radius.pill,
+              borderRadius: radius.control,
               backgroundColor: colors.surfaceStrong,
             }}
           >
@@ -139,14 +140,20 @@ export function ComerciosDelPerfil() {
               style={{ flex: 1, minHeight: 44, fontFamily: fonts.regular, fontSize: escala.bodyLg.fontSize, color: colors.ink }}
             />
           </View>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
-            {opciones.map((c) => (
-              <Chip key={c.id} label={c.nombre} icon="agregar" onPress={() => void agregar(c.nombre)} />
-            ))}
-            {ofrecerTexto ? (
-              <Chip label={`Agregar «${texto}»`} icon="agregar" onPress={() => void agregar(texto)} />
-            ) : null}
-          </View>
+          {opciones.length > 0 || ofrecerTexto ? (
+            <Card padding={space.lg} gap={0} style={{ paddingVertical: space.xs }}>
+              {opciones.map((c, i) => (
+                <View key={c.id} style={divisor(i)}>
+                  <FilaAccion titulo={c.nombre} icon="agregar" onPress={() => void agregar(c.nombre)} />
+                </View>
+              ))}
+              {ofrecerTexto ? (
+                <View style={divisor(opciones.length)}>
+                  <FilaAccion titulo={`Agregar «${texto}»`} icon="agregar" onPress={() => void agregar(texto)} />
+                </View>
+              ) : null}
+            </Card>
+          ) : null}
         </View>
       ) : null}
       {error ? (
@@ -159,10 +166,11 @@ export function ComerciosDelPerfil() {
 }
 
 /**
- * Uno del catálogo abre su pantalla. Uno escrito a mano no tiene rubro ni promos conocidas (en
+ * Uno del catálogo arranca la compra ahí. Uno escrito a mano no tiene rubro ni promos conocidas (en
  * Inicio lo avisa) hasta que #43 le asigne categoría: se muestra como texto, no como botón.
  */
 function NombreDeComercio({ nombre }: { nombre: string }) {
+  const dispatch = useAppDispatch();
   const c = comercioPorNombre(nombre);
   const texto = (
     <Text variant="bodyLg" weight="semibold">
@@ -173,9 +181,13 @@ function NombreDeComercio({ nombre }: { nombre: string }) {
   if (c.categoriaId === null) return <View style={estilo}>{texto}</View>;
   return (
     <Pressable
-      onPress={() => router.push({ pathname: "/comercio/[id]", params: { id: c.id } })}
+      onPress={() => {
+        // Arranca la compra en el paso del monto, con este comercio ya elegido.
+        dispatch(comercioElegido(c.id));
+        router.push("/comprar/monto");
+      }}
       accessibilityRole="button"
-      accessibilityLabel={`Ver ${nombre}`}
+      accessibilityLabel={`Comprar en ${nombre}`}
       style={estilo}
     >
       {texto}

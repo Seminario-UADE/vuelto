@@ -15,9 +15,9 @@ import {
 } from "@/perfil/modelo";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 import { Button } from "./button";
-import { Chip } from "./chip";
 import { Icon } from "./icon";
 import { OptionRow } from "./option-row";
+import { Segmentado } from "./segmentado";
 import { Text } from "./text";
 
 type Props = {
@@ -60,7 +60,7 @@ export function SelectorMedio({ bancos, medios, onAgregar }: Props) {
             gap: space.sm,
             minHeight: 48,
             paddingHorizontal: space.lg,
-            borderRadius: radius.pill,
+            borderRadius: radius.control,
             backgroundColor: colors.surfaceStrong,
           }}
         >
@@ -115,21 +115,23 @@ export function SelectorMedio({ bancos, medios, onAgregar }: Props) {
         <Text variant="label" tone="inkSecondary" accessibilityRole="header">
           Tipo de tarjeta
         </Text>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
-          {TIPOS_TARJETA.map((t) => (
-            <Chip key={t} label={ETIQUETAS_TIPO[t]} selected={tipo === t} onPress={() => setTipo(t)} />
-          ))}
-        </View>
+        <Segmentado
+          opciones={TIPOS_TARJETA.map((t) => ({ valor: t, label: ETIQUETAS_TIPO[t] }))}
+          valor={tipo}
+          onChange={setTipo}
+          accessibilityLabel="Tipo de tarjeta"
+        />
       </View>
       <View style={{ gap: space.sm }}>
         <Text variant="label" tone="inkSecondary" accessibilityRole="header">
           Red
         </Text>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
-          {REDES.map((r) => (
-            <Chip key={r} label={ETIQUETAS_RED[r]} selected={red === r} onPress={() => setRed(r)} />
-          ))}
-        </View>
+        <Segmentado
+          opciones={REDES.map((r) => ({ valor: r, label: ETIQUETAS_RED[r] }))}
+          valor={red}
+          onChange={setRed}
+          accessibilityLabel="Red de la tarjeta"
+        />
       </View>
       {repetido ? (
         <Text variant="label" tone="warning">

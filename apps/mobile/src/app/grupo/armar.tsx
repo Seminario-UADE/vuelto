@@ -17,7 +17,7 @@ import { fechaCorta, iniciales, parseMonto } from "@/lib/format";
 import { grupoArmado } from "@/store/contactos";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectHoy } from "@/store/selectores";
-import { colors, fonts, radius, size, space, type as escala } from "@/theme";
+import { colors, fonts, radius, rubroColors, size, space, type as escala } from "@/theme";
 
 /**
  * Armar grupo (ADR-008): vos, tus contactos vinculados y gente sin cuenta (solo el nombre,
@@ -77,7 +77,7 @@ export default function ArmarGrupo() {
     >
       {comercio.datos ? (
         <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
-          <Avatar icon={iconoDeRubro[comercio.datos.rubro]} />
+          <Avatar icon={iconoDeRubro[comercio.datos.rubro]} rubro={rubroColors[comercio.datos.rubro]} />
           <View style={{ flex: 1 }}>
             <Text variant="bodyLg" weight="semibold">
               {nombre ?? comercio.datos.nombre}
@@ -198,7 +198,7 @@ export default function ArmarGrupo() {
               minHeight: 48,
               minWidth: 48,
               paddingHorizontal: space.md,
-              borderRadius: radius.pill,
+              borderRadius: radius.control,
               backgroundColor: colors.surfaceStrong,
               alignItems: "center",
               justifyContent: "center",

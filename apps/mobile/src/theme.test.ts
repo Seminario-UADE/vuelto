@@ -3,9 +3,10 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { colors } from "./theme";
+import { temas, type ColorToken } from "./theme";
 
 function luminancia(hex: string): number {
+  if (!/^#[0-9A-F]{6}$/i.test(hex)) throw new Error(`no es un hex opaco: ${hex}`);
   const n = hex.replace("#", "");
   const canal = (i: number) => {
     const c = parseInt(n.slice(i, i + 2), 16) / 255;
@@ -19,33 +20,93 @@ function contraste(a: string, b: string): number {
   return (x + 0.05) / (y + 0.05);
 }
 
-describe("tema", () => {
-  // Pares de texto declarados en DESIGN.md §2 (WCAG 2.1 AA ≥ 4,5:1).
-  const pares: [string, string, string][] = [
-    ["ink / canvas", colors.ink, colors.canvas],
-    ["ink / surfaceStrong", colors.ink, colors.surfaceStrong],
-    ["inkSecondary / canvas", colors.inkSecondary, colors.canvas],
-    ["inkSecondary / surface", colors.inkSecondary, colors.surface],
-    ["inkSecondary / surfaceStrong", colors.inkSecondary, colors.surfaceStrong],
-    ["onAccent / accent", colors.onAccent, colors.accent],
-    ["warning / warningBg", colors.warning, colors.warningBg],
-    ["warning / surface", colors.warning, colors.surface],
-    ["error / surfaceStrong", colors.error, colors.surfaceStrong],
-    ["error / surface", colors.error, colors.surface],
-    ["ink / successBg", colors.ink, colors.successBg],
-    ["onDecision / decisionBg", colors.onDecision, colors.decisionBg],
-    ["onDecisionAccent / decisionBg", colors.onDecisionAccent, colors.decisionBg],
-  ];
+type NombreTema = keyof typeof temas;
+type Par = [nombre: string, frente: ColorToken, fondo: ColorToken];
 
-  it.each(pares)("%s cumple AA", (_n, texto, fondo) => {
-    expect(contraste(texto, fondo)).toBeGreaterThanOrEqual(4.5);
+/**
+ * Pares de DESIGN.md §2 que llevan texto (WCAG 2.1 AA, ≥ 4,5:1), por tema. En el claro,
+ * `inkSecondary` no va sobre `surfaceStrong` (4,3:1): ahí el texto va en `ink`.
+ */
+const textos: Record<NombreTema, Par[]> = {
+  claro: [],
+  oscuro: [["inkSecondary / surfaceStrong", "inkSecondary", "surfaceStrong"]],
+};
+const textosComunes: Par[] = [
+  ["ink / canvas", "ink", "canvas"],
+  ["ink / surface", "ink", "surface"],
+  ["ink / surfaceStrong", "ink", "surfaceStrong"],
+  ["inkSecondary / canvas", "inkSecondary", "canvas"],
+  ["inkSecondary / surface", "inkSecondary", "surface"],
+  ["accent / canvas (links)", "accent", "canvas"],
+  ["accent / surface (links)", "accent", "surface"],
+  ["onAccent / accent", "onAccent", "accent"],
+  // Botón destructivo: texto `onAccent` sobre `error`.
+  ["onAccent / error", "onAccent", "error"],
+  ["warning / canvas", "warning", "canvas"],
+  ["warning / warningBg", "warning", "warningBg"],
+  ["warning / surface", "warning", "surface"],
+  ["error / canvas", "error", "canvas"],
+  ["error / surface", "error", "surface"],
+  ["error / surfaceStrong", "error", "surfaceStrong"],
+  ["ink / successBg", "ink", "successBg"],
+  ["onDecision / decisionBg", "onDecision", "decisionBg"],
+  ["onDecisionMuted / decisionBg", "onDecisionMuted", "decisionBg"],
+  ["onDecisionAccent / decisionBg", "onDecisionAccent", "decisionBg"],
+  // El botón «Usar [medio]» y la inicial del medio: texto `ink` sobre `onDecisionAccent`.
+  ["ink / onDecisionAccent", "ink", "onDecisionAccent"],
+  // v8: segundo acento, éxito, cabecera de Inicio y color por rubro.
+  ["accent2 / canvas", "accent2", "canvas"],
+  ["accent2 / surface", "accent2", "surface"],
+  ["accent2 / accent2Bg", "accent2", "accent2Bg"],
+  ["success / canvas", "success", "canvas"],
+  ["success / surface", "success", "surface"],
+  ["onHero / heroBg", "onHero", "heroBg"],
+  ["onHeroMuted / heroBg", "onHeroMuted", "heroBg"],
+  ["onHero / heroBgHi", "onHero", "heroBgHi"],
+  ["onHeroMuted / heroBgHi", "onHeroMuted", "heroBgHi"],
+  ["rubroSuper / rubroSuperBg", "rubroSuper", "rubroSuperBg"],
+  ["rubroFarmacia / rubroFarmaciaBg", "rubroFarmacia", "rubroFarmaciaBg"],
+  ["rubroCombustible / rubroCombustibleBg", "rubroCombustible", "rubroCombustibleBg"],
+  ["rubroGastro / rubroGastroBg", "rubroGastro", "rubroGastroBg"],
+  ["rubroHogar / rubroHogarBg", "rubroHogar", "rubroHogarBg"],
+  ["onScrim / scrim", "onScrim", "scrim"],
+  ["onScrimMuted / scrim", "onScrimMuted", "scrim"],
+];
+
+/** Controles y bordes que tienen que verse (WCAG 1.4.11, ≥ 3:1). */
+const controles: Par[] = [
+  ["controlBorder / canvas", "controlBorder", "canvas"],
+  ["controlBorder / surface", "controlBorder", "surface"],
+  ["accent / canvas", "accent", "canvas"],
+  ["accent / surface", "accent", "surface"],
+  ["accent / surfaceStrong", "accent", "surfaceStrong"],
+  ["onDecisionAccent / decisionBg (botón)", "onDecisionAccent", "decisionBg"],
+];
+
+describe.each(Object.keys(temas) as NombreTema[])("tema %s", (nombre) => {
+  const t = temas[nombre];
+
+  it.each([...textosComunes, ...textos[nombre]])("%s ≥ 4,5:1", (_n, frente, fondo) => {
+    expect(contraste(t[frente], t[fondo])).toBeGreaterThanOrEqual(4.5);
   });
 
-  it("borde de control ≥3:1 sobre fondos claros", () => {
-    for (const fondo of [colors.canvas, colors.surface]) {
-      expect(contraste(colors.controlBorder, fondo)).toBeGreaterThanOrEqual(3);
-    }
+  it.each(controles)("%s ≥ 3:1", (_n, frente, fondo) => {
+    expect(contraste(t[frente], t[fondo])).toBeGreaterThanOrEqual(3);
   });
+
+  it("sin negro ni blanco puros", () => {
+    for (const valor of Object.values(t)) expect(valor).not.toMatch(/^#(000000|FFFFFF)$/i);
+  });
+
+  it("escala de elevación: en el oscuro lo elevado es más claro; en el claro las tarjetas son lo más claro y lo hundido lo más oscuro", () => {
+    const [c, s, f] = [t.canvas, t.surface, t.surfaceStrong].map(luminancia) as [number, number, number];
+    if (nombre === "oscuro") expect(c < s && s < f).toBe(true);
+    else expect(s > c && c > f).toBe(true);
+  });
+});
+
+it("los dos temas definen los mismos roles", () => {
+  expect(Object.keys(temas.oscuro).sort()).toEqual(Object.keys(temas.claro).sort());
 });
 
 describe("sin colores escritos a mano fuera del tema (SC-003)", () => {

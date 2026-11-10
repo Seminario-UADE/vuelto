@@ -2096,6 +2096,108 @@ logo, y que el slice `perfil` guarde lo que devuelve `perfil/datos.ts`.
 - Queda pendiente: la ingesta no carga `on_hub_list` ni `logo_url` (`publicar.ts` escribe `id` y
   `nombre`); en el proyecto alojado quedan `null` hasta que se haga.
 
+## 2026-11-10 — Revisión del flujo de gasto compartido
+
+**Herramienta:** Claude Code (Sonnet 5.5), sesión derivada de una de planificación de pendientes (visual, grupo e
+ingesta), con la app web (`mobile-web`) para recorrer las pantallas.
+
+**Objetivo:** revisar de punta a punta el flujo de contactos y gasto en grupo (ADR-008, RF-19 a RF-22, spec 006
+US5) y dejarlo escrito, sin tocar código de la app ni del backend.
+
+**Prompts principales:**
+1. "Hacé la parte B del plan: una revisión del flujo de gasto compartido, solo un documento, con el flujo esperado,
+   el recorrido en la app en claro y oscuro, los bugs con archivo:línea y lo que falta del backend."
+
+**Resultado:**
+- `docs/product/revision-gasto-grupo.md` con 14 hallazgos (7 altos, 4 medios, 3 bajos), la lista de lo que falta del
+  backend (#54/#56) y un orden sugerido. Capturas en `docs/design/capturas-grupo/`.
+- Dos hallazgos reproducidos en la app: un comercio habitual fuera del catálogo deja el resultado cargando para
+  siempre (G-04), y sin contactos el botón de armar queda deshabilitado sin salida (G-11).
+- Aviso sobre el método: la app no inicia sesión sin Supabase y no había Docker ni credenciales, así que las pantallas
+  se vieron con un cambio local temporal (sesión y perfil de ejemplo) que se revirtió antes de commitear. Por eso lo
+  observado es el comportamiento sobre datos de ejemplo; lo demás se confirmó leyendo el código y el documento lo
+  dice caso por caso.
+- Error de la IA corregido al verificar: el primer borrador decía que el reparto mostraba "≈" aun sin reintegro; el
+  código usa pesos exactos en ese caso (`resultado.tsx:128`) y se sacó la afirmación.
+- Decisión que queda para el equipo: cómo resolver el choque entre `security definer` (ADR-008 §4) y
+  `estructura.test.sql`. Se recomienda un schema propio con wrappers `security invoker` en `public`.
+- No se corrió `supabase`: no hay migraciones nuevas.
+
+---
+
+## 2026-11-10 — Ingesta: que una promo que no se pudo leer no se dé de baja
+
+**Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde un plan de pendientes de varias partes
+(visual, gasto compartido e ingesta); esta es la parte de ingesta.
+
+**Objetivo:** revisar `ingesta/` y arreglar los riesgos que podían dar de baja promos vigentes por un
+problema pasajero o de lectura, sin tocar el motor ni correr nada contra una base real.
+
+**Prompts principales:**
+1. "Revisá el script de consumir promociones" (exploración previa, solo lectura).
+2. "Arreglá, cada uno con su test: formato desconocido y no publicable sin baja, 400 con reintento,
+   429 con backoff y `Retry-After`, y timeout en cada pedido."
+
+**Resultado:**
+- `ingestar.ts`: un formato desconocido o una promo que no pasa la validación (banco fuera del
+  catálogo, valor fuera de rango) agrega a `slugsSinDatos` el slug del listado y el del detalle
+  (el `fuenteId` sale de `detalle.slug`), así `publicar` no la da de baja. Antes solo lo hacía un
+  detalle caído y el único resguardo era el de la mitad de las promos.
+- `modo.ts`: timeout de 30 s por pedido (`AbortSignal.timeout`, cuenta como corte de red); 429
+  reintentado hasta 4 veces con el mayor entre `Retry-After` y un backoff exponencial (tope 60 s),
+  sin gastar los reintentos de los 5xx; un 400 del detalle se reintenta una vez (los slugs de ICBC
+  que siempre dan 400 cuestan un pedido más cada uno).
+- ADR-011 ajustado en la línea de los resguardos. Tests nuevos en `modo.test.ts` e `ingestar.test.ts`.
+- No se corrió `--aplicar` ni el workflow: todo se probó con Vitest sin red.
+- Queda sin arreglar (va en la descripción del PR): escrituras no transaccionales, `max_rows` supuesto
+  en 1000, sin índice en `capturas_crudas.origen`, sin resumen de GitHub, listado por categoría que
+  corta con menos de 100, workflow sin tests previos y duraciones inconsistentes.
+
+---
+
+## 2026-11-10 — Rediseño v8: sin píldoras, profundidad, tema elegible e Inicio nuevo
+
+**Herramienta:** Claude Code (Opus 5.5 para el plan, Sonnet 5.5 para la implementación), con el navegador integrado
+para las capturas. Dos sesiones aparte (revisión del gasto compartido y arreglos de la ingesta) salieron del
+mismo plan y tienen su propia entrada.
+
+**Objetivo:** cinco pendientes de la lista del equipo: sin píldoras y rediseño de Inicio, modo oscuro, mejor
+colorimetría (la app quedaba plana), confirmar el flujo de gasto compartido y revisar el script de ingesta.
+Esta entrada cubre solo la parte visual.
+
+**Prompts principales:**
+1. "Corré estas cosas pendientes en sesiones o como prefieras, hagamos un plan primero." (modo plan, con
+   tres exploraciones en paralelo: UI y tema, gasto compartido, ingesta).
+2. "Implementá el plan."
+
+**Resultado:**
+- El modo oscuro ya existía (#115): faltaba elegirlo. Perfil → Apariencia (Sistema, Claro, Oscuro) con el
+  slice `apariencia`, guardado en `vuelto.apariencia.v1`; en iOS se le pasa a `Appearance.setColorScheme`.
+  En la web ese método no existe, así que `TemaProvider` resuelve el esquema con la preferencia.
+- DESIGN.md v8: el claro se veía plano porque `canvas`, `surface` y `surfaceStrong` estaban a pasos
+  mínimos y las tarjetas no tenían sombra. Ahora la tarjeta es lo más claro y lleva sombra suave, lo hundido
+  es lo más oscuro, y en el oscuro sigue la elevación por tono. Se suma un segundo acento (Lago, solo
+  información), `success`, la banda `heroBg` y cinco colores por rubro. `theme.test.ts` valida los
+  contrastes de los roles nuevos en los dos temas.
+- Inicio: panel oscuro con margen y degradé tono sobre tono (solo en la superficie), avatar y saludo,
+  el monto estimado con el «≈» atenuado y su base, y tres atajos (Con qué pagar, Escanear ticket, Tus
+  topes); cada tope en su tarjeta. La primera versión, una banda a sangre, no le gustó al equipo; la
+  segunda se inspiró en tres referencias que trajo. Las skills `impeccable` y `apple-design` aprobaron
+  el degradé como superficie y lo prohíben en el texto, así que el «≈» se atenúa con color. Se quitó el
+  acceso a Topes de arriba a la derecha y «gastaste» por redundantes.
+- Sin píldoras: la tab bar pasó de cápsula a rectángulo redondeado; los chips de tipo y red de la
+  tarjeta, y los escenarios de desarrollo, a un control segmentado (`segmentado.tsx`); la fecha de
+  Revisá y los comercios sugeridos a filas; los comercios del onboarding a cuadrados marcables. Se
+  borraron `chip.tsx`, `badge.tsx` y `comercio-search.tsx`, que no se usaban.
+- Decisión del equipo antes de implementar: se pidió ver capturas antes de tocar las píldoras y se
+  eligieron tab bar rectangular, segmentado más filas y el Inicio con banda.
+- Para sacar las capturas sin cuenta real (no hay `.env` de Supabase) se usó un acceso temporal al store
+  desde el navegador, que no se commiteó.
+- Verificado: lint, typecheck y tests; la web en claro y oscuro (Inicio, Compras, Comercios, Perfil,
+  Topes, primera respuesta, primer paso de comprar). **No verificado:** el selector de tema en iOS (no se
+  probó en un simulador), el selector de tipo y red (la lista de bancos necesita Supabase), Revisá,
+  contactos y grupo en oscuro.
+
 ---
 
 ## 2026-11-06 — Build de EAS de respaldo para el pitch (issue #56)

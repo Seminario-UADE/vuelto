@@ -13,6 +13,11 @@
  * Scraping respetuoso (RNF-13): User-Agent identificado y una pausa mínima de
  * 1 s entre pedidos. `fetch` y la espera se inyectan para que los tests no
  * usen la red ni esperen de verdad.
+ *
+ * Tolerancia a fallas: cada pedido tiene un tiempo máximo (`AbortSignal.timeout`), un
+ * 5xx o un corte de red se reintentan, un 429 se reintenta esperando lo que pida
+ * `Retry-After` (o un backoff exponencial, el mayor de los dos) y un 400 del detalle
+ * se reintenta una vez antes de darlo por «no se puede leer».
  */
 
 const BASE = "https://www.modo.com.ar/promos/api/rewards";
@@ -20,6 +25,10 @@ const USER_AGENT = "VueltoBot (UADE)";
 const PAUSA_MINIMA_MS = 1000;
 const POR_PAGINA = 100;
 const RUTA_DETALLE = "/v2/benefit";
+/** Tiempo máximo de un pedido entero (respuesta y cuerpo). Sin esto, una conexión colgada consume el job de 90 minutos. */
+const TIMEOUT_POR_DEFECTO_MS = 30_000;
+/** Lo máximo que se espera por un 429, pida lo que pida `Retry-After`: el job tiene tope de tiempo. */
+const ESPERA_MAXIMA_429_MS = 60_000;
 /** Los parámetros con los que la web pide el contenedor y las secciones. */
 const ORIGEN_WEB = "source=web_modo";
 
@@ -33,8 +42,18 @@ export interface OpcionesMODO {
   esperar: (ms: number) => Promise<void>;
   /** Tope de páginas por sección, por si el listado nunca termina. */
   maxPaginas?: number;
-  /** Reintentos ante un error de servidor (5xx) o un corte de red. Por defecto 2. */
+  /** Reintentos ante un error de servidor (5xx), un corte de red o un timeout. Por defecto 2. */
   reintentos?: number;
+  /** Reintentos ante un 429 (demasiados pedidos), aparte de los anteriores. Por defecto 4. */
+  reintentos429?: number;
+  /**
+   * Reintentos de un 400 en una ruta donde el 400 significa «no se puede leer» (el detalle) antes
+   * de darla por inexistente. Por defecto 1: un 400 transitorio no tiene que dar de baja la promo,
+   * pero los slugs que MODO rechaza siempre con 400 no deben costar mucho tiempo.
+   */
+  reintentos400?: number;
+  /** Tiempo máximo de cada pedido, en ms. Por defecto 30 s. */
+  timeoutMs?: number;
 }
 
 export interface PaginaDeSeccion {
@@ -57,37 +76,79 @@ export interface ClienteMODO {
   bancos(): Promise<unknown[]>;
 }
 
+/**
+ * Cuánto esperar antes de reintentar un 429: el mayor entre `Retry-After` (segundos o fecha HTTP) y un
+ * backoff exponencial (pausa × 2^intento), con tope. `intento` empieza en 1.
+ */
+export function esperaDe429(retryAfter: string | null, intento: number, pausaMs: number, ahora: () => number = Date.now): number {
+  const backoff = pausaMs * 2 ** intento;
+  let pedido = 0;
+  if (retryAfter !== null && retryAfter.trim() !== "") {
+    const segundos = Number(retryAfter);
+    if (Number.isFinite(segundos) && segundos >= 0) pedido = segundos * 1000;
+    else {
+      const fecha = Date.parse(retryAfter);
+      if (!Number.isNaN(fecha)) pedido = Math.max(0, fecha - ahora());
+    }
+  }
+  return Math.min(ESPERA_MAXIMA_429_MS, Math.max(backoff, pedido));
+}
+
 export function crearClienteMODO(opciones: OpcionesMODO): ClienteMODO {
   if (opciones.pausaMs < PAUSA_MINIMA_MS) {
     throw new Error(`La pausa entre pedidos tiene que ser de al menos ${PAUSA_MINIMA_MS} ms (RNF-13).`);
   }
   const maxPaginas = opciones.maxPaginas ?? 200;
   const reintentos = opciones.reintentos ?? 2;
+  const reintentos429 = opciones.reintentos429 ?? 4;
+  const reintentos400 = opciones.reintentos400 ?? 1;
+  const timeoutMs = opciones.timeoutMs ?? TIMEOUT_POR_DEFECTO_MS;
   let hizoPedidos = false;
 
   /**
-   * Un pedido. Un 5xx o un corte de red se reintentan (con la misma pausa); un 4xx no.
-   * Los estados de `inexistente` devuelven `cuerpo: null` en vez de lanzar.
+   * Un pedido. Un 5xx, un corte de red o un timeout se reintentan (con la misma pausa); un 429 se
+   * reintenta esperando más (ver `esperaDe429`); un 4xx no. Los estados de `inexistente` devuelven
+   * `cuerpo: null` en vez de lanzar; si es un 400 se reintenta antes (`reintentos400`).
    */
   async function pedir(ruta: string, inexistente: readonly number[] = [404]): Promise<{ estado: number; cuerpo: unknown }> {
     const url = `${BASE}${ruta}`;
-    let ultimoError = "";
-    for (let intento = 0; intento <= reintentos; intento++) {
-      if (hizoPedidos) await opciones.esperar(opciones.pausaMs);
+    let fallas = 0;
+    let fallas429 = 0;
+    let fallas400 = 0;
+    let espera = opciones.pausaMs;
+    for (;;) {
+      if (hizoPedidos) await opciones.esperar(espera);
       hizoPedidos = true;
+      espera = opciones.pausaMs;
       let respuesta: Response;
+      let texto: string;
       try {
         respuesta = await opciones.fetch(url, {
           headers: { "User-Agent": USER_AGENT, Accept: "application/json" },
+          signal: AbortSignal.timeout(timeoutMs),
         });
+        texto = await respuesta.text();
       } catch (error) {
-        ultimoError = `Falló la conexión con ${url}: ${error instanceof Error ? error.message : String(error)}`;
+        const motivo = error instanceof Error && error.name === "TimeoutError" ? `Se agotaron los ${timeoutMs} ms` : error instanceof Error ? error.message : String(error);
+        if (++fallas > reintentos) {
+          throw new Error(`Falló la conexión con ${url}: ${motivo} (después de ${reintentos + 1} intentos)`, { cause: error });
+        }
         continue;
       }
-      const texto = await respuesta.text();
-      if (inexistente.includes(respuesta.status)) return { estado: respuesta.status, cuerpo: null };
+      if (respuesta.status === 429) {
+        if (++fallas429 > reintentos429) throw new Error(`MODO respondió 429 en ${url} (después de ${reintentos429 + 1} intentos)`);
+        espera = esperaDe429(respuesta.headers.get("Retry-After"), fallas429, opciones.pausaMs);
+        continue;
+      }
+      if (inexistente.includes(respuesta.status)) {
+        if (respuesta.status === 400 && fallas400 < reintentos400) {
+          fallas400++;
+          continue;
+        }
+        return { estado: respuesta.status, cuerpo: null };
+      }
       if (respuesta.status >= 500) {
-        ultimoError = `MODO respondió ${respuesta.status} en ${url}`;
+        if (++fallas > reintentos) throw new Error(`MODO respondió ${respuesta.status} en ${url} (después de ${reintentos + 1} intentos)`);
         continue;
       }
       if (!respuesta.ok) throw new Error(`MODO respondió ${respuesta.status} en ${url}`);
@@ -97,7 +158,6 @@ export function crearClienteMODO(opciones: OpcionesMODO): ClienteMODO {
         throw new Error(`La respuesta de ${url} no es JSON`);
       }
     }
-    throw new Error(`${ultimoError} (después de ${reintentos + 1} intentos)`);
   }
 
   async function listarPagina(seccion: string, pagina: number): Promise<PaginaDeSeccion> {
@@ -168,6 +228,7 @@ export function crearClienteMODO(opciones: OpcionesMODO): ClienteMODO {
     async detalle(slug) {
       // MODO responde 400 (siempre, no de a ratos) a algunos slugs que el listado sí publica:
       // es un detalle que no se puede leer, no un corte, y no tiene que hacer fallar la corrida.
+      // Igual se reintenta una vez (`reintentos400`): un 400 suelto no debe dar de baja una promo.
       const { cuerpo } = await pedir(`${RUTA_DETALLE}/${encodeURIComponent(slug)}`, [400, 404]);
       return cuerpo;
     },

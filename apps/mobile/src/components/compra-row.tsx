@@ -2,9 +2,8 @@ import { View } from "react-native";
 import type { Compra } from "@/data/contracts";
 import { aprox, fechaCorta, pesos } from "@/lib/format";
 import type { MarcaDeSubida } from "@/store/selectores";
-import { colors, size, space } from "@/theme";
+import { colors, rubroColors, size, space } from "@/theme";
 import { Avatar } from "./avatar";
-import { Badge } from "./badge";
 import { Icon, iconoDeRubro } from "./icon";
 import { PressableScale } from "./pressable-scale";
 import { Text } from "./text";
@@ -37,38 +36,36 @@ export function CompraRow({ c, conFecha, onBorrar, marca }: Props) {
         }${marca ? `. ${TEXTO_MARCA[marca]}` : ""}`}
         style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: space.md, paddingVertical: space.md }}
       >
-        <Avatar icon={iconoDeRubro[c.comercio.rubro]} />
+        <Avatar icon={iconoDeRubro[c.comercio.rubro]} forma="cuadrado" rubro={rubroColors[c.comercio.rubro]} />
         <View style={{ flex: 1, gap: 2 }}>
-          {/* Dos renglones (comercio · monto, medio) más el origen y el reintegro: el comercio usa todo el ancho
-              que le deja el monto y no se parte a mitad de palabra a 375 px. */}
+          {/* Comercio y monto arriba; medio y lo que vuelve abajo. El origen solo lo lee el lector de pantalla (v7: menos información). */}
           <View style={{ flexDirection: "row", alignItems: "baseline", gap: space.sm }}>
-            <Text variant="bodyLg" weight="semibold" style={{ flex: 1, flexShrink: 1 }}>
+            <Text variant="bodyLg" weight="semibold" numberOfLines={1} style={{ flex: 1, flexShrink: 1 }}>
               {c.comercio.nombre}
             </Text>
             <Text variant="bodyLg" weight="semibold" tabular>
               {pesos(c.monto)}
             </Text>
           </View>
-          <Text variant="label" tone="inkSecondary">
-            {conFecha ? `${fechaCorta(c.fecha)} · ` : ""}
-            {c.medio.nombre}
-          </Text>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: space.sm, rowGap: 2 }}>
-            <Badge label={etiquetaOrigen[c.origen]} />
-            {marca ? (
-              <Text variant="label" tone={marca === "no-se-pudo" ? "error" : "inkSecondary"}>
-                {TEXTO_MARCA[marca]}
-              </Text>
-            ) : null}
+          <View style={{ flexDirection: "row", alignItems: "baseline", gap: space.sm }}>
+            <Text variant="label" tone="inkSecondary" numberOfLines={1} style={{ flex: 1, flexShrink: 1 }}>
+              {conFecha ? `${fechaCorta(c.fecha)} · ` : ""}
+              {c.medio.nombre}
+            </Text>
             <Text
-              variant="bodyMd"
+              variant="label"
+              weight="semibold"
               tabular
-              align="right"
-              style={{ flexGrow: 1, color: c.reintegro === null ? colors.inkSecondary : colors.accent }}
+              style={{ color: c.reintegro === null ? colors.inkSecondary : colors.accent }}
             >
               {c.reintegro === null ? "sin reintegro" : `${aprox(c.reintegro)} de vuelta`}
             </Text>
           </View>
+          {marca ? (
+            <Text variant="label" tone={marca === "no-se-pudo" ? "error" : "inkSecondary"}>
+              {TEXTO_MARCA[marca]}
+            </Text>
+          ) : null}
         </View>
       </View>
       {onBorrar ? (

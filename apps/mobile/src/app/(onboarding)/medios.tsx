@@ -60,7 +60,7 @@ export default function Medios() {
         return;
       }
     }
-    router.push("/comercios");
+    router.push("/primera-respuesta");
   };
 
   const reintentar = () => {

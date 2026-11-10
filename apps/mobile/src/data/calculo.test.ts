@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   compraParaGuardar,
   comprasVista,
+  gastoPorSemana,
   perfilDelMotor,
   promoPropuesta,
   recomendacionVista,
@@ -225,6 +226,32 @@ describe("compraParaGuardar (FR-008)", () => {
 
   it("sin monto o sin medio falla", () => {
     expect(() => compraParaGuardar(entradas, { ...borrador, monto: null }, "n1")).toThrow("Falta el monto");
+  });
+});
+
+describe("gastoPorSemana", () => {
+  it("cinco tramos de 7 días, con el de hoy marcado y los que faltan como futuros", () => {
+    const r = gastoPorSemana(
+      [
+        { fecha: "2026-11-02", monto: 1000 },
+        { fecha: "2026-11-07", monto: 500 },
+        { fecha: "2026-11-09", monto: 2000 },
+      ],
+      "2026-11-09",
+    );
+    expect(r).toEqual([
+      { etiqueta: "1–7", monto: 1500, actual: false, futuro: false },
+      { etiqueta: "8–14", monto: 2000, actual: true, futuro: false },
+      { etiqueta: "15–21", monto: 0, actual: false, futuro: true },
+      { etiqueta: "22–28", monto: 0, actual: false, futuro: true },
+      { etiqueta: "29–30", monto: 0, actual: false, futuro: true },
+    ]);
+  });
+
+  it("el último tramo llega al fin de mes", () => {
+    const r = gastoPorSemana([{ fecha: "2026-11-30", monto: 700 }], "2026-11-30");
+    expect(r).toHaveLength(5);
+    expect(r[4]).toEqual({ etiqueta: "29–30", monto: 700, actual: true, futuro: false });
   });
 });
 

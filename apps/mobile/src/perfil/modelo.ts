@@ -104,6 +104,21 @@ export function clasificarError({ status, code }: Fallo): CasoDeError {
   return "otro";
 }
 
+// ─── Nombre del usuario (spec 012, FR-027) ───
+
+/** Máximo del nombre para mostrar, sin contar los espacios de los costados. Lo valida también la base. */
+export const NOMBRE_MAXIMO = 40;
+
+export type NombreValidado = { ok: true; nombre: string } | { ok: false; mensaje: string };
+
+/** De 1 a `NOMBRE_MAXIMO` caracteres, sin contar los espacios de los costados. Devuelve el recortado. */
+export function validarNombre(texto: string): NombreValidado {
+  const nombre = texto.trim();
+  if (nombre === "") return { ok: false, mensaje: "Escribí tu nombre" };
+  if (nombre.length > NOMBRE_MAXIMO) return { ok: false, mensaje: `Hasta ${NOMBRE_MAXIMO} caracteres` };
+  return { ok: true, nombre };
+}
+
 // ─── Comercios habituales (issue #47) ───
 
 /** Una fila de `comercios_habituales`: solo el nombre, como lo escribió el usuario. */
