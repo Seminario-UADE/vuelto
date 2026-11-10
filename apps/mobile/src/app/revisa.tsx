@@ -11,15 +11,14 @@ import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { SheetHeader } from "@/components/sheet-header";
 import { Text } from "@/components/text";
-import * as api from "@/data/api";
 import { comercioPorNombre, promoPropuesta } from "@/data/calculo";
-import type { OrigenCompra } from "@/data/contracts";
+import { comercioDelCatalogo } from "@/data/comercios";
+import type { Canal, OrigenCompra } from "@/data/contracts";
 import { borradorDesdePorConfirmar } from "@/data/por-confirmar";
-import { useAsync } from "@/hooks/use-async";
 import { aprox, fechaLarga, montoEditable, parseMonto } from "@/lib/format";
 import { hapticoExito, hapticoSeleccion } from "@/lib/haptics";
 import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
-import { selectEntradasMotor, selectHoy, selectPerfilVista } from "@/store/selectores";
+import { selectCatalogoParaCompras, selectEntradasMotor, selectHoy, selectPerfilVista } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { confirmarPorConfirmar, guardarCompra } from "@/store/thunks";
 import { colors, space } from "@/theme";
@@ -47,6 +46,8 @@ export default function Revisa() {
     medio?: string;
     fecha?: string;
     texto?: string;
+    canal?: string;
+    categoriaId?: string;
     porConfirmar?: string;
     /** Abierta desde el flujo de compra: al guardar sigue a «Compra guardada». */
     flujo?: string;
@@ -63,12 +64,20 @@ export default function Revisa() {
         : null;
     return pc ? { pc, ...borradorDesdePorConfirmar(pc, ticket, hoy) } : null;
   });
+  // El canal con el que se recomendó (#43): la promo propuesta y la guardada son las mismas.
+  const canal: Canal = (desde ? desde.borrador.canal : p.canal) === "online" ? "online" : "presencial";
   const modo: OrigenCompra = desde
     ? desde.borrador.modo
     : p.modo === "ticket" || p.modo === "excepcion"
       ? p.modo
       : "manual";
-  const [comercio, setComercio] = useState(desde?.borrador.comercio ?? p.comercio ?? "");
+  const comercioInicial = desde?.borrador.comercio ?? p.comercio ?? "";
+  const [comercio, setComercio] = useState(comercioInicial);
+  // El rubro con el que se recomendó vale mientras el comercio siga siendo ese: si lo cambia a
+  // mano, se busca por nombre como siempre.
+  const categoriaElegida = desde ? (desde.borrador.categoriaId ?? NaN) : Number(p.categoriaId);
+  const categoriaId =
+    Number.isInteger(categoriaElegida) && comercio.trim() === comercioInicial.trim() ? categoriaElegida : undefined;
   const [monto, setMonto] = useState<number | null>(desde ? desde.borrador.monto : parseMonto(p.monto ?? ""));
   // Excepción: el usuario eligió el medio al tocar "Usar…". Ticket: solo si el ticket lo dice.
   // Manual: nunca preseleccionado.
@@ -87,18 +96,18 @@ export default function Revisa() {
   const fecha = fechaElegida ?? (p.fecha || hoy);
 
   const perfil = useAppSelector(selectPerfilVista);
-  const comercioConocido = perfil.comercios.find((c) => c.nombre.toLowerCase() === comercio.trim().toLowerCase());
-  const busqueda = useAsync(() => api.buscarComercios(comercio), comercio);
-  const conocido =
-    comercioConocido ?? busqueda.datos?.find((c) => c.nombre.toLowerCase() === comercio.trim().toLowerCase());
+  const comercioConocido = comercio.trim() ? comercioDelCatalogo(comercio, perfil.comercios, categoriaId) : undefined;
+  // Comercios y rubros: «Usar…» desde un rubro llega con su nombre («Supermercados»).
+  const catalogo = useAppSelector(selectCatalogoParaCompras);
+  const conocido = comercioConocido ?? (comercio.trim() ? comercioDelCatalogo(comercio, catalogo, categoriaId) : undefined);
   // Qué dice el motor de cada medio para este comercio (solo para orientar; no preselecciona).
-  const rec = useRecomendacionPara(conocido?.id ?? null, monto);
+  const rec = useRecomendacionPara(conocido?.id ?? null, monto, canal);
   // La promo que se propone y se guarda es la misma función, evaluada en la fecha de la compra
   // (FR-022): no la del día de hoy, que con un ticket de otro día mostraría otra cosa.
   const entradas = useAppSelector(selectEntradasMotor);
   const propuesta = useMemo(
-    () => (medioId && comercio.trim() ? promoPropuesta(entradas, comercioPorNombre(comercio.trim()), medioId, fecha, monto) : null),
-    [entradas, medioId, comercio, fecha, monto],
+    () => (medioId && comercio.trim() ? promoPropuesta(entradas, comercioPorNombre(comercio.trim(), catalogo, categoriaId), medioId, fecha, monto, canal) : null),
+    [entradas, catalogo, medioId, comercio, categoriaId, fecha, monto, canal],
   );
   const hayPromo = propuesta !== null && propuesta.promociones.length > 0;
 
@@ -134,6 +143,8 @@ export default function Revisa() {
         medioId,
         textoExtraido: modo === "ticket" ? (desde?.borrador.textoExtraido ?? p.texto ?? null) : null,
         usarPromo: !quitoLaPromo,
+        canal,
+        categoriaId: categoriaId ?? null,
       };
       // Desde una compra por confirmar, el origen lo decide `origenAlConfirmar` en el thunk.
       const compra = dispatch(desde ? confirmarPorConfirmar(desde.pc.id, borrador, intento) : guardarCompra(borrador, intento));

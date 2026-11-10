@@ -1,4 +1,5 @@
 import { Pressable, useWindowDimensions, View } from "react-native";
+import { etiquetaDeComercio, nombreDeRubro } from "@/data/comercios";
 import type { Comercio } from "@/data/contracts";
 import { hapticoLeve } from "@/lib/haptics";
 import { colors, ONE_COLUMN_FONT_SCALE, radius, rubroColors, space } from "@/theme";
@@ -15,6 +16,7 @@ export function GrillaComercios({
   comercios,
   onElegir,
   onAgregar,
+  conRubro = false,
   marcados,
   activo,
   onQuitar,
@@ -28,6 +30,8 @@ export function GrillaComercios({
   onQuitar?: (c: Comercio) => void;
   /** Si viene, la grilla termina en un cuadrado «Agregar» con borde punteado. */
   onAgregar?: () => void;
+  /** Resultados de búsqueda: cada uno con su rubro (spec 004 FR-002). Si no, solo si el nombre se repite. */
+  conRubro?: boolean;
 }) {
   const { width, fontScale } = useWindowDimensions();
   const columnas = fontScale > ONE_COLUMN_FONT_SCALE ? 3 : 4;
@@ -36,6 +40,8 @@ export function GrillaComercios({
     <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.md }}>
       {comercios.map((c) => {
         const marcado = marcados?.includes(c.id) ?? false;
+        // Un comercio que está en dos rubros sale una vez por rubro, con el rubro (#43).
+        const etiqueta = conRubro ? `${c.nombre} · ${nombreDeRubro(c)}` : etiquetaDeComercio(c, comercios);
         return (
           <View key={c.id} style={{ width: ancho }}>
             <PressableScale
@@ -44,7 +50,7 @@ export function GrillaComercios({
                 onElegir(c);
               }}
               accessibilityRole="button"
-              accessibilityLabel={marcados ? `${c.nombre}${marcado ? ", marcado" : ""}` : c.nombre}
+              accessibilityLabel={marcados ? `${etiqueta}${marcado ? ", marcado" : ""}` : etiqueta}
               accessibilityState={marcados ? { selected: marcado } : undefined}
               style={{ width: ancho, alignItems: "center", gap: space.sm }}
             >
@@ -66,6 +72,11 @@ export function GrillaComercios({
               <Text variant="label" align="center" numberOfLines={1} maxFontSizeMultiplier={1.4} importantForAccessibility="no">
                 {c.nombre}
               </Text>
+              {conRubro || etiqueta !== c.nombre ? (
+                <Text variant="caption" tone="inkSecondary" align="center" numberOfLines={1} maxFontSizeMultiplier={1.4} importantForAccessibility="no">
+                  {nombreDeRubro(c)}
+                </Text>
+              ) : null}
             </PressableScale>
             {marcado && onQuitar ? (
               <Pressable

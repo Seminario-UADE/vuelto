@@ -1,13 +1,12 @@
 import { useMemo, useState } from "react";
 import { TextInput, View } from "react-native";
-import * as api from "@/data/api";
-import type { Comercio, Rubro } from "@/data/contracts";
-import { useAsync } from "@/hooks/use-async";
-import { RUBROS } from "@/lib/rubros";
+import { buscarComercios, nombreDeRubro } from "@/data/comercios";
+import type { Comercio } from "@/data/contracts";
+import { useAppSelector } from "@/store/hooks";
+import { selectCatalogoComercios } from "@/store/selectores";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 import { GrillaComercios } from "./comercio-tile";
 import { Icon, iconoDeRubro } from "./icon";
-import { SkeletonList } from "./skeleton";
 import { Text } from "./text";
 
 type Props = {
@@ -21,23 +20,35 @@ type Props = {
   onQuitar: (c: Comercio) => void;
 };
 
-const norm = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+/** Con el corpus real son cientos: sin búsqueda, unos pocos por rubro; el resto, buscando. */
+const POR_RUBRO = 8;
 
 /**
  * Los comercios del catálogo para marcar (spec 012, FR-025): buscador y cuadrados agrupados por rubro.
  * Tocar marca y muestra; desmarcar es la × del comercio marcado, un control aparte para que tocar
  * de nuevo para volver a ver la respuesta no lo saque. Lo usa la primera respuesta del onboarding.
+ * Los comercios son los de las promos guardadas, sin red (#43).
  */
 export function SelectorComercios({ marcados, activo, onTocar, onQuitar }: Props) {
-  const catalogo = useAsync(() => api.getCatalogoComercios());
+  const catalogo = useAppSelector(selectCatalogoComercios);
   const [q, setQ] = useState("");
 
   const grupos = useMemo(() => {
-    const lista = (catalogo.datos ?? []).filter((c) => norm(c.nombre).includes(norm(q.trim())));
-    const por = new Map<Rubro, Comercio[]>();
-    for (const c of lista) por.set(c.rubro, [...(por.get(c.rubro) ?? []), c]);
-    return [...por.entries()];
-  }, [catalogo.datos, q]);
+    const buscando = q.trim() !== "";
+    const lista = buscando ? buscarComercios(catalogo, q, Infinity) : catalogo;
+    // Por categoría de MODO, no por rubro de la app: varias categorías son «otro» y no deben
+    // juntarse bajo un solo encabezado.
+    const por = new Map<number, Comercio[]>();
+    for (const c of lista) por.set(c.categoriaId ?? 99, [...(por.get(c.categoriaId ?? 99) ?? []), c]);
+    return [...por.entries()]
+      .sort(([a], [b]) => a - b)
+      .map(([categoria, xs]) => ({
+        categoria,
+        muestra: xs[0]!,
+        // Los marcados se ven siempre, aunque queden fuera de la muestra.
+        lista: buscando ? xs : xs.filter((c, i) => i < POR_RUBRO || marcados.includes(c.id)),
+      }));
+  }, [catalogo, q, marcados]);
 
   return (
     <View style={{ gap: space.xl }}>
@@ -64,21 +75,20 @@ export function SelectorComercios({ marcados, activo, onTocar, onQuitar }: Props
           style={{ flex: 1, minHeight: 44, fontFamily: fonts.regular, fontSize: escala.bodyLg.fontSize, color: colors.ink }}
         />
       </View>
-      {catalogo.estado === "cargando" && !catalogo.datos ? <SkeletonList rows={4} height={48} /> : null}
-      {catalogo.datos && grupos.length === 0 ? (
+      {q.trim() && grupos.length === 0 ? (
         <Text variant="bodyMd" tone="inkSecondary">
           No encontramos “{q}”. Probá con otro nombre.
         </Text>
       ) : null}
-      {grupos.map(([rubro, lista]) => (
-        <View key={rubro} style={{ gap: space.md }}>
+      {grupos.map(({ categoria, muestra, lista }) => (
+        <View key={categoria} style={{ gap: space.md }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
-            <Icon name={iconoDeRubro[rubro]} size={18} color={colors.inkSecondary} />
+            <Icon name={iconoDeRubro[muestra.rubro]} size={18} color={colors.inkSecondary} />
             <Text variant="bodyMd" weight="semibold" tone="inkSecondary">
-              {RUBROS[rubro].titulo}
+              {nombreDeRubro(muestra)}
             </Text>
           </View>
-          <GrillaComercios comercios={lista} onElegir={onTocar} marcados={marcados} activo={activo} onQuitar={onQuitar} />
+          <GrillaComercios comercios={lista} onElegir={onTocar} marcados={marcados} activo={activo} onQuitar={onQuitar} conRubro={q.trim() !== ""} />
         </View>
       ))}
     </View>

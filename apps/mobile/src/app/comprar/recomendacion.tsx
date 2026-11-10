@@ -7,23 +7,32 @@ import { divisor } from "@/components/lista";
 import { FilaAccion } from "@/components/fila-accion";
 import { Paso } from "@/components/paso";
 import { AlternativaRow, RecomendacionCard } from "@/components/recomendacion";
+import { Segmentado } from "@/components/segmentado";
 import { Skeleton } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import { useUsarRecomendacion } from "@/hooks/use-usar-recomendacion";
-import { useAppSelector } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectRecomendacion } from "@/store/selectores";
+import { canalCambiado } from "@/store/simulacion";
 import { radius, space } from "@/theme";
 
 /**
  * Paso 3: la respuesta sola. Con qué pagar, cuánto te devuelven (≈, con su base) y una razón.
  * «Voy a pagar con…» deja la compra por confirmar (FR-002) y *reemplaza* este paso por el 4: así
- * volver no puede crear otra (auditoría v7). Las alternativas y el grupo quedan plegados.
+ * volver no puede crear otra (auditoría v7). Las alternativas y el grupo quedan plegados; los
+ * medios sin promo, aparte de las otras opciones (#43). El canal arranca en presencial (spec 004
+ * FR-001): una promo online no sirve en el local.
  */
 export default function PasoRecomendacion() {
   const r = useAppSelector(selectRecomendacion);
   const monto = useAppSelector((s) => s.simulacion.monto);
   const usar = useUsarRecomendacion();
+  const dispatch = useAppDispatch();
+  const canal = useAppSelector((s) => s.simulacion.canal);
   const [verOtras, setVerOtras] = useState(false);
+  const [verDescartes, setVerDescartes] = useState(false);
+  const opciones = r?.alternativas.filter((a) => a.estado === "otra-opcion") ?? [];
+  const descartes = r?.alternativas.filter((a) => a.estado !== "otra-opcion") ?? [];
 
   const voyAPagar = () => {
     const id = usar();
@@ -37,29 +46,70 @@ export default function PasoRecomendacion() {
     <Button
       label="Registrar la compra"
       onPress={() =>
-        router.push({ pathname: "/revisa", params: { modo: "manual", comercio: r.comercio.nombre, monto: monto ?? "", flujo: "1" } })
+        router.push({
+          pathname: "/revisa",
+          params: {
+            modo: "manual",
+            comercio: r.comercio.nombre,
+            // El rubro exacto y el canal: la compra se guarda como se recomendó (FR-022).
+            ...(r.comercio.categoriaId !== null ? { categoriaId: String(r.comercio.categoriaId) } : {}),
+            monto: monto ?? "",
+            canal,
+            flujo: "1",
+          },
+        })
       }
     />
   );
 
   return (
     <Paso paso={3} titulo="Con qué te conviene pagar" footer={footer}>
+      <Segmentado
+        accessibilityLabel="Dónde pagás"
+        opciones={[
+          { valor: "presencial", label: "En el local" },
+          { valor: "online", label: "Online" },
+        ]}
+        valor={canal}
+        onChange={(c) => dispatch(canalCambiado(c))}
+      />
+
       {r ? <RecomendacionCard r={r} /> : <Skeleton height={220} r={radius.card} />}
 
       {r ? (
         <Card padding={space.lg} gap={0} style={{ paddingVertical: space.xs }}>
-          {r.alternativas.length > 0 ? (
+          {opciones.length > 0 ? (
             <FilaAccion
               icon={verOtras ? "chevronAbajo" : "chevron"}
-              titulo={r.medio ? "Otras opciones" : "Tus medios hoy"}
-              valor={String(r.alternativas.length)}
+              titulo="Otras opciones"
+              valor={String(opciones.length)}
               onPress={() => setVerOtras((v) => !v)}
               expandido={verOtras}
             />
           ) : null}
           {verOtras ? (
             <View style={{ paddingBottom: space.sm }}>
-              {r.alternativas.map((a, i) => (
+              {opciones.map((a, i) => (
+                <View key={`${a.titulo}-${i}`} style={divisor(i)}>
+                  <AlternativaRow a={a} />
+                </View>
+              ))}
+            </View>
+          ) : null}
+          {descartes.length > 0 ? (
+            <View style={opciones.length > 0 ? divisor(1) : undefined}>
+              <FilaAccion
+                icon={verDescartes ? "chevronAbajo" : "chevron"}
+                titulo={r.medio ? "Por qué no los otros" : "Por qué no tus medios"}
+                valor={String(descartes.length)}
+                onPress={() => setVerDescartes((v) => !v)}
+                expandido={verDescartes}
+              />
+            </View>
+          ) : null}
+          {verDescartes ? (
+            <View style={{ paddingBottom: space.sm }}>
+              {descartes.map((a, i) => (
                 <View key={`${a.titulo}-${i}`} style={divisor(i)}>
                   <AlternativaRow a={a} />
                 </View>

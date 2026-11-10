@@ -2268,6 +2268,113 @@ tiempo.
     con su cuenta.
   - El build, después del merge de #107; la prueba en un Android real con la
     checklist, y el link y el modelo de celular en la tabla de la guía.
+## 2026-11-04 — «¿Con qué pago?»: comercios del corpus, rubro, canal y descartadas plegadas (issue #43)
+
+**Herramienta:** Claude Code (Opus 5.5).
+
+**Objetivo:** dos de los criterios de #43 que el PR #95 dejó pendientes: el
+buscador con los comercios de las promos reales (no la lista de ejemplo) y la
+fecha de la última sincronización en la pantalla del comercio. Sin spec-kit: la
+spec ya existe (004, FR-030).
+
+**Prompts principales:**
+1. "Mira lo que me queda asignado y arma una ruta" → #43 en dos PRs (A: corpus
+   y fecha; B: categoría, presencial/online y descartadas plegadas), #56 al final.
+2. "Arranca".
+
+**Resultado:**
+- `data/comercios.ts` (funciones puras): `comerciosDelCorpus` arma los pares
+  únicos (comercio, rubro) de las promos con comercio que siguen vigentes; un
+  comercio en dos rubros sale dos veces y el chip lleva el rubro. Una categoría
+  de MODO sin rubro propio en la app conserva su id y se nombra como en MODO.
+- `selectCatalogoComercios` (ADR-010): con corpus sincronizado, esos comercios;
+  antes de la primera sincronización, el catálogo de ejemplo (va con las promos
+  de ejemplo). Lo usan el buscador de Inicio, el onboarding, Perfil, «Revisá tu
+  compra» y el gasto en grupo. `api.ts` ya no tiene `getCatalogoComercios`,
+  `buscarComercios` ni `getComercio`.
+- Buscador de Inicio: los habituales que coinciden van primero.
+- Onboarding: sin búsqueda, hasta 8 comercios por rubro (con el corpus real son
+  cientos).
+- Pantalla del comercio: «Promos actualizadas hace …», como en Inicio (lo pide
+  #43; spec 009 FR-019 solo lo pedía en Inicio).
+- Por sacar los catálogos de `api.ts` también cambian: el gasto en grupo
+  (`recomendarGrupo(pedido, comercio?)` recibe el comercio de la pantalla) y
+  las sugerencias de Perfil (un chip por nombre, porque el habitual se guarda
+  sin rubro).
+- Revisiones (rules-guardian sin hallazgos; `/code-review`): guardar una compra
+  y la lista de compras usan el mismo catálogo con el que se propuso la promo
+  (FR-022), sin catálogo por defecto; un id de antes de sincronizar o el del
+  grupo de ejemplo sigue encontrando su comercio; una sola clave para comparar
+  nombres (sin mayúsculas, acentos ni espacios de más, FR-002), así «Café» y
+  «Cafe» son el mismo comercio; buscando, cada resultado lleva su rubro; un
+  habitual que está en dos rubros da un acceso rápido por rubro.
+- Limitación: «Revisá tu compra» recibe el comercio como texto; si ese nombre
+  está en dos rubros, toma el primero.
+- Resuelve el pendiente de #47 (autocompletar desde el corpus) y responde la
+  parte de comercios de #102.
+
+**Parte B, en el mismo PR #107** (prompt: "Podés hacer la parte B dentro del
+mismo PR #107, así tenemos todo en el mismo PR"):
+- Rubro sin comercio (FR-001): «¿No sabés el comercio? Elegí el rubro» despliega
+  las 13 categorías de MODO; también aparecen si la búsqueda no encuentra nada
+  (Edge Cases). El pedido al motor va sin comercio, así solo aplican las promos
+  de todo el rubro, y no se explican promos de un comercio puntual (Principio I).
+- Canal (FR-001): «En el local» / «Online» en la pantalla del comercio,
+  presencial por defecto (`simulacion.canal`); entra al selector.
+- Descartadas plegadas: las otras opciones se ven siempre; los medios sin promo
+  quedan detrás de «Por qué no los otros (N)».
+- El botón sigue siendo «Usar Galicia» (DESIGN.md §5) hasta que el equipo decida
+  contra el «Pagué con esto» de la issue.
+- Revisiones de la parte B (rules-guardian sin hallazgos; `/code-review`): el
+  canal viaja a «Revisá tu compra» y a la compra guardada (`BorradorCompra.canal`,
+  FR-022); otro comercio vuelve a presencial (Inicio no muestra el canal); un
+  rubro se reconoce por nombre solo al registrar y listar compras
+  (`selectCatalogoParaCompras`), no en los habituales; el rubro elegido queda a la
+  vista en Inicio; los chips de canal se anuncian como opciones (`radio`).
+- El gasto en grupo sigue evaluando en presencial (fuera de #43).
+- Falta la verificación a mano en modo avión real (no hay dispositivo acá).
+- Verificación: lint, typecheck, build y tests en verde. No se probó en Expo Go.
+
+---
+
+## 2026-11-08 — La ingesta diaria no publicaba: clave equivocada y chequeo de acceso al arranque
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI.
+
+**Objetivo:** entender por qué la ingesta de `ingesta.yml` fallaba todos los días desde su primera
+corrida (2026-11-03) y que no vuelva a tardar 40 minutos en avisar.
+
+**Prompts principales:**
+1. "Leé por completo el git y dame un resumen de lo que está y lo que falta en el MVP."
+2. "Sí, investigalo" (sobre la ingesta en rojo).
+3. "Sí, pero que todas las pruebas queden acá en la compu, nada en el git sin mi aprobación."
+4. "Creá en el git un PR explicando todo lo que hicimos para que esto funcionara."
+
+**Resultado:**
+- Diagnóstico: las 5 corridas (3/11 al 7/11) fallaban igual, `leer promociones: permission denied
+  for table promociones`, en la primera consulta a la base y después de ~40 minutos bajando MODO.
+  Las migraciones le dan todo a `service_role` y le sacan todo a `anon`
+  (`20261101000006_promociones.sql`), así que el error es el de una clave `anon`/publishable cargada
+  como `SUPABASE_SERVICE_ROLE_KEY`.
+- Arreglo (a mano, fuera del repo): se reemplazó el secret `SUPABASE_SERVICE_ROLE_KEY` (y se
+  reconfirmó `SUPABASE_URL`) por la service role del proyecto. La IA no vio ni manejó la clave.
+- Verificado: la corrida manual #6 terminó bien en 43 min: 1779 candidatas, 3088 filas de
+  promociones, 82 bancos, 13 categorías y 1776 capturas crudas; 0 errores de detalle y 0 formatos
+  desconocidos; 743 descartes automáticos (690 por nivel de cliente).
+- Código: `comprobarAcceso` en `publicar.ts` lee `categorias`, `bancos`, `promociones` y
+  `capturas_crudas` antes de pedir nada a MODO; `ingestar.ts` la llama al arrancar. Con una clave
+  anon o publishable la corrida falla en segundos, con un mensaje que dice qué revisar y sin
+  imprimir la clave. Una clave que lee pero no escribe sigue fallando recién al publicar.
+  5 tests nuevos. Revisado con rules-guardian, /code-review (Standards y Spec) y test-runner.
+- Auditoría del PR (2026-11-10): con la migración de #125, `anon` también lee `categorias`,
+  `bancos` y `promociones`, así que el chequeo con esas tres tablas habría dejado pasar la clave
+  anon, justo el caso real. Se suma la lectura de `capturas_crudas` (solo la service role) y su
+  test.
+- Hallazgo: GitHub arranca las corridas programadas (09:00 UTC = 06:00 ART) con 6 a 8 horas de
+  atraso; es comportamiento de GitHub Actions, no de la configuración. Queda para decidir con el
+  equipo si se adelanta el cron.
+- Queda pendiente: alias de bancos que el mapeo no reconoce («Macro Business», «Galicia Éminent»)
+  y actualizar `actions/checkout` y `actions/setup-node` (aviso de Node 20).
 
 ---
 

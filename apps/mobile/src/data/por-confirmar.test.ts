@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { BorradorCompra } from "./contracts";
+import { catalogoComercios } from "./fixtures";
 import {
   VENCIMIENTO_POR_CONFIRMAR_MS,
   antiguedad,
@@ -35,33 +36,42 @@ const borrador = (cambios: Partial<BorradorCompra> = {}): BorradorCompra => ({
 
 describe("origenAlConfirmar (FR-006, tabla de data-model.md)", () => {
   it("«Ya pagué» con el medio y el comercio sin cambios: excepcion", () => {
-    expect(origenAlConfirmar(enCoto, borrador(), false)).toBe("excepcion");
+    expect(origenAlConfirmar(enCoto, borrador(), false, catalogoComercios)).toBe("excepcion");
   });
 
   it("el comercio se compara como el catálogo, sin importar mayúsculas ni espacios", () => {
-    expect(origenAlConfirmar(enCoto, borrador({ comercio: "  coto " }), false)).toBe("excepcion");
+    expect(origenAlConfirmar(enCoto, borrador({ comercio: "  coto " }), false, catalogoComercios)).toBe("excepcion");
   });
 
   it("cambiar el monto o la fecha no cambia el origen", () => {
-    expect(origenAlConfirmar(enCoto, borrador({ monto: 1000, fecha: "2026-10-16" }), false)).toBe("excepcion");
+    expect(origenAlConfirmar(enCoto, borrador({ monto: 1000, fecha: "2026-10-16" }), false, catalogoComercios)).toBe("excepcion");
   });
 
   it("«Ya pagué» con otro medio: manual", () => {
-    expect(origenAlConfirmar(enCoto, borrador({ medioId: "macro-visa-debito" }), false)).toBe("manual");
+    expect(origenAlConfirmar(enCoto, borrador({ medioId: "macro-visa-debito" }), false, catalogoComercios)).toBe("manual");
   });
 
   it("«Ya pagué» con otro comercio: manual", () => {
-    expect(origenAlConfirmar(enCoto, borrador({ comercio: "Jumbo" }), false)).toBe("manual");
+    expect(origenAlConfirmar(enCoto, borrador({ comercio: "Jumbo" }), false, catalogoComercios)).toBe("manual");
   });
 
   it("«Ya pagué» sin medio o sin comercio: manual", () => {
-    expect(origenAlConfirmar(enCoto, borrador({ medioId: null }), false)).toBe("manual");
-    expect(origenAlConfirmar(enCoto, borrador({ comercio: null }), false)).toBe("manual");
+    expect(origenAlConfirmar(enCoto, borrador({ medioId: null }), false, catalogoComercios)).toBe("manual");
+    expect(origenAlConfirmar(enCoto, borrador({ comercio: null }), false, catalogoComercios)).toBe("manual");
+  });
+
+  it("un comercio que está en dos rubros se compara en el rubro con el que se recomendó (#43)", () => {
+    const dosRubros = [
+      { id: "coto-super", nombre: "Coto", inicial: "C", rubro: "supermercado" as const, categoriaId: 1, frecuente: false },
+      { id: "coto-tec", nombre: "Coto", inicial: "C", rubro: "otro" as const, categoriaId: 5, frecuente: false },
+    ];
+    const enCotoTec = { ...enCoto, comercioId: "coto-tec", categoriaId: 5 };
+    expect(origenAlConfirmar(enCotoTec, borrador(), false, dosRubros)).toBe("excepcion");
   });
 
   it("si vino del ticket, siempre ticket", () => {
-    expect(origenAlConfirmar(enCoto, borrador(), true)).toBe("ticket");
-    expect(origenAlConfirmar(enCoto, borrador({ medioId: "macro-visa-debito" }), true)).toBe("ticket");
+    expect(origenAlConfirmar(enCoto, borrador(), true, catalogoComercios)).toBe("ticket");
+    expect(origenAlConfirmar(enCoto, borrador({ medioId: "macro-visa-debito" }), true, catalogoComercios)).toBe("ticket");
   });
 });
 
@@ -76,9 +86,16 @@ describe("borradorDesdePorConfirmar sin ticket (FR-006, FR-017)", () => {
       medioId: "galicia-visa-credito",
       textoExtraido: null,
       usarPromo: true,
+      canal: "presencial",
+      categoriaId: null,
     });
     expect(r.medioSugerido).toBeNull();
     expect(r.avisos).toEqual([]);
+  });
+
+  it("conserva el canal y el rubro con los que se recomendó (#43)", () => {
+    const r = borradorDesdePorConfirmar({ ...enCoto, canal: "online", categoriaId: 1 }, null, "2026-10-14");
+    expect(r.borrador).toMatchObject({ canal: "online", categoriaId: 1 });
   });
 
   it("sin monto simulado, el borrador queda sin monto", () => {

@@ -5,7 +5,7 @@
  */
 import { fechaArgentina } from "@vuelto/motor";
 import { comercioPorNombre } from "./calculo";
-import type { BorradorCompra, OrigenCompra } from "./contracts";
+import type { BorradorCompra, Canal, Comercio, OrigenCompra } from "./contracts";
 
 export type CompraPorConfirmar = {
   /** UUID; la compra confirmada usa el MISMO id (FR-016). */
@@ -21,6 +21,10 @@ export type CompraPorConfirmar = {
   monto: number | null;
   /** ISO, de `sesion.ahora` (nunca `new Date()`, ADR-010). */
   creadaEn: string;
+  /** El canal con el que se recomendó (#43). Sin él (guardada antes), presencial. */
+  canal?: Canal;
+  /** El rubro exacto del comercio, si está en dos (#43). */
+  categoriaId?: number | null;
 };
 
 /** Las 48 h de FR-011, en un único lugar del código. */
@@ -55,10 +59,17 @@ export function diaDeLaSimulacion(c: CompraPorConfirmar): string {
  * confirmar; `manual` en cualquier otro caso. El comercio se compara como lo resuelve el
  * catálogo, así «coto» y «Coto» son el mismo.
  */
-export function origenAlConfirmar(c: CompraPorConfirmar, b: BorradorCompra, vinoDelTicket: boolean): OrigenCompra {
+export function origenAlConfirmar(
+  c: CompraPorConfirmar,
+  b: BorradorCompra,
+  vinoDelTicket: boolean,
+  catalogo: readonly Comercio[],
+): OrigenCompra {
   if (vinoDelTicket) return "ticket";
   const comercio = b.comercio?.trim();
-  const mismoComercio = comercio ? comercioPorNombre(comercio).id === c.comercioId : false;
+  const mismoComercio = comercio
+    ? comercioPorNombre(comercio, catalogo, c.categoriaId ?? undefined).id === c.comercioId
+    : false;
   return mismoComercio && b.medioId === c.medioId ? "excepcion" : "manual";
 }
 
@@ -103,6 +114,8 @@ export function borradorDesdePorConfirmar(
         medioId: c.medioId,
         textoExtraido: null,
         usarPromo: true,
+        canal: c.canal ?? "presencial",
+        categoriaId: c.categoriaId ?? null,
       },
       medioSugerido: null,
       fechasPosibles: hoy === dia ? [dia] : [dia, hoy],
@@ -123,6 +136,8 @@ export function borradorDesdePorConfirmar(
       medioId: ticket.medioId,
       textoExtraido: ticket.textoExtraido,
       usarPromo: true,
+      canal: c.canal ?? "presencial",
+      categoriaId: c.categoriaId ?? null,
     },
     medioSugerido: ticket.medioId === null ? c.medioId : null,
     fechasPosibles: [fecha],

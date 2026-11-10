@@ -72,7 +72,7 @@ describe("persistencia (US4)", () => {
     await esperar();
 
     const b = await abrir(disco);
-    expect(b.getState().simulacion).toEqual({ comercioId: null, monto: null });
+    expect(b.getState().simulacion).toEqual({ comercioId: null, monto: null, canal: "presencial" });
     expect(b.getState().sesion.ahora).not.toBe("2026-10-20T15:00:00.000Z");
     expect(b.getState().contactos.lista.map((c) => c.id)).toContain("mateo");
   });
