@@ -2096,6 +2096,33 @@ logo, y que el slice `perfil` guarde lo que devuelve `perfil/datos.ts`.
 - Queda pendiente: la ingesta no carga `on_hub_list` ni `logo_url` (`publicar.ts` escribe `id` y
   `nombre`); en el proyecto alojado quedan `null` hasta que se haga.
 
+## 2026-11-10 — Revisión del flujo de gasto compartido
+
+**Herramienta:** Claude Code (Sonnet 5.5), sesión derivada de una de planificación de pendientes (visual, grupo e
+ingesta), con la app web (`mobile-web`) para recorrer las pantallas.
+
+**Objetivo:** revisar de punta a punta el flujo de contactos y gasto en grupo (ADR-008, RF-19 a RF-22, spec 006
+US5) y dejarlo escrito, sin tocar código de la app ni del backend.
+
+**Prompts principales:**
+1. "Hacé la parte B del plan: una revisión del flujo de gasto compartido, solo un documento, con el flujo esperado,
+   el recorrido en la app en claro y oscuro, los bugs con archivo:línea y lo que falta del backend."
+
+**Resultado:**
+- `docs/product/revision-gasto-grupo.md` con 14 hallazgos (7 altos, 4 medios, 3 bajos), la lista de lo que falta del
+  backend (#54/#56) y un orden sugerido. Capturas en `docs/design/capturas-grupo/`.
+- Dos hallazgos reproducidos en la app: un comercio habitual fuera del catálogo deja el resultado cargando para
+  siempre (G-04), y sin contactos el botón de armar queda deshabilitado sin salida (G-11).
+- Aviso sobre el método: la app no inicia sesión sin Supabase y no había Docker ni credenciales, así que las pantallas
+  se vieron con un cambio local temporal (sesión y perfil de ejemplo) que se revirtió antes de commitear. Por eso lo
+  observado es el comportamiento sobre datos de ejemplo; lo demás se confirmó leyendo el código y el documento lo
+  dice caso por caso.
+- Error de la IA corregido al verificar: el primer borrador decía que el reparto mostraba "≈" aun sin reintegro; el
+  código usa pesos exactos en ese caso (`resultado.tsx:128`) y se sacó la afirmación.
+- Decisión que queda para el equipo: cómo resolver el choque entre `security definer` (ADR-008 §4) y
+  `estructura.test.sql`. Se recomienda un schema propio con wrappers `security invoker` en `public`.
+- No se corrió `supabase`: no hay migraciones nuevas.
+
 ---
 
 ## 2026-11-10 — Ingesta: que una promo que no se pudo leer no se dé de baja
