@@ -15,6 +15,7 @@ type Material = ComponentProps<typeof MaterialIcons>["name"];
 const ICONOS = {
   inicio: { sf: "house", sfActivo: "house.fill", md: "home" },
   comprar: { sf: "bag", sfActivo: "bag.fill", md: "shopping-bag" },
+  compras: { sf: "list.bullet.rectangle", sfActivo: "list.bullet.rectangle.fill", md: "receipt-long" },
   topes: { sf: "chart.pie", sfActivo: "chart.pie.fill", md: "pie-chart" },
   perfil: { sf: "person", sfActivo: "person.fill", md: "person" },
   supermercado: { sf: "cart", md: "shopping-cart" },

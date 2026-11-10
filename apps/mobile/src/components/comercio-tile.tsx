@@ -14,9 +14,12 @@ import { Text } from "./text";
 export function GrillaComercios({
   comercios,
   onElegir,
+  onAgregar,
 }: {
   comercios: readonly Comercio[];
   onElegir: (c: Comercio) => void;
+  /** Si viene, la grilla termina en un cuadrado «Agregar» con borde punteado. */
+  onAgregar?: () => void;
 }) {
   const { width, fontScale } = useWindowDimensions();
   const columnas = fontScale > ONE_COLUMN_FONT_SCALE ? 3 : 4;
@@ -52,6 +55,33 @@ export function GrillaComercios({
           </Text>
         </PressableScale>
       ))}
+      {onAgregar ? (
+        <PressableScale
+          onPress={onAgregar}
+          accessibilityRole="button"
+          accessibilityLabel="Agregar comercios"
+          style={{ width: ancho, alignItems: "center", gap: space.sm }}
+        >
+          <View
+            style={{
+              width: ancho,
+              aspectRatio: 1,
+              borderRadius: radius.tile,
+              borderCurve: "continuous",
+              borderWidth: 1.5,
+              borderStyle: "dashed",
+              borderColor: colors.inkSecondary,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Icon name="agregar" size={24} color={colors.inkSecondary} />
+          </View>
+          <Text variant="label" tone="inkSecondary" align="center" numberOfLines={1} maxFontSizeMultiplier={1.4} importantForAccessibility="no">
+            Agregar
+          </Text>
+        </PressableScale>
+      ) : null}
     </View>
   );
 }

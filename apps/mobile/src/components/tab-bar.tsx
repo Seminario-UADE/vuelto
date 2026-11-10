@@ -12,7 +12,7 @@ export const RUTA_COMPRAR = "nueva";
 
 const TABS: Record<string, { titulo: string; icon: IconName }> = {
   index: { titulo: "Inicio", icon: "inicio" },
-  topes: { titulo: "Topes", icon: "topes" },
+  compras: { titulo: "Compras", icon: "compras" },
   comercios: { titulo: "Comercios", icon: "comercio" },
   perfil: { titulo: "Perfil", icon: "perfil" },
 };
@@ -22,7 +22,7 @@ const ALTO_CAPSULA = 64;
 const DIAMETRO_MAS = 60;
 
 /**
- * Barra de DESIGN.md v7 §5: una cápsula flotante con Inicio · Topes · ( + ) · Comercios · Perfil.
+ * Barra de DESIGN.md v7 §5: una cápsula flotante con Inicio · Compras · ( + ) · Comercios · Perfil.
  * El «+» es la acción principal (comprar): más grande, en el acento, y abre el flujo /comprar en
  * vez de cambiar de pestaña. Accesible como una tab bar nativa: rol de pestaña, estado
  * seleccionado, 44 pt de área táctil, y se oculta con el teclado.

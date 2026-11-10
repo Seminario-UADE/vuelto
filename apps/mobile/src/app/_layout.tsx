@@ -127,8 +127,8 @@ function Navegacion() {
             options={{ presentation: "fullScreenModal", headerShown: false, contentStyle: { backgroundColor: t.canvas } }}
           />
           <Stack.Screen
-            name="mis-compras"
-            options={{ ...header, title: "Mis compras" }}
+            name="topes"
+            options={{ ...header, title: "Tus topes" }}
           />
           <Stack.Screen
             name="tope/[clave]"

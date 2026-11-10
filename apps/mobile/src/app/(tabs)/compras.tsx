@@ -1,105 +1,90 @@
 import { router } from "expo-router";
-import { useState } from "react";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
-import { Chip } from "@/components/chip";
-import { CompraRow, etiquetaOrigen } from "@/components/compra-row";
+import { CompraRow } from "@/components/compra-row";
 import { EmptyState } from "@/components/empty-state";
+import { FilaAccion } from "@/components/fila-accion";
+import { GraficoSemanas } from "@/components/grafico-semanas";
 import { Icon } from "@/components/icon";
 import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
 import { Text } from "@/components/text";
-import type { Compra, OrigenCompra } from "@/data/contracts";
+import type { Compra } from "@/data/contracts";
 import { aprox, diaDelMes, pesos } from "@/lib/format";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectMarcasDeSubida, selectResumenCompras } from "@/store/selectores";
 import { reintentarRechazadas } from "@/store/thunks";
 import { colors, space } from "@/theme";
 
-const FILTROS: (OrigenCompra | "todas")[] = ["todas", "ticket", "excepcion", "manual"];
-
 /**
- * Mis compras: lo registrado este mes, con su origen. Filtros en chips con scroll
- * horizontal para que no se corten con texto grande (auditoría P2 #16).
+ * Compras (DESIGN.md v7 §6, pestaña propia): cuánto gastaste en el mes con un gráfico por
+ * semana, lo que te devolvieron (≈ y su base) con el acceso a tus topes, y las compras por día.
+ * Sin filtros ni badges: el origen va en el renglón de cada compra.
  */
-export default function MisCompras() {
-  const [filtro, setFiltro] = useState<OrigenCompra | "todas">("todas");
+export default function Compras() {
   const datos = useAppSelector(selectResumenCompras);
   const subida = useAppSelector(selectMarcasDeSubida);
   const dispatch = useAppDispatch();
-  const compras = datos.compras.filter((c) => filtro === "todas" || c.origen === filtro);
-  const gastaste = datos.gastaste;
+  const mes = datos.mes.replace(/^./, (c) => c.toUpperCase());
 
   const porDia = new Map<string, Compra[]>();
-  for (const c of compras) porDia.set(c.fecha, [...(porDia.get(c.fecha) ?? []), c]);
+  for (const c of [...datos.compras].sort((a, b) => b.fecha.localeCompare(a.fecha))) porDia.set(c.fecha, [...(porDia.get(c.fecha) ?? []), c]);
 
   return (
-    <Screen>
+    <Screen kind="tab" aboveTabBar gap={space.xl}>
+      <View style={{ gap: space.xs }}>
+        <Text variant="titleLg" accessibilityRole="header">
+          Tus compras
+        </Text>
+        <Text variant="bodyLg" tone="inkSecondary">
+          {mes}
+        </Text>
+      </View>
+
       {datos.compras.length === 0 ? (
         <EmptyState
           title="Todavía no registraste compras"
-          body="Escaneá un ticket o aceptá una recomendación y la compra aparece acá."
-          action={{ label: "Registrar compra", onPress: () => router.push("/comprar") }}
+          body="Tocá + cuando estés por pagar: te decimos con qué y la compra aparece acá."
         />
       ) : (
         <>
-          <Card padding={space.xl}>
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xl }}>
-              <View style={{ gap: space.xs, minWidth: 120 }}>
-                <Text variant="label" tone="inkSecondary">
-                  Gastaste
-                </Text>
-                <Text variant="titleLg" tabular>
-                  {pesos(gastaste)}
-                </Text>
-              </View>
-              <View style={{ gap: space.xs, minWidth: 120 }}>
-                <Text variant="label" tone="inkSecondary">
-                  Te devolvieron
-                </Text>
-                <Text variant="titleLg" tabular>
-                  {aprox(datos.devolvieron.monto)}
-                </Text>
-              </View>
+          <Card padding={space.xl} gap={space.lg}>
+            <View accessible style={{ gap: space.xs }}>
+              <Text variant="label" tone="inkSecondary">
+                Gastaste este mes
+              </Text>
+              <Text variant="display" tabular style={{ fontSize: 36, lineHeight: 42 }}>
+                {pesos(datos.gastaste)}
+              </Text>
+              <Text variant="label" tone="inkSecondary">
+                {datos.cantidadDelMes === 1 ? "1 compra registrada" : `${datos.cantidadDelMes} compras registradas`}
+              </Text>
             </View>
-            <Text variant="label" tone="inkSecondary">
-              {datos.devolvieron.base.texto}
-            </Text>
+            <GraficoSemanas semanas={datos.semanas} />
           </Card>
 
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={{ marginHorizontal: -space.gutter }}
-            contentContainerStyle={{ gap: space.sm, paddingHorizontal: space.gutter }}
-          >
-            {FILTROS.map((f) => (
-              <Chip
-                key={f}
-                label={f === "todas" ? "Todas" : etiquetaOrigen[f]}
-                selected={filtro === f}
-                onPress={() => setFiltro(f)}
-              />
-            ))}
-          </ScrollView>
-
-          {compras.length === 0 ? (
-            <Text variant="bodyMd" tone="inkSecondary">
-              No hay compras con este origen en {datos.mes}.
-            </Text>
-          ) : null}
+          <Card padding={space.lg} gap={0} style={{ paddingVertical: space.xs }}>
+            <FilaAccion
+              leading="devolvieron"
+              titulo={`Te devolvieron ${aprox(datos.devolvieron.monto)}`}
+              detalle={datos.devolvieron.base.texto.replace(/^./, (c) => c.toUpperCase())}
+              valor="Topes"
+              onPress={() => router.push("/topes")}
+            />
+          </Card>
 
           {[...porDia.entries()].map(([fecha, lista]) => (
             <View key={fecha} style={{ gap: space.sm }}>
               <Text variant="label" weight="semibold" tone="inkSecondary" accessibilityRole="header">
                 {diaDelMes(fecha)}
               </Text>
-              <Card padding={space.lg} gap={0}>
+              <Card padding={space.lg} gap={0} style={{ paddingVertical: space.xs }}>
                 {lista.map((c, i) => (
                   <View key={c.id} style={divisor(i)}>
                     <CompraRow
                       c={c}
+                     
                       marca={subida.marcas[c.id]}
                       onBorrar={() =>
                         router.push({ pathname: "/borrar-compra", params: { id: c.id, comercio: c.comercio.nombre } })
@@ -135,7 +120,6 @@ export default function MisCompras() {
               Las compras sin confirmar no cuentan para tus topes.
             </Text>
           </View>
-          <Button label="Registrar compra" variant="secondary" icon="agregar" onPress={() => router.push("/comprar")} />
         </>
       )}
     </Screen>

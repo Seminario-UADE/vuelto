@@ -3,7 +3,6 @@ import { View } from "react-native";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { Chip } from "@/components/chip";
-import { divisor } from "@/components/lista";
 import { FilaAccion } from "@/components/fila-accion";
 import { MediosDelPerfil } from "@/components/medios-del-perfil";
 import { NombreDelPerfil } from "@/components/nombre-del-perfil";
@@ -25,7 +24,8 @@ const ESCENARIOS: { id: Escenario; label: string }[] = [
 ];
 
 /**
- * Perfil (DESIGN.md v7): tu nombre, tus medios de pago y dos filas, Mis compras y Contactos.
+ * Perfil (DESIGN.md v7): tu nombre, tus medios de pago y Contactos. Mis compras tiene
+ * su pestaña.
  * Los comercios tienen su pestaña. Sin contadores ni textos explicativos.
  */
 export default function Perfil() {
@@ -60,15 +60,12 @@ export default function Perfil() {
       <MediosDelPerfil />
 
       <Card padding={space.lg} gap={0} style={{ paddingVertical: space.xs }}>
-        <FilaAccion leading="ticket" titulo="Mis compras" onPress={() => router.push("/mis-compras")} />
-        <View style={divisor(1)}>
-          <FilaAccion
-            leading="grupo"
-            titulo="Contactos"
-            valor={contactos.length > 0 ? String(contactos.length) : null}
-            onPress={() => router.push("/contactos")}
-          />
-        </View>
+        <FilaAccion
+          leading="grupo"
+          titulo="Contactos"
+          valor={contactos.length > 0 ? String(contactos.length) : null}
+          onPress={() => router.push("/contactos")}
+        />
       </Card>
 
       <View style={{ gap: space.xs }}>

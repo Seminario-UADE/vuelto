@@ -18,7 +18,7 @@ export function PorConfirmarFila({ c }: { c: CompraPorConfirmar }) {
   const titulo = [c.comercioNombre, c.monto !== null ? pesos(c.monto) : null].filter(Boolean).join(" · ");
   return (
     <FilaAccion
-      leading={<Avatar letras={medio?.inicial ?? c.comercioNombre.charAt(0)} tone="activo" />}
+      leading={<Avatar letras={medio?.inicial ?? c.comercioNombre.charAt(0)} tone="activo" forma="cuadrado" />}
       titulo={titulo}
       detalle={`${medio ? `Con ${medio.nombreCorto}` : "Sin medio"} · ${antiguedad(c, ahora)}`}
       valor="Confirmar"

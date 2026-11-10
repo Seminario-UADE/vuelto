@@ -15,7 +15,7 @@
 - **Ya está** (specs 006, 008 y 010): Inicio con el buscador de comercios y la respuesta en la misma tarjeta, el detalle «Con qué pagar», la hoja «Revisá tu compra» con los orígenes `excepcion` / `manual` / `ticket`, «Escanear ticket» (con el lector simulado), «Mis compras», los topes derivados de las compras confirmadas y la cola de subida de la spec 010, con su estado «Sin subir». **Esta spec no cambia el motor ni la forma de una compra confirmada.**
 - **Esta spec cambia**:
   1. «Usar [medio]» deja una **compra por confirmar**, que no cuenta para los topes, en lugar de guardar la compra antes de pagar.
-  2. La navegación pasa a **Inicio · Topes · «+» · Comercios · Perfil**, con el «+» (comprar) al centro, y comprar es un flujo de un paso por pantalla (rediseño v7, US3). La tab Comprar desaparece.
+  2. La navegación pasa a **Inicio · Compras · «+» · Comercios · Perfil**, con el «+» (comprar) al centro, y comprar es un flujo de un paso por pantalla (rediseño v7, US3). La tab Comprar desaparece.
   3. El onboarding pierde la pantalla Comercios, su primera respuesta deja de estar fija en Coto, pide el nombre y, como meta (US5), deja la cuenta para el final.
   4. Los ajustes de #103: foco de color en la tab activa (tab bar nativa), márgenes con la zona inferior del teléfono y barra de estado del color de la app.
 - **Vocabulario**: esta spec dice **«por confirmar»** para una compra simulada que todavía no se pagó. «Pendiente» y «Sin subir» siguen siendo, como en la spec 010, operaciones de la cola que no llegaron al servidor. Son cosas distintas y la UI nunca las llama igual.
@@ -76,7 +76,7 @@ Lucía pagó en Carrefour con la tarjeta que le recomendó la app. Toca «Escane
 
 > Reescrita el 09/11/2026 (rediseño v7, `docs/design/plan-rediseno-v7.md`). Reemplaza «Tres tabs con Inicio al centro»: el usuario vio la v6 y pidió que comprar sea la acción principal, al centro, y que cada pantalla tenga un solo propósito.
 
-El usuario abre la app y ve una barra flotante con Inicio, Topes, un botón «+» más grande y verde al centro, Comercios y Perfil. Toca «+» y compra en cuatro pasos, uno por pantalla, con una barra de avance: elige el comercio, pone el monto (o sigue sin él), ve con qué pagar y, después de pagar, confirma la compra escaneando el ticket o cargándola a mano.
+El usuario abre la app y ve una barra flotante con Inicio, Compras, un botón «+» más grande y verde al centro, Comercios y Perfil. Toca «+» y compra en cuatro pasos, uno por pantalla, con una barra de avance: elige el comercio, pone el monto (o sigue sin él), ve con qué pagar y, después de pagar, confirma la compra escaneando el ticket o cargándola a mano.
 
 **Why this priority**: la app apilaba demasiada información en cada pantalla y el usuario se perdía navegando. No bloquea la US1: la compra por confirmar es la misma.
 
@@ -84,7 +84,7 @@ El usuario abre la app y ve una barra flotante con Inicio, Topes, un botón «+�
 
 **Acceptance Scenarios**:
 
-1. **Given** la app abierta con sesión y el onboarding completo, **Then** la barra inferior muestra, en este orden, Inicio · Topes · «+» · Comercios · Perfil, con Inicio seleccionada, y el «+» se distingue como acción principal.
+1. **Given** la app abierta con sesión y el onboarding completo, **Then** la barra inferior muestra, en este orden, Inicio · Compras · «+» · Comercios · Perfil, con Inicio seleccionada, y el «+» se distingue como acción principal.
 2. **Given** cualquier pestaña activa, **Then** se distingue por el color del acento además del ícono relleno, y el lector de pantalla la anuncia como pestaña seleccionada. El «+» se anuncia como «Comprar».
 3. **Given** el «+», **When** lo toca, **Then** se abre el flujo de compra en el paso 1 («¿Dónde estás comprando?»), con volver, cerrar y la barra de avance de 4 pasos.
 4. **Given** el paso 1, **When** toca un comercio, **Then** pasa al paso 2 («¿Cuánto vas a pagar?»), donde puede escribir el monto con el teclado numérico o seguir sin él.
@@ -182,11 +182,11 @@ Sofía toca «Empezar» en Bienvenida sin crear cuenta. Elige sus medios, ve su 
 
 **Navegación**
 
-- **FR-018** *(v7)*: La barra inferior MUST tener, en este orden: Inicio, Topes, «+» (comprar), Comercios y Perfil. Inicio MUST ser la pestaña inicial. El «+» no es una pestaña: abre el flujo de compra.
+- **FR-018** *(v7)*: La barra inferior MUST tener, en este orden: Inicio, Compras, «+» (comprar), Comercios y Perfil. Inicio MUST ser la pestaña inicial. El «+» no es una pestaña: abre el flujo de compra. Topes MUST abrirse desde Inicio («Tus topes › Ver todos») y desde Compras («Te devolvieron»).
 - **FR-019** *(v7)*: La pestaña activa MUST distinguirse por el color del acento además del ícono, con contraste ≥ 3:1 contra la barra en los dos temas, y su etiqueta ≥ 4.5:1. El «+» MUST ser más grande que las pestañas, en el acento, con la etiqueta accesible «Comprar». La barra es propia (una cápsula flotante), porque la nativa no admite un botón central destacado; MUST anunciarse como pestañas, tener áreas táctiles de 44 pt o más y ocultarse con el teclado.
-- **FR-020** *(v7)*: La tab Comprar MUST eliminarse. Lo que ofrecía MUST seguir disponible: elegir comercio, escanear y cargar a mano (flujo del «+»), pagar entre varios (paso 3) y las últimas compras (Perfil › Mis compras y Topes).
+- **FR-020** *(v7)*: La tab Comprar MUST eliminarse. Lo que ofrecía MUST seguir disponible: elegir comercio, escanear y cargar a mano (flujo del «+»), pagar entre varios (paso 3) y las últimas compras (Inicio › Últimas compras y la pestaña Compras).
 - **FR-021** *(v7)*: El flujo de compra MUST tener un paso por pantalla con barra de avance de 4 pasos: comercio, monto (opcional), recomendación y «Pagá con [medio]». Si se entra a mitad de camino (desde Comercios o desde Inicio), los pasos anteriores se ven completos.
-- **FR-022** *(v7)*: Perfil MUST ser una pestaña con el nombre, los medios de pago, Mis compras y Contactos. Los comercios habituales MUST tener su pestaña, Comercios, donde tocar uno abre el flujo en el paso del monto.
+- **FR-022** *(v7)*: Perfil MUST ser una pestaña con el nombre, los medios de pago y Contactos; Mis compras MUST NOT estar dentro de Perfil. Los comercios habituales MUST tener su pestaña, Comercios, donde tocar uno abre el flujo en el paso del monto y «Hoy te conviene» muestra la recomendación sin monto del motor para cada uno (y los más usados, hasta seis).
 - **FR-023**: El contenido y la barra inferior MUST respetar las zonas seguras de arriba y abajo. La barra de estado MUST mostrar el fondo de la app (`canvas`) en iOS con notch, en Android con navegación por gestos y en Android con tres botones (Android 15 o más, *edge-to-edge*). En Android anterior a 15, donde no se dibuja debajo de la barra, MAY quedar el color del sistema.
 
 **Onboarding y perfil**

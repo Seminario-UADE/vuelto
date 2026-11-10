@@ -114,11 +114,11 @@
 
 > Reescrita el 09/11/2026 con el rediseño v7 (`docs/design/plan-rediseno-v7.md`).
 
-**Goal**: Inicio · Topes · «+» · Comercios · Perfil, y el flujo de compra en cuatro pasos.
+**Goal**: Inicio · Compras · «+» · Comercios · Perfil (Topes desde Inicio), y el flujo de compra en cuatro pasos.
 
 **Independent Test**: una compra completa desde el «+» y las capturas en claro y en oscuro.
 
-- [x] T026 [US3] Barra propia `src/components/tab-bar.tsx` (cápsula con «+» central) y `src/app/(tabs)/_layout.tsx` con Inicio · Topes · nueva · Comercios · Perfil (FR-018, FR-019).
+- [x] T026 [US3] Barra propia `src/components/tab-bar.tsx` (cápsula con «+» central) y `src/app/(tabs)/_layout.tsx` con Inicio · Compras · nueva · Comercios · Perfil (FR-018, FR-019).
 - [x] T027 [US3] Flujo `src/app/comprar/`: `index` (comercio), `monto`, `recomendacion`, `pagar` y `src/app/compra-guardada.tsx`. Borrar `src/app/(tabs)/comprar.tsx` y `src/app/comercio/[id].tsx` (FR-001, FR-020, FR-021).
 - [x] T028 [US3] Inicio mínimo, fila por confirmar (`por-confirmar-fila.tsx`), pestaña Comercios y Perfil sin comercios (FR-005, FR-022, FR-035).
 - [x] T029 [US3] Escaneo desde el paso 4: `escanear.tsx` reenvía `porConfirmar` y `borradorDesdePorConfirmar` cruza el ticket con la compra (FR-007 a FR-009).

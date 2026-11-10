@@ -146,8 +146,9 @@ Reglas:
 
 **Navegación (v7)**: una **cápsula flotante propia** (`tab-bar.tsx`), porque
 la nativa no admite un botón central destacado.
-- En este orden: **Inicio · Topes · ( + ) · Comercios · Perfil**. Inicio es
-  la inicial.
+- En este orden: **Inicio · Compras · ( + ) · Comercios · Perfil**. Inicio es
+  la inicial. Topes no es pestaña: se abre desde Inicio («Ver todos») y desde
+  Compras.
 - El **«+»** es la acción principal (comprar): un círculo de 60 pt en el
   acento, más alto que la cápsula, con la etiqueta accesible «Comprar». Abre
   el flujo de compra; no es una pestaña.
@@ -267,13 +268,25 @@ primera, vas a ver cuánto tope te queda.», sin botón a otra pestaña.
   resúmenes cortos, y una sola columna con `fontScale > 1.2`.
 - Las pantallas de nivel superior llevan large title nativo (colapsa al
   scrollear). Las hijas, título inline y back del sistema.
-- **Inicio**: saludo, el bloque de «Te devolvieron» y, si hay, «Por
-  confirmar».
-- **Topes**: título, «Noviembre · los mensuales se reinician en 22 días»,
-  una tarjeta por medio con su barra y una línea al pie con los estimados.
-- **Comercios**: tus comercios en cuadrados; «Editar» para agregar o sacar.
-- **Perfil**: nombre, medios de pago y una lista agrupada con Mis compras y
-  Contactos.
+- **Inicio** (de arriba abajo, como las referencias): saludo y fecha; el
+  bloque oscuro con «Este mes te devolvieron ≈X», su base y, abajo, Gastaste
+  y Compras; «Por confirmar» si hay; «Tus topes» (los primeros tres, con
+  barra y base; «Ver todos» abre Topes) y «Últimas compras» (tres; «Ver
+  todas» va a Compras).
+- **Compras** (pestaña): «Gastaste este mes» con un gráfico de barras por
+  tramo de 7 días (el de hoy en el acento), una fila «Te devolvieron ≈X» que
+  abre Topes y las compras agrupadas por día. Sin filtros ni badges.
+- **Topes** (se abre desde Inicio o Compras): dos datos en cuadros (Te
+  devolvieron ≈X con su base; Se reinician en N días) y una tarjeta por
+  tope con un anillo decorativo, la cifra con ≈ y, al pie, la base y el
+  reinicio. Sin porcentajes ni total sumado.
+- **Comercios**: buscador (abre el «+»), tus comercios en cuadrados con un
+  cuadrado «Agregar» punteado al final, y «Hoy te conviene»: con qué pagar
+  hoy en tus comercios y los más usados, la recomendación sin monto del
+  motor.
+- **Perfil**: nombre, medios de pago y Contactos.
+- Íconos de las filas en cuadrados redondeados (`radius.row`), no círculos;
+  estados como «Queda poco» en texto de color, sin badge.
 - Orden fijo en las pantallas de decisión: **pregunta → respuesta → razón →
   alternativas → acción**. Las alternativas se ven sin scroll largo.
 - Ningún elemento flotante tapa a otro.

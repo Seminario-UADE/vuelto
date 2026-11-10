@@ -9,7 +9,8 @@ import { useTema } from "@/components/tema-provider";
 import { colors } from "@/theme";
 
 /**
- * Inicio · Topes · ( + ) · Comercios · Perfil (DESIGN.md v7 §5, spec 012 FR-018). La barra es
+ * Inicio · Compras · ( + ) · Comercios · Perfil (DESIGN.md v7 §5, spec 012 FR-018). Topes se
+ * abre desde Inicio. La barra es
  * propia (`TabBar`): la nativa no admite un botón central destacado. El «+» no es una pestaña:
  * su ruta ficticia abre el flujo de compra.
  */
@@ -47,7 +48,7 @@ export default function TabsLayout() {
       screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: t.canvas } }}
     >
       <Tabs.Screen name="index" options={{ title: "Inicio" }} />
-      <Tabs.Screen name="topes" options={{ title: "Topes" }} />
+      <Tabs.Screen name="compras" options={{ title: "Compras" }} />
       <Tabs.Screen
         name={RUTA_COMPRAR}
         options={{ title: "Comprar" }}
