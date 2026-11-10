@@ -59,10 +59,12 @@ Instalar el APK desde el link (permitir apps de origen desconocido) y revisar:
 - [ ] La app abre, se puede crear cuenta o entrar.
 - [ ] Al entrar, sincroniza promos de Supabase (no quedan los datos de
       ejemplo de octubre).
-- [ ] En la pestaña «Comprar», elegir un comercio con promo hoy: la pantalla
-      del comercio recomienda un medio, y la recomendación cambia mientras se
-      tipea el monto.
-- [ ] Registrar una compra y verla reflejada en la pestaña «Topes», como
+- [ ] Con el «+» del centro (Comprar): elegir un comercio con promo hoy
+      (paso 1), poner el monto (paso 2) y ver la recomendación (paso 3). Al
+      cambiar el monto y volver, la recomendación cambia.
+- [ ] «Voy a pagar con…» deja la compra por confirmar en Inicio; al
+      confirmarla («Guardar compra», en «Revisá tu compra») queda guardada.
+- [ ] En Inicio, «Tus topes» → «Ver todos» muestra el tope consumido como
       estimado y con su base.
 - [ ] En modo avión, con la app ya sincronizada, la recomendación sigue
       funcionando (el motor corre en el celular).
