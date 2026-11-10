@@ -41,6 +41,7 @@ import type {
   ResumenTopes,
   Rubro,
   TopeMedio,
+  UsoDeTopes,
 } from "./contracts";
 import type { MedioDePago as MedioGuardado } from "../perfil/modelo";
 import { claveDeComercio, comercioDelCatalogo, comerciosConNombre, esComercioDeRubro } from "./comercios";
@@ -240,6 +241,10 @@ function topeMedio(est: EstimacionTope, entradas: EntradasMotor, hoy: string): T
       return p ? [p.titulo] : [];
     }),
     compraIds: est.compraIds,
+    aplicaHoy: est.promocionIds.some((id) => {
+      const p = entradas.promociones.find((x) => x.id === id);
+      return p !== undefined && p.vigencia.desde <= hoy && hoy <= p.vigencia.hasta && aplicaElDia(p, hoy);
+    }),
   };
 }
 
@@ -488,5 +493,26 @@ export function compraParaGuardar(
     fechaAcreditacionEstimada: null,
     origen: b.modo,
     textoExtraido: b.textoExtraido,
+  };
+}
+
+/**
+ * Inicio (v9): todos tus topes sumados, para el gráfico de torta. Un tope sin compras cuenta
+ * entero como disponible; la base son las compras distintas que contó el motor. `null` sin topes.
+ */
+export function usoDeTopes(topes: ResumenTopes): UsoDeTopes | null {
+  if (topes.medios.length === 0) return null;
+  const nominal = topes.medios.reduce((n, t) => n + t.nominal, 0);
+  const disponible = topes.medios.reduce((n, t) => n + (t.disponible ?? t.nominal), 0);
+  const compras = new Set(topes.medios.flatMap((t) => t.compraIds)).size;
+  return {
+    nominal,
+    disponible,
+    queda: nominal === 0 ? 0 : Math.min(1, Math.max(0, disponible / nominal)),
+    topes: topes.medios.length,
+    base:
+      compras === 0
+        ? "sin compras registradas este mes"
+        : `según ${compras} ${compras === 1 ? "compra" : "compras"} de ${topes.mes}`,
   };
 }

@@ -1,4 +1,4 @@
-# Design System: Vuelto (v8)
+# Design System: Vuelto (v9.1)
 
 > Fuente de verdad para diseñar y generar pantallas de Vuelto (Stitch y la
 > app). La v6 (07/11/2026) reemplaza a `DESIGN-v5.md`, y su razonamiento está
@@ -22,6 +22,36 @@
 > selección reemplazados por controles segmentados, filas con check y cuadrados.
 > Modo oscuro: sigue al sistema, o se fija en Perfil → Apariencia.
 >
+> **v9 (10/11/2026)**: cambia la **paleta**, no la estructura. El claro en
+> crema se veía viejo y raro. Siguiendo las referencias del equipo (apps de
+> pagos y eSIM con panel verde), los dos temas pasan a **neutros fríos** con un
+> **esmeralda** como acción: claro en niebla y tarjetas casi blancas, oscuro en
+> carbón (ya no bosque). El panel de Inicio es esmeralda profundo en los dos
+> temas; la decisión es casi negra en el claro (con el botón en verde vivo) y
+> clara en el oscuro. Los roles no cambian: ninguna pantalla se tocó.
+> En «Con qué te conviene pagar» la decisión pasa a un **panel a sangre**
+> arriba de todo (`Paso panel`, de marco a marco y desde el borde superior,
+> solo las esquinas de abajo redondeadas, con la navegación encima y sin
+> título visible), con la versión **centrada** de la tarjeta: el medio grande,
+> «Te devuelven aproximadamente» y la cifra sin «≈» para que quede al eje, y
+> la base en chico. El tope después de la compra no va: al pagar no suma. «En
+> el local / Online» queda debajo del panel. Es la única excepción a la
+> alineación a la izquierda.
+>
+> **v9.1 (10/11/2026)**: la paleta vuelve a los **seis verdes** de la
+> referencia del equipo: `#051F20` noche, `#0B2B26` pino, `#163832` musgo,
+> `#235347` helecho, `#8EB69B` salvia y `#DAF1DE` menta. El oscuro los usa tal
+> cual (fondo noche, tarjetas pino, hundido musgo, divisor helecho, acción
+> salvia, texto menta); el claro sale de la menta aclarada (fondo `#EEF6F0`,
+> tarjetas `#F8FCF9`, hundido menta) con tinta noche y acción helecho. El carbón
+> y el verde vivo de la v9 salen. Advertencia, error, info y rubros quedan
+> aparte: son semánticos. **Inicio** pasa a un panel a sangre
+> (`PanelSuperior`, el mismo de «Con qué te conviene pagar») con el degradé
+> noche → helecho, el monto del mes al centro con su base en una píldora y
+> cuatro atajos cuadrados; debajo, una **torta** minimalista con el tope que te
+> queda sumando todos (estimado, con su base). **Apariencia** en Perfil pasa a
+> tres miniaturas de celular pintadas con cada tema.
+>
 > **Estado de implementación**: la app implementa la paleta, los dos temas y
 > los radios de la v6 (issue #115). La fila de comercios y la lista agrupada
 > existen como componentes base (`fila-comercios.tsx`, `lista-agrupada.tsx`)
@@ -36,8 +66,10 @@ cálida y seria, como una libreta de cuentas bien llevada.
 
 **Dos luces, una marca.** La app sigue la apariencia del sistema y tiene
 dos temas compuestos:
-- un **claro** en crema y tinta esmeralda;
-- un **oscuro** en bosque profundo y crema.
+- un **claro** en neutros fríos (niebla), tarjetas casi blancas y tinta grafito;
+- un **oscuro** en carbón neutro y texto nube.
+
+Los dos con un único verde esmeralda para la acción.
 
 Ninguno es la inversión mecánica del otro: el oscuro tiene su propia escala
 de elevación.
@@ -52,8 +84,8 @@ de elevación.
 Principio rector: **la cifra primero, la razón al lado, la base siempre.**
 
 **Una sola superficie invertida marca la decisión**:
-- en el tema claro, la tarjeta de decisión es bosque oscuro;
-- en el oscuro, es crema.
+- en el tema claro, la tarjeta de decisión es casi negra (noche) con el botón en verde vivo;
+- en el oscuro, es clara (blanco verdoso) con el botón en esmeralda.
 
 Es la pieza con carácter de la app, y va solo donde hay una decisión.
 
@@ -64,43 +96,43 @@ tema. Ratios WCAG 2.1 medidos.
 
 | Rol | Claro | Oscuro | Uso | Contraste (claro / oscuro) |
 |---|---|---|---|---|
-| `canvas` | `#F1E8D0` Crema honda | `#051F20` Bosque profundo | Fondo de las pantallas | — |
-| `surface` | `#FBF7EA` Marfil | `#0B2B26` Pino | Tarjetas y listas agrupadas. En el claro es lo más claro y lleva sombra | — |
-| `surfaceStrong` | `#E6DCC0` Hueso | `#163832` Musgo oscuro | Segmentos, campos, fila seleccionada. En el claro es lo hundido | — |
-| `divider` | `#D8CDAE` | `#235347` Helecho | Divisores. Nunca el único borde de un control | decorativo |
-| `ink` | `#02110C` Esmeralda negro | `#F3EBD6` Crema | Texto principal e íconos | 15.8 / 14.4 sobre canvas |
-| `inkSecondary` | `#4E6656` | `#A3B5A8` Liquen | Texto secundario, bases, metadatos | 5.1 / 8.0 sobre canvas |
-| `controlBorder` | `#6A7A70` | `#5E8A70` | Radios, checkboxes, inputs sin seleccionar | 3.7 / 4.4 |
-| `accent` | `#1A422F` Oliva | `#8EB69B` Salvia clara | **Acento de acción**: primario, selección, tab activa, progreso, links | 9.2 / 7.6 |
-| `onAccent` | `#F3EBD6` | `#02110C` | Texto e íconos sobre el acento | 9.5 / 8.6 |
-| `warning` | `#83591A` | `#E2B65E` | Queda poco, promo de otro día | 5.0 / 9.1 |
-| `warningBg` | `#F1DFB4` | `#2B2410` | Fondo de aviso, siempre con `warning` | — |
-| `error` | `#8C4843` | `#EE8F84` | Tope agotado, error de lectura | 5.5 / 7.3 |
-| `successBg` | `#D9E6D8` | `#1A422F` | Confirmación y fondo del ahorro (con `ink` / Crema) | — |
-| `success` | `#2E6B3B` Hoja | `#8FD1A0` | Texto de lo que se ganó o se devolvió | 5.2 / 9.6 |
-| `accent2` | `#1E6B73` Lago | `#7CC4CB` | Segundo acento (v8): información y estimaciones; nunca en acciones | 5.0 / 8.7 |
-| `accent2Bg` | `#D5E7E5` | `#17484C` | Fondo del segundo acento, siempre con `accent2` | — |
-| `heroBg` | `#1A422F` Oliva | `#0F3A34` | Panel de Inicio (v8): borde del degradé | — |
-| `heroBgHi` | `#2A5C44` | `#145048` | Panel de Inicio: centro del degradé, un paso más claro que `heroBg` | — |
-| `heroSurface` | `rgba(243,235,214,0.10)` | ídem | Avatar y atajos dentro del panel | — |
-| `onHero` | `#F3EBD6` | `#F3EBD6` | Texto sobre el panel | 9.5 / 10.5 (6.5 / 7.8 sobre `heroBgHi`) |
-| `onHeroMuted` | `#C4D4C6` | `#B4C4B8` | Base, fecha y «≈» sobre el panel | 7.3 / 7.0 (5.0 / 5.1 sobre `heroBgHi`) |
-| `decisionBg` | `#051F20` | `#F3EBD6` | Tarjeta de decisión (superficie invertida) | — |
-| `onDecision` | `#F3EBD6` | `#02110C` | Texto sobre la decisión | 14.4 / 16.2 |
-| `onDecisionMuted` | `#A3B5A8` | `#4E6656` | Razón y base sobre la decisión | 7.7 / 5.3 |
-| `onDecisionAccent` | `#8EB69B` (texto `#02110C`) | `#1A422F` (texto `#F3EBD6`) | El botón «Usar [medio]» dentro de la decisión | 8.6 / 9.5 |
+| `canvas` | `#EEF6F0` Menta aclarada | `#051F20` Noche | Fondo de las pantallas | — |
+| `surface` | `#F8FCF9` | `#0B2B26` Pino | Tarjetas y listas agrupadas. En el claro es lo más claro y lleva sombra | — |
+| `surfaceStrong` | `#DAF1DE` Menta | `#163832` Musgo | Segmentos, campos, fila seleccionada, pista de la torta. En el claro es lo hundido | — |
+| `divider` | `#C9DDD0` | `#235347` Helecho | Divisores. Nunca el único borde de un control | decorativo |
+| `ink` | `#051F20` Noche | `#DAF1DE` Menta | Texto principal e íconos | 15.6 / 14.4 sobre canvas |
+| `inkSecondary` | `#456A5E` | `#8EB69B` Salvia | Texto secundario, bases, metadatos | 5.5 / 7.6 sobre canvas (5.1 / 5.7 sobre `surfaceStrong`) |
+| `controlBorder` | `#6E8C80` | `#5E8A70` | Radios, checkboxes, inputs sin seleccionar | 3.3 / 4.4 |
+| `accent` | `#235347` Helecho | `#8EB69B` Salvia | **Acento de acción**: primario, selección, tab activa, progreso, links, arco de la torta | 7.9 / 7.6 |
+| `onAccent` | `#DAF1DE` | `#051F20` | Texto e íconos sobre el acento | 7.3 / 7.6 |
+| `warning` | `#985A00` | `#E2B65E` | Queda poco, promo de otro día | 5.0 / 9.1 |
+| `warningBg` | `#FCEFD8` | `#2B2410` | Fondo de aviso, siempre con `warning` | — |
+| `error` | `#B42A22` | `#EE8F84` | Tope agotado, error de lectura | 5.8 / 7.3 |
+| `successBg` | `#DAF1DE` | `#235347` | Confirmación y fondo del ahorro (con `ink`) | — |
+| `success` | `#1D6B44` | `#9BD8AE` | Texto de lo que se ganó o se devolvió | 5.9 / 10.5 |
+| `accent2` | `#1E62A6` | `#7CC4CB` | Segundo acento: información y estimaciones; nunca en acciones | 5.7 / 8.7 |
+| `accent2Bg` | `#DFEBF7` | `#17484C` | Fondo del segundo acento, siempre con `accent2` | — |
+| `heroBg` | `#051F20` Noche | `#0B2B26` Pino | Panel de Inicio: borde del degradé | — |
+| `heroBgHi` | `#235347` Helecho | `#235347` Helecho | Panel de Inicio: arriba al centro del degradé | — |
+| `heroSurface` | `rgba(218,241,222,0.12)` | `…0.10` | Avatar, píldora de la base y atajos dentro del panel | — |
+| `onHero` | `#DAF1DE` | `#DAF1DE` | Texto sobre el panel | 14.4 / 12.7 (7.3 sobre `heroBgHi`) |
+| `onHeroMuted` | `#B9D6C2` | `#B9D6C2` | Fecha y rótulos sobre el panel (la salvia no llega a AA sobre helecho) | 11.0 / 9.7 (5.6 sobre `heroBgHi`) |
+| `decisionBg` | `#051F20` Noche | `#DAF1DE` Menta | Panel de decisión (superficie invertida) | — |
+| `onDecision` | `#DAF1DE` | `#051F20` | Texto sobre la decisión | 14.4 / 14.4 |
+| `onDecisionMuted` | `#8EB69B` | `#235347` | Razón y base sobre la decisión | 7.6 / 7.3 |
+| `onDecisionAccent` | `#8EB69B` (texto `#051F20`) | `#235347` (texto `#DAF1DE`) | Inicial del medio y botón dentro de la decisión | 7.6 / 7.3 |
 
-**Color por rubro (v8).** Cinco pares ícono/fondo para el cuadrado de cada
+**Color por rubro (v8; claro de la v9, oscuro de la v8).** Cinco pares ícono/fondo para el cuadrado de cada
 comercio (`rubroColors` en `theme.ts`). El rubro es una ayuda para reconocer el
 comercio, nunca la única señal: el nombre va siempre al lado.
 
 | Rubro | Claro (ícono / fondo) | Oscuro (ícono / fondo) |
 |---|---|---|
-| Supermercado | `#2F6B3F` / `#DCE9D5` | `#9CCB9F` / `#1F4A36` |
-| Farmacia | `#1E6B73` / `#D5E7E5` | `#7CC4CB` / `#17484C` |
-| Combustible | `#9A4F1F` / `#F3DCC6` | `#F0A66B` / `#4A2F1A` |
-| Gastronomía | `#8C3F52` / `#EFD6D9` | `#E79AAB` / `#4A2531` |
-| Hogar e indumentaria | `#4A5E86` / `#D9DEEA` | `#A5B8E0` / `#27345A` |
+| Supermercado | `#1D7543` / `#DDF2E4` | `#9CCB9F` / `#1F4A36` |
+| Farmacia | `#1E62A6` / `#DFEBF7` | `#7CC4CB` / `#17484C` |
+| Combustible | `#A0500F` / `#FBE7D4` | `#F0A66B` / `#4A2F1A` |
+| Gastronomía | `#A6334E` / `#F9DFE5` | `#E79AAB` / `#4A2531` |
+| Hogar e indumentaria | `#4A53A6` / `#E2E5F8` | `#A5B8E0` / `#27345A` |
 | Otro | `inkSecondary` / `surfaceStrong` | ídem |
 
 Roles técnicos fuera de la tabla (no son paleta nueva, derivan de los
@@ -112,13 +144,13 @@ sobre claro en los dos temas, porque muchos lectores no leen un QR invertido).
 
 Reglas:
 
-- **Un acento de acción.** Oliva en el tema claro y Salvia clara en el
-  oscuro, solo para la acción, la selección y el estado activo. Gana fuerza
+- **Un acento de acción.** Helecho en el tema claro y Salvia en el
+  oscuro (v9.1), solo para la acción, la selección y el estado activo. Gana fuerza
   porque se usa poco. Champán salió en la v6. Desde la v8 hay además un
-  segundo acento (Lago) **solo para información**: estimaciones y datos, no
+  segundo acento (Lago; Azul desde la v9) **solo para información**: estimaciones y datos, no
   botones ni selección.
-- **En el tema claro, el texto secundario va sobre `canvas` o `surface`.**
-  Sobre `surfaceStrong` baja a 4.3:1, y ahí el texto va en `ink`.
+- **El texto secundario pasa AA sobre las tres superficies** en los dos temas
+  (v9; en la v8 el claro bajaba a 4.3:1 sobre `surfaceStrong`).
 - **El color nunca es la única señal.** Todo estado lleva texto o ícono.
 - **La superficie invertida, y solo ella, marca la decisión**: la respuesta
   en Inicio con un comercio elegido, Con qué pagar, la primera respuesta del

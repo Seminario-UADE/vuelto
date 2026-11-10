@@ -2407,6 +2407,49 @@ categorías y promociones sin cuenta, para dar la primera respuesta antes de cre
 
 ---
 
+## 2026-11-10 — Rediseño de interfaz v9.1 (PR #129)
+
+**Herramienta:** Claude Code (Opus 5.5) en la app de escritorio, con el navegador integrado para ver
+la app en Expo web y la skill `emil-design-eng` para la animación.
+
+**Objetivo:** ordenar cinco problemas de interfaz que vio el equipo probando la app, siguiendo
+referencias visuales (capturas de apps de pagos, un video y una paleta de seis verdes): pantallas
+que mostraban información que no era del día, una recomendación poco clara, un modo claro que se
+veía viejo y un cierre de compra sin peso.
+
+**Prompts principales:**
+1. Pegado con cinco puntos (Comercios con comercios sin promo hoy, Inicio con topes que no son del
+   día, recomendación sin el medio al centro, paleta del modo claro, Compra guardada sin animación),
+   una imagen y un video de referencia: "hagamos el plan para lo siguiente".
+2. "no me gusta como quedo" sobre la recomendación, con cinco correcciones: panel a sangre hasta los
+   marcos, «En el local / Online» abajo, sacar el título, el «≈» en el rótulo y sacar el tope después
+   de la compra.
+3. "fijate que creo que esta la skill de emil kowalksi que hace eso", para revisar la animación.
+4. Cuatro imágenes más: Inicio con panel a sangre como la recomendación, un selector de apariencia
+   con miniaturas, "chequear que la paleta de colores es la de la tercera foto" y una torta
+   minimalista con atajos.
+
+**Resultado:**
+- Paleta: los seis verdes de la referencia en los dos temas; los contrastes AA pasan en
+  `theme.test.ts`. Antes de la última imagen la IA había llevado el oscuro a un carbón neutro con un
+  verde vivo que no estaba en la paleta; se corrigió al pedir el equipo que siguiera la foto.
+- Componente `PanelSuperior` (panel a sangre) para Inicio y la recomendación; la recomendación
+  pasa a una tarjeta centrada con «Te devuelven aproximadamente».
+- Inicio: monto del mes al centro, cuatro atajos y una torta con el tope que queda (estimado, con su
+  base). Los topes y Comercios muestran solo lo que tiene promo hoy (`aplicaHoy` en `calculo.ts`, con
+  la fecha del store).
+- Compra guardada centrada y animada con Reanimated; respeta «reducir movimiento».
+- Perfil: selector de apariencia con miniaturas pintadas con cada tema. `DESIGN.md` pasa a v9.1.
+- La primera versión de la recomendación (una tarjeta centrada con margen) no le gustó al equipo y
+  se rehízo con sus indicaciones.
+- Para ver las pestañas en la web sin cuenta, la IA expuso el store por un rato con datos de
+  ejemplo; el cambio se revirtió antes de cada commit.
+- Verificado: lint, typecheck y tests de los 4 workspaces (tests nuevos del filtro del día, de
+  `aplicaHoy` y de la torta) y revisión en la web en claro y oscuro. Queda pendiente probarlo en el
+  simulador de iOS.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

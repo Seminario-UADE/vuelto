@@ -8,9 +8,9 @@ import { NombreDelPerfil } from "@/components/nombre-del-perfil";
 import { Screen } from "@/components/screen";
 import { Segmentado } from "@/components/segmentado";
 import { SectionHeader } from "@/components/section-header";
+import { SelectorApariencia } from "@/components/selector-apariencia";
 import { Text } from "@/components/text";
 import { cerrarSesion as salir } from "@/data/auth";
-import type { PreferenciaTema } from "@/lib/apariencia";
 import { escenarioElegido, type Escenario } from "@/store/acciones";
 import { preferenciaCambiada } from "@/store/apariencia";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -18,12 +18,6 @@ import { selectPorConfirmarVigentes } from "@/store/por-confirmar";
 import { selectPendientesAlCerrarSesion } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { space } from "@/theme";
-
-const TEMAS: { valor: PreferenciaTema; label: string }[] = [
-  { valor: "sistema", label: "Sistema" },
-  { valor: "claro", label: "Claro" },
-  { valor: "oscuro", label: "Oscuro" },
-];
 
 const ESCENARIOS: { id: Escenario; label: string }[] = [
   { id: "normal", label: "Normal" },
@@ -79,12 +73,7 @@ export default function Perfil() {
 
       <View style={{ gap: space.md }}>
         <SectionHeader title="Apariencia" />
-        <Segmentado
-          opciones={TEMAS}
-          valor={preferenciaTema}
-          onChange={(v) => dispatch(preferenciaCambiada(v))}
-          accessibilityLabel="Apariencia de la app"
-        />
+        <SelectorApariencia valor={preferenciaTema} onChange={(v) => dispatch(preferenciaCambiada(v))} />
       </View>
 
       <View style={{ gap: space.xs }}>

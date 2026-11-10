@@ -1,11 +1,12 @@
 import { router } from "expo-router";
 import { View } from "react-native";
 import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
-import { aprox } from "@/lib/format";
-import { colors, radius, sombras, space } from "@/theme";
+import { pesos } from "@/lib/format";
+import { colors, radius, space } from "@/theme";
 import { Icon, type IconName } from "./icon";
+import { PanelSuperior } from "./panel-superior";
 import { PressableScale } from "./pressable-scale";
-import { useEsquema, useTema } from "./tema-provider";
+import { useTema } from "./tema-provider";
 import { Text } from "./text";
 
 type Props = {
@@ -18,125 +19,155 @@ type Props = {
   etiqueta: string;
 };
 
-const ACCIONES: { icon: IconName; label: string; ir: () => void }[] = [
-  { icon: "comprar", label: "Con qué pagar", ir: () => router.push("/comprar") },
-  { icon: "ticket", label: "Escanear ticket", ir: () => router.push("/escanear") },
-  { icon: "topes", label: "Tus topes", ir: () => router.push("/topes") },
+/** `label` es lo que se ve (corto, entra en una línea); `a11y`, lo que lee el lector de pantalla. */
+const ACCIONES: { icon: IconName; label: string; a11y: string; ir: () => void }[] = [
+  { icon: "comprar", label: "Comprar", a11y: "Con qué pagar", ir: () => router.push("/comprar") },
+  { icon: "ticket", label: "Escanear", a11y: "Escanear ticket", ir: () => router.push("/escanear") },
+  { icon: "topes", label: "Topes", a11y: "Tus topes", ir: () => router.push("/topes") },
+  { icon: "comercio", label: "Comercios", a11y: "Comercios", ir: () => router.navigate("/comercios") },
 ];
 
+const ATAJO = 56;
+
 /**
- * Panel de Inicio (DESIGN.md v8 §6): una superficie oscura con margen, no una banda. El degradé es
- * tono sobre tono (`heroBg` → `heroBgHi`), solo en la superficie y nunca en el texto. Arriba, quién
- * sos; al centro, lo que te devolvieron con el «≈» y la base atenuados; abajo, tres atajos. Los
- * radios son concéntricos: panel 28, padding 16, atajos 12.
+ * Panel de Inicio (v9): a sangre arriba de todo, como la decisión de «Con qué te conviene pagar»,
+ * con el degradé noche → helecho desde arriba al centro (solo en la superficie, nunca en el
+ * texto). Arriba, quién sos y un atajo para buscar; al centro, lo que te devolvieron en el mes
+ * (el «aproximadamente» en el rótulo, así la cifra queda al eje) con su base en una píldora; abajo,
+ * cuatro atajos cuadrados con su nombre debajo.
  */
 export function PanelInicio({ nombre, fecha, devolvieron, etiqueta }: Props) {
   const t = useTema();
-  const sombra = sombras[useEsquema()].cabecera;
   const inicial = (nombre ?? "").trim().charAt(0).toUpperCase();
   return (
-    <View
-      style={{
-        borderRadius: radius.sheet,
-        borderCurve: "continuous",
-        overflow: "hidden",
-        backgroundColor: colors.heroBg,
-        boxShadow: sombra,
-        padding: space.lg,
-        gap: space.xl,
-      }}
+    <PanelSuperior
+      color={colors.heroBg}
+      barra="light"
+      fondo={
+        <Svg width="100%" height="100%">
+          <Defs>
+            <RadialGradient id="panelInicio" cx="0.5" cy="0" r="1">
+              <Stop offset="0" stopColor={t.heroBgHi} />
+              <Stop offset="1" stopColor={t.heroBg} />
+            </RadialGradient>
+          </Defs>
+          <Rect width="100%" height="100%" fill="url(#panelInicio)" />
+        </Svg>
+      }
     >
-      <Svg width="100%" height="100%" style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
-        <Defs>
-          <RadialGradient id="panelInicio" cx="0.5" cy="0" r="1.1">
-            <Stop offset="0" stopColor={t.heroBgHi} />
-            <Stop offset="1" stopColor={t.heroBg} />
-          </RadialGradient>
-        </Defs>
-        <Rect width="100%" height="100%" fill="url(#panelInicio)" />
-      </Svg>
-
-      <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
-        <View
-          accessible={false}
-          importantForAccessibility="no-hide-descendants"
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: radius.pill,
-            backgroundColor: colors.heroSurface,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text variant="bodyLg" weight="bold" style={{ color: colors.onHero }}>
-            {inicial}
-          </Text>
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text variant="titleMd" accessibilityRole="header" numberOfLines={1} style={{ color: colors.onHero }}>
-            {nombre ? `Hola, ${nombre}` : "Hola"}
-          </Text>
-          <Text variant="label" numberOfLines={1} style={{ color: colors.onHeroMuted }}>
-            {fecha}
-          </Text>
-        </View>
-      </View>
-
-      <View accessible accessibilityLabel={etiqueta} style={{ alignItems: "center", gap: space.xs, paddingVertical: space.sm }}>
-        {devolvieron ? (
-          <>
-            <Text variant="bodyMd" style={{ color: colors.onHeroMuted }}>
-              Este mes te devolvieron
-            </Text>
-            <Text variant="display" tabular style={{ color: colors.onHero, fontSize: 52, lineHeight: 58 }}>
-              <Text variant="display" style={{ color: colors.onHeroMuted, fontSize: 52, lineHeight: 58 }}>
-                ≈
-              </Text>
-              {aprox(devolvieron.monto).slice(1)}
-            </Text>
-            <Text variant="label" align="center" style={{ color: colors.onHeroMuted }}>
-              {devolvieron.base}
-            </Text>
-          </>
-        ) : (
-          <>
-            <Text variant="titleMd" align="center" style={{ color: colors.onHero }}>
-              Todavía no registraste compras
-            </Text>
-            <Text variant="bodyMd" align="center" style={{ color: colors.onHeroMuted }}>
-              Tocá «Con qué pagar» cuando estés por pagar.
-            </Text>
-          </>
-        )}
-      </View>
-
-      <View style={{ flexDirection: "row", gap: space.sm }}>
-        {ACCIONES.map((a) => (
-          <PressableScale
-            key={a.label}
-            onPress={a.ir}
-            accessibilityRole="button"
-            accessibilityLabel={a.label}
+      <View style={{ gap: space.xl, paddingTop: space.sm, paddingBottom: space.xxl }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
+          <View
+            accessible={false}
+            importantForAccessibility="no-hide-descendants"
             style={{
-              flex: 1,
-              minHeight: 76,
+              width: 44,
+              height: 44,
+              borderRadius: radius.pill,
+              backgroundColor: colors.heroSurface,
               alignItems: "center",
               justifyContent: "center",
-              gap: space.sm,
-              paddingHorizontal: space.xs,
-              borderRadius: radius.row,
-              borderCurve: "continuous",
-              backgroundColor: colors.heroSurface,
             }}
           >
-            <Icon name={a.icon} size={22} color={colors.onHero} />
-            <Text variant="label" align="center" weight="semibold" maxFontSizeMultiplier={1.3} style={{ color: colors.onHero }}>
-              {a.label}
+            <Text variant="bodyLg" weight="bold" style={{ color: colors.onHero }}>
+              {inicial}
             </Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text variant="bodyLg" weight="semibold" accessibilityRole="header" numberOfLines={1} style={{ color: colors.onHero }}>
+              {nombre ? `Hola, ${nombre}` : "Hola"}
+            </Text>
+            <Text variant="label" numberOfLines={1} style={{ color: colors.onHeroMuted }}>
+              {fecha}
+            </Text>
+          </View>
+          <PressableScale
+            onPress={() => router.push("/comprar")}
+            accessibilityRole="search"
+            accessibilityLabel="Buscar un comercio para comprar"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: radius.pill,
+              backgroundColor: colors.heroSurface,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Icon name="buscar" size={20} color={colors.onHero} />
           </PressableScale>
-        ))}
+        </View>
+
+        <View accessible accessibilityLabel={etiqueta} style={{ alignItems: "center", gap: space.sm, paddingTop: space.sm }}>
+          {devolvieron ? (
+            <>
+              <Text variant="bodyMd" align="center" style={{ color: colors.onHeroMuted }}>
+                Este mes te devolvieron aproximadamente
+              </Text>
+              <Text
+                variant="display"
+                align="center"
+                tabular
+                adjustsFontSizeToFit
+                numberOfLines={1}
+                style={{ color: colors.onHero, fontSize: 52, lineHeight: 58, letterSpacing: -1.2, alignSelf: "stretch" }}
+              >
+                {pesos(devolvieron.monto)}
+              </Text>
+              <View
+                style={{
+                  paddingHorizontal: space.md,
+                  paddingVertical: space.xs + 2,
+                  borderRadius: radius.pill,
+                  backgroundColor: colors.heroSurface,
+                }}
+              >
+                <Text variant="label" align="center" style={{ color: colors.onHero }}>
+                  {devolvieron.base}
+                </Text>
+              </View>
+            </>
+          ) : (
+            <>
+              <Text variant="titleMd" align="center" style={{ color: colors.onHero }}>
+                Todavía no registraste compras
+              </Text>
+              <Text variant="bodyMd" align="center" style={{ color: colors.onHeroMuted }}>
+                Tocá «Con qué pagar» cuando estés por pagar.
+              </Text>
+            </>
+          )}
+        </View>
+
+        <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: space.sm }}>
+          {ACCIONES.map((a) => (
+            <PressableScale
+              key={a.label}
+              onPress={a.ir}
+              accessibilityRole="button"
+              accessibilityLabel={a.a11y}
+              style={{ flex: 1, alignItems: "center", gap: space.sm }}
+            >
+              <View
+                style={{
+                  width: ATAJO,
+                  height: ATAJO,
+                  borderRadius: radius.tile,
+                  borderCurve: "continuous",
+                  backgroundColor: colors.heroSurface,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Icon name={a.icon} size={24} color={colors.onHero} />
+              </View>
+              <Text variant="label" align="center" weight="semibold" numberOfLines={1} maxFontSizeMultiplier={1.3} style={{ color: colors.onHero }}>
+                {a.label}
+              </Text>
+            </PressableScale>
+          ))}
+        </View>
       </View>
-    </View>
+    </PanelSuperior>
   );
 }

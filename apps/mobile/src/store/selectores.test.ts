@@ -2,9 +2,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { mediosDeEjemplo } from "../data/fixtures";
 import * as motor from "@vuelto/motor";
 import { catalogoComercios, mediosDeclarados, mediosDelMotor } from "../data/fixtures";
+import { recomendacionVista } from "../data/calculo";
 import { mediosConfirmados } from "./perfil";
 import { sincronizado } from "./acciones";
-import { selectConvieneHoy, selectEntradasMotor, selectFrescura, selectRecomendacion, selectTopes } from "./selectores";
+import { selectConvieneHoy, selectEntradasMotor, selectFrescura, selectRecomendacion, selectTopes, selectUsoDeTopes } from "./selectores";
 import { ahoraCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
 import { guardarCompra } from "./thunks";
@@ -24,14 +25,57 @@ function conMartin() {
 }
 
 describe("selectConvieneHoy (Comercios, v7)", () => {
-  it("sin comercios propios: los más usados del catálogo, cada uno con la recomendación sin monto del motor", () => {
+  it("sin comercios propios: los más usados del catálogo con promo hoy, cada uno con la recomendación sin monto del motor", () => {
     const s = conMartin();
     const filas = selectConvieneHoy(s.getState());
     const nombres = filas.map((f) => f.comercio.nombre);
-    expect(nombres).toEqual(catalogoComercios.filter((c) => c.frecuente).map((c) => c.nombre));
+    expect(nombres.length).toBeGreaterThan(0);
     expect(new Set(nombres).size).toBe(nombres.length);
     const coto = filas.find((f) => f.comercio.id === "coto");
     expect(coto?.recomendacion).toMatchObject({ medio: { id: "galicia-visa-credito" }, monto: null });
+  });
+
+  it("v9: deja afuera los comercios sin promo hoy con tus medios", () => {
+    const s = conMartin();
+    const filas = selectConvieneHoy(s.getState());
+    expect(filas.every((f) => f.recomendacion.resultado === "recomendado" && f.recomendacion.medio !== null)).toBe(true);
+    // Los más usados que el motor no recomienda hoy no figuran.
+    const e = selectEntradasMotor(s.getState());
+    const sinPromo = catalogoComercios
+      .filter((c) => c.frecuente)
+      .filter((c) => recomendacionVista(e, c, null)?.resultado !== "recomendado");
+    for (const c of sinPromo) expect(filas.some((f) => f.comercio.id === c.id)).toBe(false);
+  });
+});
+
+describe("selectTopes · aplicaHoy (Inicio, v9)", () => {
+  it("marca si alguna promo del tope aplica hoy, según el día de la semana", () => {
+    const s = conMartin();
+    const topes = selectTopes(s.getState()).medios;
+    expect(topes.length).toBeGreaterThan(0);
+    expect(topes.some((t) => t.aplicaHoy)).toBe(true);
+    // Un día después cambia la semana: lo que aplica el miércoles no tiene por qué aplicar el jueves.
+    s.dispatch(ahoraCambio("2026-10-15T12:00:00-03:00"));
+    const jueves = selectTopes(s.getState()).medios;
+    expect(jueves.map((t) => t.aplicaHoy)).not.toEqual(topes.map((t) => t.aplicaHoy));
+  });
+});
+
+describe("selectUsoDeTopes (torta de Inicio, v9)", () => {
+  it("suma los topes: un tope sin compras cuenta entero, y la base son las compras distintas", () => {
+    const s = conMartin();
+    const topes = selectTopes(s.getState()).medios;
+    const uso = selectUsoDeTopes(s.getState());
+    if (!uso) throw new Error("sin topes");
+    expect(uso.nominal).toBe(topes.reduce((n, t) => n + t.nominal, 0));
+    expect(uso.disponible).toBe(topes.reduce((n, t) => n + (t.disponible ?? t.nominal), 0));
+    expect(uso.queda).toBeCloseTo(uso.disponible / uso.nominal);
+    const compras = new Set(topes.flatMap((t) => t.compraIds)).size;
+    expect(uso.base).toBe(`según ${compras} compras de octubre`);
+  });
+
+  it("sin medios no hay torta", () => {
+    expect(selectUsoDeTopes(storeDePrueba().getState())).toBeNull();
   });
 });
 

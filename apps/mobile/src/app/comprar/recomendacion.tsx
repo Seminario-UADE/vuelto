@@ -8,13 +8,12 @@ import { FilaAccion } from "@/components/fila-accion";
 import { Paso } from "@/components/paso";
 import { AlternativaRow, RecomendacionCard } from "@/components/recomendacion";
 import { Segmentado } from "@/components/segmentado";
-import { Skeleton } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import { useUsarRecomendacion } from "@/hooks/use-usar-recomendacion";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectRecomendacion } from "@/store/selectores";
 import { canalCambiado } from "@/store/simulacion";
-import { radius, space } from "@/theme";
+import { space } from "@/theme";
 
 /**
  * Paso 3: la respuesta sola. Con qué pagar, cuánto te devuelven (≈, con su base) y una razón.
@@ -63,7 +62,12 @@ export default function PasoRecomendacion() {
   );
 
   return (
-    <Paso paso={3} titulo="Con qué te conviene pagar" footer={footer}>
+    <Paso
+      paso={3}
+      titulo="Con qué te conviene pagar"
+      footer={footer}
+      panel={r ? <RecomendacionCard r={r} centrada /> : <View style={{ height: 360 }} />}
+    >
       <Segmentado
         accessibilityLabel="Dónde pagás"
         opciones={[
@@ -73,8 +77,6 @@ export default function PasoRecomendacion() {
         valor={canal}
         onChange={(c) => dispatch(canalCambiado(c))}
       />
-
-      {r ? <RecomendacionCard r={r} /> : <Skeleton height={220} r={radius.card} />}
 
       {r ? (
         <Card padding={space.lg} gap={0} style={{ paddingVertical: space.xs }}>

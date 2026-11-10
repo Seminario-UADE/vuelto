@@ -42,7 +42,7 @@ export function Avatar({ letras, icon, tone = "neutral", size = tamanos.avatar, 
         <Icon name={icon} size={size * 0.5} color={tinta} />
       ) : (
         <Text
-          variant={size >= 40 ? "bodyLg" : "label"}
+          variant={size >= 64 ? "titleLg" : size >= 40 ? "bodyLg" : "label"}
           weight="bold"
           maxFontSizeMultiplier={1.3}
           style={{ color: tinta }}
