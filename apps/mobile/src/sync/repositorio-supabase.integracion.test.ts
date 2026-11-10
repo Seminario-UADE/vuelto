@@ -165,4 +165,27 @@ describe.skipIf(!esLocal)("repositorioSupabase contra un Supabase local", () => 
     const anonimo = createClient(URL!, ANON!, { auth: { persistSession: false } });
     expect(await repositorioSupabase(anonimo).usuarioId()).toBeNull();
   });
+
+  it("sin sesión lee el corpus como con cuenta, pero no compras ni escribe (issue #112)", async () => {
+    const anonimo = repositorioSupabase(createClient(URL!, ANON!, { auth: { persistSession: false } }));
+    const signal = new AbortController().signal;
+    const leer = (f: { desde: string | null; vigenteDesde: string | null }) =>
+      leerTodo<FilaPromocion>(
+        (cursor: Cursor) => anonimo.promociones({ ...f, cursor, limite: 2, signal }),
+        (fila) => ({ valor: fila.actualizada_en, id: fila.id }),
+        2,
+      );
+    // Las mismas filas que con la sesión del usuario, en la primera y en la incremental.
+    const primera = { desde: null, vigenteDesde: "2026-11-01" };
+    expect(propias(await leer(primera)).map((f) => f.id).sort()).toEqual(propias(await leerPromos(primera)).map((f) => f.id).sort());
+    const incremental = { desde: "2000-01-01T00:00:00.000Z", vigenteDesde: null };
+    expect(propias(await leer(incremental)).map((f) => f.id).sort()).toEqual(
+      propias(await leerPromos(incremental)).map((f) => f.id).sort(),
+    );
+    expect((await anonimo.idsDePromociones("2026-11-01", signal)).filter((i) => ids.includes(i)).length).toBe(3);
+    // Las compras son de la cuenta: sin sesión, permiso denegado.
+    await expect(anonimo.compras({ desde: "2026-11-01", cursor: null, limite: 2, signal })).rejects.toBeTruthy();
+    const { error } = await createClient(URL!, ANON!, { auth: { persistSession: false } }).from("promociones").insert(promo("y"));
+    expect(error?.code).toBe("42501");
+  });
 });

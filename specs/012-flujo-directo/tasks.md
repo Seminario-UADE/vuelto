@@ -167,7 +167,7 @@
 
 ### Tests
 
-- [ ] T042 [P] [US5] Escribir `supabase/tests/database/catalogos_lectura_anon.test.sql`: `anon` lee `bancos`, `categorias` y las promociones vigentes; no lee una promo no vigente ni `perfiles`, `medios_de_pago`, `comercios_habituales` o `compras`; y no puede escribir en ninguna tabla.
+- [x] T042 [P] [US5] Escribir `supabase/tests/database/catalogos_lectura_anon.test.sql`: `anon` lee `bancos`, `categorias` y las promociones (todas, research R10); no lee `perfiles`, `medios_de_pago`, `comercios_habituales`, `compras` ni `capturas_crudas`; y no puede escribir en ninguna tabla.
 - [ ] T043 [P] [US5] Sumar a `src/store/persistencia.test.ts` que `perfil.borrador` hace ida y vuelta y que uno de más de 30 días se descarta al rehidratar.
 - [ ] T044 [P] [US5] Escribir `src/store/borrador.test.ts` para `guardarBorradorEnCuenta`, con un `DatosPerfil` en memoria:
   - cuenta vacía: guarda todo;
@@ -177,7 +177,7 @@
 
 ### Implementation
 
-- [ ] T045 [US5] Crear la migración `supabase/migrations/20261105000002_catalogos_lectura_anon.sql` con los grants y las policies de solo lectura para `anon`. Tiene que pasar T042. Pasar `rules-guardian`.
+- [x] T045 [US5] Crear la migración `supabase/migrations/20261110000001_catalogos_lectura_anon.sql` con los grants y las policies de solo lectura para `anon`. Tiene que pasar T042. Pasar `rules-guardian`. Incluye que `sync/sincronizar.ts` baje el corpus sin sesión.
 - [ ] T046 [US5] Sumar `borrador` a `src/store/perfil.ts` y a `src/store/persistencia.ts` (parte opcional validada), y escribir `guardarBorradorEnCuenta` en `src/store/perfil-remoto.ts`. Tiene que pasar T043 y T044.
 - [ ] T047 [US5] Hacer que `src/app/(onboarding)/_layout.tsx` deje entrar sin sesión a `medios` y `primera-respuesta`, y que en esas pantallas se guarde en `borrador` cuando no hay sesión.
 - [ ] T048 [US5] En `src/app/(onboarding)/bienvenida.tsx`, «Empezar» lleva a `/medios`. `registro` se titula «Guardá tu perfil» y, al crear la cuenta, corre `guardarBorradorEnCuenta`.

@@ -142,7 +142,8 @@ selectMarcasDeSubida = cola → qué compras están «Sin subir» o «Solo en es
   #44: la escritura de compras y la cola de subida son de esa issue y `EstadoCompras` sigue siendo `{ lista }`.
 - **Lo asíncrono** (catálogos, ticket, invitaciones, grupo) sigue en `api.ts` con `useAsync`.
 - La sesión de Supabase (`src/lib/supabase.ts`, AsyncStorage) la usa la sincronización; sin variables
-  de entorno o sin sesión no se sincroniza y la app sigue con lo guardado. El login es #40.
+  de entorno no se sincroniza y la app sigue con lo guardado. Sin sesión baja igual el corpus (la base
+  deja leer bancos, categorías y promociones sin cuenta, issue #112) y no pide compras. El login es #40.
 
 ### Cuentas (issue #40)
 

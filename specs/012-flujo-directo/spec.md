@@ -199,7 +199,7 @@ Sofía toca «Empezar» en Bienvenida sin crear cuenta. Elige sus medios, ve su 
 - **FR-029**: Ninguna pantalla MUST mostrar un nombre que el usuario no cargó. El estado inicial del perfil MUST tener el nombre vacío. El nombre de la demo solo aparece con un escenario de demo elegido a propósito.
 - **FR-030**: El indicador de progreso del onboarding MUST reflejar los pasos reales.
 - **FR-031** *(US5)*: Bienvenida MUST ofrecer «Empezar» sin cuenta. Los medios, los habituales y el nombre elegidos sin cuenta MUST guardarse en el teléfono, sobrevivir a cerrar la app y guardarse en la cuenta al crearla o en el primer ingreso. Si nunca se crea la cuenta, se borran a los 30 días.
-- **FR-032** *(US5)*: Los bancos, las categorías y las promociones vigentes MUST poder leerse sin cuenta, solo para lectura. Ninguna tabla con datos de usuarios cambia sus permisos.
+- **FR-032** *(US5)*: Los bancos, las categorías y las promociones MUST poder leerse sin cuenta, solo para lectura. Ninguna tabla con datos de usuarios cambia sus permisos. Las promociones se leen todas, como con cuenta, no solo las vigentes (research R10).
 - **FR-033** *(US5)*: Si el proyecto exige confirmar el email, la app MUST mostrar a qué dirección se mandó y cómo seguir, sin perder lo elegido.
 - **FR-034** *(US5)*: Al entrar con «Ya tengo cuenta» después de elegir sin cuenta, la regla se aplica por separado a medios y a habituales: si la cuenta ya los tiene, prevalecen los de la cuenta y se avisa; si no, se guardan los elegidos.
 
