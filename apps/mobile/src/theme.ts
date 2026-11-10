@@ -46,6 +46,8 @@ const paleta = {
   rubroHogarFondoClaro: "#D9DEEA",
   heroClaro: "#1A422F",
   heroTextoSuaveClaro: "#C4D4C6",
+  /** Centro del degradé del panel de Inicio: tono sobre tono con `heroBg`, un paso más claro. */
+  heroAltoClaro: "#2A5C44",
   // Oscuro
   bosqueProfundo: "#051F20",
   pino: "#0B2B26",
@@ -70,6 +72,8 @@ const paleta = {
   rubroHogarOscuro: "#A5B8E0",
   rubroHogarFondoOscuro: "#27345A",
   heroOscuro: "#0F3A34",
+  heroAltoOscuro: "#145048",
+  heroTextoSuaveOscuro: "#B4C4B8",
 } as const;
 
 type Rol =
@@ -90,6 +94,8 @@ type Rol =
   | "accent2"
   | "accent2Bg"
   | "heroBg"
+  | "heroBgHi"
+  | "heroSurface"
   | "onHero"
   | "onHeroMuted"
   | "rubroSuper"
@@ -149,8 +155,10 @@ const claro: Tema = {
   /** Segundo acento (v8): información y estimaciones; nunca reemplaza a `accent` en acciones. */
   accent2: paleta.lago,
   accent2Bg: paleta.lagoPalido,
-  /** Cabecera de Inicio (v8): banda a todo el ancho con el monto del mes. */
+  /** Panel de Inicio (v8): superficie con degradé tono sobre tono (`heroBg` → `heroBgHi`) y el monto del mes. */
   heroBg: paleta.heroClaro,
+  heroBgHi: paleta.heroAltoClaro,
+  heroSurface: "rgba(243,235,214,0.10)",
   onHero: paleta.crema,
   onHeroMuted: paleta.heroTextoSuaveClaro,
   /** Color por rubro (v8): ícono y fondo del cuadrado de comercio. */
@@ -203,8 +211,10 @@ const oscuro: Tema = {
   accent2: paleta.lagoClaro,
   accent2Bg: paleta.lagoOscuro,
   heroBg: paleta.heroOscuro,
+  heroBgHi: paleta.heroAltoOscuro,
+  heroSurface: "rgba(243,235,214,0.10)",
   onHero: paleta.crema,
-  onHeroMuted: paleta.liquen,
+  onHeroMuted: paleta.heroTextoSuaveOscuro,
   rubroSuper: paleta.rubroSuperOscuro,
   rubroSuperBg: paleta.rubroSuperFondoOscuro,
   rubroFarmacia: paleta.lagoClaro,
@@ -274,7 +284,7 @@ export const floatingShadow = "0 8px 24px rgba(2,17,12,0.10)";
 export const sombras = {
   claro: {
     tarjeta: "0 1px 2px rgba(58,44,12,0.06), 0 6px 16px rgba(58,44,12,0.08)",
-    cabecera: "0 10px 28px rgba(26,66,47,0.30)",
+    cabecera: "0 10px 24px rgba(26,66,47,0.22)",
   },
   oscuro: { tarjeta: undefined, cabecera: undefined },
 } as const;

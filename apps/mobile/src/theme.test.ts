@@ -62,6 +62,8 @@ const textosComunes: Par[] = [
   ["success / surface", "success", "surface"],
   ["onHero / heroBg", "onHero", "heroBg"],
   ["onHeroMuted / heroBg", "onHeroMuted", "heroBg"],
+  ["onHero / heroBgHi", "onHero", "heroBgHi"],
+  ["onHeroMuted / heroBgHi", "onHeroMuted", "heroBgHi"],
   ["rubroSuper / rubroSuperBg", "rubroSuper", "rubroSuperBg"],
   ["rubroFarmacia / rubroFarmaciaBg", "rubroFarmacia", "rubroFarmaciaBg"],
   ["rubroCombustible / rubroCombustibleBg", "rubroCombustible", "rubroCombustibleBg"],

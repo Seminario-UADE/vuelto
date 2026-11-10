@@ -17,9 +17,9 @@
 > **v8 (10/11/2026)**: la app se veía plana, sobre todo en claro, y todavía
 > tenía píldoras. Cambia la **profundidad** y el **color**, no la identidad:
 > tarjetas más claras que el fondo y con una sombra suave en el claro, un
-> segundo acento (lago), color por rubro, la cabecera de Inicio como banda a
-> todo el ancho, la barra como rectángulo redondeado y los chips de selección
-> reemplazados por controles segmentados, filas con check y cuadrados.
+> segundo acento (lago), color por rubro, el panel de Inicio con degradé tono
+> sobre tono y tres atajos, la barra como rectángulo redondeado y los chips de
+> selección reemplazados por controles segmentados, filas con check y cuadrados.
 > Modo oscuro: sigue al sistema, o se fija en Perfil → Apariencia.
 >
 > **Estado de implementación**: la app implementa la paleta, los dos temas y
@@ -80,9 +80,11 @@ tema. Ratios WCAG 2.1 medidos.
 | `success` | `#2E6B3B` Hoja | `#8FD1A0` | Texto de lo que se ganó o se devolvió | 5.2 / 9.6 |
 | `accent2` | `#1E6B73` Lago | `#7CC4CB` | Segundo acento (v8): información y estimaciones; nunca en acciones | 5.0 / 8.7 |
 | `accent2Bg` | `#D5E7E5` | `#17484C` | Fondo del segundo acento, siempre con `accent2` | — |
-| `heroBg` | `#1A422F` Oliva | `#0F3A34` | Banda de cabecera de Inicio (v8) | — |
-| `onHero` | `#F3EBD6` | `#F3EBD6` | Texto sobre la banda | 9.5 / 10.5 |
-| `onHeroMuted` | `#C4D4C6` | `#A3B5A8` | Base y fecha sobre la banda | 7.3 / 5.8 |
+| `heroBg` | `#1A422F` Oliva | `#0F3A34` | Panel de Inicio (v8): borde del degradé | — |
+| `heroBgHi` | `#2A5C44` | `#145048` | Panel de Inicio: centro del degradé, un paso más claro que `heroBg` | — |
+| `heroSurface` | `rgba(243,235,214,0.10)` | ídem | Avatar y atajos dentro del panel | — |
+| `onHero` | `#F3EBD6` | `#F3EBD6` | Texto sobre el panel | 9.5 / 10.5 (6.5 / 7.8 sobre `heroBgHi`) |
+| `onHeroMuted` | `#C4D4C6` | `#B4C4B8` | Base, fecha y «≈» sobre el panel | 7.3 / 7.0 (5.0 / 5.1 sobre `heroBgHi`) |
 | `decisionBg` | `#051F20` | `#F3EBD6` | Tarjeta de decisión (superficie invertida) | — |
 | `onDecision` | `#F3EBD6` | `#02110C` | Texto sobre la decisión | 14.4 / 16.2 |
 | `onDecisionMuted` | `#A3B5A8` | `#4E6656` | Razón y base sobre la decisión | 7.7 / 5.3 |
@@ -121,9 +123,14 @@ Reglas:
 - **La superficie invertida, y solo ella, marca la decisión**: la respuesta
   en Inicio con un comercio elegido, Con qué pagar, la primera respuesta del
   onboarding y Gasto en grupo. En ningún otro lado.
-- **Sin negro ni blanco puros**, sin degradés, sin brillos, sin
-  glassmorphism propio. La v8 no los suma: la profundidad sale del tono y de
-  la sombra. El único vidrio es el del sistema (tab bar, hojas).
+- **Sin negro ni blanco puros**, sin brillos, sin glassmorphism propio.
+  **Degradé: uno solo**, el del panel de Inicio, tono sobre tono
+  (`heroBg` → `heroBgHi`, radial desde arriba al centro), como superficie y
+  nunca en el texto ni como halo. En el resto la profundidad sale del tono y
+  de la sombra. Decisión de la v8: lo pidió el equipo con referencias, y las
+  skills de diseño (`impeccable`, `apple-design`) lo aprueban como
+  superficie; prohíben el degradé en el texto, por eso el «≈» se atenúa con
+  color y no con un degradé. El único vidrio es el del sistema (tab bar, hojas).
 - **Apariencia**: sigue al sistema (`userInterfaceStyle: "automatic"`) o queda
   fijo en claro u oscuro desde Perfil (`apariencia` en el store, guardado en
   el dispositivo y no en la cuenta). El tema se resuelve una vez en
@@ -171,9 +178,9 @@ Reglas:
   hundido (`surfaceStrong`) es lo más oscuro: campos y segmentos. En el
   **oscuro** no hay sombra: **lo elevado es más claro** (`canvas` →
   `surface` → `surfaceStrong`). Nunca borde y sombra a la vez.
-- **Nunca una tarjeta dentro de otra.** La cabecera de Inicio no es una
-  tarjeta: es una banda `heroBg` de borde a borde, con las esquinas de abajo
-  de 28 pt y su propia sombra en el claro.
+- **Nunca una tarjeta dentro de otra.** El panel de Inicio es una
+  superficie con margen (radio 28) y su propia sombra en el claro. Radios
+  concéntricos: panel 28, padding 16, atajos 12.
 - **Áreas táctiles de 44×44 pt o más.**
 
 ## 5. Componentes
@@ -208,11 +215,14 @@ Arriba de cada paso: volver (‹), la barra de avance de 4 segmentos y cerrar
 (×), en cuadrados de 44 pt. Entrando a mitad de camino, los pasos anteriores
 se ven completos.
 
-**Inicio (v8)**: una banda `heroBg` de borde a borde con el saludo, la fecha
-y «Este mes te devolvieron ≈$15.200» con su base y lo gastado en una línea
-(«según 10 compras de octubre · gastaste $101.500»). Sin compras: «Todavía no
-registraste compras · Tocá + cuando estés por pagar». Debajo, «Por confirmar»
-si hay, cada tope en su tarjeta y las últimas compras.
+**Inicio (v8)**: un panel oscuro con margen y degradé tono sobre tono. Arriba,
+el avatar con tu inicial, «Hola, Martín» y la fecha. Al centro, «Este mes te
+devolvieron» y **≈$15.200** en display, con el «≈» atenuado, y la base
+(«según 10 compras de octubre»). Abajo, tres atajos: **Con qué pagar**,
+**Escanear ticket** y **Tus topes**. Sin compras: «Todavía no registraste
+compras». Debajo, «Por confirmar» si hay, cada tope en su tarjeta y las
+últimas compras. Sin campana de notificaciones y sin «gastaste»: eso vive en
+Compras.
 
 **Tarjeta de decisión** (la superficie invertida). Una por pantalla, nunca más:
 - fondo `decisionBg`;
@@ -309,8 +319,8 @@ primera, vas a ver cuánto tope te queda.», sin botón a otra pestaña.
   resúmenes cortos, y una sola columna con `fontScale > 1.2`.
 - Las pantallas de nivel superior llevan large title nativo (colapsa al
   scrollear). Las hijas, título inline y back del sistema.
-- **Inicio** (de arriba abajo): la banda de borde a borde con saludo, fecha y
-  «Este mes te devolvieron ≈X» con su base; «Por confirmar» si hay; «Tus
+- **Inicio** (de arriba abajo): el panel con saludo, fecha, «Este mes te
+  devolvieron ≈X» con su base y tres atajos; «Por confirmar» si hay; «Tus
   topes» (los primeros tres, cada uno en su tarjeta con barra y base; «Ver
   todos» abre Topes) y «Últimas compras» (tres; «Ver todas» va a Compras).
 - **Compras** (pestaña): «Gastaste este mes» con un gráfico de barras por
@@ -428,7 +438,8 @@ Medio sin cobertura (solo en onboarding): Mercado Pago, con la nota
 - Chips y píldoras para elegir: se usa un segmentado, filas o cuadrados.
 - Contenido o botones tapados por la tab bar o por el pie.
 - Texto menor a 12 pt.
-- Negro o blanco puros, degradés, brillos, glow, neón, glassmorphism propio.
+- Negro o blanco puros, brillos, glow, neón, glassmorphism propio. Degradés,
+  salvo el del panel de Inicio (sección 2); nunca en texto.
 - Violetas, neón, colores de marca de bancos o comercios, y cualquier color
   fuera de la tabla de la sección 2 (los de rubro están ahí).
 - Un tema que sea la inversión mecánica del otro.

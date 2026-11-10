@@ -2122,7 +2122,12 @@ Esta entrada cubre solo la parte visual.
   es lo más oscuro, y en el oscuro sigue la elevación por tono. Se suma un segundo acento (Lago, solo
   información), `success`, la banda `heroBg` y cinco colores por rubro. `theme.test.ts` valida los
   contrastes de los roles nuevos en los dos temas.
-- Inicio: banda a todo el ancho con el monto estimado y su base, cada tope en su tarjeta.
+- Inicio: panel oscuro con margen y degradé tono sobre tono (solo en la superficie), avatar y saludo,
+  el monto estimado con el «≈» atenuado y su base, y tres atajos (Con qué pagar, Escanear ticket, Tus
+  topes); cada tope en su tarjeta. La primera versión, una banda a sangre, no le gustó al equipo; la
+  segunda se inspiró en tres referencias que trajo. Las skills `impeccable` y `apple-design` aprobaron
+  el degradé como superficie y lo prohíben en el texto, así que el «≈» se atenúa con color. Se quitó el
+  acceso a Topes de arriba a la derecha y «gastaste» por redundantes.
 - Sin píldoras: la tab bar pasó de cápsula a rectángulo redondeado; los chips de tipo y red de la
   tarjeta, y los escenarios de desarrollo, a un control segmentado (`segmentado.tsx`); la fecha de
   Revisá y los comercios sugeridos a filas; los comercios del onboarding a cuadrados marcables. Se
