@@ -3,11 +3,11 @@ import { useState } from "react";
 import { View } from "react-native";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
-import { Chip } from "@/components/chip";
 import { divisor } from "@/components/lista";
 import { FilaAccion } from "@/components/fila-accion";
 import { Paso } from "@/components/paso";
 import { AlternativaRow, RecomendacionCard } from "@/components/recomendacion";
+import { Segmentado } from "@/components/segmentado";
 import { Skeleton } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import { useUsarRecomendacion } from "@/hooks/use-usar-recomendacion";
@@ -64,15 +64,15 @@ export default function PasoRecomendacion() {
 
   return (
     <Paso paso={3} titulo="Con qué te conviene pagar" footer={footer}>
-      <View style={{ flexDirection: "row", gap: space.sm }} accessibilityRole="radiogroup">
-        <Chip
-          label="En el local"
-          rol="radio"
-          selected={canal === "presencial"}
-          onPress={() => dispatch(canalCambiado("presencial"))}
-        />
-        <Chip label="Online" rol="radio" selected={canal === "online"} onPress={() => dispatch(canalCambiado("online"))} />
-      </View>
+      <Segmentado
+        accessibilityLabel="Dónde pagás"
+        opciones={[
+          { valor: "presencial", label: "En el local" },
+          { valor: "online", label: "Online" },
+        ]}
+        valor={canal}
+        onChange={(c) => dispatch(canalCambiado(c))}
+      />
 
       {r ? <RecomendacionCard r={r} /> : <Skeleton height={220} r={radius.card} />}
 

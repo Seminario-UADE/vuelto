@@ -18,6 +18,7 @@
 import { CATEGORIAS_MODO } from "@vuelto/motor";
 import { ejecutarComoScript, hoyEnArgentina, parsearArgumentos } from "./args.ts";
 import { esObjeto, jsonCanonico } from "./crudo.ts";
+import { slugBase } from "./ids.ts";
 import { listarCandidatas } from "./listado.ts";
 import type { ResumenListado } from "./listado.ts";
 import { intentarMapear } from "./mapear.ts";
@@ -40,7 +41,7 @@ export interface ResumenCosecha {
   detalleDescartes: Descarte[];
   /** Promos cuyo detalle falló (error de servidor o de red tras los reintentos): se reintentan mañana. */
   detalleConError: { slug: string; error: string }[];
-  /** Promos con un campo que el mapeo no reconoce: hay que actualizar el mapeo. */
+  /** Promos con un campo que el mapeo no reconoce: hay que actualizar el mapeo. No se dan de baja. */
   formatoDesconocido: { slug: string; ruta: string }[];
   avisos: string[];
 }
@@ -54,6 +55,15 @@ export function leerCatalogo(crudo: readonly unknown[]): BancoCatalogo[] {
   if (bancos.length === 0) throw new Error("El catálogo de bancos de MODO vino vacío");
   return bancos;
 }
+
+/**
+ * Los slugs con los que una promo puede figurar en la base: el del listado y el del detalle (el `fuenteId`
+ * sale de `detalle.slug`; si MODO los hiciera distintos, la protección contra la baja fallaría).
+ */
+const slugsDeLaPromo = (slugListado: string, detalle: unknown): string[] => {
+  const delDetalle = esObjeto(detalle) && typeof detalle.slug === "string" && detalle.slug !== "" ? [slugBase(detalle.slug)] : [];
+  return [slugListado, ...delDetalle];
+};
 
 const contarPorMotivo = (descartes: readonly Descarte[]): Partial<Record<MotivoDescarte, number>> => {
   const cuenta: Partial<Record<MotivoDescarte, number>> = {};
@@ -104,6 +114,9 @@ export async function cosechar(
       { categorias, hoy, catalogoBancos: bancos },
     );
     if (!intento.ok) {
+      // Un formato que el mapeo no reconoce es una promo que no se pudo leer, no una promo que dejó de existir:
+      // no se da de baja, igual que un detalle que falló (la baja la decide una lectura buena, no un cambio de MODO).
+      for (const s of slugsDeLaPromo(slug, detalle)) slugsSinDatos.add(s);
       resumen.formatoDesconocido.push({ slug, ruta: intento.ruta });
       descartes.push({ slug, motivo: "formato_desconocido", detalle: intento.ruta });
       continue;
@@ -117,6 +130,10 @@ export async function cosechar(
       return propios.map((e) => `${p.fuenteId}: ${e}`);
     });
     if (errores.length > 0) {
+      // Que no pase la validación (un banco que salió del catálogo, un valor fuera de rango) tampoco la da de baja:
+      // si estaba publicada, queda como estaba hasta que una lectura buena diga otra cosa.
+      for (const s of slugsDeLaPromo(slug, detalle)) slugsSinDatos.add(s);
+      for (const p of intento.resultado.promociones) slugsSinDatos.add(slugBase(p.fuenteId));
       descartes.push({ slug, motivo: "no_publicable", detalle: errores.join("; ") });
       continue;
     }

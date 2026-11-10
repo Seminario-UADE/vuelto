@@ -55,8 +55,13 @@ resto de ADR-005 sigue vigente.
 - **"La demo no puede depender de que el scraper funcione"** (ADR-005) se
   resuelve sin carga manual: la app lee de Supabase, no de MODO. Si una
   corrida falla, la base queda con lo del día anterior y GitHub avisa por mail.
-- **Resguardos en vez de revisión.** Una promo cuyo detalle falló no se da de
-  baja (no se sabe si sigue vigente). Si una corrida publicaría menos de la
+- **Resguardos en vez de revisión.** Una promo que no se pudo leer no se da de
+  baja (no se sabe si sigue vigente): ni la que tuvo un detalle caído, ni la
+  que tiene un formato que el mapeo no reconoce, ni la que no pasa la
+  validación (por ejemplo, un banco que salió del catálogo). Los errores
+  pasajeros de MODO se reintentan antes de rendirse: un 5xx, un corte de red
+  o un timeout (30 s por pedido), un 429 esperando lo que pida `Retry-After`
+  y un 400 del detalle una vez más. Si una corrida publicaría menos de la
   mitad de las promos activas (por ejemplo, porque MODO cambió el formato),
   no escribe nada y sale con error.
 - **GitHub Actions** es gratis para el repo, ya tiene los secrets del

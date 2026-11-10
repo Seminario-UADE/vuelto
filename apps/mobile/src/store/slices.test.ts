@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { mediosDeEjemplo } from "../data/fixtures";
 import { comprasOctubre } from "../data/fixtures";
 import { escenarioElegido, sesionCerrada } from "./acciones";
+import { preferenciaCambiada } from "./apariencia";
 import { compraAgregada } from "./compras";
 import { contactoAgregado, contactoQuitado } from "./contactos";
 import { mediosConfirmados, nombreCambiado, onboardingTerminado } from "./perfil";
@@ -117,5 +118,21 @@ describe("cerrar sesión", () => {
     expect(e.compras.lista).toEqual(comprasOctubre);
     expect(e.simulacion.comercioId).toBeNull();
     expect(e.sesion.ahora).toBe(ahora);
+  });
+});
+
+describe("apariencia", () => {
+  it("arranca siguiendo al sistema y guarda la preferencia elegida", () => {
+    const s = storeDePrueba();
+    expect(s.getState().apariencia.preferencia).toBe("sistema");
+    s.dispatch(preferenciaCambiada("oscuro"));
+    expect(s.getState().apariencia.preferencia).toBe("oscuro");
+  });
+
+  it("cerrar sesión no la borra: es del dispositivo, no de la cuenta", () => {
+    const s = storeDePrueba();
+    s.dispatch(preferenciaCambiada("claro"));
+    s.dispatch(sesionCerrada());
+    expect(s.getState().apariencia.preferencia).toBe("claro");
   });
 });

@@ -54,6 +54,21 @@ const textosComunes: Par[] = [
   ["onDecisionAccent / decisionBg", "onDecisionAccent", "decisionBg"],
   // El botón «Usar [medio]» y la inicial del medio: texto `ink` sobre `onDecisionAccent`.
   ["ink / onDecisionAccent", "ink", "onDecisionAccent"],
+  // v8: segundo acento, éxito, cabecera de Inicio y color por rubro.
+  ["accent2 / canvas", "accent2", "canvas"],
+  ["accent2 / surface", "accent2", "surface"],
+  ["accent2 / accent2Bg", "accent2", "accent2Bg"],
+  ["success / canvas", "success", "canvas"],
+  ["success / surface", "success", "surface"],
+  ["onHero / heroBg", "onHero", "heroBg"],
+  ["onHeroMuted / heroBg", "onHeroMuted", "heroBg"],
+  ["onHero / heroBgHi", "onHero", "heroBgHi"],
+  ["onHeroMuted / heroBgHi", "onHeroMuted", "heroBgHi"],
+  ["rubroSuper / rubroSuperBg", "rubroSuper", "rubroSuperBg"],
+  ["rubroFarmacia / rubroFarmaciaBg", "rubroFarmacia", "rubroFarmaciaBg"],
+  ["rubroCombustible / rubroCombustibleBg", "rubroCombustible", "rubroCombustibleBg"],
+  ["rubroGastro / rubroGastroBg", "rubroGastro", "rubroGastroBg"],
+  ["rubroHogar / rubroHogarBg", "rubroHogar", "rubroHogarBg"],
   ["onScrim / scrim", "onScrim", "scrim"],
   ["onScrimMuted / scrim", "onScrimMuted", "scrim"],
 ];
@@ -83,10 +98,10 @@ describe.each(Object.keys(temas) as NombreTema[])("tema %s", (nombre) => {
     for (const valor of Object.values(t)) expect(valor).not.toMatch(/^#(000000|FFFFFF)$/i);
   });
 
-  it("el oscuro tiene su escala de elevación: lo elevado es más claro", () => {
+  it("escala de elevación: en el oscuro lo elevado es más claro; en el claro las tarjetas son lo más claro y lo hundido lo más oscuro", () => {
     const [c, s, f] = [t.canvas, t.surface, t.surfaceStrong].map(luminancia) as [number, number, number];
     if (nombre === "oscuro") expect(c < s && s < f).toBe(true);
-    else expect(c > s && s > f).toBe(true);
+    else expect(s > c && c > f).toBe(true);
   });
 });
 

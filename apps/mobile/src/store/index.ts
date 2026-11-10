@@ -12,6 +12,7 @@ import {
 import type { Subida } from "../data/compras/repositorio";
 import type { DatosPerfil } from "../perfil/datos";
 import type { RepositorioSincronizacion } from "../sync/contratos";
+import { apariencia } from "./apariencia";
 import { cola, escucharPersistenciaCola } from "./cola";
 import { compras } from "./compras";
 import { contactos } from "./contactos";
@@ -31,6 +32,7 @@ const reducer = combineReducers({
   porConfirmar: porConfirmar.reducer,
   simulacion: simulacion.reducer,
   contactos: contactos.reducer,
+  apariencia: apariencia.reducer,
 });
 
 export type RootState = ReturnType<typeof reducer>;

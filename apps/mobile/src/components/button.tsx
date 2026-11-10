@@ -23,7 +23,7 @@ type Props = {
 };
 
 /**
- * Botón primario: píldora del acento, 56 pt de alto mínimo, una sola línea de texto que crece
+ * Botón primario: botón del acento, 56 pt de alto mínimo, una sola línea de texto que crece
  * en alto si el texto del sistema es grande (DESIGN.md §5). Uno solo por pantalla.
  */
 export function Button({ label, onPress, variant = "primary", disabled, loading, icon, hint }: Props) {

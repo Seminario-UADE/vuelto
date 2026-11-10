@@ -10,7 +10,7 @@ import { agregarComercio, sacarComercio } from "@/store/perfil-remoto";
 import { selectCatalogoComercios } from "@/store/selectores";
 import { colors, fonts, radius, size, space, type as escala } from "@/theme";
 import { Card } from "./card";
-import { Chip } from "./chip";
+import { FilaAccion } from "./fila-accion";
 import { Icon } from "./icon";
 import { divisor } from "./lista";
 import { SectionHeader } from "./section-header";
@@ -140,14 +140,20 @@ export function ComerciosDelPerfil() {
               style={{ flex: 1, minHeight: 44, fontFamily: fonts.regular, fontSize: escala.bodyLg.fontSize, color: colors.ink }}
             />
           </View>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
-            {opciones.map((c) => (
-              <Chip key={c.id} label={c.nombre} icon="agregar" onPress={() => void agregar(c.nombre)} />
-            ))}
-            {ofrecerTexto ? (
-              <Chip label={`Agregar «${texto}»`} icon="agregar" onPress={() => void agregar(texto)} />
-            ) : null}
-          </View>
+          {opciones.length > 0 || ofrecerTexto ? (
+            <Card padding={space.lg} gap={0} style={{ paddingVertical: space.xs }}>
+              {opciones.map((c, i) => (
+                <View key={c.id} style={divisor(i)}>
+                  <FilaAccion titulo={c.nombre} icon="agregar" onPress={() => void agregar(c.nombre)} />
+                </View>
+              ))}
+              {ofrecerTexto ? (
+                <View style={divisor(opciones.length)}>
+                  <FilaAccion titulo={`Agregar «${texto}»`} icon="agregar" onPress={() => void agregar(texto)} />
+                </View>
+              ) : null}
+            </Card>
+          ) : null}
         </View>
       ) : null}
       {error ? (
