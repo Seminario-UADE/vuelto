@@ -200,18 +200,22 @@ export async function publicar(
 // ---------- Acceso a la base ----------
 
 /**
- * Lee categorías, bancos y promociones antes de bajar nada de MODO: si la clave no
- * sirve, la corrida falla en segundos y no después de casi una hora de pedidos. Cubre
- * el caso de una clave anon o publishable, que no puede leer ninguna de las tablas de
- * la ingesta; una clave que lee pero no escribe recién falla al publicar. La lectura
- * completa de promociones es a propósito: `publicar` la repite después de la cosecha
- * para el resguardo, y con unas miles de filas son pocos segundos.
+ * Lee categorías, bancos, promociones y capturas crudas antes de bajar nada de MODO: si la
+ * clave no sirve, la corrida falla en segundos y no después de casi una hora de pedidos.
+ * Cubre el caso de una clave anon o publishable. Las capturas crudas son lo que la distingue:
+ * categorías, bancos y promociones las puede leer también `anon` (migración
+ * `catalogos_lectura_anon`, issue #112), pero esa tabla solo la lee la service role. Una clave
+ * que lee pero no escribe recién falla al publicar. La lectura completa de promociones es a
+ * propósito: `publicar` la repite después de la cosecha para el resguardo, y con unas miles de
+ * filas son pocos segundos.
  */
 export async function comprobarAcceso(cliente: ClienteBase): Promise<void> {
   try {
     await cliente.leerCategorias();
     await cliente.leerBancos();
     await cliente.leerPromociones();
+    // Un origen que no existe: no trae filas, pero la tabla se consulta y `anon` no puede.
+    await cliente.leerUltimasCapturas(["comprobar-acceso"]);
   } catch (error) {
     const detalle = error instanceof Error ? error.message : String(error);
     throw new Error(

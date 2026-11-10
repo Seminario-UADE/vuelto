@@ -2122,11 +2122,15 @@ corrida (2026-11-03) y que no vuelva a tardar 40 minutos en avisar.
 - Verificado: la corrida manual #6 terminó bien en 43 min: 1779 candidatas, 3088 filas de
   promociones, 82 bancos, 13 categorías y 1776 capturas crudas; 0 errores de detalle y 0 formatos
   desconocidos; 743 descartes automáticos (690 por nivel de cliente).
-- Código: `comprobarAcceso` en `publicar.ts` lee `categorias`, `bancos` y `promociones` antes de
-  pedir nada a MODO; `ingestar.ts` la llama al arrancar. Con una clave anon o publishable la
-  corrida falla en segundos (en la primera tabla, `categorias`), con un mensaje que dice qué revisar
-  y sin imprimir la clave. Una clave que lee pero no escribe sigue fallando recién al publicar.
-  4 tests nuevos. Revisado con rules-guardian, /code-review (Standards y Spec) y test-runner.
+- Código: `comprobarAcceso` en `publicar.ts` lee `categorias`, `bancos`, `promociones` y
+  `capturas_crudas` antes de pedir nada a MODO; `ingestar.ts` la llama al arrancar. Con una clave
+  anon o publishable la corrida falla en segundos, con un mensaje que dice qué revisar y sin
+  imprimir la clave. Una clave que lee pero no escribe sigue fallando recién al publicar.
+  5 tests nuevos. Revisado con rules-guardian, /code-review (Standards y Spec) y test-runner.
+- Auditoría del PR (2026-11-10): con la migración de #125, `anon` también lee `categorias`,
+  `bancos` y `promociones`, así que el chequeo con esas tres tablas habría dejado pasar la clave
+  anon, justo el caso real. Se suma la lectura de `capturas_crudas` (solo la service role) y su
+  test.
 - Hallazgo: GitHub arranca las corridas programadas (09:00 UTC = 06:00 ART) con 6 a 8 horas de
   atraso; es comportamiento de GitHub Actions, no de la configuración. Queda para decidir con el
   equipo si se adelanta el cron.

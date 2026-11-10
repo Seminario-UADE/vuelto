@@ -279,7 +279,7 @@ describe("publicar — consistencia", () => {
 
 
 describe("comprobarAcceso", () => {
-  it("lee categorías, bancos y promociones, sin escribir nada", async () => {
+  it("lee categorías, bancos, promociones y capturas, sin escribir nada", async () => {
     const base = baseFalsa();
     const leidas: string[] = [];
     const cliente: ClienteBase = {
@@ -296,10 +296,15 @@ describe("comprobarAcceso", () => {
         leidas.push("promociones");
         return base.cliente.leerPromociones();
       },
+      leerUltimasCapturas: async (origenes) => {
+        leidas.push("capturas");
+        return base.cliente.leerUltimasCapturas(origenes);
+      },
     };
     await expect(comprobarAcceso(cliente)).resolves.toBeUndefined();
-    expect(leidas).toEqual(["categorias", "bancos", "promociones"]);
-    expect(base.llamadas).toEqual([]);
+    expect(leidas).toEqual(["categorias", "bancos", "promociones", "capturas"]);
+    // Solo lecturas: nada de guardar*.
+    expect(base.llamadas.filter((l) => l !== "leerUltimasCapturas")).toEqual([]);
   });
 
   it("si lo que falla no es un Error, igual lo muestra", async () => {
@@ -324,6 +329,18 @@ describe("comprobarAcceso", () => {
     const intento = comprobarAcceso(cliente);
     await expect(intento).rejects.toThrow(/permission denied for table promociones/);
     await expect(intento).rejects.toThrow(/SUPABASE_SERVICE_ROLE_KEY.*no la anon/);
+  });
+
+  it("una clave anon lee los catálogos pero no las capturas: falla igual", async () => {
+    const base = baseFalsa();
+    const cliente: ClienteBase = {
+      ...base.cliente,
+      leerUltimasCapturas: async () => {
+        throw new Error("leer capturas: permission denied for table capturas_crudas");
+      },
+    };
+    await expect(comprobarAcceso(cliente)).rejects.toThrow(/permission denied for table capturas_crudas/);
+    await expect(comprobarAcceso(cliente)).rejects.toThrow(/SUPABASE_SERVICE_ROLE_KEY/);
   });
 
   it("falla con la primera tabla que no se puede leer", async () => {
