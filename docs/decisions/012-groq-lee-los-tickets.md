@@ -42,8 +42,10 @@ pregunta, nunca se infiere.
 La Edge Function llama a una interfaz `Extractor` (ADR-009) con `ExtractorGroq`
 como implementación. Cambiar de proveedor es agregar otra implementación y otro
 secret; la validación de la respuesta contra el esquema es nuestra y no cambia.
-Lo que devuelve es lo que ya espera la app (`LecturaTicket` en
-`apps/mobile/src/data/contracts.ts`, spec 012).
+Devuelve el medio de pago tal como lo dice el ticket (por ejemplo, "VISA
+DEBITO ****1234"); el cruce con las tarjetas del perfil lo hace la app, que
+adapta su lector simulado (`LecturaTicket`) en la issue #49. El contrato está en
+`specs/013-extraer-ticket/`.
 
 ## Rationale
 
@@ -71,8 +73,10 @@ Lo que devuelve es lo que ya espera la app (`LecturaTicket` en
   La issue #48 (proveedor y contrato) se ajusta al implementarla.
 - **Secrets:** `GROQ_API_KEY` en las Edge Functions de Supabase (issue #85);
   `GEMINI_API_KEY` solo en GitHub Actions, para la ingesta (issue #51).
-- **El contrato de #48 se alinea con la app:** `LecturaTicket` no trae el
-  descuento que pedía la issue. Se decide en el plan de #48.
+- **Sin descuento en la lectura:** la issue #48 pedía leer el descuento del
+  ticket, pero casi ninguna promo bancaria aparece ahí (son reintegros que
+  llegan después). El reintegro lo sigue calculando el motor al confirmar la
+  compra (spec 013).
 
 ## Riesgos y decisiones abiertas
 

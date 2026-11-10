@@ -2492,6 +2492,10 @@ proveedor que cuide la privacidad sin costo.
    Data Retention» (se pudo, aunque el contrato lo reservaba a ciertos
    clientes) y se cargó la key en Supabase desde la web, con vencimiento a los 90 días
    (8/2/2027). La IA no la vio.
+10. Al escribir la spec de la issue #48 se decidió no leer el descuento del
+    ticket y que el medio de pago llegue tal como lo dice el ticket. "Corregí
+    el ADR-012": decía que se respetaba el formato del lector simulado de la
+    app y que el descuento se decidía después.
 
 **Resultado:**
 - ADR-012 (propuesto): los tickets los lee Groq; la letra chica de las
