@@ -5,7 +5,8 @@
 | Servicio | Para qué | Tier | Límite antes de costar |
 |---|---|---|---|
 | Supabase | Postgres + Auth | Free | 500 MB de base, 50.000 usuarios |
-| Gemini API | Extracción (letra chica y ticket) | Free (Flash) | Rate limit del free tier — poco probable a este volumen |
+| Gemini API | Extracción de la letra chica (ingesta) | Free (Flash) | Rate limit del free tier — poco probable a este volumen |
+| Groq API | Extracción del ticket (Edge Function, ADR-012) | Free | Límites por organización (tokens por minuto y por día); se ven en la consola |
 | Expo / EAS Build | Cliente mobile, distribución para el pitch | Free | 15 builds/mes gratis en EAS |
 | Playwright | Ingesta / scraping | — | Sin costo, corre en el servidor |
 
@@ -13,9 +14,9 @@ Costo total durante el cuatrimestre: **$0**.
 
 ## Secretos y dónde vive cada llamada
 
-- **Gemini API key**: nunca en la app del celular (quedaría expuesta en el
-  instalador). La llamada de letra chica sale del script de ingesta; la del
-  ticket, de una Edge Function de Supabase.
+- **Keys de los extractores**: nunca en la app del celular (quedarían expuestas
+  en el instalador). La de Gemini la usa solo el script de ingesta (letra
+  chica); la de Groq, solo la Edge Function del ticket (ADR-012).
 - **Supabase service role key**: usada por el proceso de ingesta para
   escribir en `capturas_crudas`, saltea row-level security por completo —
   tratarla como llave maestra.
@@ -29,7 +30,8 @@ Los nombres están en `apps/mobile/.env.example` y `supabase/.env.example`
 |---|---|---|---|
 | `EXPO_PUBLIC_SUPABASE_URL` | App mobile | `apps/mobile/.env` (local); variable de entorno del perfil en EAS | No es secreta (URL pública del proyecto). Cambia solo si se crea otro proyecto |
 | `EXPO_PUBLIC_SUPABASE_ANON_KEY` | App mobile | `apps/mobile/.env` (local); variable del perfil en EAS (`eas env:create`) | Es pública por diseño: la protege RLS, no el secreto. Rotar en Supabase (Settings → API Keys) y reconstruir la app con la nueva |
-| `GEMINI_API_KEY` | Edge Functions (ticket); script de ingesta (letra chica) | Edge Functions: `supabase secrets set`; local: `supabase/.env`; ingesta: secret del repo en GitHub Actions (¹) | Generar key nueva en Google AI Studio → `supabase secrets set` + redeploy de la función → actualizar la ingesta → revocar la vieja |
+| `GEMINI_API_KEY` | Script de ingesta (letra chica, #51) | Secret del repo en GitHub Actions (¹); local: `supabase/.env`. No va en las Edge Functions (ADR-012) | Generar key nueva en Google AI Studio → actualizar el secret del repo → revocar la vieja |
+| `GROQ_API_KEY` | Edge Function del ticket (#48, ADR-012) | `supabase secrets set` (hace falta ser Owner o Administrator de la organización); local: `supabase/.env` | Generar key nueva en la consola de Groq → `supabase secrets set` (las funciones la leen al instante, sin redeploy) → revocar la vieja |
 | `SUPABASE_SERVICE_ROLE_KEY` | Solo el proceso de ingesta (RNF-05) | Secret del repo en GitHub Actions (¹); local: `supabase/.env`. Nunca en EAS ni en la app. En las Edge Functions Supabase ya inyecta la suya: no se setea a mano | Crear una key nueva en Supabase (Settings → API Keys) y actualizar el lugar donde corre la ingesta en el mismo momento; revocar la vieja. Con las keys JWT legacy, rotar el JWT secret invalida también la anon key y obliga a reconstruir la app |
 
 ¹ La ingesta corre en GitHub Actions (ADR-011, «Dónde corre el cron»): los
@@ -46,7 +48,7 @@ Reglas (RNF-04, RNF-05):
 
 - Nada con prefijo `EXPO_PUBLIC_` puede ser secreto: termina en el bundle.
   Solo van la URL y la anon key.
-- La Gemini key y la service role key no aparecen en el cliente ni en el repo.
+- Las keys de Gemini y de Groq y la service role key no aparecen en el cliente ni en el repo.
   Verificación: búsqueda de ambas en el bundle exportado y en
   `git grep` / historial, 0 resultados.
 - Si una key se filtró (commit, log, captura), se rota primero y se limpia

@@ -1,5 +1,8 @@
 # ADR-006: Registro de compras por lectura del ticket
 
+> **Superado en parte por ADR-012 (10/11/2026, propuesto):** los tickets los
+> lee Groq, no Gemini. El resto de esta decisión sigue vigente.
+
 ## Context
 
 El control de tope de reintegro exige saber cuánto consumió el usuario en el

@@ -8,7 +8,7 @@ You review changes to the Vuelto codebase against the non-negotiable rules
 in this project's `CLAUDE.md`. You are not a general code reviewer — stay
 narrowly focused on these seven rules, each with its failure mode:
 
-1. **El motor de reglas nunca llama al LLM.** Any import of a Gemini/LLM
+1. **El motor de reglas nunca llama al LLM.** Any import of a Gemini/Groq/LLM
    client, or any call resembling "ask the model which payment method",
    inside the rules-engine package is a violation. The recommendation must
    be traceable to deterministic code only.
@@ -16,10 +16,10 @@ narrowly focused on these seven rules, each with its failure mode:
    optional/`?` fields in extractor output types instead of
    `{"type": ["string", "null"]}`-style explicit nulls, or any inferred/
    guessed field value where the source text didn't contain it.
-3. **La API key de Gemini nunca en la app del celular.** Grep the Expo/
-   mobile client code and its bundled env for `GEMINI`, `GOOGLE_API_KEY`, or
-   similar. It may only appear in the ingestion script or a Supabase Edge
-   Function.
+3. **Las API keys de los extractores nunca en la app del celular.** Grep the
+   Expo/mobile client code and its bundled env for `GEMINI`, `GOOGLE_API_KEY`,
+   `GROQ`, or similar. The Gemini key may only appear in the ingestion script;
+   the Groq key only in a Supabase Edge Function (ADR-012).
 4. **Las imágenes de ticket no se persisten.** Check ticket-handling code
    for any write of the raw image to storage/DB — only the extracted text
    may be persisted alongside the purchase record.
@@ -39,7 +39,7 @@ narrowly focused on these seven rules, each with its failure mode:
    store or in AsyncStorage instead of derived; a selector that reads the clock
    (`new Date()`) instead of using the `ahora` in the store; anything that mixes
    data of more than one user computed in the app (the group spend stays in an
-   Edge Function); a Gemini key or call in `apps/mobile`.
+   Edge Function); a Gemini or Groq key or call in `apps/mobile`.
 
 ## Process
 

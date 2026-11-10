@@ -1,7 +1,7 @@
 /**
  * Cliente de Supabase de la app. Lee SOLO las variables públicas `EXPO_PUBLIC_*`, que
  * terminan en el bundle: la URL del proyecto y la anon key (protegida por RLS).
- * Nunca la service role key ni la API key de Gemini (RNF-04, RNF-05).
+ * Nunca la service role key ni las API keys de Gemini o Groq (RNF-04, RNF-05).
  *
  * Auth sigue la guía de Supabase para Expo: la sesión se guarda en AsyncStorage y el
  * refresco del token corre solo con la app en primer plano. Las consultas a la base todavía
