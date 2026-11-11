@@ -1,6 +1,7 @@
 /**
- * Respuestas HTTP comunes de las Edge Functions. Contrato de errores:
- * `specs/004-recomendar-pantalla/contracts/recomendar.md` (FR-022).
+ * Respuestas HTTP comunes de las Edge Functions. Contratos de errores:
+ * `specs/004-recomendar-pantalla/contracts/recomendar.md` (FR-022) y
+ * `specs/013-extraer-ticket/contracts/extraer-ticket.md` (FR-014).
  */
 
 export type CodigoError =
@@ -8,7 +9,14 @@ export type CodigoError =
   | "no_autenticado"
   | "perfil_sin_medios"
   | "metodo_no_permitido"
-  | "interno";
+  | "interno"
+  // Lectura del ticket (spec 013).
+  | "formato_no_soportado"
+  | "imagen_demasiado_grande"
+  | "imagen_danada"
+  | "ticket_ilegible"
+  | "tardo_demasiado"
+  | "no_disponible";
 
 const STATUS: Record<CodigoError, number> = {
   invalido: 400,
@@ -16,6 +24,12 @@ const STATUS: Record<CodigoError, number> = {
   metodo_no_permitido: 405,
   perfil_sin_medios: 422,
   interno: 500,
+  formato_no_soportado: 415,
+  imagen_demasiado_grande: 413,
+  imagen_danada: 422,
+  ticket_ilegible: 422,
+  tardo_demasiado: 504,
+  no_disponible: 503,
 };
 
 export function respuestaJson(status: number, cuerpo: unknown): Response {

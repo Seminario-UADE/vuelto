@@ -2560,6 +2560,10 @@ Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
 7. "Commiteá y seguí con las tasks." 28 tareas en 3 etapas. La primera
    termina con la prueba de Groq con fotos reales, que corre el usuario: si
    no pasa, no se sigue. Los tests van antes que el código, sin red ni key.
+8. "Arrancá con la etapa 1, hasta la tarea 9 en pausa." Se armó lo mínimo
+   para hablarle a Groq: el esquema, su validación en el servidor y la
+   conexión, con tests que simulan a Groq. Más un script para que el usuario
+   pruebe con fotos reales en otra terminal, sin que la key pase por la IA.
 
 **Resultado:**
 - Spec 013: qué recibe y qué devuelve el servicio, qué datos personales
@@ -2573,9 +2577,13 @@ Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
   descuento; la segunda, detalles técnicos que se resolvieron.
 - El ADR-012 se corrigió en el PR #126: ya no promete el formato del lector
   simulado de la app.
-- Queda pendiente: el plan, las tareas y la implementación; avisarle a
-  Joaquín que la issue #49 tiene que adaptar su formato y que el campo de
-  descuento no viene del ticket.
+- Etapa 1: el esquema que recibe Groq y el que valida el servidor no se
+  pueden desalinear (un test lo controla), los errores de Groq se traducen a
+  los códigos de la spec y ningún error copia valores del ticket. 20 tests
+  nuevos, sin red ni key.
+- Queda pendiente: la prueba con fotos reales (si no pasa, se frena), las
+  etapas 2 y 3, y avisarle a Joaquín que la issue #49 tiene que adaptar su
+  formato y que el campo de descuento no viene del ticket.
 
 ---
 

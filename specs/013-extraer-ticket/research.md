@@ -74,7 +74,7 @@ Decisiones técnicas del plan de la spec 013. Cada una: decisión, por qué y al
 
   ```bash
   read -rs GROQ_API_KEY && export GROQ_API_KEY   # Git Bash: la key no se ve ni queda en el historial
-  npx deno run --config supabase/functions/extraer-ticket/deno.json \
+  npx deno run --no-lock --config supabase/functions/extraer-ticket/deno.json \
     --allow-net=api.groq.com --allow-read --allow-env=GROQ_API_KEY \
     supabase/functions/extraer-ticket/prueba-manual.ts foto1.jpg foto2.jpg foto3.jpg
   ```

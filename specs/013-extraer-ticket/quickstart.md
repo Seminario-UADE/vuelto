@@ -9,7 +9,7 @@ En una terminal de Git Bash **aparte, fuera de la sesión de IA**:
 ```bash
 cd ~/Documents/UADE/Seminario/vuelto
 read -rs GROQ_API_KEY && export GROQ_API_KEY      # pegar la key: no se ve ni queda en el historial
-npx deno run --config supabase/functions/extraer-ticket/deno.json \
+npx deno run --no-lock --config supabase/functions/extraer-ticket/deno.json \
   --allow-net=api.groq.com --allow-read --allow-env=GROQ_API_KEY \
   supabase/functions/extraer-ticket/prueba-manual.ts ~/fotos/t1.jpg ~/fotos/t2.jpg ~/fotos/t3.jpg
 unset GROQ_API_KEY

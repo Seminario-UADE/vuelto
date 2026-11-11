@@ -13,10 +13,11 @@ export default defineConfig({
     include: ["functions/**/*.test.ts"],
     // Mismo piso de cobertura que el motor (issue #37). `index.ts` solo
     // conecta Deno y Supabase: no corre en Node y se prueba desplegado.
+    // `prueba-manual.ts` (spec 013) usa Deno y la corre el usuario con fotos reales.
     coverage: {
       provider: "v8",
       include: ["functions/**/*.ts"],
-      exclude: ["functions/**/*.test.ts", "functions/_shared/test/**", "functions/*/index.ts"],
+      exclude: ["functions/**/*.test.ts", "functions/_shared/test/**", "functions/*/index.ts", "functions/*/prueba-manual.ts"],
       thresholds: { lines: 90 },
     },
   },
