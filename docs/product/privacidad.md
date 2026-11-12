@@ -23,7 +23,7 @@ comercial.
 ## Imágenes de ticket: retención durante el procesamiento
 
 La imagen viaja del celular a la Edge Function de Supabase y de ahí a la API
-de Gemini, dentro del mismo request (`04-infrastructure.md`). No se escribe
+de Groq, dentro del mismo request (`04-infrastructure.md`, ADR-012). No se escribe
 a disco ni a Supabase Storage en ningún punto del camino: vive en memoria
 durante ese request y se descarta al recibir la respuesta del extractor, se
 haya podido extraer algo o no.
@@ -114,9 +114,14 @@ Detalle y razonamiento en ADR-008.
 
 ## Terceros
 
-- **Google (Gemini API)**: procesa el texto de tickets y de letra chica de
-  promociones. Es un proveedor de servicio, no un tercero al que se le
-  entregan datos para otro fin.
+- **Groq (API)**: lee la imagen del ticket para extraer sus datos. Por
+  contrato no entrena modelos con lo que recibe (Groq Services Agreement,
+  sección 4.2). La organización tiene activado «Zero Data Retention», así que
+  tampoco guarda los pedidos ni las respuestas: sin esa opción podría
+  guardarlos hasta 30 días por confiabilidad y cumplimiento. Es un proveedor
+  de servicio, no un tercero al que se le entregan datos para otro fin.
+- **Google (Gemini API)**: procesa la letra chica de las promociones, que son
+  datos públicos de MODO. No recibe ningún dato de los usuarios.
 - **Supabase**: aloja la base de datos y la autenticación. Mismo criterio:
   proveedor de infraestructura.
 

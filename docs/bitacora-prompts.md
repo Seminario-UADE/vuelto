@@ -2450,6 +2450,82 @@ veía viejo y un cierre de compra sin peso.
 
 ---
 
+## 2026-11-10 — Quién lee los tickets: Groq en vez de Gemini (issue #85, ADR-012)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI y búsqueda web.
+
+**Objetivo:** antes de cargar la key de Gemini en Supabase (issue #85),
+averiguar qué hace Google con los tickets que le mandamos, y elegir un
+proveedor que cuide la privacidad sin costo.
+
+**Prompts principales:**
+1. "Arrancá con la issue #85, tené en cuenta que es una investigación."
+   Se leyeron las condiciones de Gemini: en el plan gratis, Google usa lo que
+   recibe para mejorar sus productos, lo pueden leer personas, y pide no
+   mandarle datos personales. Un ticket los tiene.
+2. "¿Alguna otra opción que mantenga la privacidad que no sea Gemini?" Se
+   compararon cuatro: leer el ticket en el celular, el celular más Gemini
+   con el texto sin datos personales, otro proveedor, y Gemini pago.
+3. "¿Para qué Gemini si el celular ya saca el texto?" y "o es el celular más
+   Gemini, o es solo Groq". Se separaron los dos planes, que se habían
+   mezclado.
+4. "Investigá más a fondo si es real la privacidad de Groq y las
+   limitaciones del plan gratis." El contrato de Groq prohíbe entrenar con lo
+   que recibe; sus límites gratis alcanzan para los tickets pero no para la
+   ingesta de promos.
+5. "Me gusta más la opción de solo Groq: parece más confiable y menos
+   setup." Se verificó que Groq tiene un modelo que lee fotos y respeta el
+   esquema.
+6. "Armá el PR del ADR-012." Al revisarlo, el revisor de reglas avisó que
+   varias reglas seguirían diciendo "Gemini" para el ticket. "Sumá las
+   enmiendas y mostrame los textos."
+7. "¿Las keys se suben o cada uno las tiene en su computadora? ¿Qué es más
+   seguro?" Nunca se suben: cada una vive solo donde corre el código que la
+   usa (la de Groq en Supabase, la de Gemini en GitHub) y, una vez cargada,
+   nadie puede volver a leerla.
+8. "Revisá bien cómo se crean las keys: que sea costo 0, si hace falta una
+   cuenta, cómo se cargan de forma segura sin que las lea la IA, si vencen y
+   cómo se sacan." Lo más seguro es hacer todo desde las páginas web, sin
+   archivos ni terminal. Se corrigió la issue #85, que sugería guardar la key
+   en un archivo dentro del repo.
+9. "Arranquemos con Groq." Se armó la cuenta sin tarjeta, se activó «Zero
+   Data Retention» (se pudo, aunque el contrato lo reservaba a ciertos
+   clientes) y se cargó la key en Supabase desde la web, con vencimiento a los 90 días
+   (8/2/2027). La IA no la vio.
+10. Al escribir la spec de la issue #48 se decidió no leer el descuento del
+    ticket y que el medio de pago llegue tal como lo dice el ticket. "Corregí
+    el ADR-012": decía que se respetaba el formato del lector simulado de la
+    app y que el descuento se decidía después.
+
+**Resultado:**
+- ADR-012 (propuesto): los tickets los lee Groq; la letra chica de las
+  promos sigue con Gemini, porque son datos públicos y sus límites alcanzan.
+- La nota en el ADR-006 avisa que esa parte cambió.
+- La tabla de secrets dice dónde va cada key: la de Groq en Supabase y la de
+  Gemini solo en GitHub Actions. Se corrigieron dos datos de la issue #85:
+  hace falta ser Owner o Administrator para cargar secrets, y no hace falta
+  volver a desplegar la función.
+- Las reglas del proyecto se actualizaron en el mismo PR, para que nunca
+  digan cosas distintas: la constitución (3.0.1), CLAUDE.md, los requisitos,
+  la política de privacidad y el revisor de reglas, que ahora busca también la
+  key de Groq en la app.
+- La guía para crear y cargar las keys quedó en la issue #85 y en la tabla de
+  secrets: cuentas gratis sin tarjeta, no hacer upgrade en Groq, un proyecto de
+  Google sin facturación, cargarlas desde la web y revocarlas en el proveedor
+  cuando ya no hagan falta.
+- La key de Groq quedó cargada en Supabase, con «Zero Data Retention»
+  activado: Groq no guarda los tickets. La política de privacidad y el ADR lo
+  dicen.
+- Queda pendiente: que el PO apruebe el ADR, cargar la key de Gemini en
+  GitHub (issue #85) y ajustar la issue #48 al implementarla.
+- Errores de la IA en el proceso: al principio propuso combinar el celular
+  con Groq, cuando si el celular ya quita los datos personales, Gemini
+  alcanza; lo marcó el usuario y se separaron los dos planes. Además, la
+  primera guía de la issue #85 sugería guardar la key en un archivo dentro
+  del repo, donde la IA la podría leer; se corrigió por la carga desde la web.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

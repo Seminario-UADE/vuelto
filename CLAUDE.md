@@ -77,7 +77,7 @@ Si cambia `packages/motor/src`, recompilarlo (`npm run build -w @vuelto/motor`) 
 | Motor de reglas | Paquete TypeScript propio, sin dependencias, con su suite de tests. Corre **en la app** (recomendación y topes en vivo, sin red) y, para el gasto en grupo, en una Edge Function (ADR-010) |
 | Cliente mobile | Expo (React Native) con Redux Toolkit como estado: perfil, corpus de promociones y compras del período; la recomendación y los topes se derivan con selectores, no se guardan |
 | Backend / DB | Supabase (Postgres + Auth + RLS). Edge Functions solo donde hay un secreto o datos de otros usuarios (ticket, grupo, invitaciones) |
-| Extractor | Gemini API — **siempre del lado del servidor**, nunca en el cliente |
+| Extractor | **Siempre del lado del servidor**, nunca en el cliente. Ticket: Groq (Edge Function). Letra chica: Gemini (ingesta). Ver ADR-012 |
 | Ingesta / scraping | Playwright (dónde corre el cron: pendiente) |
 | Testing | Vitest sobre el motor + Expo Go para ejecución manual |
 
@@ -102,9 +102,10 @@ Si cambia `packages/motor/src`, recompilarlo (`npm run build -w @vuelto/motor`) 
 - **Salida del extractor siempre estructurada contra un esquema.** Campos
   ausentes se devuelven `null` explícito — nunca inventados ni inferidos.
   Esquema: `{"type": ["string", "null"]}`, no campos opcionales.
-- **La API key de Gemini nunca va en la app del celular.** Letra chica → script
-  de ingesta. Ticket → Edge Function de Supabase.
-- **Las imágenes de ticket no se persisten** (se mandan a Gemini y se
+- **Las API keys de los extractores nunca van en la app del celular.** Letra
+  chica → Gemini, desde el script de ingesta. Ticket → Groq, desde una Edge
+  Function de Supabase (ADR-012).
+- **Las imágenes de ticket no se persisten** (se mandan a Groq y se
   descartan; no se escriben a disco ni a Supabase Storage en ningún paso del
   camino). Sí se persiste el texto extraído junto al registro de compra.
   Detalle completo de qué se guarda y por cuánto tiempo:

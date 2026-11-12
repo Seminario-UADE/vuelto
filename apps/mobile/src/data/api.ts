@@ -51,7 +51,7 @@ export type FallaTicket = "ilegible" | "sin-red";
 
 /**
  * Lee el ticket. En esta feature no recibe imagen: no hay captura real (spec 006 FR-015).
- * El endpoint real recibe la imagen, la manda a Gemini y la descarta (Principio IV).
+ * El endpoint real recibe la imagen, la manda a Groq y la descarta (Principio IV, ADR-012).
  * `hoy` viene del reloj del store (`sesion.ahora`), nunca de `new Date()` (spec 012 R12).
  */
 export async function leerTicket(opciones: { hoy: string; falla?: FallaTicket | null }): Promise<LecturaTicket> {

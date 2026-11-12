@@ -1,5 +1,19 @@
 <!--
 Sync Impact Report
+- Versión: 3.0.0 → 3.0.1 (PATCH: cambia el proveedor del extractor del ticket; ningún principio
+  cambia de sentido)
+- Principios modificados:
+  - III. "Extracción con esquema y null explícito" y IV. "Secretos y privacidad": el ticket lo
+    lee Groq y la letra chica Gemini; la regla de la key vale para los dos.
+- Decisión de origen: ADR-012 (docs/decisions/012-groq-lee-los-tickets.md). Requiere la
+  aprobación del PO en el PR que la introduce.
+- Archivos alineados:
+  ✅ CLAUDE.md, docs/product/requisitos.md (RNF-04), docs/product/privacidad.md,
+     docs/architecture/04-infrastructure.md, .claude/agents/rules-guardian.md y
+     .agents/agents/rules-guardian.md
+- Pendientes: la issue #48 (proveedor y contrato) se ajusta al implementarla.
+
+Versión anterior (3.0.0):
 - Versión: 2.0.1 → 3.0.0 (MAJOR: redefine el Principio II)
 - Principios modificados:
   - II. "Motor de reglas determinístico": el motor deja de correr solo en la Edge Function. Lo
@@ -77,7 +91,8 @@ innovación de la materia.
 
 ### III. Extracción con esquema y null explícito
 
-- El LLM (Gemini) vive solo en la ingesta de promociones y en la Edge Function del ticket.
+- El LLM vive solo en la ingesta de promociones (Gemini, letra chica) y en la Edge Function del
+  ticket (Groq, ADR-012).
   Nunca está en el camino crítico de la recomendación.
 - Su salida DEBE validarse contra un esquema donde todos los campos son requeridos y nullables
   (`{"type": [T, "null"]}`), sin campos opcionales. En TypeScript eso es `campo: T | null`,
@@ -93,8 +108,8 @@ innovación de la materia.
 
 ### IV. Secretos y privacidad
 
-- La API key de Gemini NUNCA está en la app móvil. La letra chica se procesa en el script de
-  ingesta y el ticket en una Edge Function de Supabase.
+- Las API keys de los extractores (Gemini y Groq) NUNCA están en la app móvil. La letra chica se
+  procesa en el script de ingesta y el ticket en una Edge Function de Supabase.
 - La service role key la usa solo el proceso de ingesta. No aparece en el cliente ni en el repo.
 - Las imágenes de ticket NUNCA se persisten: no van a disco, a Storage, a la base ni a los logs.
   Sí se persiste el texto extraído junto al registro de compra.
@@ -121,14 +136,15 @@ tiempo.
 - Cada dimensión de RF-04 tiene al menos un test: medio de pago, vigencia y día, comercio o
   categoría, monto mínimo, canal, jurisdicción, tope consumido o agotado, tope compartido vs.
   exclusivo y acumulabilidad (con `null` tratado como no acumulable).
-- Las llamadas a Gemini se prueban con mocks. Ninguna suite depende de la red.
+- Las llamadas a los extractores (Gemini y Groq) se prueban con mocks. Ninguna suite depende de
+  la red.
 
 **Por qué:** ADR-001 y RNF-03. El motor es la pieza que un evaluador técnico abre y revisa.
 
 ## Stack y restricciones
 
 - **Stack:** app en Expo (React Native) con Expo Router y Redux Toolkit como estado del cliente;
-  Supabase (Postgres + Auth + Edge Functions, solo donde hay un secreto o datos de otros usuarios); Gemini Flash solo del lado del servidor; motor en TypeScript con Vitest; monorepo
+  Supabase (Postgres + Auth + Edge Functions, solo donde hay un secreto o datos de otros usuarios); Gemini (letra chica) y Groq (ticket) solo del lado del servidor; motor en TypeScript con Vitest; monorepo
   con npm workspaces (`packages/motor`, `apps/mobile`, `supabase/`, `ingesta/`).
 - **Costo:** $0 durante el cuatrimestre. Todo servicio DEBE entrar en su tier gratuito.
 - **Alcance:** CABA/AMBA. Hay una sola fuente de ingesta, MODO, a través de su API pública, y se
@@ -168,4 +184,4 @@ tiempo.
 - La guía operativa del día a día está en `CLAUDE.md`. Si contradice a esta constitución, se
   corrige `CLAUDE.md`.
 
-**Version**: 3.0.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-11-01
+**Version**: 3.0.1 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-11-10
