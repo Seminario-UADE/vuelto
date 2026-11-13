@@ -12,7 +12,12 @@
  * chequea `deno check`.
  */
 import { ExtractorGroq, type ModoGroq } from "./extractor-groq.ts";
-import { RespuestaFueraDeEsquemaError, type TipoImagen } from "./extractor.ts";
+import {
+  ExtractorNoDisponibleError,
+  ExtractorRechazoError,
+  RespuestaFueraDeEsquemaError,
+  type TipoImagen,
+} from "./extractor.ts";
 
 const TIPOS: Record<string, TipoImagen> = {
   jpg: "image/jpeg",
@@ -50,10 +55,17 @@ for (const ruta of fotos) {
     const lectura = await extractor.leer(await Deno.readFile(ruta), tipo);
     resultados[nombre] = { ms: Date.now() - inicio, lectura };
   } catch (error) {
-    resultados[nombre] =
-      error instanceof RespuestaFueraDeEsquemaError
-        ? { ms: Date.now() - inicio, error: error.name, camino: error.camino, regla: error.regla }
-        : { ms: Date.now() - inicio, error: error instanceof Error ? error.name : "desconocido" };
+    const ms = Date.now() - inicio;
+    // Solo el tipo de falla, el código HTTP o el camino del campo: nunca la key ni datos del ticket.
+    if (error instanceof RespuestaFueraDeEsquemaError) {
+      resultados[nombre] = { ms, error: error.name, camino: error.camino, regla: error.regla };
+    } else if (error instanceof ExtractorNoDisponibleError) {
+      resultados[nombre] = { ms, error: error.name, estado: error.estado, causa: error.causa };
+    } else if (error instanceof ExtractorRechazoError) {
+      resultados[nombre] = { ms, error: error.name, estado: error.estado };
+    } else {
+      resultados[nombre] = { ms, error: error instanceof Error ? `${error.name}: ${error.message}` : "desconocido" };
+    }
   }
 }
 

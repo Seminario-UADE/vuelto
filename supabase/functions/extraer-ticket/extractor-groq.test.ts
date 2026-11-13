@@ -126,7 +126,11 @@ describe("ExtractorGroq: la respuesta", () => {
     const fn = (async () => {
       throw new TypeError("fetch failed");
     }) as typeof fetch;
-    await expect(extractor(fn).leer(IMAGEN, "image/jpeg")).rejects.toBeInstanceOf(ExtractorNoDisponibleError);
+    await expect(extractor(fn).leer(IMAGEN, "image/jpeg")).rejects.toMatchObject({
+      name: "ExtractorNoDisponibleError",
+      estado: null,
+      causa: "TypeError: fetch failed",
+    });
   });
 
   it.each([400, 401, 413])("otro rechazo de Groq (%i) es ExtractorRechazoError", async (estado) => {

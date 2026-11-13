@@ -2564,6 +2564,11 @@ Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
    para hablarle a Groq: el esquema, su validación en el servidor y la
    conexión, con tests que simulan a Groq. Más un script para que el usuario
    pruebe con fotos reales en otra terminal, sin que la key pase por la IA.
+9. "Me devolvió ExtractorNoDisponibleError." El script no decía por qué. Se
+   le sumó el código de Groq o el motivo de la falla de conexión, sin datos
+   del ticket. En el segundo intento, Groq leyó bien el primer ticket: monto,
+   fecha y red correctos, y el tipo de tarjeta vacío porque el ticket no lo
+   dice. Eligió la razón social en vez del nombre del local.
 
 **Resultado:**
 - Spec 013: qué recibe y qué devuelve el servicio, qué datos personales

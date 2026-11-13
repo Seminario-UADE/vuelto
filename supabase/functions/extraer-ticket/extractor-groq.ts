@@ -95,9 +95,9 @@ export class ExtractorGroq implements Extractor {
         body: cuerpo,
         signal: control.signal,
       });
-    } catch {
+    } catch (error) {
       if (control.signal.aborted) throw new ExtractorTiempoAgotadoError();
-      throw new ExtractorNoDisponibleError(null);
+      throw new ExtractorNoDisponibleError(null, error instanceof Error ? `${error.name}: ${error.message}` : null);
     } finally {
       clearTimeout(corte);
     }

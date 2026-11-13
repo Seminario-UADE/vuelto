@@ -40,9 +40,16 @@ export class ExtractorTiempoAgotadoError extends Error {
   }
 }
 
-/** El proveedor está caído, sin conexión o rechazó por límite de uso. */
+/**
+ * El proveedor está caído, sin conexión o rechazó por límite de uso. `estado`
+ * es el HTTP de Groq (`null` si no hubo respuesta) y `causa`, el tipo de falla
+ * de conexión: ninguno trae datos del ticket.
+ */
 export class ExtractorNoDisponibleError extends Error {
-  constructor(readonly estado: number | null) {
+  constructor(
+    readonly estado: number | null,
+    readonly causa: string | null = null,
+  ) {
     super("El lector del ticket no está disponible.");
     this.name = "ExtractorNoDisponibleError";
   }
