@@ -2574,6 +2574,20 @@ Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
     compra por confirmar) y, si no hay, la razón social. Error de la IA: el
     commit anterior dejó un import sin usar porque no se corrió el lint antes
     de commitear; se corrigió en este.
+11. "Algunas fotos dan 429. ¿Puede ser que Groq esté dormido y haya que
+    darle tiempo, o mandarle una señal antes?" El 429 era el límite de uso
+    por minuto, no un arranque en frío. "No venía de probar antes, fueron
+    días distintos": la primera explicación de la IA no cerraba, así que se
+    pasó a mostrar el mensaje de Groq, que dice qué límite se superó.
+12. "¿Las tres fotos se mandan juntas o de a una?" De a una; el script
+    muestra los resultados al final. En la app es siempre una foto por
+    pedido.
+13. Con los mensajes de Groq y los límites que el usuario vio en la consola
+    se ajustó: apagar el "pensamiento" interno del modelo (cada ticket pasó
+    de unos 3.500 a unos 1.350 tokens), sacar el tope de respuesta (con tope,
+    Groq cortaba el texto antes de tiempo; se comprobó con una prueba con y
+    sin tope) y reintentar una vez si Groq pide esperar 12 segundos o menos.
+    "¿Cuánto esperaría?": lo que diga Groq, solo si entra en los 20 segundos.
 
 **Resultado:**
 - Spec 013: qué recibe y qué devuelve el servicio, qué datos personales
@@ -2591,9 +2605,15 @@ Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
   pueden desalinear (un test lo controla), los errores de Groq se traducen a
   los códigos de la spec y ningún error copia valores del ticket. 20 tests
   nuevos, sin red ni key.
-- Queda pendiente: la prueba con fotos reales (si no pasa, se frena), las
-  etapas 2 y 3, y avisarle a Joaquín que la issue #49 tiene que adaptar su
-  formato y que el campo de descuento no viene del ticket.
+- La prueba con fotos reales pasó: 3 tickets leídos bien (montos, fechas,
+  red y débito con sus últimos 4). Se escapó un dato personal, el nombre de
+  un mozo, y se sumó a la instrucción; se mide en la issue #10.
+- Límites reales del plan gratis: unos 2 a 3 tickets por minuto y unos 145
+  por día para toda la app. Alcanza para el MVP y quedó escrito en el
+  ADR-012.
+- Queda pendiente: las etapas 2 y 3, y avisarle a Joaquín que la issue #49
+  tiene que adaptar su formato, que el descuento no viene del ticket y que el
+  iPhone saca fotos HEIC (la app tiene que mandar JPG).
 
 ---
 

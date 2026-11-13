@@ -4,8 +4,12 @@ Decisiones técnicas del plan de la spec 013. Cada una: decisión, por qué y al
 
 ## R1. Llamar a Groq con `fetch`, sin SDK
 
-- **Decisión**: `POST https://api.groq.com/openai/v1/chat/completions` con `fetch` y un `AbortController` de 20 s (FR-015). Modelo `qwen/qwen3.8-27b`, `temperature: 0`, la imagen como `image_url` con un data URL (`data:<tipo>;base64,<imagen>`) y `response_format: { type: "json_schema", json_schema: { name: "lectura_ticket", strict: true, schema } }`.
+- **Decisión**: `POST https://api.groq.com/openai/v1/chat/completions` con `fetch` y un `AbortController` de 20 s (FR-015). Modelo `qwen/qwen3.8-27b`, `temperature: 0`, `reasoning_effort: "none"`, sin `max_completion_tokens`, la imagen como `image_url` con un data URL (`data:<tipo>;base64,<imagen>`) y `response_format: { type: "json_schema", json_schema: { name: "lectura_ticket", strict: true, schema } }`.
 - **Por qué**: el contrato de Groq es el de OpenAI y alcanza con un pedido HTTP. Sin dependencias nuevas: el workspace `supabase` no tiene `dependencies` y el `deno.json` solo mapea el motor y `supabase-js`. `temperature: 0` hace que la misma foto dé la misma lectura.
+- **Aprendido en la prueba manual (13/11)**:
+  - Sin `reasoning_effort: "none"`, el modelo "pensaba" antes de responder: unos 3.500 a 4.000 tokens por ticket. Apagado, unos 1.350 (971 de entrada y 300 a 400 de salida) y unos 2 segundos.
+  - Con `max_completion_tokens: 1500`, Groq cortaba la transcripción a los 372 tokens, mucho antes del tope, y avisaba que había terminado normal. Sin tope salió completa (399 tokens). Por eso no se usa: la respuesta la acotan el corte de 20 s y el límite de salida por minuto.
+  - Límites reales del plan gratis para este modelo: 7.000 tokens de entrada y 1.000 de salida por minuto (Groq estima unos 2.250 de entrada por foto antes de leerla), 200.000 por día, 30 pedidos por minuto y 1.000 por día. Son por organización: **unos 2 a 3 tickets por minuto y unos 145 por día para toda la app**.
 - **Alternativas**: el SDK `groq-sdk` (una dependencia más para un solo pedido); el SDK de OpenAI apuntado a Groq (lo mismo).
 
 ## R2. Groq devuelve lo impreso; el servicio normaliza
@@ -50,7 +54,7 @@ Decisiones técnicas del plan de la spec 013. Cada una: decisión, por qué y al
 
 - **Decisión**: se suman a `CodigoError` de `_shared/http.ts`: `formato_no_soportado` (415), `imagen_demasiado_grande` (413), `imagen_danada` (422), `ticket_ilegible` (422), `tardo_demasiado` (504) y `no_disponible` (503). El extractor lanza errores propios y el handler los traduce:
   - `ExtractorTiempoAgotadoError` (el `AbortController` cortó) → `tardo_demasiado`.
-  - `ExtractorNoDisponibleError` (Groq respondió 429, 500, 502 o 503, o no hubo conexión) → `no_disponible`.
+  - `ExtractorNoDisponibleError` (Groq respondió 429, 500, 502 o 503, o no hubo conexión) → `no_disponible`. Ante un 429, Groq manda `retry-after` (segundos) y un mensaje con el límite superado; el extractor reintenta una vez si son 12 s o menos y entran en los 20 s (FR-015). El mensaje se guarda con el id de la organización tapado.
   - `RespuestaFueraDeEsquemaError` (la respuesta no es JSON o no cumple el esquema) → `ticket_ilegible`, con el camino del campo que falló en el registro.
   - Cualquier otro 4xx de Groq → `interno`, registrado con el estado HTTP.
 - **Por qué**: FR-014. `recomendar` usa el mismo archivo y no cambia: solo se suman valores al tipo.

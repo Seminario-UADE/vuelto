@@ -82,7 +82,7 @@ Si la foto no sirve, es demasiado grande, la lectura tarda demasiado o el servic
 6. **Given** una foto en la que el proveedor no encuentra monto, comercio ni fecha (los tres vacíos), **Then** responde `ticket_ilegible`.
 7. **Given** una respuesta del proveedor que no cumple el esquema, **Then** responde `ticket_ilegible` y registra el motivo sin copiar ningún valor del ticket.
 8. **Given** un proveedor que no responde en 20 segundos, **Then** responde `tardo_demasiado`.
-9. **Given** un proveedor que rechaza por límite de uso o no está disponible, **Then** responde `no_disponible`.
+9. **Given** un proveedor que rechaza por límite de uso pidiendo esperar 12 segundos o menos, y la espera más una lectura entran en los 20 segundos, **Then** espera ese tiempo y reintenta una sola vez. **Given** que pide esperar más, que no entra en los 20 segundos, que el reintento vuelve a fallar o que el proveedor no está disponible, **Then** responde `no_disponible`.
 
 ### Edge Cases
 
@@ -135,8 +135,8 @@ Si la foto no sirve, es demasiado grande, la lectura tarda demasiado o el servic
 
 **Errores y tiempos**
 
-- **FR-014**: Cada falla MUST tener un código estable y un estado HTTP, que la app traduce a un mensaje: `no_autenticado` (401), `invalido` (400), `formato_no_soportado` (415), `imagen_demasiado_grande` (413), `imagen_danada` (422), `ticket_ilegible` (422), `tardo_demasiado` (504), `no_disponible` (503), `metodo_no_permitido` (405) e `interno` (500). Un rechazo del proveedor por límite de uso o caída es `no_disponible`; cualquier otro rechazo del proveedor (pedido inválido, demasiado grande) es `interno` y se registra, porque el servicio ya validó el pedido antes. La respuesta de error MUST traer solo el código, sin datos del ticket.
-- **FR-015**: Si el proveedor no contesta en 20 segundos, el servicio MUST cortar y responder `tardo_demasiado`. Medido en el servidor, el servicio MUST responder siempre en menos de 25 segundos.
+- **FR-014**: Cada falla MUST tener un código estable y un estado HTTP, que la app traduce a un mensaje: `no_autenticado` (401), `invalido` (400), `formato_no_soportado` (415), `imagen_demasiado_grande` (413), `imagen_danada` (422), `ticket_ilegible` (422), `tardo_demasiado` (504), `no_disponible` (503), `metodo_no_permitido` (405) e `interno` (500). Un rechazo del proveedor por límite de uso o caída es `no_disponible`, salvo el reintento de FR-015; cualquier otro rechazo del proveedor (pedido inválido, demasiado grande) es `interno` y se registra, porque el servicio ya validó el pedido antes. La respuesta de error MUST traer solo el código, sin datos del ticket.
+- **FR-015**: La lectura, incluido un reintento, MUST durar como máximo 20 segundos: si el proveedor no contesta a tiempo, el servicio corta y responde `tardo_demasiado`. Ante un rechazo por límite de uso, el servicio MUST reintentar una sola vez si el proveedor pide esperar 12 segundos o menos y la espera más 5 segundos de lectura entran en los 20 (en la prueba manual, el proveedor pidió entre 8 y 10 segundos). Medido en el servidor, el servicio MUST responder siempre en menos de 25 segundos.
 
 **Estructura y verificación**
 

@@ -39,7 +39,14 @@ if (fotos.length === 0) {
   Deno.exit(1);
 }
 
-const extractor = new ExtractorGroq({ key, modo, fetch, limiteMs: 20_000 });
+const extractor = new ExtractorGroq({
+  key,
+  modo,
+  fetch,
+  limiteMs: 20_000,
+  esperar: (ms) => new Promise((r) => setTimeout(r, ms)),
+  ahora: () => Date.now(),
+});
 const resultados: Record<string, unknown> = {};
 
 for (const ruta of fotos) {
@@ -53,14 +60,21 @@ for (const ruta of fotos) {
   const inicio = Date.now();
   try {
     const lectura = await extractor.leer(await Deno.readFile(ruta), tipo);
-    resultados[nombre] = { ms: Date.now() - inicio, lectura };
+    // `uso`: tokens gastados y `motivoFin` ("length" = la respuesta se cortó).
+    resultados[nombre] = { ms: Date.now() - inicio, uso: extractor.ultimoUso, lectura };
   } catch (error) {
     const ms = Date.now() - inicio;
     // Solo el tipo de falla, el código HTTP o el camino del campo: nunca la key ni datos del ticket.
     if (error instanceof RespuestaFueraDeEsquemaError) {
       resultados[nombre] = { ms, error: error.name, camino: error.camino, regla: error.regla };
     } else if (error instanceof ExtractorNoDisponibleError) {
-      resultados[nombre] = { ms, error: error.name, estado: error.estado, causa: error.causa };
+      resultados[nombre] = {
+        ms,
+        error: error.name,
+        estado: error.estado,
+        causa: error.causa,
+        reintentarEn: error.reintentarEn,
+      };
     } else if (error instanceof ExtractorRechazoError) {
       resultados[nombre] = { ms, error: error.name, estado: error.estado };
     } else {
