@@ -50,6 +50,6 @@ Lo que devuelve Groq contra el esquema estricto (R2). Todo es texto tal como est
 | Error | Cuándo | Código para la app |
 |---|---|---|
 | `ExtractorTiempoAgotadoError` | El `AbortController` cortó a los 20 s | `tardo_demasiado` |
-| `ExtractorNoDisponibleError` | Groq respondió 429, 500, 502 o 503, o no hubo conexión | `no_disponible` |
+| `ExtractorNoDisponibleError` | Groq respondió 429 o cualquier 5xx, o no hubo conexión | `no_disponible` |
 | `RespuestaFueraDeEsquemaError` (con `camino` y `regla`) | La respuesta no es JSON o no cumple el esquema | `ticket_ilegible` |
 | `ExtractorRechazoError` (con `estado`) | Cualquier otro 4xx de Groq | `interno` |

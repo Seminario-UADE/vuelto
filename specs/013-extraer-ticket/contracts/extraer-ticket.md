@@ -48,8 +48,8 @@ Cuerpo: `{ "error": "<código>" }` (con `invalido`, también `"campo"`).
 | 422 | `imagen_danada` | Base64 inválido o el contenido no coincide con `tipo` | "No pudimos abrir la foto. Sacala de nuevo" |
 | 422 | `ticket_ilegible` | Sin monto, comercio ni fecha, o la respuesta del lector no cumple el esquema | "No pudimos leer el ticket. Probá con más luz o cargá la compra a mano" |
 | 500 | `interno` | Cualquier otro error | "Algo falló. Probá de nuevo o cargá la compra a mano" |
-| 503 | `no_disponible` | El lector no está disponible o se superó su límite de uso | "El lector no está disponible ahora. Probá en un rato o cargá la compra a mano" |
-| 504 | `tardo_demasiado` | El lector no contestó en 20 segundos | "Tardó demasiado. Probá de nuevo" |
+| 503 | `no_disponible` | El lector no está disponible (cualquier 5xx) o se superó su límite de uso. Ante un límite de uso, el servicio ya reintentó una vez si la espera era corta | "El lector no está disponible ahora. Probá en un rato o cargá la compra a mano" |
+| 504 | `tardo_demasiado` | El lector no contestó en 20 segundos, o el pedido completo llegó a 24 | "Tardó demasiado. Probá de nuevo" |
 
 Ninguna respuesta de error trae datos del ticket. El servicio siempre responde en menos de 25 segundos, medido en el servidor.
 

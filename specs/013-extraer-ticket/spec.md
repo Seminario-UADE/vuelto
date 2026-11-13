@@ -107,11 +107,11 @@ Si la foto no sirve, es demasiado grande, la lectura tarda demasiado o el servic
 
 **Respuesta**
 
-- **FR-003**: Ante una lectura exitosa, el servicio MUST devolver monto, comercio, fecha, medio de pago (banco, tipo, red y últimos 4 dígitos) y texto del ticket. Todos los campos MUST estar siempre presentes; el que el ticket no dice MUST llegar vacío (`null`), nunca inventado ni deducido (constitución §III).
+- **FR-003**: Ante una lectura exitosa, el servicio MUST devolver monto, comercio, fecha, medio de pago (banco, tipo, red y últimos 4 dígitos) y texto del ticket. Todos los campos MUST estar siempre presentes; el que el ticket no dice MUST llegar vacío (`null`), nunca inventado ni deducido (constitución §III). La única excepción es el texto del ticket: si el proveedor no devuelve transcripción llega como texto vacío (`""`), porque la app lo guarda como texto con la compra.
 - **FR-004**: El proveedor MUST devolver cada dato **tal como está impreso** (el importe, la fecha, la red, el tipo y los dígitos como texto), sin convertirlo. La normalización la hace el servicio, con reglas determinísticas y probadas:
   - la red, por una tabla de nombres impresos ("MASTERCARD", "MASTER", "MC" → "master"; "VISA" → "visa"; etc.);
   - el tipo, por las palabras impresas ("DEBITO", "DÉBITO", "DEB" → "debito"; "CREDITO", "CRÉDITO", "CRED" → "credito");
-  - la fecha, desde "dd/mm/aaaa" o "dd/mm/aa" (año de 2 dígitos → 20aa);
+  - la fecha, desde "dd/mm/aaaa" o "dd/mm/aa" (año de 2 dígitos → 20aa), con separador `/`, `-` o `.`, aunque venga junto con la hora;
   - el importe, en formato argentino (punto de miles, coma decimal).
 
   Lo que no está en la tabla o no tiene ese formato queda vacío. Deducir lo que no está escrito MUST NOT estar permitido: la red por los dígitos de la tarjeta, un año ausente, el tipo por la red. Cada caso tiene un test (US1-5, US1-6, US1-7).
@@ -126,7 +126,7 @@ Si la foto no sirve, es demasiado grande, la lectura tarda demasiado o el servic
 - **FR-010**: La imagen MUST existir solo en memoria durante el pedido y MUST NOT escribirse en disco, almacenamiento, base de datos ni registros, ni en caso de error (constitución §IV).
 - **FR-011**: El pedido al proveedor MUST indicarle que transcriba el ticket reemplazando nombres de personas, DNI y números de tarjeta (salvo los últimos 4) por `[DATO PERSONAL]`.
 - **FR-012**: Después, reglas determinísticas MUST tapar en el texto, en este orden y antes de recortarlo (la tarjeta queda como `****` y los últimos 4; lo demás se reemplaza por `[DATO PERSONAL]`, conservando la palabra que lo anuncia):
-  - secuencias de 13 a 19 dígitos (con o sin espacios o guiones) y tarjetas enmascaradas: queda `****` y los últimos 4;
+  - tarjetas: queda `****` y los últimos 4. Los números agrupados como se imprimen las tarjetas (de a 4, o 4-6-5) se tapan siempre, aunque el proveedor haya leído mal un dígito. Los de 13 a 19 dígitos juntos, solo si cumplen la cuenta de control de las tarjetas (Luhn), porque así se imprimen también los códigos de barras. Las tarjetas ya enmascaradas (`****`, `XXXX`) quedan como `****` y los últimos 4;
   - CUIT o CUIL de personas (prefijo 20, 23, 24 o 27) con dígito verificador válido, con o sin guiones;
   - 7 u 8 dígitos, con o sin puntos de miles, precedidos por "DNI", "D.N.I.", "DOC" o "Documento".
 
@@ -135,8 +135,8 @@ Si la foto no sirve, es demasiado grande, la lectura tarda demasiado o el servic
 
 **Errores y tiempos**
 
-- **FR-014**: Cada falla MUST tener un código estable y un estado HTTP, que la app traduce a un mensaje: `no_autenticado` (401), `invalido` (400), `formato_no_soportado` (415), `imagen_demasiado_grande` (413), `imagen_danada` (422), `ticket_ilegible` (422), `tardo_demasiado` (504), `no_disponible` (503), `metodo_no_permitido` (405) e `interno` (500). Un rechazo del proveedor por límite de uso o caída es `no_disponible`, salvo el reintento de FR-015; cualquier otro rechazo del proveedor (pedido inválido, demasiado grande) es `interno` y se registra, porque el servicio ya validó el pedido antes. La respuesta de error MUST traer solo el código, sin datos del ticket.
-- **FR-015**: La lectura, incluido un reintento, MUST durar como máximo 20 segundos: si el proveedor no contesta a tiempo, el servicio corta y responde `tardo_demasiado`. Ante un rechazo por límite de uso, el servicio MUST reintentar una sola vez si el proveedor pide esperar 12 segundos o menos y la espera más 5 segundos de lectura entran en los 20 (en la prueba manual, el proveedor pidió entre 8 y 10 segundos). Medido en el servidor, el servicio MUST responder siempre en menos de 25 segundos.
+- **FR-014**: Cada falla MUST tener un código estable y un estado HTTP, que la app traduce a un mensaje: `no_autenticado` (401), `invalido` (400), `formato_no_soportado` (415), `imagen_demasiado_grande` (413), `imagen_danada` (422), `ticket_ilegible` (422), `tardo_demasiado` (504), `no_disponible` (503), `metodo_no_permitido` (405) e `interno` (500). Un rechazo del proveedor por límite de uso o caída es `no_disponible`, salvo el reintento de FR-015; cualquier otro rechazo del proveedor (pedido inválido, demasiado grande) es `interno` y se registra, porque el servicio ya validó el pedido antes. Un 5xx del proveedor es una caída: `no_disponible`. La respuesta de error MUST traer solo el código, sin datos del ticket; con `invalido`, además el campo del pedido que falta (`body`, `imagen` o `tipo`).
+- **FR-015**: La lectura, incluido un reintento, MUST durar como máximo 20 segundos: si el proveedor no contesta a tiempo, el servicio corta y responde `tardo_demasiado`. Ante un rechazo por límite de uso, el servicio MUST reintentar una sola vez si el proveedor pide esperar 12 segundos o menos y la espera más 5 segundos de lectura entran en los 20 (en la prueba manual, el proveedor pidió entre 8 y 10 segundos). Medido en el servidor, el servicio MUST responder siempre en menos de 25 segundos: un límite de 24 segundos cubre el pedido completo (la sesión, la lectura del cuerpo y el proveedor) y responde `tardo_demasiado` si se cumple.
 
 **Estructura y verificación**
 

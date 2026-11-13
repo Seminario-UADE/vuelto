@@ -45,8 +45,18 @@ export interface UsoGroq {
   motivoFin: string | null;
 }
 
-/** Groq rechaza por límite de uso o está caído: se puede reintentar más tarde. */
-const ESTADOS_NO_DISPONIBLE = new Set([429, 500, 502, 503]);
+/** Groq rechaza por límite de uso (429) o está caído (cualquier 5xx): se puede probar más tarde. */
+function noEstaDisponible(estado: number): boolean {
+  return estado === 429 || estado >= 500;
+}
+
+/** La respuesta de Groq ya leída entera, dentro del límite de tiempo. */
+interface RespuestaGroq {
+  estado: number;
+  reintentarEnEncabezado: string | null;
+  /** El cuerpo como JSON, o `null` si no lo es. */
+  datos: unknown;
+}
 
 const INSTRUCCIONES = [
   "Sos un lector de tickets de compra de Argentina.",
@@ -83,14 +93,14 @@ function aBase64(bytes: Uint8Array): string {
  * Lo que dice Groq sobre el rechazo: qué límite se superó y cuánto esperar.
  * El id de la organización se tapa: no hace falta para diagnosticar.
  */
-async function noDisponible(respuesta: Response): Promise<ExtractorNoDisponibleError> {
-  const cuerpo = (await respuesta.json().catch(() => null)) as { error?: { message?: unknown } } | null;
+function noDisponible(respuesta: RespuestaGroq): ExtractorNoDisponibleError {
+  const cuerpo = respuesta.datos as { error?: { message?: unknown } } | null;
   const mensaje = typeof cuerpo?.error?.message === "string" ? cuerpo.error.message : null;
-  const espera = Number(respuesta.headers.get("retry-after"));
+  const espera = respuesta.reintentarEnEncabezado === null ? NaN : Number(respuesta.reintentarEnEncabezado);
   return new ExtractorNoDisponibleError(
-    respuesta.status,
+    respuesta.estado,
     mensaje?.replace(/org_[A-Za-z0-9]+/g, "org_…") ?? null,
-    Number.isFinite(espera) && espera >= 0 && respuesta.headers.has("retry-after") ? espera : null,
+    Number.isFinite(espera) && espera >= 0 ? espera : null,
   );
 }
 
@@ -126,11 +136,11 @@ export class ExtractorGroq implements Extractor {
 
   private async intentar(cuerpo: string, limiteMs: number): Promise<LecturaCruda> {
     const respuesta = await this.pedir(cuerpo, limiteMs);
-    if (!respuesta.ok) {
-      if (ESTADOS_NO_DISPONIBLE.has(respuesta.status)) throw await noDisponible(respuesta);
-      throw new ExtractorRechazoError(respuesta.status);
+    if (respuesta.estado < 200 || respuesta.estado >= 300) {
+      if (noEstaDisponible(respuesta.estado)) throw noDisponible(respuesta);
+      throw new ExtractorRechazoError(respuesta.estado);
     }
-    return this.lecturaDe(await respuesta.json().catch(() => null));
+    return this.lecturaDe(respuesta.datos);
   }
 
   private cuerpo(imagen: Uint8Array, tipo: TipoImagen): string {
@@ -159,17 +169,29 @@ export class ExtractorGroq implements Extractor {
     });
   }
 
-  /** Corta a los `limiteMs` (FR-015). Sin conexión es "no disponible", no un error nuestro. */
-  private async pedir(cuerpo: string, limiteMs: number): Promise<Response> {
+  /**
+   * Corta a los `limiteMs` (FR-015), incluida la lectura del cuerpo: si Groq se
+   * cuelga a mitad de la respuesta, también corta. Sin conexión es "no
+   * disponible", no un error nuestro.
+   */
+  private async pedir(cuerpo: string, limiteMs: number): Promise<RespuestaGroq> {
     const control = new AbortController();
     const corte = setTimeout(() => control.abort(), limiteMs);
     try {
-      return await this.opciones.fetch(URL_GROQ, {
+      const respuesta = await this.opciones.fetch(URL_GROQ, {
         method: "POST",
         headers: { Authorization: `Bearer ${this.opciones.key}`, "Content-Type": "application/json" },
         body: cuerpo,
         signal: control.signal,
       });
+      const texto = await respuesta.text();
+      let datos: unknown = null;
+      try {
+        datos = JSON.parse(texto);
+      } catch {
+        // Un cuerpo que no es JSON: `lecturaDe` o `noDisponible` lo tratan como vacío.
+      }
+      return { estado: respuesta.status, reintentarEnEncabezado: respuesta.headers.get("retry-after"), datos };
     } catch (error) {
       if (control.signal.aborted) throw new ExtractorTiempoAgotadoError();
       throw new ExtractorNoDisponibleError(null, error instanceof Error ? `${error.name}: ${error.message}` : null);

@@ -15,6 +15,15 @@ describe("taparDatosPersonales: tarjetas (US2-2)", () => {
     expect(taparDatosPersonales(`VISA DEBITO ${texto} OK`)).toBe(`VISA DEBITO ${esperado} OK`);
   });
 
+  it("una tarjeta agrupada se tapa aunque un dígito esté mal leído (no cumple la cuenta de control)", () => {
+    expect(taparDatosPersonales("VISA 4509 9535 6623 3705")).toBe("VISA ****3705");
+  });
+
+  it("13 a 19 dígitos juntos se tapan solo si cumplen la cuenta de control", () => {
+    expect(taparDatosPersonales("4509953566233704")).toBe("****3704");
+    expect(taparDatosPersonales("4509953566233705")).toBe("4509953566233705");
+  });
+
   it("no toca números de los tickets reales que no son tarjetas", () => {
     // Factura de 13 dígitos con guion, AID de la terminal y registro (prueba manual, 13/11),
     // y un código de barras de 13 dígitos que no cumple la cuenta de control de las tarjetas.

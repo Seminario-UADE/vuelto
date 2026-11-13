@@ -4,6 +4,7 @@
  * (constitución §III). El proveedor devuelve cada dato tal como está impreso;
  * la conversión es de `normalizar.ts`.
  */
+import { esObjeto } from "../_shared/objeto.ts";
 import type { LecturaCruda, MedioImpreso } from "./extractor.ts";
 
 const TEXTO_O_NULL = ["string", "null"] as const;
@@ -47,10 +48,6 @@ export type ResultadoEsquema =
   | { ok: false; camino: string; regla: "requerido" | "adicional" | "tipo" };
 
 type Falla = Extract<ResultadoEsquema, { ok: false }>;
-
-function esObjeto(valor: unknown): valor is Record<string, unknown> {
-  return typeof valor === "object" && valor !== null && !Array.isArray(valor);
-}
 
 /** Revisa que `objeto` tenga exactamente las claves `requeridas`; los tipos los revisa quien llama. */
 function revisarClaves(objeto: Record<string, unknown>, requeridas: readonly string[], prefijo: string): Falla | null {

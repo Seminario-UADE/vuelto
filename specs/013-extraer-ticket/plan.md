@@ -74,7 +74,7 @@ supabase/
 │       ├── index.ts                 # composition root: AutenticadorSupabase + ExtractorGroq
 │       ├── handler.ts               # HTTP, sesión, cuerpo, errores → códigos
 │       ├── imagen.ts                # tipo, tamaño, base64 y primeros bytes (R3)
-│       ├── servicio.ts              # LectorDeTickets: extractor → esquema → normalizar → tapar
+│       ├── servicio.ts              # ServicioLecturaTicket: extractor → esquema → normalizar → tapar
 │       ├── extractor.ts             # interfaz Extractor, LecturaCruda y errores del extractor
 │       ├── extractor-groq.ts        # fetch a Groq, prompt, timeout de 20 s, modo estricto o JSON libre
 │       ├── esquema.ts               # esquema para Groq y validador propio (R8)

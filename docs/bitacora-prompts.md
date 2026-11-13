@@ -2596,6 +2596,22 @@ Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
     de factura, códigos de barras), se usa la cuenta de control de las
     tarjetas. Error de la IA: un test del servicio se escribió y se hizo
     pasar sin verlo fallar antes; en el resto de la etapa se volvió al orden.
+15. "Commiteá y seguí con la etapa 3." La validación de la foto (formato,
+    tamaño y archivo dañado, antes de gastar cupo de Groq), la puerta de
+    entrada con un código por cada error y registros de una sola línea sin
+    datos del ticket, la entrada de la función y la documentación del
+    endpoint para la issue #49.
+16. "Revisá los resultados y mostrame todo junto" y "avanzá con los arreglos
+    1 a 8". Las revisiones (reglas, estándares y spec) no encontraron
+    incumplimientos de reglas, pero sí un caso real: si Groq o la
+    verificación de la cuenta se colgaban a mitad de camino, nada cortaba y
+    el usuario podía esperar más de 25 segundos. Ahora el corte de Groq cubre
+    la respuesta completa y hay un límite de 24 segundos para todo el pedido.
+    También: cualquier caída de Groq es "no disponible"; una tarjeta agrupada
+    de a 4 se tapa siempre, aunque Groq haya leído mal un dígito (antes
+    quedaba visible); el servicio se llama como los demás; y se sacó código
+    repetido. Error de la IA: las pruebas de estos arreglos se escribieron
+    junto con el código, sin verlas fallar antes.
 
 **Resultado:**
 - Spec 013: qué recibe y qué devuelve el servicio, qué datos personales
@@ -2619,9 +2635,11 @@ Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
 - Límites reales del plan gratis: unos 2 a 3 tickets por minuto y unos 145
   por día para toda la app. Alcanza para el MVP y quedó escrito en el
   ADR-012.
-- Queda pendiente: las etapas 2 y 3, y avisarle a Joaquín que la issue #49
-  tiene que adaptar su formato, que el descuento no viene del ticket y que el
-  iPhone saca fotos HEIC (la app tiene que mandar JPG).
+- La función está completa: 241 tests del servidor sin red ni key, y las
+  revisiones de reglas, estándares y spec sin incumplimientos.
+- Queda pendiente: desplegarla (lo corre el usuario) y avisarle a Joaquín
+  que la issue #49 tiene que adaptar su formato, que el descuento no viene
+  del ticket y que el iPhone saca fotos HEIC (la app tiene que mandar JPG).
 
 ---
 

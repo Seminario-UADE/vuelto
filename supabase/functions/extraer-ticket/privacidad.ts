@@ -37,11 +37,17 @@ export function cuitValido(digitos: string): boolean {
 const PREFIJOS_PERSONA = new Set(["20", "23", "24", "27"]);
 
 /**
- * Tarjetas completas: 13 a 19 dígitos juntos, o en grupos de 4 (y el 4-6-5 de
- * American Express), que cumplan la cuenta de control. Quedan `****` y los
- * últimos 4.
+ * Tarjetas agrupadas como se imprimen (de a 4, o el 4-6-5 de American
+ * Express): se tapan siempre, aunque el proveedor haya leído mal un dígito.
+ * Ningún número de factura o de producto tiene esa forma.
  */
-const TARJETA_COMPLETA = /\b(?:\d{13,19}|\d{4}([ -])\d{4}\1\d{4}\1\d{1,7}|\d{4}([ -])\d{6}\2\d{5})\b/g;
+const TARJETA_AGRUPADA = /\b(?:\d{4}([ -])\d{4}\1\d{4}\1\d{1,7}|\d{4}([ -])\d{6}\2\d{5})\b/g;
+
+/**
+ * 13 a 19 dígitos juntos: se tapan solo si cumplen la cuenta de control de las
+ * tarjetas, porque así se imprimen también los códigos de barras.
+ */
+const TARJETA_JUNTA = /\b\d{13,19}\b/g;
 
 /** Tarjetas ya enmascaradas (`****`, `XXXX`), con separadores o sin: quedan `****` y los últimos 4. */
 const TARJETA_ENMASCARADA = /(?:[*Xx][ -]?){4,}(\d{4})\b/g;
@@ -53,10 +59,8 @@ const DNI = /\b(Documento|D\.N\.I\.|DNI|DOC)(\s*[:.#°º]?\s*(?:N[°ºro.]*\s*)?
 
 export function taparDatosPersonales(texto: string): string {
   return texto
-    .replace(TARJETA_COMPLETA, (numero) => {
-      const digitos = numero.replace(/\D/g, "");
-      return cumpleLuhn(digitos) ? `****${digitos.slice(-4)}` : numero;
-    })
+    .replace(TARJETA_AGRUPADA, (numero) => `****${numero.replace(/\D/g, "").slice(-4)}`)
+    .replace(TARJETA_JUNTA, (numero) => (cumpleLuhn(numero) ? `****${numero.slice(-4)}` : numero))
     .replace(TARJETA_ENMASCARADA, (_, ultimos4: string) => `****${ultimos4}`)
     .replace(CUIT, (cuit, prefijo: string, medio: string, verificador: string) =>
       PREFIJOS_PERSONA.has(prefijo) && cuitValido(`${prefijo}${medio}${verificador}`) ? MARCA : cuit,

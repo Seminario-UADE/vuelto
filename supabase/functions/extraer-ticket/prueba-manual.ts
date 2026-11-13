@@ -7,11 +7,14 @@
  *     --allow-net=api.groq.com --allow-read --allow-env=GROQ_API_KEY \
  *     supabase/functions/extraer-ticket/prueba-manual.ts [--modo=json-libre] foto1.jpg foto2.jpg foto3.jpg
  *
- * Escribe por pantalla lo que leyó Groq de cada foto, o el error. Nunca
+ * Escribe por pantalla lo que leyó Groq de cada foto (`lectura`) y lo que
+ * devolvería el servicio (`respuesta`: convertido y con los datos personales
+ * tapados), o el error. Nunca
  * escribe la key ni la imagen. No la chequea `tsc` en Node (usa `Deno`): la
  * chequea `deno check`.
  */
 import { ExtractorGroq, type ModoGroq } from "./extractor-groq.ts";
+import { ServicioLecturaTicket } from "./servicio.ts";
 import {
   ExtractorNoDisponibleError,
   ExtractorRechazoError,
@@ -59,9 +62,22 @@ for (const ruta of fotos) {
   }
   const inicio = Date.now();
   try {
-    const lectura = await extractor.leer(await Deno.readFile(ruta), tipo);
+    const imagen = await Deno.readFile(ruta);
+    // El servicio llama al mismo extractor; se guarda lo que leyó Groq para mostrarlo al lado.
+    let lectura: unknown = null;
+    const lector = new ServicioLecturaTicket(
+      {
+        leer: async (bytes, t) => {
+          const cruda = await extractor.leer(bytes, t);
+          lectura = cruda;
+          return cruda;
+        },
+      },
+      () => new Date(),
+    );
+    const respuesta = await lector.leer(imagen, tipo);
     // `uso`: tokens gastados y `motivoFin` ("length" = la respuesta se cortó).
-    resultados[nombre] = { ms: Date.now() - inicio, uso: extractor.ultimoUso, lectura };
+    resultados[nombre] = { ms: Date.now() - inicio, uso: extractor.ultimoUso, lectura, respuesta };
   } catch (error) {
     const ms = Date.now() - inicio;
     // Solo el tipo de falla, el código HTTP o el camino del campo: nunca la key ni datos del ticket.

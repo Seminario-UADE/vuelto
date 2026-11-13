@@ -40,7 +40,7 @@ export class TicketIlegibleError extends Error {
   }
 }
 
-export class LectorDeTickets {
+export class ServicioLecturaTicket {
   constructor(
     private readonly extractor: Extractor,
     /** Hora actual, para saber qué es "hoy en Argentina" (FR-008). */

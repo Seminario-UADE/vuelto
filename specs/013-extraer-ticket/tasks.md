@@ -56,7 +56,7 @@ description: "Tareas para leer los datos de un ticket a partir de su foto (issue
 - [X] T011 [US1] Implementar `normalizar.ts` con funciones puras (`normalizarImporte`, `normalizarFecha(impresa, hoy)`, `normalizarRed`, `normalizarTipo`, `normalizarUltimos4`, `normalizarTexto`). `hoy` se calcula con `fechaArgentina` de `@vuelto/motor`. Hace pasar T010.
 - [X] T012 [P] [US1] Crear `test/tickets.ts` con 3 tickets **inventados** (comercios y personas que no existen, CUIT de comercio con dígito verificador válido pero inexistente): para cada uno, la `LecturaCruda` que devolvería Groq y la `LecturaTicket` esperada. Uno completo (US1-1), uno sin medio de pago (US1-2) y uno con "TARJETA DE CREDITO" sin red ni dígitos (US1-3).
 - [X] T013 [P] [US1] Escribir `servicio.test.ts` (parte US1) con un extractor simulado: los 3 tickets coinciden campo por campo (SC-001); un dato imposible vacía solo ese campo (US1-8); monto, comercio y fecha `null` → `TicketIlegibleError` (FR-009); los errores del extractor se propagan sin cambiar.
-- [X] T014 [US1] Implementar `servicio.ts`: `class LectorDeTickets` con el `Extractor` y el reloj inyectados; `leer(imagen, tipo)` llama al extractor, normaliza y arma la `LecturaTicket` (`textoExtraido` todavía sin la segunda capa). Hace pasar T013.
+- [X] T014 [US1] Implementar `servicio.ts`: `class ServicioLecturaTicket` (en la primera versión, `LectorDeTickets`) con el `Extractor` y el reloj inyectados; `leer(imagen, tipo)` llama al extractor, normaliza y arma la `LecturaTicket` (`textoExtraido` todavía sin la segunda capa). Hace pasar T013.
 
 **Checkpoint**: US1 en verde.
 
@@ -82,11 +82,11 @@ description: "Tareas para leer los datos de un ticket a partir de su foto (issue
 
 **Independent Test**: un test por código de error (SC-005).
 
-- [ ] T018 [P] [US3] Escribir `imagen.test.ts` (research R3): `tipo` fuera de JPEG, PNG y WebP → `formato_no_soportado`; base64 más largo que `ceil(2.500.000 / 3) × 4` → `imagen_demasiado_grande` sin decodificar; base64 inválido → `imagen_danada`; contenido PNG con `tipo` `image/jpeg` → `imagen_danada`; JPEG, PNG y WebP válidos (bytes armados en el test) → `{ ok: true, bytes, tipo }`.
-- [ ] T019 [US3] Implementar `imagen.ts` (`validarPedidoImagen(cuerpo: unknown)`). Hace pasar T018.
-- [ ] T020 [P] [US3] Escribir `handler.test.ts` con un autenticador y un lector simulados: método no `POST` → 405; sin sesión o con la anon key → 401 sin llamar al lector (US3-1); cuerpo que no es JSON o sin `imagen` o `tipo` → 400 con `campo` (US3-2); 413, 415 y 422 `imagen_danada` sin llamar al lector (US3-3 a US3-5); `TicketIlegibleError` y `RespuestaFueraDeEsquemaError` → 422 `ticket_ilegible` (US3-6, US3-7); `ExtractorTiempoAgotadoError` → 504 (US3-8); `ExtractorNoDisponibleError` → 503 (US3-9); `ExtractorRechazoError`, Auth caído o un error cualquiera → 500; éxito → 200 con la `LecturaTicket`. Con `console` espiado: cada pedido deja una sola línea con el resultado y la duración, y ninguna contiene la imagen, el texto ni un valor leído; ante un error de esquema, solo `camino` y `regla` (FR-013).
-- [ ] T021 [US3] Implementar `handler.ts` (`crearHandlerExtraerTicket({ autenticador, crearLector, reloj })`), siguiendo `recomendar/handler.ts`. Hace pasar T020.
-- [ ] T022 [US3] Escribir `index.ts` (composition root): `AutenticadorSupabase` con `SUPABASE_URL` y `SUPABASE_ANON_KEY`, `ExtractorGroq` con `GROQ_API_KEY` (si falta, falla al arrancar), modo estricto o JSON libre según el resultado de T009, y `Deno.serve`. Verificar con `npx deno check --config supabase/functions/extraer-ticket/deno.json supabase/functions/extraer-ticket/index.ts`.
+- [X] T018 [P] [US3] Escribir `imagen.test.ts` (research R3): `tipo` fuera de JPEG, PNG y WebP → `formato_no_soportado`; base64 más largo que `ceil(2.500.000 / 3) × 4` → `imagen_demasiado_grande` sin decodificar; base64 inválido → `imagen_danada`; contenido PNG con `tipo` `image/jpeg` → `imagen_danada`; JPEG, PNG y WebP válidos (bytes armados en el test) → `{ ok: true, bytes, tipo }`.
+- [X] T019 [US3] Implementar `imagen.ts` (`validarPedidoImagen(cuerpo: unknown)`). Hace pasar T018.
+- [X] T020 [P] [US3] Escribir `handler.test.ts` con un autenticador y un lector simulados: método no `POST` → 405; sin sesión o con la anon key → 401 sin llamar al lector (US3-1); cuerpo que no es JSON o sin `imagen` o `tipo` → 400 con `campo` (US3-2); 413, 415 y 422 `imagen_danada` sin llamar al lector (US3-3 a US3-5); `TicketIlegibleError` y `RespuestaFueraDeEsquemaError` → 422 `ticket_ilegible` (US3-6, US3-7); `ExtractorTiempoAgotadoError` → 504 (US3-8); `ExtractorNoDisponibleError` → 503 (US3-9); `ExtractorRechazoError`, Auth caído o un error cualquiera → 500; éxito → 200 con la `LecturaTicket`. Con `console` espiado: cada pedido deja una sola línea con el resultado y la duración, y ninguna contiene la imagen, el texto ni un valor leído; ante un error de esquema, solo `camino` y `regla` (FR-013).
+- [X] T021 [US3] Implementar `handler.ts` (`crearHandlerExtraerTicket({ autenticador, crearServicio, ahora, limiteMs })`), siguiendo `recomendar/handler.ts`. Hace pasar T020.
+- [X] T022 [US3] Escribir `index.ts` (composition root): `AutenticadorSupabase` con `SUPABASE_URL` y `SUPABASE_ANON_KEY`, `ExtractorGroq` con `GROQ_API_KEY` (si falta, falla al arrancar), modo estricto o JSON libre según el resultado de T009, y `Deno.serve`. Verificar con `npx deno check --config supabase/functions/extraer-ticket/deno.json supabase/functions/extraer-ticket/index.ts`.
 
 **Checkpoint**: US1, US2 y US3 en verde.
 
@@ -94,10 +94,10 @@ description: "Tareas para leer los datos de un ticket a partir de su foto (issue
 
 ## Phase 6: Polish
 
-- [ ] T023 [P] Documentar el endpoint en `docs/architecture/02-api-routes.md`, apuntando a `specs/013-extraer-ticket/contracts/extraer-ticket.md` (FR-018).
-- [ ] T024 [P] Actualizar `prueba-manual.ts` para que, además de la `LecturaCruda`, muestre la `LecturaTicket` que devolvería el servicio.
-- [ ] T025 Correr `npm run lint`, `npm run typecheck`, `npm run test` (cobertura ≥ 90% en `supabase`) y `npm run build` desde la raíz; `deno check` de `extraer-ticket/index.ts` y `prueba-manual.ts`. Verificar que ningún archivo de la función escribe en disco, Storage, la base ni registros con la imagen (`git grep` de `Deno.write`, `writeFile`, `storage`, `console` con variables de imagen o texto).
-- [ ] T026 `rules-guardian` y `/code-review` sobre el diff; corregir lo que surja.
+- [X] T023 [P] Documentar el endpoint en `docs/architecture/02-api-routes.md`, apuntando a `specs/013-extraer-ticket/contracts/extraer-ticket.md` (FR-018).
+- [X] T024 [P] Actualizar `prueba-manual.ts` para que, además de la `LecturaCruda`, muestre la `LecturaTicket` que devolvería el servicio.
+- [X] T025 Correr `npm run lint`, `npm run typecheck`, `npm run test` (cobertura ≥ 90% en `supabase`) y `npm run build` desde la raíz; `deno check` de `extraer-ticket/index.ts` y `prueba-manual.ts`. Verificar que ningún archivo de la función escribe en disco, Storage, la base ni registros con la imagen (`git grep` de `Deno.write`, `writeFile`, `storage`, `console` con variables de imagen o texto).
+- [X] T026 `rules-guardian` y `/code-review` sobre el diff; corregir lo que surja.
 - [ ] T027 Despliegue: el usuario corre `npx supabase functions deploy extraer-ticket --project-ref wahvysbxwgbbyynjiczy --use-api` (quickstart §3). La prueba de punta a punta con la cámara es de la issue #49.
 - [ ] T028 Completar la entrada en `docs/bitacora-prompts.md` y mostrarla en el chat antes de proponer el commit.
 

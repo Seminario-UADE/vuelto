@@ -152,7 +152,7 @@ describe("ExtractorGroq: la respuesta", () => {
     );
   });
 
-  it.each([429, 500, 502, 503])("un %i de Groq es ExtractorNoDisponibleError", async (estado) => {
+  it.each([429, 500, 502, 503, 504])("un %i de Groq es ExtractorNoDisponibleError", async (estado) => {
     const { fn } = fetchQueDevuelve(respuestaGroq(null, estado));
     await expect(extractor(fn).leer(IMAGEN, "image/jpeg")).rejects.toMatchObject({
       name: "ExtractorNoDisponibleError",
@@ -203,6 +203,24 @@ describe("ExtractorGroq: la respuesta", () => {
     const error = await extractor(fn).leer(IMAGEN, "image/jpeg").catch((e: unknown) => e);
     expect(error).toBeInstanceOf(ExtractorRechazoError);
     expect(error).toMatchObject({ estado });
+  });
+
+  it("si Groq se cuelga a mitad de la respuesta, el corte de 20 s también la corta", async () => {
+    vi.useFakeTimers();
+    const fn = ((_url: string, init?: RequestInit) => {
+      const senal = init?.signal ?? undefined;
+      // Manda los encabezados enseguida, pero el cuerpo nunca termina.
+      const cuerpo = new ReadableStream({
+        start(control) {
+          senal?.addEventListener("abort", () => control.error(new DOMException("aborted", "AbortError")));
+        },
+      });
+      return Promise.resolve(new Response(cuerpo, { status: 200 }));
+    }) as unknown as typeof fetch;
+
+    const lectura = extractor(fn).leer(IMAGEN, "image/jpeg").catch((e: unknown) => e);
+    await vi.advanceTimersByTimeAsync(20_000);
+    expect(await lectura).toBeInstanceOf(ExtractorTiempoAgotadoError);
   });
 
   it("si Groq no contesta en 20 s, corta el pedido y es ExtractorTiempoAgotadoError", async () => {

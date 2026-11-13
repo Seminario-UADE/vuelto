@@ -9,7 +9,7 @@ import type { FechaISO, Red, TipoTarjeta } from "@vuelto/motor";
 function palabras(texto: string): string {
   return ` ${texto
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .toUpperCase()
     .replace(/[^A-Z0-9]+/g, " ")
     .trim()} `;

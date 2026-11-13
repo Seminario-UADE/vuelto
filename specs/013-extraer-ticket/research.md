@@ -4,7 +4,7 @@ Decisiones técnicas del plan de la spec 013. Cada una: decisión, por qué y al
 
 ## R1. Llamar a Groq con `fetch`, sin SDK
 
-- **Decisión**: `POST https://api.groq.com/openai/v1/chat/completions` con `fetch` y un `AbortController` de 20 s (FR-015). Modelo `qwen/qwen3.8-27b`, `temperature: 0`, `reasoning_effort: "none"`, sin `max_completion_tokens`, la imagen como `image_url` con un data URL (`data:<tipo>;base64,<imagen>`) y `response_format: { type: "json_schema", json_schema: { name: "lectura_ticket", strict: true, schema } }`.
+- **Decisión**: `POST https://api.groq.com/openai/v1/chat/completions` con `fetch` y un `AbortController` de 20 s que cubre también la lectura del cuerpo de la respuesta (FR-015). Modelo `qwen/qwen3.8-27b`, `temperature: 0`, `reasoning_effort: "none"`, sin `max_completion_tokens`, la imagen como `image_url` con un data URL (`data:<tipo>;base64,<imagen>`) y `response_format: { type: "json_schema", json_schema: { name: "lectura_ticket", strict: true, schema } }`.
 - **Por qué**: el contrato de Groq es el de OpenAI y alcanza con un pedido HTTP. Sin dependencias nuevas: el workspace `supabase` no tiene `dependencies` y el `deno.json` solo mapea el motor y `supabase-js`. `temperature: 0` hace que la misma foto dé la misma lectura.
 - **Aprendido en la prueba manual (13/11)**:
   - Sin `reasoning_effort: "none"`, el modelo "pensaba" antes de responder: unos 3.500 a 4.000 tokens por ticket. Apagado, unos 1.350 (971 de entrada y 300 a 400 de salida) y unos 2 segundos.
@@ -43,7 +43,7 @@ Decisiones técnicas del plan de la spec 013. Cada una: decisión, por qué y al
 ## R5. Tapar datos personales (segunda capa)
 
 - **Decisión**: funciones puras en `privacidad.ts`, aplicadas al `texto` de Groq en este orden y antes de recortar (FR-012):
-  1. **Tarjetas**: 13 a 19 dígitos con espacios o guiones opcionales entre grupos, y enmascaradas (`*`, `X` o `x` seguidas de 4 dígitos al final) → `****` + últimos 4.
+  1. **Tarjetas**: agrupadas de a 4 (o 4-6-5, American Express) → `****` + últimos 4, siempre. Juntas, de 13 a 19 dígitos → solo si cumplen la cuenta de control de las tarjetas (Luhn): así no se tapan los códigos de barras. Enmascaradas (`*`, `X` o `x` seguidas de 4 dígitos al final) → `****` + últimos 4. *(Revisión de código: en la primera versión la cuenta de control se pedía también a las agrupadas, y una tarjeta con un dígito mal leído quedaba visible.)*
   2. **CUIT/CUIL de personas**: `\b(20|23|24|27)-?\d{8}-?\d\b` con dígito verificador válido (pesos `5 4 3 2 7 6 5 4 3 2`, módulo 11) → `[DATO PERSONAL]`. Los de prefijo 30, 33 y 34 no se tocan.
   3. **DNI**: `(DNI|D\.N\.I\.|DOC|Documento)` seguido de separadores y 7 u 8 dígitos con puntos de miles opcionales → la palabra se conserva y el número pasa a `[DATO PERSONAL]`.
   4. **Recorte**: si quedan más de 10.000 caracteres, se corta y se agrega `[…]`.
@@ -54,7 +54,7 @@ Decisiones técnicas del plan de la spec 013. Cada una: decisión, por qué y al
 
 - **Decisión**: se suman a `CodigoError` de `_shared/http.ts`: `formato_no_soportado` (415), `imagen_demasiado_grande` (413), `imagen_danada` (422), `ticket_ilegible` (422), `tardo_demasiado` (504) y `no_disponible` (503). El extractor lanza errores propios y el handler los traduce:
   - `ExtractorTiempoAgotadoError` (el `AbortController` cortó) → `tardo_demasiado`.
-  - `ExtractorNoDisponibleError` (Groq respondió 429, 500, 502 o 503, o no hubo conexión) → `no_disponible`. Ante un 429, Groq manda `retry-after` (segundos) y un mensaje con el límite superado; el extractor reintenta una vez si son 12 s o menos y entran en los 20 s (FR-015). El mensaje se guarda con el id de la organización tapado.
+  - `ExtractorNoDisponibleError` (Groq respondió 429 o cualquier 5xx, o no hubo conexión) → `no_disponible`. Ante un 429, Groq manda `retry-after` (segundos) y un mensaje con el límite superado; el extractor reintenta una vez si son 12 s o menos y entran en los 20 s (FR-015). El mensaje se guarda con el id de la organización tapado.
   - `RespuestaFueraDeEsquemaError` (la respuesta no es JSON o no cumple el esquema) → `ticket_ilegible`, con el camino del campo que falló en el registro.
   - Cualquier otro 4xx de Groq → `interno`, registrado con el estado HTTP.
 - **Por qué**: FR-014. `recomendar` usa el mismo archivo y no cambia: solo se suman valores al tipo.
@@ -89,6 +89,6 @@ Decisiones técnicas del plan de la spec 013. Cada una: decisión, por qué y al
 
 ## R10. Estructura según ADR-009
 
-- **Decisión**: `index.ts` (arma las piezas) → `handler.ts` (HTTP, sesión, cuerpo, imagen, errores) → `servicio.ts` (`LectorDeTickets`: llama al extractor, valida, normaliza, tapa y arma la respuesta) → `Extractor` (interfaz) con `ExtractorGroq` y, en los tests, un extractor simulado. Reusa `AutenticadorSupabase` de `_shared/autenticar.ts`, que ya rechaza la anon key (FR-001).
+- **Decisión**: `index.ts` (arma las piezas) → `handler.ts` (HTTP, sesión, cuerpo, imagen, errores) → `servicio.ts` (`ServicioLecturaTicket`: llama al extractor, valida, normaliza, tapa y arma la respuesta) → `Extractor` (interfaz) con `ExtractorGroq` y, en los tests, un extractor simulado. Reusa `AutenticadorSupabase` de `_shared/autenticar.ts`, que ya rechaza la anon key (FR-001).
 - **Por qué**: es la estructura de `recomendar`, y la interfaz cumple FR-016.
 - **Alternativas**: todo en el handler (no se podría probar la lógica sin HTTP).
