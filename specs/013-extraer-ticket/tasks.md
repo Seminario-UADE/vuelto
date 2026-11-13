@@ -46,17 +46,17 @@ description: "Tareas para leer los datos de un ticket a partir de su foto (issue
 
 **Independent Test**: con el extractor simulado devolviendo las respuestas de los 3 tickets de ejemplo, la `LecturaTicket` coincide campo por campo (SC-001).
 
-- [ ] T010 [P] [US1] Escribir `normalizar.test.ts` (research R4):
+- [X] T010 [P] [US1] Escribir `normalizar.test.ts` (research R4):
   - importe: `"$ 24.500,00"` → 24500; `"24500,5"` → 24500.5; `"24.500"` → 24500; `"24.50"`, `"1,234"` con 3 decimales, `"0"`, `"-10"`, `"abc"` → `null`;
   - fecha (con `hoy` inyectado, 14/10/2026): `"14/10/2026"`, `"14-10-26"`, `"14.10.2026"` → `"2026-10-14"`; `"14/10"`, `"31/02/2026"`, `"15/10/2026"` (futura) → `null`; una fecha de 2019 se acepta;
   - red: `"MASTERCARD"`, `"master"`, `"MC"` → `"master"`; `"Visa Débito"` → `"visa"`; `"4509"` y `"TARJETA"` → `null` (US1-5, US1-6);
   - tipo: `"DEBITO"`, `"débito"`, `"DEB"` → `"debito"`; `"CRED"` → `"credito"`; `"DEBITO/CREDITO"` y `"VISA"` → `null`;
   - últimos 4: `"1234"` → `"1234"`; `"123"`, `"12345"`, `"12a4"` → `null`;
   - banco y comercio: espacios de más recortados; `"   "` → `null`.
-- [ ] T011 [US1] Implementar `normalizar.ts` con funciones puras (`normalizarImporte`, `normalizarFecha(impresa, hoy)`, `normalizarRed`, `normalizarTipo`, `normalizarUltimos4`, `normalizarTexto`). `hoy` se calcula con `fechaArgentina` de `@vuelto/motor`. Hace pasar T010.
-- [ ] T012 [P] [US1] Crear `test/tickets.ts` con 3 tickets **inventados** (comercios y personas que no existen, CUIT de comercio con dígito verificador válido pero inexistente): para cada uno, la `LecturaCruda` que devolvería Groq y la `LecturaTicket` esperada. Uno completo (US1-1), uno sin medio de pago (US1-2) y uno con "TARJETA DE CREDITO" sin red ni dígitos (US1-3).
-- [ ] T013 [P] [US1] Escribir `servicio.test.ts` (parte US1) con un extractor simulado: los 3 tickets coinciden campo por campo (SC-001); un dato imposible vacía solo ese campo (US1-8); monto, comercio y fecha `null` → `TicketIlegibleError` (FR-009); los errores del extractor se propagan sin cambiar.
-- [ ] T014 [US1] Implementar `servicio.ts`: `class LectorDeTickets` con el `Extractor` y el reloj inyectados; `leer(imagen, tipo)` llama al extractor, normaliza y arma la `LecturaTicket` (`textoExtraido` todavía sin la segunda capa). Hace pasar T013.
+- [X] T011 [US1] Implementar `normalizar.ts` con funciones puras (`normalizarImporte`, `normalizarFecha(impresa, hoy)`, `normalizarRed`, `normalizarTipo`, `normalizarUltimos4`, `normalizarTexto`). `hoy` se calcula con `fechaArgentina` de `@vuelto/motor`. Hace pasar T010.
+- [X] T012 [P] [US1] Crear `test/tickets.ts` con 3 tickets **inventados** (comercios y personas que no existen, CUIT de comercio con dígito verificador válido pero inexistente): para cada uno, la `LecturaCruda` que devolvería Groq y la `LecturaTicket` esperada. Uno completo (US1-1), uno sin medio de pago (US1-2) y uno con "TARJETA DE CREDITO" sin red ni dígitos (US1-3).
+- [X] T013 [P] [US1] Escribir `servicio.test.ts` (parte US1) con un extractor simulado: los 3 tickets coinciden campo por campo (SC-001); un dato imposible vacía solo ese campo (US1-8); monto, comercio y fecha `null` → `TicketIlegibleError` (FR-009); los errores del extractor se propagan sin cambiar.
+- [X] T014 [US1] Implementar `servicio.ts`: `class LectorDeTickets` con el `Extractor` y el reloj inyectados; `leer(imagen, tipo)` llama al extractor, normaliza y arma la `LecturaTicket` (`textoExtraido` todavía sin la segunda capa). Hace pasar T013.
 
 **Checkpoint**: US1 en verde.
 
@@ -68,9 +68,9 @@ description: "Tareas para leer los datos de un ticket a partir de su foto (issue
 
 **Independent Test**: textos de ejemplo con datos personales inventados → 0 datos sin tapar (SC-003).
 
-- [ ] T015 [P] [US2] Escribir `privacidad.test.ts` (research R5): `"4509 9535 6623 3704"`, `"4509-9535-6623-3704"` y `"XXXX XXXX XXXX 3704"` → `"****3704"` (US2-2); `"CUIT 20-12345678-6"` y `"20123456786"` → `"CUIT [DATO PERSONAL]"` y `"[DATO PERSONAL]"` (US2-3); un CUIT de persona con dígito verificador inválido y `"30-54808315-6"` quedan igual (US2-4); `"DNI: 12345678"`, `"D.N.I. 12.345.678"`, `"Documento 1234567"` → la palabra y `[DATO PERSONAL]` (US2-5); `"Cód. 12345678"` queda igual (US2-7); un texto de 12.000 caracteres con una tarjeta en el carácter 9.995 queda tapada y el resultado termina en `"[…]"` con 10.000 caracteres de texto.
-- [ ] T016 [US2] Implementar `privacidad.ts` (`taparDatosPersonales(texto)` y `recortar(texto)`), en el orden de FR-012. Hace pasar T015.
-- [ ] T017 [US2] Sumar a `servicio.test.ts` y a `servicio.ts`: `textoExtraido` pasa por `taparDatosPersonales` y después por `recortar`; `texto` `null` → `""`; en los 3 tickets de ejemplo con datos personales inventados quedan 0 tarjetas completas, 0 CUIT o CUIL de personas y 0 DNI anunciados (SC-003).
+- [X] T015 [P] [US2] Escribir `privacidad.test.ts` (research R5): `"4509 9535 6623 3704"`, `"4509-9535-6623-3704"` y `"XXXX XXXX XXXX 3704"` → `"****3704"` (US2-2); `"CUIT 20-12345678-6"` y `"20123456786"` → `"CUIT [DATO PERSONAL]"` y `"[DATO PERSONAL]"` (US2-3); un CUIT de persona con dígito verificador inválido y `"30-54808315-6"` quedan igual (US2-4); `"DNI: 12345678"`, `"D.N.I. 12.345.678"`, `"Documento 1234567"` → la palabra y `[DATO PERSONAL]` (US2-5); `"Cód. 12345678"` queda igual (US2-7); un texto de 12.000 caracteres con una tarjeta en el carácter 9.995 queda tapada y el resultado termina en `"[…]"` con 10.000 caracteres de texto.
+- [X] T016 [US2] Implementar `privacidad.ts` (`taparDatosPersonales(texto)` y `recortar(texto)`), en el orden de FR-012. Hace pasar T015.
+- [X] T017 [US2] Sumar a `servicio.test.ts` y a `servicio.ts`: `textoExtraido` pasa por `taparDatosPersonales` y después por `recortar`; `texto` `null` → `""`; en los 3 tickets de ejemplo con datos personales inventados quedan 0 tarjetas completas, 0 CUIT o CUIL de personas y 0 DNI anunciados (SC-003).
 
 **Checkpoint**: US1 y US2 en verde.
 

@@ -2588,6 +2588,14 @@ Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
     Groq cortaba el texto antes de tiempo; se comprobó con una prueba con y
     sin tope) y reintentar una vez si Groq pide esperar 12 segundos o menos.
     "¿Cuánto esperaría?": lo que diga Groq, solo si entra en los 20 segundos.
+14. "Commiteá y seguí con la etapa 2." El servicio convierte lo que lee Groq
+    (importes con formato argentino, fechas, red, débito o crédito, últimos 4)
+    con reglas probadas que nunca deducen, y tapa en el texto tarjetas, CUIT
+    de personas y DNI. Los casos de prueba incluyen formatos reales de los
+    tickets del usuario. Para no tapar códigos que no son tarjetas (números
+    de factura, códigos de barras), se usa la cuenta de control de las
+    tarjetas. Error de la IA: un test del servicio se escribió y se hizo
+    pasar sin verlo fallar antes; en el resto de la etapa se volvió al orden.
 
 **Resultado:**
 - Spec 013: qué recibe y qué devuelve el servicio, qué datos personales

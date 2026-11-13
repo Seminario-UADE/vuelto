@@ -17,7 +17,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["functions/**/*.ts"],
-      exclude: ["functions/**/*.test.ts", "functions/_shared/test/**", "functions/*/index.ts", "functions/*/prueba-manual.ts"],
+      exclude: ["functions/**/*.test.ts", "functions/_shared/test/**", "functions/*/test/**", "functions/*/index.ts", "functions/*/prueba-manual.ts"],
       thresholds: { lines: 90 },
     },
   },
