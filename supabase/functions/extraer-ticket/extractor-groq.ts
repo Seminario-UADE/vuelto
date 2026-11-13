@@ -28,6 +28,7 @@ const INSTRUCCIONES = [
   "Devolvé cada dato copiado tal como está impreso, sin convertirlo ni corregirlo.",
   "Si un dato no aparece en el ticket, devolvé null. Nunca lo deduzcas de otro dato: por ejemplo, no deduzcas la red por los dígitos de la tarjeta ni el año si no está impreso.",
   "El monto es el total que pagó el cliente.",
+  "El comercio es el nombre del local o la marca (suele estar en la primera línea), no la razón social (S.A., S.R.L.). Si no hay nombre de local, la razón social.",
   "En el campo texto, transcribí el ticket completo, renglón por renglón, reemplazando nombres de personas, DNI y números de tarjeta (salvo los últimos 4 dígitos) por [DATO PERSONAL].",
 ].join("\n");
 

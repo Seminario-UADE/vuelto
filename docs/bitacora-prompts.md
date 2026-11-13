@@ -2569,6 +2569,11 @@ Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
    del ticket. En el segundo intento, Groq leyó bien el primer ticket: monto,
    fecha y red correctos, y el tipo de tarjeta vacío porque el ticket no lo
    dice. Eligió la razón social en vez del nombre del local.
+10. "Ajustá lo del comercio." La instrucción a Groq y el esquema ahora piden
+    el nombre del local (el que reconoce el usuario y el que se cruza con la
+    compra por confirmar) y, si no hay, la razón social. Error de la IA: el
+    commit anterior dejó un import sin usar porque no se corrió el lint antes
+    de commitear; se corrigió en este.
 
 **Resultado:**
 - Spec 013: qué recibe y qué devuelve el servicio, qué datos personales

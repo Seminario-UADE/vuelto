@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ESQUEMA_LECTURA } from "./esquema.ts";
 import {
-  ExtractorNoDisponibleError,
   ExtractorRechazoError,
   ExtractorTiempoAgotadoError,
   RespuestaFueraDeEsquemaError,
@@ -76,6 +75,9 @@ describe("ExtractorGroq: el pedido", () => {
     expect(instrucciones).toMatch(/nombres/i);
     expect(instrucciones).toMatch(/DNI/);
     expect(instrucciones).toMatch(/últimos 4/);
+    // Para el usuario y para cruzar con la compra por confirmar sirve el nombre del local (prueba manual, 10/11).
+    expect(instrucciones).toContain("nombre del local");
+    expect(instrucciones).toContain("razón social");
     expect(instrucciones).toContain("data:image/png;base64,");
   });
 

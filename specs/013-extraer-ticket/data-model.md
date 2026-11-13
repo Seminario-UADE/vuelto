@@ -16,7 +16,7 @@ Lo que devuelve Groq contra el esquema estricto (R2). Todo es texto tal como est
 | Campo | Tipo | Ejemplo |
 |---|---|---|
 | `montoImpreso` | `string \| null` | `"$ 24.500,00"` |
-| `comercio` | `string \| null` | `"COTO"` |
+| `comercio` | `string \| null` | `"COTO"` (el nombre del local; si no hay, la razón social) |
 | `fechaImpresa` | `string \| null` | `"14/10/26"` |
 | `medio.bancoImpreso` | `string \| null` | `"BCO GALICIA"` |
 | `medio.tipoImpreso` | `string \| null` | `"DEBITO"` |

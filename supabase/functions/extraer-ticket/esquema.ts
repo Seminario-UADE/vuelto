@@ -28,7 +28,9 @@ export const ESQUEMA_LECTURA = {
   type: "object",
   properties: {
     montoImpreso: campo('El total pagado, copiado tal como está impreso (ej. "$ 24.500,00"). null si no aparece.'),
-    comercio: campo("El nombre del comercio tal como está impreso. null si no aparece."),
+    comercio: campo(
+      "El nombre del local o la marca, tal como está impreso (suele estar en la primera línea). Si no hay, la razón social. null si no aparece.",
+    ),
     fechaImpresa: campo('La fecha de la compra tal como está impresa (ej. "14/10/26"). null si no aparece.'),
     medio: MEDIO,
     texto: campo(

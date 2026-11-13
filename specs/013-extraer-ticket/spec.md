@@ -91,6 +91,7 @@ Si la foto no sirve, es demasiado grande, la lectura tarda demasiado o el servic
 - **Ticket en otra moneda** (dólares): el monto llega vacío; el producto trabaja en pesos.
 - **Importes**: se leen con el formato argentino (punto de miles, coma decimal): "24.500,00" es 24500. Un importe que no se puede interpretar sin dudas llega vacío.
 - **Banco impreso de forma abreviada** ("BCO GALICIA"): llega como texto, tal cual; el cruce con el catálogo es de la app (#49).
+- **Nombre del local y razón social** ("Pucciano's" arriba y "GRAFARMAR S.A." abajo): el comercio es el nombre del local, que es el que reconoce el usuario y el que cruza con la compra por confirmar (spec 012 FR-013). Si el ticket no tiene nombre de local, la razón social. Salió de la prueba con un ticket real (10/11).
 - **Texto muy largo**: primero se tapan los datos personales y después se recorta a 10.000 caracteres, terminando en "[…]".
 - **Dos pedidos con la misma foto**: se leen los dos; no hay caché, porque guardaría la imagen o su resultado.
 - **Usuario sin cuenta**: no puede leer tickets (`no_autenticado`); la app le ofrece «Confirmar a mano».
