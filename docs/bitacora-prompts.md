@@ -2650,6 +2650,46 @@ lo conecte a la pantalla de confirmar la compra.
 
 ---
 
+## 2026-11-14 — Spec de registrar una compra con la foto del ticket (issue #49)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit, `spec-critic` y `gh` CLI.
+
+**Objetivo:** conectar la app al servicio que lee el ticket (issue #48): sacar
+la foto, mandarla y llevar lo leído a «Revisá tu compra», sin que la foto
+quede en el celular.
+
+**Prompts principales:**
+1. "Arrancá con la issue #49." Antes de escribir la spec se acordó cómo sacar
+   la foto, qué hacer con el medio de pago, qué pasa sin cuenta y sin
+   descuento.
+2. "Había una opción que dentro de la app me dejaba sacar una foto, volver a
+   sacarla si no me gustaba, y no se guardaba en la memoria del celular." Es
+   la cámara del sistema: muestra «Repetir» y «Usar foto», y no la agrega a
+   la galería. Deja una copia temporal en la carpeta privada de la app, que
+   se borra enseguida.
+3. "Vamos con la cámara del sistema, borrar los temporales, el medio del
+   ticket solo como sugerencia, sin cuenta ofrecer iniciar sesión, sin
+   descuento y con un ticket de ejemplo para la demo."
+4. spec-critic marcó que la constitución decía que la foto nunca va a disco,
+   y en el celular eso es imposible. "1a y 2a": se aclara la constitución
+   (3.0.2: un temporal que se borra al terminar no cuenta como guardar la
+   foto) y la fecha pasa a poder cambiarse en «Revisá tu compra».
+
+**Resultado:**
+- Spec 014: dos botones (cámara y galería del sistema), la foto achicada a
+  JPEG de 2,5 MB como máximo, las copias temporales borradas en todos los
+  casos, el medio del ticket como sugerencia solo si coincide con una sola
+  tarjeta, un mensaje y unas salidas para cada error, y la fecha editable.
+- La constitución (3.0.2), la política de privacidad, CLAUDE.md y el revisor
+  de reglas dicen qué pasa con la foto en el celular.
+- Dos pasadas de spec-critic: la primera encontró el choque con la
+  constitución y que el banco de la tarjeta nunca iba a coincidir con el del
+  ticket («Banco Galicia» contra «BCO GALICIA»); la segunda, contradicciones
+  con la spec 012 que se resolvieron.
+- Queda pendiente: el plan, las tareas y la implementación.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
