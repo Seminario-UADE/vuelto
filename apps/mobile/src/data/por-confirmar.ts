@@ -4,6 +4,7 @@
  * puras (ADR-009); el slice y la persistencia están en `store/por-confirmar.ts`.
  */
 import { fechaArgentina } from "@vuelto/motor";
+import type { RangoDeDias } from "../ticket/fechas";
 import { comercioPorNombre } from "./calculo";
 import type { BorradorCompra, Canal, Comercio, OrigenCompra } from "./contracts";
 
@@ -77,10 +78,10 @@ export type AvisoPorConfirmar = "monto-distinto" | "medio-distinto";
 
 export type BorradorPorConfirmar = {
   borrador: BorradorCompra;
-  /** El medio de la simulación, solo si el ticket no trae medio (FR-008). Sin ticket, `null`. */
+  /** El medio de la simulación, solo si el ticket no sugiere ninguno (FR-008). Sin ticket, `null`. */
   medioSugerido: string | null;
-  /** `[día de la simulación]` o, si hoy es otro día, `[ese día, hoy]` (FR-017). */
-  fechasPosibles: string[];
+  /** Del día de la simulación a hoy: la compra no puede ser anterior (spec 014 FR-010, spec 012 FR-013). */
+  diasPosibles: RangoDeDias;
   avisos: AvisoPorConfirmar[];
 };
 
@@ -88,7 +89,8 @@ export type BorradorPorConfirmar = {
 export type TicketParaConfirmar = {
   monto: number | null;
   fecha: string | null;
-  medioId: string | null;
+  /** La tarjeta que sugiere el medio leído (spec 014 FR-008); nunca se marca. */
+  medioSugeridoTicket: string | null;
   textoExtraido: string | null;
 };
 
@@ -96,7 +98,8 @@ export type TicketParaConfirmar = {
  * Lo que precarga «Revisá tu compra» desde una compra por confirmar (FR-006 a FR-009, FR-017).
  * Sin ticket («Cargar a mano»): el medio va elegido porque el usuario lo eligió al tocar «Voy a
  * pagar con…». Con ticket: manda lo del ticket (FR-009) y lo que no trae sale de la compra por
- * confirmar; si no dice el medio, no se preselecciona y se sugiere el de la simulación (FR-008).
+ * confirmar. El medio nunca va marcado (spec 014 FR-008): se sugiere el del ticket y, si el ticket
+ * no sugiere ninguno, el de la simulación.
  */
 export function borradorDesdePorConfirmar(
   c: CompraPorConfirmar,
@@ -104,6 +107,7 @@ export function borradorDesdePorConfirmar(
   hoy: string,
 ): BorradorPorConfirmar {
   const dia = diaDeLaSimulacion(c);
+  const diasPosibles = { desde: dia, hoy };
   if (ticket === null) {
     return {
       borrador: {
@@ -118,14 +122,14 @@ export function borradorDesdePorConfirmar(
         categoriaId: c.categoriaId ?? null,
       },
       medioSugerido: null,
-      fechasPosibles: hoy === dia ? [dia] : [dia, hoy],
+      diasPosibles,
       avisos: [],
     };
   }
   const avisos: AvisoPorConfirmar[] = [];
   // El aviso de monto solo si se simuló con monto (FR-009).
   if (ticket.monto !== null && c.monto !== null && ticket.monto !== c.monto) avisos.push("monto-distinto");
-  if (ticket.medioId !== null && ticket.medioId !== c.medioId) avisos.push("medio-distinto");
+  if (ticket.medioSugeridoTicket !== null && ticket.medioSugeridoTicket !== c.medioId) avisos.push("medio-distinto");
   const fecha = ticket.fecha ?? dia;
   return {
     borrador: {
@@ -133,14 +137,14 @@ export function borradorDesdePorConfirmar(
       comercio: c.comercioNombre,
       fecha,
       monto: ticket.monto ?? c.monto,
-      medioId: ticket.medioId,
+      medioId: null,
       textoExtraido: ticket.textoExtraido,
       usarPromo: true,
       canal: c.canal ?? "presencial",
       categoriaId: c.categoriaId ?? null,
     },
-    medioSugerido: ticket.medioId === null ? c.medioId : null,
-    fechasPosibles: [fecha],
+    medioSugerido: ticket.medioSugeridoTicket === null ? c.medioId : null,
+    diasPosibles,
     avisos,
   };
 }

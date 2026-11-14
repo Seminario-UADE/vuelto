@@ -8,31 +8,33 @@ beforeEach(() => {
   api.setDemora(0);
 });
 
-describe("ticket", () => {
-  it("no trae medio de pago (RF-10) ni imagen", async () => {
-    const t = await api.leerTicket({ hoy: "2026-11-07" });
-    expect(t.ok).toBe(true);
-    if (t.ok) expect(t.medio).toBeNull();
+describe("ticket: los escenarios de desarrollo (spec 014, FR-012)", () => {
+  it("ticket de ejemplo: la lectura de hoy, con el medio tal cual lo dice el ticket y sin imagen", async () => {
+    const t = await api.leerTicket({ hoy: "2026-11-07", escenario: "ejemplo" });
+    expect(t).toMatchObject({
+      ok: true,
+      comercio: "Coto",
+      monto: 24500,
+      medio: { banco: null, tipo: "debito", red: "visa", ultimos4: null },
+    });
     expect(JSON.stringify(t)).not.toMatch(/imagen|image|base64|uri/i);
   });
 
   it("devuelve la fecha de hoy que le pasan, también en el texto extraído (spec 012 R12)", async () => {
-    const t = await api.leerTicket({ hoy: "2026-11-07" });
+    const t = await api.leerTicket({ hoy: "2026-11-07", escenario: "ejemplo" });
     expect(t.ok).toBe(true);
     if (!t.ok) return;
     expect(t.fecha).toBe("2026-11-07");
     expect(t.textoExtraido).toContain("07/11/2026");
+    expect(t.textoExtraido).toContain("VISA DEBITO");
   });
 
-  it("escenario de ticket ilegible: error para mostrar", async () => {
-    const t = await api.leerTicket({ hoy: "2026-11-07", falla: "ilegible" });
-    expect(t.ok).toBe(false);
+  it("ticket ilegible → ticket_ilegible", async () => {
+    expect(await api.leerTicket({ hoy: "2026-11-07", escenario: "ilegible" })).toEqual({ ok: false, resultado: "ticket_ilegible" });
   });
 
-  it("escenario sin red: falla con el error de conexión (spec 012 R12)", async () => {
-    const t = await api.leerTicket({ hoy: "2026-11-07", falla: "sin-red" });
-    expect(t.ok).toBe(false);
-    if (!t.ok) expect(t.error).toMatch(/conexión/i);
+  it("sin red → sin_conexion", async () => {
+    expect(await api.leerTicket({ hoy: "2026-11-07", escenario: "sin-red" })).toEqual({ ok: false, resultado: "sin_conexion" });
   });
 });
 

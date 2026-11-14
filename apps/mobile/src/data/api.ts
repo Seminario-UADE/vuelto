@@ -10,7 +10,7 @@ import type {
   Comercio,
   Contacto,
   Invitacion,
-  LecturaTicket,
+  LecturaApp,
   PedidoGrupo,
   RecomendacionGrupo,
   VistaInvitacion,
@@ -46,36 +46,20 @@ const HOY_EN_EL_SERVIDOR = fechaArgentina(new Date(RELOJ_EJEMPLO));
 // Los comercios del buscador ya no son un pedido: se derivan del corpus del store
 // (`selectCatalogoComercios`, issue #43).
 
-/** Las fallas que se pueden forzar con los escenarios de desarrollo. */
-export type FallaTicket = "ilegible" | "sin-red";
+/** Los escenarios de desarrollo de la lectura del ticket (spec 014, FR-012). */
+export type EscenarioTicket = "ejemplo" | "ilegible" | "sin-red";
 
 /**
- * Lee el ticket. En esta feature no recibe imagen: no hay captura real (spec 006 FR-015).
- * El endpoint real recibe la imagen, la manda a Groq y la descarta (Principio IV, ADR-012).
- * `hoy` viene del reloj del store (`sesion.ahora`), nunca de `new Date()` (spec 012 R12).
+ * Simula la lectura del ticket, sin cámara ni servicio: solo para los escenarios de desarrollo
+ * (la demo, los tests y la web sin cámara). La lectura real es `ticket/leer.ts`, que manda la
+ * foto al servicio de la spec 013. `hoy` viene del reloj del store (`sesion.ahora`), nunca de
+ * `new Date()` (spec 012 R12).
  */
-export async function leerTicket(opciones: { hoy: string; falla?: FallaTicket | null }): Promise<LecturaTicket> {
-  if (opciones.falla === "ilegible") {
-    return red({
-      ok: false,
-      error: "No pudimos leer el ticket. Probá con más luz o cargá el monto a mano.",
-    });
-  }
-  if (opciones.falla === "sin-red") {
-    return red({
-      ok: false,
-      error: "Sin conexión no podemos leer el ticket. Probá de nuevo cuando tengas internet o cargá la compra a mano.",
-    });
-  }
+export async function leerTicket(opciones: { hoy: string; escenario: EscenarioTicket }): Promise<LecturaApp> {
+  if (opciones.escenario === "ilegible") return red({ ok: false, resultado: "ticket_ilegible" });
+  if (opciones.escenario === "sin-red") return red({ ok: false, resultado: "sin_conexion" });
   const t = ticketDeEjemplo(opciones.hoy);
-  return red({
-    ok: true,
-    comercio: t.comercio,
-    fecha: t.fecha,
-    monto: t.monto,
-    medio: null,
-    textoExtraido: t.textoExtraido,
-  });
+  return red({ ok: true, ...t });
 }
 
 let generadas = 0;

@@ -60,7 +60,7 @@ export default function Revisa() {
     // Con ticket (escaneo desde el paso 4): manda lo del ticket y lo que falta sale de la compra (FR-007).
     const ticket =
       p.modo === "ticket"
-        ? { monto: parseMonto(p.monto ?? ""), fecha: p.fecha || null, medioId: p.medio || null, textoExtraido: p.texto ?? null }
+        ? { monto: parseMonto(p.monto ?? ""), fecha: p.fecha || null, medioSugeridoTicket: p.medio || null, textoExtraido: p.texto ?? null }
         : null;
     return pc ? { pc, ...borradorDesdePorConfirmar(pc, ticket, hoy) } : null;
   });
@@ -94,6 +94,8 @@ export default function Revisa() {
   const dispatch = useAppDispatch();
   const [fechaElegida, setFechaElegida] = useState<string | null>(desde?.borrador.fecha ?? null);
   const fecha = fechaElegida ?? (p.fecha || hoy);
+  // Hasta el calendario de la spec 014 (T017): el día de la simulación y hoy, como en la spec 012 FR-017.
+  const fechasPosibles = desde ? [...new Set([desde.diasPosibles.desde ?? hoy, hoy])] : [];
 
   const perfil = useAppSelector(selectPerfilVista);
   const comercioConocido = comercio.trim() ? comercioDelCatalogo(comercio, perfil.comercios, categoriaId) : undefined;
@@ -200,14 +202,14 @@ export default function Revisa() {
           keyboardType="number-pad"
           tabular
         />
-        {desde && desde.fechasPosibles.length > 1 ? (
+        {fechasPosibles.length > 1 ? (
           // Cambió el día desde la simulación: se elige entre ese día y hoy (FR-017).
           <View style={{ gap: space.sm }}>
             <Text variant="label" tone="inkSecondary">
               ¿Cuándo pagaste?
             </Text>
             <View style={{ gap: space.sm }}>
-              {desde.fechasPosibles.map((f) => (
+              {fechasPosibles.map((f) => (
                 <OptionRow
                   key={f}
                   title={f === hoy ? "Hoy" : "El día que simulaste"}

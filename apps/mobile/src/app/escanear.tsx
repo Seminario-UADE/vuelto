@@ -12,6 +12,7 @@ import { fechaCorta, pesos } from "@/lib/format";
 import { hapticoLeve } from "@/lib/haptics";
 import { useAppSelector } from "@/store/hooks";
 import { selectHoy } from "@/store/selectores";
+import { salidaDe } from "@/ticket/resultados";
 import { colors, radius, size, space } from "@/theme";
 
 const LINEAS = [
@@ -39,17 +40,18 @@ export default function Escanear() {
   const [leyendo, setLeyendo] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const escenario = useAppSelector((s) => s.sesion.escenario);
-  const falla = escenario === "ticket-ilegible" ? "ilegible" : escenario === "sin-red" ? "sin-red" : null;
+  // Hasta la cámara (spec 014, T015), el escenario normal también usa el ticket de ejemplo.
+  const escenarioTicket = escenario === "ticket-ilegible" ? "ilegible" : escenario === "sin-red" ? "sin-red" : "ejemplo";
   const hoy = useAppSelector(selectHoy);
 
   const disparar = async () => {
     hapticoLeve();
     setLeyendo(true);
     setError(null);
-    const t = await api.leerTicket({ hoy, falla });
+    const t = await api.leerTicket({ hoy, escenario: escenarioTicket });
     setLeyendo(false);
     if (!t.ok) {
-      setError(t.error);
+      setError(salidaDe(t.resultado).mensaje);
       return;
     }
     router.replace({
@@ -59,8 +61,10 @@ export default function Escanear() {
         comercio: t.comercio ?? "",
         monto: t.monto ?? "",
         fecha: t.fecha ?? "",
-        // Solo si el ticket lo dice; si no, revisa pregunta (RF-10).
-        medio: t.medio?.id ?? "",
+        // Lo que dice el ticket, no una tarjeta: «Revisá» lo sugiere, nunca lo marca (FR-008).
+        medioRed: t.medio.red ?? "",
+        medioTipo: t.medio.tipo ?? "",
+        medioBanco: t.medio.banco ?? "",
         texto: t.textoExtraido,
         ...extra,
       },

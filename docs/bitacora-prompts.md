@@ -2681,6 +2681,10 @@ quede en el celular.
 6. "Commiteá y seguí con las tareas." 21 tareas en 3 etapas: la lógica
    probada sin celular, la cámara y las pantallas (termina con la prueba del
    usuario en su celular) y el cierre.
+7. "Commiteá y arrancá con la etapa 1." Toda la lógica, con las pruebas
+   escritas primero y vistas fallar antes del código: los mensajes de cada
+   error, la sugerencia del medio de pago, los días que se pueden elegir,
+   la llamada al servicio y el borrado de la foto en todos los casos.
 
 **Resultado:**
 - Spec 014: dos botones (cámara y galería del sistema), la foto achicada a
@@ -2693,7 +2697,21 @@ quede en el celular.
   constitución y que el banco de la tarjeta nunca iba a coincidir con el del
   ticket («Banco Galicia» contra «BCO GALICIA»); la segunda, contradicciones
   con la spec 012 que se resolvieron.
-- Queda pendiente: las tareas y la implementación.
+- Etapa 1 (lógica, 12 tareas): 80 pruebas nuevas, todas sin celular, más
+  las que se ajustaron de la compra por confirmar y los escenarios. Cubren
+  el mensaje y las salidas de cada error, cuándo una tarjeta lleva «El que
+  dice el ticket», qué días se pueden elegir, qué responde la app a cada
+  respuesta del servicio (incluidos los 30 segundos sin respuesta) y que la
+  foto y su copia achicada se borren en cada camino, aunque algo falle.
+- El medio del ticket ya no se marca solo en «Revisá tu compra»: queda como
+  sugerencia. En Perfil se suman los escenarios «Sin red» y «Ticket de
+  ejemplo» (este último con «VISA DEBITO», para la demo sin gastar el cupo
+  de Groq).
+- Las dos pantallas tienen un arreglo mínimo para seguir funcionando hasta la
+  etapa 2, que las rehace: «Escanear ticket» todavía usa el ticket de ejemplo
+  y la fecha sigue con las dos opciones de antes.
+- Queda pendiente: la etapa 2 (la cámara y las pantallas, con la prueba en el
+  celular) y la etapa 3 (el cierre y el PR).
 
 ---
 
