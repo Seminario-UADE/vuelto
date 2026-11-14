@@ -2674,6 +2674,10 @@ quede en el celular.
    y en el celular eso es imposible. "1a y 2a": se aclara la constitución
    (3.0.2: un temporal que se borra al terminar no cuenta como guardar la
    foto) y la fecha pasa a poder cambiarse en «Revisá tu compra».
+5. "Commiteá y seguí con el plan." Tres librerías oficiales de Expo (cámara y
+   galería, achicar la foto, borrar archivos), la lógica en una carpeta
+   aparte que se prueba sin celular, y un calendario propio para la fecha
+   porque el de la comunidad no anda en la versión web de la app.
 
 **Resultado:**
 - Spec 014: dos botones (cámara y galería del sistema), la foto achicada a
@@ -2686,7 +2690,7 @@ quede en el celular.
   constitución y que el banco de la tarjeta nunca iba a coincidir con el del
   ticket («Banco Galicia» contra «BCO GALICIA»); la segunda, contradicciones
   con la spec 012 que se resolvieron.
-- Queda pendiente: el plan, las tareas y la implementación.
+- Queda pendiente: las tareas y la implementación.
 
 ---
 
