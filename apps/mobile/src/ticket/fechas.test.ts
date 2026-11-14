@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { diaPermitido, diasDelMes } from "./fechas";
+import { diaPermitido, diasDelMes, mesDe, otroMes, puedeIrAlMes } from "./fechas";
 
 const HOY = "2026-11-14";
 
@@ -54,5 +54,28 @@ describe("diasDelMes (el calendario)", () => {
     const dias = diasDelMes("2026-12", { desde: null, hoy: "2027-01-02" });
     expect(dias.every((d) => d.permitido)).toBe(true);
     expect(dias.at(-1)?.dia).toBe("2026-12-31");
+  });
+});
+
+describe("los meses del calendario", () => {
+  it("mesDe y otroMes, también en los bordes de año", () => {
+    expect(mesDe("2026-11-14")).toBe("2026-11");
+    expect(otroMes("2026-12", 1)).toBe("2027-01");
+    expect(otroMes("2027-01", -1)).toBe("2026-12");
+    expect(otroMes("2026-11", -1)).toBe("2026-10");
+  });
+
+  it("con compra por confirmar: no se va antes del mes de la simulación ni después del de hoy", () => {
+    const rango = { desde: "2026-10-30", hoy: "2026-11-02" };
+    expect(puedeIrAlMes("2026-09", rango)).toBe(false);
+    expect(puedeIrAlMes("2026-10", rango)).toBe(true);
+    expect(puedeIrAlMes("2026-11", rango)).toBe(true);
+    expect(puedeIrAlMes("2026-12", rango)).toBe(false);
+  });
+
+  it("sin compra por confirmar: cualquier mes hasta el de hoy", () => {
+    const rango = { desde: null, hoy: "2026-11-14" };
+    expect(puedeIrAlMes("2020-01", rango)).toBe(true);
+    expect(puedeIrAlMes("2026-12", rango)).toBe(false);
   });
 });

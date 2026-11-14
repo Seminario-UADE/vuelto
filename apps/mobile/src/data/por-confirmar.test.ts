@@ -184,4 +184,9 @@ describe("borradorDesdePorConfirmar con ticket (spec 012 FR-007, spec 014 FR-008
   it("los días posibles van del día de la simulación a hoy (FR-010)", () => {
     expect(borradorDesdePorConfirmar(enCoto, ticket, "2026-10-16").diasPosibles).toEqual({ desde: "2026-10-14", hoy: "2026-10-16" });
   });
+
+  it("una fecha del ticket anterior a la simulación no se propone: va el día de la simulación (spec 012 FR-013)", () => {
+    expect(borradorDesdePorConfirmar(enCoto, { ...ticket, fecha: "2026-10-10" }, "2026-10-16").borrador.fecha).toBe("2026-10-14");
+    expect(borradorDesdePorConfirmar(enCoto, { ...ticket, fecha: "2026-10-15" }, "2026-10-16").borrador.fecha).toBe("2026-10-15");
+  });
 });

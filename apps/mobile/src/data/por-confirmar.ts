@@ -4,7 +4,7 @@
  * puras (ADR-009); el slice y la persistencia están en `store/por-confirmar.ts`.
  */
 import { fechaArgentina } from "@vuelto/motor";
-import type { RangoDeDias } from "../ticket/fechas";
+import { diaPermitido, type RangoDeDias } from "../ticket/fechas";
 import { comercioPorNombre } from "./calculo";
 import type { BorradorCompra, Canal, Comercio, OrigenCompra } from "./contracts";
 
@@ -130,7 +130,8 @@ export function borradorDesdePorConfirmar(
   // El aviso de monto solo si se simuló con monto (FR-009).
   if (ticket.monto !== null && c.monto !== null && ticket.monto !== c.monto) avisos.push("monto-distinto");
   if (ticket.medioSugeridoTicket !== null && ticket.medioSugeridoTicket !== c.medioId) avisos.push("medio-distinto");
-  const fecha = ticket.fecha ?? dia;
+  // Fuera del rango (anterior a la simulación), se propone el día de la simulación (spec 012 FR-013).
+  const fecha = ticket.fecha !== null && diaPermitido(ticket.fecha, diasPosibles) ? ticket.fecha : dia;
   return {
     borrador: {
       modo: "ticket",

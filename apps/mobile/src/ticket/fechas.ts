@@ -47,3 +47,20 @@ export function diasDelMes(mes: string, rango: RangoDeDias): DiaDelCalendario[] 
     };
   });
 }
+
+/** `AAAA-MM-DD` → `AAAA-MM`. */
+export function mesDe(dia: string): string {
+  return dia.slice(0, 7);
+}
+
+/** El mes anterior (`-1`) o el siguiente (`1`). */
+export function otroMes(mes: string, delta: -1 | 1): string {
+  const [anio, numero] = mes.split("-").map(Number) as [number, number];
+  const fecha = new Date(Date.UTC(anio, numero - 1 + delta, 1));
+  return `${fecha.getUTCFullYear()}-${dosDigitos(fecha.getUTCMonth() + 1)}`;
+}
+
+/** Si el calendario puede mostrar ese mes: tiene que tener algún día del rango. */
+export function puedeIrAlMes(mes: string, { desde, hoy }: RangoDeDias): boolean {
+  return mes <= mesDe(hoy) && (desde === null || mes >= mesDe(desde));
+}

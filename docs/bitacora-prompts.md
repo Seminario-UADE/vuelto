@@ -2685,6 +2685,10 @@ quede en el celular.
    escritas primero y vistas fallar antes del código: los mensajes de cada
    error, la sugerencia del medio de pago, los días que se pueden elegir,
    la llamada al servicio y el borrado de la foto en todos los casos.
+8. "Commiteá y seguí con la etapa 2." La cámara, «Escanear ticket», el
+   calendario y «Revisá tu compra». Antes de escribir el código que borra
+   las copias, se revisó en el código de las librerías de Expo en qué
+   carpetas las dejan, en vez de suponerlo.
 
 **Resultado:**
 - Spec 014: dos botones (cámara y galería del sistema), la foto achicada a
@@ -2707,11 +2711,20 @@ quede en el celular.
   sugerencia. En Perfil se suman los escenarios «Sin red» y «Ticket de
   ejemplo» (este último con «VISA DEBITO», para la demo sin gastar el cupo
   de Groq).
-- Las dos pantallas tienen un arreglo mínimo para seguir funcionando hasta la
-  etapa 2, que las rehace: «Escanear ticket» todavía usa el ticket de ejemplo
-  y la fecha sigue con las dos opciones de antes.
-- Queda pendiente: la etapa 2 (la cámara y las pantallas, con la prueba en el
-  celular) y la etapa 3 (el cierre y el PR).
+- Etapa 2 (cámara y pantallas): «Escanear ticket» tiene «Sacar foto» y
+  «Elegir de la galería», y pide iniciar sesión si no hay cuenta. Muestra
+  «Leyendo el ticket…» mientras lee, y un mensaje con sus botones para cada
+  error. Al abrirse, borra las copias que hubieran quedado de una lectura
+  cortada. En «Revisá tu compra», la tarjeta que coincide con el ticket
+  lleva «El que dice el ticket» sin quedar marcada, y la fecha se cambia
+  tocándola, con un calendario que no deja elegir días fuera de lo
+  permitido.
+- Si el ticket dice una fecha anterior a la simulación, se propone el día de
+  la simulación, porque la compra no puede ser anterior.
+- La versión web de la app se sigue armando bien con las librerías nuevas, y
+  la key de Groq no aparece en ningún lado de la app.
+- Queda pendiente: la prueba en el celular (la corre el usuario) y la etapa
+  3 (las revisiones, la documentación y el PR).
 
 ---
 

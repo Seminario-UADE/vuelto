@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@/components/button";
@@ -8,50 +8,73 @@ import { Card } from "@/components/card";
 import { Icon } from "@/components/icon";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
-import { fechaCorta, pesos } from "@/lib/format";
+import type { LecturaApp } from "@/data/contracts";
 import { hapticoLeve } from "@/lib/haptics";
+import { supabase } from "@/lib/supabase";
 import { useAppSelector } from "@/store/hooks";
 import { selectHoy } from "@/store/selectores";
-import { salidaDe } from "@/ticket/resultados";
+import { borrar, elegirDeGaleria, limpiarTemporales, preparar, sacarFoto, type FotoElegida } from "@/ticket/camara";
+import { leerFoto } from "@/ticket/leer";
+import { salidaDe, type ResultadoLectura, type SalidaLectura } from "@/ticket/resultados";
+import { LIMITE_LECTURA_MS, pedirLectura } from "@/ticket/servicio";
 import { colors, radius, size, space } from "@/theme";
 
-const LINEAS = [
-  ["LECHE ENTERA 1L", 1450],
-  ["QUESO CREMOSO 500G", 4850],
-  ["ACEITE GIRASOL 1.5L", 3200],
-  ["PAN ARTESANAL", 1800],
-  ["YOGUR BEBIBLE PACK", 2900],
-  ["CARNE PICADA ESP.", 10300],
-] as const;
+type Estado =
+  | { tipo: "listo" }
+  | { tipo: "sin_permiso" }
+  | { tipo: "leyendo" }
+  | { tipo: "resultado"; resultado: ResultadoLectura };
+
+const ETIQUETA_SALIDA: Record<SalidaLectura, string> = {
+  probar_de_nuevo: "Probar de nuevo",
+  iniciar_sesion: "Iniciar sesión",
+  cargar_a_mano: "Cargar a mano",
+};
 
 /**
- * Escanear ticket (modal a pantalla completa). En esta versión NO usa la cámara: el visor
- * muestra un ticket de ejemplo y el disparador simula la lectura. Ningún archivo de imagen
- * se crea (spec 006 FR-015, Principio IV).
+ * Escanear ticket (modal a pantalla completa, spec 014). «Sacar foto» abre la cámara del sistema
+ * y «Elegir de la galería», las fotos del sistema. La foto se achica, se manda al servicio y sus
+ * copias se borran antes de seguir (FR-007, `ticket/leer.ts`); nunca se guarda.
+ *
+ * Los escenarios de desarrollo de Perfil (FR-012) simulan la lectura sin cámara ni servicio.
  */
 export default function Escanear() {
-  // Desde el paso 4 del flujo: la lectura confirma esa compra por confirmar (FR-007).
+  // Desde el paso 4 del flujo: la lectura confirma esa compra por confirmar (spec 012 FR-007).
   const desde = useLocalSearchParams<{ porConfirmar?: string; flujo?: string }>();
   const extra = {
     ...(desde.porConfirmar ? { porConfirmar: desde.porConfirmar } : {}),
     ...(desde.flujo ? { flujo: desde.flujo } : {}),
   };
   const insets = useSafeAreaInsets();
-  const [leyendo, setLeyendo] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [estado, setEstado] = useState<Estado>({ tipo: "listo" });
   const escenario = useAppSelector((s) => s.sesion.escenario);
-  // Hasta la cámara (spec 014, T015), el escenario normal también usa el ticket de ejemplo.
-  const escenarioTicket = escenario === "ticket-ilegible" ? "ilegible" : escenario === "sin-red" ? "sin-red" : "ejemplo";
+  const escenarioTicket: api.EscenarioTicket | null =
+    escenario === "ticket-ilegible"
+      ? "ilegible"
+      : escenario === "sin-red"
+        ? "sin-red"
+        : escenario === "ticket-de-ejemplo"
+          ? "ejemplo"
+          : null;
+  const usuario = useAppSelector((s) => s.sesion.usuario);
+  const conSesion = usuario !== null && supabase !== null;
   const hoy = useAppSelector(selectHoy);
+  // Si el usuario cierra la pantalla mientras lee, la lectura termina (y borra) pero no navega.
+  const abierta = useRef(true);
 
-  const disparar = async () => {
-    hapticoLeve();
-    setLeyendo(true);
-    setError(null);
-    const t = await api.leerTicket({ hoy, escenario: escenarioTicket });
-    setLeyendo(false);
+  useEffect(() => {
+    // Lo que haya quedado de una lectura interrumpida (FR-007).
+    limpiarTemporales();
+    abierta.current = true;
+    return () => {
+      abierta.current = false;
+    };
+  }, []);
+
+  const terminar = (t: LecturaApp) => {
+    if (!abierta.current) return;
     if (!t.ok) {
-      setError(salidaDe(t.resultado).mensaje);
+      setEstado({ tipo: "resultado", resultado: t.resultado });
       return;
     }
     router.replace({
@@ -71,8 +94,51 @@ export default function Escanear() {
     });
   };
 
+  const leer = async (elegir: () => Promise<FotoElegida>) => {
+    if (estado.tipo === "leyendo") return;
+    hapticoLeve();
+    if (escenarioTicket) {
+      setEstado({ tipo: "leyendo" });
+      terminar(await api.leerTicket({ hoy, escenario: escenarioTicket }));
+      return;
+    }
+    const cliente = supabase;
+    if (!cliente || !conSesion) return;
+    let foto: FotoElegida;
+    try {
+      foto = await elegir();
+    } catch {
+      setEstado({ tipo: "resultado", resultado: "foto_no_valida" });
+      return;
+    }
+    // Cerró la cámara o la galería sin elegir: vuelve sin error (FR-003).
+    if (foto.tipo === "cancelada") return;
+    if (foto.tipo === "sin_permiso") {
+      setEstado({ tipo: "sin_permiso" });
+      return;
+    }
+    setEstado({ tipo: "leyendo" });
+    const t = await leerFoto(foto.uri, {
+      preparar,
+      borrar,
+      pedir: (base64) => pedirLectura(cliente, base64, { limiteMs: LIMITE_LECTURA_MS }),
+    });
+    terminar(t);
+  };
+
   const aMano = () =>
     router.replace({ pathname: "/revisa", params: desde.porConfirmar ? extra : { modo: "manual", ...extra } });
+  const iniciarSesion = () => router.push("/login");
+
+  const accion: Record<SalidaLectura, () => void> = {
+    probar_de_nuevo: () => setEstado({ tipo: "listo" }),
+    iniciar_sesion: iniciarSesion,
+    cargar_a_mano: aMano,
+  };
+
+  const leyendo = estado.tipo === "leyendo";
+  // Sin sesión no se abre la cámara ni se llama al servicio (FR-002). Los escenarios no usan ninguno.
+  const pideSesion = !conSesion && escenarioTicket === null;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.scrim, paddingTop: insets.top, paddingBottom: insets.bottom }}>
@@ -104,118 +170,81 @@ export default function Escanear() {
         style={{ flex: 1 }}
         contentContainerStyle={{ flexGrow: 1, justifyContent: "center", paddingHorizontal: space.section, gap: space.lg }}
       >
-        <View
-          accessible
-          accessibilityLabel="Visor con un ticket de ejemplo de Coto por 24.500 pesos"
-          style={{ padding: space.lg, borderRadius: radius.row, borderWidth: 2, borderColor: colors.onScrimMuted }}
-        >
-          <View style={{ backgroundColor: colors.canvas, borderRadius: radius.badge, padding: space.lg, gap: space.xs }}>
-            <Text variant="bodyMd" weight="bold" align="center">
-              COTO C.I.C.S.A.
-            </Text>
-            <Text variant="caption" tone="inkSecondary" align="center">
-              Suc. 112 · Almagro
-            </Text>
-            <View style={{ height: 1, backgroundColor: colors.divider, marginVertical: space.xs }} />
-            {LINEAS.map(([item, precio]) => (
-              <View key={item} style={{ flexDirection: "row", justifyContent: "space-between", gap: space.sm }}>
-                <Text variant="caption" tone="inkSecondary" numberOfLines={1} maxFontSizeMultiplier={1.3} style={{ flex: 1 }}>
-                  {item}
-                </Text>
-                <Text variant="caption" tabular maxFontSizeMultiplier={1.3}>
-                  {pesos(precio)}
-                </Text>
-              </View>
-            ))}
-            <View style={{ height: 1, backgroundColor: colors.divider, marginVertical: space.xs }} />
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-              <Text variant="bodyMd" weight="bold">
-                TOTAL
-              </Text>
-              <Text variant="bodyMd" weight="bold" tabular>
-                {pesos(24500)}
-              </Text>
-            </View>
-            <Text variant="caption" tone="inkSecondary" align="center">
-              {fechaCorta(hoy)}/2026 · 18:42
-            </Text>
-          </View>
+        <View style={{ alignItems: "center", gap: space.md }}>
+          <Icon name={leyendo ? "ticket" : "camara"} size={56} color={colors.onScrim} />
+          <Text variant="bodyLg" align="center" accessibilityLiveRegion="polite" style={{ color: colors.onScrim }}>
+            {leyendo ? "Leyendo el ticket…" : "Sacale una foto al ticket entero, con buena luz."}
+          </Text>
         </View>
 
-        {error ? (
+        {pideSesion ? (
+          <Card>
+            <Text variant="bodyMd" accessibilityLiveRegion="polite">
+              Iniciá sesión para leer tickets
+            </Text>
+            <Button label="Iniciar sesión" onPress={iniciarSesion} />
+            <Button label="Cargar a mano" variant="secondary" onPress={aMano} />
+          </Card>
+        ) : estado.tipo === "resultado" ? (
           <Card>
             <View style={{ flexDirection: "row", gap: space.sm }}>
               <Icon name="info" size={20} color={colors.error} />
               <Text variant="bodyMd" tone="error" style={{ flex: 1 }} accessibilityLiveRegion="polite">
-                {error}
+                {salidaDe(estado.resultado).mensaje}
               </Text>
             </View>
+            {salidaDe(estado.resultado).salidas.map((s, i) => (
+              <Button key={s} label={ETIQUETA_SALIDA[s]} variant={i === 0 ? "primary" : "secondary"} onPress={accion[s]} />
+            ))}
+          </Card>
+        ) : estado.tipo === "sin_permiso" ? (
+          <Card>
+            <Text variant="bodyMd" accessibilityLiveRegion="polite">
+              Para sacar la foto necesitamos permiso para usar la cámara
+            </Text>
+            <Button label="Elegir de la galería" icon="galeria" onPress={() => void leer(elegirDeGaleria)} />
             <Button label="Cargar a mano" variant="secondary" onPress={aMano} />
           </Card>
         ) : (
-          <View style={{ gap: space.sm }}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: space.sm,
-                padding: space.md,
-                borderRadius: radius.row,
-                backgroundColor: colors.canvas,
-              }}
-            >
+          <Card>
+            <Button label="Sacar foto" icon="camara" loading={leyendo} onPress={() => void leer(sacarFoto)} />
+            <Button
+              label="Elegir de la galería"
+              icon="galeria"
+              variant="secondary"
+              disabled={leyendo}
+              onPress={() => void leer(elegirDeGaleria)}
+            />
+            <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
               <Icon name="candado" size={18} />
               <Text variant="label" style={{ flex: 1 }}>
                 La foto no se guarda: leemos los datos y la descartamos
               </Text>
             </View>
-            <Text variant="label" align="center" style={{ color: colors.onScrimMuted }}>
-              {leyendo ? "Leyendo el ticket…" : "Modo demo: usamos un ticket de ejemplo, sin cámara"}
-            </Text>
-          </View>
+            {escenarioTicket ? (
+              <Text variant="caption" tone="inkSecondary">
+                Escenario de prueba: no abre la cámara ni manda la foto.
+              </Text>
+            ) : null}
+          </Card>
         )}
       </ScrollView>
 
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          paddingHorizontal: space.section,
-          paddingVertical: space.lg,
-        }}
-      >
-        <Pressable
-          onPress={aMano}
-          accessibilityRole="button"
-          style={{ alignItems: "center", gap: space.xs, minWidth: 88, minHeight: size.hit }}
-        >
-          <Icon name="teclado" size={24} color={colors.onScrim} />
-          <Text variant="label" style={{ color: colors.onScrim }}>
-            Cargar a mano
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={disparar}
-          disabled={leyendo}
-          accessibilityRole="button"
-          accessibilityLabel="Leer el ticket"
-          accessibilityState={{ busy: leyendo }}
-          style={{
-            width: 76,
-            height: 76,
-            borderRadius: radius.pill,
-            borderWidth: 4,
-            borderColor: colors.onScrim,
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: leyendo ? 0.5 : 1,
-          }}
-        >
-          <View style={{ width: 60, height: 60, borderRadius: radius.pill, backgroundColor: colors.accent }} />
-        </Pressable>
-        <View style={{ minWidth: 88 }} />
-      </View>
+      {pideSesion || estado.tipo === "resultado" || estado.tipo === "sin_permiso" ? null : (
+        <View style={{ alignItems: "center", paddingVertical: space.lg }}>
+          <Pressable
+            onPress={aMano}
+            disabled={leyendo}
+            accessibilityRole="button"
+            style={{ alignItems: "center", gap: space.xs, minWidth: 88, minHeight: size.hit, opacity: leyendo ? 0.5 : 1 }}
+          >
+            <Icon name="teclado" size={24} color={colors.onScrim} />
+            <Text variant="label" style={{ color: colors.onScrim }}>
+              Cargar a mano
+            </Text>
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 }

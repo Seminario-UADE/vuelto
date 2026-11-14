@@ -80,3 +80,9 @@ export function iniciales(nombre: string): string {
     .map((p) => p.charAt(0).toUpperCase())
     .join("");
 }
+
+/** "2026-11" → "noviembre de 2026" (el calendario de la fecha de la compra). */
+export function nombreDelMes(mes: string): string {
+  const [anio, numero] = mes.split("-");
+  return `${MESES[Number(numero) - 1]} de ${anio}`;
+}
