@@ -2531,8 +2531,8 @@ proveedor que cuide la privacidad sin costo.
 **Herramienta:** Claude Code (Opus 5.5), con spec-kit, `spec-critic` y `gh` CLI.
 
 **Objetivo:** escribir la spec del servicio que lee la foto de un ticket y
-devuelve sus datos, ya con Groq (ADR-012), para que después la app de
-Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
+devuelve sus datos, ya con Groq (ADR-012), para que después la issue #49
+lo conecte a la pantalla de confirmar la compra.
 
 **Prompts principales:**
 1. "Arrancá la issue #48 sobre el PR #126." Se acordó el alcance: solo el
@@ -2554,7 +2554,7 @@ Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
 6. "Commiteá ambos y seguí con el plan." El plan define cómo se arma el
    servicio (igual que el de recomendar), que Groq devuelve los datos tal
    como están impresos y nuestro código los convierte, el contrato para la
-   app de Joaquín con un mensaje sugerido para cada error, y una prueba con 3
+   app (issue #49) con un mensaje sugerido para cada error, y una prueba con 3
    fotos reales que corre el usuario fuera de la sesión de IA antes de
    escribir el servicio.
 7. "Commiteá y seguí con las tasks." 28 tareas en 3 etapas. La primera
@@ -2612,6 +2612,12 @@ Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
     quedaba visible); el servicio se llama como los demás; y se sacó código
     repetido. Error de la IA: las pruebas de estos arreglos se escribieron
     junto con el código, sin verlas fallar antes.
+17. "Pasame el comando del despliegue." El usuario desplegó la función desde
+    Git Bash (`supabase login` y `supabase functions deploy` con `--use-api`)
+    y la probó con la key pública: respondió `no_autenticado`. O sea, la
+    función arranca con la key de Groq de los secrets y rechaza a quien no
+    tiene cuenta. "Igual la #49 es mi ticket": las notas para conectar la app
+    quedan para esa issue y no como aviso a otro integrante.
 
 **Resultado:**
 - Spec 013: qué recibe y qué devuelve el servicio, qué datos personales
@@ -2637,9 +2643,10 @@ Joaquín (issue #49) lo conecte a la pantalla de confirmar la compra.
   ADR-012.
 - La función está completa: 241 tests del servidor sin red ni key, y las
   revisiones de reglas, estándares y spec sin incumplimientos.
-- Queda pendiente: desplegarla (lo corre el usuario) y avisarle a Joaquín
-  que la issue #49 tiene que adaptar su formato, que el descuento no viene
-  del ticket y que el iPhone saca fotos HEIC (la app tiene que mandar JPG).
+- La función quedó desplegada en Supabase y responde.
+- Queda pendiente: la issue #49 (ahora del usuario) conecta la app: adaptar
+  el formato que espera, sin descuento, y mandar la foto en JPG (el iPhone
+  saca HEIC) de 2,5 MB como máximo.
 
 ---
 

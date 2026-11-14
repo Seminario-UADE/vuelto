@@ -98,8 +98,8 @@ description: "Tareas para leer los datos de un ticket a partir de su foto (issue
 - [X] T024 [P] Actualizar `prueba-manual.ts` para que, además de la `LecturaCruda`, muestre la `LecturaTicket` que devolvería el servicio.
 - [X] T025 Correr `npm run lint`, `npm run typecheck`, `npm run test` (cobertura ≥ 90% en `supabase`) y `npm run build` desde la raíz; `deno check` de `extraer-ticket/index.ts` y `prueba-manual.ts`. Verificar que ningún archivo de la función escribe en disco, Storage, la base ni registros con la imagen (`git grep` de `Deno.write`, `writeFile`, `storage`, `console` con variables de imagen o texto).
 - [X] T026 `rules-guardian` y `/code-review` sobre el diff; corregir lo que surja.
-- [ ] T027 Despliegue: el usuario corre `npx supabase functions deploy extraer-ticket --project-ref wahvysbxwgbbyynjiczy --use-api` (quickstart §3). La prueba de punta a punta con la cámara es de la issue #49.
-- [ ] T028 Completar la entrada en `docs/bitacora-prompts.md` y mostrarla en el chat antes de proponer el commit.
+- [X] T027 Despliegue: el usuario corre `npx supabase functions deploy extraer-ticket --project-ref wahvysbxwgbbyynjiczy --use-api` (quickstart §3). La prueba de punta a punta con la cámara es de la issue #49.
+- [X] T028 Completar la entrada en `docs/bitacora-prompts.md` y mostrarla en el chat antes de proponer el commit.
 
 ---
 

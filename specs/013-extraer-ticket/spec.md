@@ -12,7 +12,7 @@
 
 **Frontera con otras issues** (acordada con el dueño de la issue):
 
-- **Issue #49** (Joaconz): la cámara, la galería, la pantalla «Revisá tu compra» y el cruce del medio de pago del ticket con las tarjetas del perfil. Conecta este servicio a la pantalla que hoy usa el lector simulado. Esta spec define solo el servicio y su contrato.
+- **Issue #49**: la cámara, la galería, la pantalla «Revisá tu compra» y el cruce del medio de pago del ticket con las tarjetas del perfil. Conecta este servicio a la pantalla que hoy usa el lector simulado. Esta spec define solo el servicio y su contrato.
 - **El lector simulado de la app** (`leerTicket` y el tipo `LecturaTicket` en `apps/mobile/src/data/`, issue #39) devuelve el medio ya convertido en una tarjeta del perfil, porque no había lectura real. El ticket real no dice qué tarjeta del perfil es: dice, por ejemplo, "VISA DEBITO ****1234". Este servicio devuelve eso, y la issue #49 adapta `LecturaTicket` y hace el cruce.
 - **Issue #10**: medir la precisión con 10 a 20 tickets reales, incluido si queda algún dato personal sin tapar en el texto.
 - **Issue #85**: la key del proveedor ya está cargada en los secrets del servidor.
