@@ -2678,6 +2678,9 @@ quede en el celular.
    galería, achicar la foto, borrar archivos), la lógica en una carpeta
    aparte que se prueba sin celular, y un calendario propio para la fecha
    porque el de la comunidad no anda en la versión web de la app.
+6. "Commiteá y seguí con las tareas." 21 tareas en 3 etapas: la lógica
+   probada sin celular, la cámara y las pantallas (termina con la prueba del
+   usuario en su celular) y el cierre.
 
 **Resultado:**
 - Spec 014: dos botones (cámara y galería del sistema), la foto achicada a
