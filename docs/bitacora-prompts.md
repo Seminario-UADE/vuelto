@@ -2572,6 +2572,52 @@ y presentaba como futuro lo que ya existe.
   un celular real, estado del PR #133 y de las migraciones, y el ensayo completo.
 - Error de proceso: las primeras capturas candidatas parecían del rediseño actual y
   eran de la v8 (crema, con datos de ejemplo); se vio al abrirlas y se descartaron.
+## 2026-11-14 — Migraciones al día: chequeo en el CI y error claro en la app (issue #127, ADR-013)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con `gh` CLI y el subagente `test-runner`.
+
+**Objetivo:** que no vuelva a pasar que la base alojada quede atrás de las
+migraciones del repo sin que nadie se entere (la app falló en el celular con
+«No pudimos cargar los bancos» porque faltaban cuatro migraciones).
+
+**Prompts principales:**
+1. "Leé CLAUDE.md, la infraestructura y el issue #127 [...] Mi recomendación
+   (cuestionala si ves algo mejor): NO aplicar migraciones automáticamente a
+   producción en cada merge. Un job de CI con `migration list --linked`, una
+   casilla en la plantilla de PR y que la app distinga «servidor no al día» de
+   «sin conexión». No ejecutes `db push` ni pidas credenciales. Proponeme el
+   plan y esperá mi OK antes de editar."
+2. "Aprobado" (el plan con dos desviaciones de la recomendación, ver abajo).
+
+**Resultado:**
+- Se leyó antes de proponer y se esperó el OK. Dos cambios sobre lo pedido,
+  aprobados por el usuario: el chequeo **no corre en `pull_request`** (un PR con
+  una migración nueva fallaría siempre, y un workflow editable por el PR no debe
+  leer el secret) y usa **un solo secret, `SUPABASE_DB_URL`**, con
+  `migration list --db-url`, en vez del token de acceso de toda la cuenta más la
+  contraseña.
+- `.github/workflows/migraciones.yml` (push a `main` con cambios de migraciones,
+  diario y a mano) lista las migraciones y `supabase/scripts/` las compara. Una
+  salida que no se pudo leer falla: no se toma por «al día». No aplica nada.
+- Casilla en `.github/pull_request_template.md`, comando en `CLAUDE.md`, pasos
+  para cargar el secret en `docs/architecture/04-infrastructure.md` y la decisión
+  en el ADR-013 (por qué no aplicar en el merge y cuándo revisarlo).
+- En la app, `clasificarError` devuelve `servidor_desactualizado` para columna,
+  tabla o función inexistentes y para un 403 con `42501`; el perfil y los bancos
+  lo muestran en vez de «sin conexión» o «No pudimos guardar el cambio».
+- Lo que **no** se pudo probar: la conexión real a la base alojada, el formato
+  de `--db-url` contra el pooler y la ejecución en GitHub Actions (no hay
+  secret ni se tocó la base alojada; Docker estaba apagado, así que tampoco se
+  comparó contra la salida real de `migration list --local`). El analizador se
+  probó con tablas de ejemplo con los dos estilos de separador.
+- Quedó fuera a propósito: la subida de compras (`data/compras/errores.ts`)
+  sigue tratando los errores desconocidos como transitorios, para no perder
+  compras del usuario; hay que decidirlo aparte porque cambia la spec 010.
+- Errores de la IA en el proceso: se creó primero `supabase/scripts/` sin los
+  tipos de Node en el workspace (falló el `typecheck`; se sumó `@types/node`);
+  una fila de la tabla de secrets quedó separada del resto por una línea en
+  blanco y se corrigió; un archivo temporal de prueba fue a la carpeta temporal
+  del sistema en vez de la del scratchpad y se borró.
 
 ---
 
@@ -2617,6 +2663,66 @@ en un control segmentado pensado para 2 o 3 opciones.
 - Errores de la IA en el proceso: una expectativa mal escrita en un test (Santander es `on_hub_list` y
   va antes que Banco del Sol), un alias `@/` que Vitest no resuelve y que rompió un import, y dos veces
   borró o pisó capturas con un comando demasiado amplio; se restauraron o se volvieron a sacar.
+
+---
+
+## 2026-11-15 — Gasto compartido con los datos de la cuenta (issue #130)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI, el navegador del panel
+de Claude y Supabase local (Docker). Subagentes: `test-runner`,
+`rules-guardian` y las dos revisiones de `/code-review`.
+
+**Objetivo:** corregir G-01, G-02 y G-04 de la revisión del gasto compartido
+(`docs/product/revision-gasto-grupo.md`). Con una cuenta real, «Vos» se
+evaluaba con los datos de Martín, todas las cuentas tenían a Lucía y Mateo de
+contactos y un comercio que no se podía resolver dejaba el resultado
+cargando para siempre.
+
+**Prompts principales:**
+1. "Leé CLAUDE.md, los ADR 008 a 010, la revisión y el issue #130. Corregí
+   G-01, G-02 y G-04; antes de editar, verificá que cada hallazgo siga igual.
+   Proponeme un plan y esperá mi OK." Se decidió implementar directo, sin
+   spec-kit: es un issue S de bugs y la revisión ya dice cómo corregirlos
+   (ADR-007). G-01 y G-02 seguían igual. G-04 había cambiado en parte:
+   armar y resultado ya buscaban el comercio en el store, pero si no lo
+   encontraban el pedido seguía cayendo en `comercioPorId`, y el resultado no
+   mostraba el error.
+2. "OK, avanzá." Primero los tests en rojo (10 fallaban por la razón
+   esperada), después el código.
+3. Al vaciar la lista de contactos se rompía la última línea del test
+   «contactos no se guardan» (`persistencia.test.ts`), que el usuario había
+   pedido no tocar. Se le preguntó y eligió cambiar solo esa línea: los
+   contactos siguen sin guardarse, y G-03 queda afuera.
+
+**Resultado:**
+- G-01: «Vos» se evalúa con los medios, las compras, el corpus y el reloj del
+  store (`selectEntradasMotor`). «Hoy» sale de ese reloj, no del reloj de
+  ejemplo, así que también se corrige G-12 en este camino. Los contactos
+  siguen simulados y se evalúan con el mismo corpus.
+- G-02: la lista de contactos arranca vacía y aparece el estado vacío que ya
+  estaba diseñado. Lucía y Mateo vienen solo al elegir un escenario de demo.
+- G-04: el pedido lleva el `Comercio` ya resuelto y se borró `comercioPorId`.
+  El resultado muestra el error con «Reintentar» y armar avisa si no hay
+  comercio. «¿Pagan entre varios?» ya no se ofrecía para un comercio sin
+  rubro (la recomendación es `null`), así que esa pantalla no se tocó.
+- Se verificó en la app web con Supabase local y una cuenta nueva, en claro
+  y oscuro, antes y después (`docs/design/capturas-130/`). Con el código
+  anterior, la cuenta nueva veía a Lucía y Mateo, el grupo decía «Tu Galicia
+  Visa crédito… según 3 compras de octubre» (la cuenta solo tenía una
+  Santander y ninguna compra) y un comercio desconocido dejaba el resultado
+  en el esqueleto.
+- Quedó sin verificar en pantalla el error con «Reintentar» del resultado:
+  con el comercio ya resuelto, el simulador no falla. Se va a ver con el
+  backend real (#56).
+- Lo que marcaron las revisiones y se ajustó: el resultado se recalcula si
+  cambian los datos de «Vos»; el error se muestra inline, en `error`
+  (DESIGN.md); armar no arma el grupo con otro comercio que el que pide la
+  ruta; los tests no repiten el pedido.
+- Errores de la IA en el proceso: el plan decía que «¿Pagan entre varios?»
+  se seguía ofreciendo sin rubro. Recién al leer la pantalla con más detalle
+  se vio que no. Además, la base de Supabase local estaba vieja (le faltaban
+  migraciones) y se aplicaron las que faltaban con `supabase migration up`,
+  sin borrar datos.
 
 ---
 

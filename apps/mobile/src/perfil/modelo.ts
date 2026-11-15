@@ -75,7 +75,14 @@ export function puedeSacar(medios: readonly MedioDePago[]): boolean {
   return medios.length >= 2;
 }
 
-export type CasoDeError = "duplicado" | "banco_inexistente" | "ultimo_medio" | "sesion_vencida" | "sin_conexion" | "otro";
+export type CasoDeError =
+  | "duplicado"
+  | "banco_inexistente"
+  | "ultimo_medio"
+  | "sesion_vencida"
+  | "sin_conexion"
+  | "servidor_desactualizado"
+  | "otro";
 
 export const MENSAJES_ERROR: Record<CasoDeError, string> = {
   duplicado: "Esa tarjeta ya está en tu perfil",
@@ -83,6 +90,7 @@ export const MENSAJES_ERROR: Record<CasoDeError, string> = {
   ultimo_medio: "Necesitás al menos un medio de pago: agregá otro antes de sacar este",
   sesion_vencida: "Tu sesión venció. Volvé a entrar para seguir",
   sin_conexion: "Necesitás conexión para editar tu perfil",
+  servidor_desactualizado: "El servidor no está al día con la app. Probá más tarde y, si sigue pasando, avisanos",
   otro: "No pudimos guardar el cambio. Probá de nuevo",
 };
 
@@ -94,6 +102,21 @@ export type Fallo = {
   code: string | null;
 };
 
+/**
+ * Códigos de «la base no tiene lo que la app le pide»: columna, tabla, función o relación
+ * inexistentes (Postgres `42703`, `42P01`, `42883`; PostgREST `PGRST200`, `PGRST202`, `PGRST204`,
+ * `PGRST205`). Pasa cuando un PR trajo una migración que la base alojada todavía no tiene (issue #127).
+ */
+const CODIGOS_SERVIDOR_DESACTUALIZADO = new Set([
+  "42703",
+  "42P01",
+  "42883",
+  "PGRST200",
+  "PGRST202",
+  "PGRST204",
+  "PGRST205",
+]);
+
 export function clasificarError({ status, code }: Fallo): CasoDeError {
   if (code === "23505") return "duplicado";
   if (code === "23503") return "banco_inexistente";
@@ -101,6 +124,10 @@ export function clasificarError({ status, code }: Fallo): CasoDeError {
   if (code === "VM001") return "ultimo_medio";
   if (status === 401) return "sesion_vencida";
   if (status === 0) return "sin_conexion";
+  if (code !== null && CODIGOS_SERVIDOR_DESACTUALIZADO.has(code)) return "servidor_desactualizado";
+  // Permiso denegado con la sesión vigente: falta un GRANT o una política que trae una migración.
+  // Es una heurística: también lo causaría un permiso mal puesto, no solo una migración pendiente.
+  if (status === 403 && code === "42501") return "servidor_desactualizado";
   return "otro";
 }
 

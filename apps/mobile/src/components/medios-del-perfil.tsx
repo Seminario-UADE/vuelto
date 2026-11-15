@@ -17,6 +17,7 @@ import { Text } from "./text";
 
 const AVISO_SIN_CONEXION =
   "Sin conexión: tu perfil se muestra como estaba la última vez. Para editarlo necesitás conexión.";
+const AVISO_SERVIDOR_DESACTUALIZADO = `${MENSAJES_ERROR.servidor_desactualizado}. Tu perfil se muestra como estaba la última vez.`;
 
 /**
  * «Tus medios de pago» en Perfil (issue #41, US2): agregar y sacar contra Supabase. Sin conexión se
@@ -38,7 +39,8 @@ export function MediosDelPerfil() {
   }, [dispatch]);
 
   // Solo se edita con la lectura al día: sin conexión, con error o leyendo queda en solo lectura (FR-010).
-  const sinConexion = carga === "sin-conexion" || carga === "error";
+  const servidorDesactualizado = carga === "servidor-desactualizado";
+  const sinConexion = carga === "sin-conexion" || carga === "error" || servidorDesactualizado;
   const editable = carga === "lista";
   const sePuedeSacar = editable && puedeSacar(guardados);
 
@@ -78,7 +80,7 @@ export function MediosDelPerfil() {
       {sinConexion ? (
         <Card tone="warning" padding={space.md} gap={space.sm}>
           <Text variant="bodyMd" tone="warning">
-            {AVISO_SIN_CONEXION}
+            {servidorDesactualizado ? AVISO_SERVIDOR_DESACTUALIZADO : AVISO_SIN_CONEXION}
           </Text>
           <Button label="Reintentar" variant="text" onPress={() => void dispatch(leerMedios())} />
         </Card>
@@ -87,7 +89,9 @@ export function MediosDelPerfil() {
         <SkeletonList rows={2} height={56} />
       ) : medios.length === 0 ? (
         <Text variant="bodyMd" tone="inkSecondary">
-          {sinConexion ? MENSAJES_ERROR.sin_conexion : "Todavía no tenés medios de pago."}
+          {sinConexion
+            ? MENSAJES_ERROR[servidorDesactualizado ? "servidor_desactualizado" : "sin_conexion"]
+            : "Todavía no tenés medios de pago."}
         </Text>
       ) : (
         <Card padding={space.lg} gap={0}>
