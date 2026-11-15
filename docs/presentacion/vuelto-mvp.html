@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vuelto — Entrega del MVP</title>
+<style>
+  /* Paleta de la app (v9.1, apps/mobile/src/theme.ts): seis verdes + semánticos.
+     Claro y oscuro se componen por separado; D alterna, y arranca con el modo del sistema. */
+  :root {
+    --bg: #EEF6F0;
+    --card: #F8FCF9;
+    --card-2: #DAF1DE;
+    --ink: #051F20;
+    --ink-2: #456A5E;
+    --line: #C9DDD0;
+    --accent: #235347;
+    --on-accent: #DAF1DE;
+    --hero: #0B2B26;
+    --hero-2: #163832;
+    --on-hero: #EEF6F0;
+    --on-hero-2: #B9D6C2;
+    --ok: #1D6B44;   --ok-bg: #DDF2E4;
+    --warn: #985A00; --warn-bg: #FCEFD8;
+    --bad: #B42A22;  --bad-bg: #FBE4E1;
+    --shadow: 0 1px 2px rgba(5,31,32,.06), 0 8px 24px rgba(5,31,32,.07);
+    --sans: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  :root[data-theme="dark"] {
+    --bg: #051F20;
+    --card: #0B2B26;
+    --card-2: #163832;
+    --ink: #DAF1DE;
+    --ink-2: #8EB69B;
+    --line: #1E4A3F;
+    --accent: #8EB69B;
+    --on-accent: #051F20;
+    --hero: #0B2B26;
+    --hero-2: #163832;
+    --on-hero: #DAF1DE;
+    --on-hero-2: #8EB69B;
+    --ok: #9BD8AE;   --ok-bg: #1F4A36;
+    --warn: #E2B65E; --warn-bg: #2B2410;
+    --bad: #EE8F84;  --bad-bg: #3A1E1B;
+    --shadow: none;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--ink); font-family: var(--sans); transition: background .3s ease, color .3s ease; }
+
+  /* Escenario 16:9 escalado a la ventana */
+  .stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px; transform-origin: center center; background: var(--bg); overflow: hidden; transition: background .3s ease; }
+  .slide { position: absolute; inset: 0; padding: 64px 72px 60px; display: flex; flex-direction: column; opacity: 0; visibility: hidden; transition: opacity .35s ease, visibility 0s linear .35s; }
+  .slide.active { opacity: 1; visibility: visible; transition: opacity .35s ease; }
+  .slide.hero { background: var(--hero); color: var(--on-hero); }
+  .rise { opacity: 0; transform: translateY(12px); }
+  .slide.active .rise { animation: rise .55s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--d, 0s); }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .rise, .slide.active .rise { animation: none; opacity: 1; transform: none; } .slide { transition: none; } }
+
+  .who { position: absolute; top: 26px; left: 72px; right: 72px; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+  .who::before { content: ""; width: 24px; height: 2px; background: var(--accent); }
+  .who .t { margin-left: auto; font-family: var(--mono); letter-spacing: 0; font-weight: 600; }
+  .hero .who { color: var(--on-hero-2); }
+  .hero .who::before { background: var(--on-hero-2); }
+
+  .kicker { font-size: 15px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .hero .kicker { color: var(--on-hero-2); }
+  h1, h2 { font-weight: 800; letter-spacing: -.02em; line-height: 1.08; }
+  h1 { font-size: 104px; }
+  h2 { font-size: 44px; max-width: 1080px; }
+  h3 { font-size: 21px; font-weight: 700; margin-bottom: 6px; }
+  .lead { font-size: 24px; line-height: 1.4; color: var(--ink-2); max-width: 880px; }
+  .hero .lead { color: var(--on-hero-2); }
+  .body { display: flex; flex-direction: column; gap: 22px; margin-top: 26px; flex: 1; min-height: 0; }
+  .foot { margin-top: auto; font-size: 16px; line-height: 1.45; color: var(--ink-2); }
+  .hero .foot { color: var(--on-hero-2); }
+  b, strong { font-weight: 700; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 22px 24px; box-shadow: var(--shadow); }
+  .card p, .card li { font-size: 21px; line-height: 1.4; color: var(--ink-2); }
+  .card li { margin-bottom: 6px; }
+  .card ul { list-style: none; }
+  .card li::before { content: "·"; margin-right: 10px; font-weight: 800; color: var(--accent); }
+  .grid { display: grid; gap: 18px; }
+  .g2 { grid-template-columns: 1fr 1fr; } .g3 { grid-template-columns: repeat(3, 1fr); } .g4 { grid-template-columns: repeat(4, 1fr); }
+
+  .badge { display: inline-block; font-size: 13px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; padding: 4px 11px; border-radius: 8px; }
+  .b-ok { background: var(--ok-bg); color: var(--ok); }
+  .b-sim { background: var(--warn-bg); color: var(--warn); }
+  .b-falta { background: var(--bad-bg); color: var(--bad); }
+  .b-neu { background: var(--card-2); color: var(--accent); }
+
+  .big { font-weight: 800; letter-spacing: -.03em; line-height: 1; font-size: 84px; color: var(--accent); }
+  .big.sm { font-size: 56px; }
+  .tile { display: flex; flex-direction: column; gap: 10px; }
+  .tile p { font-size: 18px; }
+  .pend { font-family: var(--mono); font-size: 14px; color: var(--warn); background: var(--warn-bg); border-radius: 8px; padding: 6px 10px; display: inline-block; }
+
+  /* Slide 4 */
+  .src { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); font-size: 18px; }
+  .src small { display: block; font-size: 15px; color: var(--ink-2); }
+  .src.no { opacity: .85; }
+  .src.si { border-color: var(--accent); }
+  .src.pick { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .src.pick small { color: var(--on-accent); opacity: .85; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; background: var(--bad); }
+  .src.si .dot { background: var(--ok); } .src.pick .dot { background: var(--on-accent); }
+
+  /* Diagrama de la slide 5 */
+  svg.dia { width: 100%; height: auto; }
+  svg.dia text { font-family: var(--sans); fill: var(--ink); }
+  svg.dia .box { fill: var(--card); stroke: var(--line); stroke-width: 2; }
+  svg.dia .core { fill: var(--hero); stroke: var(--hero); }
+  svg.dia .core text { fill: var(--on-hero); }
+  svg.dia .core .sub { fill: var(--on-hero-2); }
+  svg.dia .llm { fill: none; stroke: var(--warn); stroke-width: 2; stroke-dasharray: 7 6; }
+  svg.dia .sub { font-size: 16px; fill: var(--ink-2); }
+  svg.dia .ttl { font-size: 21px; font-weight: 700; }
+  svg.dia .arrow { stroke: var(--accent); stroke-width: 3; fill: none; }
+  svg.dia .arrow.d { stroke: var(--warn); stroke-dasharray: 7 6; }
+  svg.dia .tagt { font-size: 13px; font-weight: 800; letter-spacing: .06em; }
+  svg.dia .band { fill: var(--card-2); }
+  svg.dia text.oh { fill: var(--on-hero); }
+  svg.dia text.oh2 { fill: var(--on-hero-2); }
+
+  /* Slide 6: corridas */
+  .runs { display: flex; gap: 8px; }
+  .runs i { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 13px; font-weight: 700; font-family: var(--mono); }
+  .runs i.ok { background: var(--ok-bg); color: var(--ok); }
+  .runs i.ko { background: var(--bad-bg); color: var(--bad); }
+  .kv { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 20px; color: var(--ink-2); }
+  .kv:last-child { border-bottom: 0; }
+  .kv b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  /* Slide 7 */
+  .flow { display: flex; align-items: center; gap: 12px; }
+  .node { flex: 1; text-align: center; padding: 24px 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); font-size: 18px; font-weight: 700; }
+  .node small { display: block; font-weight: 500; font-size: 15px; color: var(--ink-2); margin-top: 3px; }
+  .node.mem { background: var(--hero); border-color: var(--hero); color: var(--on-hero); }
+  .node.mem small { color: var(--on-hero-2); }
+  .arr { font-size: 26px; color: var(--accent); font-weight: 800; }
+
+  /* Slide 9: demo */
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+  .step .n { width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: var(--on-accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
+  .step p { font-size: 18px; line-height: 1.35; color: var(--ink-2); }
+  .step h3 { font-size: 19px; margin: 0; color: var(--ink); }
+
+  /* Slide 10: capturas */
+  .phones { display: flex; justify-content: center; gap: 28px; flex: 1; min-height: 0; margin-top: 26px; }
+  .phone { width: 190px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .phone .frame { width: 190px; height: 392px; border-radius: 28px; border: 3px solid var(--ink); overflow: hidden; background: var(--card-2); position: relative; display: flex; align-items: center; justify-content: center; }
+  .phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+  .phone .frame.vacia { border-style: dashed; border-color: var(--warn); background: var(--warn-bg); }
+  .phone .frame.vacia span { display: block; font-family: var(--mono); font-size: 13px; padding: 14px; text-align: center; color: var(--warn); line-height: 1.5; }
+  .phone .cap { font-size: 16px; font-weight: 700; color: var(--ink-2); }
+
+  /* Slide 11: tres columnas */
+  .col { display: flex; flex-direction: column; gap: 12px; }
+  .col .badge { align-self: flex-start; }
+  .col .card { flex: 1; padding: 18px 20px; }
+  .col .card li { font-size: 20px; line-height: 1.35; margin-bottom: 9px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip { font-size: 16px; font-weight: 600; background: var(--card-2); color: var(--accent); border-radius: 999px; padding: 6px 14px; }
+
+  /* Slide 12: ciclo */
+  .cycle { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .cycle span { font-family: var(--mono); font-size: 15px; font-weight: 600; background: var(--card-2); color: var(--accent); padding: 6px 11px; border-radius: 8px; }
+  .cycle em { font-style: normal; color: var(--ink-2); }
+
+  .mark { width: 56px; height: 56px; color: var(--on-hero); }
+  .hero .row { display: flex; gap: 22px; }
+  .hero .pane { flex: 1; background: var(--hero-2); border-radius: 18px; padding: 22px 26px; }
+  .hero .pane h3 { color: var(--on-hero); }
+  .hero .pane li { list-style: none; font-size: 20px; line-height: 1.4; color: var(--on-hero-2); margin-bottom: 6px; }
+  .hero .pane li::before { content: "·"; margin-right: 10px; font-weight: 800; color: var(--on-hero); }
+  .quote { font-size: 36px; font-weight: 800; letter-spacing: -.015em; line-height: 1.2; }
+
+  /* Controles */
+  .ctrl { position: fixed; bottom: 14px; right: 16px; display: flex; align-items: center; gap: 8px; z-index: 10; transition: opacity .3s; }
+  .ctrl button { font: 600 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 10px; padding: 8px 12px; cursor: pointer; }
+  .ctrl button:hover { border-color: var(--accent); }
+  .ctrl button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #counter { font-family: var(--mono); font-size: 14px; color: var(--ink-2); padding: 0 6px; }
+  #timer { display: none; font-family: var(--mono); font-size: 14px; color: var(--ink-2); }
+  body.show-timer #timer { display: inline; }
+  #progress { position: fixed; left: 0; bottom: 0; height: 4px; width: 0; background: var(--accent); transition: width .3s ease; z-index: 10; }
+  body.fs.idle .ctrl { opacity: 0; } body.fs.idle { cursor: none; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <!-- 1 · Portada -->
+  <section class="slide hero">
+    <div class="who">Joaquín<span class="t">0:10</span></div>
+    <div style="margin-top:auto; margin-bottom:auto;">
+      <svg class="mark rise" viewBox="0 0 1024 1024" aria-hidden="true" style="margin-bottom:28px"><path fill="currentColor" d="M 330 270 L 405 270 L 590 560 C 612 594 646 615 686 615 C 652 647 606 660 565 642 C 542 632 523 613 508 590 Z M 710 285 C 665 308 623 330 592 359 C 555 393 548 437 570 477 C 583 501 599 518 618 535 C 611 501 622 471 648 448 C 675 424 713 408 747 389 C 780 371 795 341 795 285 C 767 300 739 315 710 285 Z"/></svg>
+      <div class="kicker rise" style="--d:.05s">Seminario de Integración Profesional · UADE</div>
+      <h1 class="rise" style="--d:.1s">Vuelto</h1>
+      <p class="lead rise" style="--d:.2s; margin-top:18px">Entrega del MVP: con qué medio pagar cada compra y cuánto tope de reintegro queda.</p>
+    </div>
+    <p class="foot rise" style="--d:.3s">Joaquín Nuñez · Jesús Quijada · Agustín Herrero · Santiago Pazos</p>
+  </section>
+
+  <!-- 2 · Problema y propuesta -->
+  <section class="slide">
+    <div class="who">Joaquín<span class="t">0:50</span></div>
+    <div class="kicker rise" style="margin-top:14px">El problema</div>
+    <h2 class="rise" style="--d:.05s">No falta información. <span style="color:var(--accent)">Falta la decisión.</span></h2>
+    <div class="body">
+      <div class="grid g2">
+        <div class="card rise" style="--d:.12s">
+          <h3>Hoy, en la caja</h3>
+          <ul>
+            <li>La promo cambia por día, billetera, banco y tarjeta.</li>
+            <li>El tope de reintegro es mensual, se comparte entre promos y no se ve.</li>
+            <li>Se paga con el primer medio que aparece y se pierde plata sin darse cuenta.</li>
+          </ul>
+        </div>
+        <div class="card rise" style="--d:.2s; background:var(--hero); border-color:var(--hero);">
+          <h3 style="color:var(--on-hero)">Vuelto hace dos cosas</h3>
+          <ul>
+            <li style="color:var(--on-hero-2)"><b style="color:var(--on-hero)">Recomienda</b> con qué medio pagar una compra concreta, y por qué.</li>
+            <li style="color:var(--on-hero-2)"><b style="color:var(--on-hero)">Controla</b> cuánto tope queda, como estimado y con su base.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="foot rise" style="--d:.3s">No es un buscador de promociones: la decisión sale de código determinístico sobre los medios que el usuario declaró.</p>
+    </div>
+  </section>
+
+  <!-- 3 · Encuesta -->
+  <section class="slide">
+    <div class="who">Santiago<span class="t">0:50</span></div>
+    <div class="kicker rise" style="margin-top:14px">Research · encuesta propia, 51 respuestas (8 al 20 de septiembre)</div>
+    <h2 class="rise" style="--d:.05s">El problema existe y la gente decide a ciegas</h2>
+    <div class="body">
+      <div class="grid g4">
+        <div class="card tile rise" style="--d:.1s"><div class="big">98%</div><p>pagó y se enteró después de una promo mejor</p></div>
+        <div class="card tile rise" style="--d:.16s"><div class="big">47,1%</div><p>no lleva ningún control del tope. Solo 7,8% lleva un registro exacto</p></div>
+        <div class="card tile rise" style="--d:.22s"><div class="big">68,6%</div><p>elige la tarjeta mirando solo el % de descuento. 13,7% mira si queda tope</p></div>
+        <div class="card tile rise" style="--d:.28s"><div class="big">41,2%</div><p>quiere que la app diga «pagá con tal». El buscador de promos quedó último: 15,7%</p></div>
+      </div>
+      <p class="foot rise" style="--d:.36s"><b style="color:var(--ink)">Sesgo de la muestra:</b> 62,7% tiene entre 18 y 25 años y llegó por nuestros contactos. Valida que el problema existe; no dimensiona el mercado. El 96,1% que dice que usaría la app es intención declarada.</p>
+    </div>
+  </section>
+
+  <!-- 4 · Por qué MODO -->
+  <section class="slide">
+    <div class="who">Santiago<span class="t">0:35</span></div>
+    <div class="kicker rise" style="margin-top:14px">Research · fuentes de promociones</div>
+    <h2 class="rise" style="--d:.05s">Evaluamos 6 fuentes y elegimos una: MODO</h2>
+    <div class="body">
+      <div class="grid g2" style="gap:26px">
+        <div class="grid rise" style="--d:.1s; gap:10px">
+          <div class="src no"><span class="dot"></span><div><b>Mercado Pago</b><small>sus términos prohíben el scraping</small></div></div>
+          <div class="src no"><span class="dot"></span><div><b>Santander</b><small>un firewall bloquea el acceso automatizado</small></div></div>
+          <div class="src no"><span class="dot"></span><div><b>BBVA</b><small>un firewall bloquea el acceso automatizado</small></div></div>
+          <div class="src si"><span class="dot"></span><div><b>Cuenta DNI · Galicia</b><small>se podían automatizar; no se eligieron</small></div></div>
+          <div class="src pick"><span class="dot"></span><div><b>MODO</b><small>elegida: una sola fuente, sin mezclar con carga manual</small></div></div>
+        </div>
+        <div class="card rise" style="--d:.18s; align-self:start">
+          <h3>Lo que tiene MODO</h3>
+          <ul>
+            <li>Una <b style="color:var(--ink)">API pública, sin autenticación</b>.</li>
+            <li><b style="color:var(--ink)">13 categorías</b> fijas, no solo supermercado.</li>
+            <li>~1864 promos activas en el relevamiento del 21/9.</li>
+            <li>Alcance del MVP: CABA/AMBA.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · Arquitectura -->
+  <section class="slide">
+    <div class="who">Agustín<span class="t">0:55</span></div>
+    <div class="kicker rise" style="margin-top:14px">Arquitectura</div>
+    <h2 class="rise" style="--d:.05s">El motor es código determinístico y corre en la app</h2>
+    <div class="body" style="margin-top:14px">
+      <svg class="dia rise" style="--d:.12s" viewBox="0 0 1136 400" role="img" aria-label="Diagrama: API de MODO, ingesta, Supabase y app con motor de reglas; fuera del camino crítico, Groq para tickets y Gemini para letra chica.">
+        <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker><marker id="ahd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--warn)"/></marker></defs>
+        <rect class="band" x="0" y="0" width="1136" height="196" rx="20"/>
+        <text x="22" y="30" class="tagt" style="fill:var(--accent)">CAMINO CRÍTICO · SIN MODELO DE LENGUAJE</text>
+
+        <rect class="box" x="22" y="56" width="230" height="110" rx="16"/>
+        <text x="40" y="96" class="ttl">API de MODO</text><text x="40" y="124" class="sub">pública, sin login</text><text x="40" y="146" class="sub">13 categorías</text>
+
+        <rect class="box" x="322" y="56" width="250" height="110" rx="16"/>
+        <text x="340" y="96" class="ttl">Ingesta diaria</text><text x="340" y="124" class="sub">GitHub Actions, 06:00</text><text x="340" y="146" class="sub">mapeo por código</text>
+
+        <rect class="box" x="642" y="56" width="220" height="110" rx="16"/>
+        <text x="660" y="96" class="ttl">Supabase</text><text x="660" y="124" class="sub">Postgres, Auth, RLS</text><text x="660" y="146" class="sub">promos y compras</text>
+
+        <rect class="box core" x="932" y="56" width="182" height="110" rx="16"/>
+        <text x="950" y="96" class="ttl oh">App Expo</text><text x="950" y="124" class="sub oh2">motor de reglas</text><text x="950" y="146" class="sub oh2">sin red</text>
+
+        <path class="arrow" d="M252 111 H318" marker-end="url(#ah)"/>
+        <path class="arrow" d="M572 111 H638" marker-end="url(#ah)"/>
+        <path class="arrow" d="M862 111 H928" marker-end="url(#ah)"/>
+
+        <text x="22" y="232" class="tagt" style="fill:var(--warn)">FUERA DEL CAMINO CRÍTICO</text><text x="22" y="258" class="sub">El LLM extrae datos,</text><text x="22" y="280" class="sub">nunca decide.</text>
+
+        <rect class="llm" x="322" y="256" width="250" height="124" rx="16"/>
+        <text x="340" y="292" class="ttl">Letra chica · Gemini</text><text x="340" y="320" class="sub">en la ingesta, en lote</text>
+        <text x="340" y="354" class="tagt" style="fill:var(--bad)">FALTA (#51)</text>
+
+        <rect class="llm" x="642" y="256" width="220" height="124" rx="16"/>
+        <text x="660" y="292" class="ttl">Ticket · Groq</text><text x="660" y="320" class="sub">Edge Function</text>
+        <text x="660" y="354" class="tagt" style="fill:var(--warn)">HECHA · SIN CONECTAR</text>
+
+        <path class="arrow d" d="M752 256 V170" marker-end="url(#ahd)"/>
+        <path class="arrow d" d="M447 256 V170" marker-end="url(#ahd)"/>
+        <text x="880" y="300" class="sub">La foto del ticket se descarta:</text>
+        <text x="880" y="324" class="sub">no se guarda en ningún paso.</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 6 · Ingesta -->
+  <section class="slide">
+    <div class="who">Agustín<span class="t">0:35</span></div>
+    <div class="kicker rise" style="margin-top:14px">Ingesta automática · corrida del 14/11</div>
+    <h2 class="rise" style="--d:.05s">3100 promos publicables, sin que nadie las toque</h2>
+    <div class="body">
+      <div class="grid g2" style="gap:22px">
+        <div class="card rise" style="--d:.1s">
+          <div class="kv"><span>Publicables</span><b>3100</b></div>
+          <div class="kv"><span>Nuevas · dadas de baja · sin cambios</span><b>7 · 5 · 3093</b></div>
+          <div class="kv"><span>Descartadas por nivel de cliente (Selecta, Platinum…)</span><b>696</b></div>
+          <div class="kv"><span>Descartadas por tope que el motor no modela</span><b>18</b></div>
+          <div class="kv"><span>Duración de la corrida</span><b>~43 min</b></div>
+        </div>
+        <div class="grid" style="gap:18px; align-content:start">
+          <div class="card rise" style="--d:.16s">
+            <h3>Últimas 10 corridas (6 al 14/11)</h3>
+            <div class="runs" aria-label="Seis de noviembre, falló; siete, falló; ocho, ok; ocho, ok; nueve, ok; diez, falló; once a catorce, ok.">
+              <i class="ko">6</i><i class="ko">7</i><i class="ok">8</i><i class="ok">8</i><i class="ok">9</i><i class="ko">10</i><i class="ok">11</i><i class="ok">12</i><i class="ok">13</i><i class="ok">14</i>
+            </div>
+            <p style="margin-top:12px">Fallaron 3. Las últimas 4 pasaron.</p>
+          </div>
+          <div class="card rise" style="--d:.22s">
+            <h3>Lo que todavía queda en <span style="font-family:var(--mono)">null</span></h3>
+            <p>Acumulabilidad y jurisdicción están en la letra chica y las leerá el extractor (#51). Hasta entonces, vacío.</p>
+          </div>
+        </div>
+      </div>
+      <p class="foot rise" style="--d:.3s">El mapeo es por código: sin modelo de lenguaje y sin revisión humana. Las 3100 no se comparan con las ~1864 del relevamiento de septiembre: se contaron con criterios distintos.</p>
+    </div>
+  </section>
+
+  <!-- 7 · Privacidad -->
+  <section class="slide">
+    <div class="who">Agustín<span class="t">0:30</span></div>
+    <div class="kicker rise" style="margin-top:14px">Privacidad y secretos</div>
+    <h2 class="rise" style="--d:.05s">La imagen del ticket no se guarda</h2>
+    <div class="body">
+      <div class="flow rise" style="--d:.1s">
+        <div class="node">Celular<small>saca la foto</small></div><span class="arr">→</span>
+        <div class="node">Edge Function<small>en el mismo pedido</small></div><span class="arr">→</span>
+        <div class="node mem">Groq<small>Zero Data Retention · en memoria, se descarta</small></div>
+      </div>
+      <div class="grid g3">
+        <div class="card rise" style="--d:.16s"><h3>Se guarda</h3><p>El texto extraído, con datos personales tapados, y solo después de que el usuario lo confirma. 90 días.</p></div>
+        <div class="card rise" style="--d:.22s"><h3>No se guarda</h3><p>La foto: ni en disco ni en Storage ni en la base.</p></div>
+        <div class="card rise" style="--d:.28s"><h3>Las keys</h3><p>Groq vive en Supabase y Gemini en GitHub Actions. En el código de la app no hay ninguna.</p></div>
+      </div>
+      <p class="foot rise" style="--d:.34s"><span class="badge b-falta">Falta</span>&nbsp; La auditoría formal de secretos y privacidad (#55). Y el borrado a los 90 días es una política, no un proceso corriendo.</p>
+    </div>
+  </section>
+
+  <!-- 8 · Plan B -->
+  <section class="slide">
+    <div class="who">Agustín<span class="t">0:20</span></div>
+    <div class="kicker rise" style="margin-top:14px">Plan B de la demo</div>
+    <h2 class="rise" style="--d:.05s">Si Expo Go falla, hay un APK de respaldo</h2>
+    <div class="body">
+      <div class="grid g2">
+        <div class="card rise" style="--d:.1s">
+          <span class="badge b-ok">Principal</span>
+          <h3 style="margin-top:12px">Expo Go con el QR</h3>
+          <p>La app corre en el celular. También está publicada la versión web.</p>
+        </div>
+        <div class="card rise" style="--d:.16s">
+          <span class="badge b-falta">Falta</span>
+          <h3 style="margin-top:12px">APK de EAS (#56)</h3>
+          <p>La guía está en <span style="font-family:var(--mono)">build-respaldo.md</span>. El build todavía no se hizo.</p>
+          <p class="pend" style="margin-top:10px">[PENDIENTE: link y celular de prueba]</p>
+        </div>
+      </div>
+      <div class="card rise" style="--d:.22s">
+        <h3>Antes de entrar</h3>
+        <ul>
+          <li>La última ingesta del día, en verde: la app no recomienda sin promos.</li>
+          <li>Migraciones aplicadas en la base alojada (ya pasó que quedaron atrasadas, #127).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 · Demo -->
+  <section class="slide">
+    <div class="who">Jesús<span class="t">2:20</span></div>
+    <div class="kicker rise" style="margin-top:14px">Demo en vivo</div>
+    <h2 class="rise" style="--d:.05s">Una compra, de la recomendación al tope</h2>
+    <div class="body">
+      <div class="steps">
+        <div class="step rise" style="--d:.1s"><div class="n">1</div><h3>Entrar</h3><p>Cuenta de demo, con medios de pago declarados.</p></div>
+        <div class="step rise" style="--d:.15s"><div class="n">2</div><h3>Comprar</h3><p>«+», un comercio con promo hoy, el monto. La recomendación explica el porqué.</p></div>
+        <div class="step rise" style="--d:.2s"><div class="n">3</div><h3>Voy a pagar con…</h3><p>La compra queda por confirmar en Inicio.</p></div>
+        <div class="step rise" style="--d:.25s"><div class="n">4</div><h3>Confirmar</h3><p>«Revisá tu compra» y guardar.</p><span class="badge b-sim" style="align-self:flex-start">Ticket simulado</span></div>
+        <div class="step rise" style="--d:.3s"><div class="n">5</div><h3>Tus topes</h3><p>Lo que queda, estimado y con su base.</p></div>
+      </div>
+      <div class="grid g2">
+        <p class="pend rise" style="--d:.36s; align-self:start">[PENDIENTE: comercio y monto con promo vigente el día de la entrega]</p>
+        <p class="foot rise" style="--d:.4s; margin:0"><span class="badge b-sim">Simulado</span>&nbsp; El gasto en grupo existe en la app, pero con contactos de ejemplo. No lo mostramos como funcionando.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 · Capturas -->
+  <section class="slide">
+    <div class="who">Jesús<span class="t">0:15</span></div>
+    <div class="kicker rise" style="margin-top:14px">Rediseño v9.1</div>
+    <h2 class="rise" style="--d:.05s">Claro y oscuro, el que use el sistema</h2>
+    <div class="phones">
+      <div class="phone rise" style="--d:.1s"><div class="frame"><img src="assets/capturas/inicio-claro.png" alt="Inicio en modo claro"></div><div class="cap">Inicio · claro</div></div>
+      <div class="phone rise" style="--d:.15s"><div class="frame"><img src="assets/capturas/inicio-oscuro.png" alt="Inicio en modo oscuro"></div><div class="cap">Inicio · oscuro</div></div>
+      <div class="phone rise" style="--d:.2s"><div class="frame"><img src="assets/capturas/recomendacion-claro.png" alt="Recomendación en modo claro"></div><div class="cap">Recomendación · claro</div></div>
+      <div class="phone rise" style="--d:.25s"><div class="frame"><img src="assets/capturas/recomendacion-oscuro.png" alt="Recomendación en modo oscuro"></div><div class="cap">Recomendación · oscuro</div></div>
+    </div>
+    <p class="foot">La app sigue el modo del sistema, o se fija en Perfil → Apariencia.</p>
+  </section>
+
+  <!-- 11 · Estado real -->
+  <section class="slide">
+    <div class="who">Joaquín<span class="t">1:10</span></div>
+    <div class="kicker rise" style="margin-top:14px">Estado real del MVP</div>
+    <h2 class="rise" style="--d:.05s">Qué funciona, qué está simulado y qué falta</h2>
+    <div class="body" style="gap:16px">
+      <div class="grid g3" style="flex:1; min-height:0">
+        <div class="col rise" style="--d:.1s"><span class="badge b-ok">Funciona de punta a punta</span>
+          <div class="card"><ul>
+            <li>Ingesta diaria de MODO a Supabase</li>
+            <li>Sincronización de promos al celular</li>
+            <li>Motor en la app: recomendación y topes</li>
+            <li>Cuenta, perfil y compras con RLS</li>
+            <li>Registrar la compra y confirmarla</li>
+          </ul></div></div>
+        <div class="col rise" style="--d:.16s"><span class="badge b-sim">Simulado</span>
+          <div class="card"><ul>
+            <li><b style="color:var(--ink)">Lectura del ticket en la app:</b> devuelve un ticket de ejemplo, sin cámara (#49)</li>
+            <li><b style="color:var(--ink)">Gasto en grupo:</b> contactos e invitaciones de ejemplo, sin servidor (#54, #130)</li>
+          </ul></div></div>
+        <div class="col rise" style="--d:.22s"><span class="badge b-falta">Falta</span>
+          <div class="card"><ul>
+            <li>Extractor de letra chica con Gemini (#51)</li>
+            <li>Medir precisión del lector y del extractor (#10, #53): no hay cifra</li>
+            <li>Conectar la app a la función del ticket (#48 está en el PR #133)</li>
+            <li>APK de respaldo (#56) y auditoría de secretos (#55)</li>
+          </ul></div></div>
+      </div>
+      <div class="chips rise" style="--d:.3s"><span class="chip">1260 tests en verde</span><span class="chip">CI con 6 chequeos</span><span class="chip">12 ADRs · 12 specs</span><span class="chip">66 PRs mergeados</span></div>
+    </div>
+  </section>
+
+  <!-- 12 · IA -->
+  <section class="slide">
+    <div class="who">Santiago<span class="t">0:35</span></div>
+    <div class="kicker rise" style="margin-top:14px">Uso de IA</div>
+    <h2 class="rise" style="--d:.05s">En el producto extrae; para construir, ayuda</h2>
+    <div class="body">
+      <div class="grid g2">
+        <div class="card rise" style="--d:.1s">
+          <h3>En el producto</h3>
+          <ul>
+            <li>El LLM extrae datos y <b style="color:var(--ink)">nunca decide</b>.</li>
+            <li>Groq lee tickets: función hecha, app sin conectar.</li>
+            <li>Gemini leerá la letra chica: pendiente.</li>
+            <li>El motor de reglas no tiene LLM.</li>
+          </ul>
+        </div>
+        <div class="card rise" style="--d:.16s">
+          <h3>Para construir</h3>
+          <ul>
+            <li>Claude Code con spec-kit y agentes de revisión.</li>
+            <li>Una persona decide alcance y arquitectura.</li>
+            <li>55 sesiones en la bitácora, con los errores de la IA.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card rise" style="--d:.22s">
+        <h3>El ciclo de cada feature</h3>
+        <div class="cycle"><span>specify</span><em>→</em><span>spec-critic</span><em>→</em><span>plan</span><em>→</em><span>tasks</span><em>→</em><span>implement</span><em>→</em><span>code-review</span><em>→</em><span>test-runner</span></div>
+      </div>
+      <p class="foot rise" style="--d:.3s">Todo está declarado en <span style="font-family:var(--mono)">docs/uso-de-ia.md</span>.</p>
+    </div>
+  </section>
+
+  <!-- 13 · Cierre -->
+  <section class="slide hero">
+    <div class="who">Joaquín<span class="t">0:20</span></div>
+    <div style="margin-top:18px">
+      <div class="kicker rise">Cierre</div>
+      <div class="row rise" style="--d:.08s; margin-top:10px">
+        <div class="pane"><h3>Hecho</h3><ul><li>Problema validado con datos</li><li>Una fuente andando todos los días</li><li>Motor determinístico en la app</li><li>Una demo real</li></ul></div>
+        <div class="pane"><h3>Sigue</h3><ul><li>Conectar la lectura del ticket</li><li>Extractor de letra chica y su precisión</li><li>Gasto en grupo con datos reales</li></ul></div>
+      </div>
+    </div>
+    <div style="margin-top:auto">
+      <p class="quote rise" style="--d:.2s">Vuelto decide con código, mide con datos y dice lo que todavía no hace.</p>
+      <p class="lead rise" style="--d:.28s; margin-top:14px">Gracias. ¿Preguntas?</p>
+    </div>
+  </section>
+
+</div>
+
+<div class="ctrl">
+  <span id="timer">00:00</span>
+  <span id="counter">1 / 13</span>
+  <button id="theme" type="button" title="Modo claro u oscuro (D)">Claro / oscuro</button>
+  <button id="prev" type="button" aria-label="Anterior">←</button>
+  <button id="next" type="button" aria-label="Siguiente">→</button>
+  <button id="present" type="button" title="Pantalla completa (F)">Pantalla completa</button>
+</div>
+<div id="progress"></div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var stage = document.getElementById('stage');
+  var counter = document.getElementById('counter');
+  var progress = document.getElementById('progress');
+  var root = document.documentElement;
+  var cur = 0;
+
+  /* Tema: el guardado, o el del sistema */
+  function setTheme(t) { root.setAttribute('data-theme', t); try { localStorage.setItem('vuelto-deck-tema', t); } catch (e) {} }
+  var saved = null;
+  try { saved = localStorage.getItem('vuelto-deck-tema'); } catch (e) {}
+  setTheme(saved || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+  function toggleTheme() { setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
+  document.getElementById('theme').addEventListener('click', toggleTheme);
+
+  /* Capturas que todavía no están: se marcan como pendientes en vez de mostrar una imagen rota */
+  Array.prototype.forEach.call(document.querySelectorAll('.phone img'), function (img) {
+    function vacia() {
+      var f = img.parentNode; f.classList.add('vacia');
+      f.innerHTML = '<span>[PENDIENTE: captura v9.1]<br>' + (img.getAttribute('src') || '').replace('assets/capturas/', '') + '</span>';
+    }
+    img.addEventListener('error', vacia);
+    if (img.complete && img.naturalWidth === 0) vacia();
+  });
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+  function go(n) {
+    cur = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (el, i) { el.classList.toggle('active', i === cur); });
+    counter.textContent = (cur + 1) + ' / ' + slides.length;
+    progress.style.width = ((cur + 1) / slides.length * 100) + '%';
+    try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+  }
+  function next() { go(cur + 1); }
+  function prev() { go(cur - 1); }
+  document.getElementById('next').addEventListener('click', next);
+  document.getElementById('prev').addEventListener('click', prev);
+  window.addEventListener('resize', fit);
+
+  document.addEventListener('keydown', function (e) {
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); next(); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); prev(); }
+    else if (k === 'Home') go(0);
+    else if (k === 'End') go(slides.length - 1);
+    else if (k === 'f' || k === 'F') toggleFs();
+    else if (k === 'd' || k === 'D') toggleTheme();
+    else if (k === 't' || k === 'T') toggleTimer();
+  });
+
+  function toggleFs() {
+    var el = document.documentElement;
+    if (!document.fullscreenElement) { if (el.requestFullscreen) el.requestFullscreen().catch(function () {}); }
+    else if (document.exitFullscreen) document.exitFullscreen();
+  }
+  document.addEventListener('fullscreenchange', function () {
+    document.body.classList.toggle('fs', !!document.fullscreenElement);
+    document.body.classList.remove('idle');
+    fit();
+  });
+  document.getElementById('present').addEventListener('click', toggleFs);
+
+  var idleT;
+  function wake() { document.body.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(function () { document.body.classList.add('idle'); }, 2500); }
+  document.addEventListener('mousemove', wake);
+  document.addEventListener('mousedown', wake);
+
+  var timerEl = document.getElementById('timer'), t0 = null, tick = null;
+  function fmt(n) { return (n < 10 ? '0' : '') + n; }
+  function toggleTimer() {
+    var on = document.body.classList.toggle('show-timer');
+    if (on) {
+      t0 = t0 || Date.now();
+      tick = setInterval(function () { var s = Math.floor((Date.now() - t0) / 1000); timerEl.textContent = fmt(Math.floor(s / 60)) + ':' + fmt(s % 60); }, 500);
+    } else { clearInterval(tick); t0 = null; timerEl.textContent = '00:00'; }
+  }
+
+  var sx = null;
+  document.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (sx === null) return;
+    var dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+    sx = null;
+  }, { passive: true });
+
+  fit();
+  var start = parseInt((location.hash || '').replace('#', ''), 10);
+  go(isNaN(start) ? 0 : start - 1);
+})();
+</script>
+</body>
+</html>

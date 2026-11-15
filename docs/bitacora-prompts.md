@@ -2526,6 +2526,55 @@ proveedor que cuide la privacidad sin costo.
 
 ---
 
+## 2026-11-15 — Presentación de la entrega del MVP (issue #131)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con la skill `presentaciones-visuales`.
+
+**Objetivo:** armar el guion con reparto y tiempos de los 4 integrantes y el
+deck de la entrega del MVP. El material anterior era de las entregas parciales
+y presentaba como futuro lo que ya existe.
+
+**Prompts principales:**
+1. Leer `CLAUDE.md`, la issue #131, el guion y el deck anteriores, el alcance, los
+   requisitos, `uso-de-ia.md` y `docs/design/`. Antes de redactar: preguntar fecha,
+   duración y formato, y armar una tabla de «qué funciona de punta a punta / qué
+   está simulado / qué falta» verificada contra el repo, sin asumir.
+2. Respuestas al formulario: entrega esta semana (sin día exacto), 10 minutos,
+   presencial con proyector.
+3. «Sí, seguí» a la tabla, para pasar a redactar el guion y el deck en HTML, en modo
+   claro y oscuro.
+
+**Resultado:**
+- La tabla se verificó contra `gh issue list --state all`, el código, el CI y el log
+  de la última ingesta. Confirmó lo que el usuario ya sabía: la lectura del ticket en
+  la app (#49) y el gasto en grupo (#54, #130) están simulados, y la ingesta de MODO
+  corre sola todos los días. Encontró lo que faltaba: la Edge Function del ticket
+  (#48) está hecha pero en un PR abierto (#133) y sin conectar a la app; el extractor
+  de letra chica (#51) no existe; no hay informes de precisión (#10, #53); el APK de
+  respaldo (#56) y la auditoría de secretos (#55) no se hicieron; la base alojada
+  estuvo con migraciones atrasadas (#127); y 3 de las últimas 10 corridas de la
+  ingesta fallaron.
+- `docs/presentacion/guion.md` se reescribió para 10 minutos, con reparto por
+  integrante, tiempos por slide, qué decir y qué decir «en voz alta» como simulado,
+  preguntas probables y lista de control.
+- `docs/presentacion/vuelto-mvp.html`: deck de 13 slides con la paleta de la app v9.1,
+  modo claro y oscuro (`D`), cronómetro (`T`) y pantalla completa (`F`). Las capturas
+  del rediseño quedaron como `[PENDIENTE]`: las de `docs/design/` son de la v8 y no
+  había una sesión de Supabase local libre para sacar nuevas.
+- `docs/uso-de-ia.md` se actualizó: dice Groq para tickets y Gemini para letra chica,
+  y que esta última todavía no está implementada.
+- Las cifras del deck salen de las fuentes del repo: la encuesta
+  (`encuesta-resultados.md`), `alcance-mvp.md`, el log de la ingesta del 14/11 y el
+  conteo de tests (motor 216, app 709, supabase 40, ingesta 295). No se citan
+  resultados de #10 ni #53 porque no existen.
+- Pendientes marcados `[PENDIENTE: …]`: día y hora de la entrega, capturas v9.1,
+  build de respaldo y su link, comercio y monto de la demo, prueba en modo avión en
+  un celular real, estado del PR #133 y de las migraciones, y el ensayo completo.
+- Error de proceso: las primeras capturas candidatas parecían del rediseño actual y
+  eran de la v8 (crema, con datos de ejemplo); se vio al abrirlas y se descartaron.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
