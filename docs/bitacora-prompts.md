@@ -2526,6 +2526,66 @@ proveedor que cuide la privacidad sin costo.
 
 ---
 
+## 2026-11-15 — Gasto compartido con los datos de la cuenta (issue #130)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI, el navegador del panel
+de Claude y Supabase local (Docker). Subagentes: `test-runner`,
+`rules-guardian` y las dos revisiones de `/code-review`.
+
+**Objetivo:** corregir G-01, G-02 y G-04 de la revisión del gasto compartido
+(`docs/product/revision-gasto-grupo.md`). Con una cuenta real, «Vos» se
+evaluaba con los datos de Martín, todas las cuentas tenían a Lucía y Mateo de
+contactos y un comercio que no se podía resolver dejaba el resultado
+cargando para siempre.
+
+**Prompts principales:**
+1. "Leé CLAUDE.md, los ADR 008 a 010, la revisión y el issue #130. Corregí
+   G-01, G-02 y G-04; antes de editar, verificá que cada hallazgo siga igual.
+   Proponeme un plan y esperá mi OK." Se decidió implementar directo, sin
+   spec-kit: es un issue S de bugs y la revisión ya dice cómo corregirlos
+   (ADR-007). G-01 y G-02 seguían igual. G-04 había cambiado en parte:
+   armar y resultado ya buscaban el comercio en el store, pero si no lo
+   encontraban el pedido seguía cayendo en `comercioPorId`, y el resultado no
+   mostraba el error.
+2. "OK, avanzá." Primero los tests en rojo (10 fallaban por la razón
+   esperada), después el código.
+3. Al vaciar la lista de contactos se rompía la última línea del test
+   «contactos no se guardan» (`persistencia.test.ts`), que el usuario había
+   pedido no tocar. Se le preguntó y eligió cambiar solo esa línea: los
+   contactos siguen sin guardarse, y G-03 queda afuera.
+
+**Resultado:**
+- G-01: «Vos» se evalúa con los medios, las compras, el corpus y el reloj del
+  store (`selectEntradasMotor`). «Hoy» sale de ese reloj, no del reloj de
+  ejemplo, así que también se corrige G-12 en este camino. Los contactos
+  siguen simulados y se evalúan con el mismo corpus.
+- G-02: la lista de contactos arranca vacía y aparece el estado vacío que ya
+  estaba diseñado. Lucía y Mateo vienen solo al elegir un escenario de demo.
+- G-04: el pedido lleva el `Comercio` ya resuelto y se borró `comercioPorId`.
+  El resultado muestra el error con «Reintentar» y armar avisa si no hay
+  comercio. «¿Pagan entre varios?» ya no se ofrecía para un comercio sin
+  rubro (la recomendación es `null`), así que esa pantalla no se tocó.
+- Se verificó en la app web con Supabase local y una cuenta nueva, en claro
+  y oscuro, antes y después (`docs/design/capturas-130/`). Con el código
+  anterior, la cuenta nueva veía a Lucía y Mateo, el grupo decía «Tu Galicia
+  Visa crédito… según 3 compras de octubre» (la cuenta solo tenía una
+  Santander y ninguna compra) y un comercio desconocido dejaba el resultado
+  en el esqueleto.
+- Quedó sin verificar en pantalla el error con «Reintentar» del resultado:
+  con el comercio ya resuelto, el simulador no falla. Se va a ver con el
+  backend real (#56).
+- Lo que marcaron las revisiones y se ajustó: el resultado se recalcula si
+  cambian los datos de «Vos»; el error se muestra inline, en `error`
+  (DESIGN.md); armar no arma el grupo con otro comercio que el que pide la
+  ruta; los tests no repiten el pedido.
+- Errores de la IA en el proceso: el plan decía que «¿Pagan entre varios?»
+  se seguía ofreciendo sin rubro. Recién al leer la pantalla con más detalle
+  se vio que no. Además, la base de Supabase local estaba vieja (le faltaban
+  migraciones) y se aplicaron las que faltaban con `supabase migration up`,
+  sin borrar datos.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

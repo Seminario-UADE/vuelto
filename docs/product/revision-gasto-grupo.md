@@ -84,7 +84,7 @@ real; **Media** = contradice el ADR o el diseño; **Baja** = detalle o deuda con
 
 ### Alta
 
-**G-01 · "Vos" y las promos salen de los fixtures.** Código (con los medios de Martín
+**G-01 · "Vos" y las promos salen de los fixtures.** ✅ Corregido (#130). Código (con los medios de Martín
 el resultado coincide, por eso no se ve al recorrer la app).
 - `apps/mobile/src/data/grupo-simulado.ts:37-44` arma a "Vos" con `mediosDeclarados` y
   `comprasOctubre`, no con el perfil ni las compras del store.
@@ -96,7 +96,7 @@ el resultado coincide, por eso no se ve al recorrer la app).
   medios, las compras y el corpus del store (selectores existentes) para "Vos". Lo de
   los contactos sigue simulado hasta #56.
 
-**G-02 · Todas las cuentas tienen de contactos a Lucía y Mateo.** Código.
+**G-02 · Todas las cuentas tienen de contactos a Lucía y Mateo.** ✅ Corregido (#130). Código.
 - `apps/mobile/src/store/contactos.ts:12` arranca con `fixtures.contactos`, y
   `sesionCerrada` (`:29`) vuelve a ellos.
 - Efecto: un usuario nuevo ve "Contactos 2", puede armar grupos con personas que no
@@ -114,6 +114,7 @@ el resultado coincide, por eso no se ve al recorrer la app).
   o sacarla de la app real (junto con G-02).
 
 **G-04 · Un comercio fuera del catálogo deja el resultado cargando para siempre.**
+✅ Corregido (#130); el punto (2) ya se cumplía cuando se corrigió.
 Observado (ver `armar-comercio-libre-oscuro.jpg` y `resultado-comercio-libre-oscuro.jpg`).
 - Cómo se llega: un comercio habitual escrito a mano se resuelve como `libre-<nombre>`
   (`apps/mobile/src/data/calculo.ts:313-324`); `selectComerciosFrecuentes`
