@@ -2575,6 +2575,51 @@ y presentaba como futuro lo que ya existe.
 
 ---
 
+## 2026-11-15 — Selector de medio: todos los bancos y redes en grilla (issue #128)
+
+**Herramienta:** Claude Code (Sonnet 5.5) en la app de escritorio, con el emulador de Android y Expo Go
+para probar en pantalla, y los agentes `test-runner` y `/code-review` antes del PR.
+
+**Objetivo:** arreglar dos problemas del selector de medio de pago (onboarding y «Agregar tarjeta» en
+Perfil): la lista de bancos aparecía vacía hasta escribir, y las 9 redes salían encimadas y cortadas
+en un control segmentado pensado para 2 o 3 opciones.
+
+**Prompts principales:**
+1. Pedido del issue #128 con reglas: verificar los dos problemas en el código y mostrar la opción de
+   diseño en una línea antes de editar; bancos completos con el buscador vacío; redes legibles con
+   44 pt de área táctil, sin volver a las píldoras; tests primero para `buscar-bancos`; actualizar a
+   mano la spec 001; sin tocar ingesta ni base; capturas antes y después; no dar por hecho lo no
+   probado. «Mostrame el plan con los archivos que vas a tocar y esperá mi OK.»
+2. «Sí, adelante», sobre el plan con la rama cortada desde `origin/main`.
+
+**Resultado:**
+- La rama de trabajo estaba 138 commits atrás de `origin/main` y no tenía `apps/mobile/src/perfil`;
+  se cortó `claude/128-bancos-y-redes` desde `origin/main`.
+- `buscarBancos` devuelve el catálogo completo, ordenado, con el texto vacío; los tests se reescribieron
+  primero y se vieron fallar. El issue decía «8 redes» pero lista 9: son 9 (spec y enum).
+- `GrillaRedes` (cuadrados de opción de 16 pt, borde de 2 pt y check al elegir) reemplaza al
+  `Segmentado` de las redes. `columnasRedes` (función pura, con tests) elige 3, 2 o 1 columnas según
+  el ancho del contenedor y la letra del sistema; así «Mastercard» nunca se parte.
+- `Screen` deja libre el alto del teclado al final en Android (`useAlturaTeclado`): en el emulador
+  con teclado abierto el último banco quedaba tapado. Es un cambio global, lo usan unas 18 pantallas.
+- Spec 001 (US1-1, US3-2, FR-001, FR-002, FR-005), `plan.md`, `tasks.md` y `DESIGN.md` (v9.2).
+- Capturas antes y después en `docs/capturas/bancos-redes-128/`, en claro y oscuro, con teclado,
+  con letra 1.3 y 1.8 y la variante de Perfil.
+- Revisión (`/code-review`): sin violaciones duras. Se aplicaron los tokens del tema en la grilla, un
+  comentario que contradecía a su constante, `plan.md:80` (decía que con texto vacío no se muestra
+  nada) y un aviso para el catálogo vacío. Quedó sin cambiar: el hook del teclado repite el patrón de
+  `tab-bar.tsx` y la lista de 82 no está virtualizada.
+- Verificado: lint, typecheck y los tests de los 4 workspaces. En pantalla, solo en el emulador de
+  Android (API 36) y con un arnés temporal que no se commiteó, porque en esta máquina no hay
+  credenciales de Supabase: muestra el `SelectorMedio` real con los 82 bancos del relevamiento de MODO,
+  no la pantalla real con la base. No se probó en iOS ni en un celular real; los componentes no tienen
+  tests de pantalla.
+- Errores de la IA en el proceso: una expectativa mal escrita en un test (Santander es `on_hub_list` y
+  va antes que Banco del Sol), un alias `@/` que Vitest no resuelve y que rompió un import, y dos veces
+  borró o pisó capturas con un comando demasiado amplio; se restauraron o se volvieron a sacar.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

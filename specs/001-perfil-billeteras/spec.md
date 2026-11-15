@@ -8,6 +8,8 @@
 
 **Input**: Issue [#41](https://github.com/Seminario-UADE/vuelto/issues/41) — "Perfil: declarar mis bancos y tarjetas". Reemplaza la spec de prueba del 19/09, que listaba 6 billeteras genéricas: el alcance vigente (`docs/product/alcance-mvp.md`) acotó la ingesta a una sola fuente, MODO, donde las promociones se definen por banco + tipo de tarjeta + red, no por "billetera".
 
+**Revisión 2026-11-15 (issue #128)**: con el buscador vacío se muestra el catálogo completo (US1-1, US3-2, FR-001, FR-002), y las 9 redes se ven enteras y tocables (FR-005). Antes, con texto vacío no se listaba ningún banco y las redes salían encimadas.
+
 **Nota de estado**: esta spec pasó una ronda de `spec-critic` que encontró 3 huecos de modelado bloqueantes (clave de join del banco, cardinalidad banco×tipo×red, bancos/emisores sin catálogo) — los tres se resolvieron abajo, verificados contra la API real de `GET /promos/api/rewards/banks?source=app_modo` (no solo contra lo que decía la issue). Lista para `/speckit-plan`. La implementación queda bloqueada hasta que cierren los habilitadores de los que depende: #34 (esquema de Supabase con RLS) y #40 (login y registro).
 
 ## User Scenarios & Testing *(mandatory)*
@@ -22,7 +24,7 @@ Un usuario nuevo, antes de recibir cualquier recomendación, busca y selecciona 
 
 **Acceptance Scenarios**:
 
-1. **Given** un usuario sin perfil declarado, **When** abre el onboarding de medios de pago por primera vez, **Then** ve un buscador vacío sobre el catálogo de bancos y no puede confirmar sin haber agregado al menos un medio de pago completo (banco + tipo de tarjeta + red).
+1. **Given** un usuario sin perfil declarado, **When** abre el onboarding de medios de pago por primera vez, **Then** ve el catálogo completo de bancos ordenado por nombre, con el buscador vacío arriba, y no puede confirmar sin haber agregado al menos un medio de pago completo (banco + tipo de tarjeta + red).
 2. **Given** un usuario que busca "Galicia", **When** lo selecciona y agrega una tarjeta de crédito con red Visa, **Then** el medio de pago queda agregado a su selección con esos tres datos.
 3. **Given** un usuario que ya agregó Galicia crédito Visa, **When** agrega una segunda tarjeta de Galicia, crédito, red American Express, **Then** ambas quedan declaradas como medios de pago distintos del mismo banco (mismo banco, mismo tipo, red diferente).
 4. **Given** un usuario que ya agregó Galicia crédito Visa, **When** intenta agregar otra vez Galicia crédito Visa, **Then** el sistema no lo permite — esa combinación exacta de banco, tipo y red ya existe en su perfil.
@@ -50,7 +52,7 @@ El usuario agrega o saca bancos y tarjetas declarados, en cualquier momento, des
 
 ### User Story 3 - Priorizar bancos frecuentes en el buscador (Priority: P3)
 
-Al buscar un banco por nombre, el usuario ve primero los bancos más relevantes (los 32 marcados `on_hub_list` del catálogo de 82) cuando el texto tipeado coincide con varios.
+Al abrir el selector, o al buscar un banco por nombre, el usuario ve primero los bancos más relevantes (los 32 marcados `on_hub_list` del catálogo de 82) cuando hay varios para mostrar.
 
 **Why this priority**: El buscador en sí (texto parcial sobre el catálogo completo) es parte de User Story 1 y no es recortable — sin buscador no hay forma razonable de elegir entre 82 bancos. Lo que sí es una mejora independiente y diferible es el **orden** de los resultados: sin priorización, un banco poco común podría tapar a uno de uso masivo en una coincidencia parcial.
 
@@ -59,6 +61,7 @@ Al buscar un banco por nombre, el usuario ve primero los bancos más relevantes 
 **Acceptance Scenarios**:
 
 1. **Given** un texto de búsqueda que coincide con bancos dentro y fuera de `on_hub_list`, **When** se muestran los resultados, **Then** los bancos `on_hub_list` aparecen primero, y dentro de cada grupo se ordenan alfabéticamente.
+2. **Given** el buscador vacío, **When** se abre el selector, **Then** se ven todos los bancos del catálogo con el mismo orden: los `on_hub_list` primero (cuando la base los informa; si `on_hub_list` es `null` en todos, solo por nombre) y cada grupo alfabético.
 
 ---
 
@@ -76,11 +79,11 @@ Al buscar un banco por nombre, el usuario ve primero los bancos más relevantes 
 
 ### Functional Requirements
 
-- **FR-001**: El sistema MUST ofrecer un buscador por nombre sobre el catálogo completo de bancos (82). La coincidencia se evalúa sobre el nombre, sin distinguir mayúsculas de minúsculas ni acentos, como substring (no solo prefijo).
-- **FR-002**: El sistema MUST mostrar, cuando el texto buscado coincide con bancos dentro y fuera del subconjunto `on_hub_list` (32), los `on_hub_list` primero; dentro de cada grupo, los resultados se ordenan alfabéticamente.
+- **FR-001**: El sistema MUST ofrecer un buscador por nombre sobre el catálogo completo de bancos (82). La coincidencia se evalúa sobre el nombre, sin distinguir mayúsculas de minúsculas ni acentos, como substring (no solo prefijo). Con el buscador vacío (o solo espacios) MUST mostrar todos los bancos del catálogo: el buscador es un filtro por nombre, no una condición para ver la lista. *(Cambia desde el 2026-11-15, issue #128: antes, con texto vacío, la lista quedaba vacía.)*
+- **FR-002**: El sistema MUST mostrar, cuando hay bancos dentro y fuera del subconjunto `on_hub_list` (32) para mostrar —ya sea por el texto buscado o porque el buscador está vacío—, los `on_hub_list` primero; dentro de cada grupo, los resultados se ordenan alfabéticamente (por nombre sin mayúsculas ni acentos y, a igual nombre, por `id`).
 - **FR-003**: El sistema MUST permitir, por cada banco seleccionado, declarar una o más tarjetas (débito y/o crédito), cada una con su propia red. Un mismo banco puede tener más de una tarjeta del mismo tipo si la red es distinta (ej. crédito Visa y crédito American Express del mismo banco).
 - **FR-004**: El sistema MUST NOT permitir declarar dos veces la combinación exacta banco + tipo de tarjeta + red.
-- **FR-005**: El sistema MUST exigir una red para cada tarjeta declarada, elegida de un enum fijo de 9 valores (ver Key Entities § Red de tarjeta).
+- **FR-005**: El sistema MUST exigir una red para cada tarjeta declarada, elegida de un enum fijo de 9 valores (ver Key Entities § Red de tarjeta). Las 9 redes MUST verse todas a la vez, con su nombre entero (sin cortarse ni encimarse) y un área táctil de al menos 44 pt cada una, también con un celular angosto y con la letra grande del sistema, en claro y en oscuro. *(Agregado el 2026-11-15, issue #128.)*
 - **FR-006**: El sistema MUST NOT persistir un banco seleccionado que no tenga al menos una tarjeta (tipo + red) agregada — un banco sin tarjeta es solo estado transitorio de la pantalla.
 - **FR-007**: El sistema MUST exigir al menos un medio de pago completo (banco + tipo de tarjeta + red) para poder confirmar el onboarding. El mismo mínimo lo exige, del lado de la recomendación, el criterio de aceptación de RF-01 en `docs/product/requisitos.md` — esta spec garantiza que el perfil nunca llega a estar vacío, no reimplementa ese gate en la pantalla de recomendación (issue #43).
 - **FR-008**: Users MUST be able to editar su selección en cualquier momento posterior a la carga inicial, desde la pestaña Perfil (agregar o sacar bancos y tarjetas).
