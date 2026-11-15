@@ -7,6 +7,7 @@ export type CodigoError =
   | "invalido"
   | "no_autenticado"
   | "perfil_sin_medios"
+  | "contacto_no_vinculado"
   | "metodo_no_permitido"
   | "interno";
 
@@ -14,6 +15,7 @@ const STATUS: Record<CodigoError, number> = {
   invalido: 400,
   no_autenticado: 401,
   metodo_no_permitido: 405,
+  contacto_no_vinculado: 409,
   perfil_sin_medios: 422,
   interno: 500,
 };
