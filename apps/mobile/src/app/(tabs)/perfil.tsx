@@ -95,10 +95,10 @@ export default function Perfil() {
             accessibilityLabel="Datos de ejemplo"
           />
           <Button
-            label="Abrir una invitación de ejemplo"
+            label="Pegar una invitación"
             variant="text"
             icon="link"
-            onPress={() => router.push("/i/demo-tomas")}
+            onPress={() => router.push("/contactos/pegar")}
           />
         </View>
       ) : null}

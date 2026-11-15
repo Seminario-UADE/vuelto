@@ -5,9 +5,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@/components/button";
 import { SheetHeader } from "@/components/sheet-header";
 import { Text } from "@/components/text";
-import * as api from "@/data/api";
 import { hapticoLeve } from "@/lib/haptics";
-import { contactoQuitado } from "@/store/contactos";
+import { quitarContacto } from "@/store/contactos";
 import { useAppDispatch } from "@/store/hooks";
 import { avisoMostrado } from "@/store/sesion";
 import { colors, space } from "@/theme";
@@ -17,12 +16,20 @@ export default function Quitar() {
   const { id, nombre = "este contacto" } = useLocalSearchParams<{ id: string; nombre?: string }>();
   const insets = useSafeAreaInsets();
   const [quitando, setQuitando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const dispatch = useAppDispatch();
 
+  // La lista local cambia solo si el servidor confirmó (spec 013 US2-15).
   const quitar = async () => {
     setQuitando(true);
-    await api.quitarContacto(id);
-    dispatch(contactoQuitado(id));
+    setError(null);
+    try {
+      await dispatch(quitarContacto(id));
+    } catch {
+      setQuitando(false);
+      setError("No pudimos quitarlo. Revisá tu conexión y probá de nuevo.");
+      return;
+    }
     hapticoLeve();
     dispatch(avisoMostrado(`Quitaste a ${nombre}. El vínculo se cortó para los dos.`));
     router.back();
@@ -44,7 +51,12 @@ export default function Quitar() {
         en grupo. Para volver a vincularse hace falta una invitación nueva.
       </Text>
       <View style={{ gap: space.sm }}>
-        <Button label="Quitar contacto" variant="destructive" onPress={quitar} loading={quitando} />
+        {error ? (
+          <Text variant="label" tone="error" align="center" accessibilityLiveRegion="polite">
+            {error}
+          </Text>
+        ) : null}
+        <Button label={error ? "Reintentar" : "Quitar contacto"} variant="destructive" onPress={quitar} loading={quitando} />
         <Button label="Cancelar" variant="text" onPress={() => router.back()} />
       </View>
     </View>

@@ -1,33 +1,174 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { Contacto, PedidoGrupo } from "../data/contracts";
-import { contactos as deEjemplo } from "../data/fixtures";
-import { sesionCerrada } from "./acciones";
-
 /**
- * Contactos (solo lo que ADR-008 §3 deja ver) y el grupo en armado. No se persiste: en
- * producción la lista sale del servidor.
+ * Contactos vinculados (spec 013 US2, ADR-008): solo lo que ADR-008 §3 deja ver (nombre y fecha
+ * del vínculo). La lista sale del servidor y arranca vacía (G-02). Se guarda en el teléfono con
+ * su propia clave, asociada a la cuenta: otra cuenta en el mismo teléfono no la ve, ni sin red, y
+ * cerrar sesión la borra (FR-019, G-03).
  */
-export type EstadoContactos = { lista: Contacto[]; grupo: PedidoGrupo | null };
+import { createSlice, type ListenerMiddlewareInstance, type PayloadAction } from "@reduxjs/toolkit";
+import type { Contacto } from "../data/contracts";
+import type { ContactoRemoto, ResultadoAceptar } from "../grupo/repositorio";
+import { iniciales } from "../lib/format";
+import { sesionCerrada } from "./acciones";
+import type { AppThunk, RootState } from "./index";
+import type { Almacenamiento } from "./persistencia";
+import { usuarioCambio } from "./sesion";
 
-const inicial: EstadoContactos = { lista: deEjemplo, grupo: null };
+export const CLAVE_CONTACTOS = "vuelto.contactos.v1";
+
+export type EstadoContactos = {
+  /** De qué cuenta es `lista`. */
+  cuentaId: string | null;
+  lista: Contacto[];
+  estado: "inicial" | "cargando" | "listo" | "error";
+  /** Ya se leyó lo guardado. Antes, no se escribe nada (no se pisa). */
+  hidratada: boolean;
+};
+
+const inicial: EstadoContactos = { cuentaId: null, lista: [], estado: "inicial", hidratada: false };
+
+/** Del contacto que da el servidor al de la app. Sin nombre para mostrar se dice «Contacto». */
+export function aContacto(c: ContactoRemoto): Contacto {
+  const nombre = c.nombre ?? "Contacto";
+  return { id: c.id, nombre, iniciales: iniciales(nombre) || "?", vinculadoDesde: c.vinculadoDesde.slice(0, 10) };
+}
 
 export const contactos = createSlice({
   name: "contactos",
   initialState: inicial,
   reducers: {
+    cargaDeContactos(s, a: PayloadAction<EstadoContactos["estado"]>) {
+      s.estado = a.payload;
+    },
+    contactosCargados(s, a: PayloadAction<{ cuentaId: string; lista: Contacto[] }>) {
+      s.cuentaId = a.payload.cuentaId;
+      s.lista = a.payload.lista;
+      s.estado = "listo";
+    },
     contactoAgregado(s, a: PayloadAction<Contacto>) {
       s.lista = [...s.lista.filter((c) => c.id !== a.payload.id), a.payload];
     },
     contactoQuitado(s, a: PayloadAction<string>) {
       s.lista = s.lista.filter((c) => c.id !== a.payload);
     },
-    grupoArmado(s, a: PayloadAction<PedidoGrupo | null>) {
-      s.grupo = a.payload;
+    /** Lo leído del dispositivo. Si ya se cargó del servidor, gana el servidor. */
+    rehidratadoContactos(s, a: PayloadAction<{ cuentaId: string; lista: Contacto[] } | null>) {
+      if (a.payload && s.estado !== "listo" && (s.cuentaId === null || s.cuentaId === a.payload.cuentaId)) {
+        s.cuentaId = a.payload.cuentaId;
+        s.lista = a.payload.lista;
+      }
+      s.hidratada = true;
     },
   },
   extraReducers: (b) => {
-    b.addCase(sesionCerrada, () => inicial);
+    // Otra cuenta (o ninguna): la lista de la anterior no se muestra (US2-16).
+    b.addCase(usuarioCambio, (s, a) => {
+      const id = a.payload?.id ?? null;
+      if (id !== s.cuentaId) return { ...inicial, cuentaId: id, hidratada: s.hidratada };
+      return s;
+    });
+    b.addCase(sesionCerrada, (s) => ({ ...inicial, hidratada: s.hidratada }));
   },
 });
 
-export const { contactoAgregado, contactoQuitado, grupoArmado } = contactos.actions;
+export const { cargaDeContactos, contactosCargados, contactoAgregado, contactoQuitado, rehidratadoContactos } =
+  contactos.actions;
+
+// ─── Thunks ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Trae la lista del servidor: al entrar una cuenta, al volver a primer plano y al entrar a
+ * Contactos (FR-019). Sin cuenta o sin Supabase no hace nada; si falla, la lista queda como estaba.
+ */
+export function cargarContactos(): AppThunk<Promise<void>> {
+  return async (dispatch, getState, { contactosRemoto }) => {
+    const cuentaId = getState().sesion.usuario?.id ?? null;
+    if (!contactosRemoto || cuentaId === null) return;
+    dispatch(cargaDeContactos("cargando"));
+    try {
+      const lista = (await contactosRemoto.listar()).map(aContacto);
+      // La cuenta pudo cambiar mientras se esperaba la respuesta: no se mezclan listas.
+      if (getState().sesion.usuario?.id !== cuentaId) return;
+      dispatch(contactosCargados({ cuentaId, lista }));
+    } catch {
+      dispatch(cargaDeContactos("error"));
+    }
+  };
+}
+
+/** Quita el vínculo en el servidor y recién entonces de la lista local (US2-15). Si falla, lanza. */
+export function quitarContacto(id: string): AppThunk<Promise<void>> {
+  return async (dispatch, _getState, { contactosRemoto }) => {
+    if (!contactosRemoto) throw new Error("Necesitás conexión con tu cuenta para quitar un contacto.");
+    await contactosRemoto.quitar(id);
+    dispatch(contactoQuitado(id));
+  };
+}
+
+/** Acepta la invitación; si se creó el vínculo, suma el contacto a la lista. Si falla la red, lanza. */
+export function aceptarInvitacion(token: string): AppThunk<Promise<ResultadoAceptar>> {
+  return async (dispatch, _getState, { contactosRemoto, reloj }) => {
+    if (!contactosRemoto) throw new Error("Necesitás conexión con tu cuenta para aceptar la invitación.");
+    const r = await contactosRemoto.aceptarInvitacion(token);
+    if (r.estado === "aceptada") {
+      dispatch(contactoAgregado(aContacto({ ...r.contacto, vinculadoDesde: reloj().toISOString() })));
+    }
+    return r;
+  };
+}
+
+// ─── Persistencia ──────────────────────────────────────────────────────────────
+
+type Desconocido = Record<string, unknown>;
+const esObjeto = (x: unknown): x is Desconocido => typeof x === "object" && x !== null && !Array.isArray(x);
+const esTexto = (x: unknown): x is string => typeof x === "string" && x !== "";
+
+function contactoValido(x: unknown): x is Contacto {
+  return esObjeto(x) && esTexto(x.id) && esTexto(x.nombre) && typeof x.iniciales === "string" && esTexto(x.vinculadoDesde);
+}
+
+/** `null` si no hay nada guardado o no se puede leer. Un contacto inválido se descarta solo. */
+export function leerContactos(raw: string | null): { cuentaId: string; lista: Contacto[] } | null {
+  if (raw === null) return null;
+  let x: unknown;
+  try {
+    x = JSON.parse(raw);
+  } catch {
+    return null;
+  }
+  if (!esObjeto(x) || x.version !== 1 || !esTexto(x.cuentaId) || !Array.isArray(x.lista)) return null;
+  return { cuentaId: x.cuentaId, lista: x.lista.filter(contactoValido) };
+}
+
+/** Al abrir la app, después de `rehidratar()`: lee la lista guardada (la de otra cuenta se descarta). */
+export function iniciarContactos(): AppThunk<Promise<void>> {
+  return async (dispatch, getState, { almacenamiento }) => {
+    let guardada: { cuentaId: string; lista: Contacto[] } | null = null;
+    try {
+      guardada = leerContactos(await almacenamiento.getItem(CLAVE_CONTACTOS));
+    } catch {
+      // Sin almacenamiento la app funciona en memoria.
+    }
+    const cuentaActual = getState().sesion.usuario?.id ?? null;
+    dispatch(rehidratadoContactos(guardada && (cuentaActual === null || guardada.cuentaId === cuentaActual) ? guardada : null));
+  };
+}
+
+/** Escribe la lista cada vez que cambia, una vez leída. Sin cuenta, borra lo guardado. */
+export function escucharPersistenciaContactos(listener: ListenerMiddlewareInstance<RootState>, almacenamiento: Almacenamiento) {
+  listener.startListening({
+    predicate: (_accion, actual, previo) =>
+      actual.contactos.hidratada &&
+      (actual.contactos.lista !== previo.contactos.lista ||
+        actual.contactos.cuentaId !== previo.contactos.cuentaId ||
+        !previo.contactos.hidratada),
+    effect: async (_accion, api) => {
+      const { cuentaId, lista } = api.getState().contactos;
+      try {
+        if (cuentaId === null) await almacenamiento.removeItem(CLAVE_CONTACTOS);
+        else await almacenamiento.setItem(CLAVE_CONTACTOS, JSON.stringify({ version: 1, cuentaId, lista }));
+      } catch {
+        // Almacenamiento lleno o no disponible: al abrir se vuelve a pedir al servidor.
+      }
+    },
+  });
+}

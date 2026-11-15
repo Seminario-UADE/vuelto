@@ -10,13 +10,15 @@ import {
   type UnknownAction,
 } from "@reduxjs/toolkit";
 import type { Subida } from "../data/compras/repositorio";
+import type { RepositorioContactos } from "../grupo/repositorio";
 import type { DatosPerfil } from "../perfil/datos";
 import type { RepositorioSincronizacion } from "../sync/contratos";
 import { apariencia } from "./apariencia";
 import { cola, escucharPersistenciaCola } from "./cola";
 import { compras } from "./compras";
-import { contactos } from "./contactos";
+import { contactos, escucharPersistenciaContactos } from "./contactos";
 import { corpus } from "./corpus";
+import { grupo } from "./grupo";
 import { escucharPersistencia, type Almacenamiento } from "./persistencia";
 import { perfil } from "./perfil";
 import { escucharPersistenciaPorConfirmar, porConfirmar } from "./por-confirmar";
@@ -32,6 +34,7 @@ const reducer = combineReducers({
   porConfirmar: porConfirmar.reducer,
   simulacion: simulacion.reducer,
   contactos: contactos.reducer,
+  grupo: grupo.reducer,
   apariencia: apariencia.reducer,
 });
 
@@ -52,6 +55,8 @@ export type Extra = {
   repositorio: RepositorioSincronizacion | null;
   /** Lee y escribe los medios del perfil en Supabase (issue #41); `null` sin cliente de Supabase. */
   perfilRemoto: DatosPerfil | null;
+  /** Contactos, invitaciones y gasto en grupo en Supabase (spec 013); `null` sin cliente de Supabase. */
+  contactosRemoto: RepositorioContactos | null;
   /** El reloj real. La app: `() => new Date()`. Los tests lo controlan (spec 009 R2). */
   reloj: () => Date;
   coordinacion: Coordinacion;
@@ -64,6 +69,7 @@ export function crearStore(opciones: {
   subida?: Subida | null;
   repositorio?: RepositorioSincronizacion | null;
   perfilRemoto?: DatosPerfil | null;
+  contactosRemoto?: RepositorioContactos | null;
   reloj?: () => Date;
 }) {
   const listener = createListenerMiddleware<RootState>();
@@ -73,6 +79,7 @@ export function crearStore(opciones: {
     subida: opciones.subida ?? null,
     repositorio: opciones.repositorio ?? null,
     perfilRemoto: opciones.perfilRemoto ?? null,
+    contactosRemoto: opciones.contactosRemoto ?? null,
     reloj: opciones.reloj ?? (() => new Date()),
     coordinacion: { enVuelo: false, ultimoIntentoMs: null },
   };
@@ -86,6 +93,7 @@ export function crearStore(opciones: {
   escucharPersistencia(listener, opciones.almacenamiento);
   // Las compras por confirmar, al final: su escritura sale después de la de `compras` (spec 012, FR-016).
   escucharPersistenciaPorConfirmar(listener, opciones.almacenamiento);
+  escucharPersistenciaContactos(listener, opciones.almacenamiento);
   return store;
 }
 

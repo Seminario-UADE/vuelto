@@ -1,6 +1,7 @@
 /** Utilidades de los tests del store: un almacenamiento en memoria y un store recién creado. */
 import { generadorDeIds } from "../data/compras/prueba";
 import type { Subida } from "../data/compras/repositorio";
+import type { RepositorioContactos } from "../grupo/repositorio";
 import type { DatosPerfil } from "../perfil/datos";
 import type { RepositorioSincronizacion } from "../sync/contratos";
 import { crearStore, type RootState } from "./index";
@@ -28,6 +29,7 @@ export function storeDePrueba(
     subida?: Subida | null;
     repositorio?: RepositorioSincronizacion | null;
     perfilRemoto?: DatosPerfil | null;
+    contactosRemoto?: RepositorioContactos | null;
     reloj?: () => Date;
   } = {},
 ) {

@@ -7,7 +7,7 @@
  */
 import { RUBROS } from "../lib/rubros";
 import type { Compra as CompraMotor, Dia, MedioDePago as MedioMotor, Promocion } from "@vuelto/motor";
-import type { Comercio, Contacto, MedioDePago, Rubro } from "./contracts";
+import type { Comercio, MedioDePago, Rubro } from "./contracts";
 import type { MedioDePago as MedioGuardado } from "../perfil/modelo";
 import { medioDelMotor } from "../perfil/vista";
 
@@ -285,32 +285,6 @@ export const comprasOctubre: CompraMotor[] = [
 
 export const usuario = { nombre: "Martín", email: "martin@ejemplo.com" };
 
-export const contactos: Contacto[] = [
-  { id: "lucia", nombre: "Lucía", iniciales: "L", vinculadoDesde: "2026-10-12" },
-  { id: "mateo", nombre: "Mateo", iniciales: "M", vinculadoDesde: "2026-10-02" },
-];
-
-/**
- * Lo que el servidor sabe de cada integrante de un grupo, con la forma del motor (ADR-008 §3,
- * columna "¿Llega al motor?"). Solo lo lee `grupo-simulado.ts`, el reemplazo de la Edge
- * Function: nunca llega a una pantalla.
- */
-export const datosDeContactos: Record<string, { medios: MedioMotor[]; compras: CompraMotor[] }> = {
-  lucia: { medios: [mediosDelMotor[medios.galicia.id]!], compras: [] },
-  mateo: {
-    medios: [mediosDelMotor[medios.provincia.id]!],
-    compras: [compra("m1", comercios.coto, "2026-10-12", 8000, medios.provincia, null, null, "manual")],
-  },
-};
-
-/** Gasto en grupo de ejemplo (DESIGN.md §9). */
-export const grupoDeEjemplo = {
-  nombre: "Cena del sábado",
-  comercioId: "la-parolaccia",
-  monto: 41000,
-  fecha: "2026-10-17",
-};
-
 /**
  * El ticket que devuelve el lector simulado, con la fecha de `hoy` (del reloj del store, spec 012
  * R12): con una fecha fija, el ticket caía en otro mes y no se veía que los topes cambian.
@@ -324,8 +298,3 @@ export function ticketDeEjemplo(hoy: string) {
     textoExtraido: `COTO C.I.C.S.A. · SUC. 112 ALMAGRO\n${d}/${m}/${a} 18:42\nVARIOS SUPERMERCADO\nTOTAL $ 24.500,00\nGRACIAS POR SU COMPRA`,
   };
 }
-
-export const invitacionPropia = {
-  link: "vuelto.app/i/k7Qm2x",
-  venceEn: "24 h",
-};
