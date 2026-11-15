@@ -166,3 +166,15 @@ number | null`), que además cubre el caso de la app.
    issue #42): al abrir, al volver a primer plano y por incremental.
 6. **Topes en la app** (#45) con el mismo store.
 7. Limpiar lo que queda sin uso: `recomendar` y su contrato, o reutilizarlos.
+
+## Actualización (15/11/2026, issue #54, spec 013)
+
+- **§2, slice `contactos`.** La lista sale de la RPC `mis_contactos` y se
+  guarda en el teléfono con su propia clave (`vuelto.contactos.v1`), asociada
+  a la cuenta. El grupo en armado vive en un slice aparte (`grupo`) que no se
+  persiste, porque lleva los nombres de los integrantes sin cuenta.
+- **§3, invitaciones.** Crear, ver y aceptar una invitación van por RPC
+  (funciones de la base en `contactos_privado`, con envoltorios en `public`),
+  **sin Edge Function**: no hay secreto ni datos ajenos que proteger más allá
+  de lo que la función ya verifica. La única Edge Function del gasto en grupo
+  es `recomendar-grupo`.

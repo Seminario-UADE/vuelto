@@ -118,7 +118,7 @@ interface RecomendacionDeGrupo {
 ## App (`apps/mobile`)
 
 - `Contacto` (sin cambios de forma): `{ id, nombre, iniciales, vinculadoDesde }`.
-- Slice `contactos`: `{ cuentaId: string | null; lista: Contacto[]; estado: "inicial" | "cargando" | "listo" | "error" }`. Persistido: `{ cuentaId, lista }`.
+- Slice `contactos`: `{ cuentaId: string | null; lista: Contacto[]; estado: "inicial" | "cargando" | "listo" | "error"; hidratada: boolean }`. Persistido en `vuelto.contactos.v1`: `{ version: 1, cuentaId, lista }`.
 - Slice `grupo` (no persistido): el `PedidoGrupo` en armado, con los sin cuenta como `{ posicion, nombre }`. El nombre nunca entra al pedido HTTP.
 - `PedidoGrupo` pierde `fecha` y `nombre` del grupo de ejemplo; suma `canal` y `comercio` resuelto (`Comercio` con `categoriaId` no nulo).
 - `RecomendacionGrupo` (vista): se arma en `grupo/vista.ts` con la respuesta del servidor más los nombres de los sin cuenta del teléfono.

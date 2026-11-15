@@ -20,7 +20,7 @@ Decisiones técnicas en [research.md](research.md); modelo en [data-model.md](da
 
 **Primary Dependencies**: motor sin `dependencies`. Edge Function: `@supabase/supabase-js@2` (jsr, en `deno.json`). App: Expo 58, Expo Router, Redux Toolkit, `@supabase/supabase-js` ^2.118, `expo-linking`, `expo-clipboard` (todas ya instaladas). Base: `pgcrypto` y `supabase_vault` (ya en el stack, verificado).
 
-**Storage**: Postgres de Supabase (dos tablas nuevas y un schema). En el teléfono, AsyncStorage (`vuelto.store.v1`): la lista de contactos asociada a la cuenta.
+**Storage**: Postgres de Supabase (dos tablas nuevas y un schema). En el teléfono, AsyncStorage (`vuelto.contactos.v1`): la lista de contactos asociada a la cuenta.
 
 **Testing**: Vitest (motor, Edge Function en Node, app), pgTAP (`supabase test db`), `deno check`, e integración de la app contra Supabase local (`test:integracion`).
 
@@ -115,7 +115,7 @@ apps/mobile/src/
 │   ├── token.ts (+ .test.ts)                    # tokenDeInvitacion()
 │   └── vista.ts (+ .test.ts)                    # respuesta → RecomendacionGrupo con textos
 ├── store/contactos.ts (+ thunks, tests)         # slice por cuenta, persistido
-├── store/persistencia.ts                        # guarda {cuentaId, lista}
+├── store/contactos.ts                           # persiste {cuentaId, lista} en vuelto.contactos.v1
 ├── hooks/use-contactos.ts                       # carga al entrar, en primer plano y al enfocar
 ├── data/contracts.ts                            # PedidoGrupo, EstadoInvitacion, RecomendacionGrupo
 ├── data/api.ts                                  # sin funciones de grupo ni invitaciones

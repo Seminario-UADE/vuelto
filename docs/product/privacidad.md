@@ -17,8 +17,9 @@ comercial.
 | Registro de compra confirmado | Confirmación del usuario (RF-09) | Sí, 90 días (ver abajo) |
 | Vínculo con un contacto (las dos cuentas y la fecha) | Aceptación de una invitación (RF-21) | Sí, mientras ninguno de los dos lo quite ni borre su cuenta |
 | Nombre para mostrar | Perfil (RF-21) | Sí, mientras la cuenta exista. Lo ven los contactos vinculados y quien recibe una invitación |
-| Invitación de contacto (hash del token, emisor, vencimiento, fecha de uso) | Perfil (RF-21) | Sí, mientras exista la cuenta del emisor. Deja de servir al usarse o a las 24 h; el borrado automático de las vencidas queda fuera de alcance del MVP, igual que el de compras |
-| Integrantes declarados a mano en un grupo (nombre y medios de pago de alguien sin cuenta) | Quien arma el grupo (RF-19) | Sí, mientras exista el grupo |
+| Invitación de contacto (hash del token, emisor, vencimiento, fecha de uso) | Perfil (RF-21) | Sí, mientras exista la cuenta del emisor. Como mucho una sin usar por cuenta: generar otra borra la anterior. Deja de servir al usarse o a las 24 h; el borrado automático de las vencidas queda fuera de alcance del MVP, igual que el de compras |
+| Lista de contactos en el teléfono (id, nombre para mostrar y fecha del vínculo) | Servidor (spec 013, FR-019) | Sí, en el teléfono (`vuelto.contactos.v1`), asociada a la cuenta; se borra al cerrar sesión o al entrar otra cuenta |
+| Integrantes sin cuenta de un grupo (solo el nombre) | Quien arma el grupo (RF-19, spec 013 D5) | **No.** El nombre vive en la memoria del teléfono mientras se arma el grupo; no se guarda en el teléfono ni sale de él (al servidor va solo la cantidad) |
 
 ## Imágenes de ticket: retención durante el procesamiento
 
@@ -75,6 +76,12 @@ usuario vuelve a fotografiar el ticket.
     48 h** de creada: deja de mostrarse y se borra al abrir la app. También se
     borran al cerrar sesión (la app avisa antes cuántas se pierden) y cuando
     entra otra cuenta en el mismo teléfono.
+  - **La lista de contactos** (spec 013) usa otra clave, `vuelto.contactos.v1`:
+    el id, el nombre para mostrar y la fecha del vínculo de cada contacto, con
+    el id de la cuenta a la que pertenece. Sirve para mostrar la lista sin red;
+    con red se reemplaza por la del servidor. Otra cuenta en el mismo teléfono
+    no la ve, y se borra al cerrar sesión. El grupo que se está armando (con los
+    nombres de quienes no tienen cuenta) nunca se guarda.
 - **Perfil** (medios de pago, comercios): se guarda mientras la cuenta
   exista.
 - **Aislamiento entre usuarios**: cada tabla lleva row-level security desde
@@ -89,28 +96,45 @@ Detalle y razonamiento en ADR-008.
 - **Consentimiento.** Dos cuentas comparten datos solo si una invitó y la
   otra aceptó en una pantalla que dice qué se comparte. Abrir un link o
   escanear un QR no alcanza. No hay buscador de usuarios.
-- **Qué se comparte.** Nombre para mostrar, medios de pago declarados,
-  tope consumido agregado por promoción y cantidad de compras registradas
-  (para la base del estimado). Nunca compras individuales (monto, comercio,
-  fecha), comercios habituales ni email.
+- **Qué se comparte.** Nombre para mostrar, medios de pago declarados y las
+  compras del período reducidas a promoción, fecha, monto y descuento obtenido
+  (spec 013, D4), para calcular el tope que le queda al contacto. Nunca el
+  comercio, el medio de la compra, el texto del ticket, los comercios
+  habituales ni el email. Esas compras reducidas **solo las lee la Edge
+  Function** de grupo, en el servidor, durante el cálculo: no llegan al
+  teléfono de nadie ni se guardan en otro lado. Se leen solo las del período en
+  curso (como mucho 40 días).
 - **Qué ve el otro.** Además del nombre, solo la recomendación: qué medio
-  del contacto conviene usar y el reintegro estimado de esa compra, con su
-  base dicha en palabras ("según las compras que registró Ana" / "sin
-  base"). No ve el tope ni el número de compras, pero **puede inferir**
-  parte del tope cuando el estimado sale recortado, y si el contacto
-  registró alguna compra o ninguna. La pantalla de aceptación lo advierte y
-  eso forma parte del consentimiento.
-- **Cómo se accede.** Las policies de `perfil`, `compra` e `invitacion`
-  siguen siendo de lectura exclusiva del dueño. Las Edge Functions corren
-  con el JWT del usuario (nunca con la service role key) y pasan por
-  funciones SQL que verifican el vínculo (para leer datos del contacto) o
-  la invitación (para aceptarla).
+  del contacto conviene usar (solo si es quien paga), qué da esa promo y el
+  reintegro estimado de esa compra, **redondeado de a $100**, con su base
+  dicha en palabras sobre la promo que se aplica ("según las compras que
+  registró Ana", "Ana no tiene compras registradas con esta promo: sin base",
+  "la promo no informa tope" o "tope por compra"). No ve el tope, lo que le
+  queda, el número de compras ni los otros medios del contacto.
+- **Qué se puede inferir, y se consiente igual.** Cuando el estimado sale
+  recortado, el otro puede deducir parte de lo que te queda en una promo, y si
+  usaste esa promo en el período. **Y si repite consultas** cambiando el monto,
+  el comercio o el día, puede deducir más sobre cómo usás tus topes. El
+  redondeo de a $100 lo hace menos preciso, pero no lo impide. La pantalla de
+  aceptación lo advierte y eso forma parte del consentimiento (ADR-008 §3).
+- **Cómo se accede.** Las policies de `perfiles`, `medios_de_pago` y
+  `compras` siguen siendo de lectura exclusiva del dueño; `invitaciones` solo
+  la ve su emisor y `contactos`, sus dos integrantes. La Edge Function corre
+  con el JWT del usuario (nunca con la service role key) y lee los datos de un
+  contacto con una función SQL que verifica el vínculo y además exige una
+  **clave de servidor** que solo tiene la Edge Function (spec 013, D8): con la
+  sesión sola, desde la app o con cualquier otro cliente, la lectura se
+  rechaza. Las funciones con permisos elevados viven fuera de `public` y no
+  las puede ejecutar nadie sin sesión.
 - **Revocación.** Cualquiera de los dos puede quitar el contacto; el
   vínculo se rompe para ambos y el acceso se corta al instante. Borrar la
-  cuenta borra sus vínculos.
-- **Integrantes sin cuenta.** Quien arma un grupo puede declarar a mano a
-  alguien que no usa la app (nombre y medios de pago). Es un dato que carga
-  un tercero: se usa solo dentro de ese grupo y se borra con él.
+  cuenta borra sus vínculos y sus invitaciones.
+- **Integrantes sin cuenta.** Quien arma un grupo puede sumar a alguien que
+  no usa la app, **solo con su nombre**. Ese nombre no sale del teléfono ni se
+  guarda: al servidor va solo cuántos son, para la división. No se cargan sus
+  medios de pago, así que nunca es quien paga.
+- **Registros del servidor.** La Edge Function de grupo registra solo el tipo
+  de error, nunca medios, compras, topes ni tokens de invitación.
 
 ## Terceros
 

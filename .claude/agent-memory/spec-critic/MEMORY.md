@@ -15,3 +15,4 @@
 - [Corpus/seed manual](patron_corpus_seed_manual.md) — validador sobrevendido, null→sin_tope/mensual, seed JSON vs db reset, demo alojada, manual+modo duplicados, pba≠AMBA.
 - [Rediseño de flujo con estado local nuevo](patron_flujo_ui_estado_local_nuevo.md) — 012: sin cuenta vs. RLS authenticated, preselección vs. RF-10, pendiente sin clave/atomicidad, "pendiente" choca con 010.
 - [Capa servidor sobre el motor](patron_capa_servidor_sobre_motor.md) — prefiltro que duplica reglas, test de equivalencia tautológico, errores HTTP sin forma, anon key como sesión.
+- [Grupo: servidor con JWT del usuario](patron_grupo_servidor_con_jwt_del_usuario.md) — 013: RPC que la app también llama, motivo del motor con tope, sondeo repetido, empate sin unidad.

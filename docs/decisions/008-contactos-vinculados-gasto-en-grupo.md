@@ -168,3 +168,49 @@ conocido; la recomendación lo indica.
 - Prerrequisito para `/speckit-plan`: la constitución (Principio II) todavía
   dice que el motor corre en el dispositivo, en contra de ADR-001
   §Actualización y RNF-02.
+
+## Actualización (15/11/2026, issue #54, spec 013)
+
+Al implementar el gasto en grupo (`specs/013-gasto-grupo/`), el Product Owner
+decidió estos cambios, que ajustan el texto de arriba sin cambiar el
+objetivo: decidir quién paga con el tope de cada uno, sin abrir el historial
+de nadie.
+
+- **§3 Qué se comparte.** Para calcular el tope de un contacto no alcanza con
+  un "tope consumido agregado": el consumo depende del período (mes o semana),
+  de los topes compartidos entre promos y del descuento que falta informar, y
+  todo eso está en el motor (`tope.ts`). Agregarlo en SQL duplicaría las
+  reglas del motor fuera de sus tests. Por eso la función de la base entrega
+  las **compras del período reducidas a promoción, fecha, monto y descuento
+  obtenido** (sin comercio, medio de la compra, origen, texto ni id), **solo a
+  la Edge Function**. Ahí el motor calcula y nada de eso sale (D4). La fila
+  "Compras individuales" de la tabla pasa a: ¿Llega al motor? *Sí, reducidas,
+  solo en el servidor*; ¿Lo ve el usuario? *No*.
+- **§3 Lo que se puede inferir.** El reintegro estimado de un contacto se
+  calcula y se muestra en **escalones de $100** (D9). Repetir consultas
+  cambiando el monto, el comercio o el día deja deducir más sobre cómo usa sus
+  topes. El redondeo lo hace menos preciso, pero no lo impide. Se acepta y la
+  pantalla de aceptación lo dice.
+- **§3 La base en palabras.** Se dice sobre las compras que consumieron el
+  tope de **la promo que se aplica**, no sobre cualquier compra del período
+  (D10, constitución §V). Hay cuatro casos: con compras, sin compras, la promo
+  no informa tope y tope por compra.
+- **§4 Cómo se leen los datos ajenos.** Las funciones `security definer` viven
+  en el schema `contactos_privado`. En `public` hay envoltorios
+  `security invoker` (PostgREST solo expone `public`, y
+  `estructura.test.sql` prohíbe `security definer` ahí). La función que lee los
+  datos de los contactos exige, además del JWT del usuario, una **clave de
+  servidor** que solo tiene la Edge Function (secreto de Vault y variable
+  `GRUPO_CLAVE_SERVIDOR`). Si no, la app podría llamarla directo con la misma
+  sesión (D8). No es la service role key: RNF-05 sigue intacto.
+- **§5 Desempate.** Se decide **sobre las cifras que se muestran**: el
+  reintegro de quien pide redondeado al peso y el de cada contacto en
+  escalones de $100. Así la pantalla nunca contradice la decisión. Para pagar,
+  hace falta al menos $1 a la vista. El orden canónico es el id en minúsculas,
+  comparado por código de carácter.
+- **§7 Integrantes sin cuenta.** Solo con un nombre, que no sale del teléfono
+  ni se guarda (D5). No pueden ser quien paga, pero cuentan para la división.
+- **§8 Débito y redondeo, resueltos.** La división descuenta el reintegro igual
+  para débito y crédito, y el reintegro le llega a quien paga (D2). Se divide
+  en pesos enteros y el resto se reparte de a $1 en el orden del desempate
+  (D3).
