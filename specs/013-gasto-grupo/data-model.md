@@ -10,7 +10,7 @@ Todo en una sola migración, con su RLS (constitución §IV, RNF-07).
 |---|---|---|
 | `id` | `uuid` PK | `default gen_random_uuid()` |
 | `emisor` | `uuid` not null | FK `auth.users(id) on delete cascade` |
-| `token_hash` | `bytea` not null, unique | `sha256` del token; nunca el token |
+| `token_hash` | `text` not null, unique, `check (token_hash ~ '^[0-9a-f]{64}$')` | `sha256` del token en hexadecimal; nunca el token. Texto y no `bytea`: `estructura.test.sql` prohíbe columnas binarias (imágenes de ticket) |
 | `creada_en` | `timestamptz` not null | `default now()` |
 | `vence_en` | `timestamptz` not null | `default now() + interval '24 hours'`; `check (vence_en > creada_en)` |
 | `usada_en` | `timestamptz` null | `null` = sin usar |
