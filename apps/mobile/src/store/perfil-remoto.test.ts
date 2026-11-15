@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { DatosPerfil, Resultado } from "../perfil/datos";
-import type { MedioDePago, MedioNuevo } from "../perfil/modelo";
+import { MENSAJES_ERROR, type MedioDePago, type MedioNuevo } from "../perfil/modelo";
 import { sesionCerrada } from "./acciones";
 import { mediosConfirmados, nombreCambiado } from "./perfil";
 import {
@@ -9,6 +9,7 @@ import {
   cambiarNombre,
   confirmarComercios,
   confirmarMedios,
+  leerBancos,
   leerComercios,
   leerMedios,
   sacarComercio,
@@ -92,6 +93,27 @@ describe("leerMedios (T009, T011)", () => {
     const s = armar(remoto({ leerMisMedios: { ok: false, error: "sesion_vencida" } }));
     await s.dispatch(leerMedios());
     expect(s.getState().perfil.carga).toBe("error");
+  });
+
+  it("si la base no está al día con la app, la carga lo dice en vez de «error» (issue #127)", async () => {
+    const s = armar(remoto({ leerMisMedios: { ok: false, error: "servidor_desactualizado" } }));
+    s.dispatch(mediosConfirmados([guardado("m1")]));
+    await s.dispatch(leerMedios());
+    expect(s.getState().perfil.medios).toEqual([guardado("m1")]);
+    expect(s.getState().perfil.carga).toBe("servidor-desactualizado");
+  });
+
+  it("los bancos: el mensaje distingue servidor desactualizado, sin conexión y otro error (issue #127)", async () => {
+    const mensaje = async (error: "servidor_desactualizado" | "sin_conexion" | "otro") =>
+      armar(remoto({ leerBancos: { ok: false, error } }))
+        .dispatch(leerBancos())
+        .then(
+          () => null,
+          (e: Error) => e.message,
+        );
+    expect(await mensaje("servidor_desactualizado")).toBe(MENSAJES_ERROR.servidor_desactualizado);
+    expect(await mensaje("sin_conexion")).toBe("Necesitás conexión para elegir tu banco");
+    expect(await mensaje("otro")).toBe(MENSAJES_ERROR.otro);
   });
 
   it("una lectura que salió antes de una escritura no la pisa", async () => {

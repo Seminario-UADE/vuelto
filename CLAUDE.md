@@ -31,7 +31,7 @@ directo, sin compilar.
 |---|---|
 | `packages/motor` (`@vuelto/motor`) | Motor de reglas: TS puro, sin `dependencies`, tests Vitest |
 | `apps/mobile` | App Expo (issue #39). Importa `@vuelto/motor` y guarda su estado en Redux; la recomendación y los topes son selectores (ADR-010, issue #81). Sincroniza el corpus y las compras del período desde Supabase (`src/sync/`, issue #42). Tests Vitest de cálculo, store, persistencia y sincronización; `npm run test:integracion -w @vuelto/mobile` prueba las consultas contra un Supabase local (Docker) |
-| `supabase` (`@vuelto/supabase`) | Edge Functions (`functions/`: `recomendar`, hoy fuera del camino de la app por ADR-010, y `_shared/`, tests Vitest); `migrations/` (esquema con RLS), `seed.sql` y `tests/database/` (pgTAP, `supabase test db`). Los `functions/*/index.ts` corren en Deno: los chequea `deno check` en el CI, no `tsc` |
+| `supabase` (`@vuelto/supabase`) | Edge Functions (`functions/`: `recomendar`, hoy fuera del camino de la app por ADR-010, y `_shared/`, tests Vitest); `migrations/` (esquema con RLS), `seed.sql` y `tests/database/` (pgTAP, `supabase test db`); `scripts/` (comparación de las migraciones del repo con las de la base alojada, ADR-013). Los `functions/*/index.ts` corren en Deno: los chequea `deno check` en el CI, no `tsc` |
 | `ingesta` (`@vuelto/ingesta`) | Ingesta automática de promociones de MODO (issue #35, ADR-011): `src/corpus/` con el listado de la API pública, el mapeo del detalle, la validación y la publicación en Supabase (capturas crudas, promos y bajas). La corre todos los días `.github/workflows/ingesta.yml`. Tests Vitest sin red. El extractor con Gemini de la letra chica (#50, #51) se suma acá |
 
 Comandos (desde la raíz; recorren todos los workspaces, los mismos que corre el CI):
@@ -51,6 +51,18 @@ El job `supabase-rls` levanta Supabase local, hace `supabase db reset` dos
 veces y corre `supabase test db` (requiere Docker). A mano, lo mismo desde la
 raíz; si los puertos por defecto (54321-54329) están ocupados por otro
 proyecto de Supabase, hay que frenarlo o cambiarlos solo en tu copia local.
+
+Migraciones (ADR-013). Mergear una migración de `supabase/migrations/` **no** la
+aplica a la base alojada: la aplica una persona (no la IA ni el CI), después de
+mergear. El PR que trae una migración lo recuerda con una casilla. El workflow
+`migraciones.yml` falla si el repo trae migraciones que la base alojada no tiene
+(y avisa por mail), pero no aplica nada. Con la CLI de Supabase ya vinculada
+(una vez: `supabase login` y `supabase link --project-ref <ref>`):
+
+```bash
+supabase migration list --linked   # qué migraciones le faltan a la base alojada (solo lectura)
+supabase db push --linked          # aplicar las que faltan
+```
 
 Un solo workspace: `npm run test -w @vuelto/motor`. Tests en modo watch:
 `npx vitest` dentro de `packages/motor`. Un workspace nuevo se suma a
