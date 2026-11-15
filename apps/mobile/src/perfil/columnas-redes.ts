@@ -5,11 +5,16 @@
  * ninguna red se corta ni se parte a media palabra.
  */
 
-/** Hueco entre cuadrados: es `space.sm` del tema. */
-export const HUECO_REDES = 8;
-/** Margen interno horizontal de cada cuadrado, a cada lado. */
-export const MARGEN_CUADRADO_REDES = 8;
-/** Ancho de «Mastercard» en `label` (13 pt) con letra del sistema normal, con un poco de aire. */
+import { space } from "../theme";
+
+/** Hueco entre cuadrados, en las dos direcciones. */
+export const HUECO_REDES = space.sm;
+/** Margen interno de cada cuadrado, a cada lado (horizontal) y arriba y abajo (vertical). */
+export const MARGEN_CUADRADO_REDES = space.sm;
+/**
+ * Ancho de «Mastercard», la palabra más larga, en `label` (13 pt) con letra del sistema normal, con un
+ * poco de aire. Se midió a mano: si cambia la tipografía de `label` o la lista de redes, revisarlo.
+ */
 const ANCHO_PALABRA_LARGA = 80;
 
 /** Ancho de cada cuadrado para `columnas` columnas en un contenedor de `ancho`. */

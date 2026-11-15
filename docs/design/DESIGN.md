@@ -318,16 +318,17 @@ juntas (las 9 redes), cuadrados de opción; entre comercios, cuadrados.
 
 **Control segmentado** (`segmentado.tsx`): rectángulo de 14 pt `surfaceStrong`
 con segmentos de 12 pt; el activo en `accent` con texto `onAccent`. **Solo para
-dos o tres opciones**: tipo de tarjeta (Débito · Crédito), Apariencia (Sistema ·
-Claro · Oscuro) y los datos de ejemplo. Los filtros de Compras y Mensual/Semanal en Topes siguen con el
+dos o tres opciones**: tipo de tarjeta (Débito · Crédito), Apariencia
+(Sistema · Claro · Oscuro) y los datos de ejemplo. Los filtros de Compras y Mensual/Semanal en Topes siguen con el
 nativo (`@react-native-segmented-control`).
 
 **Cuadrado de opción** (`grilla-redes.tsx`): para elegir una entre varias
 cortas, todas a la vista; hoy, la red de la tarjeta (9). Rectángulo de 16 pt
 `surfaceStrong` de 64 pt de alto o más, con el nombre entero en label,
 centrado y hasta en dos líneas. El elegido lleva borde de 2 pt en `accent` y
-un check de 22 pt en la esquina, así no depende solo del color; el borde
-siempre ocupa lugar para que no se corra nada. Rol de radio. Son 3 columnas;
+un check de 24 pt en la esquina, como la × del comercio marcable: así no
+depende solo del color. El borde siempre ocupa lugar para que no se corra
+nada. Rol de radio. Son 3 columnas;
 si «Mastercard» no entra en un cuadrado (celular angosto o letra grande del
 sistema) baja a 2 y, con letra muy grande, a 1 fila por opción
 (`columnasRedes`). Se mide el contenedor, no la ventana.

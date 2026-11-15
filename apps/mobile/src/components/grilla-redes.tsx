@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useWindowDimensions, View } from "react-native";
 import { anchoColumnaRedes, columnasRedes, HUECO_REDES, MARGEN_CUADRADO_REDES } from "@/perfil/columnas-redes";
 import { ETIQUETAS_RED, REDES, type Red } from "@/perfil/modelo";
-import { colors, radius, size } from "@/theme";
+import { colors, radius, size, space } from "@/theme";
 import { Icon } from "./icon";
 import { PressableScale } from "./pressable-scale";
 import { Text } from "./text";
@@ -68,17 +68,17 @@ export function GrillaRedes({ valor, onChange, accessibilityLabel }: Props) {
                     pointerEvents="none"
                     style={{
                       position: "absolute",
-                      top: -6,
-                      right: -6,
-                      width: 22,
-                      height: 22,
+                      top: -space.xs,
+                      right: -space.xs,
+                      width: 24,
+                      height: 24,
                       borderRadius: radius.pill,
                       backgroundColor: colors.accent,
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
-                    <Icon name="check" size={14} color={colors.onAccent} />
+                    <Icon name="check" size={16} color={colors.onAccent} />
                   </View>
                 ) : null}
               </View>

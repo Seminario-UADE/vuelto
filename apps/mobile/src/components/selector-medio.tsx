@@ -77,6 +77,11 @@ export function SelectorMedio({ bancos, medios, onAgregar }: Props) {
             style={{ flex: 1, minHeight: 44, fontFamily: fonts.regular, fontSize: escala.bodyLg.fontSize, color: colors.ink }}
           />
         </View>
+        {bancos.length === 0 ? (
+          <Text variant="bodyMd" tone="inkSecondary">
+            Todavía no hay bancos para mostrar. Volvé a intentar en un rato.
+          </Text>
+        ) : null}
         {q.trim() && resultados.length === 0 ? (
           <Text variant="bodyMd" tone="inkSecondary">
             Ese banco o emisor no está disponible en esta versión. Podés seguir con otro medio de pago.

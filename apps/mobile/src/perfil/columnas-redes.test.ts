@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { anchoColumnaRedes, columnasRedes } from "./columnas-redes";
+import { anchoColumnaRedes, columnasRedes, HUECO_REDES } from "./columnas-redes";
 
 describe("columnasRedes", () => {
   it("con ancho de sobra y letra normal entran 3 columnas (3 × 3 = las 9 redes)", () => {
@@ -37,7 +37,7 @@ describe("columnasRedes", () => {
   it("el ancho de cada columna reparte el ancho menos los huecos, sin pasarse", () => {
     for (const cols of [1, 2, 3] as const) {
       const w = anchoColumnaRedes(335, cols);
-      expect(w * cols + 8 * (cols - 1)).toBeLessThanOrEqual(335);
+      expect(w * cols + HUECO_REDES * (cols - 1)).toBeLessThanOrEqual(335);
       expect(w).toBeGreaterThan(0);
     }
   });
