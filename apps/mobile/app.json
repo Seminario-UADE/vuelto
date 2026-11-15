@@ -53,7 +53,15 @@
           }
         }
       ],
-      "expo-image"
+      "expo-image",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Vuelto usa la cámara para sacarle una foto al ticket y leer la compra. La foto no se guarda.",
+          "photosPermission": "Vuelto usa tus fotos solo para leer el ticket que elijas. La foto no se guarda.",
+          "microphonePermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

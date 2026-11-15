@@ -2650,6 +2650,115 @@ lo conecte a la pantalla de confirmar la compra.
 
 ---
 
+## 2026-11-14 — Spec de registrar una compra con la foto del ticket (issue #49)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit, `spec-critic` y `gh` CLI.
+
+**Objetivo:** conectar la app al servicio que lee el ticket (issue #48): sacar
+la foto, mandarla y llevar lo leído a «Revisá tu compra», sin que la foto
+quede en el celular.
+
+**Prompts principales:**
+1. "Arrancá con la issue #49." Antes de escribir la spec se acordó cómo sacar
+   la foto, qué hacer con el medio de pago, qué pasa sin cuenta y sin
+   descuento.
+2. "Había una opción que dentro de la app me dejaba sacar una foto, volver a
+   sacarla si no me gustaba, y no se guardaba en la memoria del celular." Es
+   la cámara del sistema: muestra «Repetir» y «Usar foto», y no la agrega a
+   la galería. Deja una copia temporal en la carpeta privada de la app, que
+   se borra enseguida.
+3. "Vamos con la cámara del sistema, borrar los temporales, el medio del
+   ticket solo como sugerencia, sin cuenta ofrecer iniciar sesión, sin
+   descuento y con un ticket de ejemplo para la demo."
+4. spec-critic marcó que la constitución decía que la foto nunca va a disco,
+   y en el celular eso es imposible. "1a y 2a": se aclara la constitución
+   (3.0.2: un temporal que se borra al terminar no cuenta como guardar la
+   foto) y la fecha pasa a poder cambiarse en «Revisá tu compra».
+5. "Commiteá y seguí con el plan." Tres librerías oficiales de Expo (cámara y
+   galería, achicar la foto, borrar archivos), la lógica en una carpeta
+   aparte que se prueba sin celular, y un calendario propio para la fecha
+   porque el de la comunidad no anda en la versión web de la app.
+6. "Commiteá y seguí con las tareas." 21 tareas en 3 etapas: la lógica
+   probada sin celular, la cámara y las pantallas (termina con la prueba del
+   usuario en su celular) y el cierre.
+7. "Commiteá y arrancá con la etapa 1." Toda la lógica, con las pruebas
+   escritas primero y vistas fallar antes del código: los mensajes de cada
+   error, la sugerencia del medio de pago, los días que se pueden elegir,
+   la llamada al servicio y el borrado de la foto en todos los casos.
+8. "Commiteá y seguí con la etapa 2." La cámara, «Escanear ticket», el
+   calendario y «Revisá tu compra». Antes de escribir el código que borra
+   las copias, se revisó en el código de las librerías de Expo en qué
+   carpetas las dejan, en vez de suponerlo.
+9. "Commiteá y hago la prueba en el celular." Para abrir la app en Expo Go
+   hubo vueltas: el login de Expo falla en Windows al abrir el navegador, así
+   que se arrancó sin cuenta de Expo (`--offline`). Además, faltaba el
+   archivo con la dirección de Supabase de la app, que cargó el usuario.
+10. "¿Cómo puedo probar alguno con reintegro? ¿No hay una librería que busque
+    por parecido?" La lectura anduvo, pero la compra quedó sin reintegro: el
+    ticket dice «COTO C.I.C.S.A.» y el catálogo dice «Coto». Idea del
+    usuario: sugerir el comercio más parecido. Quedó como la issue #134,
+    siempre como sugerencia que el usuario confirma.
+11. "Salió el mensaje de sin conexión, seguí con la etapa 3." Tres revisiones
+    en paralelo: las reglas del proyecto, el estilo del código y lo que pide
+    la spec.
+12. "El E1 no tiene mucho sentido: si la sacás de nuevo va a pesar similar."
+    Se aclaró que E1 no era la foto pesada, sino la que no se puede abrir
+    (dañada o en un formato raro), que con otra foto sí anda. "Dale, hacé el
+    E1."
+
+**Resultado:**
+- Spec 014: dos botones (cámara y galería del sistema), la foto achicada a
+  JPEG de 2,5 MB como máximo, las copias temporales borradas en todos los
+  casos, el medio del ticket como sugerencia solo si coincide con una sola
+  tarjeta, un mensaje y unas salidas para cada error, y la fecha editable.
+- La constitución (3.0.2), la política de privacidad, CLAUDE.md y el revisor
+  de reglas dicen qué pasa con la foto en el celular.
+- Dos pasadas de spec-critic: la primera encontró el choque con la
+  constitución y que el banco de la tarjeta nunca iba a coincidir con el del
+  ticket («Banco Galicia» contra «BCO GALICIA»); la segunda, contradicciones
+  con la spec 012 que se resolvieron.
+- Etapa 1 (lógica, 12 tareas): 80 pruebas nuevas, todas sin celular, más
+  las que se ajustaron de la compra por confirmar y los escenarios. Cubren
+  el mensaje y las salidas de cada error, cuándo una tarjeta lleva «El que
+  dice el ticket», qué días se pueden elegir, qué responde la app a cada
+  respuesta del servicio (incluidos los 30 segundos sin respuesta) y que la
+  foto y su copia achicada se borren en cada camino, aunque algo falle.
+- El medio del ticket ya no se marca solo en «Revisá tu compra»: queda como
+  sugerencia. En Perfil se suman los escenarios «Sin red» y «Ticket de
+  ejemplo» (este último con «VISA DEBITO», para la demo sin gastar el cupo
+  de Groq).
+- Etapa 2 (cámara y pantallas): «Escanear ticket» tiene «Sacar foto» y
+  «Elegir de la galería», y pide iniciar sesión si no hay cuenta. Muestra
+  «Leyendo el ticket…» mientras lee, y un mensaje con sus botones para cada
+  error. Al abrirse, borra las copias que hubieran quedado de una lectura
+  cortada. En «Revisá tu compra», la tarjeta que coincide con el ticket
+  lleva «El que dice el ticket» sin quedar marcada, y la fecha se cambia
+  tocándola, con un calendario que no deja elegir días fuera de lo
+  permitido.
+- Si el ticket dice una fecha anterior a la simulación, se propone el día de
+  la simulación, porque la compra no puede ser anterior.
+- La versión web de la app se sigue armando bien con las librerías nuevas, y
+  la key de Groq no aparece en ningún lado de la app.
+- Prueba en el celular (iPhone, con el servicio real): la cámara, la galería
+  y una foto HEIC leyeron bien y rápido; la foto no quedó en la galería; sin
+  permiso de cámara y sin conexión mostraron sus mensajes. «Sin sesión» no
+  se puede probar a mano porque la app no deja entrar sin cuenta.
+- Revisiones: no se rompe ninguna regla del proyecto. Se arreglaron dos
+  cosas de lo que pide la spec: si la sesión vence durante la lectura,
+  ahora siempre se ofrece iniciar sesión, en vez de «Algo falló»; y una foto
+  que no se puede abrir ya no dice «La foto es muy pesada», sino que ofrece
+  sacarla de nuevo. También se juntó en un solo lugar código que estaba
+  repetido y se corrigieron dos textos de la spec para que digan lo mismo
+  que lo decidido.
+- Los documentos de arquitectura ya dicen que la lectura del ticket es real
+  y qué pasa con la foto en el celular.
+- Error de la IA: en la primera explicación de E1 no quedó claro que se
+  trataba de la foto que no se abre, no de la pesada.
+- Queda pendiente: el PR, con la aclaración 3.0.2 de la constitución para
+  que la apruebe el PO.
+
+---
+
 ## 2026-11-15 — Presentación de la entrega del MVP (issue #131)
 
 **Herramienta:** Claude Code (Sonnet 5.5), con la skill `presentaciones-visuales`.

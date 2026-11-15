@@ -103,13 +103,10 @@ describe("borradorDesdePorConfirmar sin ticket (FR-006, FR-017)", () => {
     expect(r.borrador.monto).toBeNull();
   });
 
-  it("el mismo día: una sola fecha posible", () => {
-    expect(borradorDesdePorConfirmar(enCoto, null, "2026-10-14").fechasPosibles).toEqual(["2026-10-14"]);
-  });
-
-  it("otro día: el de la simulación primero y hoy después", () => {
+  it("los días posibles van del día de la simulación a hoy (spec 014, FR-010)", () => {
+    expect(borradorDesdePorConfirmar(enCoto, null, "2026-10-14").diasPosibles).toEqual({ desde: "2026-10-14", hoy: "2026-10-14" });
     const r = borradorDesdePorConfirmar(enCoto, null, "2026-10-15");
-    expect(r.fechasPosibles).toEqual(["2026-10-14", "2026-10-15"]);
+    expect(r.diasPosibles).toEqual({ desde: "2026-10-14", hoy: "2026-10-15" });
     expect(r.borrador.fecha).toBe("2026-10-14");
   });
 });
@@ -142,14 +139,21 @@ describe("antiguedad (la tarjeta «por confirmar», contracts/rutas.md)", () => 
   });
 });
 
-describe("borradorDesdePorConfirmar con ticket (FR-007 a FR-009)", () => {
-  const ticket = { monto: 24500, fecha: "2026-10-14", medioId: "galicia-visa-credito", textoExtraido: "COTO 24500" };
+describe("borradorDesdePorConfirmar con ticket (spec 012 FR-007, spec 014 FR-008 y FR-010)", () => {
+  const ticket = { monto: 24500, fecha: "2026-10-14", medioSugeridoTicket: "galicia-visa-credito", textoExtraido: "COTO 24500" };
 
   it("guarda como ticket, con los datos del ticket y el comercio de la compra por confirmar", () => {
     const r = borradorDesdePorConfirmar(enCoto, ticket, "2026-10-14");
-    expect(r.borrador).toMatchObject({ modo: "ticket", comercio: "Coto", monto: 24500, medioId: "galicia-visa-credito", textoExtraido: "COTO 24500" });
+    expect(r.borrador).toMatchObject({ modo: "ticket", comercio: "Coto", monto: 24500, textoExtraido: "COTO 24500" });
     expect(r.avisos).toEqual([]);
-    expect(r.medioSugerido).toBeNull();
+  });
+
+  it("el medio nunca va marcado, aunque el ticket sugiera uno (FR-008)", () => {
+    expect(borradorDesdePorConfirmar(enCoto, ticket, "2026-10-14").borrador.medioId).toBeNull();
+  });
+
+  it("si la sugerencia del ticket es el medio simulado, una sola nota: no va la de la simulación", () => {
+    expect(borradorDesdePorConfirmar(enCoto, ticket, "2026-10-14").medioSugerido).toBeNull();
   });
 
   it("lo que el ticket no trae sale de la compra por confirmar", () => {
@@ -158,20 +162,31 @@ describe("borradorDesdePorConfirmar con ticket (FR-007 a FR-009)", () => {
     expect(r.borrador.fecha).toBe("2026-10-14");
   });
 
-  it("si el ticket no dice el medio, no lo preselecciona y sugiere el de la simulación (FR-008)", () => {
-    const r = borradorDesdePorConfirmar(enCoto, { ...ticket, medioId: null }, "2026-10-14");
+  it("sin sugerencia del ticket, vale la nota de la simulación (spec 012 FR-008)", () => {
+    const r = borradorDesdePorConfirmar(enCoto, { ...ticket, medioSugeridoTicket: null }, "2026-10-14");
     expect(r.borrador.medioId).toBeNull();
     expect(r.medioSugerido).toBe("galicia-visa-credito");
+    expect(r.avisos).toEqual([]);
   });
 
-  it("avisa si el monto o el medio del ticket difieren (FR-009)", () => {
-    const r = borradorDesdePorConfirmar(enCoto, { ...ticket, monto: 25000, medioId: "macro-visa-debito" }, "2026-10-14");
-    expect(r.borrador).toMatchObject({ monto: 25000, medioId: "macro-visa-debito" });
+  it("avisa si el monto o la sugerencia del ticket difieren de la simulación", () => {
+    const r = borradorDesdePorConfirmar(enCoto, { ...ticket, monto: 25000, medioSugeridoTicket: "macro-visa-debito" }, "2026-10-14");
+    expect(r.borrador).toMatchObject({ monto: 25000, medioId: null });
+    expect(r.medioSugerido).toBeNull();
     expect(r.avisos).toEqual(["monto-distinto", "medio-distinto"]);
   });
 
   it("sin monto simulado no avisa diferencia de monto", () => {
     const r = borradorDesdePorConfirmar({ ...enCoto, monto: null }, { ...ticket, monto: 9000 }, "2026-10-14");
     expect(r.avisos).toEqual([]);
+  });
+
+  it("los días posibles van del día de la simulación a hoy (FR-010)", () => {
+    expect(borradorDesdePorConfirmar(enCoto, ticket, "2026-10-16").diasPosibles).toEqual({ desde: "2026-10-14", hoy: "2026-10-16" });
+  });
+
+  it("una fecha del ticket anterior a la simulación no se propone: va el día de la simulación (spec 012 FR-013)", () => {
+    expect(borradorDesdePorConfirmar(enCoto, { ...ticket, fecha: "2026-10-10" }, "2026-10-16").borrador.fecha).toBe("2026-10-14");
+    expect(borradorDesdePorConfirmar(enCoto, { ...ticket, fecha: "2026-10-15" }, "2026-10-16").borrador.fecha).toBe("2026-10-15");
   });
 });

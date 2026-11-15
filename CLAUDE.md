@@ -119,7 +119,10 @@ Si cambia `packages/motor/src`, recompilarlo (`npm run build -w @vuelto/motor`) 
   Function de Supabase (ADR-012).
 - **Las imágenes de ticket no se persisten** (se mandan a Groq y se
   descartan; no se escriben a disco ni a Supabase Storage en ningún paso del
-  camino). Sí se persiste el texto extraído junto al registro de compra.
+  camino). En el celular, los archivos temporales de la cámara y del achicado
+  se borran en cuanto termina la lectura, y la foto nunca va a la galería
+  (constitución §IV). Sí se persiste el texto extraído junto al registro de
+  compra.
   Detalle completo de qué se guarda y por cuánto tiempo:
   `docs/product/privacidad.md`.
 - **La ingesta de promociones es 100% automática, sin revisión humana.** El

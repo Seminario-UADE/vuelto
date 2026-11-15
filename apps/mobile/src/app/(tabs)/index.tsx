@@ -10,7 +10,7 @@ import { SectionHeader } from "@/components/section-header";
 import { Text } from "@/components/text";
 import { TopeFila } from "@/components/tope-card";
 import { TortaTopes } from "@/components/torta-topes";
-import { fechaLarga, pesos } from "@/lib/format";
+import { conMayuscula, fechaLarga, pesos } from "@/lib/format";
 import { useAppSelector } from "@/store/hooks";
 import { selectPorConfirmarVigentes } from "@/store/por-confirmar";
 import { selectHoy, selectResumenCompras, selectTopes, selectUsoDeTopes } from "@/store/selectores";
@@ -42,7 +42,7 @@ export default function Inicio() {
     <Screen kind="tab" aboveTabBar gap={space.xl}>
       <PanelInicio
         nombre={nombre}
-        fecha={fechaLarga(hoy).replace(/^./, (c) => c.toUpperCase())}
+        fecha={conMayuscula(fechaLarga(hoy))}
         devolvieron={sinCompras ? null : { monto, base: base.texto }}
         etiqueta={
           sinCompras

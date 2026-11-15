@@ -1,5 +1,18 @@
 <!--
 Sync Impact Report
+- Versión: 3.0.1 → 3.0.2 (PATCH: aclaración del Principio IV)
+- Principios modificados:
+  - IV. "Secretos y privacidad": se aclara qué pasa con la foto en el celular. La cámara, la
+    galería y el achicado dejan un archivo temporal en la carpeta privada de la app; se borra en
+    cuanto termina la lectura y no cuenta como persistir. Nunca va a la galería.
+- Decisión de origen: spec 014 (issue #49), hallazgo de spec-critic; aprobada por el usuario.
+  Requiere la aprobación del PO en el PR que la introduce.
+- Archivos alineados:
+  ✅ CLAUDE.md, docs/product/privacidad.md, .claude/agents/rules-guardian.md y
+     .agents/agents/rules-guardian.md
+- Pendientes: ninguno.
+
+Versión anterior (3.0.1):
 - Versión: 3.0.0 → 3.0.1 (PATCH: cambia el proveedor del extractor del ticket; ningún principio
   cambia de sentido)
 - Principios modificados:
@@ -112,6 +125,9 @@ innovación de la materia.
   procesa en el script de ingesta y el ticket en una Edge Function de Supabase.
 - La service role key la usa solo el proceso de ingesta. No aparece en el cliente ni en el repo.
 - Las imágenes de ticket NUNCA se persisten: no van a disco, a Storage, a la base ni a los logs.
+  En el celular, la cámara, la galería y el achicado de la foto dejan un archivo temporal en la
+  carpeta privada de la app: se borra en cuanto termina la lectura, con éxito, con error o
+  cancelada, y no cuenta como persistir. La foto nunca se agrega a la galería.
   Sí se persiste el texto extraído junto al registro de compra.
 - Toda tabla nueva de Supabase lleva su row-level security **en la misma migración** que la crea.
 - Cualquier cambio sobre datos de usuario DEBE ser consistente con `docs/product/privacidad.md`.
@@ -184,4 +200,4 @@ tiempo.
 - La guía operativa del día a día está en `CLAUDE.md`. Si contradice a esta constitución, se
   corrige `CLAUDE.md`.
 
-**Version**: 3.0.1 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-11-10
+**Version**: 3.0.2 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-11-14
