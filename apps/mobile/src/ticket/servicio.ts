@@ -6,7 +6,7 @@
 
 import { FunctionsFetchError, FunctionsHttpError, type SupabaseClient } from "@supabase/supabase-js";
 import type { LecturaApp } from "../data/contracts";
-import { ETIQUETAS_RED, ETIQUETAS_TIPO } from "../perfil/modelo";
+import { esRed, esTipoTarjeta } from "../perfil/modelo";
 import { resultadoDeCodigo, type ResultadoLectura } from "./resultados";
 import type { MedioLeido } from "./sugerencia";
 
@@ -25,9 +25,9 @@ function medioDelContrato(v: unknown): MedioLeido | null {
   if (typeof v !== "object" || v === null) return null;
   const { banco, tipo, red, ultimos4 } = v as Record<string, unknown>;
   if (!textoONull(banco) || !textoONull(ultimos4)) return null;
-  if (tipo !== null && !(typeof tipo === "string" && Object.hasOwn(ETIQUETAS_TIPO, tipo))) return null;
-  if (red !== null && !(typeof red === "string" && Object.hasOwn(ETIQUETAS_RED, red))) return null;
-  return { banco, ultimos4, tipo, red } as MedioLeido;
+  if (tipo !== null && !esTipoTarjeta(tipo)) return null;
+  if (red !== null && !esRed(red)) return null;
+  return { banco, ultimos4, tipo, red };
 }
 
 /** La respuesta 200 del contrato; cualquier otra forma es `interno`. */
@@ -50,8 +50,12 @@ function lecturaDelContrato(data: unknown): LecturaApp {
 async function resultadoDeError(error: unknown): Promise<ResultadoLectura> {
   if (error instanceof FunctionsFetchError) return "sin_conexion";
   if (error instanceof FunctionsHttpError) {
+    const respuesta = error.context as Response;
+    // La puerta de Supabase rechaza una sesión vencida antes de llegar al servicio, con su propio
+    // cuerpo: un 401 es siempre «Tu sesión venció» (spec 014, edge case de la sesión).
+    if (respuesta.status === 401) return "no_autenticado";
     try {
-      const cuerpo: unknown = await (error.context as Response).json();
+      const cuerpo: unknown = await respuesta.json();
       return resultadoDeCodigo(typeof cuerpo === "object" && cuerpo !== null ? (cuerpo as { error?: unknown }).error : null);
     } catch {
       return "interno";

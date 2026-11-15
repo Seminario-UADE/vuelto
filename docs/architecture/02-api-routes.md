@@ -68,7 +68,7 @@ cambiar el cuerpo de esa función.
 
 | Función | Endpoint | Estado |
 |---|---|---|
-| `leerTicket({ ilegible })` | `POST /functions/v1/extraer-ticket` (#48) | Mock. El endpoint ya existe; conectarlo es la issue #49: adaptar `LecturaTicket` al contrato (el medio viene tal como lo dice el ticket y se cruza con el perfil; no hay descuento), mandar la foto en JPEG (el iPhone saca HEIC) y achicarla a 2,5 MB como máximo |
+| Leer el ticket | `POST /functions/v1/extraer-ticket` (#48) | **Conectado** (issue #49, spec 014). No pasa por `api.ts`: `ticket/leer.ts` achica la foto a JPEG de 2,5 MB como máximo, la manda con `ticket/servicio.ts` (`functions.invoke`, con la sesión del usuario, 30 s de espera) y borra las copias temporales en todos los caminos. La respuesta llega como `LecturaApp`: el medio tal como lo dice el ticket, que «Revisá» solo sugiere. `api.leerTicket({ hoy, escenario })` queda para los escenarios de desarrollo («Ticket de ejemplo», «Ticket ilegible», «Sin red»), sin cámara ni servicio |
 | `recomendarGrupo(pedido, comercio?)` | `POST /functions/v1/recomendar-grupo` (#56) | Reemplazo local (`grupo-simulado.ts`) que evalúa a cada integrante con el motor; de los contactos solo viaja lo de ADR-008 §3 |
 | `verInvitacion`, `aceptarInvitacion`, `quitarContacto`, `crearInvitacion` | Edge Function y RPC `security definer` (ADR-008 §4) | Mock |
 | Escribir y borrar compras (`public.compras`) | Supabase directo con RLS (ADR-009), desde la cola de subida (spec 010) | Repositorio escrito y probado contra Supabase local; **sin conectar** hasta #40, #41 y #42 |

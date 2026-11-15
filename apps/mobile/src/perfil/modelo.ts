@@ -32,6 +32,15 @@ export const ETIQUETAS_TIPO: Record<TipoTarjeta, string> = {
 export const REDES = Object.keys(ETIQUETAS_RED) as Red[];
 export const TIPOS_TARJETA = Object.keys(ETIQUETAS_TIPO) as TipoTarjeta[];
 
+/** Para lo que llega como texto (el servicio del ticket, los parámetros de una ruta). */
+export function esRed(v: unknown): v is Red {
+  return typeof v === "string" && Object.hasOwn(ETIQUETAS_RED, v);
+}
+
+export function esTipoTarjeta(v: unknown): v is TipoTarjeta {
+  return typeof v === "string" && Object.hasOwn(ETIQUETAS_TIPO, v);
+}
+
 /** Banco del catálogo de MODO. */
 export type Banco = {
   id: string;

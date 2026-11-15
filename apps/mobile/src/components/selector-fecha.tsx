@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pressable, View } from "react-native";
-import { fechaLarga, nombreDelMes } from "@/lib/format";
+import { conMayuscula, fechaLarga, nombreDelDia, nombreDelMes } from "@/lib/format";
 import { colors, radius, size, space } from "@/theme";
 import { diasDelMes, mesDe, otroMes, puedeIrAlMes, type RangoDeDias } from "@/ticket/fechas";
 import { Icon } from "./icon";
@@ -13,9 +13,6 @@ type Props = {
 };
 
 const INICIALES = ["D", "L", "M", "M", "J", "V", "S"];
-const DIAS_SEMANA = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
-
-const mayuscula = (texto: string) => texto.replace(/^./, (c) => c.toUpperCase());
 
 function Flecha({ atras, habilitada, onPress }: { atras: boolean; habilitada: boolean; onPress: () => void }) {
   return (
@@ -71,7 +68,7 @@ export function SelectorFecha({ valor, rango, onChange }: Props) {
       >
         <Icon name="calendario" size={18} />
         <Text variant="bodyMd" style={{ flex: 1 }}>
-          {mayuscula(fechaLarga(valor))}
+          {conMayuscula(fechaLarga(valor))}
         </Text>
         <Icon name="editar" size={16} color={colors.inkSecondary} />
       </Pressable>
@@ -81,7 +78,7 @@ export function SelectorFecha({ valor, rango, onChange }: Props) {
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Flecha atras habilitada={puedeIrAlMes(otroMes(mes, -1), rango)} onPress={() => setMes(otroMes(mes, -1))} />
             <Text variant="bodyMd" weight="semibold" align="center" accessibilityRole="header" style={{ flex: 1 }}>
-              {mayuscula(nombreDelMes(mes))}
+              {conMayuscula(nombreDelMes(mes))}
             </Text>
             <Flecha atras={false} habilitada={puedeIrAlMes(otroMes(mes, 1), rango)} onPress={() => setMes(otroMes(mes, 1))} />
           </View>
@@ -106,7 +103,7 @@ export function SelectorFecha({ valor, rango, onChange }: Props) {
                     }}
                     disabled={!c.permitido}
                     accessibilityRole="button"
-                    accessibilityLabel={`${DIAS_SEMANA[c.diaDeLaSemana]} ${numero}`}
+                    accessibilityLabel={`${nombreDelDia(c.diaDeLaSemana)} ${numero}`}
                     accessibilityState={{ disabled: !c.permitido, selected: elegido }}
                     style={{
                       width: size.hit - 4,

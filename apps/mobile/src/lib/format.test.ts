@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aprox, diaDelMes, fechaCorta, fechaLarga, iniciales, montoEditable, nombreDelMes, parseMonto, pesos } from "./format";
+import { aprox, conMayuscula, diaDelMes, fechaCorta, fechaLarga, iniciales, montoEditable, nombreDelDia, nombreDelMes, parseMonto, pesos } from "./format";
 
 describe("format", () => {
   it("pesos con punto de miles", () => {
@@ -27,6 +27,10 @@ describe("format", () => {
     expect(diaDelMes("2026-10-14")).toBe("Miércoles 14");
     expect(fechaLarga("2026-10-14")).toBe("miércoles 14 de octubre");
     expect(nombreDelMes("2026-11")).toBe("noviembre de 2026");
+    expect(nombreDelDia(0)).toBe("domingo");
+    expect(nombreDelDia(3)).toBe("miércoles");
+    expect(conMayuscula("miércoles 14 de octubre")).toBe("Miércoles 14 de octubre");
+    expect(conMayuscula("")).toBe("");
   });
 
   it("iniciales", () => {

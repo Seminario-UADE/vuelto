@@ -41,7 +41,7 @@ description: "Tareas para registrar una compra con la foto del ticket (issue #49
 
 - [X] T008 [P] [US1] Escribir `src/ticket/servicio.test.ts` (research R3) con un cliente de Supabase falso: 200 → la lectura con el medio leído tal cual; `FunctionsHttpError` con cada código del contrato → su `ResultadoLectura`; un cuerpo que no es del contrato → `interno`; `FunctionsFetchError` → `sin_conexion`; `FunctionsRelayError` → `interno`; 30 s sin respuesta → `tardo_demasiado` (temporizador simulado). El pedido manda `{ imagen, tipo: "image/jpeg" }` a `extraer-ticket` y nunca una key.
 - [X] T009 [US1] Implementar `src/ticket/servicio.ts` (`pedirLectura(cliente, base64, { limiteMs })`). Hace pasar T008.
-- [X] T010 [P] [US2] Escribir `src/ticket/leer.test.ts` con `preparar`, `borrar` y `pedir` simulados: éxito → `LecturaApp` y los temporales borrados antes de devolver; cada error del servicio → su resultado y los temporales borrados; `preparar` que falla o que no baja de 2,5 MB → `imagen_demasiado_grande`, sin pedir y con los temporales borrados; un `borrar` que falla no cambia el resultado; las rutas de web (`blob:`, `data:`) no se borran. Un test por camino (SC-002).
+- [X] T010 [P] [US2] Escribir `src/ticket/leer.test.ts` con `preparar`, `borrar` y `pedir` simulados: éxito → `LecturaApp` y los temporales borrados antes de devolver; cada error del servicio → su resultado y los temporales borrados; `preparar` que falla (foto que no se puede abrir) → `foto_no_valida` y una que no baja de 2,5 MB → `imagen_demasiado_grande`, en los dos casos sin pedir y con los temporales borrados; un `borrar` que falla no cambia el resultado; las rutas de web (`blob:`, `data:`) no se borran. Un test por camino (SC-002).
 - [X] T011 [US2] Implementar `src/ticket/leer.ts` (`leerFoto(foto, deps)`: preparar → pedir → traducir, con el borrado en un `finally`). Hace pasar T010.
 - [X] T012 [US1] Cambiar `LecturaTicket` por `LecturaApp` en `src/data/contracts.ts` (data-model) y adaptar `src/data/api.ts` (`leerTicket` solo para escenarios) y `src/data/fixtures.ts` (el ticket de ejemplo con `VISA DEBITO`); sumar el escenario `"ticket-de-ejemplo"` en `src/store/acciones.ts` y su opción en Perfil. Ajustar `src/data/api.test.ts`.
 
@@ -60,7 +60,7 @@ description: "Tareas para registrar una compra con la foto del ticket (issue #49
 - [X] T015 [US1] [US3] Rehacer `src/app/escanear.tsx`: sin sesión, «Iniciá sesión para leer tickets» con «Iniciar sesión» y «Cargar a mano» (FR-002); con sesión, «Sacar foto» y «Elegir de la galería»; permiso negado (FR-003); «Leyendo el ticket…» sin poder disparar otra (FR-006); cada resultado con el mensaje y las salidas de `resultados.ts` (FR-011); `limpiarTemporales()` al abrir (FR-007); los escenarios de desarrollo con `api.leerTicket` (FR-012). Al leer bien, abre «Revisá» con `medioRed`, `medioTipo` y `medioBanco`.
 - [X] T016 [P] [US1] Escribir `src/components/selector-fecha.tsx`: una hoja con el calendario del mes, con los colores del tema, flechas de mes, días fuera del rango deshabilitados (`fechas.ts`) y etiquetas accesibles.
 - [X] T017 [US1] Ajustar `src/app/revisa.tsx`: la sugerencia del ticket con `sugerencia.ts` y sus notas y mensajes (FR-008); los avisos de monto y de medio con sus textos nuevos; el medio nunca marcado en modo `ticket`; la fecha editable con `selector-fecha.tsx` y el rango de FR-010 (reemplaza la lista de dos días); sin campo de descuento.
-- [ ] T018 [US1] Prueba a mano en el celular (quickstart §2), la corre el usuario: cámara, «Repetir», galería, HEIC, la nota del medio, la fecha, que la foto no aparezca en la galería, sin sesión, sin permiso, modo avión, y 10 lecturas cronometradas (SC-001).
+- [X] T018 [US1] Prueba a mano en el celular (quickstart §2), la corre el usuario: cámara, «Repetir», galería, HEIC, la nota del medio, la fecha, que la foto no aparezca en la galería, sin sesión, sin permiso, modo avión, y 10 lecturas cronometradas (SC-001).
 
 **Checkpoint**: las tres historias andando en el celular.
 
@@ -68,9 +68,9 @@ description: "Tareas para registrar una compra con la foto del ticket (issue #49
 
 ## Phase 4: Polish
 
-- [ ] T019 Correr `npm run lint`, `npm run typecheck`, `npm run test` y `npm run build` desde la raíz; buscar la key del proveedor en la app (`git grep -i "groq_api_key\|gsk_" apps/mobile`, 0 resultados, SC-005).
-- [ ] T020 `rules-guardian` y `/code-review` sobre el diff; corregir lo que surja.
-- [ ] T021 Actualizar `docs/architecture/02-api-routes.md` y `docs/architecture/03-frontend.md` (la lectura del ticket ya no es simulada) y completar la entrada de la issue #49 en `docs/bitacora-prompts.md`, mostrándola antes del commit.
+- [X] T019 Correr `npm run lint`, `npm run typecheck`, `npm run test` y `npm run build` desde la raíz; buscar la key del proveedor en la app (`git grep -i "groq_api_key\|gsk_" apps/mobile`, 0 resultados, SC-005).
+- [X] T020 `rules-guardian` y `/code-review` sobre el diff; corregir lo que surja.
+- [X] T021 Actualizar `docs/architecture/02-api-routes.md` y `docs/architecture/03-frontend.md` (la lectura del ticket ya no es simulada) y completar la entrada de la issue #49 en `docs/bitacora-prompts.md`, mostrándola antes del commit.
 
 ---
 

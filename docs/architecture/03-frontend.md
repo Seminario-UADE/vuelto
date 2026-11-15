@@ -140,7 +140,10 @@ selectMarcasDeSubida = cola → qué compras están «Sin subir» o «Solo en es
   y borra `vuelto.corpus.v1`. La leyenda «Promos actualizadas hace X» sale de `selectFrescura`. La mezcla de
   las compras del servidor con las locales es `reconciliarCompras` (`sync/compras.ts`), la única costura con
   #44: la escritura de compras y la cola de subida son de esa issue y `EstadoCompras` sigue siendo `{ lista }`.
-- **Lo asíncrono** (catálogos, ticket, invitaciones, grupo) sigue en `api.ts` con `useAsync`.
+- **Lo asíncrono** (catálogos, invitaciones, grupo) sigue en `api.ts` con `useAsync`. El ticket
+  tiene su propia carpeta, `src/ticket/` (issue #49, spec 014): lógica pura que recibe lo nativo y el
+  cliente de Supabase por parámetro (`leer.ts`, `servicio.ts`, `sugerencia.ts`, `resultados.ts`,
+  `fechas.ts`) y un adaptador fino de Expo sin tests (`camara.ts`).
 - La sesión de Supabase (`src/lib/supabase.ts`, AsyncStorage) la usa la sincronización; sin variables
   de entorno no se sincroniza y la app sigue con lo guardado. Sin sesión baja igual el corpus (la base
   deja leer bancos, categorías y promociones sin cuenta, issue #112) y no pide compras. El login es #40.
@@ -183,9 +186,10 @@ selectMarcasDeSubida = cola → qué compras están «Sin subir» o «Solo en es
   integrante con el motor sobre sus datos de ejemplo, con el reloj en la fecha del grupo; la app
   recibe solo lo de ADR-008 §3. Lo importa solo `api.ts`.
 - `api.ts`: lo que sale a la red, con la firma del cliente real (`02-api-routes.md`): catálogos,
-  ticket, invitaciones y grupo.
-- Escenarios de prueba (solo desarrollo, en Perfil): mes sin compras y ticket ilegible, para ver los
-  estados vacíos y de error.
+  invitaciones, grupo y la lectura simulada del ticket para los escenarios.
+- Escenarios de prueba (solo desarrollo, en Perfil): mes sin compras, ticket ilegible, sin red y
+  ticket de ejemplo, para ver los estados vacíos y de error y hacer la demo sin cámara ni cupo de
+  Groq.
 
 ## Tema, tipografía e íconos
 
@@ -221,8 +225,14 @@ selectMarcasDeSubida = cola → qué compras están «Sin subir» o «Solo en es
 ## Privacidad en el cliente
 
 - Solo variables `EXPO_PUBLIC_*`. Nunca la service role key ni la de Gemini.
-- No hay cámara en esta versión: Escanear muestra un ticket de ejemplo y no crea archivos de
-  imagen. La captura real se diseña con la Edge Function del ticket (Principio IV).
+- La app nunca tiene la key de Groq: la foto va a `extraer-ticket` con la sesión del usuario.
+- La foto del ticket (Principio IV, constitución 3.0.2): la cámara y la galería del sistema
+  (`expo-image-picker`, sin `saveToPhotos`, así que nunca va a la galería), el achicado a JPEG
+  (`expo-image-manipulator`) y el borrado (`expo-file-system`). Las copias temporales se borran al
+  terminar cada lectura, salga bien o mal, y al abrir «Escanear ticket» se vacían las carpetas de
+  caché `ImagePicker/` e `ImageManipulator/` por si quedó algo de una lectura cortada. La foto no
+  pasa por el store, la persistencia, los parámetros de ruta ni los registros; sí se guarda el
+  texto del ticket con la compra.
 
 ## Comandos
 

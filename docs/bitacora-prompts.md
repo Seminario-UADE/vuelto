@@ -2689,6 +2689,22 @@ quede en el celular.
    calendario y «Revisá tu compra». Antes de escribir el código que borra
    las copias, se revisó en el código de las librerías de Expo en qué
    carpetas las dejan, en vez de suponerlo.
+9. "Commiteá y hago la prueba en el celular." Para abrir la app en Expo Go
+   hubo vueltas: el login de Expo falla en Windows al abrir el navegador, así
+   que se arrancó sin cuenta de Expo (`--offline`). Además, faltaba el
+   archivo con la dirección de Supabase de la app, que cargó el usuario.
+10. "¿Cómo puedo probar alguno con reintegro? ¿No hay una librería que busque
+    por parecido?" La lectura anduvo, pero la compra quedó sin reintegro: el
+    ticket dice «COTO C.I.C.S.A.» y el catálogo dice «Coto». Idea del
+    usuario: sugerir el comercio más parecido. Quedó como la issue #134,
+    siempre como sugerencia que el usuario confirma.
+11. "Salió el mensaje de sin conexión, seguí con la etapa 3." Tres revisiones
+    en paralelo: las reglas del proyecto, el estilo del código y lo que pide
+    la spec.
+12. "El E1 no tiene mucho sentido: si la sacás de nuevo va a pesar similar."
+    Se aclaró que E1 no era la foto pesada, sino la que no se puede abrir
+    (dañada o en un formato raro), que con otra foto sí anda. "Dale, hacé el
+    E1."
 
 **Resultado:**
 - Spec 014: dos botones (cámara y galería del sistema), la foto achicada a
@@ -2723,8 +2739,23 @@ quede en el celular.
   la simulación, porque la compra no puede ser anterior.
 - La versión web de la app se sigue armando bien con las librerías nuevas, y
   la key de Groq no aparece en ningún lado de la app.
-- Queda pendiente: la prueba en el celular (la corre el usuario) y la etapa
-  3 (las revisiones, la documentación y el PR).
+- Prueba en el celular (iPhone, con el servicio real): la cámara, la galería
+  y una foto HEIC leyeron bien y rápido; la foto no quedó en la galería; sin
+  permiso de cámara y sin conexión mostraron sus mensajes. «Sin sesión» no
+  se puede probar a mano porque la app no deja entrar sin cuenta.
+- Revisiones: no se rompe ninguna regla del proyecto. Se arreglaron dos
+  cosas de lo que pide la spec: si la sesión vence durante la lectura,
+  ahora siempre se ofrece iniciar sesión, en vez de «Algo falló»; y una foto
+  que no se puede abrir ya no dice «La foto es muy pesada», sino que ofrece
+  sacarla de nuevo. También se juntó en un solo lugar código que estaba
+  repetido y se corrigieron dos textos de la spec para que digan lo mismo
+  que lo decidido.
+- Los documentos de arquitectura ya dicen que la lectura del ticket es real
+  y qué pasa con la foto en el celular.
+- Error de la IA: en la primera explicación de E1 no quedó claro que se
+  trataba de la foto que no se abre, no de la pesada.
+- Queda pendiente: el PR, con la aclaración 3.0.2 de la constitución para
+  que la apruebe el PO.
 
 ---
 

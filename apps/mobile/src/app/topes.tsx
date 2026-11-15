@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/empty-state";
 import { Screen } from "@/components/screen";
 import { Text } from "@/components/text";
 import { TopeDetalle } from "@/components/tope-card";
-import { aprox } from "@/lib/format";
+import { aprox, conMayuscula } from "@/lib/format";
 import { useAppSelector } from "@/store/hooks";
 import { selectTopes } from "@/store/selectores";
 import { space } from "@/theme";
@@ -19,7 +19,7 @@ export default function Topes() {
   // Derivados con el motor sobre las compras del store: una compra guardada los cambia al instante.
   const datos = useAppSelector(selectTopes);
   const vacio = datos.devolvieron.monto === 0 && datos.medios.every((m) => m.disponible === null);
-  const mes = datos.mes.replace(/^./, (c) => c.toUpperCase());
+  const mes = conMayuscula(datos.mes);
 
   return (
     <Screen gap={space.xl}>

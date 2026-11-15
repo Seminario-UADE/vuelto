@@ -80,6 +80,13 @@ describe("pedirLectura", () => {
     expect(await pedirLectura(c, "QUJD", LIMITE)).toEqual({ ok: false, resultado });
   });
 
+  it("un 401 de la puerta de Supabase (sesión vencida, antes de llegar al servicio) → no_autenticado", async () => {
+    for (const cuerpo of [{ code: 401, message: "Invalid JWT" }, { msg: "Missing authorization header" }, "Unauthorized"]) {
+      const { cliente: c } = cliente(async () => ({ data: null, error: errorHttp(401, cuerpo) }));
+      expect(await pedirLectura(c, "QUJD", LIMITE)).toEqual({ ok: false, resultado: "no_autenticado" });
+    }
+  });
+
   it("un error HTTP con un cuerpo fuera del contrato → interno", async () => {
     for (const cuerpo of ["<html>Bad Gateway</html>", { mensaje: "otra cosa" }, { error: "nuevo_codigo" }]) {
       const { cliente: c } = cliente(async () => ({ data: null, error: errorHttp(502, cuerpo) }));

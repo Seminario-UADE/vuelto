@@ -83,7 +83,7 @@ Si no hay sesión, no hay conexión, la foto no se puede leer o el servicio no e
 ### Edge Cases
 
 - **Comercio del ticket que no coincide con la compra por confirmar** y **fecha anterior a la simulación**: siguen la spec 012 (US2-5, US2-6, FR-013).
-- **El banco del ticket** («BCO GALICIA») se compara con el de la tarjeta («Banco Galicia») sin las palabras «banco», «bco» ni «bco.», sin mayúsculas, tildes ni puntuación. Si la tarjeta no tiene banco cargado, el banco no filtra.
+- **El banco del ticket** («BCO GALICIA») se compara con el de la tarjeta («Banco Galicia») sin las palabras «banco», «bco» ni «bco.», sin mayúsculas, tildes ni puntuación: coincide si el banco de la tarjeta aparece entero dentro del que dice el ticket («BBVA FRANCES» coincide con «BBVA»; data-model). Si la tarjeta no tiene banco cargado, el banco no filtra.
 - **El ticket trae solo el tipo** («TARJETA DE CREDITO», sin red): sigue FR-008 igual que con la red. Si el perfil tiene una sola tarjeta de crédito, lleva «El que dice el ticket»; si tiene ninguna o varias, aparece «El ticket dice crédito, pero no sabemos cuál de tus tarjetas es».
 - **El ticket trae últimos 4 dígitos**: el perfil no los guarda, así que no cambian la sugerencia. Se ven en el texto del ticket.
 - **La foto no se puede achicar a 2,5 MB**: se muestra el mensaje de `imagen_demasiado_grande` sin mandarla.
@@ -110,7 +110,7 @@ Si no hay sesión, no hay conexión, la foto no se puede leer o el servicio no e
 
 **Privacidad de la foto**
 
-- **FR-007**: Las copias temporales de la foto en la carpeta privada de la app (la que dejan la cámara o la galería y la achicada) MUST borrarse en cuanto termina la lectura, con éxito, con error o cancelada, y antes de que el usuario pueda seguir. Al abrir «Escanear ticket», la app MUST borrar las que hubieran quedado de una lectura interrumpida: las copias achicadas viven en una carpeta propia de la app para fotos de tickets, que se vacía entera, y la carpeta donde el selector de fotos deja sus copias se vacía también, porque la app no la usa para nada más. La foto MUST NOT agregarse a la galería ni guardarse en el estado de la app, en su persistencia ni en los registros, y la app MUST NOT tocar las fotos que el usuario ya tenía en su galería (constitución 3.0.2 §IV).
+- **FR-007**: Las copias temporales de la foto en la carpeta privada de la app (la que dejan la cámara o la galería y la achicada) MUST borrarse en cuanto termina la lectura, con éxito, con error o cancelada, y antes de que el usuario pueda seguir. Al abrir «Escanear ticket», la app MUST borrar las que hubieran quedado de una lectura interrumpida: se vacían enteras las dos carpetas de caché donde dejan sus copias el selector de fotos y el achicador, porque la app no las usa para nada más (research R4). La foto MUST NOT agregarse a la galería ni guardarse en el estado de la app, en su persistencia ni en los registros, y la app MUST NOT tocar las fotos que el usuario ya tenía en su galería (constitución 3.0.2 §IV).
 
 **Confirmar**
 

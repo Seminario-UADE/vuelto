@@ -11,6 +11,7 @@ import * as api from "@/data/api";
 import type { LecturaApp } from "@/data/contracts";
 import { hapticoLeve } from "@/lib/haptics";
 import { supabase } from "@/lib/supabase";
+import type { Escenario } from "@/store/acciones";
 import { useAppSelector } from "@/store/hooks";
 import { selectHoy } from "@/store/selectores";
 import { borrar, elegirDeGaleria, limpiarTemporales, preparar, sacarFoto, type FotoElegida } from "@/ticket/camara";
@@ -24,6 +25,15 @@ type Estado =
   | { tipo: "sin_permiso" }
   | { tipo: "leyendo" }
   | { tipo: "resultado"; resultado: ResultadoLectura };
+
+/** Los escenarios de desarrollo de Perfil que simulan la lectura (FR-012); el resto usa la cámara. */
+const ESCENARIO_TICKET: Record<Escenario, api.EscenarioTicket | null> = {
+  normal: null,
+  "mes-vacio": null,
+  "ticket-ilegible": "ilegible",
+  "sin-red": "sin-red",
+  "ticket-de-ejemplo": "ejemplo",
+};
 
 const ETIQUETA_SALIDA: Record<SalidaLectura, string> = {
   probar_de_nuevo: "Probar de nuevo",
@@ -48,14 +58,7 @@ export default function Escanear() {
   const insets = useSafeAreaInsets();
   const [estado, setEstado] = useState<Estado>({ tipo: "listo" });
   const escenario = useAppSelector((s) => s.sesion.escenario);
-  const escenarioTicket: api.EscenarioTicket | null =
-    escenario === "ticket-ilegible"
-      ? "ilegible"
-      : escenario === "sin-red"
-        ? "sin-red"
-        : escenario === "ticket-de-ejemplo"
-          ? "ejemplo"
-          : null;
+  const escenarioTicket = ESCENARIO_TICKET[escenario];
   const usuario = useAppSelector((s) => s.sesion.usuario);
   const conSesion = usuario !== null && supabase !== null;
   const hoy = useAppSelector(selectHoy);

@@ -17,7 +17,7 @@ import { comercioDelCatalogo } from "@/data/comercios";
 import type { Canal, OrigenCompra } from "@/data/contracts";
 import { borradorDesdePorConfirmar } from "@/data/por-confirmar";
 import { aprox, montoEditable, parseMonto } from "@/lib/format";
-import { REDES, TIPOS_TARJETA, type Red, type TipoTarjeta } from "@/perfil/modelo";
+import { esRed, esTipoTarjeta } from "@/perfil/modelo";
 import { hapticoExito, hapticoSeleccion } from "@/lib/haptics";
 import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
 import { selectCatalogoParaCompras, selectEntradasMotor, selectHoy, selectPerfilVista } from "@/store/selectores";
@@ -124,6 +124,13 @@ export default function Revisa() {
     [entradas, catalogo, medioId, comercio, categoriaId, fecha, monto, canal],
   );
   const hayPromo = propuesta !== null && propuesta.promociones.length > 0;
+
+  /** La sugerencia, nunca marcada: la del ticket (spec 014 FR-008) o, sin ella, la de la simulación (spec 012 FR-008). */
+  const notaDelMedio = (id: string): string | null => {
+    if (medioId !== null) return null;
+    if (medioSugeridoTicket === id) return "El que dice el ticket";
+    return desde?.medioSugerido === id ? "El que elegiste al simular" : null;
+  };
 
   const detalleDe = (id: string): string | null => {
     const r = rec;
@@ -251,15 +258,7 @@ export default function Revisa() {
               key={m.id}
               title={m.nombre}
               detail={detalleDe(m.id)}
-              note={
-                medioId !== null
-                  ? null
-                  : medioSugeridoTicket === m.id
-                    ? "El que dice el ticket"
-                    : desde?.medioSugerido === m.id
-                      ? "El que elegiste al simular"
-                      : null
-              }
+              note={notaDelMedio(m.id)}
               selected={medioId === m.id}
               onPress={() => {
                 hapticoSeleccion();
@@ -318,8 +317,8 @@ export default function Revisa() {
 /** El medio leído llega como texto en los parámetros de la ruta; lo que no es del contrato es `null`. */
 function medioDeLosParametros(p: { medioRed?: string; medioTipo?: string; medioBanco?: string }): MedioLeido {
   return {
-    red: p.medioRed && (REDES as string[]).includes(p.medioRed) ? (p.medioRed as Red) : null,
-    tipo: p.medioTipo && (TIPOS_TARJETA as string[]).includes(p.medioTipo) ? (p.medioTipo as TipoTarjeta) : null,
+    red: esRed(p.medioRed) ? p.medioRed : null,
+    tipo: esTipoTarjeta(p.medioTipo) ? p.medioTipo : null,
     banco: p.medioBanco || null,
     ultimos4: null,
   };

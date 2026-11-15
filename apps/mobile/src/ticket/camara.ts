@@ -8,7 +8,7 @@ import { Directory, File, Paths } from "expo-file-system";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { Platform } from "react-native";
-import { MAXIMO_BYTES, type FotoPreparada } from "./leer";
+import { MAXIMO_BYTES, bytesDe, type FotoPreparada } from "./leer";
 
 export type FotoElegida = { tipo: "foto"; uri: string } | { tipo: "cancelada" } | { tipo: "sin_permiso" };
 
@@ -60,7 +60,7 @@ export async function preparar(uri: string): Promise<FotoPreparada> {
   try {
     let resultado = await imagen.saveAsync({ format: SaveFormat.JPEG, compress: 0.8, base64: true });
     temporales.push(resultado.uri);
-    if ((resultado.base64 ?? "").length * 0.75 > MAXIMO_BYTES) {
+    if (bytesDe(resultado.base64 ?? "") > MAXIMO_BYTES) {
       resultado = await imagen.saveAsync({ format: SaveFormat.JPEG, compress: 0.6, base64: true });
       temporales.push(resultado.uri);
     }

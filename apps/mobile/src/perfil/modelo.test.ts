@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  esRed,
+  esTipoTarjeta,
   clasificarError,
   comercioRepetido,
   esDuplicado,
@@ -88,5 +90,18 @@ describe("comercioRepetido (issue #47)", () => {
 
   it("los acentos cuentan: «Dia» y «Día» son distintos", () => {
     expect(comercioRepetido([{ nombre: "Día" }], "Dia")).toBe(false);
+  });
+});
+
+describe("esRed y esTipoTarjeta (lo que llega como texto: el servicio del ticket y los parámetros de ruta)", () => {
+  it("aceptan solo las del motor", () => {
+    expect(esRed("visa")).toBe(true);
+    expect(esRed("tarjeta_sol")).toBe(true);
+    expect(esRed("VISA")).toBe(false);
+    expect(esRed("toString")).toBe(false);
+    expect(esRed(null)).toBe(false);
+    expect(esTipoTarjeta("debito")).toBe(true);
+    expect(esTipoTarjeta("prepaga")).toBe(false);
+    expect(esTipoTarjeta(3)).toBe(false);
   });
 });

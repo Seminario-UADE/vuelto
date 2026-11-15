@@ -23,7 +23,8 @@ export type DependenciasLectura = {
   borrar: (rutas: string[]) => Promise<void>;
 };
 
-function bytesDe(base64: string): number {
+/** Cuánto pesa, decodificado, un base64. */
+export function bytesDe(base64: string): number {
   const relleno = base64.endsWith("==") ? 2 : base64.endsWith("=") ? 1 : 0;
   return (base64.length / 4) * 3 - relleno;
 }
@@ -40,7 +41,8 @@ export async function leerFoto(uri: string, deps: DependenciasLectura): Promise<
     try {
       foto = await deps.preparar(uri);
     } catch {
-      return { ok: false, resultado: "imagen_demasiado_grande" };
+      // No se pudo abrir ni achicar (dañada, formato raro): con otra foto puede andar (FR-011).
+      return { ok: false, resultado: "foto_no_valida" };
     }
     temporales.push(...foto.temporales);
     if (bytesDe(foto.base64) > MAXIMO_BYTES) return { ok: false, resultado: "imagen_demasiado_grande" };

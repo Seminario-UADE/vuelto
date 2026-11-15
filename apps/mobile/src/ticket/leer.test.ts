@@ -75,13 +75,13 @@ describe("leerFoto", () => {
     expect(borradas.sort()).toEqual([ACHICADA, FOTO].sort());
   });
 
-  it("preparar que falla: imagen_demasiado_grande, sin pedir, y la foto borrada", async () => {
+  it("una foto que no se puede abrir (dañada o en un formato raro): foto_no_valida, sin pedir, y la foto borrada", async () => {
     const { d, borradas } = deps({
       preparar: vi.fn(async () => {
-        throw new Error("no se pudo achicar");
+        throw new Error("no se pudo decodificar");
       }),
     });
-    expect(await leerFoto(FOTO, d)).toEqual({ ok: false, resultado: "imagen_demasiado_grande" });
+    expect(await leerFoto(FOTO, d)).toEqual({ ok: false, resultado: "foto_no_valida" });
     expect(d.pedir).not.toHaveBeenCalled();
     expect(borradas).toEqual([FOTO]);
   });
