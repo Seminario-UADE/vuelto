@@ -105,6 +105,15 @@ describe("handler extraer-ticket: errores (US3, FR-014)", () => {
     vi.useRealTimers();
   });
 
+  it("la consulta previa del navegador (OPTIONS): 204 con CORS, sin sesión ni lector ni registro", async () => {
+    const lector = lectorQueDevuelve();
+    const r = await handler({ usuario: null, lector })(new Request(URL_FUNCION, { method: "OPTIONS" }));
+    expect(r.status).toBe(204);
+    expect(r.headers.get("Access-Control-Allow-Origin")).toBe("*");
+    expect(lector.llamadas).toBe(0);
+    expect(lineasRegistradas()).toBe(0);
+  });
+
   it("un método que no es POST: 405", async () => {
     const r = await handler()(new Request(URL_FUNCION, { method: "GET" }));
     expect(r.status).toBe(405);

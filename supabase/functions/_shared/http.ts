@@ -32,10 +32,29 @@ const STATUS: Record<CodigoError, number> = {
   no_disponible: 503,
 };
 
+/**
+ * CORS para la versión web de la app: el navegador consulta antes (`OPTIONS`) si el servicio
+ * acepta el pedido y, si no ve estos encabezados, lo bloquea. Origen `*`: la sesión viaja en el
+ * encabezado `Authorization`, no en cookies. Los encabezados son los de
+ * `@supabase/supabase-js/cors` (un test controla que sigan iguales); no se importa de ahí porque
+ * este archivo corre en Deno.
+ */
+export const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-retry-count, traceparent, tracestate, baggage",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+} as const;
+
+/** La respuesta a la consulta previa del navegador. */
+export function respuestaPreflight(): Response {
+  return new Response(null, { status: 204, headers: CORS });
+}
+
 export function respuestaJson(status: number, cuerpo: unknown): Response {
   return new Response(JSON.stringify(cuerpo), {
     status,
-    headers: { "Content-Type": "application/json; charset=utf-8" },
+    headers: { ...CORS, "Content-Type": "application/json; charset=utf-8" },
   });
 }
 

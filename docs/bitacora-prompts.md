@@ -2705,6 +2705,17 @@ quede en el celular.
     Se aclaró que E1 no era la foto pesada, sino la que no se puede abrir
     (dañada o en un formato raro), que con otra foto sí anda. "Dale, hacé el
     E1."
+13. "Mergealo, está bien así." Se mergearon el PR #133 y el PR #135, después
+    de resolver los choques con lo que otros PRs habían sumado a `main`.
+14. "¿Podemos probar la versión web a ver si las fotos funcionan?" En el
+    celular, la web dijo «No pudimos abrir la foto». "¿Cambiamos algo desde
+    que funcionó con el QR?" No en la foto: el problema era de Safari, que
+    se queda sin memoria al cargar la foto entera de 12 megapíxeles. Se
+    cambió para cargarla ya achicada.
+15. Probada desde la compu, la web pasó a decir «Sin conexión». El servicio
+    no le contestaba al navegador la consulta previa que hace antes de
+    mandar un pedido a otro sitio (CORS), y el navegador lo bloqueaba. En la
+    app del celular no pasa porque no hay navegador de por medio.
 
 **Resultado:**
 - Spec 014: dos botones (cámara y galería del sistema), la foto achicada a
@@ -2754,8 +2765,14 @@ quede en el celular.
   y qué pasa con la foto en el celular.
 - Error de la IA: en la primera explicación de E1 no quedó claro que se
   trataba de la foto que no se abre, no de la pesada.
-- Queda pendiente: el PR, con la aclaración 3.0.2 de la constitución para
-  que la apruebe el PO.
+- Se mergearon el PR #133 (issue #48) y el PR #135 (issue #49, con la
+  constitución 3.0.2).
+- Arreglos para la versión web: la foto se carga ya achicada, que también
+  le baja la memoria a la app del celular, y el servicio contesta la
+  consulta del navegador. Hay que volver a desplegar el servicio.
+- Error de la IA: la prueba en el celular se hizo solo con la app y no con
+  la web, y la web era una de las plataformas del plan. Los dos problemas
+  aparecieron recién después del merge.
 
 ---
 

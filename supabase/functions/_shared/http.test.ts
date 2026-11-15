@@ -1,5 +1,6 @@
+import { corsHeaders } from "@supabase/supabase-js/cors";
 import { describe, expect, it } from "vitest";
-import { respuestaError, type CodigoError } from "./http.ts";
+import { CORS, respuestaError, respuestaJson, respuestaPreflight, type CodigoError } from "./http.ts";
 
 describe("respuestaError", () => {
   const casos: [CodigoError, number][] = [
@@ -26,5 +27,27 @@ describe("respuestaError", () => {
     const r = respuestaError("invalido", "imagen");
     expect(r.status).toBe(400);
     expect(await r.json()).toEqual({ error: "invalido", campo: "imagen" });
+  });
+});
+
+describe("CORS (la versión web de la app, en el navegador)", () => {
+  it("deja pasar los encabezados que manda supabase-js, desde cualquier origen", () => {
+    // La lista oficial del SDK: si suma un encabezado, este test avisa que hay que sumarlo acá.
+    expect(CORS["Access-Control-Allow-Headers"]).toBe(corsHeaders["Access-Control-Allow-Headers"]);
+    expect(CORS["Access-Control-Allow-Origin"]).toBe("*");
+    expect(CORS["Access-Control-Allow-Methods"]).toBe("POST, OPTIONS");
+  });
+
+  it("la consulta previa del navegador responde 204 con los encabezados, sin cuerpo", async () => {
+    const r = respuestaPreflight();
+    expect(r.status).toBe(204);
+    expect(r.headers.get("Access-Control-Allow-Origin")).toBe("*");
+    expect(await r.text()).toBe("");
+  });
+
+  it("las respuestas JSON y los errores llevan los encabezados", () => {
+    expect(respuestaJson(200, {}).headers.get("Access-Control-Allow-Origin")).toBe("*");
+    expect(respuestaError("no_autenticado").headers.get("Access-Control-Allow-Origin")).toBe("*");
+    expect(respuestaJson(200, {}).headers.get("Content-Type")).toBe("application/json; charset=utf-8");
   });
 });
