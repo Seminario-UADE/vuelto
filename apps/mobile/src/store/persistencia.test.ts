@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { comprasOctubre, mediosDeEjemplo, promociones } from "../data/fixtures";
 import { compraAgregada } from "./compras";
 import { contactoQuitado } from "./contactos";
-import { sesionCerrada, sincronizado } from "./acciones";
+import { escenarioElegido, sesionCerrada, sincronizado } from "./acciones";
 import { CLAVE, CLAVE_CORPUS, CLAVE_VIEJA, CORPUS_VACIO, rehidratar } from "./persistencia";
 import { cargaCambio, mediosConfirmados, onboardingTerminado } from "./perfil";
 import { selectRecomendacion, selectTopes } from "./selectores";
@@ -67,6 +67,8 @@ describe("persistencia (US4)", () => {
     a.dispatch(comercioElegido("coto"));
     a.dispatch(montoCambiado(10000));
     a.dispatch(ahoraCambio("2026-10-20T15:00:00.000Z"));
+    // Los contactos de ejemplo vienen con la demo (G-02); quitar a Mateo deja solo a Lucía.
+    a.dispatch(escenarioElegido("normal"));
     a.dispatch(contactoQuitado("mateo"));
     a.dispatch(onboardingTerminado());
     await esperar();
@@ -74,7 +76,8 @@ describe("persistencia (US4)", () => {
     const b = await abrir(disco);
     expect(b.getState().simulacion).toEqual({ comercioId: null, monto: null, canal: "presencial" });
     expect(b.getState().sesion.ahora).not.toBe("2026-10-20T15:00:00.000Z");
-    expect(b.getState().contactos.lista.map((c) => c.id)).toContain("mateo");
+    // Si se guardaran, al reabrir volvería Lucía; no vuelve nada (G-03 sigue abierto).
+    expect(b.getState().contactos.lista).toEqual([]);
   });
 
   it("lo guardado no tiene nada derivado (FR-010)", async () => {

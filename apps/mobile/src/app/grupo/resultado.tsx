@@ -4,6 +4,7 @@ import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { DecisionCard } from "@/components/decision-card";
+import { EmptyState } from "@/components/empty-state";
 import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
@@ -14,7 +15,7 @@ import { useAsync } from "@/hooks/use-async";
 import { aprox, iniciales, pesos } from "@/lib/format";
 import { hapticoExito } from "@/lib/haptics";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectBuscarComercioPorId } from "@/store/selectores";
+import { selectEntradasMotor } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { radius, space } from "@/theme";
 
@@ -25,10 +26,10 @@ import { radius, space } from "@/theme";
 export default function GastoEnGrupo() {
   const dispatch = useAppDispatch();
   const pedido = useAppSelector((s) => s.contactos.grupo);
-  const buscarComercio = useAppSelector(selectBuscarComercioPorId);
-  const comercio = pedido ? buscarComercio(pedido.comercioId) : null;
+  // «Vos» con tus medios, tus compras, el corpus y el reloj del store (G-01, ADR-010).
+  const vos = useAppSelector(selectEntradasMotor);
   const r = useAsync(
-    () => (pedido ? api.recomendarGrupo(pedido, comercio ?? undefined) : Promise.resolve(null)),
+    () => (pedido ? api.recomendarGrupo(pedido, vos) : Promise.resolve(null)),
     pedido ? JSON.stringify(pedido) : null,
   );
   const g = r.datos;
@@ -49,6 +50,19 @@ export default function GastoEnGrupo() {
       <Screen>
         <Text variant="bodyLg">Armá el grupo primero.</Text>
         <Button label="Armar grupo" onPress={() => router.replace("/grupo/armar")} />
+      </Screen>
+    );
+  }
+
+  if (!g && r.estado === "error") {
+    // Sin esto la pantalla quedaba en el esqueleto para siempre (G-04).
+    return (
+      <Screen>
+        <EmptyState
+          title="No pudimos calcular quién conviene que pague"
+          body={r.error ?? "Algo salió mal. Probá de nuevo."}
+          action={{ label: "Reintentar", onPress: r.recargar }}
+        />
       </Screen>
     );
   }

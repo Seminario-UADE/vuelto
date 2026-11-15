@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import * as api from "./api";
+import { catalogoComercios, mediosDeEjemplo, mediosDeclarados } from "./fixtures";
+import { mediosConfirmados } from "../store/perfil";
+import { storeDePrueba } from "../store/prueba";
+import { selectEntradasMotor } from "../store/selectores";
+import { ahoraCambio } from "../store/sesion";
 
 // Lo que la app todavía pide a la red (ticket, invitaciones, grupo). El cálculo de la
 // recomendación y los topes se prueba en `calculo.test.ts` y `store/*.test.ts`.
@@ -36,17 +41,37 @@ describe("ticket", () => {
   });
 });
 
+/** Las entradas del motor de una cuenta, como las arma el store (`selectEntradasMotor`). */
+function entradasDe(opciones: { medios?: string[]; compras?: boolean; corpus?: boolean; ahora?: string } = {}) {
+  const s = storeDePrueba();
+  s.dispatch(mediosConfirmados(mediosDeEjemplo(opciones.medios ?? [])));
+  if (opciones.ahora) s.dispatch(ahoraCambio(opciones.ahora));
+  const e = selectEntradasMotor(s.getState());
+  return {
+    ...e,
+    compras: opciones.compras === false ? [] : e.compras,
+    promociones: opciones.corpus === false ? [] : e.promociones,
+  };
+}
+
+/** La demo: los medios y las compras de Martín, con las promos de ejemplo. */
+const demo = () => entradasDe({ medios: mediosDeclarados.map((m) => m.id) });
+const coto = catalogoComercios.find((c) => c.id === "coto")!;
+
 describe("gasto en grupo (stand-in de la Edge Function, con el motor por integrante)", () => {
   it("cena del sábado: paga Mateo, ≈$5.000 y ≈$9.000 cada uno", async () => {
-    const g = await api.recomendarGrupo({
-      ...api.getGrupoDeEjemplo(),
-      integrantes: [
-        { tipo: "vos" },
-        { tipo: "contacto", contactoId: "lucia" },
-        { tipo: "contacto", contactoId: "mateo" },
-        { tipo: "sin-cuenta", nombre: "Sofía" },
-      ],
-    });
+    const g = await api.recomendarGrupo(
+      {
+        ...api.getGrupoDeEjemplo(),
+        integrantes: [
+          { tipo: "vos" },
+          { tipo: "contacto", contactoId: "lucia" },
+          { tipo: "contacto", contactoId: "mateo" },
+          { tipo: "sin-cuenta", nombre: "Sofía" },
+        ],
+      },
+      demo(),
+    );
     expect(g.quienPaga).toEqual({ nombre: "Mateo", esVos: false });
     expect(g.medio).toBe("su Provincia Visa débito");
     expect(g.reintegro).toBe(5000);
@@ -62,18 +87,70 @@ describe("gasto en grupo (stand-in de la Edge Function, con el motor por integra
   });
 
   it("cada reintegro estimado lleva su base: a igual reintegro gana el que tiene base", async () => {
-    const g = await api.recomendarGrupo({
-      nombre: null,
-      comercioId: "coto",
-      monto: 24500,
-      fecha: "2026-10-14",
-      integrantes: [{ tipo: "vos" }, { tipo: "contacto", contactoId: "lucia" }],
-    });
+    const g = await api.recomendarGrupo(
+      {
+        nombre: null,
+        comercio: coto,
+        monto: 24500,
+        fecha: "2026-10-14",
+        integrantes: [{ tipo: "vos" }, { tipo: "contacto", contactoId: "lucia" }],
+      },
+      demo(),
+    );
     // Vos y Lucía empatan en ≈$4.900; gana Vos porque su estimado tiene base.
     expect(g.quienPaga).toEqual({ nombre: "Vos", esVos: true });
     expect(g.cuando).toBe("hoy miércoles");
     const lucia = g.integrantes.find((i) => i.nombre === "Lucía")?.detalle ?? "";
     expect(lucia).toBe("≈$4.900 si paga Lucía · Lucía no tiene compras registradas: sin base");
+  });
+
+  const conLucia = (comercio = coto) => ({
+    nombre: null,
+    comercio,
+    monto: 24500,
+    fecha: "2026-10-14",
+    integrantes: [{ tipo: "vos" as const }, { tipo: "contacto" as const, contactoId: "lucia" }],
+  });
+
+  it("«Vos» se evalúa con los medios de la cuenta, no con los de Martín (G-01)", async () => {
+    // Una cuenta sin medios cargados no puede pagar con promo: paga Lucía.
+    const g = await api.recomendarGrupo(conLucia(), entradasDe({ medios: [], compras: false }));
+    expect(g.quienPaga).toEqual({ nombre: "Lucía", esVos: false });
+    const vos = g.integrantes.find((i) => i.esVos)?.detalle ?? "";
+    expect(vos).not.toMatch(/Galicia|BBVA|Provincia|Santander|Macro|Naranja/);
+  });
+
+  it("«Vos» se evalúa con las compras de la cuenta: sin compras, el estimado no tiene base (G-01)", async () => {
+    const conCompras = await api.recomendarGrupo(conLucia(), demo());
+    const sinCompras = await api.recomendarGrupo(conLucia(), { ...demo(), compras: [] });
+    // Paga Vos en los dos casos; cambia la base del estimado.
+    expect(conCompras.quienPaga?.esVos).toBe(true);
+    expect(conCompras.base).toMatchObject({ tipo: "compras", texto: expect.stringMatching(/^según \d+ compras? de octubre$/) });
+    expect(sinCompras.quienPaga?.esVos).toBe(true);
+    expect(sinCompras.base?.tipo).toBe("sin-compras");
+  });
+
+  it("todos se evalúan con el corpus del store, no con las promos de ejemplo (G-01)", async () => {
+    const g = await api.recomendarGrupo(conLucia(), { ...demo(), promociones: [] });
+    expect(g.quienPaga).toBeNull();
+    expect(g.reintegro).toBeNull();
+  });
+
+  it("«hoy» sale del reloj del store (ADR-010)", async () => {
+    const g = await api.recomendarGrupo(conLucia(), entradasDe({ medios: [], ahora: "2026-11-10T15:00:00.000Z" }));
+    expect(g.cuando).toBe("miércoles 14/10");
+    const hoy = await api.recomendarGrupo(
+      { ...conLucia(), fecha: "2026-11-10" },
+      entradasDe({ medios: [], ahora: "2026-11-10T15:00:00.000Z" }),
+    );
+    expect(hoy.cuando).toBe("hoy martes");
+  });
+
+  it("un comercio fuera del catálogo (sin rubro) responde sin reintegro, no se cuelga (G-04)", async () => {
+    const libre = { id: "libre-panaderia-juan", nombre: "Panadería Juan", inicial: "P", rubro: "otro" as const, categoriaId: null, frecuente: false };
+    const g = await api.recomendarGrupo(conLucia(libre), demo());
+    expect(g.comercio.nombre).toBe("Panadería Juan");
+    expect(g.quienPaga).toBeNull();
   });
 });
 
