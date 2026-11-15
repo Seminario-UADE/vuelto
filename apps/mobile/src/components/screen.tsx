@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { ScrollView, View, type ScrollViewProps } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAlturaTeclado } from "@/hooks/use-altura-teclado";
 import { colors, floatingShadow, space } from "@/theme";
 
 type Props = {
@@ -21,11 +22,13 @@ type Props = {
 
 /**
  * Contenedor de pantalla con scroll. Si hay `footer`, mide su alto y lo reserva como
- * espacio al final del contenido más el área segura (auditoría P1 #3, P2 #7 y #9).
+ * espacio al final del contenido más el área segura (auditoría P1 #3, P2 #7 y #9). Con el teclado
+ * abierto deja libre su alto al final, para poder desplazar hasta el último elemento (issue #128).
  */
 export function Screen({ children, footer, kind = "stack", aboveTabBar, gap = space.xxl, scrollProps }: Props) {
   const insets = useSafeAreaInsets();
   const [altoFooter, setAltoFooter] = useState(0);
+  const altoTeclado = useAlturaTeclado();
   const inferior = aboveTabBar || kind === "sheet" ? space.md : Math.max(insets.bottom, space.md);
   return (
     <View style={{ flex: 1, backgroundColor: colors.canvas }}>
@@ -34,11 +37,12 @@ export function Screen({ children, footer, kind = "stack", aboveTabBar, gap = sp
         contentInsetAdjustmentBehavior={kind === "tab" ? "never" : "automatic"}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive"
+        automaticallyAdjustKeyboardInsets
         {...scrollProps}
         contentContainerStyle={{
           paddingHorizontal: space.gutter,
           paddingTop: kind === "tab" ? insets.top + space.lg : space.lg,
-          paddingBottom: (footer ? altoFooter : inferior) + space.xxl,
+          paddingBottom: (footer ? altoFooter : inferior) + space.xxl + altoTeclado,
           gap,
         }}
       >
