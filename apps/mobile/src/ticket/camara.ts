@@ -42,21 +42,20 @@ export async function elegirDeGaleria(): Promise<FotoElegida> {
   return elegida(await ImagePicker.launchImageLibraryAsync(OPCIONES));
 }
 
-/** Achica la foto (lado mayor de 2.000 px) y la pasa a JPEG en base64. Lee también el HEIC. */
+/**
+ * Achica la foto (lado mayor de 2.000 px) y la pasa a JPEG en base64. Lee también el HEIC.
+ * La foto se carga ya achicada (`maxWidth`/`maxHeight`): nunca entra entera a memoria, que en
+ * Safari no alcanza para una foto de 12 megapíxeles.
+ */
 export async function preparar(uri: string): Promise<FotoPreparada> {
   const temporales: string[] = [];
-  const original = await ImageManipulator.manipulate(uri).renderAsync();
-  const escala = LADO_MAXIMO / Math.max(original.width, original.height);
-  const imagen =
-    escala < 1
-      ? await ImageManipulator.manipulate(original)
-          .resize(
-            original.width >= original.height
-              ? { width: LADO_MAXIMO, height: null }
-              : { width: null, height: LADO_MAXIMO },
-          )
-          .renderAsync()
-      : original;
+  const contexto = ImageManipulator.manipulate(uri, { maxWidth: LADO_MAXIMO, maxHeight: LADO_MAXIMO });
+  let imagen: Awaited<ReturnType<typeof contexto.renderAsync>>;
+  try {
+    imagen = await contexto.renderAsync();
+  } finally {
+    contexto.release();
+  }
   try {
     let resultado = await imagen.saveAsync({ format: SaveFormat.JPEG, compress: 0.8, base64: true });
     temporales.push(resultado.uri);
@@ -70,7 +69,6 @@ export async function preparar(uri: string): Promise<FotoPreparada> {
     throw e;
   } finally {
     imagen.release();
-    if (imagen !== original) original.release();
   }
 }
 

@@ -8,7 +8,7 @@
  * imagen, el texto ni un valor leído.
  */
 import type { Autenticador } from "../_shared/autenticar.ts";
-import { respuestaError, respuestaJson, type CodigoError } from "../_shared/http.ts";
+import { respuestaError, respuestaJson, respuestaPreflight, type CodigoError } from "../_shared/http.ts";
 import {
   ExtractorNoDisponibleError,
   ExtractorRechazoError,
@@ -63,6 +63,8 @@ export function crearHandlerExtraerTicket(deps: DependenciasExtraerTicket): (req
       return respuestaError(codigo, campo);
     };
 
+    // La consulta previa del navegador (versión web, spec 014): sin sesión ni registro.
+    if (req.method === "OPTIONS") return respuestaPreflight();
     if (req.method !== "POST") return fallar("metodo_no_permitido");
 
     let corte: ReturnType<typeof setTimeout> | undefined;
