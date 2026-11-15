@@ -5,9 +5,10 @@ import { escenarioElegido, rehidratado, sesionCerrada, type ComercioHabitual, ty
 /**
  * Cómo quedó la última lectura de los medios en Supabase (issue #41). No se persiste: al abrir la
  * app arranca en `sin-leer`. Con `sin-conexion` el perfil se muestra como estaba y no se edita
- * (FR-010, FR-012).
+ * (FR-010, FR-012). `servidor-desactualizado`: la base alojada no tiene una migración que la app
+ * necesita (issue #127); se comporta como `sin-conexion`, pero el aviso lo dice.
  */
-export type CargaPerfil = "sin-leer" | "leyendo" | "lista" | "sin-conexion" | "error";
+export type CargaPerfil = "sin-leer" | "leyendo" | "lista" | "sin-conexion" | "servidor-desactualizado" | "error";
 
 export type EstadoPerfilSlice = EstadoPerfil & { carga: CargaPerfil };
 

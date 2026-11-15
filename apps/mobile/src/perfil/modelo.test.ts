@@ -68,6 +68,26 @@ describe("clasificarError", () => {
     expect(clasificarError({ status: 0, code: null })).toBe("sin_conexion");
   });
 
+  it("columna, tabla o función inexistentes son «servidor no está al día», no un error genérico (issue #127)", () => {
+    // El caso real: la app pidió `bancos.on_hub_list` y la base alojada no tenía la migración.
+    expect(clasificarError({ status: 400, code: "42703" })).toBe("servidor_desactualizado");
+    expect(clasificarError({ status: 404, code: "42P01" })).toBe("servidor_desactualizado");
+    expect(clasificarError({ status: 404, code: "42883" })).toBe("servidor_desactualizado");
+    for (const code of ["PGRST200", "PGRST202", "PGRST204", "PGRST205"]) {
+      expect(clasificarError({ status: 400, code })).toBe("servidor_desactualizado");
+    }
+  });
+
+  it("permiso denegado con la sesión vigente (403) es servidor desactualizado; sin sesión (401) sigue siendo sesión vencida", () => {
+    expect(clasificarError({ status: 403, code: "42501" })).toBe("servidor_desactualizado");
+    expect(clasificarError({ status: 401, code: "42501" })).toBe("sesion_vencida");
+  });
+
+  it("sin conexión sigue ganándole a todo lo demás, y un 403 sin código no se confunde con una migración", () => {
+    expect(clasificarError({ status: 0, code: "42703" })).toBe("sin_conexion");
+    expect(clasificarError({ status: 403, code: null })).toBe("otro");
+  });
+
   it("cualquier otro caso es genérico", () => {
     expect(clasificarError({ status: 500, code: "XX000" })).toBe("otro");
     expect(clasificarError({ status: 400, code: null })).toBe("otro");

@@ -70,8 +70,28 @@ describe("nombre del usuario (spec 012, FR-029, SC-005)", () => {
 });
 
 describe("contactos", () => {
+  it("una cuenta arranca sin contactos: ve el estado vacío, no a Lucía y Mateo (G-02)", () => {
+    expect(storeDePrueba().getState().contactos.lista).toEqual([]);
+  });
+
+  it("los contactos de ejemplo vienen solo con un escenario de demo", () => {
+    for (const escenario of ["normal", "mes-vacio"] as const) {
+      const s = storeDePrueba();
+      s.dispatch(escenarioElegido(escenario));
+      expect(s.getState().contactos.lista.map((c) => c.nombre)).toEqual(["Lucía", "Mateo"]);
+    }
+  });
+
+  it("cerrar sesión vuelve a la lista vacía, no a los de ejemplo", () => {
+    const s = storeDePrueba();
+    s.dispatch(escenarioElegido("normal"));
+    s.dispatch(sesionCerrada());
+    expect(s.getState().contactos.lista).toEqual([]);
+  });
+
   it("agregar no duplica; quitar lo saca", () => {
     const s = storeDePrueba();
+    s.dispatch(escenarioElegido("normal"));
     const tomas = { id: "tomas", nombre: "Tomás", iniciales: "T", vinculadoDesde: "2026-10-14" };
     s.dispatch(contactoAgregado(tomas));
     s.dispatch(contactoAgregado(tomas));

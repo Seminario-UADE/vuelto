@@ -13,8 +13,9 @@ import * as api from "@/data/api";
 import { useAsync } from "@/hooks/use-async";
 import { aprox, iniciales, pesos } from "@/lib/format";
 import { hapticoExito } from "@/lib/haptics";
+import { idDeReferencia } from "@/lib/identidad";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectBuscarComercioPorId } from "@/store/selectores";
+import { selectEntradasMotor } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { radius, space } from "@/theme";
 
@@ -25,11 +26,13 @@ import { radius, space } from "@/theme";
 export default function GastoEnGrupo() {
   const dispatch = useAppDispatch();
   const pedido = useAppSelector((s) => s.contactos.grupo);
-  const buscarComercio = useAppSelector(selectBuscarComercioPorId);
-  const comercio = pedido ? buscarComercio(pedido.comercioId) : null;
+  // «Vos» con tus medios, tus compras, el corpus y el reloj del store (G-01, ADR-010).
+  const vos = useAppSelector(selectEntradasMotor);
+  // Se recalcula si cambia el pedido o cualquier cosa de «Vos»: el selector devuelve otra
+  // referencia apenas cambia un medio, una compra, una promo o el reloj (ADR-010).
   const r = useAsync(
-    () => (pedido ? api.recomendarGrupo(pedido, comercio ?? undefined) : Promise.resolve(null)),
-    pedido ? JSON.stringify(pedido) : null,
+    () => (pedido ? api.recomendarGrupo(pedido, vos) : Promise.resolve(null)),
+    pedido ? `${JSON.stringify(pedido)}|${idDeReferencia(vos)}` : null,
   );
   const g = r.datos;
 
@@ -81,7 +84,16 @@ export default function GastoEnGrupo() {
         {g ? `${g.nombre ?? g.comercio.nombre} · ${g.cuando} · ${pesos(g.monto)} · ${n} personas` : " "}
       </Text>
 
-      {g ? (
+      {!g && r.estado === "error" ? (
+        // Sin esto la pantalla quedaba en el esqueleto para siempre (G-04). Error inline, en
+        // `error` y con una salida (DESIGN.md).
+        <Card gap={space.md}>
+          <Text variant="bodyLg" tone="error" accessibilityLiveRegion="polite">
+            No pudimos calcular quién conviene que pague. Probá de nuevo.
+          </Text>
+          <Button label="Reintentar" variant="secondary" icon="recargar" onPress={r.recargar} />
+        </Card>
+      ) : g ? (
         <DecisionCard
           titulo={titulo}
           inicial={g.quienPaga && !g.quienPaga.esVos ? iniciales(g.quienPaga.nombre) : null}

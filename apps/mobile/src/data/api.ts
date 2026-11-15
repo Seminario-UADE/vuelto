@@ -7,7 +7,6 @@
  */
 import { fechaArgentina } from "@vuelto/motor";
 import type {
-  Comercio,
   Contacto,
   Invitacion,
   LecturaApp,
@@ -15,6 +14,7 @@ import type {
   RecomendacionGrupo,
   VistaInvitacion,
 } from "./contracts";
+import type { EntradasMotor } from "./calculo";
 import {
   RELOJ_EJEMPLO,
   catalogoComercios,
@@ -34,14 +34,8 @@ function red<T>(valor: T): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(valor), demoraMs));
 }
 
-function comercioPorId(id: string): Comercio {
-  const c = catalogoComercios.find((x) => x.id === id);
-  if (!c) throw new Error(`Comercio desconocido: ${id}`);
-  return c;
-}
-
-/** "Hoy" para el servidor de ejemplo (el reloj de los fixtures). */
-const HOY_EN_EL_SERVIDOR = fechaArgentina(new Date(RELOJ_EJEMPLO));
+/** Desde cuándo es contacto quien invita en los tokens de ejemplo (el reloj de los fixtures). */
+const VINCULADO_EJEMPLO = fechaArgentina(new Date(RELOJ_EJEMPLO));
 
 // Los comercios del buscador ya no son un pedido: se derivan del corpus del store
 // (`selectCatalogoComercios`, issue #43).
@@ -73,7 +67,7 @@ export async function crearInvitacion(): Promise<Invitacion> {
 
 /** Quién invita en cada token de ejemplo (en el servidor sale de `ver_invitacion`). */
 const invitantes: Record<string, Contacto> = {
-  tomas: { id: "tomas", nombre: "Tomás", iniciales: "T", vinculadoDesde: HOY_EN_EL_SERVIDOR },
+  tomas: { id: "tomas", nombre: "Tomás", iniciales: "T", vinculadoDesde: VINCULADO_EJEMPLO },
 };
 
 const TOKENS: Record<string, { estado: VistaInvitacion["estado"]; quien: string | null; contactoId: string | null }> = {
@@ -119,22 +113,20 @@ export async function quitarContacto(id: string): Promise<{ ok: true; id: string
   return red({ ok: true as const, id });
 }
 
+/** El grupo de ejemplo, con su comercio ya resuelto (la cena del sábado en La Parolaccia). */
 export function getGrupoDeEjemplo(): Omit<PedidoGrupo, "integrantes"> {
-  return { ...grupoDeEjemplo };
+  const { comercioId, ...resto } = grupoDeEjemplo;
+  const comercio = catalogoComercios.find((c) => c.id === comercioId);
+  if (!comercio) throw new Error(`El grupo de ejemplo apunta a un comercio que no está: ${comercioId}`);
+  return { ...resto, comercio };
 }
 
-/** `comercio`: el que eligió la pantalla (puede ser del corpus); sin él, el del grupo de ejemplo. */
-export async function recomendarGrupo(pedido: PedidoGrupo, comercio?: Comercio): Promise<RecomendacionGrupo> {
-  return red(
-    grupoEnElServidor(
-      {
-        nombre: pedido.nombre,
-        comercio: comercio ?? comercioPorId(pedido.comercioId),
-        monto: pedido.monto,
-        fecha: pedido.fecha,
-        integrantes: pedido.integrantes,
-      },
-      HOY_EN_EL_SERVIDOR,
-    ),
-  );
+/**
+ * Quién conviene que pague. `pedido.comercio` llega ya resuelto por la pantalla (G-04): un
+ * comercio fuera del catálogo se evalúa (sin rubro, nadie tiene promo) en vez de colgarse.
+ * `vos`: las entradas del motor de quien pide, del store (`selectEntradasMotor`, G-01). En el
+ * servidor real (#56) salen de la base con el JWT; acá viajan en el pedido.
+ */
+export async function recomendarGrupo(pedido: PedidoGrupo, vos: EntradasMotor): Promise<RecomendacionGrupo> {
+  return red(grupoEnElServidor(pedido, vos));
 }

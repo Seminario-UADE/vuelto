@@ -71,7 +71,17 @@ export function leerMedios(): AppThunk<Promise<void>> {
       return;
     }
     if (r.ok) dispatch(mediosLeidos(r.datos));
-    else dispatch(cargaCambio(r.error === "sin_conexion" ? "sin-conexion" : "error"));
+    else {
+      dispatch(
+        cargaCambio(
+          r.error === "sin_conexion"
+            ? "sin-conexion"
+            : r.error === "servidor_desactualizado"
+              ? "servidor-desactualizado"
+              : "error",
+        ),
+      );
+    }
   };
 }
 
@@ -148,7 +158,15 @@ export function leerBancos(): AppThunk<Promise<Banco[]>> {
   return async (_dispatch, _getState, { perfilRemoto }) => {
     if (!perfilRemoto) throw new Error(MENSAJES_ERROR.sin_conexion);
     const r = await perfilRemoto.leerBancos();
-    if (!r.ok) throw new Error(r.error === "sin_conexion" ? "Necesitás conexión para elegir tu banco" : MENSAJES_ERROR.otro);
+    if (!r.ok) {
+      throw new Error(
+        r.error === "sin_conexion"
+          ? "Necesitás conexión para elegir tu banco"
+          : r.error === "servidor_desactualizado"
+            ? MENSAJES_ERROR.servidor_desactualizado
+            : MENSAJES_ERROR.otro,
+      );
+    }
     return r.datos;
   };
 }

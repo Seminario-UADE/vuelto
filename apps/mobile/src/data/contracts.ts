@@ -277,7 +277,8 @@ export type FilaIntegrante = {
 
 export type PedidoGrupo = {
   nombre: string | null;
-  comercioId: string;
+  /** Ya resuelto por la pantalla (`selectComercioSimulado`), también uno fuera del catálogo (G-04). */
+  comercio: Comercio;
   monto: number;
   /** Día de la compra (ISO). La cena del ejemplo es el sábado 17/10. */
   fecha: string;

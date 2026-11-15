@@ -17,13 +17,15 @@ function porCodigo(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
-/** Primero los `on_hub_list`, después por nombre normalizado y por `id`. Texto vacío → `[]`. */
+/**
+ * Primero los `on_hub_list`, después por nombre normalizado y por `id`. Con el texto vacío devuelve
+ * todo el catálogo, en ese mismo orden: el buscador es solo un filtro por nombre.
+ */
 export function buscarBancos(catalogo: readonly Banco[], texto: string): Banco[] {
   const buscado = normalizar(texto);
-  if (buscado === "") return [];
   return catalogo
     .map((banco) => ({ banco, nombre: normalizar(banco.nombre) }))
-    .filter(({ nombre }) => nombre.includes(buscado))
+    .filter(({ nombre }) => nombre.includes(buscado)) // "" está en cualquier nombre
     .sort(
       (a, b) =>
         Number(b.banco.onHubList === true) - Number(a.banco.onHubList === true) ||

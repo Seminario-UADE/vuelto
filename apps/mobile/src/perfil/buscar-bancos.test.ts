@@ -28,10 +28,36 @@ describe("buscarBancos", () => {
     expect(nombres(buscarBancos(catalogo, "  banco   del  "))).toEqual(["Banco del Sol"]);
   });
 
-  it("texto vacío o sin coincidencias devuelve []", () => {
-    expect(buscarBancos(catalogo, "")).toEqual([]);
-    expect(buscarBancos(catalogo, "   ")).toEqual([]);
+  it("sin coincidencias devuelve []", () => {
     expect(buscarBancos(catalogo, "mercado pago")).toEqual([]);
+  });
+
+  it("con texto vacío o solo espacios devuelve todo el catálogo: on_hub_list primero, cada grupo por nombre", () => {
+    for (const texto of ["", "   "]) {
+      const resultado = buscarBancos(catalogo, texto);
+      expect(resultado).toHaveLength(catalogo.length);
+      expect(nombres(resultado)).toEqual([
+        "Banco de la Nación Argentina",
+        "Banco Galicia",
+        "Santander",
+        "Banco del Sol",
+      ]);
+    }
+  });
+
+  it("sin texto y con onHubList en null en todos, ordena solo por nombre", () => {
+    const sinDato = [banco("b-3", "Santander", null), banco("b-1", "Banco Ciudad", null), banco("b-2", "Banco Galicia", null)];
+    expect(nombres(buscarBancos(sinDato, ""))).toEqual(["Banco Ciudad", "Banco Galicia", "Santander"]);
+  });
+
+  it("sin texto, el orden ignora mayúsculas y acentos del nombre", () => {
+    const mezcla = [banco("b-2", "Ñandú Bank", null), banco("b-1", "álamo Bank", null), banco("b-3", "Zeta Bank", null)];
+    expect(nombres(buscarBancos(mezcla, ""))).toEqual(["álamo Bank", "Ñandú Bank", "Zeta Bank"]);
+  });
+
+  it("un catálogo vacío devuelve []", () => {
+    expect(buscarBancos([], "")).toEqual([]);
+    expect(buscarBancos([], "galicia")).toEqual([]);
   });
 
   it("los on_hub_list van primero y cada grupo en orden alfabético (US3-1)", () => {
@@ -58,9 +84,10 @@ describe("buscarBancos", () => {
     expect(buscarBancos([...catalogo].reverse(), "banco")).toEqual(resultado);
   });
 
-  it("no muta el catálogo", () => {
+  it("no muta el catálogo, ni con texto vacío", () => {
     const copia = [...catalogo];
     buscarBancos(catalogo, "banco");
+    buscarBancos(catalogo, "");
     expect(catalogo).toEqual(copia);
   });
 });
