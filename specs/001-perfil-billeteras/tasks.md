@@ -28,7 +28,7 @@ description: "Tareas para el perfil de bancos, tarjetas y redes (issue #41)"
   - `"galic"`, `"GALIC"` y `"Galíc"` encuentran "Galicia".
   - Encuentra la palabra aunque esté en el medio del nombre.
   - Los espacios de más no importan.
-  - Texto vacío o sin coincidencias → `[]`.
+  - Sin coincidencias → `[]`. Texto vacío o solo espacios → todo el catálogo, con el mismo orden (cambia por la issue #128; antes devolvía `[]`).
   - Con coincidencias dentro y fuera de `on_hub_list`, los `on_hub_list` van primero y cada grupo queda en orden alfabético (US3-1). `onHubList: null` se ordena como no priorizado (decisión 9).
   - El resultado es el mismo sin importar el orden del catálogo de entrada.
 - [x] T005 Implementar `pf/buscar-bancos.ts` según la decisión 7 del plan: la normalización exacta que figura ahí, desempate por `id` y sin `localeCompare`. Hace pasar T004.
