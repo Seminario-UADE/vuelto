@@ -13,8 +13,9 @@ import * as api from "@/data/api";
 import { useAsync } from "@/hooks/use-async";
 import { aprox, iniciales, pesos } from "@/lib/format";
 import { hapticoExito } from "@/lib/haptics";
+import { idDeReferencia } from "@/lib/identidad";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectEntradasMotor, selectHoy } from "@/store/selectores";
+import { selectEntradasMotor } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { radius, space } from "@/theme";
 
@@ -27,12 +28,11 @@ export default function GastoEnGrupo() {
   const pedido = useAppSelector((s) => s.contactos.grupo);
   // «Vos» con tus medios, tus compras, el corpus y el reloj del store (G-01, ADR-010).
   const vos = useAppSelector(selectEntradasMotor);
-  const hoy = useAppSelector(selectHoy);
-  // Se recalcula si cambia el pedido o lo de «Vos» (medios, compras, corpus, día): ADR-010.
-  const claveVos = `${hoy}|${vos.medios.map((m) => m.id).join(",")}|${vos.compras.length}|${vos.promociones.length}`;
+  // Se recalcula si cambia el pedido o cualquier cosa de «Vos»: el selector devuelve otra
+  // referencia apenas cambia un medio, una compra, una promo o el reloj (ADR-010).
   const r = useAsync(
     () => (pedido ? api.recomendarGrupo(pedido, vos) : Promise.resolve(null)),
-    pedido ? `${JSON.stringify(pedido)}|${claveVos}` : null,
+    pedido ? `${JSON.stringify(pedido)}|${idDeReferencia(vos)}` : null,
   );
   const g = r.datos;
 

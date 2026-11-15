@@ -217,7 +217,10 @@ Observado (ver `armar-comercio-libre-oscuro.jpg` y `resultado-comercio-libre-osc
 
 ### Baja
 
-**G-12 · El reloj del "servidor" no es el de la app.** Código.
+**G-12 · El reloj del "servidor" no es el de la app.** ✅ Corregido (#130, de rebote con G-01):
+`recomendarGrupo` recibe las entradas del motor del store y toma «hoy» de su `ahora`; se
+borró `HOY_EN_EL_SERVIDOR`. Cuando exista la Edge Function (#56), el pedido tiene que llevar
+ese día explícito. Código.
 - `data/api.ts:44,163` usa `RELOJ_EJEMPLO` (14/10/2026); Armar usa `selectHoy` del
   store (`armar.tsx:29,34`), que con el corpus sincronizado es la fecha real.
 - Cuando difieren, `cuandoTexto` (`grupo-simulado.ts:61-64`) cae en la rama "no es hoy":
@@ -296,6 +299,7 @@ Recomendamos A. Decidirlo en la spec de #54/#56, antes de escribir la migración
    cuenta), G-07 (invitación pendiente), G-11 (estado vacío).
 2. **Decisiones de producto antes de código:** G-06 (dominio o esquema propio), G-08
    (¿cuenta la base en el desempate?), G-09 (qué hace «Confirmar»), G-10 (redondeo).
-3. **Con el backend (#54/#56):** G-03, G-12, G-13, G-14 y la sección 4. Es una feature
+3. **Con el backend (#54/#56):** G-03, G-13, G-14 y la sección 4 (G-12 ya se corrigió en
+   la app con #130; falta llevar el día en el pedido a la Edge Function). Es una feature
    completa: sigue el ciclo de spec-kit (`/speckit-specify` → `spec-critic` →
    `/speckit-plan`).
