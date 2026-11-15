@@ -8,14 +8,15 @@ el proyecto con Claude Code. Se entrega a la cátedra junto con
 
 ## 1. IA en el producto (en producción)
 
-Vuelto usa un LLM (Gemini API) en un solo rol, acotado y explícito: **extraer
-datos estructurados de texto no estructurado**. Nunca decide nada por el
-usuario.
+Vuelto usa modelos de lenguaje en un solo rol, acotado y explícito: **extraer
+datos estructurados de texto o imágenes no estructurados**. Nunca deciden nada
+por el usuario. Los tickets los lee Groq y la letra chica de las promos, Gemini
+(`decisions/012-groq-lee-los-tickets.md`).
 
 | Dónde | Qué hace | Corre en | Revisión humana |
 |---|---|---|---|
-| Ingesta de letra chica de promociones | Convierte la prosa legal de cada banco/billetera en los atributos del modelo de datos, contra un esquema forzado (`null` explícito si un campo no está) | Servidor, offline, en lote | Ninguna — publicación automática si el borrador completa el esquema (campos obligatorios no `null`); si no, se descarta solo (ver `decisions/005-ingesta-automatica-sin-revision-humana.md`) |
-| Registro de compras por ticket | Extrae monto, comercio, medio de pago y descuento de la foto del comprobante | Edge Function de Supabase (servidor) | El propio usuario confirma antes de que el registro sea válido (ver `decisions/006-registro-de-compras-por-ticket.md`) |
+| Ingesta de letra chica de promociones (Gemini) | Convierte la prosa legal de cada banco/billetera en los atributos del modelo de datos, contra un esquema forzado (`null` explícito si un campo no está). **Todavía no está implementado** (issue #51): hoy la ingesta mapea por código lo que MODO ya trae estructurado, y deja en `null` lo que solo está en la letra chica | Servidor, offline, en lote | Ninguna — publicación automática si el borrador completa el esquema (campos obligatorios no `null`); si no, se descarta solo (ver `decisions/005-ingesta-automatica-sin-revision-humana.md`) |
+| Registro de compras por ticket (Groq) | Extrae monto, comercio, fecha y medio de pago tal como figura en la foto del comprobante; no lee descuentos (ADR-012). La Edge Function `extraer-ticket` está hecha, pero la app todavía no la llama: hoy la pantalla devuelve un ticket de ejemplo (issues #48 y #49) | Edge Function de Supabase (servidor) | El propio usuario confirma antes de que el registro sea válido (ver `decisions/006-registro-de-compras-por-ticket.md`) |
 
 **Frontera que no se cruza:** el motor de reglas — la pieza que efectivamente
 le dice al usuario qué medio de pago usar — es código determinístico,
@@ -25,9 +26,10 @@ preguntarle a un modelo "con qué pago" en vez de correr el motor mata el
 determinismo, los tests, y el argumento de innovación tecnológica de la
 materia.
 
-Las imágenes de ticket no se persisten (se mandan a Gemini y se descartan);
-sí se persiste el texto extraído. La API key de Gemini nunca viaja al
-celular — solo el script de ingesta y la Edge Function la usan.
+Las imágenes de ticket no se persisten (se mandan a Groq, con Zero Data
+Retention activado, y se descartan); sí se persiste el texto extraído, con los
+datos personales tapados. Las API keys nunca viajan al celular: la de Groq vive
+en Supabase y la de Gemini, en GitHub Actions.
 
 ## 2. IA para construir y gestionar el proyecto (Claude Code)
 
@@ -65,5 +67,6 @@ sesión de trabajo con IA queda registrada en `docs/bitacora-prompts.md`.
 - **Por qué se decidió cada cosa**: `docs/decisions/` (motor de reglas
   separado, Expo sobre Flutter, Supabase sobre Firebase, LLM solo en la
   ingesta, ingesta automática sin revisión humana, registro por ticket,
-  spec-kit sobre `to-spec`).
+  spec-kit sobre `to-spec`, contactos vinculados, núcleo funcional, motor en la
+  app con Redux, corpus siempre automático y Groq para los tickets).
 - **Qué falta o está en duda**: `docs/product/pendientes.md`.

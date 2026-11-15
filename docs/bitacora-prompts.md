@@ -2650,6 +2650,206 @@ lo conecte a la pantalla de confirmar la compra.
 
 ---
 
+## 2026-11-15 — Presentación de la entrega del MVP (issue #131)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con la skill `presentaciones-visuales`.
+
+**Objetivo:** armar el guion con reparto y tiempos de los 4 integrantes y el
+deck de la entrega del MVP. El material anterior era de las entregas parciales
+y presentaba como futuro lo que ya existe.
+
+**Prompts principales:**
+1. Leer `CLAUDE.md`, la issue #131, el guion y el deck anteriores, el alcance, los
+   requisitos, `uso-de-ia.md` y `docs/design/`. Antes de redactar: preguntar fecha,
+   duración y formato, y armar una tabla de «qué funciona de punta a punta / qué
+   está simulado / qué falta» verificada contra el repo, sin asumir.
+2. Respuestas al formulario: entrega esta semana (sin día exacto), 10 minutos,
+   presencial con proyector.
+3. «Sí, seguí» a la tabla, para pasar a redactar el guion y el deck en HTML, en modo
+   claro y oscuro.
+
+**Resultado:**
+- La tabla se verificó contra `gh issue list --state all`, el código, el CI y el log
+  de la última ingesta. Confirmó lo que el usuario ya sabía: la lectura del ticket en
+  la app (#49) y el gasto en grupo (#54, #130) están simulados, y la ingesta de MODO
+  corre sola todos los días. Encontró lo que faltaba: la Edge Function del ticket
+  (#48) está hecha pero en un PR abierto (#133) y sin conectar a la app; el extractor
+  de letra chica (#51) no existe; no hay informes de precisión (#10, #53); el APK de
+  respaldo (#56) y la auditoría de secretos (#55) no se hicieron; la base alojada
+  estuvo con migraciones atrasadas (#127); y 3 de las últimas 10 corridas de la
+  ingesta fallaron.
+- `docs/presentacion/guion.md` se reescribió para 10 minutos, con reparto por
+  integrante, tiempos por slide, qué decir y qué decir «en voz alta» como simulado,
+  preguntas probables y lista de control.
+- `docs/presentacion/vuelto-mvp.html`: deck de 13 slides con la paleta de la app v9.1,
+  modo claro y oscuro (`D`), cronómetro (`T`) y pantalla completa (`F`). Las capturas
+  del rediseño quedaron como `[PENDIENTE]`: las de `docs/design/` son de la v8 y no
+  había una sesión de Supabase local libre para sacar nuevas.
+- `docs/uso-de-ia.md` se actualizó: dice Groq para tickets y Gemini para letra chica,
+  y que esta última todavía no está implementada.
+- Las cifras del deck salen de las fuentes del repo: la encuesta
+  (`encuesta-resultados.md`), `alcance-mvp.md`, el log de la ingesta del 14/11 y el
+  conteo de tests (motor 216, app 709, supabase 40, ingesta 295). No se citan
+  resultados de #10 ni #53 porque no existen.
+- Pendientes marcados `[PENDIENTE: …]`: día y hora de la entrega, capturas v9.1,
+  build de respaldo y su link, comercio y monto de la demo, prueba en modo avión en
+  un celular real, estado del PR #133 y de las migraciones, y el ensayo completo.
+- Error de proceso: las primeras capturas candidatas parecían del rediseño actual y
+  eran de la v8 (crema, con datos de ejemplo); se vio al abrirlas y se descartaron.
+## 2026-11-14 — Migraciones al día: chequeo en el CI y error claro en la app (issue #127, ADR-013)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con `gh` CLI y el subagente `test-runner`.
+
+**Objetivo:** que no vuelva a pasar que la base alojada quede atrás de las
+migraciones del repo sin que nadie se entere (la app falló en el celular con
+«No pudimos cargar los bancos» porque faltaban cuatro migraciones).
+
+**Prompts principales:**
+1. "Leé CLAUDE.md, la infraestructura y el issue #127 [...] Mi recomendación
+   (cuestionala si ves algo mejor): NO aplicar migraciones automáticamente a
+   producción en cada merge. Un job de CI con `migration list --linked`, una
+   casilla en la plantilla de PR y que la app distinga «servidor no al día» de
+   «sin conexión». No ejecutes `db push` ni pidas credenciales. Proponeme el
+   plan y esperá mi OK antes de editar."
+2. "Aprobado" (el plan con dos desviaciones de la recomendación, ver abajo).
+
+**Resultado:**
+- Se leyó antes de proponer y se esperó el OK. Dos cambios sobre lo pedido,
+  aprobados por el usuario: el chequeo **no corre en `pull_request`** (un PR con
+  una migración nueva fallaría siempre, y un workflow editable por el PR no debe
+  leer el secret) y usa **un solo secret, `SUPABASE_DB_URL`**, con
+  `migration list --db-url`, en vez del token de acceso de toda la cuenta más la
+  contraseña.
+- `.github/workflows/migraciones.yml` (push a `main` con cambios de migraciones,
+  diario y a mano) lista las migraciones y `supabase/scripts/` las compara. Una
+  salida que no se pudo leer falla: no se toma por «al día». No aplica nada.
+- Casilla en `.github/pull_request_template.md`, comando en `CLAUDE.md`, pasos
+  para cargar el secret en `docs/architecture/04-infrastructure.md` y la decisión
+  en el ADR-013 (por qué no aplicar en el merge y cuándo revisarlo).
+- En la app, `clasificarError` devuelve `servidor_desactualizado` para columna,
+  tabla o función inexistentes y para un 403 con `42501`; el perfil y los bancos
+  lo muestran en vez de «sin conexión» o «No pudimos guardar el cambio».
+- Lo que **no** se pudo probar: la conexión real a la base alojada, el formato
+  de `--db-url` contra el pooler y la ejecución en GitHub Actions (no hay
+  secret ni se tocó la base alojada; Docker estaba apagado, así que tampoco se
+  comparó contra la salida real de `migration list --local`). El analizador se
+  probó con tablas de ejemplo con los dos estilos de separador.
+- Quedó fuera a propósito: la subida de compras (`data/compras/errores.ts`)
+  sigue tratando los errores desconocidos como transitorios, para no perder
+  compras del usuario; hay que decidirlo aparte porque cambia la spec 010.
+- Errores de la IA en el proceso: se creó primero `supabase/scripts/` sin los
+  tipos de Node en el workspace (falló el `typecheck`; se sumó `@types/node`);
+  una fila de la tabla de secrets quedó separada del resto por una línea en
+  blanco y se corrigió; un archivo temporal de prueba fue a la carpeta temporal
+  del sistema en vez de la del scratchpad y se borró.
+
+---
+
+## 2026-11-15 — Selector de medio: todos los bancos y redes en grilla (issue #128)
+
+**Herramienta:** Claude Code (Sonnet 5.5) en la app de escritorio, con el emulador de Android y Expo Go
+para probar en pantalla, y los agentes `test-runner` y `/code-review` antes del PR.
+
+**Objetivo:** arreglar dos problemas del selector de medio de pago (onboarding y «Agregar tarjeta» en
+Perfil): la lista de bancos aparecía vacía hasta escribir, y las 9 redes salían encimadas y cortadas
+en un control segmentado pensado para 2 o 3 opciones.
+
+**Prompts principales:**
+1. Pedido del issue #128 con reglas: verificar los dos problemas en el código y mostrar la opción de
+   diseño en una línea antes de editar; bancos completos con el buscador vacío; redes legibles con
+   44 pt de área táctil, sin volver a las píldoras; tests primero para `buscar-bancos`; actualizar a
+   mano la spec 001; sin tocar ingesta ni base; capturas antes y después; no dar por hecho lo no
+   probado. «Mostrame el plan con los archivos que vas a tocar y esperá mi OK.»
+2. «Sí, adelante», sobre el plan con la rama cortada desde `origin/main`.
+
+**Resultado:**
+- La rama de trabajo estaba 138 commits atrás de `origin/main` y no tenía `apps/mobile/src/perfil`;
+  se cortó `claude/128-bancos-y-redes` desde `origin/main`.
+- `buscarBancos` devuelve el catálogo completo, ordenado, con el texto vacío; los tests se reescribieron
+  primero y se vieron fallar. El issue decía «8 redes» pero lista 9: son 9 (spec y enum).
+- `GrillaRedes` (cuadrados de opción de 16 pt, borde de 2 pt y check al elegir) reemplaza al
+  `Segmentado` de las redes. `columnasRedes` (función pura, con tests) elige 3, 2 o 1 columnas según
+  el ancho del contenedor y la letra del sistema; así «Mastercard» nunca se parte.
+- `Screen` deja libre el alto del teclado al final en Android (`useAlturaTeclado`): en el emulador
+  con teclado abierto el último banco quedaba tapado. Es un cambio global, lo usan unas 18 pantallas.
+- Spec 001 (US1-1, US3-2, FR-001, FR-002, FR-005), `plan.md`, `tasks.md` y `DESIGN.md` (v9.2).
+- Capturas antes y después en `docs/capturas/bancos-redes-128/`, en claro y oscuro, con teclado,
+  con letra 1.3 y 1.8 y la variante de Perfil.
+- Revisión (`/code-review`): sin violaciones duras. Se aplicaron los tokens del tema en la grilla, un
+  comentario que contradecía a su constante, `plan.md:80` (decía que con texto vacío no se muestra
+  nada) y un aviso para el catálogo vacío. Quedó sin cambiar: el hook del teclado repite el patrón de
+  `tab-bar.tsx` y la lista de 82 no está virtualizada.
+- Verificado: lint, typecheck y los tests de los 4 workspaces. En pantalla, solo en el emulador de
+  Android (API 36) y con un arnés temporal que no se commiteó, porque en esta máquina no hay
+  credenciales de Supabase: muestra el `SelectorMedio` real con los 82 bancos del relevamiento de MODO,
+  no la pantalla real con la base. No se probó en iOS ni en un celular real; los componentes no tienen
+  tests de pantalla.
+- Errores de la IA en el proceso: una expectativa mal escrita en un test (Santander es `on_hub_list` y
+  va antes que Banco del Sol), un alias `@/` que Vitest no resuelve y que rompió un import, y dos veces
+  borró o pisó capturas con un comando demasiado amplio; se restauraron o se volvieron a sacar.
+
+---
+
+## 2026-11-15 — Gasto compartido con los datos de la cuenta (issue #130)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI, el navegador del panel
+de Claude y Supabase local (Docker). Subagentes: `test-runner`,
+`rules-guardian` y las dos revisiones de `/code-review`.
+
+**Objetivo:** corregir G-01, G-02 y G-04 de la revisión del gasto compartido
+(`docs/product/revision-gasto-grupo.md`). Con una cuenta real, «Vos» se
+evaluaba con los datos de Martín, todas las cuentas tenían a Lucía y Mateo de
+contactos y un comercio que no se podía resolver dejaba el resultado
+cargando para siempre.
+
+**Prompts principales:**
+1. "Leé CLAUDE.md, los ADR 008 a 010, la revisión y el issue #130. Corregí
+   G-01, G-02 y G-04; antes de editar, verificá que cada hallazgo siga igual.
+   Proponeme un plan y esperá mi OK." Se decidió implementar directo, sin
+   spec-kit: es un issue S de bugs y la revisión ya dice cómo corregirlos
+   (ADR-007). G-01 y G-02 seguían igual. G-04 había cambiado en parte:
+   armar y resultado ya buscaban el comercio en el store, pero si no lo
+   encontraban el pedido seguía cayendo en `comercioPorId`, y el resultado no
+   mostraba el error.
+2. "OK, avanzá." Primero los tests en rojo (10 fallaban por la razón
+   esperada), después el código.
+3. Al vaciar la lista de contactos se rompía la última línea del test
+   «contactos no se guardan» (`persistencia.test.ts`), que el usuario había
+   pedido no tocar. Se le preguntó y eligió cambiar solo esa línea: los
+   contactos siguen sin guardarse, y G-03 queda afuera.
+
+**Resultado:**
+- G-01: «Vos» se evalúa con los medios, las compras, el corpus y el reloj del
+  store (`selectEntradasMotor`). «Hoy» sale de ese reloj, no del reloj de
+  ejemplo, así que también se corrige G-12 en este camino. Los contactos
+  siguen simulados y se evalúan con el mismo corpus.
+- G-02: la lista de contactos arranca vacía y aparece el estado vacío que ya
+  estaba diseñado. Lucía y Mateo vienen solo al elegir un escenario de demo.
+- G-04: el pedido lleva el `Comercio` ya resuelto y se borró `comercioPorId`.
+  El resultado muestra el error con «Reintentar» y armar avisa si no hay
+  comercio. «¿Pagan entre varios?» ya no se ofrecía para un comercio sin
+  rubro (la recomendación es `null`), así que esa pantalla no se tocó.
+- Se verificó en la app web con Supabase local y una cuenta nueva, en claro
+  y oscuro, antes y después (`docs/design/capturas-130/`). Con el código
+  anterior, la cuenta nueva veía a Lucía y Mateo, el grupo decía «Tu Galicia
+  Visa crédito… según 3 compras de octubre» (la cuenta solo tenía una
+  Santander y ninguna compra) y un comercio desconocido dejaba el resultado
+  en el esqueleto.
+- Quedó sin verificar en pantalla el error con «Reintentar» del resultado:
+  con el comercio ya resuelto, el simulador no falla. Se va a ver con el
+  backend real (#56).
+- Lo que marcaron las revisiones y se ajustó: el resultado se recalcula si
+  cambian los datos de «Vos»; el error se muestra inline, en `error`
+  (DESIGN.md); armar no arma el grupo con otro comercio que el que pide la
+  ruta; los tests no repiten el pedido.
+- Errores de la IA en el proceso: el plan decía que «¿Pagan entre varios?»
+  se seguía ofreciendo sin rubro. Recién al leer la pantalla con más detalle
+  se vio que no. Además, la base de Supabase local estaba vieja (le faltaban
+  migraciones) y se aplicaron las que faltaban con `supabase migration up`,
+  sin borrar datos.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
