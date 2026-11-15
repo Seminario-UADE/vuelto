@@ -9,5 +9,5 @@
     }
   },
   "include": ["functions/**/*.ts"],
-  "exclude": ["functions/*/index.ts"]
+  "exclude": ["functions/*/index.ts", "functions/_shared/supabase/**"]
 }

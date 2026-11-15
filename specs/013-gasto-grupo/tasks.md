@@ -21,9 +21,9 @@ description: "Tareas de la spec 013: gasto en grupo con contactos vinculados"
 
 **Purpose**: dejar el entorno listo y la base verde antes de tocar nada.
 
-- [ ] T001 Correr `npm run lint`, `npm run typecheck` y `npm run test` en la raíz sobre la rama sin cambios y anotar el resultado de base (si algo ya falla en `main`, se dice en el PR).
-- [ ] T002 [P] Crear `supabase/functions/.env.example` con `GRUPO_CLAVE_SERVIDOR=` y un comentario que remita a `specs/013-gasto-grupo/quickstart.md` §Configuración; confirmar que `supabase/functions/.env` está en `.gitignore` (sumarlo si no).
-- [ ] T003 [P] Excluir `functions/_shared/supabase/**` de `supabase/tsconfig.json` (`exclude`) y de la cobertura en `supabase/vitest.config.ts`, con el mismo comentario que ya justifica `functions/*/index.ts` (lo chequea `deno check`, research R8).
+- [X] T001 Correr `npm run lint`, `npm run typecheck` y `npm run test` en la raíz sobre la rama sin cambios y anotar el resultado de base (si algo ya falla en `main`, se dice en el PR).
+- [X] T002 [P] Crear `supabase/functions/.env.example` con `GRUPO_CLAVE_SERVIDOR=` y un comentario que remita a `specs/013-gasto-grupo/quickstart.md` §Configuración; confirmar que `supabase/functions/.env` está en `.gitignore` (sumarlo si no).
+- [X] T003 [P] Excluir `functions/_shared/supabase/**` de `supabase/tsconfig.json` (`exclude`) y de la cobertura en `supabase/vitest.config.ts`, con el mismo comentario que ya justifica `functions/*/index.ts` (lo chequea `deno check`, research R8).
 
 ---
 
@@ -31,10 +31,10 @@ description: "Tareas de la spec 013: gasto en grupo con contactos vinculados"
 
 **Purpose**: un solo cálculo de consumo de topes para la compra individual y la de grupo (FR-003, research R7).
 
-- [ ] T004 Agregar `ConsumoDeTope { id: string; promocionId: string | null; fecha: FechaISO; monto: number; descuentoObtenido: number | null }` en `packages/motor/src/tipos.ts`, con su comentario ("Lo que el motor necesita de una compra para los topes. `Compra` lo cumple").
-- [ ] T005 Cambiar las firmas para que acepten `readonly ConsumoDeTope[]` en lugar de `Compra[]`: `calcularSaldos` y lo que use en `packages/motor/src/tope.ts`, `recomendar` (`comprasDelPeriodo`) en `packages/motor/src/recomendar.ts` y `estimarTopes` en `packages/motor/src/estimar.ts`. No cambiar ningún test existente.
-- [ ] T006 Agregar un test en `packages/motor/src/tope.test.ts` que llame a `calcularSaldos` con objetos `ConsumoDeTope` literales (sin los demás campos de `Compra`) y obtenga el mismo saldo que con compras completas.
-- [ ] T007 Correr `npm run test -w @vuelto/motor`, `npm run typecheck` y `npm run test -w @vuelto/supabase`: todo verde sin tocar los tests existentes (la app y `recomendar/servicio.ts` siguen pasando `Compra[]`).
+- [X] T004 Agregar `ConsumoDeTope { id: string; promocionId: string | null; fecha: FechaISO; monto: number; descuentoObtenido: number | null }` en `packages/motor/src/tipos.ts`, con su comentario ("Lo que el motor necesita de una compra para los topes. `Compra` lo cumple").
+- [X] T005 Cambiar las firmas para que acepten `readonly ConsumoDeTope[]` en lugar de `Compra[]`: `calcularSaldos` y lo que use en `packages/motor/src/tope.ts`, `recomendar` (`comprasDelPeriodo`) en `packages/motor/src/recomendar.ts` y `estimarTopes` en `packages/motor/src/estimar.ts`. No cambiar ningún test existente.
+- [X] T006 Agregar un test en `packages/motor/src/tope.test.ts` que llame a `calcularSaldos` con objetos `ConsumoDeTope` literales (sin los demás campos de `Compra`) y obtenga el mismo saldo que con compras completas.
+- [X] T007 Correr `npm run test -w @vuelto/motor`, `npm run typecheck` y `npm run test -w @vuelto/supabase`: todo verde sin tocar los tests existentes (la app y `recomendar/servicio.ts` siguen pasando `Compra[]`).
 
 **Checkpoint**: el motor acepta el consumo reducido; nada más cambió.
 

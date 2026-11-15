@@ -15,11 +15,11 @@ import {
 import { cifraDeTope, estePeriodo, textoSegun } from "./motivos.ts";
 import { compararIds } from "./orden.ts";
 import { calcularSaldos, type Saldo } from "./tope.ts";
-import type { Compra, EstimacionTope, Perfil, Promocion, TextoEstimacion } from "./tipos.ts";
+import type { ConsumoDeTope, EstimacionTope, Perfil, Promocion, TextoEstimacion } from "./tipos.ts";
 
 export function estimarTopes(
   promociones: Promocion[],
-  comprasDelPeriodo: Compra[],
+  comprasDelPeriodo: readonly ConsumoDeTope[],
   perfil: Perfil | null,
   ahora: Date,
 ): EstimacionTope[] {

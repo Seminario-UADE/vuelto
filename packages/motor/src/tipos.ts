@@ -152,6 +152,21 @@ export interface Compra {
   textoExtraido: string | null;
 }
 
+/**
+ * Lo que el motor necesita de una compra para los topes (spec 013, FR-002 y
+ * FR-003). `Compra` lo cumple, así que la compra individual y la de grupo
+ * calculan el consumo con la misma función. En el gasto en grupo, el `id` de
+ * la compra de un contacto es opaco: lo arma la Edge Function y nunca es el de
+ * la base.
+ */
+export interface ConsumoDeTope {
+  id: string;
+  promocionId: string | null;
+  fecha: FechaISO;
+  monto: number;
+  descuentoObtenido: number | null;
+}
+
 /** La compra que el usuario está por hacer: la entrada de `recomendar()`. */
 export interface CompraPropuesta {
   comercio: string | null;
