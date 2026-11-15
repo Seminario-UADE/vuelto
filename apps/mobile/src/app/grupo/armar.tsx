@@ -34,8 +34,9 @@ export default function ArmarGrupo() {
   const nombre = desdeComercio ? null : ejemplo.nombre;
 
   // El mismo comercio que resolvió el «+» (G-04), sin red (#43); sin él, el del grupo de ejemplo.
+  // Si la ruta pide otro que el de la simulación, no se arma el grupo con uno que no se eligió.
   const simulado = useAppSelector(selectComercioSimulado);
-  const comercio = desdeComercio ? simulado : ejemplo.comercio;
+  const comercio = desdeComercio ? (simulado?.id === p.comercio ? simulado : null) : ejemplo.comercio;
 
   const [monto, setMonto] = useState<number | null>(desdeComercio ? parseMonto(p.monto ?? "") : ejemplo.monto);
   const [excluidos, setExcluidos] = useState<string[]>([]);
@@ -44,7 +45,7 @@ export default function ArmarGrupo() {
 
   const elegidos = contactos.filter((c) => !excluidos.includes(c.id));
   const cantidad = 1 + elegidos.length + sinCuenta.length;
-  const listo = comercio !== null && monto !== null && cantidad >= 2;
+  const listo = monto !== null && cantidad >= 2;
 
   const agregar = () => {
     const n = nuevo.trim();
@@ -90,20 +91,18 @@ export default function ArmarGrupo() {
         </>
       }
     >
-      {
-        <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
-          <Avatar icon={iconoDeRubro[comercio.rubro]} rubro={rubroColors[comercio.rubro]} />
-          <View style={{ flex: 1 }}>
-            <Text variant="bodyLg" weight="semibold">
-              {nombre ?? comercio.nombre}
-            </Text>
-            <Text variant="label" tone="inkSecondary">
-              {nombre ? `${comercio.nombre} · ` : ""}
-              {fecha === hoy ? "hoy" : `sábado ${fechaCorta(fecha)}`}
-            </Text>
-          </View>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
+        <Avatar icon={iconoDeRubro[comercio.rubro]} rubro={rubroColors[comercio.rubro]} />
+        <View style={{ flex: 1 }}>
+          <Text variant="bodyLg" weight="semibold">
+            {nombre ?? comercio.nombre}
+          </Text>
+          <Text variant="label" tone="inkSecondary">
+            {nombre ? `${comercio.nombre} · ` : ""}
+            {fecha === hoy ? "hoy" : `sábado ${fechaCorta(fecha)}`}
+          </Text>
         </View>
-      }
+      </View>
 
       <Card>
         <MontoInput value={monto} onChange={setMonto} label="Monto total" />

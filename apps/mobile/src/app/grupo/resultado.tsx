@@ -4,7 +4,6 @@ import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
 import { DecisionCard } from "@/components/decision-card";
-import { EmptyState } from "@/components/empty-state";
 import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
@@ -15,7 +14,7 @@ import { useAsync } from "@/hooks/use-async";
 import { aprox, iniciales, pesos } from "@/lib/format";
 import { hapticoExito } from "@/lib/haptics";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectEntradasMotor } from "@/store/selectores";
+import { selectEntradasMotor, selectHoy } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { radius, space } from "@/theme";
 
@@ -28,9 +27,12 @@ export default function GastoEnGrupo() {
   const pedido = useAppSelector((s) => s.contactos.grupo);
   // «Vos» con tus medios, tus compras, el corpus y el reloj del store (G-01, ADR-010).
   const vos = useAppSelector(selectEntradasMotor);
+  const hoy = useAppSelector(selectHoy);
+  // Se recalcula si cambia el pedido o lo de «Vos» (medios, compras, corpus, día): ADR-010.
+  const claveVos = `${hoy}|${vos.medios.map((m) => m.id).join(",")}|${vos.compras.length}|${vos.promociones.length}`;
   const r = useAsync(
     () => (pedido ? api.recomendarGrupo(pedido, vos) : Promise.resolve(null)),
-    pedido ? JSON.stringify(pedido) : null,
+    pedido ? `${JSON.stringify(pedido)}|${claveVos}` : null,
   );
   const g = r.datos;
 
@@ -50,19 +52,6 @@ export default function GastoEnGrupo() {
       <Screen>
         <Text variant="bodyLg">Armá el grupo primero.</Text>
         <Button label="Armar grupo" onPress={() => router.replace("/grupo/armar")} />
-      </Screen>
-    );
-  }
-
-  if (!g && r.estado === "error") {
-    // Sin esto la pantalla quedaba en el esqueleto para siempre (G-04).
-    return (
-      <Screen>
-        <EmptyState
-          title="No pudimos calcular quién conviene que pague"
-          body={r.error ?? "Algo salió mal. Probá de nuevo."}
-          action={{ label: "Reintentar", onPress: r.recargar }}
-        />
       </Screen>
     );
   }
@@ -95,7 +84,16 @@ export default function GastoEnGrupo() {
         {g ? `${g.nombre ?? g.comercio.nombre} · ${g.cuando} · ${pesos(g.monto)} · ${n} personas` : " "}
       </Text>
 
-      {g ? (
+      {!g && r.estado === "error" ? (
+        // Sin esto la pantalla quedaba en el esqueleto para siempre (G-04). Error inline, en
+        // `error` y con una salida (DESIGN.md).
+        <Card gap={space.md}>
+          <Text variant="bodyLg" tone="error" accessibilityLiveRegion="polite">
+            No pudimos calcular quién conviene que pague. Probá de nuevo.
+          </Text>
+          <Button label="Reintentar" variant="secondary" icon="recargar" onPress={r.recargar} />
+        </Card>
+      ) : g ? (
         <DecisionCard
           titulo={titulo}
           inicial={g.quienPaga && !g.quienPaga.esVos ? iniciales(g.quienPaga.nombre) : null}
