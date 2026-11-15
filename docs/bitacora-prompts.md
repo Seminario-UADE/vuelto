@@ -2526,6 +2526,130 @@ proveedor que cuide la privacidad sin costo.
 
 ---
 
+## 2026-11-10 — Spec de la lectura del ticket con Groq (issue #48)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit, `spec-critic` y `gh` CLI.
+
+**Objetivo:** escribir la spec del servicio que lee la foto de un ticket y
+devuelve sus datos, ya con Groq (ADR-012), para que después la issue #49
+lo conecte a la pantalla de confirmar la compra.
+
+**Prompts principales:**
+1. "Arrancá la issue #48 sobre el PR #126." Se acordó el alcance: solo el
+   servicio y su contrato; la cámara y la pantalla son de la issue #49.
+2. "¿Cómo serían las reglas de código para tapar datos personales, si no
+   todos los tickets los tienen en el mismo lugar?" Las reglas buscan por la
+   forma del dato (tarjeta, CUIT con dígito verificador, DNI anunciado), no
+   por su lugar. Los nombres no tienen forma fija: se le pide a Groq que los
+   tape, y las reglas quedan como red de seguridad. "Con las dos capas,
+   arrancá."
+3. "No entendí: ¿quién definió el formato que espera la app? ¿El descuento se
+   puede sacar del ticket o se calcula después?" El formato lo armó Joaquín
+   para un lector de mentira. Se decidió que el servicio devuelva el medio de
+   pago tal como lo dice el ticket (la app lo cruza con las tarjetas del
+   perfil) y no leer el descuento: casi ninguna promo bancaria aparece en el
+   ticket, y el reintegro ya lo calcula el motor al confirmar.
+4. "El ticket va a ser de un solo pago" y "que haga falta tener cuenta".
+5. "Pasala por spec-critic y corregí el ADR-012."
+6. "Commiteá ambos y seguí con el plan." El plan define cómo se arma el
+   servicio (igual que el de recomendar), que Groq devuelve los datos tal
+   como están impresos y nuestro código los convierte, el contrato para la
+   app (issue #49) con un mensaje sugerido para cada error, y una prueba con 3
+   fotos reales que corre el usuario fuera de la sesión de IA antes de
+   escribir el servicio.
+7. "Commiteá y seguí con las tasks." 28 tareas en 3 etapas. La primera
+   termina con la prueba de Groq con fotos reales, que corre el usuario: si
+   no pasa, no se sigue. Los tests van antes que el código, sin red ni key.
+8. "Arrancá con la etapa 1, hasta la tarea 9 en pausa." Se armó lo mínimo
+   para hablarle a Groq: el esquema, su validación en el servidor y la
+   conexión, con tests que simulan a Groq. Más un script para que el usuario
+   pruebe con fotos reales en otra terminal, sin que la key pase por la IA.
+9. "Me devolvió ExtractorNoDisponibleError." El script no decía por qué. Se
+   le sumó el código de Groq o el motivo de la falla de conexión, sin datos
+   del ticket. En el segundo intento, Groq leyó bien el primer ticket: monto,
+   fecha y red correctos, y el tipo de tarjeta vacío porque el ticket no lo
+   dice. Eligió la razón social en vez del nombre del local.
+10. "Ajustá lo del comercio." La instrucción a Groq y el esquema ahora piden
+    el nombre del local (el que reconoce el usuario y el que se cruza con la
+    compra por confirmar) y, si no hay, la razón social. Error de la IA: el
+    commit anterior dejó un import sin usar porque no se corrió el lint antes
+    de commitear; se corrigió en este.
+11. "Algunas fotos dan 429. ¿Puede ser que Groq esté dormido y haya que
+    darle tiempo, o mandarle una señal antes?" El 429 era el límite de uso
+    por minuto, no un arranque en frío. "No venía de probar antes, fueron
+    días distintos": la primera explicación de la IA no cerraba, así que se
+    pasó a mostrar el mensaje de Groq, que dice qué límite se superó.
+12. "¿Las tres fotos se mandan juntas o de a una?" De a una; el script
+    muestra los resultados al final. En la app es siempre una foto por
+    pedido.
+13. Con los mensajes de Groq y los límites que el usuario vio en la consola
+    se ajustó: apagar el "pensamiento" interno del modelo (cada ticket pasó
+    de unos 3.500 a unos 1.350 tokens), sacar el tope de respuesta (con tope,
+    Groq cortaba el texto antes de tiempo; se comprobó con una prueba con y
+    sin tope) y reintentar una vez si Groq pide esperar 12 segundos o menos.
+    "¿Cuánto esperaría?": lo que diga Groq, solo si entra en los 20 segundos.
+14. "Commiteá y seguí con la etapa 2." El servicio convierte lo que lee Groq
+    (importes con formato argentino, fechas, red, débito o crédito, últimos 4)
+    con reglas probadas que nunca deducen, y tapa en el texto tarjetas, CUIT
+    de personas y DNI. Los casos de prueba incluyen formatos reales de los
+    tickets del usuario. Para no tapar códigos que no son tarjetas (números
+    de factura, códigos de barras), se usa la cuenta de control de las
+    tarjetas. Error de la IA: un test del servicio se escribió y se hizo
+    pasar sin verlo fallar antes; en el resto de la etapa se volvió al orden.
+15. "Commiteá y seguí con la etapa 3." La validación de la foto (formato,
+    tamaño y archivo dañado, antes de gastar cupo de Groq), la puerta de
+    entrada con un código por cada error y registros de una sola línea sin
+    datos del ticket, la entrada de la función y la documentación del
+    endpoint para la issue #49.
+16. "Revisá los resultados y mostrame todo junto" y "avanzá con los arreglos
+    1 a 8". Las revisiones (reglas, estándares y spec) no encontraron
+    incumplimientos de reglas, pero sí un caso real: si Groq o la
+    verificación de la cuenta se colgaban a mitad de camino, nada cortaba y
+    el usuario podía esperar más de 25 segundos. Ahora el corte de Groq cubre
+    la respuesta completa y hay un límite de 24 segundos para todo el pedido.
+    También: cualquier caída de Groq es "no disponible"; una tarjeta agrupada
+    de a 4 se tapa siempre, aunque Groq haya leído mal un dígito (antes
+    quedaba visible); el servicio se llama como los demás; y se sacó código
+    repetido. Error de la IA: las pruebas de estos arreglos se escribieron
+    junto con el código, sin verlas fallar antes.
+17. "Pasame el comando del despliegue." El usuario desplegó la función desde
+    Git Bash (`supabase login` y `supabase functions deploy` con `--use-api`)
+    y la probó con la key pública: respondió `no_autenticado`. O sea, la
+    función arranca con la key de Groq de los secrets y rechaza a quien no
+    tiene cuenta. "Igual la #49 es mi ticket": las notas para conectar la app
+    quedan para esa issue y no como aviso a otro integrante.
+
+**Resultado:**
+- Spec 013: qué recibe y qué devuelve el servicio, qué datos personales
+  tapa en el texto del ticket, un código distinto para cada error y una
+  prueba manual con fotos reales antes de escribir el código.
+- Groq devuelve los datos tal como están impresos y nuestro código los
+  convierte, así se puede probar que nunca se deduce nada (por ejemplo, la
+  red por los dígitos de la tarjeta).
+- Dos pasadas de spec-critic: la primera encontró que el contrato no
+  coincidía con lo que espera la app y que no estaba claro qué era el
+  descuento; la segunda, detalles técnicos que se resolvieron.
+- El ADR-012 se corrigió en el PR #126: ya no promete el formato del lector
+  simulado de la app.
+- Etapa 1: el esquema que recibe Groq y el que valida el servidor no se
+  pueden desalinear (un test lo controla), los errores de Groq se traducen a
+  los códigos de la spec y ningún error copia valores del ticket. 20 tests
+  nuevos, sin red ni key.
+- La prueba con fotos reales pasó: 3 tickets leídos bien (montos, fechas,
+  red y débito con sus últimos 4). Se escapó un dato personal, el nombre de
+  un mozo, y se sumó a la instrucción; se mide en la issue #10.
+- Límites reales del plan gratis: unos 2 a 3 tickets por minuto y unos 145
+  por día para toda la app. Alcanza para el MVP y quedó escrito en el
+  ADR-012.
+- La función está completa: 241 tests del servidor sin red ni key, y las
+  revisiones de reglas, estándares y spec sin incumplimientos.
+- La función quedó desplegada en Supabase y responde.
+- Queda pendiente: la issue #49 (ahora del usuario) conecta la app: adaptar
+  el formato que espera, sin descuento, y mandar la foto en JPG (el iPhone
+  saca HEIC) de 2,5 MB como máximo.
+
+---
+
 ## 2026-11-15 — Presentación de la entrega del MVP (issue #131)
 
 **Herramienta:** Claude Code (Sonnet 5.5), con la skill `presentaciones-visuales`.

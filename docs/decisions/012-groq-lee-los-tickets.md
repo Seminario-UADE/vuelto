@@ -84,7 +84,7 @@ adapta su lector simulado (`LecturaTicket`) en la issue #49. El contrato está e
 |---|---|
 | La documentación no muestra imagen y esquema estricto en el mismo pedido | Probarlo con un ticket al empezar #48; si no anda, modo `json_object` y la validación propia contra el esquema (ya prevista en #48) |
 | Sin «Zero Data Retention», Groq puede guardar pedidos y respuestas hasta 30 días por confiabilidad y cumplimiento | **Resuelto (10/11/2026):** activado en la organización de Groq, también en el plan gratis. Tiene que seguir activado; si se crea otra cuenta u organización, se activa antes de generar la key |
-| Límites del plan gratis del modelo de imágenes (no están en la página pública) | Verlos en la consola. Un ticket ronda los 3.000 tokens (la imagen cuenta 2.048). Las pruebas de #10 se mandan espaciadas |
+| Límites del plan gratis del modelo de imágenes | **Medidos (13/11/2026):** por organización, 7.000 tokens de entrada y 1.000 de salida por minuto, 200.000 por día. Con el "pensamiento" del modelo apagado, un ticket usa unos 1.350 tokens: entran **unos 2 a 3 tickets por minuto y unos 145 por día para toda la app**. Ante un 429 se reintenta una vez si Groq pide esperar poco (spec 013, FR-015). Alcanza para el MVP; con más usuarios haría falta el plan pago |
 | Fotos pesadas (el pedido admite hasta 20 MB) | Achicar la imagen en el celular antes de mandarla |
 | La precisión no alcanza | Se mide en #10. Respaldo: leer el texto en el celular y mandar a Gemini solo el texto sin datos personales |
 

@@ -10,5 +10,5 @@
     }
   },
   "include": ["functions/**/*.ts", "scripts/**/*.ts"],
-  "exclude": ["functions/*/index.ts"]
+  "exclude": ["functions/*/index.ts", "functions/*/prueba-manual.ts"]
 }
