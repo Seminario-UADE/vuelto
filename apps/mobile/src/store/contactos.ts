@@ -1,15 +1,16 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Contacto, PedidoGrupo } from "../data/contracts";
 import { contactos as deEjemplo } from "../data/fixtures";
-import { sesionCerrada } from "./acciones";
+import { escenarioElegido, sesionCerrada } from "./acciones";
 
 /**
  * Contactos (solo lo que ADR-008 §3 deja ver) y el grupo en armado. No se persiste: en
- * producción la lista sale del servidor.
+ * producción la lista sale del servidor (#56). Una cuenta arranca sin contactos y ve el estado
+ * vacío; Lucía y Mateo vienen solo con un escenario de demo (G-02).
  */
 export type EstadoContactos = { lista: Contacto[]; grupo: PedidoGrupo | null };
 
-const inicial: EstadoContactos = { lista: deEjemplo, grupo: null };
+const inicial: EstadoContactos = { lista: [], grupo: null };
 
 export const contactos = createSlice({
   name: "contactos",
@@ -27,6 +28,9 @@ export const contactos = createSlice({
   },
   extraReducers: (b) => {
     b.addCase(sesionCerrada, () => inicial);
+    b.addCase(escenarioElegido, (s) => {
+      s.lista = deEjemplo;
+    });
   },
 });
 

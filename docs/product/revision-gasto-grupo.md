@@ -84,7 +84,7 @@ real; **Media** = contradice el ADR o el diseño; **Baja** = detalle o deuda con
 
 ### Alta
 
-**G-01 · "Vos" y las promos salen de los fixtures.** Código (con los medios de Martín
+**G-01 · "Vos" y las promos salen de los fixtures.** ✅ Corregido (#130). Código (con los medios de Martín
 el resultado coincide, por eso no se ve al recorrer la app).
 - `apps/mobile/src/data/grupo-simulado.ts:37-44` arma a "Vos" con `mediosDeclarados` y
   `comprasOctubre`, no con el perfil ni las compras del store.
@@ -96,7 +96,7 @@ el resultado coincide, por eso no se ve al recorrer la app).
   medios, las compras y el corpus del store (selectores existentes) para "Vos". Lo de
   los contactos sigue simulado hasta #56.
 
-**G-02 · Todas las cuentas tienen de contactos a Lucía y Mateo.** Código.
+**G-02 · Todas las cuentas tienen de contactos a Lucía y Mateo.** ✅ Corregido (#130). Código.
 - `apps/mobile/src/store/contactos.ts:12` arranca con `fixtures.contactos`, y
   `sesionCerrada` (`:29`) vuelve a ellos.
 - Efecto: un usuario nuevo ve "Contactos 2", puede armar grupos con personas que no
@@ -114,6 +114,7 @@ el resultado coincide, por eso no se ve al recorrer la app).
   o sacarla de la app real (junto con G-02).
 
 **G-04 · Un comercio fuera del catálogo deja el resultado cargando para siempre.**
+✅ Corregido (#130); el punto (2) ya se cumplía cuando se corrigió.
 Observado (ver `armar-comercio-libre-oscuro.jpg` y `resultado-comercio-libre-oscuro.jpg`).
 - Cómo se llega: un comercio habitual escrito a mano se resuelve como `libre-<nombre>`
   (`apps/mobile/src/data/calculo.ts:313-324`); `selectComerciosFrecuentes`
@@ -216,7 +217,10 @@ Observado (ver `armar-comercio-libre-oscuro.jpg` y `resultado-comercio-libre-osc
 
 ### Baja
 
-**G-12 · El reloj del "servidor" no es el de la app.** Código.
+**G-12 · El reloj del "servidor" no es el de la app.** ✅ Corregido (#130, de rebote con G-01):
+`recomendarGrupo` recibe las entradas del motor del store y toma «hoy» de su `ahora`; se
+borró `HOY_EN_EL_SERVIDOR`. Cuando exista la Edge Function (#56), el pedido tiene que llevar
+ese día explícito. Código.
 - `data/api.ts:44,163` usa `RELOJ_EJEMPLO` (14/10/2026); Armar usa `selectHoy` del
   store (`armar.tsx:29,34`), que con el corpus sincronizado es la fecha real.
 - Cuando difieren, `cuandoTexto` (`grupo-simulado.ts:61-64`) cae en la rama "no es hoy":
@@ -295,6 +299,7 @@ Recomendamos A. Decidirlo en la spec de #54/#56, antes de escribir la migración
    cuenta), G-07 (invitación pendiente), G-11 (estado vacío).
 2. **Decisiones de producto antes de código:** G-06 (dominio o esquema propio), G-08
    (¿cuenta la base en el desempate?), G-09 (qué hace «Confirmar»), G-10 (redondeo).
-3. **Con el backend (#54/#56):** G-03, G-12, G-13, G-14 y la sección 4. Es una feature
+3. **Con el backend (#54/#56):** G-03, G-13, G-14 y la sección 4 (G-12 ya se corrigió en
+   la app con #130; falta llevar el día en el pedido a la Edge Function). Es una feature
    completa: sigue el ciclo de spec-kit (`/speckit-specify` → `spec-critic` →
    `/speckit-plan`).

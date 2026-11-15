@@ -2,28 +2,28 @@
  * REEMPLAZO LOCAL DE LA EDGE FUNCTION DE GRUPO (#54/#56). En producción el grupo cruza datos
  * de varios usuarios y se calcula en el servidor (constitución §II, ADR-008 §4); la app recibe
  * solo lo que ADR-008 §3 deja ver. Acá, como en el servidor, cada integrante se evalúa con
- * `recomendar()` del motor sobre sus datos (los de `fixtures.ts`, no el store: el servidor
- * lee la base). Lo importa solo `api.ts`. Se borra, junto con `datosDeContactos` de
- * `fixtures.ts`, cuando la app llame a la Edge Function de grupo (#56): las compras de un
- * contacto no pueden quedar en el bundle de la app.
+ * `recomendar()` del motor. «Vos» va con los datos de quien pide (sus medios, sus compras, el
+ * corpus y el reloj del store, `selectEntradasMotor`: G-01); los contactos, con los de
+ * `fixtures.ts` y el mismo corpus. Lo importa solo `api.ts`. Se borra, junto con
+ * `datosDeContactos` de `fixtures.ts`, cuando la app llame a la Edge Function de grupo (#56): las
+ * compras de un contacto no pueden quedar en el bundle de la app.
  */
-import { nombreDelMes, type Compra as CompraMotor, type MedioDePago as MedioMotor } from "@vuelto/motor";
-import type { Base, Comercio, FilaIntegrante, IntegranteGrupo, MedioDePago, RecomendacionGrupo } from "./contracts";
 import {
-  catalogoMedios,
-  comprasOctubre,
-  contactos,
-  datosDeContactos,
-  mediosDeclarados,
-  mediosDelMotor,
-  promociones,
-} from "./fixtures";
-import { pedidoDeCompra, recomendarSeguro, textoDia } from "./calculo";
+  fechaArgentina,
+  nombreDelMes,
+  type Compra as CompraMotor,
+  type MedioDePago as MedioMotor,
+  type Promocion,
+} from "@vuelto/motor";
+import type { Base, Comercio, FilaIntegrante, IntegranteGrupo, RecomendacionGrupo } from "./contracts";
+import { catalogoMedios, contactos, datosDeContactos } from "./fixtures";
+import { pedidoDeCompra, recomendarSeguro, textoDia, type EntradasMotor } from "./calculo";
 import { razonDe } from "./vista-recomendacion";
 import { aprox, fechaCorta } from "../lib/format";
 import { mediodia } from "../lib/reloj";
 import { RUBROS } from "../lib/rubros";
 import { periodoDeVista, textoBase } from "../lib/textos";
+import { medioVista } from "../perfil/vista";
 
 type Opcion = {
   quien: { nombre: string; esVos: boolean; orden: number };
@@ -34,27 +34,21 @@ type Opcion = {
   base: Base;
 };
 
-/** Lo que el servidor sabe de Martín: sus medios declarados y sus compras del período. */
-const usuarioEnElServidor = {
-  medios: mediosDeclarados.flatMap((m) => {
-    const motor = mediosDelMotor[m.id];
-    return motor ? [motor] : [];
-  }),
-  compras: comprasOctubre,
-};
-
-function evaluar(medios: MedioMotor[], compras: CompraMotor[], comercio: Comercio, monto: number, fecha: string) {
+function evaluar(
+  medios: readonly MedioMotor[],
+  compras: readonly CompraMotor[],
+  promociones: readonly Promocion[],
+  comercio: Comercio,
+  monto: number,
+  fecha: string,
+) {
   if (comercio.categoriaId === null) return null;
   return recomendarSeguro(pedidoDeCompra({ ...comercio, categoriaId: comercio.categoriaId }, monto), {
-    perfil: { nombreParaMostrar: null, mediosDePago: medios, comerciosHabituales: [] },
-    promociones,
-    compras,
+    perfil: { nombreParaMostrar: null, mediosDePago: [...medios], comerciosHabituales: [] },
+    promociones: [...promociones],
+    compras: [...compras],
     ahora: mediodia(fecha),
   });
-}
-
-function medioDeLaApp(id: string): MedioDePago | undefined {
-  return mediosDeclarados.find((m) => m.id === id);
 }
 
 /** "hoy miércoles" o "sábado 17/10". */
@@ -63,11 +57,21 @@ function cuandoTexto(fecha: string, hoy: string): string {
   return `${textoDia(fecha).replace(/^hoy /, "")} ${fechaCorta(fecha)}`;
 }
 
+/**
+ * `vos`: las entradas del motor de quien pide, del store (`selectEntradasMotor`). Su `ahora` es
+ * el reloj del store: de ahí sale «hoy» (ADR-010), nunca del reloj del sistema.
+ */
 export function recomendarGrupo(
   pedido: { nombre: string | null; comercio: Comercio; monto: number; fecha: string; integrantes: IntegranteGrupo[] },
-  hoy: string,
+  vos: EntradasMotor,
 ): RecomendacionGrupo {
   const { nombre, comercio, monto, fecha, integrantes } = pedido;
+  const hoy = fechaArgentina(vos.ahora);
+  const { promociones } = vos;
+  const nombreDeTuMedio = (id: string): string | undefined => {
+    const m = vos.medios.find((x) => x.id === id);
+    return m ? medioVista(m).nombre : undefined;
+  };
   const n = Math.max(1, integrantes.length);
   const rubro = RUBROS[comercio.rubro].enFrase;
   const mes = nombreDelMes(fecha);
@@ -76,16 +80,16 @@ export function recomendarGrupo(
 
   integrantes.forEach((i, orden) => {
     if (i.tipo === "vos") {
-      const r = evaluar(usuarioEnElServidor.medios, usuarioEnElServidor.compras, comercio, monto, fecha);
+      const r = evaluar(vos.perfil.mediosDePago, vos.compras, promociones, comercio, monto, fecha);
       const mejor = r?.mejor ?? null;
-      const medio = mejor ? medioDeLaApp(mejor.medioDePagoId) : undefined;
+      const medio = mejor ? nombreDeTuMedio(mejor.medioDePagoId) : undefined;
       if (mejor && medio) {
         const principal = mejor.promociones[0];
         const periodo = periodoDeVista(principal?.periodo ?? null);
         const base = textoBase(principal?.base?.comprasRegistradas ?? 0, periodo, mes);
         opciones.push({
           quien: { nombre: "Vos", esVos: true, orden: -1 },
-          medio: `tu ${medio.nombre}`,
+          medio: `tu ${medio}`,
           razon: razonDe(mejor),
           reintegro: mejor.ahorroEstimado,
           conBase: base.tipo === "compras",
@@ -97,23 +101,23 @@ export function recomendarGrupo(
           esVos: true,
           detalle:
             base.tipo === "compras"
-              ? `Tu ${medio.nombre}: ${aprox(mejor.ahorroEstimado)} de reintegro, ${base.texto}`
-              : `Tu ${medio.nombre}: ${razonDe(mejor)}, sin base ${periodo === "semana" ? "esta semana" : "este mes"}`,
+              ? `Tu ${medio}: ${aprox(mejor.ahorroEstimado)} de reintegro, ${base.texto}`
+              : `Tu ${medio}: ${razonDe(mejor)}, sin base ${periodo === "semana" ? "esta semana" : "este mes"}`,
         });
         return;
       }
       // Sin opción: se explica con la promo del rubro que no aplica ese día o está agotada.
       const descarte = r?.descartadas.find((d) => d.causa !== "categoria" && d.causa !== "medio_de_pago");
       const promo = promociones.find((p) => p.id === descarte?.promocionId);
-      const delBanco = usuarioEnElServidor.medios.find((m) => m.bancoId === promo?.bancoId);
-      const suyo = delBanco ? medioDeLaApp(delBanco.id) : undefined;
+      const delBanco = vos.perfil.mediosDePago.find((m) => m.bancoId === promo?.bancoId);
+      const suyo = delBanco ? nombreDeTuMedio(delBanco.id) : undefined;
       filas.push({
         nombre: "Vos",
         iniciales: null,
         esVos: true,
         detalle:
           descarte && suyo
-            ? `Tu ${suyo.nombre}: ${descarte.causa === "tope_agotado" ? "tope agotado" : descarte.motivo.replace(/^Hoy no aplica[:,] /, "")}`
+            ? `Tu ${suyo}: ${descarte.causa === "tope_agotado" ? "tope agotado" : descarte.motivo.replace(/^Hoy no aplica[:,] /, "")}`
             : `Tus medios no tienen promo en ${rubro} ese día`,
       });
       return;
@@ -131,7 +135,7 @@ export function recomendarGrupo(
     const datos = datosDeContactos[i.contactoId];
     const nombreC = c?.nombre ?? "Contacto";
     const tieneCompras = (datos?.compras.length ?? 0) > 0;
-    const r = datos ? evaluar(datos.medios, datos.compras, comercio, monto, fecha) : null;
+    const r = datos ? evaluar(datos.medios, datos.compras, promociones, comercio, monto, fecha) : null;
     const mejor = r?.mejor ?? null;
     const nombreMedio = mejor ? (catalogoMedios.find((m) => m.id === mejor.medioDePagoId)?.nombre ?? null) : null;
     const base: Base = tieneCompras
