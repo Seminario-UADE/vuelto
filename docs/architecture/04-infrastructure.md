@@ -33,6 +33,7 @@ Los nombres están en `apps/mobile/.env.example` y `supabase/.env.example`
 | `GEMINI_API_KEY` | Script de ingesta (letra chica, #51) | Secret del repo en GitHub Actions (¹), cargado desde la web (Settings → Secrets and variables → Actions); local: `supabase/.env`. No va en las Edge Functions (ADR-012) | Generar key nueva en Google AI Studio (proyecto sin facturación) → actualizar el secret del repo → revocar la vieja |
 | `GROQ_API_KEY` | Edge Function del ticket (#48, ADR-012) | Secrets de las Edge Functions, cargado desde el panel de Supabase (Edge Functions → Secrets; hace falta ser Owner o Administrator de la organización); local: `supabase/.env` | Generar key nueva en la consola de Groq (con «Zero Data Retention» activado en Settings → Data Controls) → reemplazar el secret en el panel (las funciones la leen al instante, sin redeploy) → revocar la vieja. La key vence a los 90 días (la actual, el 8/2/2027): antes de esa fecha, generar una nueva con el mismo vencimiento y reemplazar el secret |
 | `SUPABASE_SERVICE_ROLE_KEY` | Solo el proceso de ingesta (RNF-05) | Secret del repo en GitHub Actions (¹); local: `supabase/.env`. Nunca en EAS ni en la app. En las Edge Functions Supabase ya inyecta la suya: no se setea a mano | Crear una key nueva en Supabase (Settings → API Keys) y actualizar el lugar donde corre la ingesta en el mismo momento; revocar la vieja. Con las keys JWT legacy, rotar el JWT secret invalida también la anon key y obliga a reconstruir la app |
+| `SUPABASE_DB_URL` | Solo el workflow `migraciones.yml` (issue #127, ADR-013) | Secret del repo en GitHub Actions, cargado desde la web (pasos en «Migraciones al día»). Nunca en EAS ni en la app | Cambiar la contraseña de la base en Supabase (Settings → Database), armar la cadena nueva y actualizar el secret. La contraseña de la base puede todo: no se usa en ningún otro lugar |
 
 ¹ La ingesta corre en GitHub Actions (ADR-011, «Dónde corre el cron»): los
 secrets viven como secret del repo y solo los recibe el workflow
@@ -85,6 +86,32 @@ tiene relación con el cron de ingesta de abajo — comparten runner
 de `.nvmrc` (22; ESLint 10 y Vitest 5 exigen ≥ 22.13). Hasta la issue #32 el
 workflow tenía un job `no-code-yet` que lo mantenía en verde sin
 `package.json`; se eliminó al crear el monorepo.
+
+### Migraciones al día (issue #127, ADR-013)
+
+El job `supabase-rls` prueba las migraciones contra una base local: da verde aunque
+la base alojada esté atrasada. Para eso está `.github/workflows/migraciones.yml`, que
+corre `supabase migration list --db-url` (solo lectura) y falla si el repo trae
+migraciones que la base alojada no tiene (`supabase/scripts/verificar-migraciones.ts`).
+Corre al mergear cambios de `supabase/migrations/` a `main`, una vez por día
+(09:00 ART) y a mano. **No corre en `pull_request`** y no aplica nada: las
+migraciones las aplica una persona con `supabase db push --linked` (ver «Migraciones»
+en `CLAUDE.md`). Usa el secret `SUPABASE_DB_URL` (tabla de secrets); sin él, el
+workflow falla diciendo que falta.
+
+**Cargar el secret (lo hace una persona, desde la web):**
+
+1. En el panel de Supabase, **Connect → Session pooler**, copiar la cadena de
+   conexión (`postgresql://postgres.<ref>:[YOUR-PASSWORD]@<host>:5432/postgres`).
+   Si no se sabe la contraseña de la base, se genera una nueva en Settings →
+   Database (invalida la anterior).
+2. Reemplazar `[YOUR-PASSWORD]` por la contraseña **codificada en porcentaje**
+   (`@` → `%40`, `#` → `%23`, `/` → `%2F`, `:` → `%3A`, `%` → `%25`): la CLI lo exige
+   en `--db-url`. Se evitan problemas generando una contraseña solo con letras y números.
+3. En GitHub: Settings → Secrets and variables → Actions → New repository secret,
+   nombre `SUPABASE_DB_URL`, y pegar la cadena. Ni por el chat, ni en un archivo
+   del repo, ni en la terminal.
+4. Pestaña Actions → «Migraciones al día» → Run workflow, y ver que termine bien.
 
 ## Pipeline de ingesta
 

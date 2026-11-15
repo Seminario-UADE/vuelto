@@ -2526,6 +2526,55 @@ proveedor que cuide la privacidad sin costo.
 
 ---
 
+## 2026-11-14 — Migraciones al día: chequeo en el CI y error claro en la app (issue #127, ADR-013)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con `gh` CLI y el subagente `test-runner`.
+
+**Objetivo:** que no vuelva a pasar que la base alojada quede atrás de las
+migraciones del repo sin que nadie se entere (la app falló en el celular con
+«No pudimos cargar los bancos» porque faltaban cuatro migraciones).
+
+**Prompts principales:**
+1. "Leé CLAUDE.md, la infraestructura y el issue #127 [...] Mi recomendación
+   (cuestionala si ves algo mejor): NO aplicar migraciones automáticamente a
+   producción en cada merge. Un job de CI con `migration list --linked`, una
+   casilla en la plantilla de PR y que la app distinga «servidor no al día» de
+   «sin conexión». No ejecutes `db push` ni pidas credenciales. Proponeme el
+   plan y esperá mi OK antes de editar."
+2. "Aprobado" (el plan con dos desviaciones de la recomendación, ver abajo).
+
+**Resultado:**
+- Se leyó antes de proponer y se esperó el OK. Dos cambios sobre lo pedido,
+  aprobados por el usuario: el chequeo **no corre en `pull_request`** (un PR con
+  una migración nueva fallaría siempre, y un workflow editable por el PR no debe
+  leer el secret) y usa **un solo secret, `SUPABASE_DB_URL`**, con
+  `migration list --db-url`, en vez del token de acceso de toda la cuenta más la
+  contraseña.
+- `.github/workflows/migraciones.yml` (push a `main` con cambios de migraciones,
+  diario y a mano) lista las migraciones y `supabase/scripts/` las compara. Una
+  salida que no se pudo leer falla: no se toma por «al día». No aplica nada.
+- Casilla en `.github/pull_request_template.md`, comando en `CLAUDE.md`, pasos
+  para cargar el secret en `docs/architecture/04-infrastructure.md` y la decisión
+  en el ADR-013 (por qué no aplicar en el merge y cuándo revisarlo).
+- En la app, `clasificarError` devuelve `servidor_desactualizado` para columna,
+  tabla o función inexistentes y para un 403 con `42501`; el perfil y los bancos
+  lo muestran en vez de «sin conexión» o «No pudimos guardar el cambio».
+- Lo que **no** se pudo probar: la conexión real a la base alojada, el formato
+  de `--db-url` contra el pooler y la ejecución en GitHub Actions (no hay
+  secret ni se tocó la base alojada; Docker estaba apagado, así que tampoco se
+  comparó contra la salida real de `migration list --local`). El analizador se
+  probó con tablas de ejemplo con los dos estilos de separador.
+- Quedó fuera a propósito: la subida de compras (`data/compras/errores.ts`)
+  sigue tratando los errores desconocidos como transitorios, para no perder
+  compras del usuario; hay que decidirlo aparte porque cambia la spec 010.
+- Errores de la IA en el proceso: se creó primero `supabase/scripts/` sin los
+  tipos de Node en el workspace (falló el `typecheck`; se sumó `@types/node`);
+  una fila de la tabla de secrets quedó separada del resto por una línea en
+  blanco y se corrigió; un archivo temporal de prueba fue a la carpeta temporal
+  del sistema en vez de la del scratchpad y se borró.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
