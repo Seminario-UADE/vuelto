@@ -288,3 +288,65 @@ export interface TextoEstimacion {
   /** "según 3 compras de octubre", con " · vuelve el 1/11" si está agotado, o el texto sin compras. */
   base: string;
 }
+
+// ─── Gasto en grupo (spec 013, ADR-008) ──────────────────────────────────────
+
+/** La compra de un grupo: siempre con monto, entero y mayor a 0 (FR-001). */
+export interface CompraDeGrupo extends CompraPropuesta {
+  monto: number;
+}
+
+/**
+ * La foto de un integrante (FR-002). Uno con cuenta trae sus medios y su
+ * consumo de topes del período; uno sin cuenta, solo su posición de carga
+ * (entero ≥ 0), como dato propio y no como su lugar en la lista.
+ */
+export type IntegranteDeGrupo =
+  | { tipo: "cuenta"; id: string; pide: boolean; mediosDePago: MedioDePago[]; consumos: ConsumoDeTope[] }
+  | { tipo: "sin_cuenta"; posicion: number };
+
+/**
+ * En qué se apoya el reintegro de un integrante (FR-008, D10): las compras que
+ * consumieron el tope de la promo aplicada en su período. La Edge Function no
+ * manda `comprasRegistradas` ni `periodo` de un contacto (FR-021).
+ */
+export type BaseDeGrupo =
+  | { tipo: "con_compras"; comprasRegistradas: number; periodo: PeriodoAcumulable }
+  | { tipo: "sin_compras"; periodo: PeriodoAcumulable }
+  | { tipo: "sin_tope_informado" }
+  | { tipo: "tope_por_compra" };
+
+export interface OpcionDeGrupo {
+  medioDePagoId: string;
+  /** La promo principal de la opción (la primera que ordena `recomendar`). */
+  promocionId: string;
+  /** Qué da la promo, sin nada de su tope ni la variante sin saldo (FR-021). */
+  queDa: string;
+  /** ≥ 1, pesos enteros (escalón de $100 si no es quien pide, FR-004). */
+  reintegroMostrado: number;
+  base: BaseDeGrupo;
+}
+
+export type ResultadoDeIntegrante =
+  | {
+      tipo: "cuenta";
+      id: string;
+      pide: boolean;
+      /** `null` = sin reintegro: nunca se nombra un medio (FR-009). */
+      opcion: OpcionDeGrupo | null;
+      parte: number;
+      /** Solo de quien pide (son sus datos): su opción completa y el descarte principal. */
+      propia: { opcion: OpcionDePago | null; descarte: Descarte | null } | null;
+    }
+  | { tipo: "sin_cuenta"; posicion: number; parte: number };
+
+export interface RecomendacionDeGrupo {
+  /** Id del integrante con cuenta que conviene que pague, o `null`. */
+  quienPaga: string | null;
+  /** Reintegro mostrado de quien paga; `null` si nadie paga. */
+  reintegro: number | null;
+  /** max(0, monto − reintegro): lo que se reparte. */
+  total: number;
+  /** En el orden del desempate: quien pide, contactos por id, sin cuenta por posición. */
+  integrantes: ResultadoDeIntegrante[];
+}

@@ -107,7 +107,7 @@ interface RecomendacionDeGrupo {
 
 - `recomendarGrupo(compra: CompraDeGrupo, integrantes: IntegranteDeGrupo[], promociones: Promocion[], ahora: Date): RecomendacionDeGrupo`.
 - `dividir(total: number, n: number): number[]`: las partes en el orden recibido; las primeras `total % n` llevan +1.
-- `GrupoInvalidoError` (`motivo`: `"pocos_integrantes" | "sin_quien_pide" | "varios_piden" | "repetidos" | "demasiados" | "monto"`).
+- `GrupoInvalidoError` (`motivo`: `"pocos_integrantes" | "sin_quien_pide" | "varios_piden" | "repetidos" | "demasiados" | "monto" | "posicion"`).
 - Orden del desempate (y de `integrantes` en la salida): quien pide; los demás con cuenta por `compararIds(id.toLowerCase())`; los sin cuenta por `posicion`.
 
 ## Edge Function: datos internos
