@@ -3,10 +3,8 @@ import { TextInput, View } from "react-native";
 import { buscarBancos } from "@/perfil/buscar-bancos";
 import {
   esDuplicado,
-  ETIQUETAS_RED,
   ETIQUETAS_TIPO,
   MENSAJES_ERROR,
-  REDES,
   TIPOS_TARJETA,
   type Banco,
   type MedioNuevo,
@@ -15,6 +13,7 @@ import {
 } from "@/perfil/modelo";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 import { Button } from "./button";
+import { GrillaRedes } from "./grilla-redes";
 import { Icon } from "./icon";
 import { OptionRow } from "./option-row";
 import { Segmentado } from "./segmentado";
@@ -30,8 +29,9 @@ type Props = {
 };
 
 /**
- * Banco → tipo → red (issue #41, US1). Lo usan el onboarding y Perfil. Con el texto
- * vacío no muestra bancos; sin coincidencias avisa que el emisor no está (US1-7).
+ * Banco → tipo → red (issue #41, US1). Lo usan el onboarding y Perfil. Con el buscador vacío
+ * muestra todos los bancos (issue #128); escribir los filtra, y sin coincidencias avisa que el
+ * emisor no está (US1-7). El tipo (2 opciones) va en un segmentado; las 9 redes, en una grilla.
  */
 export function SelectorMedio({ bancos, medios, onAgregar }: Props) {
   const [q, setQ] = useState("");
@@ -126,12 +126,7 @@ export function SelectorMedio({ bancos, medios, onAgregar }: Props) {
         <Text variant="label" tone="inkSecondary" accessibilityRole="header">
           Red
         </Text>
-        <Segmentado
-          opciones={REDES.map((r) => ({ valor: r, label: ETIQUETAS_RED[r] }))}
-          valor={red}
-          onChange={setRed}
-          accessibilityLabel="Red de la tarjeta"
-        />
+        <GrillaRedes valor={red} onChange={setRed} accessibilityLabel="Red de la tarjeta" />
       </View>
       {repetido ? (
         <Text variant="label" tone="warning">

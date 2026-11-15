@@ -1,4 +1,4 @@
-# Design System: Vuelto (v9.1)
+# Design System: Vuelto (v9.2)
 
 > Fuente de verdad para diseñar y generar pantallas de Vuelto (Stitch y la
 > app). La v6 (07/11/2026) reemplaza a `DESIGN-v5.md`, y su razonamiento está
@@ -51,6 +51,12 @@
 > cuatro atajos cuadrados; debajo, una **torta** minimalista con el tope que te
 > queda sumando todos (estimado, con su base). **Apariencia** en Perfil pasa a
 > tres miniaturas de celular pintadas con cada tema.
+>
+> **v9.2 (15/11/2026, issue #128)**: las **9 redes** de la tarjeta dejan el
+> control segmentado, que es para dos o tres opciones, y pasan a una grilla de
+> **cuadrados de opción** (`grilla-redes.tsx`). El tipo de tarjeta (Débito ·
+> Crédito) sigue segmentado. El selector de banco muestra **todos los bancos**
+> con el buscador vacío.
 >
 > **Estado de implementación**: la app implementa la paleta, los dos temas y
 > los radios de la v6 (issue #115). La fila de comercios y la lista agrupada
@@ -307,13 +313,24 @@ derecha.
   selecciona.
 
 **Sin chips (v8).** Elegir entre pocas opciones es un **control segmentado**;
-entre varias, filas con radio o check; entre comercios, cuadrados.
+entre varias, filas con radio o check o, si son cortas y todas deben verse
+juntas (las 9 redes), cuadrados de opción; entre comercios, cuadrados.
 
 **Control segmentado** (`segmentado.tsx`): rectángulo de 14 pt `surfaceStrong`
-con segmentos de 12 pt; el activo en `accent` con texto `onAccent`. Para tipo
-y red de la tarjeta, Apariencia (Sistema · Claro · Oscuro) y los datos de
-ejemplo. Los filtros de Compras y Mensual/Semanal en Topes siguen con el
+con segmentos de 12 pt; el activo en `accent` con texto `onAccent`. **Solo para
+dos o tres opciones**: tipo de tarjeta (Débito · Crédito), Apariencia (Sistema ·
+Claro · Oscuro) y los datos de ejemplo. Los filtros de Compras y Mensual/Semanal en Topes siguen con el
 nativo (`@react-native-segmented-control`).
+
+**Cuadrado de opción** (`grilla-redes.tsx`): para elegir una entre varias
+cortas, todas a la vista; hoy, la red de la tarjeta (9). Rectángulo de 16 pt
+`surfaceStrong` de 64 pt de alto o más, con el nombre entero en label,
+centrado y hasta en dos líneas. El elegido lleva borde de 2 pt en `accent` y
+un check de 22 pt en la esquina, así no depende solo del color; el borde
+siempre ocupa lugar para que no se corra nada. Rol de radio. Son 3 columnas;
+si «Mastercard» no entra en un cuadrado (celular angosto o letra grande del
+sistema) baja a 2 y, con letra muy grande, a 1 fila por opción
+(`columnasRedes`). Se mide el contenedor, no la ventana.
 
 **Cuadrado de comercio marcable**: el de la grilla, con borde de 2 pt en
 `accent` cuando está marcado (`ink` el que muestra su respuesta) y una × de
