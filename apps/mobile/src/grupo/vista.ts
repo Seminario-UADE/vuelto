@@ -1,5 +1,5 @@
 /**
- * De la respuesta de `recomendar-grupo` a lo que muestra Gasto en grupo (spec 013 US3). Función
+ * De la respuesta de `recomendar-grupo` a lo que muestra Gasto en grupo (spec 016 US3). Función
  * pura: los textos se arman acá, en el teléfono, y del servidor no llega ningún texto sobre un
  * contacto. De un contacto se dice como mucho el medio que conviene (si paga), qué da la promo, el
  * reintegro y la base en palabras; nunca su tope ni cuántas compras tiene (FR-021). Toda cifra

@@ -1,5 +1,5 @@
 /**
- * Repositorio de contactos en memoria, para los tests (spec 013). Reproduce los estados que
+ * Repositorio de contactos en memoria, para los tests (spec 016). Reproduce los estados que
  * devuelve la base (`contracts/rpc-contactos.md`) sin red. La recomendación de grupo se configura
  * con una respuesta fija o una falla.
  */

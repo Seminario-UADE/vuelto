@@ -266,7 +266,7 @@ export type VistaInvitacion = {
 /** Alguien sin cuenta en el grupo: su nombre vive solo en el teléfono (D5); al servidor va la cantidad. */
 export type SinCuentaEnGrupo = { posicion: number; nombre: string };
 
-/** El grupo que arma Armar (spec 013). Sin fecha: la compra es de hoy, según el servidor (FR-025). */
+/** El grupo que arma Armar (spec 016). Sin fecha: la compra es de hoy, según el servidor (FR-025). */
 export type PedidoGrupo = {
   /** Resuelto en el paso de compra, siempre con rubro (FR-029). */
   comercio: Comercio & { categoriaId: number };

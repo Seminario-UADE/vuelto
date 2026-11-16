@@ -4,7 +4,7 @@ import type { DatosDeContacto } from "../_shared/repositorios.ts";
 import { AHORA, GALICIA, SANTANDER, medio, promo } from "../_shared/test/fabricas.ts";
 import { armarRespuesta } from "./respuesta.ts";
 
-// Spec 013, FR-021 y SC-008. Lucía tiene un tope de $10.000 con $6.300 consumidos en 6 compras
+// Spec 016, FR-021 y SC-008. Lucía tiene un tope de $10.000 con $6.300 consumidos en 6 compras
 // (le quedan $3.700) y dos medios: el Galicia, que conviene, y un Santander que no tiene promo.
 
 const YO = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";

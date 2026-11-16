@@ -169,9 +169,9 @@ conocido; la recomendación lo indica.
   dice que el motor corre en el dispositivo, en contra de ADR-001
   §Actualización y RNF-02.
 
-## Actualización (15/11/2026, issue #54, spec 013)
+## Actualización (15/11/2026, issue #54, spec 016)
 
-Al implementar el gasto en grupo (`specs/013-gasto-grupo/`), el Product Owner
+Al implementar el gasto en grupo (`specs/016-gasto-grupo/`), el Product Owner
 decidió estos cambios, que ajustan el texto de arriba sin cambiar el
 objetivo: decidir quién paga con el tope de cada uno, sin abrir el historial
 de nadie.

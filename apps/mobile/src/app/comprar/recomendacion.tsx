@@ -118,7 +118,7 @@ export default function PasoRecomendacion() {
               ))}
             </View>
           ) : null}
-          {/* Un comercio sin rubro (escrito a mano) no se puede evaluar en grupo (spec 013 FR-029, G-04). */}
+          {/* Un comercio sin rubro (escrito a mano) no se puede evaluar en grupo (spec 016 FR-029, G-04). */}
           {r.comercio.categoriaId !== null ? (
             <View style={r.alternativas.length > 0 ? divisor(1) : undefined}>
               <FilaAccion

@@ -12,7 +12,7 @@ export class PerfilSinMediosError extends Error {
   }
 }
 
-/** Por qué un grupo no se puede evaluar (spec 013, FR-010). */
+/** Por qué un grupo no se puede evaluar (spec 016, FR-010). */
 export type MotivoGrupoInvalido =
   | "pocos_integrantes"
   | "sin_quien_pide"

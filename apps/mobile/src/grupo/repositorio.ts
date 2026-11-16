@@ -1,5 +1,5 @@
 /**
- * Contactos, invitaciones y gasto en grupo contra Supabase (spec 013, research R10).
+ * Contactos, invitaciones y gasto en grupo contra Supabase (spec 016, research R10).
  * Las invitaciones y la lista van por RPC (`contracts/rpc-contactos.md`); la recomendación de
  * grupo, por la Edge Function `recomendar-grupo` (`contracts/recomendar-grupo.md`). El token de
  * una invitación viaja siempre en el cuerpo del pedido, nunca en la dirección (FR-011).

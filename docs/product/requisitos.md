@@ -130,7 +130,7 @@ No se dan por chequeados hasta resolver el pendiente que los frena
 | RF-13, RNF-13 | ~~Dónde corre el cron de ingesta~~: GitHub Actions, una vez por día (ADR-011) | — |
 | RF-08, RNF-09 | Proveedor/modelo del extractor y precisión sobre tickets reales | #10 |
 | RF-05 | Cómo se dispara el momento de uso (notificación / geolocalización) | `pendientes.md` |
-| RF-19, RF-20 | ~~Promoción de débito y redondeo de la división~~: resueltos por el PO el 15/11/2026 (débito y crédito igual, pesos enteros con el resto de a $1; ADR-008 §Actualización, spec 013) | #54 |
+| RF-19, RF-20 | ~~Promoción de débito y redondeo de la división~~: resueltos por el PO el 15/11/2026 (débito y crédito igual, pesos enteros con el resto de a $1; ADR-008 §Actualización, spec 016) | #54 |
 | RNF-14 | Cronograma real del cuatrimestre y tamaño del equipo | `restricciones-catedra.md`, `estado.md` |
 
 ## Chequeo de coherencia (issue #3)

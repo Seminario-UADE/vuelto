@@ -1,5 +1,5 @@
 /**
- * El token de una invitación (spec 013, FR-012, D11). Lo genera la base: 18 bytes al azar en
+ * El token de una invitación (spec 016, FR-012, D11). Lo genera la base: 18 bytes al azar en
  * base64url, 24 caracteres. El link es `vuelto://i/<token>`; en Expo Go, el que da Expo para el
  * mismo camino (`exp://…/--/i/<token>`). Funciones puras: no tocan la red.
  */

@@ -70,7 +70,7 @@ describe("nombre del usuario (spec 012, FR-029, SC-005)", () => {
 });
 
 describe("contactos", () => {
-  it("arranca vacío (spec 013, G-02); agregar no duplica; quitar lo saca", () => {
+  it("arranca vacío (spec 016, G-02); agregar no duplica; quitar lo saca", () => {
     const s = storeDePrueba();
     expect(s.getState().contactos.lista).toEqual([]);
     const tomas = { id: "tomas", nombre: "Tomás", iniciales: "T", vinculadoDesde: "2026-10-14" };

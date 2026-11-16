@@ -1,5 +1,5 @@
 /**
- * Lo que dice la pantalla de aceptación (ADR-008 §1 y §3, spec 013 US2-6): quién invita, qué se
+ * Lo que dice la pantalla de aceptación (ADR-008 §1 y §3, spec 016 US2-6): quién invita, qué se
  * comparte, qué no y qué se puede deducir, incluido lo que deja deducir repetir consultas (D9).
  * Función pura sobre la respuesta del servidor.
  */

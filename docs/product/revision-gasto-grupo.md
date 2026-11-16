@@ -1,6 +1,6 @@
 # Revisión del flujo de gasto compartido
 
-> **Estado (15/11/2026):** la issue #54 (spec 013, que absorbe #130) cierra G-01 a
+> **Estado (15/11/2026):** la issue #54 (spec 016, que absorbe #130) cierra G-01 a
 > G-06, G-08, G-10 y G-12 a G-14; G-06 con la opción (b), `vuelto://i/<token>`
 > más «Tengo una invitación» para pegarlo. Quedan en issues aparte: G-07 (#137),
 > G-09 (#138) y G-11 (#139). La referencia a "#56" de este documento era un error:

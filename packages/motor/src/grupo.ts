@@ -1,5 +1,5 @@
 /**
- * Gasto en grupo (spec 013, ADR-008 §5): quién de nosotros conviene que pague
+ * Gasto en grupo (spec 016, ADR-008 §5): quién de nosotros conviene que pague
  * esta compra, con qué medio, y cuánto pone cada uno. Función pura sobre una
  * foto de los integrantes: no lee la base, no usa la red ni el reloj.
  *

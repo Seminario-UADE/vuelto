@@ -55,7 +55,7 @@ export type Extra = {
   repositorio: RepositorioSincronizacion | null;
   /** Lee y escribe los medios del perfil en Supabase (issue #41); `null` sin cliente de Supabase. */
   perfilRemoto: DatosPerfil | null;
-  /** Contactos, invitaciones y gasto en grupo en Supabase (spec 013); `null` sin cliente de Supabase. */
+  /** Contactos, invitaciones y gasto en grupo en Supabase (spec 016); `null` sin cliente de Supabase. */
   contactosRemoto: RepositorioContactos | null;
   /** El reloj real. La app: `() => new Date()`. Los tests lo controlan (spec 009 R2). */
   reloj: () => Date;

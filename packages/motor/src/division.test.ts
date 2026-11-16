@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { dividir } from "./division.ts";
 
-// Spec 013, FR-006 y D3: pesos enteros, el resto de a $1 a los primeros del orden recibido.
+// Spec 016, FR-006 y D3: pesos enteros, el resto de a $1 a los primeros del orden recibido.
 describe("dividir", () => {
   it("US1-11: $10.000 entre 3 → el $1 extra va al primero", () => {
     expect(dividir(10000, 3)).toEqual([3334, 3333, 3333]);

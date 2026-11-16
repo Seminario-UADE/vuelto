@@ -13,7 +13,7 @@ import type {
   Tope,
 } from "./tipos.ts";
 
-// Spec 013, US1. Fotos de grupo escritas a mano: sin base, sin red, con la hora fija.
+// Spec 016, US1. Fotos de grupo escritas a mano: sin base, sin red, con la hora fija.
 // AHORA = miércoles 21/10/2026, 12:00 en Argentina. `compra()` es de supermercados (1), presencial.
 
 const NACION = "0330e59b-b6e3-43eb-9083-a88fcc61e845";

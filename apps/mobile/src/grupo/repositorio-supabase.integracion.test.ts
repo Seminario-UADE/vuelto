@@ -1,5 +1,5 @@
 /**
- * El repositorio de contactos (spec 013 US2) contra un Supabase LOCAL (Docker), con dos usuarios de
+ * El repositorio de contactos (spec 016 US2) contra un Supabase LOCAL (Docker), con dos usuarios de
  * prueba que se registran en la corrida. Se salta sola si faltan las variables o si la URL no es
  * localhost: con una URL remota no hace ningún pedido. La clave de servicio (la de DEMO de
  * `supabase status`, nunca una real) solo borra los usuarios de prueba al final.
@@ -19,7 +19,7 @@ const hayEntorno = Boolean(URL && ANON && SERVICIO);
 const esLocal = hayEntorno && /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(URL!);
 const corrida = randomUUID().slice(0, 8);
 
-describe.skipIf(!esLocal)("repositorio de contactos contra un Supabase local (spec 013 US2)", () => {
+describe.skipIf(!esLocal)("repositorio de contactos contra un Supabase local (spec 016 US2)", () => {
   const nuevo = () => createClient(URL!, ANON!, { auth: { persistSession: false } });
   const admin = esLocal ? createClient(URL!, SERVICIO!, { auth: { persistSession: false } }) : null!;
   const ana = esLocal ? nuevo() : null!;

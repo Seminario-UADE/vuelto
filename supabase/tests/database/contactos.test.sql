@@ -1,4 +1,4 @@
--- Contactos vinculados e invitaciones (spec 013 US2 y US3, ADR-008).
+-- Contactos vinculados e invitaciones (spec 016 US2 y US3, ADR-008).
 -- Las carreras reales (dos aceptaciones a la vez) las resuelven `for update` y la clave primaria
 -- del par; acá se prueba la lógica de cada caso en una sola transacción.
 begin;

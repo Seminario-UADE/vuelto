@@ -1,4 +1,4 @@
-# Quickstart: validar el gasto en grupo (spec 013)
+# Quickstart: validar el gasto en grupo (spec 016)
 
 Guía para comprobar que la feature anda, de punta a punta. Los contratos están en `contracts/`; el modelo, en `data-model.md`.
 
@@ -45,7 +45,7 @@ Prueba manual con la base local (opcional):
 
 1. Copiar `supabase/functions/.env.example` a `supabase/functions/.env` y poner una clave de prueba en `GRUPO_CLAVE_SERVIDOR`.
 2. Cargar la misma clave en Vault de la base local: `select vault.create_secret('<clave>', 'recomendar_grupo_clave');` desde el SQL editor de Studio.
-3. `supabase functions serve recomendar-grupo --env-file supabase/functions/.env`.
+3. `supabase functions serve --env-file supabase/functions/.env` (sirve todas las funciones; esta versión de la CLI no acepta el nombre).
 4. Con dos usuarios de prueba vinculados (registrarse en la app, invitar y aceptar), llamar con el JWT de uno: `POST /functions/v1/recomendar-grupo` con el body del contrato. Esperado: 200 con la forma del contrato; con un uuid que no es contacto, 409 `contacto_no_vinculado`.
 5. Desde la app o con un curl, llamar `rpc/datos_de_contactos` con el JWT de un usuario vinculado y sin la clave: error `42501` (SC-005).
 

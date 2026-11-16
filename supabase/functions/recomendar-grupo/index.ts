@@ -4,7 +4,7 @@
  * en `handler.ts`, `servicio.ts`, `respuesta.ts` y `validacion.ts`.
  *
  * Deploy: `supabase functions deploy recomendar-grupo --use-api`. Necesita el secreto
- * `GRUPO_CLAVE_SERVIDOR`, igual al de Vault (`specs/013-gasto-grupo/quickstart.md`).
+ * `GRUPO_CLAVE_SERVIDOR`, igual al de Vault (`specs/016-gasto-grupo/quickstart.md`).
  */
 import { createClient } from "@supabase/supabase-js";
 import { AutenticadorSupabase } from "../_shared/autenticar.ts";

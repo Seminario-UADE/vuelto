@@ -1,5 +1,5 @@
 /**
- * Contactos vinculados (spec 013 US2, ADR-008): solo lo que ADR-008 §3 deja ver (nombre y fecha
+ * Contactos vinculados (spec 016 US2, ADR-008): solo lo que ADR-008 §3 deja ver (nombre y fecha
  * del vínculo). La lista sale del servidor y arranca vacía (G-02). Se guarda en el teléfono con
  * su propia clave, asociada a la cuenta: otra cuenta en el mismo teléfono no la ve, ni sin red, y
  * cerrar sesión la borra (FR-019, G-03).

@@ -1,5 +1,5 @@
 /**
- * El grupo en armado (spec 013): lo arma Armar y lo lee el resultado. Vive solo en memoria:
+ * El grupo en armado (spec 016): lo arma Armar y lo lee el resultado. Vive solo en memoria:
  * nunca se guarda, porque lleva los nombres de los integrantes sin cuenta, que no salen del
  * teléfono ni se persisten (D5, FR-019).
  */

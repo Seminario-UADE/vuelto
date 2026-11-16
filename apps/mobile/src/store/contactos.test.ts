@@ -23,7 +23,7 @@ function conCuenta(repo = repositorioContactosMemoria({ contactos: [ana, beto] }
   return { s, repo, disco };
 }
 
-describe("contactos: lista desde el servidor (spec 013 US2)", () => {
+describe("contactos: lista desde el servidor (spec 016 US2)", () => {
   it("US2-12: una cuenta nueva arranca sin contactos (G-02)", () => {
     const s = storeDePrueba();
     expect(s.getState().contactos.lista).toEqual([]);

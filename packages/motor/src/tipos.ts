@@ -153,7 +153,7 @@ export interface Compra {
 }
 
 /**
- * Lo que el motor necesita de una compra para los topes (spec 013, FR-002 y
+ * Lo que el motor necesita de una compra para los topes (spec 016, FR-002 y
  * FR-003). `Compra` lo cumple, así que la compra individual y la de grupo
  * calculan el consumo con la misma función. En el gasto en grupo, el `id` de
  * la compra de un contacto es opaco: lo arma la Edge Function y nunca es el de
@@ -289,7 +289,7 @@ export interface TextoEstimacion {
   base: string;
 }
 
-// ─── Gasto en grupo (spec 013, ADR-008) ──────────────────────────────────────
+// ─── Gasto en grupo (spec 016, ADR-008) ──────────────────────────────────────
 
 /** La compra de un grupo: siempre con monto, entero y mayor a 0 (FR-001). */
 export interface CompraDeGrupo extends CompraPropuesta {

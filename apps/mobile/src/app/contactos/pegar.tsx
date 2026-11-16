@@ -10,7 +10,7 @@ import { tokenDeInvitacion } from "@/grupo/token";
 import { colors, fonts, radius, space, type as escala } from "@/theme";
 
 /**
- * «Tengo una invitación» (spec 013 US2-5, D11). WhatsApp y otras apps no dejan tocar un link
+ * «Tengo una invitación» (spec 016 US2-5, D11). WhatsApp y otras apps no dejan tocar un link
  * `vuelto://`, así que se pega acá. Se valida en el teléfono, sin red: si no es una invitación, se
  * dice ahí mismo. Si lo es, se abre Aceptar invitación.
  */

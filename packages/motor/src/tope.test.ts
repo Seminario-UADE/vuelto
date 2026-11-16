@@ -12,7 +12,7 @@ const saldoDe = (p: Promocion, compras: Compra[], hoy = HOY) =>
   calcularSaldos([p], compras, hoy).get(p.id);
 
 // Importes en centavos: $5.000 = 500000.
-describe("calcularSaldos: consumo reducido (spec 013, FR-003)", () => {
+describe("calcularSaldos: consumo reducido (spec 016, FR-003)", () => {
   it("con solo promoción, fecha, monto y descuento da el mismo saldo que con compras completas", () => {
     const completas = [
       compraRegistrada({ id: "c1", descuentoObtenido: 1500 }),

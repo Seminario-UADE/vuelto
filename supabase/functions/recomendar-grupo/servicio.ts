@@ -1,5 +1,5 @@
 /**
- * Caso de uso de `POST /recomendar-grupo` (spec 013, ADR-009): junta la foto del grupo y llama
+ * Caso de uso de `POST /recomendar-grupo` (spec 016, ADR-009): junta la foto del grupo y llama
  * al motor. No duplica ninguna regla: quién paga, el redondeo y la división son de
  * `recomendarGrupo()`. Lo de quien pide se lee con su sesión (RLS); lo de los contactos, con la
  * función de la base que verifica el vínculo y exige la clave de servidor (D8).

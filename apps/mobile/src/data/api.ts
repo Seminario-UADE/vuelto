@@ -1,6 +1,6 @@
 /**
  * Lo que la app pide a la red y todavía es de ejemplo: la lectura del ticket (#48). Los contactos,
- * las invitaciones y el gasto en grupo van por `src/grupo/repositorio.ts` (spec 013).
+ * las invitaciones y el gasto en grupo van por `src/grupo/repositorio.ts` (spec 016).
  * Cada función tiene la firma del cliente de la Edge Function o de la tabla que la va a
  * reemplazar (docs/architecture/02-api-routes.md); hoy responde con fixtures. La
  * recomendación, los topes, el perfil y las compras NO están acá: se derivan del store con

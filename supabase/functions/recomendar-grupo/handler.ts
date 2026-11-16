@@ -1,7 +1,7 @@
 /**
  * Handler de `POST /functions/v1/recomendar-grupo` (rol de controller, ADR-009): HTTP, sesión,
  * validación del body y códigos de respuesta. El caso de uso es del servicio. Contrato:
- * `specs/013-gasto-grupo/contracts/recomendar-grupo.md`.
+ * `specs/016-gasto-grupo/contracts/recomendar-grupo.md`.
  */
 import { GrupoInvalidoError } from "@vuelto/motor";
 import type { Autenticador } from "../_shared/autenticar.ts";

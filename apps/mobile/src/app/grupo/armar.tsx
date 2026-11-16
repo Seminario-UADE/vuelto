@@ -19,7 +19,7 @@ import { selectBuscarComercioPorId } from "@/store/selectores";
 import { colors, fonts, radius, rubroColors, size, space, type as escala } from "@/theme";
 
 /**
- * Armar grupo (ADR-008, spec 013 US3): vos, tus contactos vinculados y gente sin cuenta (solo el
+ * Armar grupo (ADR-008, spec 016 US3): vos, tus contactos vinculados y gente sin cuenta (solo el
  * nombre, que no sale del teléfono). La compra es la del paso de compra, de hoy, con su rubro y su
  * canal. Hasta 12 personas (FR-026). El primario va en un pie fijo que no tapa la lista (P2 #7).
  */
@@ -34,7 +34,7 @@ export default function ArmarGrupo() {
   const [monto, setMonto] = useState<number | null>(parseMonto(p.monto ?? ""));
   const [excluidos, setExcluidos] = useState<string[]>([]);
   const [sinCuenta, setSinCuenta] = useState<SinCuentaEnGrupo[]>([]);
-  // La posición de carga de cada uno: no se reusa al sacar a alguien (spec 013 FR-002).
+  // La posición de carga de cada uno: no se reusa al sacar a alguien (spec 016 FR-002).
   const [proxima, setProxima] = useState(0);
   const [nuevo, setNuevo] = useState("");
 

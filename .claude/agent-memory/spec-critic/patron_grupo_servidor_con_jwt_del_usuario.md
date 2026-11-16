@@ -1,11 +1,11 @@
 ---
 name: patron-grupo-servidor-con-jwt-del-usuario
-description: Gasto en grupo (spec 013, #54): una RPC que la Edge Function llama con el JWT del usuario también la puede llamar la app; los textos del motor llevan tope y cantidad de compras; el sondeo repetido saca compras ajenas; el empate no tiene unidad
+description: Gasto en grupo (spec 016, #54): una RPC que la Edge Function llama con el JWT del usuario también la puede llamar la app; los textos del motor llevan tope y cantidad de compras; el sondeo repetido saca compras ajenas; el empate no tiene unidad
 metadata:
   type: project
 ---
 
-Visto 2026-11-15 en `specs/013-gasto-grupo/spec.md` (#54 + #130). Huecos que la spec no ve:
+Visto 2026-11-15 en `specs/016-gasto-grupo/spec.md` (#54 + #130). Huecos que la spec no ve:
 
 1. **"Solo la Edge Function la llama" no existe con el JWT del usuario.** La Edge Function corre con el JWT de quien pide (RNF-05). Así que cualquier RPC que pueda llamar por PostgREST, la app (o curl con anon key + JWT) la llama igual. Con D4 (compras reducidas de contactos) más los wrappers invoker en `public` (D6), el cliente lee fecha y monto de las compras de un contacto. El problema ya estaba latente en ADR-008 §4, que devolvía todos los medios. Hay que pedir el camino (función sin wrapper expuesto + conexión directa, o un secreto que solo tenga la Edge Function) y un test de permiso denegado.
 2. **Los textos libres del motor filtran.** `motivo` incluye "te quedan ≈$X de tope, según N compras"; `textoPromo` con `sinSaldo` dice que otra promo agotó el tope. Un SC que revisa "el contrato" por nombre de campo no lo ve. Pedir lista blanca de textos o solo datos estructurados, y un test que busque cifras conocidas en todo el JSON.

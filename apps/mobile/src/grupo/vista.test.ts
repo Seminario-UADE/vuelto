@@ -38,7 +38,7 @@ const base = (datos: Partial<RespuestaGrupo> = {}): RespuestaGrupo => ({
 
 const opciones = { hoy: "2026-11-14", mediosPropios: [mioProvincia], nombresDeContactos: {} };
 
-describe("vistaDeGrupo (spec 013 US3)", () => {
+describe("vistaDeGrupo (spec 016 US3)", () => {
   it("US3-2: paga un contacto: nombre, su medio, qué da, ≈ y la base en palabras", () => {
     const v = vistaDeGrupo(base(), pedido, opciones);
     expect(v.titulo).toBe("Te conviene que pague Lucía");

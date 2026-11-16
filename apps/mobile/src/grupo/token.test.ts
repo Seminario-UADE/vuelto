@@ -3,7 +3,7 @@ import { linkDeInvitacion, tokenDeInvitacion } from "./token";
 
 const T = "q3Zk_-a9Bc1De2Fg3Hi4Jk5L";
 
-describe("tokenDeInvitacion (spec 013, FR-012)", () => {
+describe("tokenDeInvitacion (spec 016, FR-012)", () => {
   it("acepta el link de la app, el de Expo Go y el token solo", () => {
     expect(tokenDeInvitacion(`vuelto://i/${T}`)).toBe(T);
     expect(tokenDeInvitacion(`exp://192.168.0.5:8081/--/i/${T}`)).toBe(T);

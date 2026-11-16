@@ -22,7 +22,7 @@ import { selectHoy } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { radius, space } from "@/theme";
 
-/** Qué dice y qué ofrece cada falla (spec 013 FR-027). */
+/** Qué dice y qué ofrece cada falla (spec 016 FR-027). */
 const FALLAS: Record<FallaGrupo, { titulo: string; texto: string }> = {
   invalido: { titulo: "No pudimos armar este grupo", texto: "Revisá el comercio, el monto y que no sean más de 12 personas." },
   "contacto-no-vinculado": {
@@ -34,7 +34,7 @@ const FALLAS: Record<FallaGrupo, { titulo: string; texto: string }> = {
 };
 
 /**
- * Gasto en grupo (spec 013 US3): quién conviene que pague, con qué medio y cuánto pone cada uno,
+ * Gasto en grupo (spec 016 US3): quién conviene que pague, con qué medio y cuánto pone cada uno,
  * con los datos reales de la cuenta, sus contactos y el corpus. De un contacto solo se muestra lo
  * de FR-021; sin estados de cobro (FR-027 de la spec 006). Nunca se queda cargando: termina en el
  * resultado o en un error con su acción (SC-009).

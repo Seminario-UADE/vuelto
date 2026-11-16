@@ -8,7 +8,7 @@ export * from "./publicable.ts";
 export { recomendar } from "./recomendar.ts";
 export { estimarTopes, formatearEstimacion } from "./estimar.ts";
 export { GrupoInvalidoError, PerfilSinMediosError, type MotivoGrupoInvalido } from "./errores.ts";
-/** Gasto en grupo (spec 013): la decisión y la división. */
+/** Gasto en grupo (spec 016): la decisión y la división. */
 export { MAXIMO_INTEGRANTES, recomendarGrupo } from "./grupo.ts";
 export { dividir } from "./division.ts";
 export { JURISDICCIONES_VALIDAS, normalizar } from "./elegibilidad.ts";

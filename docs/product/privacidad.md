@@ -18,8 +18,8 @@ comercial.
 | Vínculo con un contacto (las dos cuentas y la fecha) | Aceptación de una invitación (RF-21) | Sí, mientras ninguno de los dos lo quite ni borre su cuenta |
 | Nombre para mostrar | Perfil (RF-21) | Sí, mientras la cuenta exista. Lo ven los contactos vinculados y quien recibe una invitación |
 | Invitación de contacto (hash del token, emisor, vencimiento, fecha de uso) | Perfil (RF-21) | Sí, mientras exista la cuenta del emisor. Como mucho una sin usar por cuenta: generar otra borra la anterior. Deja de servir al usarse o a las 24 h; el borrado automático de las vencidas queda fuera de alcance del MVP, igual que el de compras |
-| Lista de contactos en el teléfono (id, nombre para mostrar y fecha del vínculo) | Servidor (spec 013, FR-019) | Sí, en el teléfono (`vuelto.contactos.v1`), asociada a la cuenta; se borra al cerrar sesión o al entrar otra cuenta |
-| Integrantes sin cuenta de un grupo (solo el nombre) | Quien arma el grupo (RF-19, spec 013 D5) | **No.** El nombre vive en la memoria del teléfono mientras se arma el grupo; no se guarda en el teléfono ni sale de él (al servidor va solo la cantidad) |
+| Lista de contactos en el teléfono (id, nombre para mostrar y fecha del vínculo) | Servidor (spec 016, FR-019) | Sí, en el teléfono (`vuelto.contactos.v1`), asociada a la cuenta; se borra al cerrar sesión o al entrar otra cuenta |
+| Integrantes sin cuenta de un grupo (solo el nombre) | Quien arma el grupo (RF-19, spec 016 D5) | **No.** El nombre vive en la memoria del teléfono mientras se arma el grupo; no se guarda en el teléfono ni sale de él (al servidor va solo la cantidad) |
 
 ## Imágenes de ticket: retención durante el procesamiento
 
@@ -76,7 +76,7 @@ usuario vuelve a fotografiar el ticket.
     48 h** de creada: deja de mostrarse y se borra al abrir la app. También se
     borran al cerrar sesión (la app avisa antes cuántas se pierden) y cuando
     entra otra cuenta en el mismo teléfono.
-  - **La lista de contactos** (spec 013) usa otra clave, `vuelto.contactos.v1`:
+  - **La lista de contactos** (spec 016) usa otra clave, `vuelto.contactos.v1`:
     el id, el nombre para mostrar y la fecha del vínculo de cada contacto, con
     el id de la cuenta a la que pertenece. Sirve para mostrar la lista sin red;
     con red se reemplaza por la del servidor. Otra cuenta en el mismo teléfono
@@ -98,7 +98,7 @@ Detalle y razonamiento en ADR-008.
   escanear un QR no alcanza. No hay buscador de usuarios.
 - **Qué se comparte.** Nombre para mostrar, medios de pago declarados y las
   compras del período reducidas a promoción, fecha, monto y descuento obtenido
-  (spec 013, D4), para calcular el tope que le queda al contacto. Nunca el
+  (spec 016, D4), para calcular el tope que le queda al contacto. Nunca el
   comercio, el medio de la compra, el texto del ticket, los comercios
   habituales ni el email. Esas compras reducidas **solo las lee la Edge
   Function** de grupo, en el servidor, durante el cálculo: no llegan al
@@ -122,7 +122,7 @@ Detalle y razonamiento en ADR-008.
   la ve su emisor y `contactos`, sus dos integrantes. La Edge Function corre
   con el JWT del usuario (nunca con la service role key) y lee los datos de un
   contacto con una función SQL que verifica el vínculo y además exige una
-  **clave de servidor** que solo tiene la Edge Function (spec 013, D8): con la
+  **clave de servidor** que solo tiene la Edge Function (spec 016, D8): con la
   sesión sola, desde la app o con cualquier otro cliente, la lectura se
   rechaza. Las funciones con permisos elevados viven fuera de `public` y no
   las puede ejecutar nadie sin sesión.

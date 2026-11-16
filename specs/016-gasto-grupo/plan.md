@@ -2,7 +2,7 @@
 
 **Branch**: `claude/54-gasto-grupo` | **Date**: 2026-11-15 | **Spec**: [spec.md](spec.md)
 
-**Input**: Feature specification from `specs/013-gasto-grupo/spec.md`
+**Input**: Feature specification from `specs/016-gasto-grupo/spec.md`
 
 ## Summary
 
@@ -58,7 +58,7 @@ Decisiones técnicas en [research.md](research.md); modelo en [data-model.md](da
 ### Documentation (this feature)
 
 ```text
-specs/013-gasto-grupo/
+specs/016-gasto-grupo/
 ├── spec.md
 ├── plan.md              # este archivo
 ├── research.md

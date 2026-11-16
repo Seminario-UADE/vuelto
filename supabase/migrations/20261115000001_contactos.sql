@@ -1,5 +1,5 @@
 -- Contactos vinculados por invitación y lectura de sus datos para el gasto en grupo
--- (spec 013, ADR-008). RLS en la misma migración que crea cada tabla (constitución §IV).
+-- (spec 016, ADR-008). RLS en la misma migración que crea cada tabla (constitución §IV).
 --
 -- Las funciones que necesitan permisos elevados (leer el nombre o los datos de otra cuenta,
 -- crear el vínculo) viven en el schema `contactos_privado`, fuera de `public`: así

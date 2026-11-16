@@ -19,7 +19,7 @@ export default function Quitar() {
   const [error, setError] = useState<string | null>(null);
   const dispatch = useAppDispatch();
 
-  // La lista local cambia solo si el servidor confirmó (spec 013 US2-15).
+  // La lista local cambia solo si el servidor confirmó (spec 016 US2-15).
   const quitar = async () => {
     setQuitando(true);
     setError(null);

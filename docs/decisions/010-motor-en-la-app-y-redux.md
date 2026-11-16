@@ -167,7 +167,7 @@ number | null`), que además cubre el caso de la app.
 6. **Topes en la app** (#45) con el mismo store.
 7. Limpiar lo que queda sin uso: `recomendar` y su contrato, o reutilizarlos.
 
-## Actualización (15/11/2026, issue #54, spec 013)
+## Actualización (15/11/2026, issue #54, spec 016)
 
 - **§2, slice `contactos`.** La lista sale de la RPC `mis_contactos` y se
   guarda en el teléfono con su propia clave (`vuelto.contactos.v1`), asociada

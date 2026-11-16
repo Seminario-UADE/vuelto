@@ -6,7 +6,7 @@ promociones y compras, cada una con su RLS) está en `supabase/migrations/`
 (issue #34); el detalle de columnas, constraints y quién lee/escribe cada tabla
 está en `specs/007-esquema-supabase-rls/data-model.md`. Contactos e invitaciones
 (ADR-008) están en `supabase/migrations/20261115000001_contactos.sql`, con su
-detalle en `specs/013-gasto-grupo/data-model.md`.
+detalle en `specs/016-gasto-grupo/data-model.md`.
 
 ## Promoción
 
@@ -101,7 +101,7 @@ Declarado manualmente, en tres capas de prioridad:
 2. **Comercios recurridos** (alta) — dónde compra habitualmente
 3. **Gustos y preferencias** (diferible, no entra al MVP)
 
-## Grupo (contexto §4.5 — nivel 1 del alcance, ADR-008, spec 013)
+## Grupo (contexto §4.5 — nivel 1 del alcance, ADR-008, spec 016)
 
 Integrantes: quien pide, contactos vinculados y, opcionalmente, personas sin
 cuenta, solo con un nombre que no sale del teléfono ni se guarda. El motor

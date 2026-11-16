@@ -5,7 +5,7 @@
  *
  * El mapeo de promociones repite el de `apps/mobile/src/sync/mapeo.ts`: vive en otro workspace y
  * otro runtime (Deno), y mover el mapeo al motor le metería la forma de las filas al núcleo. Es
- * deuda conocida (spec 013, plan §Complexity Tracking).
+ * deuda conocida (spec 016, plan §Complexity Tracking).
  */
 import { fechaArgentina } from "@vuelto/motor";
 import type {

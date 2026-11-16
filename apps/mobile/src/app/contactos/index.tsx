@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { colors, radius, size, space } from "@/theme";
 
 /**
- * Contactos vinculados (ADR-008, spec 013 US2). Sin buscador: solo se vincula por invitación. La
+ * Contactos vinculados (ADR-008, spec 016 US2). Sin buscador: solo se vincula por invitación. La
  * lista sale del servidor y se vuelve a pedir cada vez que se entra (FR-019).
  */
 export default function Contactos() {

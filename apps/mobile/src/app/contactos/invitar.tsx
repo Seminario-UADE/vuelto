@@ -48,7 +48,7 @@ async function crear(): Promise<Invitacion> {
 }
 
 /**
- * Invitar contacto (ADR-008 §1, spec 013 US2): link + QR de un solo uso que vence en 24 h. Generar
+ * Invitar contacto (ADR-008 §1, spec 016 US2): link + QR de un solo uso que vence en 24 h. Generar
  * otro invalida el anterior (FR-011). Sin buscador.
  */
 export default function Invitar() {

@@ -1,4 +1,4 @@
-# Research: Gasto en grupo (spec 013)
+# Research: Gasto en grupo (spec 016)
 
 Decisiones técnicas que el plan toma para cumplir la spec. Cada una: decisión, por qué y qué se descartó. Lo verificado en el repo o en la base local se marca como **verificado**; lo que hay que confirmar al implementar, como **a confirmar**.
 

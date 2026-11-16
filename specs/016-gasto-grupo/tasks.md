@@ -1,10 +1,10 @@
 ---
-description: "Tareas de la spec 013: gasto en grupo con contactos vinculados"
+description: "Tareas de la spec 016: gasto en grupo con contactos vinculados"
 ---
 
 # Tasks: Gasto en grupo — quién de nosotros paga, con contactos vinculados
 
-**Input**: `specs/013-gasto-grupo/` (spec.md, plan.md, research.md, data-model.md, contracts/, quickstart.md)
+**Input**: `specs/016-gasto-grupo/` (spec.md, plan.md, research.md, data-model.md, contracts/, quickstart.md)
 
 **Tests**: obligatorios. La constitución §VI exige test-first en el motor, y el PO pidió "tests del motor primero". Cada capa escribe sus tests antes del código: Vitest en el motor, pgTAP antes de la migración, Vitest del handler, el servicio y la respuesta antes de la Edge Function.
 
@@ -22,7 +22,7 @@ description: "Tareas de la spec 013: gasto en grupo con contactos vinculados"
 **Purpose**: dejar el entorno listo y la base verde antes de tocar nada.
 
 - [X] T001 Correr `npm run lint`, `npm run typecheck` y `npm run test` en la raíz sobre la rama sin cambios y anotar el resultado de base (si algo ya falla en `main`, se dice en el PR).
-- [X] T002 [P] Crear `supabase/functions/.env.example` con `GRUPO_CLAVE_SERVIDOR=` y un comentario que remita a `specs/013-gasto-grupo/quickstart.md` §Configuración; confirmar que `supabase/functions/.env` está en `.gitignore` (sumarlo si no).
+- [X] T002 [P] Crear `supabase/functions/.env.example` con `GRUPO_CLAVE_SERVIDOR=` y un comentario que remita a `specs/016-gasto-grupo/quickstart.md` §Configuración; confirmar que `supabase/functions/.env` está en `.gitignore` (sumarlo si no).
 - [X] T003 [P] Excluir `functions/_shared/supabase/**` de `supabase/tsconfig.json` (`exclude`) y de la cobertura en `supabase/vitest.config.ts`, con el mismo comentario que ya justifica `functions/*/index.ts` (lo chequea `deno check`, research R8).
 
 ---
@@ -150,7 +150,7 @@ description: "Tareas de la spec 013: gasto en grupo con contactos vinculados"
 - [X] T059 [P] Enmendar `docs/decisions/008-contactos-vinculados-gasto-en-grupo.md` (actualización fechada: §3 compras reducidas solo en el servidor, escalones de $100, base sobre la promo aplicada y lo que se deduce repitiendo consultas; §4 schema propio, envoltorios y clave de servidor; §7 sin cuenta solo con nombre; §8 débito y redondeo resueltos) y `docs/decisions/010-motor-en-la-app-y-redux.md` (§2 slice `contactos` desde RPC; §3 invitaciones por RPC sin Edge Function).
 - [X] T060 [P] Actualizar `docs/product/privacidad.md` según FR-032 (tabla de lo que se guarda, la clave `vuelto.store.v1` con los contactos por cuenta, sin cuenta no se guardan, compras reducidas solo en el servidor, lo que se deduce repitiendo consultas) y corregir la inconsistencia de G-11 (sin cuenta con nombre **y** medios).
 - [X] T061 [P] Actualizar `docs/product/requisitos.md` (sacar RF-19/RF-20 de pendientes), `docs/product/pendientes.md` (tildar «Gasto en grupo: promoción de débito, redondeo de la división» con la decisión), `docs/architecture/01-data-models.md` (tablas en plural, G-14; quitar "todavía no tienen migración") y `docs/architecture/04-infrastructure.md` (la Edge Function y la clave de servidor, con los pasos de `quickstart.md`).
-- [X] T062 [P] Enmendar `specs/006-app-mobile-pantallas/spec.md` US5-9 (sin grupo de ejemplo con fecha fija; remite a la spec 013), actualizar la tabla de workspaces y la fila Stack de `CLAUDE.md` si cambia lo que dicen de `supabase` (Edge Function `recomendar-grupo`) y marcar en `docs/product/revision-gasto-grupo.md` qué hallazgos cierra este PR.
+- [X] T062 [P] Enmendar `specs/006-app-mobile-pantallas/spec.md` US5-9 (sin grupo de ejemplo con fecha fija; remite a la spec 016), actualizar la tabla de workspaces y la fila Stack de `CLAUDE.md` si cambia lo que dicen de `supabase` (Edge Function `recomendar-grupo`) y marcar en `docs/product/revision-gasto-grupo.md` qué hallazgos cierra este PR.
 - [ ] T063 Correr los chequeos del PR: `npm run lint`, `npm run typecheck`, `npm run test`, `deno check` de las dos funciones, `supabase test db` y `npm run test:integracion -w @vuelto/mobile`; después los agentes `test-runner` y `rules-guardian` y la skill `/code-review`, y corregir lo que encuentren.
 - [ ] T064 Verificar en la app web (`mobile-web`) las pantallas que se pueden ver sin dos teléfonos (Contactos vacío, Pegar, Armar con y sin rubro, errores de resultado) y sacar capturas antes/después para el PR (criterio de #130). Lo que necesita dispositivo real (QR con la cámara) se dice en el PR como no verificado.
 - [ ] T065 Registrar la sesión en `docs/bitacora-prompts.md` (prompt, decisiones del PO, hallazgos de `spec-critic`, qué se verificó y qué no) y abrir el PR con `Closes #54` y `Closes #130`.

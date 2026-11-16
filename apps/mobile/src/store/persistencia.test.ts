@@ -62,7 +62,7 @@ describe("persistencia (US4)", () => {
     expect(b.getState().sesion.usuario).toBeNull();
   });
 
-  it("simulación, reloj y grupo en armado no se guardan (spec 013, D5)", async () => {
+  it("simulación, reloj y grupo en armado no se guardan (spec 016, D5)", async () => {
     const disco = memoria();
     const a = await abrir(disco);
     a.dispatch(comercioElegido("coto"));
@@ -88,7 +88,7 @@ describe("persistencia (US4)", () => {
     expect([...disco.datos.values()].some((v) => v.includes("Sofía"))).toBe(false);
   });
 
-  it("los contactos arrancan vacíos y no van en la clave del perfil (spec 013, G-02)", async () => {
+  it("los contactos arrancan vacíos y no van en la clave del perfil (spec 016, G-02)", async () => {
     const disco = memoria();
     const a = await abrir(disco);
     expect(a.getState().contactos.lista).toEqual([]);

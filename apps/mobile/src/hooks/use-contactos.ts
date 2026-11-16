@@ -5,7 +5,7 @@ import { cargarContactos } from "@/store/contactos";
 
 /**
  * Trae la lista de contactos del servidor al entrar una cuenta y cada vez que la app vuelve a
- * primer plano (spec 013 FR-019): un vínculo creado o quitado desde el otro teléfono aparece solo.
+ * primer plano (spec 016 FR-019): un vínculo creado o quitado desde el otro teléfono aparece solo.
  * Contactos, además, recarga al enfocarse.
  */
 export function useContactos(): void {

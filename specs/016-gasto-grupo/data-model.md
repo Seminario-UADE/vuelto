@@ -1,4 +1,4 @@
-# Data Model: Gasto en grupo (spec 013)
+# Data Model: Gasto en grupo (spec 016)
 
 ## Base (migración `20261115000001_contactos.sql`)
 

@@ -46,7 +46,7 @@ export interface MedioDeContacto extends MedioDePago {
 }
 
 /**
- * Lo que la Edge Function de grupo sabe de un contacto (spec 013, D4): nombre, medios y compras
+ * Lo que la Edge Function de grupo sabe de un contacto (spec 016, D4): nombre, medios y compras
  * del período reducidas. Nunca sale de la Edge Function; al teléfono va solo lo de FR-021.
  */
 export interface DatosDeContacto {

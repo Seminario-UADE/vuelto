@@ -1,5 +1,5 @@
 /**
- * Repositorios reales sobre Supabase (ADR-009, spec 013 research R8). El cliente se crea por
+ * Repositorios reales sobre Supabase (ADR-009, spec 016 research R8). El cliente se crea por
  * pedido con el `Authorization` del usuario: todo lo propio se lee con su sesión y el RLS aplica.
  * Los datos de los contactos pasan por `datos_de_contactos`, que verifica el vínculo y exige la
  * clave de servidor (D8). Solo los chequea `deno check` (los importa `recomendar-grupo/index.ts`):

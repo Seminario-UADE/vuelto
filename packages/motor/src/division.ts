@@ -1,5 +1,5 @@
 /**
- * División de un gasto en grupo (spec 013, FR-006 y D3): pesos enteros. Cada
+ * División de un gasto en grupo (spec 016, FR-006 y D3): pesos enteros. Cada
  * uno pone la parte entera de `total / n`; el resto se reparte de a $1 entre
  * los primeros del orden recibido (el del desempate). La suma es exactamente
  * `total`. No distingue débito de crédito (D2).
