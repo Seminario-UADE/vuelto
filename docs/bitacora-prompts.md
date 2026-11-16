@@ -3051,6 +3051,10 @@ contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
 9. "Cuando edité el nombre a «FarmaPlu», me seguía sugiriendo primero
    Kansas, el negocio del ticket." Era un error de la spec: el texto del
    ticket seguía mandando aunque el usuario hubiera cambiado el nombre.
+10. "Funciona bien, seguí con la etapa 3." Tres revisiones en paralelo: las
+    reglas del proyecto, el estilo del código y lo que pide la spec.
+11. "Avanzá así y mostrame la bitácora." Se aplicaron los arreglos
+    propuestos de las revisiones.
 
 **Resultado:**
 - Spec 015: si el comercio no coincide, un recuadro con hasta 3 sugerencias
@@ -3082,8 +3086,20 @@ contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
   ticket solo se usa mientras el comercio sea el que leyó el ticket.
 - Error de la IA: la spec ponía el texto del ticket por delante de lo que
   escribía el usuario, y no lo vio ninguna revisión hasta la prueba real.
-- Queda pendiente: volver a probar y el cierre (revisiones, documentación y
-  PR).
+- La segunda prueba del usuario anduvo: «Online» con FarmaPlus y la
+  sugerencia después de editar el nombre.
+- Revisiones: no se rompe ninguna regla del proyecto. Se arreglaron:
+  - el anuncio del recuadro para el lector de pantalla del iPhone;
+  - la línea de confirmación también cuando el comercio viene de la
+    simulación;
+  - el título sin «¿Cuál es?» cuando no hay sugerencias;
+  - que tocar una sugerencia con el teclado abierto no dependa del orden
+    en que el celular avisa los toques;
+  - el orden entre rubros de un mismo comercio, fijo por categoría.
+  Además, la regla de cuándo mostrar la ayuda pasó a una función con sus
+  pruebas, y el buscador tomó el estilo de los demás buscadores de la app.
+- Los documentos de arquitectura explican la sugerencia y que «Revisá tu
+  compra» calcula todo con la fecha y el lugar de la compra.
 
 ---
 

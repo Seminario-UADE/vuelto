@@ -5,6 +5,7 @@ import {
   buscarEnCatalogo,
   nombreLimpio,
   parecido,
+  sugerenciaEnPantalla,
   sugerirComercio,
   textoParaSugerir,
   type ResultadoSugerencia,
@@ -251,5 +252,53 @@ describe("textoParaSugerir: el texto del ticket solo mientras el comercio sea el
       categoriaConocida: null,
     });
     expect(nombres(r)).toEqual(["FarmaPlus/4"]);
+  });
+});
+
+describe("el orden entre rubros de un mismo comercio (spec 015, Edge Cases)", () => {
+  it("por categoría, aunque el catálogo venga en otro orden", () => {
+    const desordenado = [comercio("Coto", 9), comercio("Jumbo", 1), comercio("Coto", 1)];
+    const r = sugerirComercio({ nombre: "COTO C.I.C.S.A.", textoTicket: null, catalogo: desordenado, categoriaConocida: null });
+    expect(nombres(r)).toEqual(["Coto/1", "Coto/9"]);
+  });
+});
+
+describe("sugerenciaEnPantalla: qué se muestra debajo del campo (spec 015, FR-006, FR-008 a FR-010)", () => {
+  const base = {
+    comercio: "COTO C.I.C.S.A.",
+    buscadoEn: "COTO C.I.C.S.A." as string | null,
+    noEsta: false,
+    vinoElComercio: false,
+    categoriaElegida: null as number | null,
+    categoriaQueVino: null as number | null,
+    textoTicket: null as string | null,
+    catalogo: CATALOGO,
+  };
+
+  it("con lo buscado igual al campo: las sugerencias", () => {
+    expect(sugerenciaEnPantalla(base)).toMatchObject({ tipo: "sugerencias" });
+  });
+
+  it("mientras escribe (lo buscado no es lo del campo) o antes de buscar: nada", () => {
+    expect(sugerenciaEnPantalla({ ...base, buscadoEn: "COTO" })).toBeNull();
+    expect(sugerenciaEnPantalla({ ...base, buscadoEn: null })).toBeNull();
+  });
+
+  it("después de «No está en la lista»: nada", () => {
+    expect(sugerenciaEnPantalla({ ...base, noEsta: true })).toBeNull();
+  });
+
+  it("con una sugerencia elegida, la línea de confirmación aunque lo buscado haya quedado viejo (teclado abierto)", () => {
+    expect(sugerenciaEnPantalla({ ...base, comercio: "Coto", buscadoEn: "COTO C.I.C.S.A.", categoriaElegida: 9 })).toEqual({
+      tipo: "coincide",
+      comercio: CATALOGO[2],
+    });
+  });
+
+  it("el comercio que vino (compra por confirmar o recomendación): solo la línea, nunca el recuadro", () => {
+    const vino = { ...base, vinoElComercio: true, buscadoEn: null };
+    expect(sugerenciaEnPantalla({ ...vino, comercio: "Coto", categoriaQueVino: 1 })).toEqual({ tipo: "coincide", comercio: CATALOGO[1] });
+    expect(sugerenciaEnPantalla({ ...vino, comercio: "Supermercados" })).toBeNull();
+    expect(sugerenciaEnPantalla({ ...vino, comercio: "COTO C.I.C.S.A." })).toBeNull();
   });
 });

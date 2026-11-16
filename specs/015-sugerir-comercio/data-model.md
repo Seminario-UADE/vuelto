@@ -19,13 +19,13 @@ type ResultadoSugerencia =
   | { tipo: "nada" };                                      // comercio vacío y el texto no nombra a ninguno
 ```
 
-`sugerirComercio({ nombre, textoTicket, catalogo, categoriaConocida })` devuelve uno de estos. Con `categoriaConocida` y nombre que coincide en ese rubro → `coincide`. `sugerencias` con lista vacía = el recuadro con solo «Buscar otro comercio» y «No está en la lista».
+`sugerirComercio({ nombre, textoTicket, catalogo, categoriaConocida })` devuelve uno de estos. `sugerenciaEnPantalla(...)` decide cuándo llamarla según el estado de la pantalla (después de la revisión de código: así esa regla también tiene tests). Con `categoriaConocida` y nombre que coincide en ese rubro → `coincide`. `sugerencias` con lista vacía = el recuadro con solo «Buscar otro comercio» y «No está en la lista».
 
 ## Elección en «Revisá tu compra» (estado de la pantalla)
 
 | Estado | Tipo | Se borra cuando |
 |---|---|---|
-| `elegido` | `{ nombre: string; categoriaId: number } \| null` | El usuario cambia el texto del campo |
+| `categoriaElegida` | `number \| null` (el rubro de la sugerencia tocada; el nombre ya queda en el campo) | El usuario cambia el texto del campo |
 | `noEstaEnLaLista` | `boolean` | El usuario cambia el texto del campo |
 | `buscadoEn` | `string \| null` | — (el texto en el que se buscó por última vez: al abrir con ticket o en `onBlur`) |
 

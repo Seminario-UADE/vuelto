@@ -12,6 +12,12 @@ const PALABRAS_QUE_SOBRAN = new Set(["sa", "srl", "sas", "cicsa", "saciei", "sac
 /** Parecido mínimo para sugerir por escritura (research R1, ajustado con la lista de R2). */
 export const UMBRAL_PARECIDO = 0.8;
 
+const MAXIMO_SUGERENCIAS = 3;
+/** Los nombres de hasta 3 letras solo cuentan en el texto del ticket si ocupan una línea entera. */
+const LARGO_NOMBRE_CORTO = 3;
+/** Más cortos que esto, no se comparan por parecido: solo por contenido. */
+const LARGO_MINIMO_PARECIDO = 4;
+
 /**
  * El nombre sin formas societarias, sucursal, dígitos, tildes, mayúsculas ni puntuación. Solo
  * para encontrar sugerencias: si coincide exacto se decide con `claveDeComercio`, como hoy.
@@ -75,39 +81,43 @@ export type ResultadoSugerencia =
   | { tipo: "sugerencias"; titulo: "no_encontrado" | "es_alguno"; sugerencias: SugerenciaComercio[] }
   | { tipo: "nada" };
 
-const MAXIMO_SUGERENCIAS = 3;
-/** Los nombres de hasta 3 letras solo cuentan en el texto del ticket si ocupan una línea entera. */
-const LARGO_CORTO = 3;
-/** Más cortos que esto, no se comparan por parecido: solo por contenido. */
-const LARGO_MINIMO_PARECIDO = 4;
-
-type ComercioLimpio = { comercio: Comercio; clave: string; palabras: string[]; junto: string };
+type ComercioLimpio = {
+  comercio: Comercio;
+  /** `claveDeComercio`: para decidir si coincide exacto. */
+  clave: string;
+  /** `nombreLimpio`, en palabras. */
+  palabras: string[];
+  /** `nombreLimpio` sin espacios: para el parecido («Open 25» → «open»). */
+  sinEspacios: string;
+};
 
 type CatalogoLimpio = {
+  /** Sin rubros (FR-013), por nombre y, a igual nombre, por categoría (spec 015, Edge Cases). */
   lista: ComercioLimpio[];
   /** Por su primera palabra, para buscar en el texto del ticket sin recorrer todo el catálogo. */
   porPrimeraPalabra: Map<string, ComercioLimpio[]>;
 };
 
-/** El catálogo limpio, sin los rubros (FR-013); se limpia una vez por catálogo (research R5). */
-const limpios = new WeakMap<readonly Comercio[], CatalogoLimpio>();
+/** El catálogo limpio, calculado una sola vez por catálogo (research R5). */
+const catalogosLimpios = new WeakMap<readonly Comercio[], CatalogoLimpio>();
 function catalogoLimpio(catalogo: readonly Comercio[]): CatalogoLimpio {
-  const guardado = limpios.get(catalogo);
+  const guardado = catalogosLimpios.get(catalogo);
   if (guardado) return guardado;
-  const lista = catalogo.flatMap((comercio) => {
-    if (esComercioDeRubro(comercio)) return [];
-    const limpio = nombreLimpio(comercio.nombre);
-    return limpio === ""
-      ? []
-      : [{ comercio, clave: claveDeComercio(comercio.nombre), palabras: limpio.split(" "), junto: limpio.replace(/ /g, "") }];
-  });
+  const lista = catalogo
+    .flatMap((comercio) => {
+      if (esComercioDeRubro(comercio)) return [];
+      const limpio = nombreLimpio(comercio.nombre);
+      if (limpio === "") return [];
+      return [{ comercio, clave: claveDeComercio(comercio.nombre), palabras: limpio.split(" "), sinEspacios: limpio.replace(/ /g, "") }];
+    })
+    .sort((a, b) => a.clave.localeCompare(b.clave, "es") || (a.comercio.categoriaId ?? 0) - (b.comercio.categoriaId ?? 0));
   const porPrimeraPalabra = new Map<string, ComercioLimpio[]>();
   for (const c of lista) {
     const primera = c.palabras[0] as string;
     porPrimeraPalabra.set(primera, [...(porPrimeraPalabra.get(primera) ?? []), c]);
   }
   const limpio = { lista, porPrimeraPalabra };
-  limpios.set(catalogo, limpio);
+  catalogosLimpios.set(catalogo, limpio);
   return limpio;
 }
 
@@ -126,13 +136,23 @@ function mejorParecido(c: ComercioLimpio, palabras: readonly string[]): number {
     let tramo = "";
     for (let j = i; j < palabras.length; j++) {
       tramo += palabras[j];
-      if (tramo.length > c.junto.length * 2) break;
+      if (tramo.length > c.sinEspacios.length * 2) break;
       // El mejor parecido posible con esta diferencia de largo; si no llega al umbral, no se compara letra por letra.
-      if (1 - Math.abs(tramo.length - c.junto.length) / Math.max(tramo.length, c.junto.length) < UMBRAL_PARECIDO) continue;
-      mejor = Math.max(mejor, parecido(tramo, c.junto));
+      if (1 - Math.abs(tramo.length - c.sinEspacios.length) / Math.max(tramo.length, c.sinEspacios.length) < UMBRAL_PARECIDO) continue;
+      mejor = Math.max(mejor, parecido(tramo, c.sinEspacios));
     }
   }
   return mejor;
+}
+
+/** Los del catálogo que se parecen a lo leído por encima del umbral, del más parecido al menos. */
+function parecidos(lista: readonly ComercioLimpio[], palabras: readonly string[]): Comercio[] {
+  return lista
+    .filter((c) => c.sinEspacios.length >= LARGO_MINIMO_PARECIDO)
+    .map((c) => ({ c, puntaje: mejorParecido(c, palabras) }))
+    .filter((x) => x.puntaje >= UMBRAL_PARECIDO)
+    .sort((a, b) => b.puntaje - a.puntaje)
+    .map((x) => x.c.comercio);
 }
 
 /** Los del catálogo nombrados en el texto del ticket, en el orden en que aparecen (research R4). */
@@ -145,7 +165,9 @@ function delTexto(texto: string, catalogo: CatalogoLimpio): Comercio[] {
     palabras.forEach((palabra, i) => {
       for (const c of catalogo.porPrimeraPalabra.get(palabra) ?? []) {
         const esta =
-          c.junto.length <= LARGO_CORTO ? limpia === c.palabras.join(" ") : c.palabras.every((p, j) => palabras[i + j] === p);
+          c.sinEspacios.length <= LARGO_NOMBRE_CORTO
+            ? limpia === c.palabras.join(" ")
+            : c.palabras.every((p, j) => palabras[i + j] === p);
         if (esta && !encontrados.includes(c.comercio)) encontrados.push(c.comercio);
       }
     });
@@ -171,14 +193,10 @@ export function sugerirComercio({
   categoriaConocida: number | null;
 }): ResultadoSugerencia {
   const limpio = catalogoLimpio(catalogo);
-  const limpiosDelCatalogo = limpio.lista;
   const clave = claveDeComercio(nombre);
 
   if (clave !== "") {
-    const mismos = limpiosDelCatalogo
-      .filter((c) => c.clave === clave)
-      .map((c) => c.comercio)
-      .sort((a, b) => (a.categoriaId ?? 0) - (b.categoriaId ?? 0));
+    const mismos = limpio.lista.filter((c) => c.clave === clave).map((c) => c.comercio);
     const delRubro = categoriaConocida === null ? undefined : mismos.find((c) => c.categoriaId === categoriaConocida);
     if (delRubro) return { tipo: "coincide", comercio: delRubro };
     const [unico] = mismos;
@@ -198,18 +216,12 @@ export function sugerirComercio({
   const leido = nombreLimpio(nombre);
   const palabras = leido === "" ? [] : leido.split(" ");
   if (palabras.length > 0) {
-    limpiosDelCatalogo
+    limpio.lista
       .map((c) => ({ c, pos: posicion(palabras, c.palabras) }))
       .filter((x) => x.pos >= 0)
       .sort((a, b) => a.pos - b.pos)
       .forEach((x) => sumar(x.c.comercio, "contenido"));
-
-    limpiosDelCatalogo
-      .filter((c) => c.junto.length >= LARGO_MINIMO_PARECIDO)
-      .map((c) => ({ c, puntaje: mejorParecido(c, palabras) }))
-      .filter((x) => x.puntaje >= UMBRAL_PARECIDO)
-      .sort((a, b) => b.puntaje - a.puntaje)
-      .forEach((x) => sumar(x.c.comercio, "parecido"));
+    for (const c of parecidos(limpio.lista, palabras)) sumar(c, "parecido");
   }
 
   if (clave === "") return sugerencias.length > 0 ? { tipo: "sugerencias", titulo: "es_alguno", sugerencias } : { tipo: "nada" };
@@ -228,13 +240,7 @@ export function buscarEnCatalogo(catalogo: readonly Comercio[], texto: string, l
   const resultados = lista.filter((c) => c.clave.includes(buscado)).map((c) => c.comercio);
   const leido = nombreLimpio(texto);
   if (leido !== "") {
-    const palabras = leido.split(" ");
-    lista
-      .filter((c) => c.junto.length >= LARGO_MINIMO_PARECIDO && !resultados.includes(c.comercio))
-      .map((c) => ({ c, puntaje: mejorParecido(c, palabras) }))
-      .filter((x) => x.puntaje >= UMBRAL_PARECIDO)
-      .sort((a, b) => b.puntaje - a.puntaje)
-      .forEach((x) => resultados.push(x.c.comercio));
+    for (const c of parecidos(lista, leido.split(" "))) if (!resultados.includes(c)) resultados.push(c);
   }
   return resultados.slice(0, limite);
 }
@@ -255,4 +261,43 @@ export function textoParaSugerir({
   if (textoTicket === null) return null;
   const clave = claveDeComercio(nombre);
   return clave === "" || clave === claveDeComercio(nombreLeido) ? textoTicket : null;
+}
+
+/**
+ * Qué se ve debajo del campo «Comercio» en cada momento (spec 015, FR-006, FR-008 a FR-010):
+ * - después de «No está en la lista», nada;
+ * - el comercio que vino (compra por confirmar o recomendación): solo la línea de confirmación,
+ *   nunca el recuadro;
+ * - una sugerencia elegida: su línea, sin depender de cuándo se cerró el teclado;
+ * - si no, se busca solo cuando lo buscado es lo que dice el campo (al abrir con ticket o al
+ *   terminar de escribir); mientras escribe, nada.
+ */
+export function sugerenciaEnPantalla({
+  comercio,
+  buscadoEn,
+  noEsta,
+  vinoElComercio,
+  categoriaElegida,
+  categoriaQueVino,
+  textoTicket,
+  catalogo,
+}: {
+  comercio: string;
+  buscadoEn: string | null;
+  noEsta: boolean;
+  vinoElComercio: boolean;
+  /** El rubro de la sugerencia que tocó el usuario; se borra al cambiar el texto. */
+  categoriaElegida: number | null;
+  /** El rubro con el que vino el comercio (compra por confirmar o recomendación). */
+  categoriaQueVino: number | null;
+  textoTicket: string | null;
+  catalogo: readonly Comercio[];
+}): ResultadoSugerencia | null {
+  if (noEsta) return null;
+  if (vinoElComercio) {
+    const r = sugerirComercio({ nombre: comercio, textoTicket: null, catalogo, categoriaConocida: categoriaQueVino });
+    return r.tipo === "coincide" ? r : null;
+  }
+  if (categoriaElegida === null && buscadoEn !== comercio) return null;
+  return sugerirComercio({ nombre: comercio, textoTicket, catalogo, categoriaConocida: categoriaElegida });
 }

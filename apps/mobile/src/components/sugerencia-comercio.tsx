@@ -1,13 +1,12 @@
-import { useMemo, useState } from "react";
-import { View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { AccessibilityInfo, Platform, TextInput, View } from "react-native";
 import { nombreDeRubro } from "@/data/comercios";
 import type { Comercio } from "@/data/contracts";
 import { buscarEnCatalogo, type ResultadoSugerencia } from "@/data/sugerir-comercio";
-import { colors, space } from "@/theme";
+import { colors, fonts, radius, space, type as escala } from "@/theme";
 import { Button } from "./button";
 import { Card } from "./card";
 import { FilaAccion } from "./fila-accion";
-import { Field } from "./field";
 import { Icon } from "./icon";
 import { divisor } from "./lista";
 import { Text } from "./text";
@@ -23,10 +22,16 @@ type Props = {
 /** Cuántos resultados muestra el buscador. */
 const RESULTADOS_DEL_BUSCADOR = 8;
 
-const TITULOS = {
-  no_encontrado: "No lo encontramos entre los comercios con promo. ¿Cuál es?",
-  es_alguno: "¿Es alguno de estos?",
-} as const;
+/** El título del recuadro; `null` si no hay recuadro (la línea de confirmación o nada). */
+function tituloDe(resultado: ResultadoSugerencia | null): string | null {
+  if (resultado === null || resultado.tipo === "nada" || resultado.tipo === "coincide") return null;
+  if (resultado.tipo === "elegir_rubro") return "¿En qué rubro?";
+  if (resultado.titulo === "es_alguno") return "¿Es alguno de estos?";
+  // Sin sugerencias no se pregunta «¿Cuál es?»: no hay de dónde elegir (spec 015, Edge Cases).
+  return resultado.sugerencias.length > 0
+    ? "No lo encontramos entre los comercios con promo. ¿Cuál es?"
+    : "No lo encontramos entre los comercios con promo";
+}
 
 function Filas({ comercios, onElegir }: { comercios: readonly Comercio[]; onElegir: (c: Comercio) => void }) {
   return (
@@ -36,6 +41,36 @@ function Filas({ comercios, onElegir }: { comercios: readonly Comercio[]; onEleg
           <FilaAccion titulo={c.nombre} detalle={nombreDeRubro(c)} onPress={() => onElegir(c)} />
         </View>
       ))}
+    </View>
+  );
+}
+
+/** El buscador con el estilo de los demás buscadores de comercios (DESIGN.md, `selector-comercios`). */
+function Buscador({ texto, onCambiar }: { texto: string; onCambiar: (t: string) => void }) {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: space.sm,
+        minHeight: 48,
+        paddingHorizontal: space.lg,
+        borderRadius: radius.control,
+        backgroundColor: colors.surfaceStrong,
+      }}
+    >
+      <Icon name="buscar" size={20} color={colors.inkSecondary} />
+      <TextInput
+        value={texto}
+        onChangeText={onCambiar}
+        placeholder="Buscá un comercio"
+        placeholderTextColor={colors.inkSecondary}
+        accessibilityLabel="Buscar comercio"
+        returnKeyType="search"
+        autoFocus
+        selectionColor={colors.accent}
+        style={{ flex: 1, minHeight: 44, fontFamily: fonts.regular, fontSize: escala.bodyLg.fontSize, color: colors.ink }}
+      />
     </View>
   );
 }
@@ -52,6 +87,13 @@ export function SugerenciaComercio({ resultado, catalogo, onElegir, onNoEsta }: 
     () => (buscando ? buscarEnCatalogo(catalogo, texto, RESULTADOS_DEL_BUSCADOR) : []),
     [buscando, catalogo, texto],
   );
+  const titulo = tituloDe(resultado);
+
+  // El lector de pantalla anuncia el recuadro (FR-014): en Android lo hace la región viva del
+  // título; en iOS hay que pedirlo.
+  useEffect(() => {
+    if (titulo !== null && Platform.OS === "ios") AccessibilityInfo.announceForAccessibility(titulo);
+  }, [titulo]);
 
   if (resultado === null || resultado.tipo === "nada") return null;
 
@@ -66,46 +108,48 @@ export function SugerenciaComercio({ resultado, catalogo, onElegir, onNoEsta }: 
     );
   }
 
-  const elegir = (c: Comercio) => {
+  const cerrarBuscador = () => {
     setBuscando(false);
     setTexto("");
+  };
+  const elegir = (c: Comercio) => {
+    cerrarBuscador();
     onElegir(c);
   };
   const noEsta = () => {
-    setBuscando(false);
-    setTexto("");
+    cerrarBuscador();
     onNoEsta();
   };
 
-  const titulo = resultado.tipo === "elegir_rubro" ? "¿En qué rubro?" : TITULOS[resultado.titulo];
+  const cuerpo = buscando ? (
+    <>
+      <Buscador texto={texto} onCambiar={setTexto} />
+      {texto.trim() !== "" && encontrados.length === 0 ? (
+        <Text variant="bodyMd" tone="inkSecondary" accessibilityLiveRegion="polite">
+          No encontramos comercios con promo con ese nombre
+        </Text>
+      ) : (
+        <Filas comercios={encontrados} onElegir={elegir} />
+      )}
+    </>
+  ) : resultado.tipo === "elegir_rubro" ? (
+    <Filas comercios={resultado.opciones} onElegir={elegir} />
+  ) : (
+    <>
+      <Filas comercios={resultado.sugerencias.map((s) => s.comercio)} onElegir={elegir} />
+      <FilaAccion titulo="Buscar otro comercio" leading="buscar" onPress={() => setBuscando(true)} />
+    </>
+  );
+  // «¿En qué rubro?» no ofrece «No está en la lista»: el nombre sí está en el catálogo.
+  const ofreceNoEsta = buscando || resultado.tipo === "sugerencias";
 
   return (
     <Card padding={space.lg} gap={space.sm}>
       <Text variant="bodyMd" weight="semibold" accessibilityLiveRegion="polite">
         {buscando ? "Buscá el comercio" : titulo}
       </Text>
-      {buscando ? (
-        <>
-          <Field label="Comercio" value={texto} onChangeText={setTexto} placeholder="Escribí el nombre" autoFocus />
-          {texto.trim() !== "" && encontrados.length === 0 ? (
-            <Text variant="bodyMd" tone="inkSecondary" accessibilityLiveRegion="polite">
-              No encontramos comercios con promo con ese nombre
-            </Text>
-          ) : (
-            <Filas comercios={encontrados} onElegir={elegir} />
-          )}
-        </>
-      ) : resultado.tipo === "elegir_rubro" ? (
-        <Filas comercios={resultado.opciones} onElegir={elegir} />
-      ) : (
-        <>
-          <Filas comercios={resultado.sugerencias.map((s) => s.comercio)} onElegir={elegir} />
-          <FilaAccion titulo="Buscar otro comercio" leading="buscar" onPress={() => setBuscando(true)} />
-        </>
-      )}
-      {resultado.tipo === "elegir_rubro" && !buscando ? null : (
-        <Button label="No está en la lista" variant="text" onPress={noEsta} />
-      )}
+      {cuerpo}
+      {ofreceNoEsta ? <Button label="No está en la lista" variant="text" onPress={noEsta} /> : null}
     </Card>
   );
 }

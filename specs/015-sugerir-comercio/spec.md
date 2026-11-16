@@ -20,7 +20,7 @@
 ## Definiciones
 
 - **Coincide exacto**: el nombre, sin mayúsculas, tildes ni espacios de más (como compara hoy la app), es igual al de un comercio del catálogo. «coto» y « Coto » coinciden exacto con «Coto»; «COTO S.A.» no.
-- **Nombre limpio**: el nombre sin formas societarias («S.A.», «SA», «S.R.L.», «SRL», «S.A.S.», «C.I.C.S.A.», «CICSA»), sin sucursal («SUC.», «SUCURSAL») ni números, sin tildes, mayúsculas ni puntuación. Solo se usa para encontrar sugerencias, nunca para decidir si coincide exacto.
+- **Nombre limpio**: el nombre sin formas societarias («S.A.», «SA», «S.A.U.», «S.R.L.», «SRL», «S.A.S.», «C.I.C.S.A.», «CICSA», «S.A.C.I.e.I.», «SACIeI», «S.A.C.I.F.I.», «SACIF»), sin sucursal («SUC.», «SUCURSAL») ni números, sin tildes, mayúsculas ni puntuación. Solo se usa para encontrar sugerencias, nunca para decidir si coincide exacto.
 - **Terminar de escribir**: salir del campo «Comercio» (tocar otro lugar de la pantalla o cerrar el teclado).
 - **Catálogo**: los comercios (con su rubro) de las promos vigentes que la app ya tiene, sin red. Los rubros sin comercio («Supermercados» como opción de rubro) **no** son comercios y nunca se sugieren.
 

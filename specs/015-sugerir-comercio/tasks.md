@@ -66,7 +66,7 @@ description: "Tareas para sugerir el comercio del catálogo (issue #134)"
 - [X] T012 [US3] En `src/app/revisa.tsx`, buscar en `onBlur` del campo «Comercio» y no mostrar el recuadro mientras se escribe (FR-009); con compra por confirmar (con o sin ticket) o desde una recomendación, pasar el rubro que vino como `categoriaConocida` y no mostrar el recuadro mientras el comercio sea el que vino (FR-010).
 - [X] T013a [US1] Después de la prueba del usuario: el texto del ticket se usa solo mientras el comercio sea el leído o esté vacío (FR-002.1); test de la regla en `src/data/sugerir-comercio.test.ts` antes del código y aplicarla en `src/app/revisa.tsx`.
 - [X] T013b [US1] Después de la prueba del usuario: «¿Dónde pagaste?» con «En el local» y «Online» en `src/app/revisa.tsx` (FR-015), con `Segmentado`; test en `src/data/calculo.test.ts` de que una promo solo online aplica con canal online y no en el local.
-- [ ] T013 [US3] Prueba a mano (quickstart §2, todos los pasos), la corre el usuario en el celular o en la web.
+- [X] T013 [US3] Prueba a mano (quickstart §2, todos los pasos), la corre el usuario en el celular o en la web.
 
 **Checkpoint**: las tres historias andando.
 
@@ -74,9 +74,9 @@ description: "Tareas para sugerir el comercio del catálogo (issue #134)"
 
 ## Phase 5: Polish
 
-- [ ] T014 Correr `npm run lint`, `npm run typecheck`, `npm run test` y `npm run build` desde la raíz.
-- [ ] T015 `rules-guardian` y `/code-review` sobre el diff; corregir lo que surja.
-- [ ] T016 Actualizar `docs/architecture/03-frontend.md` (la sugerencia del comercio en «Revisá») y completar la entrada de la issue #134 en `docs/bitacora-prompts.md`, mostrándola antes del commit.
+- [X] T014 Correr `npm run lint`, `npm run typecheck`, `npm run test` y `npm run build` desde la raíz.
+- [X] T015 `rules-guardian` y `/code-review` sobre el diff; corregir lo que surja.
+- [X] T016 Actualizar `docs/architecture/03-frontend.md` (la sugerencia del comercio en «Revisá») y completar la entrada de la issue #134 en `docs/bitacora-prompts.md`, mostrándola antes del commit.
 
 ---
 

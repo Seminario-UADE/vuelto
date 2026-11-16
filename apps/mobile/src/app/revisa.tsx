@@ -17,7 +17,7 @@ import { Text } from "@/components/text";
 import { comercioPorNombre, detallesDeLaCompra, promoPropuesta } from "@/data/calculo";
 import type { Canal, Comercio, OrigenCompra } from "@/data/contracts";
 import { borradorDesdePorConfirmar } from "@/data/por-confirmar";
-import { sugerirComercio, textoParaSugerir } from "@/data/sugerir-comercio";
+import { sugerenciaEnPantalla, textoParaSugerir } from "@/data/sugerir-comercio";
 import { aprox, montoEditable, parseMonto } from "@/lib/format";
 import { esRed, esTipoTarjeta } from "@/perfil/modelo";
 import { hapticoExito, hapticoSeleccion } from "@/lib/haptics";
@@ -92,9 +92,9 @@ export default function Revisa() {
       : "manual";
   const comercioInicial = desde?.borrador.comercio ?? p.comercio ?? "";
   const [comercio, setComercio] = useState(comercioInicial);
-  // El comercio que el usuario tocó en la sugerencia (spec 015, FR-005): su rubro vale hasta que
-  // cambie el texto del campo.
-  const [elegido, setElegido] = useState<{ nombre: string; categoriaId: number } | null>(null);
+  // El rubro de la sugerencia que tocó el usuario (spec 015, FR-005): vale hasta que cambie el
+  // texto del campo.
+  const [categoriaElegida, setCategoriaElegida] = useState<number | null>(null);
   /** Tocó «No está en la lista» (FR-008): no se vuelve a sugerir hasta que cambie el texto. */
   const [noEsta, setNoEsta] = useState(false);
   /**
@@ -106,10 +106,10 @@ export default function Revisa() {
   const vinoElComercio = (desde !== null || p.modo === "excepcion") && comercio.trim() === comercioInicial.trim();
   // El rubro con el que se recomendó vale mientras el comercio siga siendo ese: si lo cambia a
   // mano, se busca por nombre como siempre, salvo que haya elegido una sugerencia.
-  const categoriaElegida = desde ? (desde.borrador.categoriaId ?? NaN) : Number(p.categoriaId);
-  const categoriaId =
-    elegido?.categoriaId ??
-    (Number.isInteger(categoriaElegida) && comercio.trim() === comercioInicial.trim() ? categoriaElegida : undefined);
+  const categoriaDeOrigen = desde ? (desde.borrador.categoriaId ?? NaN) : Number(p.categoriaId);
+  const categoriaQueVino =
+    Number.isInteger(categoriaDeOrigen) && comercio.trim() === comercioInicial.trim() ? categoriaDeOrigen : undefined;
+  const categoriaId = categoriaElegida ?? categoriaQueVino;
   const [monto, setMonto] = useState<number | null>(desde ? desde.borrador.monto : parseMonto(p.monto ?? ""));
   // Excepción: el usuario eligió el medio al tocar "Usar…". Ticket y manual: nunca preseleccionado.
   const [medioId, setMedioId] = useState<string | null>(
@@ -139,14 +139,21 @@ export default function Revisa() {
   });
   const sugerenciaDeComercio = useMemo(
     () =>
-      noEsta || vinoElComercio || buscadoEn === null || buscadoEn !== comercio
-        ? null
-        : sugerirComercio({ nombre: comercio, textoTicket: textoDelTicket, catalogo, categoriaConocida: elegido?.categoriaId ?? null }),
-    [noEsta, vinoElComercio, buscadoEn, comercio, textoDelTicket, catalogo, elegido],
+      sugerenciaEnPantalla({
+        comercio,
+        buscadoEn,
+        noEsta,
+        vinoElComercio,
+        categoriaElegida,
+        categoriaQueVino: categoriaQueVino ?? null,
+        textoTicket: textoDelTicket,
+        catalogo,
+      }),
+    [comercio, buscadoEn, noEsta, vinoElComercio, categoriaElegida, categoriaQueVino, textoDelTicket, catalogo],
   );
   const cambiarComercio = (texto: string) => {
     setComercio(texto);
-    setElegido(null);
+    setCategoriaElegida(null);
     setNoEsta(false);
   };
   const elegirComercio = (c: Comercio) => {
@@ -154,7 +161,7 @@ export default function Revisa() {
     setComercio(c.nombre);
     setBuscadoEn(c.nombre);
     setNoEsta(false);
-    setElegido(c.categoriaId === null ? null : { nombre: c.nombre, categoriaId: c.categoriaId });
+    setCategoriaElegida(c.categoriaId);
   };
   // La promo que se propone y se guarda y el texto de cada tarjeta salen de la misma cuenta,
   // evaluada en la fecha de la compra (FR-022, issue #144): no la del día de hoy, que con un

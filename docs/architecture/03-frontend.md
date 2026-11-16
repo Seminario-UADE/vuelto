@@ -97,8 +97,16 @@ selectMarcasDeSubida = cola → qué compras están «Sin subir» o «Solo en es
 - **En vivo**: tipear el monto cambia `simulacion.monto`; las entradas del motor no se
   reconstruyen (misma referencia) y solo corre `recomendar()`. Sin botón, sin debounce, sin red y
   sin estado de carga. Un estado idéntico devuelve el mismo objeto sin correr el motor.
-- **Otro comercio sin tocar la simulación** (Revisá tu compra, Primera respuesta):
+- **Otro comercio sin tocar la simulación** (Primera respuesta):
   `useRecomendacionPara(comercioId, monto)`, la misma función con `useMemo`.
+- **Revisá tu compra** calcula todo en la fecha y el canal de la compra («¿Dónde pagaste?», spec
+  015 FR-015): la promo propuesta (`promoPropuesta`) y el texto de cada tarjeta
+  (`detallesDeLaCompra`, issue #144) salen de la misma cuenta. Si el comercio no coincide con el
+  catálogo, `data/sugerir-comercio.ts` (spec 015, issue #134) sugiere hasta 3 comercios, sin red ni
+  modelos de lenguaje: los nombrados en el texto del ticket (solo mientras el comercio sea el
+  leído), los contenidos en el nombre sin «S.A.» ni sucursal, y los parecidos por letras de
+  diferencia. Nunca elige solo: el comercio y su rubro cambian solo si el usuario toca una
+  sugerencia (`components/sugerencia-comercio.tsx`).
 - **Reloj**: ningún selector lee el reloj del sistema. `useReloj` escribe `sesion.ahora` al abrir,
   al volver a primer plano y a cada medianoche de Argentina. Mientras `corpus.marca` es `null` (datos
   de ejemplo, compras de octubre de 2026) la fuente es fija, `2026-10-14T12:00:00-03:00`; con un
