@@ -1,7 +1,8 @@
 /**
  * El token de una invitación (spec 016, FR-012, D11). Lo genera la base: 18 bytes al azar en
  * base64url, 24 caracteres. El link es `vuelto://i/<token>`; en Expo Go, el que da Expo para el
- * mismo camino (`exp://…/--/i/<token>`). Funciones puras: no tocan la red.
+ * mismo camino (`exp://…/--/i/<token>`), y en la versión web, la dirección de la web
+ * (`https://…/i/<token>`). Funciones puras: no tocan la red.
  */
 
 export const FORMATO_TOKEN = /^[A-Za-z0-9_-]{24}$/;
@@ -13,8 +14,8 @@ export const FORMATO_TOKEN = /^[A-Za-z0-9_-]{24}$/;
 export function tokenDeInvitacion(texto: string): string | null {
   const limpio = texto.trim();
   if (FORMATO_TOKEN.test(limpio)) return limpio;
-  // El camino `i/<token>` al final del link, con o sin `--/` (Expo Go) y sin nada después.
-  const m = /^(?:vuelto:\/\/|exps?:\/\/[^\s]+?\/--\/)i\/([A-Za-z0-9_-]+)\/?$/.exec(limpio);
+  // El camino `i/<token>` al final del link de la app, de Expo Go (`--/`) o de la web, sin nada después.
+  const m = /^(?:vuelto:\/\/|exps?:\/\/[^\s]+?\/--\/|https?:\/\/[^\s/]+\/)i\/([A-Za-z0-9_-]+)\/?$/.exec(limpio);
   const token = m?.[1];
   return token !== undefined && FORMATO_TOKEN.test(token) ? token : null;
 }

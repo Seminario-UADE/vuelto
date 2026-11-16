@@ -1,5 +1,5 @@
-import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useState } from "react";
 import { Pressable, TextInput, View } from "react-native";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
@@ -14,6 +14,7 @@ import type { SinCuentaEnGrupo } from "@/data/contracts";
 import { cantidadDeIntegrantes } from "@/grupo/pedido";
 import { MAXIMO_INTEGRANTES } from "@/grupo/vista";
 import { iniciales, parseMonto } from "@/lib/format";
+import { cargarContactos } from "@/store/contactos";
 import { grupoArmado } from "@/store/grupo";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectBuscarComercioPorId } from "@/store/selectores";
@@ -38,6 +39,12 @@ export default function ArmarGrupo() {
   // La posición de carga de cada uno: no se reusa al sacar a alguien (spec 016 FR-002).
   const [proxima, setProxima] = useState(0);
   const [nuevo, setNuevo] = useState("");
+  // La lista al día al armar (FR-019): un vínculo quitado desde el otro teléfono no aparece.
+  useFocusEffect(
+    useCallback(() => {
+      void dispatch(cargarContactos());
+    }, [dispatch]),
+  );
 
   if (!comercio || comercio.categoriaId === null) {
     return (

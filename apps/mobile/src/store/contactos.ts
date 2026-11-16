@@ -5,6 +5,7 @@
  * cerrar sesión la borra (FR-019, G-03).
  */
 import { createSlice, type ListenerMiddlewareInstance, type PayloadAction } from "@reduxjs/toolkit";
+import { fechaArgentina } from "@vuelto/motor";
 import type { Contacto, VistaInvitacion } from "../data/contracts";
 import { vistaDeInvitacion } from "../grupo/invitacion";
 import type { ContactoRemoto, InvitacionCreada, ResultadoAceptar } from "../grupo/repositorio";
@@ -32,10 +33,15 @@ export type EstadoContactos = {
 
 const inicial: EstadoContactos = { cuentaId: null, lista: [], estado: "inicial", hidratada: false, invitacion: null };
 
-/** Del contacto que da el servidor al de la app. Sin nombre para mostrar se dice «Contacto». */
+/**
+ * Del contacto que da el servidor al de la app. Sin nombre para mostrar se dice «Contacto». La
+ * fecha del vínculo es la de Argentina: el servidor la da en UTC, y a las 23 h ya es el día siguiente.
+ */
 export function aContacto(c: ContactoRemoto): Contacto {
   const nombre = c.nombre ?? "Contacto";
-  return { id: c.id, nombre, iniciales: iniciales(nombre) || "?", vinculadoDesde: c.vinculadoDesde.slice(0, 10) };
+  const instante = Date.parse(c.vinculadoDesde);
+  const vinculadoDesde = Number.isNaN(instante) ? c.vinculadoDesde.slice(0, 10) : fechaArgentina(new Date(instante));
+  return { id: c.id, nombre, iniciales: iniciales(nombre) || "?", vinculadoDesde };
 }
 
 export const contactos = createSlice({

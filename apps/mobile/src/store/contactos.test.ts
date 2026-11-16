@@ -60,8 +60,13 @@ describe("contactos: lista desde el servidor (spec 016 US2)", () => {
     expect(s.getState().contactos.lista).toHaveLength(2);
   });
 
+  it("la fecha del vínculo es la de Argentina, no la de UTC", () => {
+    // 01:57 UTC del 16/11 son las 22:57 del 15/11 en Argentina.
+    expect(aContacto({ id: "x", nombre: "Beto", vinculadoDesde: "2026-11-16T01:57:00.000Z" }).vinculadoDesde).toBe("2026-11-15");
+  });
+
   it("un contacto sin nombre para mostrar se llama «Contacto»", () => {
-    expect(aContacto({ id: "x", nombre: null, vinculadoDesde: "2026-11-01T00:00:00Z" })).toEqual({
+    expect(aContacto({ id: "x", nombre: null, vinculadoDesde: "2026-11-01T15:00:00Z" })).toEqual({
       id: "x",
       nombre: "Contacto",
       iniciales: "C",

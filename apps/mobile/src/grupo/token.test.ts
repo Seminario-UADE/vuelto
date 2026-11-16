@@ -10,13 +10,16 @@ describe("tokenDeInvitacion (spec 016, FR-012)", () => {
     expect(tokenDeInvitacion(T)).toBe(T);
     expect(tokenDeInvitacion(`   vuelto://i/${T}\n`)).toBe(T);
     expect(tokenDeInvitacion(`vuelto://i/${T}/`)).toBe(T);
+    // La versión web arma el link con su propia dirección.
+    expect(tokenDeInvitacion(`https://vuelto.expo.app/i/${T}`)).toBe(T);
+    expect(tokenDeInvitacion(`http://localhost:8082/i/${T}`)).toBe(T);
   });
 
   it("rechaza lo que no es una invitación", () => {
     expect(tokenDeInvitacion("")).toBeNull();
     expect(tokenDeInvitacion("hola, te mando la invitación")).toBeNull();
     expect(tokenDeInvitacion(`vuelto://comprar/${T}`)).toBeNull();
-    expect(tokenDeInvitacion(`https://vuelto.app/i/${T}`)).toBeNull();
+    expect(tokenDeInvitacion(`https://vuelto.expo.app/otra/cosa/i/${T}`)).toBeNull();
     expect(tokenDeInvitacion(T.slice(1))).toBeNull();
     expect(tokenDeInvitacion(`${T}x`)).toBeNull();
     expect(tokenDeInvitacion(`vuelto://i/${T.slice(0, 23)}$`)).toBeNull();
