@@ -37,18 +37,20 @@ export default function PrimeraRespuesta() {
   const sinCuenta = useAppSelector((s) => s.sesion.usuario === null);
   const catalogo = useAppSelector(selectCatalogoComercios);
   const delBorrador = useAppSelector((s) => s.perfil.borrador?.comercios);
+  // Sin cuenta, vuelve con los que ya había marcado (US5, escenario 7): id del catálogo y nombre.
+  const [inicial] = useState(() =>
+    sinCuenta && delBorrador
+      ? delBorrador.flatMap((n): [string, string][] => {
+          const c = comerciosConNombre(n, catalogo)[0];
+          return c ? [[c.id, n]] : [];
+        })
+      : [],
+  );
   // Los nombres de los marcados, como los guarda `comercios_habituales`.
-  const nombres = useRef(new Map<string, string>());
-  // Sin cuenta, vuelve con los que ya había marcado (US5, escenario 7).
-  const [seleccion, setSeleccion] = useState(() => {
-    if (!sinCuenta || !delBorrador) return SELECCION_VACIA;
-    const marcados = delBorrador.flatMap((n) => {
-      const c = comerciosConNombre(n, catalogo)[0];
-      if (c) nombres.current.set(c.id, n);
-      return c ? [c.id] : [];
-    });
-    return { marcados, activo: null };
-  });
+  const nombres = useRef(new Map<string, string>(inicial));
+  const [seleccion, setSeleccion] = useState(
+    inicial.length > 0 ? { marcados: inicial.map(([id]) => id), activo: null } : SELECCION_VACIA,
+  );
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const r = useRecomendacionPara(seleccion.activo, null);
