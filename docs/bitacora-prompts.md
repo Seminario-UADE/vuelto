@@ -2976,6 +2976,40 @@ cargando para siempre.
 
 ---
 
+## 2026-11-15 — «Revisá tu compra»: la promo de cada tarjeta, con la fecha de la compra (issue #144)
+
+**Herramienta:** Claude Code (Opus 5.5), sin spec-kit (issue chica).
+
+**Objetivo:** que el texto debajo de cada tarjeta, al registrar una compra,
+hable solo de esa compra y use su fecha, no la de hoy.
+
+**Prompts principales:**
+1. "Cuando pongo «Perfumería Raffe» a mano me dice «La promo es solo en
+   FarmaPlus»." La pantalla mostraba el «¿por qué no?» de la recomendación (issue #46),
+   que explica también las promos de otros comercios del mismo rubro.
+2. "Para el ticket no me sirve saber eso. Y si alguien carga tarde una
+   compra de una promo que estaba vigente ese día, ¿no debería contar?" El
+   reintegro ya se calculaba con la fecha de la compra, pero el texto de
+   cada tarjeta usaba la de hoy: la misma pantalla podía decir «Promo
+   aplicada» y «La promo venció». Quedó como la issue #144.
+3. "Si es del mismo negocio, como Coto, está bien decir «Hoy no aplica, la
+   promo es los miércoles»." Se ajustó la regla: el motivo se muestra si la
+   promo es de ese comercio; si es de otro comercio o de otro rubro, «No hay
+   ninguna promo».
+
+**Resultado:**
+- Cada tarjeta dice cuánto devuelve esa compra (estimado, con su base), por
+  qué no aplicó una promo de ese comercio (el día, la vigencia, el canal, el
+  monto mínimo o el tope agotado) o «No hay ninguna promo». Nunca promos de
+  otros comercios.
+- El texto y el reintegro salen de la misma cuenta, con la fecha de la
+  compra: una compra cargada tarde cuenta con la promo vigente ese día.
+- La recomendación antes de comprar no cambió (es de otro equipo).
+- Queda anotado en la issue: la app solo conserva las promos vencidas del
+  mes en curso, no las de meses anteriores.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
