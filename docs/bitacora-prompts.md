@@ -3038,6 +3038,10 @@ contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
    fácil («Carrefur» está a una letra de «Carrefour»).
 5. "Commiteá y seguí con las tareas." 16 tareas en 3 etapas: la lógica con
    su medición, la pantalla (termina con la prueba del usuario) y el cierre.
+6. "Commiteá y arrancá con la etapa 1." La lógica de la sugerencia, con las
+   pruebas escritas primero y vistas fallar antes del código. La prueba de
+   tiempo falló al correr junto con todas las demás; en vez de aflojarla, se
+   hizo más rápida la búsqueda en el texto del ticket.
 
 **Resultado:**
 - Spec 015: si el comercio no coincide, un recuadro con hasta 3 sugerencias
@@ -3051,6 +3055,13 @@ contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
 - Plan: la lógica en un archivo nuevo que se prueba sin celular, el umbral
   ajustado con una lista distinta de la de medición, y el campo «Comercio»
   avisa cuando el usuario termina de escribir.
+- Etapa 1 (lógica): con las dos listas de la spec, el comercio correcto
+  sale primero en los 20 nombres de tickets y no se sugiere nada en los 10
+  comercios que no están en el catálogo. Con 1.000 comercios, una búsqueda
+  tarda unos 12 milisegundos.
+- Errores de la IA: dos veces, al generar los archivos con un script, los
+  saltos de línea de los textos de prueba quedaron mal escritos y hubo que
+  corregirlos a mano.
 
 ---
 
