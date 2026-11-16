@@ -18,6 +18,7 @@ import { comercioPorNombre, compraParaGuardar, comprasVista, pedidoDeCompra } fr
 import {
   buscarComercios,
   comercioDeRubro,
+  comerciosConNombre,
   comerciosDelCorpus,
   etiquetaDeComercio,
   idDeComercio,
@@ -79,6 +80,22 @@ describe("identidad del comercio", () => {
       HOY,
     );
     expect(r.map((c) => c.nombre)).toEqual(["Café Martínez"]);
+  });
+
+  it("«McDonald's» y «Mc Donald's» son uno solo; «Coto» y «Cotto», dos (#147)", () => {
+    const r = comerciosDelCorpus(
+      [
+        promo("a", { comercio: "McDonald's", categoriaId: 2 }),
+        promo("b", { comercio: "Mc Donald's", categoriaId: 2 }),
+        promo("c", { comercio: "Coto", categoriaId: 1 }),
+        promo("d", { comercio: "Cotto", categoriaId: 1 }),
+      ],
+      HOY,
+    );
+    expect(r.map((c) => c.nombre)).toEqual(["Coto", "Cotto", "McDonald's"]);
+    expect(comerciosConNombre("Mc Donald's", r).map((c) => c.nombre)).toEqual(["McDonald's"]);
+    expect(buscarComercios(r, "mc don").map((c) => c.nombre)).toEqual(["McDonald's"]);
+    expect(buscarComercios(r, "mcdon").map((c) => c.nombre)).toEqual(["McDonald's"]);
   });
 });
 

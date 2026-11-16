@@ -333,7 +333,7 @@ export function comprasDeTopeVista(
 export function comercioPorNombre(nombre: string, catalogo: readonly Comercio[], categoriaId?: number): Comercio {
   return (
     comercioDelCatalogo(nombre, catalogo, categoriaId) ?? {
-      id: `libre-${claveDeComercio(nombre).replace(/ /g, "-")}`,
+      id: `libre-${claveDeComercio(nombre)}`,
       nombre,
       inicial: nombre.charAt(0).toUpperCase(),
       rubro: "otro",

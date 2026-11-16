@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  claveComercio,
   JURISDICCIONES_VALIDAS,
   mediosCompatibles,
   normalizar,
@@ -32,6 +33,15 @@ describe("elegibilidad: caso feliz", () => {
   it("normaliza el comercio sin mayúsculas, acentos ni espacios de más", () => {
     expect(normalizar("  COTO  ")).toBe(normalizar("Coto"));
     expect(normalizar("Café   Martínez")).toBe("cafe martinez");
+  });
+
+  it("el mismo comercio con otra escritura es el mismo: espacios y puntuación no cuentan (#147)", () => {
+    expect(claveComercio("McDonald's")).toBe(claveComercio("Mc Donald's"));
+    expect(claveComercio("Get The Look")).toBe(claveComercio("GetTheLook"));
+    expect(claveComercio("Mostaza & Co.")).toBe(claveComercio("mostaza-co"));
+    expect(claveComercio("Coto")).not.toBe(claveComercio("Cotto"));
+    const p = promo({ comercio: "Mc Donald's" });
+    expect(primeraReglaQueFalla(p, contexto(compra({ comercio: "McDonald's" })))).toBeNull();
   });
 
   it("las jurisdicciones válidas del MVP son nacional, CABA y PBA", () => {

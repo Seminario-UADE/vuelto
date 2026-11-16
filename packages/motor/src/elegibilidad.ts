@@ -46,6 +46,15 @@ export function normalizar(texto: string): string {
     .replace(/\s+/g, " ");
 }
 
+/**
+ * Clave para saber si dos nombres son el mismo comercio: como `normalizar`, pero sin espacios ni
+ * puntuación. MODO escribe el mismo local de varias formas («McDonald's» y «Mc Donald's»), y
+ * tratarlos como dos hacía perder la mejor promo (issue #147).
+ */
+export function claveComercio(texto: string): string {
+  return normalizar(texto).replace(/[^\p{L}\p{N}]/gu, "");
+}
+
 export const REGLAS_DE_PROMOCION: readonly Regla[] = [
   { causa: "categoria", cumple: (p, { compra }) => p.categoriaId === compra.categoriaId },
   {
@@ -53,7 +62,7 @@ export const REGLAS_DE_PROMOCION: readonly Regla[] = [
     // Sin comercio en la compra no se puede confirmar una promo de un comercio.
     cumple: (p, { compra }) =>
       p.comercio === null ||
-      (compra.comercio !== null && normalizar(p.comercio) === normalizar(compra.comercio)),
+      (compra.comercio !== null && claveComercio(p.comercio) === claveComercio(compra.comercio)),
   },
   {
     causa: "vigencia",
