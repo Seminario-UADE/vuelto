@@ -16,7 +16,9 @@ import { Provider } from "react-redux";
 import { TemaProvider, useTema } from "@/components/tema-provider";
 import { Toast } from "@/components/toast";
 import { iniciarAuth } from "@/data/auth";
+import { contactosRemoto } from "@/grupo/remoto";
 import { useApariencia } from "@/hooks/use-apariencia";
+import { useContactos } from "@/hooks/use-contactos";
 import { usePerfilRemoto } from "@/hooks/use-perfil-remoto";
 import { useReloj } from "@/hooks/use-reloj";
 import { useSincronizacion } from "@/hooks/use-sincronizacion";
@@ -27,6 +29,7 @@ import { crearDatosPerfil } from "@/perfil/datos";
 import { crearStore } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { rehidratar } from "@/store/persistencia";
+import { iniciarContactos } from "@/store/contactos";
 import { iniciarPorConfirmar } from "@/store/por-confirmar";
 import { iniciarCompras } from "@/store/thunks";
 import { repositorioSupabase } from "@/sync/repositorio-supabase";
@@ -43,13 +46,15 @@ const store = crearStore({
   generarId: randomUUID,
   repositorio: supabase ? repositorioSupabase(supabase) : null,
   perfilRemoto: supabase ? crearDatosPerfil(supabase) : null,
+  contactosRemoto,
   reloj: () => new Date(),
 });
 // Las compras por confirmar se leen después de las compras: la purga saca las ya confirmadas (spec 012).
 void store
   .dispatch(rehidratar())
   .then(() => store.dispatch(iniciarCompras()))
-  .then(() => store.dispatch(iniciarPorConfirmar()));
+  .then(() => store.dispatch(iniciarPorConfirmar()))
+  .then(() => store.dispatch(iniciarContactos()));
 
 export const unstable_settings = { anchor: "(tabs)" };
 
@@ -76,6 +81,7 @@ function Raiz() {
   usePerfilRemoto();
   useSincronizacion();
   useSubidaDeCompras();
+  useContactos();
 
   // Lee la sesión guardada de Supabase y sigue sus cambios (issue #40).
   useEffect(() => dispatch(iniciarAuth()), [dispatch]);
@@ -143,6 +149,10 @@ function Navegacion() {
           <Stack.Screen
             name="contactos/invitar"
             options={{ ...header, title: "Invitar a alguien" }}
+          />
+          <Stack.Screen
+            name="contactos/pegar"
+            options={{ ...header, title: "Tengo una invitación" }}
           />
           <Stack.Screen
             name="grupo/armar"

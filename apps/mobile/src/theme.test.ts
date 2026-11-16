@@ -156,7 +156,7 @@ describe("el cálculo vive en el motor, detrás de la capa de datos (ADR-010)", 
 
   it("el cálculo no lee el reloj del sistema (FR-005)", () => {
     const culpables = todos.filter(
-      (p) => /data\/(calculo|grupo-simulado)\.ts$|store\/selectores\.ts$/.test(p) &&
+      (p) => /data\/calculo\.ts$|grupo\/vista\.ts$|store\/selectores\.ts$/.test(p) &&
         /new Date\(\)|Date\.now\(/.test(readFileSync(p, "utf8")),
     );
     expect(culpables).toEqual([]);

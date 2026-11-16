@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { comprasOctubre, mediosDeEjemplo, promociones } from "../data/fixtures";
 import { compraAgregada } from "./compras";
-import { contactoQuitado } from "./contactos";
-import { escenarioElegido, sesionCerrada, sincronizado } from "./acciones";
+import { CLAVE_CONTACTOS } from "./contactos";
+import { grupoArmado } from "./grupo";
+import { sesionCerrada, sincronizado } from "./acciones";
 import { CLAVE, CLAVE_CORPUS, CLAVE_VIEJA, CORPUS_VACIO, rehidratar } from "./persistencia";
 import { cargaCambio, mediosConfirmados, onboardingTerminado } from "./perfil";
 import { selectRecomendacion, selectTopes } from "./selectores";
@@ -61,23 +62,39 @@ describe("persistencia (US4)", () => {
     expect(b.getState().sesion.usuario).toBeNull();
   });
 
-  it("simulación, reloj y contactos no se guardan", async () => {
+  it("simulación, reloj y grupo en armado no se guardan (spec 016, D5)", async () => {
     const disco = memoria();
     const a = await abrir(disco);
     a.dispatch(comercioElegido("coto"));
     a.dispatch(montoCambiado(10000));
     a.dispatch(ahoraCambio("2026-10-20T15:00:00.000Z"));
-    // Los contactos de ejemplo vienen con la demo (G-02); quitar a Mateo deja solo a Lucía.
-    a.dispatch(escenarioElegido("normal"));
-    a.dispatch(contactoQuitado("mateo"));
+    a.dispatch(
+      grupoArmado({
+        comercio: { id: "coto", nombre: "Coto", inicial: "C", rubro: "supermercado", categoriaId: 1, frecuente: false },
+        canal: "presencial",
+        monto: 10000,
+        contactos: [],
+        sinCuenta: [{ posicion: 0, nombre: "Sofía" }],
+      }),
+    );
     a.dispatch(onboardingTerminado());
     await esperar();
 
     const b = await abrir(disco);
     expect(b.getState().simulacion).toEqual({ comercioId: null, monto: null, canal: "presencial" });
     expect(b.getState().sesion.ahora).not.toBe("2026-10-20T15:00:00.000Z");
-    // Si se guardaran, al reabrir volvería Lucía; no vuelve nada (G-03 sigue abierto).
-    expect(b.getState().contactos.lista).toEqual([]);
+    expect(b.getState().grupo.pedido).toBeNull();
+    // Los nombres de los integrantes sin cuenta no llegan al disco en ninguna clave.
+    expect([...disco.datos.values()].some((v) => v.includes("Sofía"))).toBe(false);
+  });
+
+  it("los contactos arrancan vacíos y no van en la clave del perfil (spec 016, G-02)", async () => {
+    const disco = memoria();
+    const a = await abrir(disco);
+    expect(a.getState().contactos.lista).toEqual([]);
+    a.dispatch(onboardingTerminado());
+    await esperar();
+    expect(disco.datos.has(CLAVE_CONTACTOS)).toBe(false);
   });
 
   it("lo guardado no tiene nada derivado (FR-010)", async () => {

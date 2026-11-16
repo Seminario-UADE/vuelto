@@ -1,4 +1,6 @@
 import * as Clipboard from "expo-clipboard";
+import * as Linking from "expo-linking";
+import { router } from "expo-router";
 import { useState } from "react";
 import { Pressable, Share, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
@@ -8,9 +10,12 @@ import { Icon, type IconName } from "@/components/icon";
 import { Screen } from "@/components/screen";
 import { Skeleton } from "@/components/skeleton";
 import { Text } from "@/components/text";
-import * as api from "@/data/api";
+import { textoVencimiento } from "@/grupo/invitacion";
+import { SinNombreError } from "@/grupo/repositorio";
+import { linkDeInvitacion } from "@/grupo/token";
 import { useAsync } from "@/hooks/use-async";
-import { useAppDispatch } from "@/store/hooks";
+import { crearInvitacion } from "@/store/contactos";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { avisoMostrado } from "@/store/sesion";
 import { colors, qrColors, radius, space } from "@/theme";
 
@@ -28,34 +33,78 @@ function Item({ icon, texto, tono }: { icon: IconName; texto: string; tono: "ink
   );
 }
 
-/** Invitar contacto (ADR-008 §1): link + QR de un solo uso que vence en 24 h. Sin buscador. */
+/** El texto de la invitación lleva el link para pegar: WhatsApp no deja tocar un `vuelto://` (D11). */
+function mensaje(link: string): string {
+  return (
+    `Te invito a Vuelto para decidir juntos quién conviene que pague: ${link}\n\n` +
+    "Si el link no se abre, copialo y pegalo en Vuelto → Perfil → Contactos → «Tengo una invitación»."
+  );
+}
+
+/**
+ * Invitar contacto (ADR-008 §1, spec 016 US2): link + QR de un solo uso que vence en 24 h. Al
+ * volver a entrar se muestra la misma invitación; generar otra invalida la anterior (FR-011).
+ * Sin buscador.
+ */
 export default function Invitar() {
   const [n, setN] = useState(0);
   const dispatch = useAppDispatch();
-  const inv = useAsync(() => api.crearInvitacion(), n);
-  const link = inv.datos?.link;
+  const ahora = useAppSelector((s) => s.sesion.ahora);
+  // Al abrir, la invitación vigente si hay una; «Generar otro link» pide una nueva (US2-2).
+  const inv = useAsync(async () => {
+    const creada = await dispatch(crearInvitacion(n > 0));
+    return { link: linkDeInvitacion(creada.token, Linking.createURL), venceEn: creada.venceEn };
+  }, n);
+  const link = inv.estado === "listo" ? inv.datos?.link : undefined;
+  const sinNombre = inv.estado === "error" && inv.error === new SinNombreError().message;
 
   const compartir = async () => {
     if (!link) return;
-    await Share.share({ message: `Te invito a Vuelto para decidir juntos quién conviene que pague: https://${link}` });
+    await Share.share({ message: mensaje(link) });
   };
   const copiar = async () => {
     if (!link) return;
-    await Clipboard.setStringAsync(`https://${link}`);
+    await Clipboard.setStringAsync(link);
     dispatch(avisoMostrado("Link copiado"));
   };
+
+  if (inv.estado === "error") {
+    return (
+      <Screen
+        footer={
+          sinNombre ? (
+            <Button label="Elegir mi nombre" onPress={() => router.replace("/perfil")} />
+          ) : (
+            <Button label="Reintentar" icon="recargar" onPress={inv.recargar} />
+          )
+        }
+      >
+        <Card padding={space.xl}>
+          <Text variant="titleMd" accessibilityRole="header">
+            {sinNombre ? "Primero elegí tu nombre" : "No pudimos crear la invitación"}
+          </Text>
+          <Text variant="bodyMd" tone="inkSecondary" accessibilityLiveRegion="polite">
+            {sinNombre
+              ? "Quien acepte tu invitación va a ver tu nombre para mostrar. Elegilo en Perfil y volvé."
+              : "Revisá tu conexión y probá de nuevo."}
+          </Text>
+        </Card>
+      </Screen>
+    );
+  }
 
   return (
     <Screen footer={<Button label="Compartir link" icon="compartir" onPress={compartir} disabled={!link} />}>
       <Text variant="bodyLg" tone="inkSecondary">
-        Mandale este link o mostrale el QR. Cuando acepte, Vuelto puede decidir quién de ustedes conviene que pague.
+        Mostrale el QR para que lo escanee con la cámara, o mandale el link. Cuando acepte, Vuelto puede decidir quién de
+        ustedes conviene que pague.
       </Text>
 
       <Card padding={space.xl} gap={space.lg}>
         <View style={{ alignItems: "center", gap: space.md }}>
           {link ? (
             <View style={{ padding: space.md, backgroundColor: qrColors.fondo, borderRadius: radius.row }}>
-              <QRCode value={`https://${link}`} size={180} color={qrColors.ink} backgroundColor={qrColors.fondo} />
+              <QRCode value={link} size={180} color={qrColors.ink} backgroundColor={qrColors.fondo} />
             </View>
           ) : (
             <Skeleton height={204} width={204} />
@@ -63,7 +112,7 @@ export default function Invitar() {
           <View style={{ flexDirection: "row", alignItems: "center", gap: space.xs }}>
             <Icon name="reloj" size={16} color={colors.inkSecondary} />
             <Text variant="label" tone="inkSecondary">
-              Vence en {inv.datos?.venceEn ?? "24 h"} · sirve una sola vez
+              {link && inv.datos ? textoVencimiento(inv.datos.venceEn, new Date(ahora)) : "Vence en 24 h · sirve una sola vez"}
             </Text>
           </View>
         </View>

@@ -1,29 +1,13 @@
 /**
- * Lo que la app pide a la red: catálogos, lectura del ticket, invitaciones y el gasto en grupo.
+ * Lo que la app simula de la red: la lectura del ticket de los escenarios de desarrollo. Los
+ * contactos, las invitaciones y el gasto en grupo van por `src/grupo/repositorio.ts` (spec 016).
  * Cada función tiene la firma del cliente de la Edge Function o de la tabla que la va a
  * reemplazar (docs/architecture/02-api-routes.md); hoy responde con fixtures. La
  * recomendación, los topes, el perfil y las compras NO están acá: se derivan del store con
  * `@vuelto/motor`, sin red (ADR-010, `src/store/selectores.ts`).
  */
-import { fechaArgentina } from "@vuelto/motor";
-import type {
-  Contacto,
-  Invitacion,
-  LecturaApp,
-  PedidoGrupo,
-  RecomendacionGrupo,
-  VistaInvitacion,
-} from "./contracts";
-import type { EntradasMotor } from "./calculo";
-import {
-  RELOJ_EJEMPLO,
-  catalogoComercios,
-  grupoDeEjemplo,
-  invitacionPropia,
-  ticketDeEjemplo,
-  usuario,
-} from "./fixtures";
-import { recomendarGrupo as grupoEnElServidor } from "./grupo-simulado";
+import type { LecturaApp } from "./contracts";
+import { ticketDeEjemplo } from "./fixtures";
 
 /** Demora simulada de red (0 en tests). */
 let demoraMs = 250;
@@ -33,9 +17,6 @@ export function setDemora(ms: number): void {
 function red<T>(valor: T): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(valor), demoraMs));
 }
-
-/** Desde cuándo es contacto quien invita en los tokens de ejemplo (el reloj de los fixtures). */
-const VINCULADO_EJEMPLO = fechaArgentina(new Date(RELOJ_EJEMPLO));
 
 // Los comercios del buscador ya no son un pedido: se derivan del corpus del store
 // (`selectCatalogoComercios`, issue #43).
@@ -54,79 +35,4 @@ export async function leerTicket(opciones: { hoy: string; escenario: EscenarioTi
   if (opciones.escenario === "sin-red") return red({ ok: false, resultado: "sin_conexion" });
   const t = ticketDeEjemplo(opciones.hoy);
   return red({ ok: true, ...t });
-}
-
-let generadas = 0;
-
-/** Cada llamada genera un link nuevo (el anterior deja de servir en el servidor). */
-export async function crearInvitacion(): Promise<Invitacion> {
-  generadas += 1;
-  const link = generadas === 1 ? invitacionPropia.link : `${invitacionPropia.link.slice(0, -2)}${generadas}q`;
-  return red({ link, venceEn: invitacionPropia.venceEn, usoUnico: true });
-}
-
-/** Quién invita en cada token de ejemplo (en el servidor sale de `ver_invitacion`). */
-const invitantes: Record<string, Contacto> = {
-  tomas: { id: "tomas", nombre: "Tomás", iniciales: "T", vinculadoDesde: VINCULADO_EJEMPLO },
-};
-
-const TOKENS: Record<string, { estado: VistaInvitacion["estado"]; quien: string | null; contactoId: string | null }> = {
-  "demo-tomas": { estado: "valida", quien: "Tomás", contactoId: "tomas" },
-  "demo-vencida": { estado: "vencida", quien: "Tomás", contactoId: null },
-  "demo-usada": { estado: "usada", quien: "Tomás", contactoId: null },
-  "demo-propia": { estado: "propia", quien: usuario.nombre, contactoId: null },
-  k7Qm2x: { estado: "propia", quien: usuario.nombre, contactoId: null },
-  "demo-contacto": { estado: "ya-contacto", quien: "Lucía", contactoId: "lucia" },
-};
-
-/** `contactos`: los ids que ya son contacto (en el servidor lo sabe `ver_invitacion`). */
-export async function verInvitacion(token: string, contactos: string[]): Promise<VistaInvitacion> {
-  const t = TOKENS[token] ?? { estado: "vencida" as const, quien: null, contactoId: null };
-  const yaAceptada = t.estado === "valida" && t.contactoId !== null && contactos.includes(t.contactoId);
-  return red({
-    estado: yaAceptada ? "ya-contacto" : t.estado,
-    quienInvita: t.quien,
-    comparte: [
-      "Tu nombre para mostrar",
-      "Qué medio tuyo conviene en una compra del grupo (solo ese)",
-      "El reintegro estimado de esa compra, calculado con tu tope",
-    ],
-    noComparte: [
-      "Tus compras, montos, comercios y fechas",
-      "Cuánto tope te queda",
-      "Tus otros medios de pago",
-      "Tu email",
-    ],
-    sePuedeDeducir: `A partir de una recomendación, ${t.quien ?? "la otra persona"} podría deducir cuánto reintegro te queda en una promo.`,
-  });
-}
-
-export async function aceptarInvitacion(token: string): Promise<{ contacto: Contacto }> {
-  const t = TOKENS[token];
-  const contacto = t?.contactoId ? invitantes[t.contactoId] : undefined;
-  if (!t || t.estado !== "valida" || !contacto) throw new Error("La invitación ya no es válida");
-  return red({ contacto });
-}
-
-/** En el servidor corta el vínculo para los dos; la pantalla lo saca del store. */
-export async function quitarContacto(id: string): Promise<{ ok: true; id: string }> {
-  return red({ ok: true as const, id });
-}
-
-/** El grupo de ejemplo, con su comercio ya resuelto (la cena del sábado en La Parolaccia). */
-export function getGrupoDeEjemplo(): Omit<PedidoGrupo, "integrantes"> {
-  const { comercioId, ...resto } = grupoDeEjemplo;
-  const comercio = catalogoComercios.find((c) => c.id === comercioId);
-  if (!comercio) throw new Error(`El grupo de ejemplo apunta a un comercio que no está: ${comercioId}`);
-  return { ...resto, comercio };
-}
-
-/**
- * Quién conviene que pague. `pedido.comercio` llega ya resuelto por la pantalla (G-04): un
- * comercio fuera del catálogo se evalúa (sin rubro, nadie tiene promo) en vez de colgarse.
- * `vos`: las entradas del motor de quien pide, del store (`selectEntradasMotor`, G-01). En el
- * servidor real (#56) salen de la base con el JWT; acá viajan en el pedido.
- */
-export async function recomendarGrupo(pedido: PedidoGrupo, vos: EntradasMotor): Promise<RecomendacionGrupo> {
-  return red(grupoEnElServidor(pedido, vos));
 }

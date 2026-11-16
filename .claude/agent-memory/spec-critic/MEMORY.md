@@ -18,3 +18,4 @@
 - [Captura de foto en el cliente](patron_captura_foto_cliente.md) — 014: temporales vs. §IV "no van a disco", regla de banco que falla su ejemplo, "como en manual" falso.
 - [Sugerencia aproximada de comercio](patron_sugerencia_fuzzy_comercio.md) — 015: umbral calibrado con el SC, "exacto" doble, rubro elegido sin estado, buscador invertido.
 - [Capa servidor sobre el motor](patron_capa_servidor_sobre_motor.md) — prefiltro que duplica reglas, test de equivalencia tautológico, errores HTTP sin forma, anon key como sesión.
+- [Grupo: servidor con JWT del usuario](patron_grupo_servidor_con_jwt_del_usuario.md) — 016: RPC que la app también llama, motivo del motor con tope, sondeo repetido, empate sin unidad.

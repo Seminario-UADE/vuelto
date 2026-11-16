@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:integracion": "vitest run --config vitest.integracion.config.mts src/sync/repositorio-supabase.integracion.test.ts",
+    "test:integracion": "vitest run --config vitest.integracion.config.mts src/sync/repositorio-supabase.integracion.test.ts src/grupo/repositorio-supabase.integracion.test.ts",
     "medir:corpus": "vitest run --config vitest.integracion.config.mts src/sync/medir-corpus.integracion.test.ts"
   },
   "dependencies": {

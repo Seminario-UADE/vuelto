@@ -49,7 +49,8 @@
 > (`PanelSuperior`, el mismo de «Con qué te conviene pagar») con el degradé
 > noche → helecho, el monto del mes al centro con su base en una píldora y
 > cuatro atajos cuadrados; debajo, una **torta** minimalista con el tope que te
-> queda sumando todos (estimado, con su base). **Apariencia** en Perfil pasa a
+> queda sumando los que ya usaste este mes (estimado, con su base; sin compras,
+> lo dice en vez de sumar, issue #149). **Apariencia** en Perfil pasa a
 > tres miniaturas de celular pintadas con cada tema.
 >
 > **v9.2 (15/11/2026, issue #128)**: las **9 redes** de la tarjeta dejan el

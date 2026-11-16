@@ -48,6 +48,7 @@ detrás de un selector.
 | `contactos/index` | Contactos | Stack, header nativo |
 | `contactos/invitar` | Invitar contacto | Stack, header nativo |
 | `contactos/quitar` | Quitar contacto | Sheet que se ajusta al contenido |
+| `contactos/pegar` | Tengo una invitación (pegar el link o el código, spec 016 D11) | Stack, header nativo |
 | `i/[token]` | Aceptar invitación | Stack, header nativo; deep link `vuelto://i/<token>` (en Expo Go `exp://…/--/i/<token>`) |
 | `grupo/armar` | Armar grupo | Stack, header nativo |
 | `grupo/resultado` | Gasto en grupo | Stack, header nativo |
@@ -84,7 +85,8 @@ dispositivo (ADR-010, spec 008).
 | `compras` | Compras con la forma del motor (`promocionId`, `descuentoObtenido`, `reintegroEsperado`) | Sí |
 | `cola` | Operaciones de guardar y borrar compras que la cuenta todavía no tiene, con dueño y estado (spec 010) | Sí, en su propia clave (`vuelto.cola.v1`) |
 | `simulacion` | Comercio (o rubro sin comercio, `rubro-N`) elegido, monto opcional y canal (presencial por defecto) de «¿Con qué pago?» | No |
-| `contactos` | Contactos (solo lo de ADR-008 §3) y grupo en armado | No |
+| `contactos` | Contactos de la cuenta (solo lo de ADR-008 §3), con el id de la cuenta, el estado de la carga y la última invitación creada (spec 016) | La lista y su cuenta, en `vuelto.contactos.v1`; la invitación y el estado, no |
+| `grupo` | El grupo en armado, con los nombres de los integrantes sin cuenta (spec 016) | No: los nombres de los sin cuenta no se guardan (D5) |
 
 ```
 selectEntradasMotor  = perfil.medios + corpus + compras + sesion.ahora → { perfil, promociones, compras, ahora }
@@ -148,7 +150,15 @@ selectMarcasDeSubida = cola → qué compras están «Sin subir» o «Solo en es
   y borra `vuelto.corpus.v1`. La leyenda «Promos actualizadas hace X» sale de `selectFrescura`. La mezcla de
   las compras del servidor con las locales es `reconciliarCompras` (`sync/compras.ts`), la única costura con
   #44: la escritura de compras y la cola de subida son de esa issue y `EstadoCompras` sigue siendo `{ lista }`.
-- **Lo asíncrono** (catálogos, invitaciones, grupo) sigue en `api.ts` con `useAsync`. El ticket
+- **Contactos, invitaciones y gasto en grupo** (`src/grupo/`, spec 016): el repositorio
+  (`repositorio.ts`: RPC de contactos y la Edge Function `recomendar-grupo`, con corte a los 15 s) se
+  inyecta en `Extra.contactosRemoto`, y las pantallas lo usan solo a través de thunks
+  (`store/contactos.ts`: cargar, crear y ver invitación, aceptar, quitar; `store/grupo.ts`:
+  `pedirRecomendacionGrupo`, que no lanza y devuelve la falla con su campo). `useContactos` recarga la
+  lista al entrar una cuenta y al volver a primer plano; Contactos, además, al enfocarse. La respuesta
+  del grupo no se guarda: `grupo/vista.ts` la convierte en lo que pinta Gasto en grupo, con los
+  textos armados en el teléfono. En los tests, `repositorio-memoria.ts`.
+- **Lo asíncrono que queda** (la lectura simulada del ticket para los escenarios) sigue en `api.ts` con `useAsync`. El ticket
   tiene su propia carpeta, `src/ticket/` (issue #49, spec 014): lógica pura que recibe lo nativo y el
   cliente de Supabase por parámetro (`leer.ts`, `servicio.ts`, `sugerencia.ts`, `resultados.ts`,
   `fechas.ts`) y un adaptador fino de Expo sin tests (`camara.ts`).
@@ -190,11 +200,9 @@ selectMarcasDeSubida = cola → qué compras están «Sin subir» o «Solo en es
   como alternativa (se filtra en la vista, no el corpus, para no romper un tope compartido).
 - `vista-recomendacion.ts`: traduce la respuesta del motor (ids, `motivo`,
   `base.comprasRegistradas`) a lo que pintan las pantallas. No calcula.
-- `grupo-simulado.ts`: **reemplazo local de la Edge Function de grupo** (#54/#56). Evalúa a cada
-  integrante con el motor sobre sus datos de ejemplo, con el reloj en la fecha del grupo; la app
-  recibe solo lo de ADR-008 §3. Lo importa solo `api.ts`.
-- `api.ts`: lo que sale a la red, con la firma del cliente real (`02-api-routes.md`): catálogos,
-  invitaciones, grupo y la lectura simulada del ticket para los escenarios.
+- `api.ts`: la lectura simulada del ticket para los escenarios de desarrollo. El gasto en grupo ya no
+  tiene reemplazo local: lo calcula la Edge Function `recomendar-grupo` (spec 016) y la app no lleva
+  datos de contactos de ejemplo.
 - Escenarios de prueba (solo desarrollo, en Perfil): mes sin compras, ticket ilegible, sin red y
   ticket de ejemplo, para ver los estados vacíos y de error y hacer la demo sin cámara ni cupo de
   Groq.

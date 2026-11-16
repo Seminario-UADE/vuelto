@@ -3103,6 +3103,82 @@ contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
 
 ---
 
+## 2026-11-15 — Gasto en grupo con contactos vinculados (issue #54, spec 016)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI, spec-kit, Supabase local
+(Docker), Deno y el navegador del panel de Claude. Subagentes: `spec-critic`,
+`test-runner`, `rules-guardian` y las dos revisiones de `/code-review`.
+
+**Objetivo:** que «¿quién de nosotros paga?» funcione de verdad con los ADR
+008 a 010: contactos vinculados por invitación, el motor como función pura
+sobre una foto de los integrantes, y la recomendación en una Edge Function.
+Hasta ahora las pantallas corrían sobre datos de ejemplo.
+
+**Prompts principales:**
+1. "Leé CLAUDE.md, los ADR 008 a 010, la propuesta, la revisión, el alcance,
+   la spec 006 y el issue #54. Confirmá que #130 esté mergeado. Reconciliá el
+   issue con los ADR y decime qué queda; no escribas código y esperá mi OK."
+   #130 no estaba mergeado: era un issue abierto, sin PR. Se mostró que el
+   body de #54 era del nivel 0, que la revisión llamaba #56 al backend (#56 es
+   el build de EAS) y que no había nada de base, función ni motor de grupo.
+   Se propusieron ocho decisiones.
+2. "Sí, todas." Decisiones del PO: sumar #130 a #54 (después #130 se mergeó
+   por su lado, PR #141); débito y crédito iguales en la división, y el
+   reintegro le llega a quien paga; división en pesos enteros con el resto de
+   a $1; compras de los contactos reducidas solo en el servidor; integrantes
+   sin cuenta solo con nombre; funciones con permisos elevados en un schema
+   propio; crear invitaciones por RPC; link `vuelto://`. Se actualizó #54 y se
+   abrieron #137, #138 y #139 para lo que queda afuera.
+3. `spec-critic` encontró cuatro bloqueantes. Las cuatro preguntas de producto
+   fueron al PO: la app podía llamar la función de datos ajenos con su propia
+   sesión (se resolvió con una clave de servidor en Vault); repetir consultas
+   deja deducir compras (escalones de $100 y avisarlo); la base sobre la promo
+   aplicada; y WhatsApp no deja tocar un `vuelto://` («Tengo una invitación»
+   para pegarlo). La unidad del empate se definió en la spec: se decide sobre
+   lo que se muestra.
+4. Plan, tareas e implementación por capas, con los tests primero en cada
+   una: motor (Vitest), base (pgTAP antes de la migración), Edge Function y
+   app.
+5. "Inténtalo de nuevo" (después de un corte de la API) y el OK para hacer
+   `supabase db reset` en la base local, que comparten todos los worktrees.
+
+**Resultado:**
+- Motor: `recomendarGrupo` y `dividir`. Las 18 situaciones de US1 tienen su
+  test, más 100 permutaciones con semilla fija. Dos mutaciones a propósito (el
+  desempate y el escalón) las detectan los tests. El consumo de topes pasó a
+  un tipo mínimo, `ConsumoDeTope`, que `Compra` cumple.
+- Base: `invitaciones` y `contactos` con RLS en la misma migración. Las
+  funciones con permisos elevados viven en `contactos_privado`, y
+  `datos_de_contactos` exige la clave de Vault. pgTAP: 69 pruebas propias, y
+  267 en total con `estructura.test.sql` sin cambios.
+- Edge Function `recomendar-grupo` (handler → servicio → repositorios), con
+  una lista blanca de lo que sale de un contacto y un test que busca su tope y
+  sus compras en todo el JSON.
+- App: contactos reales guardados por cuenta, «Tengo una invitación»,
+  errores con su acción en cada pantalla, y se borró la simulación del grupo.
+- Verificado: lint, typecheck, 1.764 tests, build, `deno check` de las tres
+  funciones, pgTAP completo y la integración contra la base local. La Edge
+  Function se probó de punta a punta con `functions serve` (200, 400, 401 y
+  409, también después de quitar el contacto). El recorrido en la app web se
+  hizo con Supabase local y dos cuentas (`docs/design/capturas-grupo-016/`).
+- Sin verificar: escanear el QR con la cámara de un teléfono real, y el link
+  `vuelto://` en un build de EAS. Un `mis_contactos` dio 401 justo después de
+  entrar, en un navegador con una sesión vieja de antes del reset; la causa no
+  quedó confirmada, y Armar ahora recarga la lista al abrirse.
+- Lo que encontraron las revisiones y se corrigió: el tipo de la app admitía
+  la cantidad de compras de un contacto (FR-023); las pantallas llamaban al
+  repositorio sin pasar por el store; Invitar invalidaba el link enviado cada
+  vez que se abría; el 400 no decía el motivo; faltaba la base de «Vos» cuando
+  paga; y `03-frontend.md` estaba desactualizado. En pantalla salieron dos
+  más: la fecha del vínculo en UTC y el link de la versión web.
+- Errores de la IA en el proceso: escribió la huella del token como `bytea`
+  y chocó con la regla de estructura; puso mal un límite en un test de
+  validación; y en zsh pasó una lista de archivos sin separar, así que la
+  primera renumeración no hizo nada. También tuvo que renumerar la spec de 013
+  a 016, porque `main` ya tenía las 013 a 015.
+
+---
+
 ## 2026-11-15 — Prueba en Android y tres arreglos que salieron de ella (issues #43, #147, #148, #149)
 
 **Herramienta:** Claude Code (Opus 5.5), con los agentes `rules-guardian` y

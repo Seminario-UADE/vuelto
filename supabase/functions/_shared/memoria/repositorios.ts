@@ -4,8 +4,11 @@
  * argumentos los llamaron, para verificar qué datos pide el servicio (FR-025).
  */
 import type { CategoriaId, Compra, FechaISO, MedioDePago, Promocion } from "@vuelto/motor";
+import { ContactoNoVinculadoError } from "../errores.ts";
 import type {
+  DatosDeContacto,
   RepositorioCategorias,
+  RepositorioContactos,
   RepositorioCompras,
   RepositorioMediosDePago,
   RepositorioPromociones,
@@ -68,3 +71,23 @@ export class CategoriasEnMemoria implements RepositorioCategorias {
     return this.ids.includes(categoriaId);
   }
 }
+
+/**
+ * Contactos en memoria: `vinculados` son los ids vinculados con `quienPide`. Como la función de la
+ * base, rechaza el pedido entero si algún id no está vinculado, y filtra las compras por fecha.
+ */
+export class ContactosEnMemoria implements RepositorioContactos {
+  readonly llamadas: { ids: UsuarioId[]; desde: FechaISO; hasta: FechaISO }[] = [];
+  constructor(private readonly datos: DatosDeContacto[]) {}
+
+  async datosDe(ids: UsuarioId[], desde: FechaISO, hasta: FechaISO): Promise<DatosDeContacto[]> {
+    this.llamadas.push({ ids, desde, hasta });
+    const encontrados = ids.map((id) => this.datos.find((d) => d.id === id));
+    if (encontrados.some((d) => d === undefined)) throw new ContactoNoVinculadoError();
+    return (encontrados as DatosDeContacto[]).map((d) => ({
+      ...d,
+      consumos: d.consumos.filter((c) => desde <= c.fecha && c.fecha <= hasta),
+    }));
+  }
+}
+

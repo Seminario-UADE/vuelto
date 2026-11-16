@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fechaArgentina } from "./fecha.ts";
 import { compraRegistrada, promo } from "./test/fabricas.ts";
-import type { Compra, Promocion, Tope } from "./tipos.ts";
+import type { Compra, ConsumoDeTope, Promocion, Tope } from "./tipos.ts";
 import { calcularSaldos, clasificarTope } from "./tope.ts";
 
 const HOY = "2026-10-21";
@@ -12,6 +12,21 @@ const saldoDe = (p: Promocion, compras: Compra[], hoy = HOY) =>
   calcularSaldos([p], compras, hoy).get(p.id);
 
 // Importes en centavos: $5.000 = 500000.
+describe("calcularSaldos: consumo reducido (spec 016, FR-003)", () => {
+  it("con solo promoción, fecha, monto y descuento da el mismo saldo que con compras completas", () => {
+    const completas = [
+      compraRegistrada({ id: "c1", descuentoObtenido: 1500 }),
+      compraRegistrada({ id: "c2", monto: 10000, descuentoObtenido: null }),
+    ];
+    const reducidas: ConsumoDeTope[] = [
+      { id: "c1", promocionId: "promo-galicia", fecha: "2026-10-10", monto: 10000, descuentoObtenido: 1500 },
+      { id: "c2", promocionId: "promo-galicia", fecha: "2026-10-10", monto: 10000, descuentoObtenido: null },
+    ];
+    const p = conTope(5000);
+    expect(calcularSaldos([p], reducidas, HOY).get(p.id)).toEqual(calcularSaldos([p], completas, HOY).get(p.id));
+  });
+});
+
 describe("calcularSaldos: saldo propio", () => {
   it("suma el descuento informado de las compras del mes", () => {
     const compras = [

@@ -12,7 +12,7 @@ import { compararIds } from "./orden.ts";
 import { calcularSaldos, clasificarTope, type Saldo } from "./tope.ts";
 import type {
   CausaDescarte,
-  Compra,
+  ConsumoDeTope,
   CompraPropuesta,
   Descarte,
   FechaISO,
@@ -163,7 +163,7 @@ export function recomendar(
   compra: CompraPropuesta,
   perfil: Perfil,
   promociones: Promocion[],
-  comprasDelPeriodo: Compra[],
+  comprasDelPeriodo: readonly ConsumoDeTope[],
   ahora: Date,
 ): Recomendacion {
   if (perfil.mediosDePago.length === 0) throw new PerfilSinMediosError();

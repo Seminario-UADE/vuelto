@@ -8,12 +8,12 @@ import { Icon } from "@/components/icon";
 import { Screen } from "@/components/screen";
 import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
-import * as api from "@/data/api";
 import type { EstadoInvitacion } from "@/data/contracts";
+import { textoVencimiento } from "@/grupo/invitacion";
 import { useAsync } from "@/hooks/use-async";
 import { hapticoExito } from "@/lib/haptics";
 import { iniciales } from "@/lib/format";
-import { contactoAgregado } from "@/store/contactos";
+import { aceptarInvitacion, verInvitacion } from "@/store/contactos";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { invitacionGuardada } from "@/store/perfil";
 import { avisoMostrado } from "@/store/sesion";
@@ -24,6 +24,11 @@ const MOTIVO: Record<Exclude<EstadoInvitacion, "valida">, { titulo: string; text
   usada: { titulo: "Esta invitación ya se usó", texto: "Cada invitación sirve una sola vez. Pedile a quien te la mandó un link nuevo." },
   propia: { titulo: "Es tu propia invitación", texto: "Mandásela a la persona con la que querés vincularte." },
   "ya-contacto": { titulo: "Ya son contactos", texto: "No hace falta aceptar de nuevo. Lo ves en Perfil, en Contactos." },
+  inexistente: { titulo: "Esta invitación no es válida", texto: "Revisá que hayas copiado el link completo, o pedí uno nuevo." },
+  "sin-nombre": {
+    titulo: "Primero elegí tu nombre",
+    texto: "Quien te invitó va a ver tu nombre para mostrar. Elegilo en Perfil y volvé a abrir la invitación.",
+  },
 };
 
 /**
@@ -35,17 +40,11 @@ export default function AceptarInvitacion() {
   const dispatch = useAppDispatch();
   const onboardingCompleto = useAppSelector((s) => s.perfil.onboardingCompleto);
   const usuario = useAppSelector((s) => s.sesion.usuario);
-  const contactos = useAppSelector((s) => s.contactos.lista);
-  const v = useAsync(
-    () =>
-      api.verInvitacion(
-        token,
-        contactos.map((c) => c.id),
-      ),
-    token,
-  );
+  const ahora = useAppSelector((s) => s.sesion.ahora);
+  const v = useAsync(() => dispatch(verInvitacion(token)), token);
   const [aceptando, setAceptando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [motivo, setMotivo] = useState<Exclude<EstadoInvitacion, "valida"> | null>(null);
 
   // Quien abre el link sin cuenta ni perfil pasa primero por registro y onboarding, y vuelve acá al terminar.
   useEffect(() => {
@@ -59,26 +58,35 @@ export default function AceptarInvitacion() {
     setAceptando(true);
     setError(null);
     try {
-      const { contacto } = await api.aceptarInvitacion(token);
+      const r = await dispatch(aceptarInvitacion(token));
+      if (r.estado !== "aceptada") {
+        // Cambió entre que se abrió y se tocó «Aceptar» (otra persona la usó, venció, ya son contactos).
+        setAceptando(false);
+        setMotivo(r.estado);
+        return;
+      }
       hapticoExito();
-      dispatch(contactoAgregado(contacto));
-      dispatch(avisoMostrado(`Ahora ${contacto.nombre} es tu contacto`));
+      dispatch(avisoMostrado(`Ahora ${r.contacto.nombre ?? "esa persona"} es tu contacto`));
       router.replace("/perfil");
-    } catch (e) {
+    } catch {
       setAceptando(false);
-      setError(e instanceof Error ? e.message : "No pudimos aceptar la invitación. Probá de nuevo.");
+      setError("No pudimos aceptar la invitación. Revisá tu conexión y probá de nuevo.");
     }
   };
   const ahoraNo = () => router.replace("/");
 
   const d = v.datos;
-  const valida = d?.estado === "valida";
+  const estado = motivo ?? d?.estado;
+  const valida = estado === "valida";
+  const fallaDeRed = v.estado === "error" && !d;
   const quien = d?.quienInvita ?? "Alguien";
 
   return (
     <Screen
       footer={
-        d ? (
+        fallaDeRed ? (
+          <Button label="Reintentar" variant="secondary" onPress={v.recargar} />
+        ) : d ? (
           valida ? (
             <>
               {error ? (
@@ -86,9 +94,12 @@ export default function AceptarInvitacion() {
                   {error}
                 </Text>
               ) : null}
-              <Button label="Aceptar invitación" variant="secondary" onPress={aceptar} loading={aceptando} />
+              <Button label={error ? "Reintentar" : "Aceptar invitación"} variant="secondary" onPress={aceptar} loading={aceptando} />
               <Button label="Ahora no" variant="secondary" onPress={ahoraNo} disabled={aceptando} />
             </>
+          ) : estado === "sin-nombre" ? (
+            // US2-3: sin nombre para mostrar, a Perfil a elegirlo (el otro lo va a ver).
+            <Button label="Elegir mi nombre" variant="secondary" onPress={() => router.replace("/perfil")} />
           ) : (
             <Button label="Volver" variant="secondary" onPress={ahoraNo} />
           )
@@ -100,15 +111,24 @@ export default function AceptarInvitacion() {
           {quien} te invita a ser su contacto en Vuelto
         </Text>
       ) : null}
-      {!d ? (
+      {fallaDeRed ? (
+        <Card padding={space.xl}>
+          <Text variant="titleMd" accessibilityRole="header">
+            No pudimos abrir la invitación
+          </Text>
+          <Text variant="bodyMd" tone="inkSecondary" accessibilityLiveRegion="polite">
+            Revisá tu conexión y probá de nuevo.
+          </Text>
+        </Card>
+      ) : !d ? (
         <SkeletonList rows={3} height={96} />
       ) : !valida ? (
         <Card padding={space.xl}>
           <Text variant="titleMd" accessibilityRole="header">
-            {MOTIVO[d.estado as Exclude<EstadoInvitacion, "valida">].titulo}
+            {MOTIVO[estado as Exclude<EstadoInvitacion, "valida">].titulo}
           </Text>
           <Text variant="bodyMd" tone="inkSecondary">
-            {MOTIVO[d.estado as Exclude<EstadoInvitacion, "valida">].texto}
+            {MOTIVO[estado as Exclude<EstadoInvitacion, "valida">].texto}
           </Text>
         </Card>
       ) : (
@@ -164,7 +184,7 @@ export default function AceptarInvitacion() {
             corta para los dos.
           </Text>
           <Text variant="label" tone="inkSecondary">
-            Vence en 23 h · sirve una sola vez
+            {textoVencimiento(d.venceEn, new Date(ahora))}
           </Text>
         </>
       )}
