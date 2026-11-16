@@ -69,7 +69,7 @@ Un solo workspace: `npm run test -w @vuelto/motor`. Tests en modo watch:
 `workspaces` del `package.json` raíz y define los scripts que le apliquen.
 
 Ingesta de promociones (ADR-011). Las promos **nunca se cargan a mano**: las
-publica todos los días el workflow `ingesta.yml` (06:00 ART, también a mano
+publica todos los días el workflow `ingesta.yml` (programado 04:17 ART, también a mano
 desde la pestaña Actions), con los secrets `SUPABASE_URL` y
 `SUPABASE_SERVICE_ROLE_KEY` del repo. A mano, desde la raíz (red, pausa >= 1 s
 entre pedidos a MODO; más de 25 minutos con las 13 categorías, duración a medir):

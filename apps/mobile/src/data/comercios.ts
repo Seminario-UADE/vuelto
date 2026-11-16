@@ -3,9 +3,8 @@
  * no de una lista armada a mano. Funciones puras: el selector `selectCatalogoComercios` las
  * llama con el corpus del store y `hoy` (ADR-010), así el buscador anda sin red.
  */
-import { CATEGORIAS_MODO, type FechaISO, type Promocion } from "@vuelto/motor";
+import { CATEGORIAS_MODO, claveComercio, type FechaISO, type Promocion } from "@vuelto/motor";
 import { RUBROS } from "../lib/rubros";
-import { normalizarComercio } from "../perfil/modelo";
 import type { Comercio, Rubro } from "./contracts";
 
 /** Las categorías de MODO que la app ya conoce como rubro (ícono y textos propios). */
@@ -16,16 +15,17 @@ const RUBRO_DE_CATEGORIA = new Map<number, Rubro>(
 );
 
 /**
- * Clave para comparar nombres en el buscador (spec 004 FR-002): sin mayúsculas, acentos ni
- * espacios de más. «Café  Martínez» y «cafe martinez» son el mismo comercio.
+ * Clave para comparar nombres en el buscador (spec 004 FR-002): la misma que usa el motor para
+ * saber si una promo es de este comercio, sin mayúsculas, acentos, espacios ni puntuación.
+ * «Café  Martínez» = «cafe martinez», y «McDonald's» = «Mc Donald's» (issue #147).
  */
 export function claveDeComercio(nombre: string): string {
-  return normalizarComercio(nombre).normalize("NFD").replace(/\p{Diacritic}/gu, "");
+  return claveComercio(nombre);
 }
 
 /** El mismo comercio en el mismo rubro tiene siempre el mismo id, venga de la promo que venga. */
 export function idDeComercio(nombre: string, categoriaId: number): string {
-  return `${categoriaId}-${claveDeComercio(nombre).replace(/ /g, "-")}`;
+  return `${categoriaId}-${claveDeComercio(nombre)}`;
 }
 
 /**
@@ -39,8 +39,9 @@ export function comerciosDelCorpus(promociones: readonly Promocion[], hoy: Fecha
   for (const p of promociones) {
     if (p.comercio === null || p.vigencia.hasta < hoy) continue;
     const nombre = p.comercio.trim().replace(/\s+/g, " ");
-    if (nombre === "") continue;
-    // El mismo par con otra escritura («Café» / «Cafe») queda con el primer nombre que llegó.
+    if (claveDeComercio(nombre) === "") continue;
+    // El mismo par con otra escritura («Café» / «Cafe», «McDonald's» / «Mc Donald's») es una sola
+    // entrada, con el primer nombre que llegó.
     const id = idDeComercio(nombre, p.categoriaId);
     if (por.has(id)) continue;
     por.set(id, {

@@ -13,7 +13,7 @@
  */
 import type { Dia, Red } from "@vuelto/motor";
 import { contrastar } from "./bancos.ts";
-import { bancoDeLaTarjeta, comercioDeLaTarjeta, esObjeto } from "./crudo.ts";
+import { ESTADO_POR_EMPEZAR, ESTADO_VIGENTE, bancoDeLaTarjeta, comercioDeLaTarjeta, esObjeto } from "./crudo.ts";
 import type { Objeto } from "./crudo.ts";
 import { CANALES, DIAS, REDES, esFechaISO } from "./dominio.ts";
 import { FUENTE_INGESTA } from "./tipos.ts";
@@ -253,7 +253,8 @@ export function mapearDetalle(crudo: Crudo, opciones: OpcionesMapeo): ResultadoM
     avisos: [],
   });
 
-  if (typeof detalle.real_status === "string" && detalle.real_status !== "RUNNING") {
+  // Una promo que todavía no empezó se publica igual, con su fecha de inicio: el motor no la recomienda antes.
+  if (typeof detalle.real_status === "string" && detalle.real_status !== ESTADO_VIGENTE && detalle.real_status !== ESTADO_POR_EMPEZAR) {
     return descartar("vencida_en_la_fuente", `real_status = ${detalle.real_status}`);
   }
   if (typeof detalle.type === "string" && detalle.type !== "cashback") {

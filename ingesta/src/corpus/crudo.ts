@@ -11,6 +11,15 @@ export const esObjeto = (x: unknown): x is Objeto => typeof x === "object" && x 
 /** Un slug que se puede poner en una URL sin escaparlo de más: sin barras ni puntos al principio. */
 export const SLUG_SEGURO = /^[a-z0-9][a-z0-9._-]*$/i;
 
+/** Estado de una promo que ya se puede usar hoy (`calculated_status` del listado, `real_status` del detalle). */
+export const ESTADO_VIGENTE = "RUNNING";
+/**
+ * Estado de una promo publicada que todavía no empezó (relevado el 2026-11-16 en `/v2/slots` y en el
+ * detalle). Se ingesta igual, con su `vigencia.desde` en el futuro: así está en la base antes del día
+ * en que arranca, y no después de la corrida de ese día. El motor no la recomienda antes de tiempo.
+ */
+export const ESTADO_POR_EMPEZAR = "NEXT_FOR_PRODUCT";
+
 /** Texto recortado, o `null` si no es texto o está en blanco. */
 function textoLimpio(x: unknown): string | null {
   return typeof x === "string" && x.trim() !== "" ? x.trim() : null;

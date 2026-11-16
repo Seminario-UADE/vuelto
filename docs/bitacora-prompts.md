@@ -3179,6 +3179,90 @@ Hasta ahora las pantallas corrían sobre datos de ejemplo.
 
 ---
 
+## 2026-11-16 — Por qué no llega Carrefour y mejoras a la ingesta
+
+**Herramienta:** Claude Code.
+
+**Objetivo:** entender por qué no llegan promos de algunas cadenas, como
+Carrefour, revisar la ingesta de MODO y mejorar lo que haga falta.
+
+**Prompts principales:**
+1. "Fijate qué está pasando con el scraping de las promociones y por qué no
+   llegan algunas como Carrefour. Verificá y hacé un review de lo que está
+   construido." Se leyó el registro de la última corrida y se consultó la
+   API pública de MODO: Carrefour tuvo dos promos en octubre de 2026 y las
+   dos terminaron. No tiene ninguna vigente; la ingesta las excluye bien.
+2. "Creo que el scraping actual está mal: en la página de Coto hay muchos
+   bancos adheridos, no solo Macro." Se abrió la página de
+   `coto-noviembre26` en un navegador y se comparó con lo que genera el
+   mapeo del repo: 20 bancos en la web y 20 filas en la ingesta, sin
+   diferencias. La portada de promos pide los datos a las mismas rutas que
+   usa la ingesta.
+3. "¿Hay algo para mejorar?" y "Ok, dale." Se hicieron los cambios chicos.
+
+**Resultado:**
+- La ingesta trae lo mismo que muestra MODO. Carrefour solo va a aparecer
+  cuando vuelva a publicar en MODO o si se suma otra fuente.
+- Error de la IA: el primer resumen decía que dos de cada tres promos eran
+  de Macro. Contaba el rótulo del listado, donde una promo de muchos bancos
+  figura como «Bancos adheridos». Por filas publicadas, Macro ronda el 18%.
+  Lo corrigió la objeción del usuario.
+- El workflow pasa de las 09:00 UTC a las 07:17 UTC: con la hora en punto,
+  las corridas de noviembre arrancaron entre 6 y 10 horas tarde.
+- Entran también las promos publicadas que todavía no empezaron
+  (`NEXT_FOR_PRODUCT`), con su fecha de inicio.
+- El resumen de la corrida desglosa lo que el listado deja afuera (por
+  estado, tipo y categoría) y controla ocho cadenas grandes.
+- El motivo de una falla se imprime al final del registro y en el resumen
+  del job de GitHub Actions.
+- Queda pendiente, para una issue aparte: bajar el detalle solo de las
+  promos nuevas o cambiadas (hoy son 42 minutos para detectar 5 cambios).
+## 2026-11-15 — Prueba en Android y tres arreglos que salieron de ella (issues #43, #147, #148, #149)
+
+**Herramienta:** Claude Code (Opus 5.5), con los agentes `rules-guardian` y
+`test-runner` y la skill `/code-review`.
+
+**Objetivo:** cerrar la verificación en Android del issue #43 y arreglar lo
+que se encontró al probar la app en un celular real.
+
+**Prompts principales:**
+1. "Crea un paso a paso con bancos, tarjetas, comercios y resultados
+   esperados para probar la aplicación." Se armó una guía con las tarjetas
+   para cargar en el perfil, los comercios para buscar y lo que tenía que
+   mostrar cada pantalla.
+2. "Mira lo que me salió con cada paso que hicimos y dime si terminamos."
+   Se revisaron las capturas de pantalla contra la guía. El flujo de compra
+   anduvo, pero aparecieron tres problemas.
+3. "Mi modelo de celular es Samsung A53, crea las issues necesarias y
+   comiénzalas para terminarlas el día de hoy." Se cerró el #43 con el
+   modelo del celular y se abrió un issue por problema, cada uno en su rama.
+
+**Resultado:**
+- #43: verificado en un Samsung A53 con Expo Go (SDK 58) y cerrado.
+- #147: MODO escribe el mismo local de varias formas («McDonald's» y «Mc
+  Donald's»), y la app los trataba como dos comercios distintos, así que se
+  perdía la mejor promo. El motor ahora compara los nombres sin espacios ni
+  puntuación, y el buscador muestra una sola entrada. «Coto» y «Cotto»
+  siguen siendo dos comercios distintos.
+- #148: «Por qué no los otros» listaba promos de otros comercios del rubro.
+  Ahora cada medio aparece una sola vez, «Sin promo para esta compra».
+- #149: la torta de Inicio sumaba el tope de todas las promos del corpus
+  (≈$13 millones con una cuenta nueva). Ahora suma solo los topes que ya
+  tienen compras este mes y, sin compras, lo dice en vez de mostrar una
+  cifra.
+- Decisión de la IA: con dos escrituras del mismo comercio, se muestra el
+  primer nombre que llegó. Ordenar por nombre convertía «COTO» en «coto».
+- Revisiones: `rules-guardian` no encontró nada contra las reglas del
+  proyecto. `/code-review` pidió darle un id propio al comercio escrito solo
+  con símbolos, unificar el texto de la torta sin compras y actualizar
+  `DESIGN.md`, y se arregló.
+- Quedan fuera:
+  - los comercios habituales del perfil se siguen comparando sin quitar la
+    puntuación, igual que el índice único de la base;
+  - la torta sin compras la tiene que revisar diseño.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

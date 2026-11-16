@@ -11,7 +11,7 @@ export { GrupoInvalidoError, PerfilSinMediosError, type MotivoGrupoInvalido } fr
 /** Gasto en grupo (spec 016): la decisión y la división. */
 export { MAXIMO_INTEGRANTES, recomendarGrupo } from "./grupo.ts";
 export { dividir } from "./division.ts";
-export { JURISDICCIONES_VALIDAS, normalizar } from "./elegibilidad.ts";
+export { JURISDICCIONES_VALIDAS, claveComercio, normalizar } from "./elegibilidad.ts";
 /**
  * La Edge Function y la app calculan "hoy", los períodos y los textos de fecha
  * con las mismas funciones que el motor (issues #43, #37 y #81).
