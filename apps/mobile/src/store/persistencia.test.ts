@@ -5,7 +5,7 @@ import { CLAVE_CONTACTOS } from "./contactos";
 import { grupoArmado } from "./grupo";
 import { sesionCerrada, sincronizado } from "./acciones";
 import { CLAVE, CLAVE_CORPUS, CLAVE_VIEJA, CORPUS_VACIO, rehidratar } from "./persistencia";
-import { cargaCambio, mediosConfirmados, onboardingTerminado } from "./perfil";
+import { borradorComercios, borradorMedios, borradorNombre, cargaCambio, mediosConfirmados, onboardingTerminado } from "./perfil";
 import { selectRecomendacion, selectTopes } from "./selectores";
 import { ahoraCambio, usuarioCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
@@ -226,6 +226,73 @@ describe("persistencia (US4)", () => {
     s.dispatch(onboardingTerminado());
     await esperar();
     expect(s.getState().perfil.onboardingCompleto).toBe(true);
+  });
+});
+
+describe("persistencia del borrador del onboarding (spec 012, US5, T043)", () => {
+  const medio = { bancoId: "galicia", nombreBanco: "Banco Galicia", tipo: "credito" as const, red: "visa" as const };
+
+  async function abrirEl(disco: ReturnType<typeof memoria>, dia: string) {
+    const s = storeDePrueba(null, disco, { reloj: () => new Date(dia) });
+    await s.dispatch(rehidratar());
+    return s;
+  }
+
+  it("hace ida y vuelta: sobrevive a cerrar la app (FR-031)", async () => {
+    const disco = memoria();
+    const a = await abrirEl(disco, "2026-11-16T12:00:00Z");
+    a.dispatch(borradorMedios({ medios: [medio], ahora: "2026-11-16T12:00:00.000Z" }));
+    a.dispatch(borradorComercios({ comercios: ["Coto"], ahora: "2026-11-16T12:00:00.000Z" }));
+    a.dispatch(borradorNombre({ nombre: "Ana", ahora: "2026-11-16T12:00:00.000Z" }));
+    await esperar();
+
+    const b = await abrirEl(disco, "2026-11-20T12:00:00Z");
+    expect(b.getState().perfil.borrador).toEqual({
+      medios: [medio],
+      comercios: ["Coto"],
+      nombre: "Ana",
+      creadoEn: "2026-11-16T12:00:00.000Z",
+    });
+  });
+
+  it("uno de más de 30 días se descarta al abrir, sin llevarse el resto del perfil", async () => {
+    const disco = memoria();
+    const a = await abrirEl(disco, "2026-10-01T12:00:00Z");
+    a.dispatch(borradorMedios({ medios: [medio], ahora: "2026-10-01T12:00:00.000Z" }));
+    a.dispatch(onboardingTerminado());
+    await esperar();
+
+    const justo = await abrirEl(disco, "2026-10-31T12:00:00Z");
+    expect(justo.getState().perfil.borrador).not.toBeNull();
+    const vencido = await abrirEl(disco, "2026-10-31T12:00:01Z");
+    expect(vencido.getState().perfil.borrador).toBeNull();
+    expect(vencido.getState().perfil.onboardingCompleto).toBe(true);
+  });
+
+  it("un perfil guardado antes del borrador se lee igual, sin borrador", async () => {
+    const disco = memoria();
+    const a = await abrir(disco);
+    a.dispatch(onboardingTerminado());
+    await esperar();
+    const guardado = JSON.parse(disco.datos.get(CLAVE)!);
+    delete guardado.perfil.borrador;
+    disco.datos.set(CLAVE, JSON.stringify(guardado));
+    const b = await abrir(disco);
+    expect(b.getState().perfil.onboardingCompleto).toBe(true);
+    expect(b.getState().perfil.borrador).toBeNull();
+  });
+
+  it("un borrador con forma rota se descarta solo", async () => {
+    const disco = memoria();
+    const a = await abrir(disco);
+    a.dispatch(onboardingTerminado());
+    await esperar();
+    const guardado = JSON.parse(disco.datos.get(CLAVE)!);
+    guardado.perfil.borrador = { medios: [{ bancoId: 3 }], comercios: [], nombre: null, creadoEn: "2026-11-16" };
+    disco.datos.set(CLAVE, JSON.stringify(guardado));
+    const b = await abrir(disco);
+    expect(b.getState().perfil.onboardingCompleto).toBe(true);
+    expect(b.getState().perfil.borrador).toBeNull();
   });
 });
 

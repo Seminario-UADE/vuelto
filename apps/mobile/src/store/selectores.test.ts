@@ -3,9 +3,17 @@ import { mediosDeEjemplo } from "../data/fixtures";
 import * as motor from "@vuelto/motor";
 import { catalogoComercios, mediosDeclarados, mediosDelMotor } from "../data/fixtures";
 import { recomendacionVista } from "../data/calculo";
-import { mediosConfirmados } from "./perfil";
+import { borradorMedios, mediosConfirmados } from "./perfil";
 import { sincronizado } from "./acciones";
-import { selectConvieneHoy, selectEntradasMotor, selectFrescura, selectRecomendacion, selectTopes, selectUsoDeTopes } from "./selectores";
+import {
+  selectConvieneHoy,
+  selectEntradasMotor,
+  selectFrescura,
+  selectMediosParaMotor,
+  selectRecomendacion,
+  selectTopes,
+  selectUsoDeTopes,
+} from "./selectores";
 import { ahoraCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
 import { guardarCompra } from "./thunks";
@@ -95,6 +103,18 @@ describe("selectUsoDeTopes (torta de Inicio, v9)", () => {
 
   it("sin medios no hay torta", () => {
     expect(selectUsoDeTopes(storeDePrueba().getState())).toBeNull();
+  });
+});
+
+describe("selectMediosParaMotor (spec 012, US5)", () => {
+  it("sin medios guardados, el motor responde con los del borrador; con medios de la cuenta, con esos", () => {
+    const s = storeDePrueba();
+    const medio = { bancoId: "galicia", nombreBanco: "Banco Galicia", tipo: "credito" as const, red: "visa" as const };
+    s.dispatch(borradorMedios({ medios: [medio], ahora: "2026-10-14T12:00:00.000Z" }));
+    expect(selectMediosParaMotor(s.getState())).toEqual([{ ...medio, id: "borrador-0" }]);
+    expect(selectEntradasMotor(s.getState()).medios).toEqual([{ ...medio, id: "borrador-0" }]);
+    s.dispatch(mediosConfirmados(mediosDeEjemplo(["macro-visa-debito"])));
+    expect(selectMediosParaMotor(s.getState()).map((m) => m.id)).toEqual(["macro-visa-debito"]);
   });
 });
 

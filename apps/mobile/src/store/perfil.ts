@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { usuario } from "../data/fixtures";
+import { borradorVacio, type MedioDelBorrador } from "../perfil/borrador";
 import { escenarioElegido, rehidratado, sesionCerrada, type ComercioHabitual, type EstadoPerfil, type MedioGuardado } from "./acciones";
 
 /**
@@ -19,8 +20,12 @@ export const perfilInicial: EstadoPerfilSlice = {
   medios: [],
   comercios: [],
   invitacionPendiente: null,
+  borrador: null,
   carga: "sin-leer",
 };
+
+/** Qué parte del borrador ya quedó en la cuenta (o se descartó porque la cuenta ya tenía). */
+export type ParteDelBorrador = "medios" | "comercios" | "nombre";
 
 export const perfil = createSlice({
   name: "perfil",
@@ -69,6 +74,31 @@ export const perfil = createSlice({
     invitacionGuardada(s, a: PayloadAction<string | null>) {
       s.invitacionPendiente = a.payload;
     },
+    /**
+     * Los medios elegidos sin cuenta (US5): reemplazan los del borrador. `ahora` es el reloj del
+     * store; marca el comienzo del borrador si recién empieza (FR-031).
+     */
+    borradorMedios(s, a: PayloadAction<{ medios: MedioDelBorrador[]; ahora: string }>) {
+      s.borrador ??= { medios: [], comercios: [], nombre: null, creadoEn: a.payload.ahora };
+      s.borrador.medios = a.payload.medios;
+    },
+    borradorComercios(s, a: PayloadAction<{ comercios: string[]; ahora: string }>) {
+      s.borrador ??= { medios: [], comercios: [], nombre: null, creadoEn: a.payload.ahora };
+      s.borrador.comercios = a.payload.comercios;
+    },
+    /** El nombre del registro, cuando la cuenta todavía no tiene sesión (confirmar el email, FR-033). */
+    borradorNombre(s, a: PayloadAction<{ nombre: string; ahora: string }>) {
+      s.borrador ??= { medios: [], comercios: [], nombre: null, creadoEn: a.payload.ahora };
+      s.borrador.nombre = a.payload.nombre;
+    },
+    /** Esa parte ya está en la cuenta: sale del borrador, y sin nada más el borrador se borra. */
+    borradorParteGuardada(s, a: PayloadAction<ParteDelBorrador>) {
+      if (!s.borrador) return;
+      if (a.payload === "medios") s.borrador.medios = [];
+      else if (a.payload === "comercios") s.borrador.comercios = [];
+      else s.borrador.nombre = null;
+      if (borradorVacio(s.borrador)) s.borrador = null;
+    },
   },
   extraReducers: (b) => {
     b.addCase(rehidratado, (s, a) => (a.payload.perfil ? { ...a.payload.perfil, carga: s.carga } : s));
@@ -93,4 +123,8 @@ export const {
   onboardingTerminado,
   nombreCambiado,
   invitacionGuardada,
+  borradorMedios,
+  borradorComercios,
+  borradorNombre,
+  borradorParteGuardada,
 } = perfil.actions;

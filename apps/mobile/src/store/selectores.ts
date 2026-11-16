@@ -20,6 +20,7 @@ import { contarPendientes } from "../data/compras/operaciones";
 import type { Comercio, MedioDePago, Perfil } from "../data/contracts";
 import { comerciosConNombre, comerciosDelCorpus, RUBROS_DE_MODO } from "../data/comercios";
 import { catalogoComercios } from "../data/fixtures";
+import { mediosDelBorrador } from "../perfil/borrador";
 import { medioVista } from "../perfil/vista";
 import type { RootState } from "./index";
 
@@ -29,12 +30,21 @@ export const selectAhora = createSelector([(s: RootState) => s.sesion.ahora], (i
 export const selectHoy = createSelector([selectAhora], fechaArgentina);
 
 /**
+ * Los medios con los que responde el motor: los de la cuenta o, sin ninguno guardado todavía, los
+ * del borrador del onboarding, para la primera recomendación antes de tener cuenta (spec 012, US5).
+ */
+export const selectMediosParaMotor = createSelector(
+  [(s: RootState) => s.perfil.medios, (s: RootState) => s.perfil.borrador],
+  (medios, borrador) => (medios.length > 0 ? medios : mediosDelBorrador(borrador)),
+);
+
+/**
  * Lo que el motor necesita, con su forma. Cambiar el monto o el comercio de la simulación no
  * lo reconstruye: el motor recibe las mismas referencias.
  */
 export const selectEntradasMotor = createSelector(
   [
-    (s: RootState) => s.perfil.medios,
+    selectMediosParaMotor,
     (s: RootState) => s.corpus.promociones,
     (s: RootState) => s.compras.lista,
     selectAhora,

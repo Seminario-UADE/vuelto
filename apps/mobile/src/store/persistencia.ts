@@ -10,6 +10,7 @@ import type { ListenerMiddlewareInstance } from "@reduxjs/toolkit";
 import { fechaArgentina } from "@vuelto/motor";
 import { comprasDelPeriodo } from "../data/calculo";
 import { catalogoComercios, mediosDeEjemplo } from "../data/fixtures";
+import { borradorVencido, type BorradorPerfil } from "../perfil/borrador";
 import { REDES, TIPOS_TARJETA } from "../perfil/modelo";
 import {
   rehidratado,
@@ -61,6 +62,7 @@ export function aPersistir(s: RootState): Persistido {
       medios: s.perfil.medios,
       comercios: s.perfil.comercios,
       invitacionPendiente: s.perfil.invitacionPendiente,
+      borrador: s.perfil.borrador,
     },
     compras: { lista: comprasDelPeriodo(s.compras.lista, hoy) },
   };
@@ -91,6 +93,13 @@ function medioValido(x: unknown): x is MedioGuardado {
   );
 }
 
+/** Un medio del borrador (US5): como uno guardado, pero todavía sin id de Supabase. */
+function medioNuevoValido(x: unknown): boolean {
+  return (
+    esObjeto(x) && esTexto(x.bancoId) && textoONull(x.nombreBanco) && esUno(TIPOS_TARJETA, x.tipo) && esUno(REDES, x.red)
+  );
+}
+
 /**
  * Los medios guardados (issue #41). Antes eran ids del catálogo de ejemplo: se migran a la forma
  * nueva con los datos de ejemplo y los que no se reconocen se descartan. Al entrar, lo que diga
@@ -116,6 +125,21 @@ function comerciosValidos(x: unknown): ComercioHabitual[] | null {
   return null;
 }
 
+/**
+ * El borrador del onboarding (US5). Es opcional: un guardado de antes no lo trae. Uno con forma rota
+ * se descarta solo, sin llevarse el perfil.
+ */
+function borradorValido(x: unknown): BorradorPerfil | null {
+  if (!esObjeto(x) || !Array.isArray(x.medios) || !x.medios.every(medioNuevoValido)) return null;
+  if (!listaDeTextos(x.comercios) || !textoONull(x.nombre) || !esTexto(x.creadoEn)) return null;
+  return {
+    medios: x.medios as BorradorPerfil["medios"],
+    comercios: x.comercios,
+    nombre: x.nombre as string | null,
+    creadoEn: x.creadoEn,
+  };
+}
+
 function perfilValido(x: unknown): EstadoPerfil | null {
   if (!esObjeto(x)) return null;
   const medios = mediosValidos(x.medios);
@@ -133,6 +157,7 @@ function perfilValido(x: unknown): EstadoPerfil | null {
     medios,
     comercios,
     invitacionPendiente: x.invitacionPendiente as string | null,
+    borrador: borradorValido(x.borrador),
   };
 }
 
@@ -244,6 +269,11 @@ export function rehidratar(): AppThunk<Promise<void>> {
     }
     // Con un corpus ya sincronizado el reloj es el real desde este mismo tick (spec 009 FR-016).
     if (partes.corpus?.marca != null) partes = { ...partes, ahora: reloj().toISOString() };
+    // Un borrador de más de 30 días se descarta al abrir (FR-031).
+    const borrador = partes.perfil?.borrador;
+    if (partes.perfil && borrador && borradorVencido(borrador, reloj())) {
+      partes = { ...partes, perfil: { ...partes.perfil, borrador: null } };
+    }
     // El nombre no estaba en el perfil viejo: queda el del store.
     if (partes.perfil && partes.perfil.nombre === null) {
       partes = { ...partes, perfil: { ...partes.perfil, nombre: getState().perfil.nombre } };
