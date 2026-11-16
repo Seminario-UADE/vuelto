@@ -153,7 +153,7 @@ description: "Tareas de la spec 016: gasto en grupo con contactos vinculados"
 - [X] T062 [P] Enmendar `specs/006-app-mobile-pantallas/spec.md` US5-9 (sin grupo de ejemplo con fecha fija; remite a la spec 016), actualizar la tabla de workspaces y la fila Stack de `CLAUDE.md` si cambia lo que dicen de `supabase` (Edge Function `recomendar-grupo`) y marcar en `docs/product/revision-gasto-grupo.md` qué hallazgos cierra este PR.
 - [X] T063 Correr los chequeos del PR: `npm run lint`, `npm run typecheck`, `npm run test`, `deno check` de las dos funciones, `supabase test db` y `npm run test:integracion -w @vuelto/mobile`; después los agentes `test-runner` y `rules-guardian` y la skill `/code-review`, y corregir lo que encuentren.
 - [X] T064 Verificar en la app web (`mobile-web`) las pantallas que se pueden ver sin dos teléfonos (Contactos vacío, Pegar, Armar con y sin rubro, errores de resultado) y sacar capturas antes/después para el PR (criterio de #130). Lo que necesita dispositivo real (QR con la cámara) se dice en el PR como no verificado.
-- [ ] T065 Registrar la sesión en `docs/bitacora-prompts.md` (prompt, decisiones del PO, hallazgos de `spec-critic`, qué se verificó y qué no) y abrir el PR con `Closes #54` y `Closes #130`.
+- [X] T065 Registrar la sesión en `docs/bitacora-prompts.md` (prompt, decisiones del PO, hallazgos de `spec-critic`, qué se verificó y qué no) y abrir el PR con `Closes #54` y `Closes #130`.
 
 ---
 
