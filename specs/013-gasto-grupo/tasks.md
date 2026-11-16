@@ -81,7 +81,7 @@ description: "Tareas de la spec 013: gasto en grupo con contactos vinculados"
 ### Implementation for User Story 2 — base
 
 - [X] T021 [US2] Crear `supabase/migrations/20261115000001_contactos.sql` según `data-model.md` §Base y `contracts/rpc-contactos.md`: tabla `invitaciones` (`token_hash bytea not null unique`, `vence_en ... default now() + interval '24 hours'`, `check (vence_en > creada_en)`, índice único parcial `invitaciones_una_vigente (emisor) where usada_en is null`), tabla `contactos` (PK `(usuario_a, usuario_b)`, `check (usuario_a < usuario_b)`, índice en `usuario_b`), las dos con RLS y policies en la misma migración y los grants de `data-model.md`; schema `contactos_privado` (`usage` solo a `authenticated`); funciones `security definer` con `set search_path = ''` (`crear_invitacion`, `ver_invitacion`, `aceptar_invitacion` con `for update` y `on conflict do nothing`, `mis_contactos`), con `execute` revocado a `public` y `anon` y dado a `authenticated`; envoltorios `security invoker` `language sql` en `public` con la misma firma; `public.quitar_contacto(p_contacto uuid)` `security invoker`. Comentarios en español que remitan a la spec y a ADR-008.
-- [ ] T022 [US2] Avisar en el chat que `supabase db reset` cambia la base local compartida y, con el OK, correr `supabase db reset` y `supabase test db`: pasan `contactos.test.sql` (parte de vínculos) y los demás tests, `estructura.test.sql` incluido, sin cambios.
+- [X] T022 [US2] Avisar en el chat que `supabase db reset` cambia la base local compartida y, con el OK, correr `supabase db reset` y `supabase test db`: pasan `contactos.test.sql` (parte de vínculos) y los demás tests, `estructura.test.sql` incluido, sin cambios.
 
 ### Implementation for User Story 2 — app
 
@@ -97,7 +97,7 @@ description: "Tareas de la spec 013: gasto en grupo con contactos vinculados"
 - [X] T032 [US2] `apps/mobile/src/app/contactos/quitar.tsx`: `quitarContacto` con `try/catch`, error con «Reintentar», y la lista local cambia solo si el servidor confirmó (US2-15).
 - [X] T033 [US2] Crear `apps/mobile/src/app/contactos/pegar.tsx` («Tengo una invitación»): campo de texto, botón «Pegar» con `expo-clipboard`, validación con `tokenDeInvitacion` sin red y `router.replace('/i/<token>')`. Registrar la ruta en `apps/mobile/src/app/_layout.tsx` (encabezado nativo con volver, spec 006 US5-11) y sumar el acceso en `apps/mobile/src/app/contactos/index.tsx`.
 - [X] T034 [US2] Sacar de `apps/mobile/src/data/api.ts` `crearInvitacion`, `verInvitacion`, `aceptarInvitacion` y `quitarContacto` con sus tokens de ejemplo, y de `apps/mobile/src/data/fixtures.ts` `invitacionPropia` y `contactos` (el escenario de demo deja de cargarlos); ajustar los tests que los usaban (`apps/mobile/src/data/api.test.ts`, `apps/mobile/src/store/pantallas.test.ts` y los que aparezcan).
-- [ ] T035 [US2] Sumar a la integración de la app (`apps/mobile/src/grupo/repositorio-supabase.integracion.test.ts`, con la configuración de `vitest.integracion.config.mts`) el ciclo crear → ver → aceptar → listar → quitar entre dos usuarios contra la base local.
+- [X] T035 [US2] Sumar a la integración de la app (`apps/mobile/src/grupo/repositorio-supabase.integracion.test.ts`, con la configuración de `vitest.integracion.config.mts`) el ciclo crear → ver → aceptar → listar → quitar entre dos usuarios contra la base local.
 - [X] T036 [US2] Correr `npm run test -w @vuelto/mobile`, `npm run typecheck` y `npm run lint`.
 
 **Checkpoint**: los contactos existen de verdad; el grupo todavía usa la simulación.
