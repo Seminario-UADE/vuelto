@@ -3010,6 +3010,41 @@ hable solo de esa compra y use su fecha, no la de hoy.
 
 ---
 
+## 2026-11-15 — Sugerir el comercio del catálogo (issue #134)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit y `spec-critic`.
+
+**Objetivo:** que al registrar una compra, si el nombre del ticket o el
+escrito a mano no coincide con un comercio con promos («COTO C.I.C.S.A.»
+contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
+
+**Prompts principales:**
+1. "Arrancá con la issue #134, pero antes evaluemos cómo se vería: una opción
+   con el negocio sugerido para que el usuario elija, el top 3 o un buscador
+   si no lo encuentra, así si se leyó el nombre de la sociedad dueña de las
+   franquicias se encuentra el nombre comercial del local." Se mostraron
+   tres formas de presentarlo y el usuario eligió «top 3 + buscar». Para la
+   razón social se propuso buscar los nombres del catálogo dentro del texto
+   completo del ticket, en vez de una búsqueda con un modelo de lenguaje.
+2. "No hace falta la otra issue para recordar." Se aclaró que la app no
+   recuerda la elección del usuario para la próxima vez.
+3. "Aplicá las correcciones como las proponés." spec-critic encontró 13
+   puntos. Entre ellos: el rubro elegido se perdía al cambiar el nombre,
+   «coincide exacto» tenía dos definiciones, y la medición se ajustaba con la
+   misma lista que la medía.
+
+**Resultado:**
+- Spec 015: si el comercio no coincide, un recuadro con hasta 3 sugerencias
+  (nombre y rubro), «Buscar otro comercio» y «No está en la lista». Si
+  coincide, una línea chica de confirmación. Nunca se elige solo y no hace
+  falta elegir para guardar.
+- Las sugerencias salen del texto del ticket, del nombre sin «S.A.» ni
+  sucursal, y de la búsqueda por parecido. Todo en el celular, sin red.
+- La medición queda fija en dos listas dentro de la spec: 20 nombres como
+  los de tickets reales y 10 comercios que no están en el catálogo.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
