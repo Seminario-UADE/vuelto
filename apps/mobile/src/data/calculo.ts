@@ -555,23 +555,30 @@ export function compraParaGuardar(
   };
 }
 
+/** La torta de Inicio sin compras en el período: no hay suma para mostrar (issue #149). */
+export const SIN_TOPES_USADOS = "Todavía no usaste ningún tope este mes";
+
 /**
- * Inicio (v9): todos tus topes sumados, para el gráfico de torta. Un tope sin compras cuenta
- * entero como disponible; la base son las compras distintas que contó el motor. `null` sin topes.
+ * Inicio (v9): los topes que estás usando este mes, sumados, para el gráfico de torta. Solo
+ * cuentan los que ya tienen compras: sumar el tope de cada promo del corpus daba una cifra que
+ * nadie va a usar y falsamente precisa (issue #149, auditoría v5 P1 #4). La base son las compras
+ * distintas que contó el motor. Sin compras, `topes` es 0 y la torta lo dice en vez de sumar.
+ * `null` sin topes.
  */
 export function usoDeTopes(topes: ResumenTopes): UsoDeTopes | null {
   if (topes.medios.length === 0) return null;
-  const nominal = topes.medios.reduce((n, t) => n + t.nominal, 0);
-  const disponible = topes.medios.reduce((n, t) => n + (t.disponible ?? t.nominal), 0);
-  const compras = new Set(topes.medios.flatMap((t) => t.compraIds)).size;
+  const usados = topes.medios.filter((t) => t.compraIds.length > 0);
+  const nominal = usados.reduce((n, t) => n + t.nominal, 0);
+  const disponible = usados.reduce((n, t) => n + (t.disponible ?? t.nominal), 0);
+  const compras = new Set(usados.flatMap((t) => t.compraIds)).size;
   return {
     nominal,
     disponible,
     queda: nominal === 0 ? 0 : Math.min(1, Math.max(0, disponible / nominal)),
-    topes: topes.medios.length,
+    topes: usados.length,
     base:
       compras === 0
-        ? "sin compras registradas este mes"
+        ? SIN_TOPES_USADOS
         : `según ${compras} ${compras === 1 ? "compra" : "compras"} de ${topes.mes}`,
   };
 }

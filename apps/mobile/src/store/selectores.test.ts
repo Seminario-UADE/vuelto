@@ -62,16 +62,35 @@ describe("selectTopes · aplicaHoy (Inicio, v9)", () => {
 });
 
 describe("selectUsoDeTopes (torta de Inicio, v9)", () => {
-  it("suma los topes: un tope sin compras cuenta entero, y la base son las compras distintas", () => {
+  it("suma solo los topes con compras este mes, y la base son las compras distintas (#149)", () => {
     const s = conMartin();
-    const topes = selectTopes(s.getState()).medios;
+    const todos = selectTopes(s.getState()).medios;
+    const usados = todos.filter((t) => t.compraIds.length > 0);
+    // Los datos de ejemplo tienen topes sin compras: si no, el test no prueba nada.
+    expect(usados.length).toBeGreaterThan(0);
+    expect(usados.length).toBeLessThan(todos.length);
     const uso = selectUsoDeTopes(s.getState());
     if (!uso) throw new Error("sin topes");
-    expect(uso.nominal).toBe(topes.reduce((n, t) => n + t.nominal, 0));
-    expect(uso.disponible).toBe(topes.reduce((n, t) => n + (t.disponible ?? t.nominal), 0));
+    expect(uso.topes).toBe(usados.length);
+    expect(uso.nominal).toBe(usados.reduce((n, t) => n + t.nominal, 0));
+    expect(uso.disponible).toBe(usados.reduce((n, t) => n + (t.disponible ?? t.nominal), 0));
     expect(uso.queda).toBeCloseTo(uso.disponible / uso.nominal);
-    const compras = new Set(topes.flatMap((t) => t.compraIds)).size;
+    const compras = new Set(usados.flatMap((t) => t.compraIds)).size;
     expect(uso.base).toBe(`según ${compras} compras de octubre`);
+  });
+
+  it("sin compras en el período no suma nada: todavía no usaste ningún tope (#149)", () => {
+    const s = conMartin();
+    // Un mes sin compras registradas: noviembre.
+    s.dispatch(ahoraCambio("2026-11-18T12:00:00-03:00"));
+    expect(selectTopes(s.getState()).medios.length).toBeGreaterThan(0);
+    expect(selectUsoDeTopes(s.getState())).toEqual({
+      nominal: 0,
+      disponible: 0,
+      queda: 0,
+      topes: 0,
+      base: "Todavía no usaste ningún tope este mes",
+    });
   });
 
   it("sin medios no hay torta", () => {
