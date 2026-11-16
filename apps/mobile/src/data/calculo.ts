@@ -47,6 +47,7 @@ import type { MedioDePago as MedioGuardado } from "../perfil/modelo";
 import { claveDeComercio, comercioDelCatalogo, comerciosConNombre, esComercioDeRubro } from "./comercios";
 import { medioDelMotor, medioVista } from "../perfil/vista";
 import { aVista } from "./vista-recomendacion";
+import { aprox } from "../lib/format";
 import { mediodia } from "../lib/reloj";
 import { RUBROS } from "../lib/rubros";
 import { periodoDeVista, textoBase } from "../lib/textos";
@@ -433,19 +434,28 @@ export type PromoPropuesta = {
   base: string | null;
 };
 
-export function promoPropuesta(
+/** El motor en la fecha de la compra (al mediodía); `null` si el comercio no tiene rubro. */
+function recomendacionEnLaFecha(
   entradas: EntradasMotor,
   comercio: Comercio,
+  fecha: string,
+  monto: number | null,
+  canal: Canal,
+): RecomendacionMotor | null {
+  if (comercio.categoriaId === null) return null;
+  const pedido = pedidoDeCompra({ ...comercio, categoriaId: comercio.categoriaId }, monto, canal);
+  return recomendarSeguro(pedido, { ...entradas, ahora: mediodia(fecha) });
+}
+
+function propuestaDe(
+  r: RecomendacionMotor | null,
+  entradas: EntradasMotor,
   medioId: string,
   fecha: string,
   monto: number | null,
-  canal: Canal = "presencial",
 ): PromoPropuesta {
   const vacia: PromoPropuesta = { medioId, fecha, promociones: [], reintegro: null, base: null };
-  if (comercio.categoriaId === null) return vacia;
-  const pedido = pedidoDeCompra({ ...comercio, categoriaId: comercio.categoriaId }, monto, canal);
-  const r = recomendarSeguro(pedido, { ...entradas, ahora: mediodia(fecha) });
-  const opcion = [r.mejor, ...r.alternativas].find((o) => o?.medioDePagoId === medioId) ?? null;
+  const opcion = r === null ? null : ([r.mejor, ...r.alternativas].find((o) => o?.medioDePagoId === medioId) ?? null);
   if (opcion === null || opcion.promociones.length === 0) return vacia;
   const catalogo = new Map(entradas.promociones.map((p) => [p.id, p]));
   const conBase = opcion.promociones.find((p) => p.base !== null);
@@ -460,6 +470,55 @@ export function promoPropuesta(
     reintegro: monto === null ? null : opcion.ahorroEstimado,
     base: conBase?.base ? textoBase(conBase.base.comprasRegistradas, periodo, nombreDelMes(fecha)).texto : null,
   };
+}
+
+export function promoPropuesta(
+  entradas: EntradasMotor,
+  comercio: Comercio,
+  medioId: string,
+  fecha: string,
+  monto: number | null,
+  canal: Canal = "presencial",
+): PromoPropuesta {
+  return propuestaDe(recomendacionEnLaFecha(entradas, comercio, fecha, monto, canal), entradas, medioId, fecha, monto);
+}
+
+export const SIN_PROMO_EN_LA_COMPRA = "No hay ninguna promo";
+
+/** Las promos de otro rubro, otro comercio u otro medio no explican nada de esta compra. */
+const NO_SON_DE_ESTA_COMPRA: readonly CausaDescarte[] = ["categoria", "comercio", "medio_de_pago"];
+
+/**
+ * El texto de cada tarjeta en «Revisá tu compra» (issue #144): sale de la misma cuenta que
+ * `promoPropuesta`, en la fecha de la compra. Solo lo que le pasó a esta compra: cuánto devuelve,
+ * por qué no aplicó una promo de este comercio (el día, la vigencia, el canal, el monto mínimo o
+ * el tope agotado, con su base) o que no hubo promo. Nunca las promos de otro comercio u otro
+ * rubro: eso sería listar promociones (Principio I).
+ */
+export function detallesDeLaCompra(
+  entradas: EntradasMotor,
+  comercio: Comercio,
+  fecha: string,
+  monto: number | null,
+  canal: Canal = "presencial",
+): Record<string, string> {
+  const r = recomendacionEnLaFecha(entradas, comercio, fecha, monto, canal);
+  return Object.fromEntries(
+    entradas.perfil.mediosDePago.map(({ id }) => {
+      const p = propuestaDe(r, entradas, id, fecha, monto);
+      if (p.promociones.length > 0) {
+        const texto =
+          p.reintegro === null
+            ? "Tiene promo: cargá el monto para estimar cuánto te devuelven"
+            : `Te devuelven ${aprox(p.reintegro)}${p.base ? `, ${p.base}` : ""}`;
+        return [id, texto];
+      }
+      const porQueNo = r?.descartadas.find(
+        (d) => d.mediosDePagoIds.includes(id) && !NO_SON_DE_ESTA_COMPRA.includes(d.causa),
+      );
+      return [id, porQueNo?.motivo ?? SIN_PROMO_EN_LA_COMPRA];
+    }),
+  );
 }
 
 /**

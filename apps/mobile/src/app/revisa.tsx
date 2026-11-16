@@ -12,14 +12,13 @@ import { SectionHeader } from "@/components/section-header";
 import { SelectorFecha } from "@/components/selector-fecha";
 import { SheetHeader } from "@/components/sheet-header";
 import { Text } from "@/components/text";
-import { comercioPorNombre, promoPropuesta } from "@/data/calculo";
-import { comercioDelCatalogo } from "@/data/comercios";
+import { comercioPorNombre, detallesDeLaCompra, promoPropuesta } from "@/data/calculo";
 import type { Canal, OrigenCompra } from "@/data/contracts";
 import { borradorDesdePorConfirmar } from "@/data/por-confirmar";
 import { aprox, montoEditable, parseMonto } from "@/lib/format";
 import { esRed, esTipoTarjeta } from "@/perfil/modelo";
 import { hapticoExito, hapticoSeleccion } from "@/lib/haptics";
-import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectCatalogoParaCompras, selectEntradasMotor, selectHoy, selectPerfilVista } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { confirmarPorConfirmar, guardarCompra } from "@/store/thunks";
@@ -110,18 +109,24 @@ export default function Revisa() {
   const rangoDeDias = desde ? desde.diasPosibles : { desde: null, hoy };
 
   const perfil = useAppSelector(selectPerfilVista);
-  const comercioConocido = comercio.trim() ? comercioDelCatalogo(comercio, perfil.comercios, categoriaId) : undefined;
   // Comercios y rubros: «Usar…» desde un rubro llega con su nombre («Supermercados»).
   const catalogo = useAppSelector(selectCatalogoParaCompras);
-  const conocido = comercioConocido ?? (comercio.trim() ? comercioDelCatalogo(comercio, catalogo, categoriaId) : undefined);
-  // Qué dice el motor de cada medio para este comercio (solo para orientar; no preselecciona).
-  const rec = useRecomendacionPara(conocido?.id ?? null, monto, canal);
-  // La promo que se propone y se guarda es la misma función, evaluada en la fecha de la compra
-  // (FR-022): no la del día de hoy, que con un ticket de otro día mostraría otra cosa.
+  // La promo que se propone y se guarda y el texto de cada tarjeta salen de la misma cuenta,
+  // evaluada en la fecha de la compra (FR-022, issue #144): no la del día de hoy, que con un
+  // ticket de otro día mostraría otra cosa.
   const entradas = useAppSelector(selectEntradasMotor);
+  const comercioDeLaCompra = useMemo(
+    () => (comercio.trim() ? comercioPorNombre(comercio.trim(), catalogo, categoriaId) : null),
+    [comercio, catalogo, categoriaId],
+  );
   const propuesta = useMemo(
-    () => (medioId && comercio.trim() ? promoPropuesta(entradas, comercioPorNombre(comercio.trim(), catalogo, categoriaId), medioId, fecha, monto, canal) : null),
-    [entradas, catalogo, medioId, comercio, categoriaId, fecha, monto, canal],
+    () => (medioId && comercioDeLaCompra ? promoPropuesta(entradas, comercioDeLaCompra, medioId, fecha, monto, canal) : null),
+    [entradas, comercioDeLaCompra, medioId, fecha, monto, canal],
+  );
+  // Solo lo que le pasó a esta compra con cada tarjeta, sin promos de otros comercios (issue #144).
+  const detalles = useMemo(
+    () => (comercioDeLaCompra ? detallesDeLaCompra(entradas, comercioDeLaCompra, fecha, monto, canal) : null),
+    [entradas, comercioDeLaCompra, fecha, monto, canal],
   );
   const hayPromo = propuesta !== null && propuesta.promociones.length > 0;
 
@@ -130,14 +135,6 @@ export default function Revisa() {
     if (medioId !== null) return null;
     if (medioSugeridoTicket === id) return "El que dice el ticket";
     return desde?.medioSugerido === id ? "El que elegiste al simular" : null;
-  };
-
-  const detalleDe = (id: string): string | null => {
-    const r = rec;
-    if (!r) return null;
-    if (r.medio?.id === id) return r.razon;
-    const a = r.alternativas.find((x) => x.medioId === id);
-    return a ? a.motivo : null;
   };
 
   const listo = medioId !== null && monto !== null && comercio.trim() !== "";
@@ -257,7 +254,7 @@ export default function Revisa() {
             <OptionRow
               key={m.id}
               title={m.nombre}
-              detail={detalleDe(m.id)}
+              detail={detalles?.[m.id] ?? null}
               note={notaDelMedio(m.id)}
               selected={medioId === m.id}
               onPress={() => {
