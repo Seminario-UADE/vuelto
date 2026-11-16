@@ -59,6 +59,30 @@ describe("recomendacionVista (US1)", () => {
     expect(alternativas.every((a) => a.motivo === SIN_PROMO)).toBe(true);
   });
 
+  it("las promos de otro comercio del rubro no aparecen: cada medio una sola vez, sin promo (#148)", () => {
+    const base = promociones.find((p) => p.id === "promo-galicia-super-mie");
+    if (!base) throw new Error("promo-galicia-super-mie");
+    const deOtrosComercios = ["Jumbo", "Disco", "Vea"].map((nombre) => ({
+      ...base,
+      id: `promo-santander-${nombre}`,
+      bancoId: "santander",
+      tarjetas: { debito: [], credito: ["master" as const] },
+      comercio: nombre,
+    }));
+    const r = recomendacionVista(
+      { ...entradas, promociones: [...promociones, ...deOtrosComercios] },
+      comercio("coto"),
+      10000,
+    );
+    const alternativas = r?.alternativas ?? [];
+    expect(r?.medio?.id).toBe("galicia-visa-credito");
+    expect(alternativas.filter((a) => a.medioId === "santander-mastercard-credito")).toEqual([
+      expect.objectContaining({ motivo: SIN_PROMO, estado: "no-aplica" }),
+    ]);
+    const ids = alternativas.map((a) => a.medioId);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
   it("Farmacity: sin recomendación y Macro agotado con su base", () => {
     const r = recomendacionVista(entradas, comercio("farmacity"), 10000);
     expect(r?.resultado).toBe("sin-promo");
