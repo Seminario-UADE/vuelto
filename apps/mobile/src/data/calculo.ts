@@ -171,9 +171,10 @@ export function recomendacionVista(
   if (comercio.categoriaId === null) return null;
   const pedido = pedidoDeCompra({ ...comercio, categoriaId: comercio.categoriaId }, monto, canal);
   const r = recomendarSeguro(pedido, entradas);
-  // Las promos de otro rubro no son una alternativa para esta compra (research R4). Eligiendo
-  // solo el rubro, tampoco las de un comercio puntual: explicarlas sería listar promos (Principio I).
-  const ajenas = new Set<CausaDescarte>(esComercioDeRubro(comercio) ? ["categoria", "comercio"] : ["categoria"]);
+  // Las promos de otro rubro no son una alternativa para esta compra (research R4), ni las de otro
+  // comercio: en Coto, la promo de Jumbo no explica por qué no un medio, y mostrarla sería listar
+  // promos (Principio I, issue #148). Ese medio queda una sola vez, «Sin promo para esta compra».
+  const ajenas = new Set<CausaDescarte>(["categoria", "comercio"]);
   const respuesta = { ...r, descartadas: r.descartadas.filter((d) => !ajenas.has(d.causa)) };
   const hoy = fechaArgentina(entradas.ahora);
   return aVista(pedido, respuesta, comercio, {
