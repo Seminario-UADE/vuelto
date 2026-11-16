@@ -6,9 +6,11 @@ import {
   aContacto,
   cargarContactos,
   CLAVE_CONTACTOS,
+  crearInvitacion,
   iniciarContactos,
   leerContactos,
   quitarContacto,
+  verInvitacion,
 } from "./contactos";
 import { esperar, memoria, storeDePrueba } from "./prueba";
 import { usuarioCambio } from "./sesion";
@@ -172,3 +174,46 @@ describe("contactos: cuentas y persistencia (FR-019, US2-16)", () => {
     expect(leerContactos(JSON.stringify({ version: 1, cuentaId: "u1", lista: [{ id: 1 }, aContacto(ana)] }))?.lista).toHaveLength(1);
   });
 });
+
+describe("contactos: invitaciones (US2-2, US2-6)", () => {
+  it("abrir Invitar otra vez muestra la misma invitación; «Generar otro link» crea una nueva", async () => {
+    const { s } = conCuenta();
+    const primera = await s.dispatch(crearInvitacion());
+    expect(await s.dispatch(crearInvitacion())).toEqual(primera);
+    const otra = await s.dispatch(crearInvitacion(true));
+    expect(otra.token).not.toBe(primera.token);
+    expect(await s.dispatch(crearInvitacion())).toEqual(otra);
+  });
+
+  it("una invitación vencida no se reusa", async () => {
+    const repo = repositorioContactosMemoria();
+    const s = storeDePrueba(null, memoria(), { contactosRemoto: repo, reloj: () => new Date("2026-11-17T15:00:00.000Z") });
+    s.dispatch(usuarioCambio({ id: "u1", email: "yo@mail.com" }));
+    const primera = await s.dispatch(crearInvitacion());
+    // La de memoria vence el 16/11: a las 15 del 17/11 ya venció.
+    expect((await s.dispatch(crearInvitacion())).token).not.toBe(primera.token);
+  });
+
+  it("la invitación no se guarda en el teléfono y otra cuenta no la ve", async () => {
+    const disco = memoria();
+    const { s } = conCuenta(undefined, disco);
+    await s.dispatch(iniciarContactos());
+    const inv = await s.dispatch(crearInvitacion());
+    await esperar();
+    expect([...disco.datos.values()].some((v) => v.includes(inv.token))).toBe(false);
+    s.dispatch(usuarioCambio({ id: "u2", email: "otra@mail.com" }));
+    expect(s.getState().contactos.invitacion).toBeNull();
+  });
+
+  it("ver una invitación arma lo que dice la pantalla de aceptación", async () => {
+    const repo = repositorioContactosMemoria({
+      invitaciones: { tok: { estado: "valida", quienInvita: "Tomás", venceEn: "2026-11-16T00:00:00Z" } },
+    });
+    const { s } = conCuenta(repo);
+    const v = await s.dispatch(verInvitacion("tok"));
+    expect(v).toMatchObject({ estado: "valida", quienInvita: "Tomás" });
+    expect(v.sePuedeDeducir).toMatch(/repite consultas/);
+    expect((await s.dispatch(verInvitacion("otro"))).estado).toBe("inexistente");
+  });
+});
+

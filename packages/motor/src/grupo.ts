@@ -101,39 +101,51 @@ function descartePrincipal(descartadas: Descarte[]): Descarte | null {
   return descartadas.find((d) => d.mediosDePagoIds.length > 0 && d.causa !== "categoria") ?? null;
 }
 
+/**
+ * Qué da la opción, sin el tope ni la variante "sin saldo": no dice nada de lo que le queda
+ * (FR-021). Con promos acumulables, todas, en el orden de `recomendar`: el reintegro las suma.
+ */
+function queDaLaOpcion(opcion: OpcionDePago, porId: Map<string, Promocion>): string {
+  return opcion.promociones
+    .flatMap((p) => {
+      const promo = porId.get(p.promocionId);
+      return promo ? [textoPromo(promo, false, false)] : [];
+    })
+    .join(" + ");
+}
+
 interface Evaluacion {
   opcion: OpcionDeGrupo | null;
-  propia: { opcion: OpcionDePago | null; descarte: Descarte | null } | null;
+  deQuienPide: { opcion: OpcionDePago | null; descarte: Descarte | null } | null;
 }
 
 function evaluar(compra: CompraDeGrupo, i: ConCuenta, promociones: Promocion[], porId: Map<string, Promocion>, ahora: Date): Evaluacion {
   // Sin medios no se llama a `recomendar` (lanzaría PerfilSinMediosError): queda sin reintegro (FR-009).
-  if (i.mediosDePago.length === 0) return { opcion: null, propia: i.pide ? { opcion: null, descarte: null } : null };
+  if (i.mediosDePago.length === 0) return { opcion: null, deQuienPide: i.pide ? { opcion: null, descarte: null } : null };
 
   const perfil = { nombreParaMostrar: null, mediosDePago: i.mediosDePago, comerciosHabituales: [] };
   const r = recomendar(compra, perfil, promociones, i.consumos, ahora);
-  const propia = i.pide ? { opcion: r.mejor, descarte: r.mejor ? null : descartePrincipal(r.descartadas) } : null;
+  const deQuienPide = i.pide ? { opcion: r.mejor, descarte: r.mejor ? null : descartePrincipal(r.descartadas) } : null;
 
   const mejor = r.mejor;
   const principal = mejor?.promociones[0];
   const promo = principal ? porId.get(principal.promocionId) : undefined;
-  if (!mejor || !principal || !promo) return { opcion: null, propia };
+  if (!mejor || !principal || !promo) return { opcion: null, deQuienPide };
 
   const centavos = aCentavos(mejor.ahorroEstimado);
   const reintegroMostrado = i.pide ? alPeso(centavos) : alEscalon(centavos);
   // Menos de $1 a la vista es "sin reintegro": nunca se nombra el medio (FR-004, FR-009).
-  if (reintegroMostrado < 1) return { opcion: null, propia };
+  if (reintegroMostrado < 1) return { opcion: null, deQuienPide };
 
   return {
     opcion: {
       medioDePagoId: mejor.medioDePagoId,
       promocionId: promo.id,
-      // Sin el tope ni la variante "sin saldo": no dice nada de lo que le queda (FR-021).
-      queDa: textoPromo(promo, false, false),
+      queDa: queDaLaOpcion(mejor, porId),
       reintegroMostrado,
       base: baseDe(mejor, promo),
     },
-    propia,
+    deQuienPide,
   };
 }
 
@@ -174,7 +186,7 @@ export function recomendarGrupo(
     const parte = partes[k] ?? 0;
     if (i.tipo === "sin_cuenta") return { tipo: "sin_cuenta", posicion: i.posicion, parte };
     const e = evaluaciones.get(i.id);
-    return { tipo: "cuenta", id: i.id, pide: i.pide, opcion: e?.opcion ?? null, parte, propia: e?.propia ?? null };
+    return { tipo: "cuenta", id: i.id, pide: i.pide, opcion: e?.opcion ?? null, parte, deQuienPide: e?.deQuienPide ?? null };
   });
 
   return { quienPaga, reintegro, total, integrantes: resultado };

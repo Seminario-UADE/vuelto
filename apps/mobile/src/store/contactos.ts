@@ -5,8 +5,9 @@
  * cerrar sesión la borra (FR-019, G-03).
  */
 import { createSlice, type ListenerMiddlewareInstance, type PayloadAction } from "@reduxjs/toolkit";
-import type { Contacto } from "../data/contracts";
-import type { ContactoRemoto, ResultadoAceptar } from "../grupo/repositorio";
+import type { Contacto, VistaInvitacion } from "../data/contracts";
+import { vistaDeInvitacion } from "../grupo/invitacion";
+import type { ContactoRemoto, InvitacionCreada, ResultadoAceptar } from "../grupo/repositorio";
 import { iniciales } from "../lib/format";
 import { sesionCerrada } from "./acciones";
 import type { AppThunk, RootState } from "./index";
@@ -22,9 +23,14 @@ export type EstadoContactos = {
   estado: "inicial" | "cargando" | "listo" | "error";
   /** Ya se leyó lo guardado. Antes, no se escribe nada (no se pisa). */
   hidratada: boolean;
+  /**
+   * La última invitación creada, para volver a mostrarla al abrir Invitar sin invalidar el link
+   * que ya se mandó (FR-011: generar otra borra la anterior). Solo en memoria: nunca se guarda.
+   */
+  invitacion: InvitacionCreada | null;
 };
 
-const inicial: EstadoContactos = { cuentaId: null, lista: [], estado: "inicial", hidratada: false };
+const inicial: EstadoContactos = { cuentaId: null, lista: [], estado: "inicial", hidratada: false, invitacion: null };
 
 /** Del contacto que da el servidor al de la app. Sin nombre para mostrar se dice «Contacto». */
 export function aContacto(c: ContactoRemoto): Contacto {
@@ -46,6 +52,9 @@ export const contactos = createSlice({
     },
     contactoAgregado(s, a: PayloadAction<Contacto>) {
       s.lista = [...s.lista.filter((c) => c.id !== a.payload.id), a.payload];
+    },
+    invitacionCreada(s, a: PayloadAction<InvitacionCreada | null>) {
+      s.invitacion = a.payload;
     },
     contactoQuitado(s, a: PayloadAction<string>) {
       s.lista = s.lista.filter((c) => c.id !== a.payload);
@@ -70,8 +79,14 @@ export const contactos = createSlice({
   },
 });
 
-export const { cargaDeContactos, contactosCargados, contactoAgregado, contactoQuitado, rehidratadoContactos } =
-  contactos.actions;
+export const {
+  cargaDeContactos,
+  contactosCargados,
+  contactoAgregado,
+  contactoQuitado,
+  invitacionCreada,
+  rehidratadoContactos,
+} = contactos.actions;
 
 // ─── Thunks ─────────────────────────────────────────────────────────────────────
 
@@ -98,16 +113,43 @@ export function cargarContactos(): AppThunk<Promise<void>> {
 /** Quita el vínculo en el servidor y recién entonces de la lista local (US2-15). Si falla, lanza. */
 export function quitarContacto(id: string): AppThunk<Promise<void>> {
   return async (dispatch, _getState, { contactosRemoto }) => {
-    if (!contactosRemoto) throw new Error("Necesitás conexión con tu cuenta para quitar un contacto.");
+    if (!contactosRemoto) throw new Error(SIN_CUENTA);
     await contactosRemoto.quitar(id);
     dispatch(contactoQuitado(id));
+  };
+}
+
+/** Sin Supabase no hay cuenta ni contactos (spec 006 FR-028): se avisa en vez de simular. */
+const SIN_CUENTA = "Necesitás conexión con tu cuenta para esto.";
+
+/**
+ * La invitación para mostrar en Invitar. Si la última sigue vigente y no se pidió otra, es la
+ * misma: abrir Invitar no invalida el link que ya se mandó (US2-2). «Generar otro link» pasa
+ * `nueva` y la base borra la anterior. Lanza `SinNombreError` o el error de red.
+ */
+export function crearInvitacion(nueva = false): AppThunk<Promise<InvitacionCreada>> {
+  return async (dispatch, getState, { contactosRemoto, reloj }) => {
+    const actual = getState().contactos.invitacion;
+    if (!nueva && actual && Date.parse(actual.venceEn) > reloj().getTime()) return actual;
+    if (!contactosRemoto) throw new Error(SIN_CUENTA);
+    const inv = await contactosRemoto.crearInvitacion();
+    dispatch(invitacionCreada(inv));
+    return inv;
+  };
+}
+
+/** Lo que dice la pantalla de aceptación de una invitación. Si falla la red, lanza. */
+export function verInvitacion(token: string): AppThunk<Promise<VistaInvitacion>> {
+  return async (_dispatch, _getState, { contactosRemoto }) => {
+    if (!contactosRemoto) throw new Error(SIN_CUENTA);
+    return vistaDeInvitacion(await contactosRemoto.verInvitacion(token));
   };
 }
 
 /** Acepta la invitación; si se creó el vínculo, suma el contacto a la lista. Si falla la red, lanza. */
 export function aceptarInvitacion(token: string): AppThunk<Promise<ResultadoAceptar>> {
   return async (dispatch, _getState, { contactosRemoto, reloj }) => {
-    if (!contactosRemoto) throw new Error("Necesitás conexión con tu cuenta para aceptar la invitación.");
+    if (!contactosRemoto) throw new Error(SIN_CUENTA);
     const r = await contactosRemoto.aceptarInvitacion(token);
     if (r.estado === "aceptada") {
       dispatch(contactoAgregado(aContacto({ ...r.contacto, vinculadoDesde: reloj().toISOString() })));

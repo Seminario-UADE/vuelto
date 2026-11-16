@@ -11,6 +11,7 @@ import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { Text } from "@/components/text";
 import type { SinCuentaEnGrupo } from "@/data/contracts";
+import { cantidadDeIntegrantes } from "@/grupo/pedido";
 import { MAXIMO_INTEGRANTES } from "@/grupo/vista";
 import { iniciales, parseMonto } from "@/lib/format";
 import { grupoArmado } from "@/store/grupo";
@@ -56,7 +57,7 @@ export default function ArmarGrupo() {
   const conRubro = { ...comercio, categoriaId: comercio.categoriaId };
 
   const elegidos = contactos.filter((c) => !excluidos.includes(c.id));
-  const cantidad = 1 + elegidos.length + sinCuenta.length;
+  const cantidad = cantidadDeIntegrantes({ contactos: elegidos.map((c) => c.id), sinCuenta });
   const lleno = cantidad >= MAXIMO_INTEGRANTES;
   const listo = monto !== null && cantidad >= 2 && cantidad <= MAXIMO_INTEGRANTES;
 

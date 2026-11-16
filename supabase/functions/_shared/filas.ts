@@ -188,19 +188,20 @@ export function filaAMedio(f: FilaMedio): MedioDePago | null {
   return { id: f.id, bancoId: f.banco_id, tipo: f.tipo as TipoTarjeta, red: f.red as Red };
 }
 
-/** `id` lo arma quien llama: para un contacto es opaco, nunca el de la base (research R6). */
-export function filaAConsumo(f: FilaConsumo, id: string): ConsumoDeTope | null {
+/** Sin id: el de un contacto lo arma el servicio, opaco, nunca el de la base (research R6). */
+export function filaAConsumo(f: FilaConsumo): Omit<ConsumoDeTope, "id"> | null {
   const monto = numero(f.monto);
   const descuento = numeroONull(f.descuento_obtenido);
   if (monto === null || descuento === undefined || !FECHA.test(f.fecha)) return null;
-  return { id, promocionId: f.promocion_id, fecha: f.fecha, monto, descuentoObtenido: descuento };
+  return { promocionId: f.promocion_id, fecha: f.fecha, monto, descuentoObtenido: descuento };
 }
 
 export function filaACompra(f: FilaCompra): Compra | null {
-  const consumo = filaAConsumo(f, f.id);
+  const consumo = filaAConsumo(f);
   const reintegro = numeroONull(f.reintegro_esperado);
   if (consumo === null || reintegro === undefined || !ORIGENES.includes(f.origen)) return null;
   return {
+    id: f.id,
     ...consumo,
     comercio: f.comercio,
     categoriaId: f.categoria_id,

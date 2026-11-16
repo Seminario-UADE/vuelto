@@ -95,7 +95,7 @@ describe("vistaDeGrupo (spec 016 US3)", () => {
     expect(v.titulo).toBe("Te conviene pagar vos");
     expect(v.medio).toBe("tu Provincia Visa débito");
     expect(v.base).toBe("según 3 compras de noviembre");
-    expect(v.integrantes[0]?.detalle).toBe("Paga con tu Provincia Visa débito");
+    expect(v.integrantes[0]?.detalle).toBe("Paga con tu Provincia Visa débito · según 3 compras de noviembre");
     expect(v.integrantes[1]?.detalle).toBe("≈$5.000 si paga Lucía · según las compras que registró Lucía");
   });
 

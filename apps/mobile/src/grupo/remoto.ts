@@ -5,10 +5,5 @@
 import { supabase } from "../lib/supabase";
 import { repositorioContactosSupabase, type RepositorioContactos } from "./repositorio";
 
+/** Se inyecta en el store (`crearStore`): las pantallas lo usan solo a través de los thunks (ADR-009). */
 export const contactosRemoto: RepositorioContactos | null = supabase ? repositorioContactosSupabase(supabase) : null;
-
-/** Para las pantallas que llaman sin pasar por el store (crear y ver una invitación). */
-export function exigirContactosRemoto(): RepositorioContactos {
-  if (!contactosRemoto) throw new Error("Necesitás conexión con tu cuenta para esto.");
-  return contactosRemoto;
-}

@@ -335,8 +335,8 @@ export type ResultadoDeIntegrante =
       /** `null` = sin reintegro: nunca se nombra un medio (FR-009). */
       opcion: OpcionDeGrupo | null;
       parte: number;
-      /** Solo de quien pide (son sus datos): su opción completa y el descarte principal. */
-      propia: { opcion: OpcionDePago | null; descarte: Descarte | null } | null;
+      /** Solo de quien pide (son sus datos): su opción completa y el descarte principal; `null` para los demás. */
+      deQuienPide: { opcion: OpcionDePago | null; descarte: Descarte | null } | null;
     }
   | { tipo: "sin_cuenta"; posicion: number; parte: number };
 

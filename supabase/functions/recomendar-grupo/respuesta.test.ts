@@ -106,4 +106,11 @@ describe("armarRespuesta: lo que ve el teléfono de un contacto (FR-021, SC-008)
     expect(r.vos.opcion).toBeNull();
     expect(r.vos.sinOpcion).toEqual(expect.any(String));
   });
+
+  it("si quien pide tiene una opción que no llega a $1, lo dice en vez de «no tienen promo»", () => {
+    // 20% de $2 = $0,40: se muestra $0.
+    const r = caso([medio({ id: "mi-galicia", bancoId: GALICIA })], [], 2);
+    expect(r.vos.opcion).toBeNull();
+    expect(r.vos.sinOpcion).toBe("El reintegro de tus medios en esta compra no llega a $1");
+  });
 });

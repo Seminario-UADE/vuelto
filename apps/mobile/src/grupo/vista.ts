@@ -6,16 +6,22 @@
  * lleva «≈» (constitución §V). Los nombres de los sin cuenta salen del pedido, en el teléfono.
  */
 import { nombreDelMes } from "@vuelto/motor";
-
-/** Las pantallas no importan el motor (ADR-010): el tope del grupo llega por acá. */
-export { MAXIMO_INTEGRANTES } from "@vuelto/motor";
 import { textoDia } from "../data/calculo";
 import type { FilaIntegrante, PedidoGrupo, RecomendacionGrupo } from "../data/contracts";
 import { aprox, fechaCorta, iniciales } from "../lib/format";
 import { periodoDeVista, textoBase } from "../lib/textos";
 import type { MedioDePago } from "../perfil/modelo";
 import { medioVista } from "../perfil/vista";
-import type { BaseRemota, MedioRemoto, OpcionRemota, RespuestaGrupo } from "./repositorio";
+import type {
+  BaseDeContactoRemota,
+  BaseDeVosRemota,
+  OpcionDeContactoRemota,
+  OpcionDeVosRemota,
+  RespuestaGrupo,
+} from "./repositorio";
+
+/** Las pantallas no importan el motor (ADR-010): el tope del grupo llega por acá. */
+export { MAXIMO_INTEGRANTES } from "@vuelto/motor";
 
 /** "hoy sábado" o, si el servidor evaluó otro día (pasada la medianoche), "domingo 16/11" (US3-8). */
 function cuando(fecha: string, hoy: string): string {
@@ -23,128 +29,121 @@ function cuando(fecha: string, hoy: string): string {
   return `${textoDia(fecha).replace(/^hoy /, "")} ${fechaCorta(fecha)}`;
 }
 
-/** El nombre visible de un medio que llegó del servidor (banco, red y tipo; sin id para un contacto). */
-function nombreDeMedio(m: MedioRemoto, propios: readonly MedioDePago[]): string {
-  const propio = m.id ? propios.find((p) => p.id === m.id) : undefined;
-  if (propio) return medioVista(propio).nombre;
-  return medioVista({ id: m.id ?? "", bancoId: "", nombreBanco: m.bancoNombre, tipo: m.tipo, red: m.red as MedioDePago["red"] }).nombre;
+/** Las iniciales de un avatar; "?" si el nombre no tiene letras. */
+function inicialesDe(nombre: string): string {
+  return iniciales(nombre) || "?";
 }
 
-/** La base de un contacto en palabras, sin números (ADR-008 §3, D10). */
-function baseDeContacto(base: BaseRemota, nombre: string): string {
-  switch (base.tipo) {
-    case "con_compras":
-      return `según las compras que registró ${nombre}`;
-    case "sin_compras":
-      return `${nombre} no tiene compras registradas con esta promo: sin base`;
-    case "sin_tope_informado":
-      return "la promo no informa tope";
-    case "tope_por_compra":
-      return "tope por compra";
+/** El nombre visible de un medio propio: el del perfil, por id (lo tiene el teléfono). */
+function nombreDeMedioPropio(m: OpcionDeVosRemota["medio"], propios: readonly MedioDePago[]): string {
+  const propio = propios.find((p) => p.id === m.id);
+  return medioVista(propio ?? { id: m.id, bancoId: "", nombreBanco: null, tipo: m.tipo, red: m.red as MedioDePago["red"] }).nombre;
+}
+
+/** El nombre visible del medio de un contacto que paga (banco, red y tipo; sin id). */
+function nombreDeMedioDeContacto(m: NonNullable<OpcionDeContactoRemota["medio"]>): string {
+  return medioVista({ id: "", bancoId: "", nombreBanco: m.bancoNombre, tipo: m.tipo, red: m.red as MedioDePago["red"] }).nombre;
+}
+
+/**
+ * La base en palabras (constitución §V). De un contacto, sin números (ADR-008 §3, D10); de quien
+ * pide, como en la compra individual, con la cantidad y el período (son sus datos).
+ */
+function base(b: BaseDeVosRemota | BaseDeContactoRemota, quien: { nombre: string } | { fecha: string }): string {
+  if (b.tipo === "sin_tope_informado") return "la promo no informa tope";
+  if (b.tipo === "tope_por_compra") return "tope por compra";
+  if ("nombre" in quien) {
+    return b.tipo === "con_compras"
+      ? `según las compras que registró ${quien.nombre}`
+      : `${quien.nombre} no tiene compras registradas con esta promo: sin base`;
   }
+  const propia = b as Extract<BaseDeVosRemota, { periodo: unknown }>;
+  const periodo = periodoDeVista(propia.periodo);
+  return propia.tipo === "con_compras"
+    ? textoBase(propia.comprasRegistradas, periodo, nombreDelMes(quien.fecha)).texto
+    : `sin base ${periodo === "semana" ? "esta semana" : "este mes"}`;
 }
 
-/** La base de quien pide: como en la compra individual, con la cantidad (son sus datos). */
-function baseDeVos(base: BaseRemota, fecha: string): string {
-  if (base.tipo === "sin_tope_informado") return "la promo no informa tope";
-  if (base.tipo === "tope_por_compra") return "tope por compra";
-  const periodo = periodoDeVista(base.periodo ?? "mensual");
-  const cantidad = base.tipo === "con_compras" ? (base.comprasRegistradas ?? 0) : 0;
-  return cantidad > 0 ? textoBase(cantidad, periodo, nombreDelMes(fecha)).texto : `sin base ${periodo === "semana" ? "esta semana" : "este mes"}`;
-}
+type Pagador = { quienPaga: NonNullable<RecomendacionGrupo["quienPaga"]>; medio: string; razon: string; base: string };
 
 export function vistaDeGrupo(
   r: RespuestaGrupo,
   pedido: PedidoGrupo,
   opciones: { hoy: string; mediosPropios: readonly MedioDePago[]; nombresDeContactos: Record<string, string> },
 ): RecomendacionGrupo {
-  const nombreDe = (id: string, delServidor: string | null) => delServidor ?? opciones.nombresDeContactos[id] ?? "Contacto";
   const filas: FilaIntegrante[] = [];
+  let pagador: Pagador | null = null;
 
-  const pagaVos = r.quienPaga?.tipo === "vos";
+  // Vos.
   const vos = r.vos.opcion;
-  filas.push({
-    clave: "vos",
-    nombre: "Vos",
-    iniciales: null,
-    esVos: true,
-    detalle:
-      vos && pagaVos
-        ? `Paga con tu ${nombreDeMedio(vos.medio as MedioRemoto, opciones.mediosPropios)}`
-        : vos
-          ? `Tu ${nombreDeMedio(vos.medio as MedioRemoto, opciones.mediosPropios)}: ${aprox(vos.reintegro)} de reintegro, ${baseDeVos(vos.base, r.fecha)}`
-          : (r.vos.sinOpcion ?? "Tus medios no tienen promo en esta compra"),
-    pone: r.vos.parte,
-  });
-
-  for (const c of r.contactos) {
-    const nombre = nombreDe(c.id, c.nombre);
-    const paga = r.quienPaga?.tipo === "contacto" && r.quienPaga.id === c.id;
-    const o = c.opcion;
+  if (vos) {
+    const medio = nombreDeMedioPropio(vos.medio, opciones.mediosPropios);
+    const baseVos = base(vos.base, { fecha: r.fecha });
+    const paga = r.quienPaga?.tipo === "vos";
+    if (paga) pagador = { quienPaga: { clave: "vos", nombre: "Vos", esVos: true, iniciales: null }, medio: `tu ${medio}`, razon: vos.queDa, base: baseVos };
     filas.push({
-      clave: c.id,
-      nombre,
-      iniciales: iniciales(nombre) || "?",
-      esVos: false,
-      detalle:
-        o && paga && o.medio
-          ? `Paga con su ${nombreDeMedio(o.medio, [])}`
-          : o
-            ? `${aprox(o.reintegro)} si paga ${nombre} · ${baseDeContacto(o.base, nombre)}`
-            : "Sin reintegro en esta compra",
-      pone: c.parte,
+      clave: "vos",
+      nombre: "Vos",
+      iniciales: null,
+      esVos: true,
+      // US3-4: tu medio con su estado y su base, como en la compra individual.
+      detalle: paga ? `Paga con tu ${medio} · ${baseVos}` : `Tu ${medio}: ${aprox(vos.reintegro)} de reintegro, ${baseVos}`,
+      pone: r.vos.parte,
+    });
+  } else {
+    filas.push({
+      clave: "vos",
+      nombre: "Vos",
+      iniciales: null,
+      esVos: true,
+      detalle: r.vos.sinOpcion ?? "Tus medios no tienen promo en esta compra",
+      pone: r.vos.parte,
     });
   }
 
+  // Contactos, en el orden del servidor (el del desempate).
+  for (const c of r.contactos) {
+    const nombre = c.nombre ?? opciones.nombresDeContactos[c.id] ?? "Contacto";
+    const o = c.opcion;
+    const paga = r.quienPaga?.tipo === "contacto" && r.quienPaga.id === c.id;
+    let detalle = "Sin reintegro en esta compra";
+    if (o) {
+      const baseContacto = base(o.base, { nombre });
+      if (paga && o.medio) {
+        const medio = nombreDeMedioDeContacto(o.medio);
+        pagador = { quienPaga: { clave: c.id, nombre, esVos: false, iniciales: inicialesDe(nombre) }, medio: `su ${medio}`, razon: o.queDa ?? "", base: baseContacto };
+        detalle = `Paga con su ${medio}`;
+      } else {
+        detalle = `${aprox(o.reintegro)} si paga ${nombre} · ${baseContacto}`;
+      }
+    }
+    filas.push({ clave: c.id, nombre, iniciales: inicialesDe(nombre), esVos: false, detalle, pone: c.parte });
+  }
+
+  // Los sin cuenta, con su nombre del teléfono.
   for (const s of [...r.sinCuenta].sort((a, b) => a.posicion - b.posicion)) {
     const nombre = pedido.sinCuenta.find((x) => x.posicion === s.posicion)?.nombre ?? "Sin cuenta";
     filas.push({
       clave: `sin-${s.posicion}`,
       nombre,
-      iniciales: iniciales(nombre) || "?",
+      iniciales: inicialesDe(nombre),
       esVos: false,
       detalle: "Sin cuenta: no conocemos su tope",
       pone: s.parte,
     });
   }
 
-  // Quién paga, con qué medio, qué da la promo y la base.
-  let quienPaga: RecomendacionGrupo["quienPaga"] = null;
-  let medio: string | null = null;
-  let base: string | null = null;
-  let opcionQuePaga: OpcionRemota | null = null;
-  if (r.quienPaga?.tipo === "vos" && vos) {
-    quienPaga = { clave: "vos", nombre: "Vos", esVos: true, iniciales: null };
-    medio = `tu ${nombreDeMedio(vos.medio as MedioRemoto, opciones.mediosPropios)}`;
-    opcionQuePaga = vos;
-    base = baseDeVos(vos.base, r.fecha);
-  } else if (r.quienPaga?.tipo === "contacto") {
-    const id = r.quienPaga.id;
-    const c = r.contactos.find((x) => x.id === id);
-    if (c?.opcion) {
-      const nombre = nombreDe(c.id, c.nombre);
-      quienPaga = { clave: c.id, nombre, esVos: false, iniciales: iniciales(nombre) || "?" };
-      medio = c.opcion.medio ? `su ${nombreDeMedio(c.opcion.medio, [])}` : null;
-      opcionQuePaga = c.opcion;
-      base = baseDeContacto(c.opcion.base, nombre);
-    }
-  }
-  const razon = opcionQuePaga?.queDa ?? null;
-
+  const p: Pagador | null = pagador;
   return {
-    titulo: quienPaga
-      ? quienPaga.esVos
-        ? "Te conviene pagar vos"
-        : `Te conviene que pague ${quienPaga.nombre}`
-      : "Nadie del grupo tiene reintegro en esta compra",
+    titulo: p ? (p.quienPaga.esVos ? "Te conviene pagar vos" : `Te conviene que pague ${p.quienPaga.nombre}`) : "Nadie del grupo tiene reintegro en esta compra",
     comercio: pedido.comercio,
     cuando: cuando(r.fecha, opciones.hoy),
     monto: pedido.monto,
-    quienPaga,
-    medio,
-    razon,
-    reintegro: quienPaga ? r.reintegro : null,
-    base,
+    quienPaga: p?.quienPaga ?? null,
+    medio: p?.medio ?? null,
+    razon: p?.razon || null,
+    reintegro: p ? r.reintegro : null,
+    base: p?.base ?? null,
     integrantes: filas,
   };
 }

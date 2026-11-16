@@ -135,12 +135,7 @@ export class ContactosSupabase implements RepositorioContactos {
         return medio ? [{ ...medio, bancoNombre: m.banco_nombre ?? null }] : [];
       }),
       // Sin id: el servicio les pone uno opaco (research R6).
-      consumos: f.consumos.flatMap((c) => {
-        const consumo = filaAConsumo(c, "");
-        if (!consumo) return [];
-        const { promocionId, fecha, monto, descuentoObtenido } = consumo;
-        return [{ promocionId, fecha, monto, descuentoObtenido }];
-      }),
+      consumos: soloValidos(f.consumos, filaAConsumo),
     }));
   }
 }

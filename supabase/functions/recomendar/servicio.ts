@@ -3,14 +3,9 @@
  * usuario y llama al motor. No duplica ninguna regla: elegibilidad, ahorro,
  * topes y ranking son de `recomendar()`.
  */
-import {
-  fechaArgentina,
-  inicioDelPeriodo,
-  recomendar,
-  type CompraPropuesta,
-  type Recomendacion,
-} from "@vuelto/motor";
+import { fechaArgentina, recomendar, type CompraPropuesta, type Recomendacion } from "@vuelto/motor";
 import { CategoriaInexistenteError } from "../_shared/errores.ts";
+import { inicioDeConsumos, promosReferenciadasQueFaltan } from "../_shared/periodo.ts";
 import type {
   RepositorioCategorias,
   RepositorioCompras,
@@ -34,12 +29,7 @@ export class ServicioRecomendacion {
     // Hoy sale del mismo `ahora` que recibe el motor, en hora de Argentina;
     // nunca de `current_date` de la base, que está en UTC (FR-020).
     const hoy = fechaArgentina(ahora);
-    // Compras desde el día 1 del mes o el lunes de la semana, lo que sea
-    // anterior: si no, el tope semanal falla en las semanas que cruzan de mes
-    // (precondición del motor, issue #37).
-    const inicioMes = inicioDelPeriodo("mensual", hoy);
-    const inicioSemana = inicioDelPeriodo("semanal", hoy);
-    const desde = inicioSemana < inicioMes ? inicioSemana : inicioMes;
+    const desde = inicioDeConsumos(hoy);
 
     const [mediosDePago, delRubro, comprasDelPeriodo] = await Promise.all([
       this.medios.deUsuario(usuarioId),
@@ -47,17 +37,7 @@ export class ServicioRecomendacion {
       this.compras.delUsuarioEntre(usuarioId, desde, hoy),
     ]);
 
-    // Las promos de las compras registradas que no vinieron con el rubro de
-    // hoy (vencidas o de otro rubro): el motor las necesita para descontar
-    // el tope compartido de su grupo, y las descarta (precondición, #37).
-    const yaEstan = new Set(delRubro.map((p) => p.id));
-    const faltantes = [
-      ...new Set(
-        comprasDelPeriodo
-          .map((c) => c.promocionId)
-          .filter((id): id is string => id !== null && !yaEstan.has(id)),
-      ),
-    ];
+    const faltantes = promosReferenciadasQueFaltan(comprasDelPeriodo, delRubro);
     const referenciadas = faltantes.length > 0 ? await this.promociones.porIds(faltantes) : [];
 
     // El motor no usa el nombre ni los comercios habituales del perfil.

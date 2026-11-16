@@ -9,12 +9,11 @@ import { Screen } from "@/components/screen";
 import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import type { EstadoInvitacion } from "@/data/contracts";
-import { textoVencimiento, vistaDeInvitacion } from "@/grupo/invitacion";
-import { exigirContactosRemoto } from "@/grupo/remoto";
+import { textoVencimiento } from "@/grupo/invitacion";
 import { useAsync } from "@/hooks/use-async";
 import { hapticoExito } from "@/lib/haptics";
 import { iniciales } from "@/lib/format";
-import { aceptarInvitacion } from "@/store/contactos";
+import { aceptarInvitacion, verInvitacion } from "@/store/contactos";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { invitacionGuardada } from "@/store/perfil";
 import { avisoMostrado } from "@/store/sesion";
@@ -42,7 +41,7 @@ export default function AceptarInvitacion() {
   const onboardingCompleto = useAppSelector((s) => s.perfil.onboardingCompleto);
   const usuario = useAppSelector((s) => s.sesion.usuario);
   const ahora = useAppSelector((s) => s.sesion.ahora);
-  const v = useAsync(async () => vistaDeInvitacion(await exigirContactosRemoto().verInvitacion(token)), token);
+  const v = useAsync(() => dispatch(verInvitacion(token)), token);
   const [aceptando, setAceptando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [motivo, setMotivo] = useState<Exclude<EstadoInvitacion, "valida"> | null>(null);
@@ -98,6 +97,9 @@ export default function AceptarInvitacion() {
               <Button label={error ? "Reintentar" : "Aceptar invitación"} variant="secondary" onPress={aceptar} loading={aceptando} />
               <Button label="Ahora no" variant="secondary" onPress={ahoraNo} disabled={aceptando} />
             </>
+          ) : estado === "sin-nombre" ? (
+            // US2-3: sin nombre para mostrar, a Perfil a elegirlo (el otro lo va a ver).
+            <Button label="Elegir mi nombre" variant="secondary" onPress={() => router.replace("/perfil")} />
           ) : (
             <Button label="Volver" variant="secondary" onPress={ahoraNo} />
           )

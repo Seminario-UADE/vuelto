@@ -31,28 +31,45 @@ export type PedidoRecomendarGrupo = {
   sinCuenta: number;
 };
 
-export type BaseRemota =
-  | { tipo: "con_compras"; comprasRegistradas?: number; periodo?: "mensual" | "semanal" }
-  | { tipo: "sin_compras"; periodo?: "mensual" | "semanal" }
+type Periodo = "mensual" | "semanal";
+type TipoTarjeta = "debito" | "credito";
+
+/** La base de quien pide: con la cantidad y el período, porque son sus datos (FR-022). */
+export type BaseDeVosRemota =
+  | { tipo: "con_compras"; comprasRegistradas: number; periodo: Periodo }
+  | { tipo: "sin_compras"; periodo: Periodo }
   | { tipo: "sin_tope_informado" }
   | { tipo: "tope_por_compra" };
 
-export type MedioRemoto = { id?: string; bancoNombre: string | null; tipo: "debito" | "credito"; red: string };
+/** La base de un contacto: solo el tipo, nunca la cantidad ni el período (FR-021, FR-023 de la 006). */
+export type BaseDeContactoRemota = { tipo: BaseDeVosRemota["tipo"] };
 
-export type OpcionRemota = {
-  medio: MedioRemoto | null;
-  queDa: string | null;
+export type OpcionDeVosRemota = {
+  /** Por id: la app nombra su propio medio con lo que tiene en el perfil. */
+  medio: { id: string; bancoNombre: null; tipo: TipoTarjeta; red: string };
+  queDa: string;
   reintegro: number;
-  base: BaseRemota;
+  base: BaseDeVosRemota;
 };
 
+export type OpcionDeContactoRemota = {
+  /** Solo si paga, y sin id (ADR-008 §3). */
+  medio: { bancoNombre: string | null; tipo: TipoTarjeta; red: string } | null;
+  /** Solo si paga. */
+  queDa: string | null;
+  /** En escalones de $100 (D9). */
+  reintegro: number;
+  base: BaseDeContactoRemota;
+};
+
+/** La respuesta de `recomendar-grupo` (`specs/016-gasto-grupo/contracts/recomendar-grupo.md`). */
 export type RespuestaGrupo = {
   fecha: string;
   quienPaga: { tipo: "vos" } | { tipo: "contacto"; id: string } | null;
   reintegro: number | null;
   total: number;
-  vos: { opcion: OpcionRemota | null; sinOpcion: string | null; parte: number };
-  contactos: { id: string; nombre: string | null; opcion: OpcionRemota | null; parte: number }[];
+  vos: { opcion: OpcionDeVosRemota | null; sinOpcion: string | null; parte: number };
+  contactos: { id: string; nombre: string | null; opcion: OpcionDeContactoRemota | null; parte: number }[];
   sinCuenta: { posicion: number; parte: number }[];
 };
 
@@ -61,12 +78,18 @@ export type FallaGrupo = "invalido" | "contacto-no-vinculado" | "sin-sesion" | "
 
 export class FallaGrupoError extends Error {
   readonly falla: FallaGrupo;
-  constructor(falla: FallaGrupo) {
-    super(falla);
+  /** Con `invalido`: qué dato del pedido rechazó el servidor (FR-027, «con el motivo»). */
+  readonly campo: string | null;
+  constructor(falla: FallaGrupo, campo: string | null = null) {
+    super(`No se pudo calcular el grupo: ${falla}`);
     this.name = "FallaGrupoError";
     this.falla = falla;
+    this.campo = campo;
   }
 }
+
+/** El resultado de pedir la recomendación: nunca lanza, para que la pantalla no traduzca textos de error. */
+export type ResultadoGrupo = { ok: true; respuesta: RespuestaGrupo } | { ok: false; falla: FallaGrupo; campo: string | null };
 
 /** La cuenta no tiene nombre para mostrar: no puede invitar (US2-3). */
 export class SinNombreError extends Error {
@@ -97,6 +120,16 @@ const ESTADOS_VISTA: readonly string[] = ["valida", "vencida", "usada", "propia"
 
 function error(e: { message: string } | null, contexto: string): Error {
   return new Error(e?.message ? `${contexto}: ${e.message}` : contexto);
+}
+
+/** El `campo` del cuerpo `{ error: "invalido", campo }`; `null` si no se puede leer. */
+async function campoDelError(response: Response | undefined): Promise<string | null> {
+  try {
+    const cuerpo = (await response?.clone().json()) as { campo?: unknown } | undefined;
+    return typeof cuerpo?.campo === "string" ? cuerpo.campo : null;
+  } catch {
+    return null;
+  }
 }
 
 export function repositorioContactosSupabase(cliente: SupabaseClient): RepositorioContactos {
@@ -148,7 +181,7 @@ export function repositorioContactosSupabase(cliente: SupabaseClient): Repositor
       });
       if (!e && data) return data;
       const status = response?.status ?? 0;
-      if (status === 400) throw new FallaGrupoError("invalido");
+      if (status === 400) throw new FallaGrupoError("invalido", await campoDelError(response));
       if (status === 401) throw new FallaGrupoError("sin-sesion");
       if (status === 409) throw new FallaGrupoError("contacto-no-vinculado");
       // 500, sin red o el corte de 15 s.

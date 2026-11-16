@@ -34,6 +34,12 @@ export interface RespuestaGrupo {
   sinCuenta: { posicion: number; parte: number }[];
 }
 
+/** Por qué quien pide no tiene opción: el descarte del motor o, si tenía una, que no llega a $1. */
+function motivoSinOpcion(d: { opcion: unknown; descarte: { motivo: string } | null } | null): string | null {
+  if (d?.descarte) return d.descarte.motivo;
+  return d?.opcion ? "El reintegro de tus medios en esta compra no llega a $1" : null;
+}
+
 export function armarRespuesta(
   fecha: FechaISO,
   r: RecomendacionDeGrupo,
@@ -68,7 +74,7 @@ export function armarRespuesta(
                 base: i.opcion.base,
               }
             : null,
-        sinOpcion: i.opcion ? null : (i.propia?.descarte?.motivo ?? null),
+        sinOpcion: i.opcion ? null : motivoSinOpcion(i.deQuienPide),
         parte: i.parte,
       };
       continue;

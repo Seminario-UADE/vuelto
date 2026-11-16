@@ -196,7 +196,7 @@ describe("recomendarGrupo: quién paga (US1)", () => {
   it("quien pide sin medios también queda sin reintegro, sin error", () => {
     const r = grupo(delGrupo(10000), [yo([]), contacto("u-lucia")], [promoGalicia]);
     expect(de(r, "u-vos").opcion).toBeNull();
-    expect(de(r, "u-vos").propia).toEqual({ opcion: null, descarte: null });
+    expect(de(r, "u-vos").deQuienPide).toEqual({ opcion: null, descarte: null });
     expect(r.quienPaga).toBe("u-lucia");
   });
 
@@ -283,16 +283,26 @@ describe("recomendarGrupo: lo que se devuelve de cada integrante", () => {
     expect(queDa).not.toMatch(/tope|queda|sin tope disponible|según/i);
   });
 
-  it("«propia» solo viene en quien pide, con su opción completa", () => {
+  it("con promos acumulables, «queDa» las nombra a todas (el reintegro las suma)", () => {
+    const a = promo({ id: "promo-a", porcentaje: 20, acumulable: true });
+    const b = promo({ id: "promo-b", porcentaje: 10, acumulable: true });
+    const r = grupo(delGrupo(10000), [yo([nacion]), contacto("u-lucia")], [a, b]);
+    const opcion = de(r, "u-lucia").opcion;
+    expect(opcion?.reintegroMostrado).toBe(3000);
+    expect(opcion?.queDa.split(" + ")).toHaveLength(2);
+    expect(opcion?.queDa).toMatch(/20%.* \+ .*10%|10%.* \+ .*20%/);
+  });
+
+  it("«deQuienPide» solo viene en quien pide, con su opción completa", () => {
     const r = grupo(delGrupo(10000), [yo(), contacto("u-lucia")], [promoGalicia]);
-    expect(de(r, "u-vos").propia?.opcion).toMatchObject({ medioDePagoId: galicia.id, ahorroEstimado: 2000 });
-    expect(de(r, "u-lucia").propia).toBeNull();
+    expect(de(r, "u-vos").deQuienPide?.opcion).toMatchObject({ medioDePagoId: galicia.id, ahorroEstimado: 2000 });
+    expect(de(r, "u-lucia").deQuienPide).toBeNull();
   });
 
   it("de quien pide sin opción devuelve el descarte principal (es su propio dato)", () => {
     const r = grupo(delGrupo(10000), [yo([santander], [consumo("promo-santander", 3000)]), contacto("u-lucia", [nacion])], [promoSantander]);
     expect(de(r, "u-vos").opcion).toBeNull();
-    expect(de(r, "u-vos").propia?.descarte).toMatchObject({ promocionId: "promo-santander", causa: "tope_agotado" });
+    expect(de(r, "u-vos").deQuienPide?.descarte).toMatchObject({ promocionId: "promo-santander", causa: "tope_agotado" });
   });
 
   it("el reintegro de quien pide redondea al peso y el de un contacto al escalón de $100", () => {

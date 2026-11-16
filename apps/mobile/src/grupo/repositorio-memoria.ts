@@ -22,6 +22,8 @@ export type OpcionesMemoria = {
   sinNombre?: boolean;
   respuestaGrupo?: RespuestaGrupo;
   fallaGrupo?: FallaGrupo;
+  /** El campo de una falla `invalido`. */
+  campoFalla?: string;
 };
 
 export type RepositorioMemoria = RepositorioContactos & {
@@ -88,7 +90,7 @@ export function repositorioContactosMemoria(opciones: OpcionesMemoria = {}): Rep
     async recomendarGrupo(pedido) {
       pedidosGrupo.push(pedido);
       quizasFallar();
-      if (opciones.fallaGrupo) throw new FallaGrupoError(opciones.fallaGrupo);
+      if (opciones.fallaGrupo) throw new FallaGrupoError(opciones.fallaGrupo, opciones.campoFalla ?? null);
       if (!opciones.respuestaGrupo) throw new FallaGrupoError("servidor");
       return opciones.respuestaGrupo;
     },

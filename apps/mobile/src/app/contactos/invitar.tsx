@@ -10,12 +10,11 @@ import { Icon, type IconName } from "@/components/icon";
 import { Screen } from "@/components/screen";
 import { Skeleton } from "@/components/skeleton";
 import { Text } from "@/components/text";
-import type { Invitacion } from "@/data/contracts";
 import { textoVencimiento } from "@/grupo/invitacion";
-import { exigirContactosRemoto } from "@/grupo/remoto";
 import { SinNombreError } from "@/grupo/repositorio";
 import { linkDeInvitacion } from "@/grupo/token";
 import { useAsync } from "@/hooks/use-async";
+import { crearInvitacion } from "@/store/contactos";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { avisoMostrado } from "@/store/sesion";
 import { colors, qrColors, radius, space } from "@/theme";
@@ -42,20 +41,20 @@ function mensaje(link: string): string {
   );
 }
 
-async function crear(): Promise<Invitacion> {
-  const inv = await exigirContactosRemoto().crearInvitacion();
-  return { link: linkDeInvitacion(inv.token, Linking.createURL), venceEn: inv.venceEn, usoUnico: true };
-}
-
 /**
- * Invitar contacto (ADR-008 §1, spec 016 US2): link + QR de un solo uso que vence en 24 h. Generar
- * otro invalida el anterior (FR-011). Sin buscador.
+ * Invitar contacto (ADR-008 §1, spec 016 US2): link + QR de un solo uso que vence en 24 h. Al
+ * volver a entrar se muestra la misma invitación; generar otra invalida la anterior (FR-011).
+ * Sin buscador.
  */
 export default function Invitar() {
   const [n, setN] = useState(0);
   const dispatch = useAppDispatch();
   const ahora = useAppSelector((s) => s.sesion.ahora);
-  const inv = useAsync(crear, n);
+  // Al abrir, la invitación vigente si hay una; «Generar otro link» pide una nueva (US2-2).
+  const inv = useAsync(async () => {
+    const creada = await dispatch(crearInvitacion(n > 0));
+    return { link: linkDeInvitacion(creada.token, Linking.createURL), venceEn: creada.venceEn };
+  }, n);
   const link = inv.estado === "listo" ? inv.datos?.link : undefined;
   const sinNombre = inv.estado === "error" && inv.error === new SinNombreError().message;
 

@@ -67,17 +67,16 @@ describe("filaAMedio", () => {
 });
 
 describe("filaAConsumo y filaACompra", () => {
-  it("el consumo lleva el id que le dan, no el de la base", () => {
-    expect(filaAConsumo({ promocion_id: "p1", fecha: "2026-11-05", monto: "1000.00", descuento_obtenido: "200" }, "c1")).toEqual({
-      id: "c1",
+  it("el consumo no lleva id: el de un contacto lo arma el servicio", () => {
+    expect(filaAConsumo({ promocion_id: "p1", fecha: "2026-11-05", monto: "1000.00", descuento_obtenido: "200" })).toEqual({
       promocionId: "p1",
       fecha: "2026-11-05",
       monto: 1000,
       descuentoObtenido: 200,
     });
-    expect(filaAConsumo({ promocion_id: null, fecha: "2026-11-05", monto: 1000, descuento_obtenido: null }, "c2")?.descuentoObtenido).toBeNull();
-    expect(filaAConsumo({ promocion_id: "p1", fecha: "ayer", monto: 1000, descuento_obtenido: null }, "c3")).toBeNull();
-    expect(filaAConsumo({ promocion_id: "p1", fecha: "2026-11-05", monto: "x", descuento_obtenido: null }, "c4")).toBeNull();
+    expect(filaAConsumo({ promocion_id: null, fecha: "2026-11-05", monto: 1000, descuento_obtenido: null })?.descuentoObtenido).toBeNull();
+    expect(filaAConsumo({ promocion_id: "p1", fecha: "ayer", monto: 1000, descuento_obtenido: null })).toBeNull();
+    expect(filaAConsumo({ promocion_id: "p1", fecha: "2026-11-05", monto: "x", descuento_obtenido: null })).toBeNull();
   });
 
   it("la compra propia se mapea entera", () => {

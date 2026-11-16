@@ -89,3 +89,12 @@ El timeout de 15 s lo pone la app (`AbortController`) y se trata como `interno`.
 - **Edge Function**: Vitest del handler (status y códigos), del servicio (con repositorios en memoria) y de `respuesta.ts`: un contacto con tope, restante y cantidad de compras conocidos, y una búsqueda recursiva de esos valores en todo el JSON (SC-008).
 - **App**: Vitest de `tokenDeInvitacion`, la vista de grupo, el slice y los thunks (repositorio en memoria), y la persistencia por cuenta. La integración contra Supabase local (`test:integracion`) suma las RPC de contactos.
 - **Base local compartida**: los contenedores de Supabase usan el `project_id` `vuelto`, compartido por todos los worktrees. **Verificado**: hoy hay una instancia corriendo con las 11 migraciones de `main`. `supabase db reset` desde esta rama la cambia para cualquier otra sesión que la use: se avisa antes de correrlo.
+
+## R12. Ajustes después de `/code-review` y `rules-guardian` (15/11/2026)
+
+- **Tipos de la respuesta en la app:** `OpcionDeVosRemota` y `OpcionDeContactoRemota` por separado, con `null` y sin campos opcionales: el tipo de un contacto no tiene dónde recibir cantidad de compras, período ni id de medio (FR-023 de la spec 006). El contrato sigue escrito dos veces (Deno y la app); queda como deuda junto con `filas.ts`.
+- **Las pantallas no llaman al repositorio directo:** todo pasa por thunks con `Extra.contactosRemoto` (crear y ver invitación, aceptar, quitar, cargar, `pedirRecomendacionGrupo`). El thunk del grupo no lanza: devuelve la falla con su `campo`, y el resultado elige el texto y la acción (FR-027) sin traducir mensajes.
+- **Invitar no invalida el link enviado:** la última invitación queda en memoria (slice `contactos`, nunca en disco) y se vuelve a mostrar mientras esté vigente; solo «Generar otro link» crea otra (US2-2).
+- **`_shared/periodo.ts`:** el período de los consumos y las promos referenciadas que faltan, que `recomendar` y `recomendar-grupo` repetían.
+- **`queDa`** nombra todas las promos de la opción (con acumulables, el reintegro las suma), y el motivo de «Vos» dice cuando su opción no llega a $1.
+

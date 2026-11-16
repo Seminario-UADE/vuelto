@@ -4,14 +4,9 @@
  * `recomendarGrupo()`. Lo de quien pide se lee con su sesión (RLS); lo de los contactos, con la
  * función de la base que verifica el vínculo y exige la clave de servidor (D8).
  */
-import {
-  fechaArgentina,
-  inicioDelPeriodo,
-  recomendarGrupo,
-  type ConsumoDeTope,
-  type IntegranteDeGrupo,
-} from "@vuelto/motor";
+import { fechaArgentina, recomendarGrupo, type ConsumoDeTope, type IntegranteDeGrupo } from "@vuelto/motor";
 import { CategoriaInexistenteError, ContactoNoVinculadoError } from "../_shared/errores.ts";
+import { inicioDeConsumos, promosReferenciadasQueFaltan } from "../_shared/periodo.ts";
 import type {
   DatosDeContacto,
   RepositorioCategorias,
@@ -41,9 +36,7 @@ export class ServicioGrupo {
     // Hoy sale del mismo `ahora` que recibe el motor, en hora de Argentina (FR-025). Las compras,
     // desde el inicio del mes o de la semana, lo que sea anterior (FR-002).
     const hoy = fechaArgentina(ahora);
-    const inicioMes = inicioDelPeriodo("mensual", hoy);
-    const inicioSemana = inicioDelPeriodo("semanal", hoy);
-    const desde = inicioSemana < inicioMes ? inicioSemana : inicioMes;
+    const desde = inicioDeConsumos(hoy);
 
     const [mediosPropios, comprasPropias, delRubro, contactos] = await Promise.all([
       this.medios.deUsuario(quienPide),
@@ -64,14 +57,9 @@ export class ServicioGrupo {
       };
     });
 
-    // Las promos que referencian los consumos de todos y no vinieron con el rubro (vencidas o de
-    // otro rubro): el motor las necesita para descontar los topes compartidos (M9).
-    const yaEstan = new Set(delRubro.map((p) => p.id));
-    const referenciadas = new Set<string>();
-    for (const c of [...comprasPropias, ...integrantesContactos.flatMap((i) => i.consumos)]) {
-      if (c.promocionId !== null && !yaEstan.has(c.promocionId)) referenciadas.add(c.promocionId);
-    }
-    const extra = referenciadas.size > 0 ? await this.promociones.porIds([...referenciadas]) : [];
+    // Las promos que referencian los consumos de todos y no vinieron con el rubro (M9).
+    const faltan = promosReferenciadasQueFaltan([...comprasPropias, ...integrantesContactos.flatMap((i) => i.consumos)], delRubro);
+    const extra = faltan.length > 0 ? await this.promociones.porIds(faltan) : [];
 
     const integrantes: IntegranteDeGrupo[] = [
       { tipo: "cuenta", id: quienPide, pide: true, mediosDePago: mediosPropios, consumos: comprasPropias },
