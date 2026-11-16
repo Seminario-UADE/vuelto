@@ -101,4 +101,70 @@ describe("listarCandidatas", () => {
       /categoría 1.*slug/,
     );
   });
+
+  it("una promo publicada que todavía no empezó también es candidata, y se cuenta aparte", async () => {
+    const r = await listarCandidatas(clienteCon({ s: [tarjeta("hoy"), tarjeta("manana", { estado: "NEXT_FOR_PRODUCT" })] }), [1]);
+    expect(slugs(r)).toEqual(["hoy", "manana"]);
+    expect(r.resumen.porEmpezar).toBe(1);
+    expect(r.resumen.descartadas.noVigente).toBe(0);
+  });
+
+  it("desglosa lo que deja afuera por estado, tipo y categoría", async () => {
+    const r = await listarCandidatas(
+      clienteCon(
+        {
+          s: [
+            tarjeta("a"),
+            tarjeta("b", { estado: "FINISHED_FOR_PRODUCT" }),
+            tarjeta("c", { estado: "FINISHED_FOR_PRODUCT" }),
+            tarjeta("d", { tipo: "financing" }),
+            tarjeta("e", { tipo: "payment_scratch" }),
+            tarjeta("f", { categorias: ["15"] }),
+            tarjeta("g", { categorias: ["15", "0"] }),
+            tarjeta("h", { categorias: [] }),
+            { ...tarjeta("i"), calculated_status: undefined },
+          ],
+        },
+        undefined,
+        { 1: [tarjetaAnterior("vieja", { calculated_status: "FINISHED" }), tarjetaAnterior("cuotas", { trigger_type: "installments" })] },
+      ),
+      [1],
+    );
+    expect(slugs(r)).toEqual(["a"]);
+    expect(r.resumen.descartadas).toEqual({ noVigente: 4, noEsReintegro: 3, otraCategoria: 3 });
+    expect(r.resumen.desglose).toEqual({
+      porEstado: { FINISHED_FOR_PRODUCT: 2, "(sin estado)": 1, FINISHED: 1 },
+      porTipo: { financing: 1, payment_scratch: 1, installments: 1 },
+      porCategoria: { 15: 2, 0: 1, "(sin categoría)": 1 },
+    });
+  });
+
+  it("controla las cadenas grandes: cuántas promos vio de cada una y qué pasó con ellas", async () => {
+    const de = (slug: string, comercio: string, o = {}) => ({ ...tarjeta(slug, o), card: { validity_place: comercio, participating_bank: "ICBC" } });
+    const r = await listarCandidatas(
+      clienteCon({
+        s: [
+          de("c1", "Carrefour Hiper, Market y Express", { estado: "FINISHED_FOR_PRODUCT" }),
+          de("c2", "CARREFOUR", { estado: "FINISHED_FOR_PRODUCT" }),
+          de("coto", "COTO"),
+          de("coto-cuotas", "Coto", { tipo: "financing" }),
+          de("chango", "ChangoMas", { estado: "NEXT_FOR_PRODUCT" }),
+          de("dia", "DIA"),
+          de("diarco", "Diarco Mayorista"),
+          de("anonima", "La Anónima"),
+          de("jumbo-libreria", "LIBRERIA JUMBO", { categorias: ["15"] }),
+        ],
+      }),
+      [1],
+    );
+    expect(Object.keys(r.resumen.cadenas)).toEqual(["Carrefour", "Coto", "Jumbo", "Disco", "Vea", "Día", "ChangoMás", "La Anónima"]);
+    expect(r.resumen.cadenas.Carrefour).toEqual({ candidatas: 0, noVigentes: 2, otrasDescartadas: 0 });
+    expect(r.resumen.cadenas.Coto).toEqual({ candidatas: 1, noVigentes: 0, otrasDescartadas: 1 });
+    expect(r.resumen.cadenas["ChangoMás"]!.candidatas).toBe(1);
+    // «Diarco» no es «Día»: el nombre se busca como palabra entera.
+    expect(r.resumen.cadenas["Día"]).toEqual({ candidatas: 1, noVigentes: 0, otrasDescartadas: 0 });
+    expect(r.resumen.cadenas["La Anónima"]!.candidatas).toBe(1);
+    expect(r.resumen.cadenas.Jumbo).toEqual({ candidatas: 0, noVigentes: 0, otrasDescartadas: 1 });
+    expect(r.resumen.cadenas.Disco).toEqual({ candidatas: 0, noVigentes: 0, otrasDescartadas: 0 });
+  });
 });

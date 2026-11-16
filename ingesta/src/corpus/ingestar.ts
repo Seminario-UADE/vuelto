@@ -15,6 +15,7 @@
  * reconoce) o si el resguardo frenó la escritura: GitHub avisa por mail al que mantiene
  * el repo. La base queda con lo de la corrida anterior hasta que la siguiente funcione.
  */
+import { appendFileSync } from "node:fs";
 import { CATEGORIAS_MODO } from "@vuelto/motor";
 import { ejecutarComoScript, hoyEnArgentina, parsearArgumentos } from "./args.ts";
 import { esObjeto, jsonCanonico } from "./crudo.ts";
@@ -152,6 +153,51 @@ export function codigoDeSalida(resumen: ResumenCosecha, publicacion: { ok: boole
   return !publicacion.ok || resumen.detalleConError.length > 0 || resumen.formatoDesconocido.length > 0 ? 1 : 0;
 }
 
+/**
+ * Por qué la corrida sale con código 1, una línea por motivo. Vacía si salió bien. Se imprime al
+ * final de todo: el motivo no tiene que quedar perdido entre cientos de líneas de descartes.
+ */
+export function motivosDeFalla(resumen: ResumenCosecha, publicacion: { ok: boolean; motivo: string | null }): string[] {
+  const motivos: string[] = [];
+  if (!publicacion.ok) motivos.push(publicacion.motivo ?? "La publicación se frenó sin informar el motivo.");
+  for (const e of resumen.detalleConError) motivos.push(`Falló el detalle de ${e.slug}: ${e.error}`);
+  for (const f of resumen.formatoDesconocido) motivos.push(`Formato desconocido en ${f.slug}: ${f.ruta} (hay que actualizar el mapeo)`);
+  return motivos;
+}
+
+const lineasDe = (cuenta: Readonly<Record<string, number>>): string =>
+  Object.entries(cuenta)
+    .sort(([, a], [, b]) => b - a)
+    .map(([clave, n]) => `${clave}: ${n}`)
+    .join(", ") || "ninguna";
+
+/** El resumen de la corrida en Markdown, para la página del job en GitHub Actions. */
+export function resumenParaActions(
+  resumen: ResumenCosecha,
+  publicacion: { ok: boolean; motivo: string | null; resumen: ResumenPublicacion },
+): string {
+  const { listado } = resumen;
+  const p = publicacion.resumen.promociones;
+  const motivos = motivosDeFalla(resumen, publicacion);
+  return [
+    motivos.length === 0 ? "## Ingesta de promociones: salió bien" : "## Ingesta de promociones: FALLÓ",
+    ...(motivos.length === 0 ? [] : ["", ...motivos.map((m) => `- ${m}`)]),
+    "",
+    `- Candidatas del listado: ${listado.candidatas} (${listado.porEmpezar} todavía no empezaron)`,
+    `- Filas publicables: ${resumen.publicables}`,
+    `- Promociones: ${p.insertar} nuevas, ${p.actualizar} cambiadas, ${p.reactivar} reactivadas, ${p.darDeBaja} bajas, ${p.sinCambios} sin cambios`,
+    `- Descartadas al mapear: ${lineasDe(resumen.descartes)}`,
+    `- Descartadas en el listado por estado: ${lineasDe(listado.desglose.porEstado)}`,
+    `- Descartadas en el listado por tipo: ${lineasDe(listado.desglose.porTipo)}`,
+    `- Descartadas en el listado por categoría: ${lineasDe(listado.desglose.porCategoria)}`,
+    "",
+    "| Cadena | Candidatas | No vigentes | Otras descartadas |",
+    "|---|---|---|---|",
+    ...Object.entries(listado.cadenas).map(([cadena, c]) => `| ${cadena} | ${c.candidatas} | ${c.noVigentes} | ${c.otrasDescartadas} |`),
+    "",
+  ].join("\n");
+}
+
 /** Lo que se imprime al final: sin la lista de descartes uno por uno, que va aparte. */
 export function informe(resumen: ResumenCosecha, publicacion: ResumenPublicacion): Record<string, unknown> {
   const cosecha: Partial<ResumenCosecha> = { ...resumen };
@@ -190,10 +236,15 @@ async function main(argv: readonly string[]): Promise<void> {
   console.log(JSON.stringify(informe(resumen, publicacion.resumen), null, 2));
   console.log("Descartes:");
   for (const d of resumen.detalleDescartes) console.log(`  ${d.motivo}\t${d.slug}\t${d.detalle ?? ""}`);
-  for (const e of resumen.detalleConError) console.error(`Falló el detalle de ${e.slug}: ${e.error}`);
-  for (const f of resumen.formatoDesconocido) console.error(`Formato desconocido en ${f.slug}: ${f.ruta}`);
-  if (publicacion.motivo !== null) console.error(publicacion.motivo);
   console.log(aplicar && publicacion.ok ? "Listo." : "No se escribió nada.");
+  // Los motivos van al final y por la misma salida que el resto, para que queden a la vista en el registro.
+  // `::error::` hace que GitHub Actions los muestre además como anotaciones de la corrida.
+  const motivos = motivosDeFalla(resumen, publicacion);
+  const enActions = process.env.GITHUB_ACTIONS === "true";
+  if (motivos.length > 0) console.log(`La corrida falló por ${motivos.length} motivo(s):`);
+  for (const m of motivos) console.log(enActions ? `::error::${m}` : `  ${m}`);
+  const archivoDeResumen = process.env.GITHUB_STEP_SUMMARY;
+  if (archivoDeResumen !== undefined && archivoDeResumen !== "") appendFileSync(archivoDeResumen, resumenParaActions(resumen, publicacion));
   process.exitCode = codigoDeSalida(resumen, publicacion);
 }
 

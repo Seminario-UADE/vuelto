@@ -118,7 +118,7 @@ workflow falla diciendo que falta.
 
 | Paso | Dónde corre | Qué hace |
 |---|---|---|
-| 1. Disparo | GitHub Actions, `ingesta.yml`: todos los días a las 06:00 ART, y a mano («Run workflow») | Arranca `ingesta/src/corpus/ingestar.ts --aplicar` |
+| 1. Disparo | GitHub Actions, `ingesta.yml`: todos los días, programado a las 04:17 ART (GitHub puede atrasarlo), y a mano («Run workflow») | Arranca `ingesta/src/corpus/ingestar.ts --aplicar` |
 | 2. Captura | Playwright, o `fetch`/`curl` directo cuando la fuente lo permite | Abre cada página (SPA) en navegador headless y espera el render — salvo MODO, la única fuente del MVP (`../product/alcance-mvp.md`), que expone una API REST pública (`modo.com.ar/promos/api/rewards/...`) y no necesita navegador |
 | 3. Guardado | Supabase `capturas_crudas` | Tarjeta del listado y detalle de MODO, tal cual, con service role key. Solo si cambió respecto de la última captura de esa promo |
 | 4. Extracción | Código (hoy); Gemini para la letra chica (#51) | Lo que MODO trae estructurado se mapea por código, sin modelo de lenguaje. La letra chica (acumulabilidad, jurisdicción) queda en `null` hasta #51 |
