@@ -17,7 +17,7 @@ import { RUBROS } from "@/lib/rubros";
 import { quitarComercio, SELECCION_VACIA, tocarComercio } from "@/lib/seleccion-comercios";
 import { MENSAJES_ERROR } from "@/perfil/modelo";
 import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
-import { invitacionGuardada, onboardingTerminado } from "@/store/perfil";
+import { borradorComercios, invitacionGuardada, onboardingTerminado } from "@/store/perfil";
 import { confirmarComercios } from "@/store/perfil-remoto";
 import { rubroColors, space } from "@/theme";
 
@@ -27,10 +27,13 @@ import { rubroColors, space } from "@/theme";
  * Inicio, ADR-010); los marcados se guardan como habituales al seguir. Se puede seguir sin elegir.
  * Cierra el onboarding: va a Inicio, o a la invitación que abrió antes de tener cuenta. Un usuario
  * nuevo no tiene compras, así que no se muestra ninguna cifra de tope (Principio V).
+ * Sin cuenta (spec 012, US5), los marcados van al borrador y se sigue a «Guardá tu perfil».
  */
 export default function PrimeraRespuesta() {
   const dispatch = useAppDispatch();
   const pendiente = useAppSelector((s) => s.perfil.invitacionPendiente);
+  const sinCuenta = useAppSelector((s) => s.sesion.usuario === null);
+  const ahora = useAppSelector((s) => s.sesion.ahora);
   const [seleccion, setSeleccion] = useState(SELECCION_VACIA);
   // Los nombres de los marcados, como los guarda `comercios_habituales`.
   const nombres = useRef(new Map<string, string>());
@@ -46,6 +49,12 @@ export default function PrimeraRespuesta() {
   };
 
   const seguir = async () => {
+    if (sinCuenta) {
+      const comercios = seleccion.marcados.map((id) => nombres.current.get(id) ?? id);
+      dispatch(borradorComercios({ comercios, ahora }));
+      router.push("/registro");
+      return;
+    }
     if (seleccion.marcados.length === 0) return terminar();
     setEnviando(true);
     setError(null);

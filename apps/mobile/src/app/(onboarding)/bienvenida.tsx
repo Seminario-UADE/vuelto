@@ -13,17 +13,20 @@ const PUNTOS: { icon: IconName; texto: string }[] = [
   { icon: "candado", texto: "Sin conectar tu banco ni pedir tus claves" },
 ];
 
-/** Bienvenida (onboarding 1/5): la propuesta y la puerta a crear cuenta o entrar. */
+/**
+ * Bienvenida: la propuesta y «Empezar», sin cuenta (spec 012, US5, FR-031). La cuenta se pide al
+ * final, después de ver la primera recomendación; quien ya tiene una entra por «Ya tengo cuenta».
+ */
 export default function Bienvenida() {
   return (
     <Screen
       kind="tab"
       footer={
         <>
-          <Button label="Crear cuenta" onPress={() => router.push("/registro")} />
+          <Button label="Empezar" onPress={() => router.push("/medios")} />
           <Button label="Ya tengo cuenta" variant="text" onPress={() => router.push("/login")} />
           <Text variant="label" tone="inkSecondary" align="center">
-            Después te lleva un minuto: tus medios y, si querés, tus comercios.
+            Te lleva un minuto y no hace falta cuenta para probar: tus tarjetas y, si querés, tus comercios.
           </Text>
         </>
       }

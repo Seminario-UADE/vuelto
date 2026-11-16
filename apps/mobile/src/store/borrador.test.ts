@@ -112,6 +112,16 @@ describe("guardarBorradorEnCuenta (spec 012, US5, FR-031 y FR-034)", () => {
     expect(s.getState().perfil.borrador).toBeNull();
   });
 
+  it("el registro y la lectura de la sesión nueva a la vez comparten una sola pasada: nada se guarda dos veces", async () => {
+    const r = remoto({ confirmarOnboarding: ok([guardado("m1")]) });
+    const s = conBorrador(r);
+    const [a, b] = await Promise.all([s.dispatch(guardarBorradorEnCuenta()), s.dispatch(leerMedios())]);
+    expect(a.ok).toBe(true);
+    expect(b).toBeUndefined();
+    expect(r.llamadas.filter((l) => l.startsWith("confirmar:"))).toHaveLength(1);
+    expect(r.llamadas.filter((l) => l.startsWith("confirmarComercios"))).toHaveLength(1);
+  });
+
   it("sin sesión no hace nada: el borrador espera a la cuenta", async () => {
     const r = remoto();
     const s = storeDePrueba(null, memoria(), { perfilRemoto: r.datos });

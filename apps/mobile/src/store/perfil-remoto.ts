@@ -256,9 +256,21 @@ export const TEXTO_AVISO_BORRADOR: Record<AvisoBorrador, string> = {
  * cuenta y, por separado para medios y habituales, si ya los tiene prevalecen y se avisa; si no, se
  * guardan los del borrador (FR-034). El nombre, solo si la cuenta no tiene uno. Cada parte sale del
  * borrador recién cuando quedó en la cuenta: una falla a mitad conserva lo que falta, y la próxima
- * lectura lo vuelve a intentar.
+ * lectura lo vuelve a intentar. Dos llamadas a la vez (el registro y la lectura que dispara la
+ * sesión nueva) comparten la misma pasada: el borrador nunca se guarda dos veces.
  */
+let guardandoBorrador: Promise<Resultado<AvisoBorrador[]>> | null = null;
+
 export function guardarBorradorEnCuenta(): AppThunk<Promise<Resultado<AvisoBorrador[]>>> {
+  return (dispatch) => {
+    guardandoBorrador ??= dispatch(pasarBorradorALaCuenta()).finally(() => {
+      guardandoBorrador = null;
+    });
+    return guardandoBorrador;
+  };
+}
+
+function pasarBorradorALaCuenta(): AppThunk<Promise<Resultado<AvisoBorrador[]>>> {
   return async (dispatch, getState, { perfilRemoto }) => {
     const usuarioId = usuarioActual(getState);
     const borrador = () => getState().perfil.borrador;
