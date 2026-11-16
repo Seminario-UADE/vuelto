@@ -2985,8 +2985,7 @@ hable solo de esa compra y use su fecha, no la de hoy.
 
 **Prompts principales:**
 1. "Cuando pongo «Perfumería Raffe» a mano me dice «La promo es solo en
-   FarmaPlus». ¿Qué promo? Yo quería Perfumería Raffe, ¿qué tiene que ver?"
-   La pantalla mostraba el «¿por qué no?» de la recomendación (issue #46),
+   FarmaPlus»." La pantalla mostraba el «¿por qué no?» de la recomendación (issue #46),
    que explica también las promos de otros comercios del mismo rubro.
 2. "Para el ticket no me sirve saber eso. Y si alguien carga tarde una
    compra de una promo que estaba vigente ese día, ¿no debería contar?" El
