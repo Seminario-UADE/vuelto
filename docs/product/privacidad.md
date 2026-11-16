@@ -23,7 +23,14 @@ comercial.
 
 ## Imágenes de ticket: retención durante el procesamiento
 
-La imagen viaja del celular a la Edge Function de Supabase y de ahí a la API
+**En el celular** (spec 014): la cámara o la galería del sistema dejan la foto
+como archivo temporal en la carpeta privada de la app, que ninguna otra app
+puede leer, y la app la achica y la pasa a JPEG en otro archivo temporal. Los
+dos se borran en cuanto termina la lectura, salga bien, mal o se cancele; si
+la app se cierra en el medio, se borran la próxima vez que se abre «Escanear
+ticket». La foto nunca se agrega a la galería del usuario.
+
+**En el servidor**: la imagen viaja del celular a la Edge Function de Supabase y de ahí a la API
 de Groq, dentro del mismo request (`04-infrastructure.md`, ADR-012). No se escribe
 a disco ni a Supabase Storage en ningún punto del camino: vive en memoria
 durante ese request y se descarta al recibir la respuesta del extractor, se

@@ -11,7 +11,7 @@ endpoints**: los calcula la app con el motor (ADR-010, constitución §II).
 
 | Endpoint | Issue | Qué hace | Contrato |
 |---|---|---|---|
-| Extracción de ticket | #48 | Gemini sobre la imagen, sin guardarla (pendiente) | — |
+| `POST /functions/v1/extraer-ticket` | #48 | Groq lee la foto del ticket (ADR-012) y devuelve monto, comercio, fecha, medio de pago tal como lo dice el ticket y el texto con los datos personales tapados. La imagen no se guarda. Exige una cuenta real | `specs/013-extraer-ticket/contracts/extraer-ticket.md` |
 | `POST /functions/v1/recomendar-grupo` | #54 | Gasto en grupo: lee datos de contactos vinculados (ADR-008 §4) y llama al motor (pendiente) | — |
 | Invitaciones | — | Edge Function y RPC `security definer` (ADR-008 §4) | — |
 | `POST /functions/v1/recomendar` | #43 | **Fuera del camino de la app (ADR-010 §5).** Implementada y testeada con repositorios en memoria (PR #71); no se sigue invirtiendo en ella y se borra o se reutiliza para el grupo | `specs/004-recomendar-pantalla/contracts/recomendar.md` |
@@ -33,12 +33,16 @@ supabase/functions/
     ├── deno.json            # import map: @vuelto/motor → packages/motor/src
     ├── index.ts             # composition root + Deno.serve, sin lógica
     ├── handler.ts           # rol de controller: HTTP, sesión, validación, códigos
-    └── servicio.ts          # caso de uso: junta datos y llama al motor
+    ├── servicio.ts          # caso de uso: junta datos y llama al motor
+    └── <módulos propios>    # lo que es solo de esa función (por ejemplo, `imagen.ts`
+                             # y `extractor-groq.ts` en `extraer-ticket`); lo que
+                             # comparten varias va a `_shared/`
 ```
 
 - **Contrato de errores** común: 400 `{error:"invalido", campo}`, 401
   `no_autenticado`, 405 `metodo_no_permitido`, 422 (de negocio, por ejemplo
-  `perfil_sin_medios`), 500 `interno` sin detalles. Los registros solo
+  `perfil_sin_medios`), 500 `interno` sin detalles. `extraer-ticket` suma 413,
+  415, 422, 503 y 504 (ver su contrato). Los registros solo
   incluyen el tipo de error, nunca datos del usuario (`privacidad.md`).
 - **Sesión**: el cliente de Supabase se crea por pedido con el JWT del
   usuario para que aplique el RLS. Nunca la service role key.
@@ -64,7 +68,7 @@ cambiar el cuerpo de esa función.
 
 | Función | Endpoint | Estado |
 |---|---|---|
-| `leerTicket({ ilegible })` | Extracción de ticket (#48) | Mock; en esta versión no hay captura real. `ilegible` es el escenario de desarrollo |
+| Leer el ticket | `POST /functions/v1/extraer-ticket` (#48) | **Conectado** (issue #49, spec 014). No pasa por `api.ts`: `ticket/leer.ts` achica la foto a JPEG de 2,5 MB como máximo, la manda con `ticket/servicio.ts` (`functions.invoke`, con la sesión del usuario, 30 s de espera) y borra las copias temporales en todos los caminos. La respuesta llega como `LecturaApp`: el medio tal como lo dice el ticket, que «Revisá» solo sugiere. `api.leerTicket({ hoy, escenario })` queda para los escenarios de desarrollo («Ticket de ejemplo», «Ticket ilegible», «Sin red»), sin cámara ni servicio |
 | `recomendarGrupo(pedido, comercio?)` | `POST /functions/v1/recomendar-grupo` (#56) | Reemplazo local (`grupo-simulado.ts`) que evalúa a cada integrante con el motor; de los contactos solo viaja lo de ADR-008 §3 |
 | `verInvitacion`, `aceptarInvitacion`, `quitarContacto`, `crearInvitacion` | Edge Function y RPC `security definer` (ADR-008 §4) | Mock |
 | Escribir y borrar compras (`public.compras`) | Supabase directo con RLS (ADR-009), desde la cola de subida (spec 010) | Repositorio escrito y probado contra Supabase local; **sin conectar** hasta #40, #41 y #42 |

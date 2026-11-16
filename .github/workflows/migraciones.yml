@@ -1,0 +1,63 @@
+# Chequeo de migraciones (issue #127, ADR-013): falla si el repo trae migraciones de
+# supabase/migrations/ que la base alojada no tiene. NO aplica nada: solo lista las
+# migraciones de los dos lados y compara (`supabase migration list`, solo lectura).
+# Las migraciones las aplica una persona con `supabase db push --linked` (CLAUDE.md).
+#
+# Por qué existe: el job `supabase-rls` del CI prueba las migraciones contra una base
+# local, y da verde aunque la base alojada esté atrasada.
+#
+# Necesita un secret del repo (Settings → Secrets and variables → Actions), cargado desde
+# la web de GitHub, nunca por el chat ni en un archivo:
+#   SUPABASE_DB_URL   cadena de conexión «Session pooler» del proyecto, con la contraseña
+#                     de la base ya puesta y codificada en porcentaje (docs/architecture/04-infrastructure.md)
+#
+# Corre al mergear a `main` cambios de migraciones, una vez por día y a mano («Run workflow»).
+# Nunca en `pull_request`: un PR que trae una migración nueva falla siempre (todavía no se
+# aplicó), y un workflow de PR editable por quien abre el PR no puede leer este secret.
+# Si falla, GitHub avisa por mail: aplicar las migraciones y volver a correrlo.
+name: Migraciones al día
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+      - "supabase/scripts/**"
+      - ".github/workflows/migraciones.yml"
+  schedule:
+    # 12:00 UTC = 09:00 en Argentina.
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: migraciones-al-dia
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.113.0
+      - name: Listar las migraciones del repo y de la base alojada
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error title=Falta el secret::Cargar SUPABASE_DB_URL en Settings → Secrets and variables → Actions (docs/architecture/04-infrastructure.md)."
+            exit 1
+          fi
+          supabase migration list --db-url "$SUPABASE_DB_URL" > "$RUNNER_TEMP/migraciones.txt"
+          cat "$RUNNER_TEMP/migraciones.txt"
+      # `verificar-migraciones.ts` corre con Node directo (≥ 22.18, sin compilar), igual que la ingesta.
+      - name: Comparar
+        run: node supabase/scripts/verificar-migraciones.ts "$RUNNER_TEMP/migraciones.txt"

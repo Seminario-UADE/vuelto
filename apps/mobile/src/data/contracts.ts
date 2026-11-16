@@ -1,4 +1,6 @@
 import type { Canal } from "@vuelto/motor";
+import type { ResultadoLectura } from "../ticket/resultados";
+import type { MedioLeido } from "../ticket/sugerencia";
 /**
  * Forma de las respuestas que la app espera del servidor (Edge Functions y tablas con RLS).
  *
@@ -205,18 +207,21 @@ export type GastoSemana = {
   futuro: boolean;
 };
 
-/** Lectura del ticket. Nunca contiene la imagen (Principio IV). */
-export type LecturaTicket =
+/**
+ * Lectura del ticket (spec 014, data-model). Nunca contiene la imagen (Principio IV). El medio es
+ * lo que dice el ticket, no una tarjeta del perfil: «Revisá» lo cruza con el perfil y lo sugiere,
+ * nunca lo marca (RF-10).
+ */
+export type LecturaApp =
   | {
       ok: true;
       comercio: string | null;
       fecha: string | null;
       monto: number | null;
-      /** `null` si el ticket no lo dice: se pregunta, nunca se infiere (RF-10). */
-      medio: MedioDePago | null;
+      medio: MedioLeido;
       textoExtraido: string;
     }
-  | { ok: false; error: string };
+  | { ok: false; resultado: ResultadoLectura };
 
 export type BorradorCompra = {
   modo: OrigenCompra;

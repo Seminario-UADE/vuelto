@@ -9,18 +9,23 @@ import { Icon } from "@/components/icon";
 import { OptionRow } from "@/components/option-row";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
+import { Segmentado } from "@/components/segmentado";
+import { SelectorFecha } from "@/components/selector-fecha";
+import { SugerenciaComercio } from "@/components/sugerencia-comercio";
 import { SheetHeader } from "@/components/sheet-header";
 import { Text } from "@/components/text";
-import { comercioPorNombre, promoPropuesta } from "@/data/calculo";
-import { comercioDelCatalogo } from "@/data/comercios";
-import type { Canal, OrigenCompra } from "@/data/contracts";
+import { comercioPorNombre, detallesDeLaCompra, promoPropuesta } from "@/data/calculo";
+import type { Canal, Comercio, OrigenCompra } from "@/data/contracts";
 import { borradorDesdePorConfirmar } from "@/data/por-confirmar";
-import { aprox, fechaLarga, montoEditable, parseMonto } from "@/lib/format";
+import { sugerenciaEnPantalla, textoParaSugerir } from "@/data/sugerir-comercio";
+import { aprox, montoEditable, parseMonto } from "@/lib/format";
+import { esRed, esTipoTarjeta } from "@/perfil/modelo";
 import { hapticoExito, hapticoSeleccion } from "@/lib/haptics";
-import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectCatalogoParaCompras, selectEntradasMotor, selectHoy, selectPerfilVista } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
 import { confirmarPorConfirmar, guardarCompra } from "@/store/thunks";
+import { sugerirMedio, type MedioLeido } from "@/ticket/sugerencia";
 import { colors, space } from "@/theme";
 
 const SUBTITULO: Record<OrigenCompra, string> = {
@@ -35,15 +40,21 @@ const SUBTITULO: Record<OrigenCompra, string> = {
  * eligió al tocar "Usar…". Pie fijo con un único "Guardar compra" (auditoría P1 #3).
  *
  * Con `porConfirmar` («Ya pagué», spec 012 FR-006): precarga la compra por confirmar, deja
- * elegir entre el día de la simulación y hoy si cambió el día (FR-017) y guarda con su mismo
- * id, así confirmar dos veces deja una sola compra (FR-016).
+ * elegir un día entre el de la simulación y hoy (spec 014 FR-010) y guarda con su mismo id, así
+ * confirmar dos veces deja una sola compra (FR-016). Con ticket, el medio leído es solo una
+ * sugerencia (spec 014 FR-008).
  */
 export default function Revisa() {
   const p = useLocalSearchParams<{
     modo?: string;
     comercio?: string;
     monto?: string;
+    /** Con `modo: "excepcion"`: el medio que eligió el usuario con «Usar…». */
     medio?: string;
+    /** Con `modo: "ticket"`: el medio tal cual lo dice el ticket (spec 014, FR-008). */
+    medioRed?: string;
+    medioTipo?: string;
+    medioBanco?: string;
     fecha?: string;
     texto?: string;
     canal?: string;
@@ -55,17 +66,25 @@ export default function Revisa() {
   const hoy = useAppSelector(selectHoy);
   // La compra por confirmar se lee una vez, al abrir: si vence con la hoja abierta, igual se guarda.
   const listaPorConfirmar = useAppSelector((s) => s.porConfirmar.lista);
+  // El medio del ticket se cruza una vez, al abrir, con las tarjetas del perfil: es solo una
+  // sugerencia, nunca se marca (spec 014, FR-008).
+  const tarjetas = useAppSelector((s) => s.perfil.medios);
+  const [sugerencia] = useState(() => (p.modo === "ticket" ? sugerirMedio(medioDeLosParametros(p), tarjetas) : null));
+  const medioSugeridoTicket = sugerencia?.tipo === "sugerida" ? sugerencia.medioId : null;
   const [desde] = useState(() => {
     const pc = p.porConfirmar ? listaPorConfirmar.find((c) => c.id === p.porConfirmar) : undefined;
     // Con ticket (escaneo desde el paso 4): manda lo del ticket y lo que falta sale de la compra (FR-007).
     const ticket =
       p.modo === "ticket"
-        ? { monto: parseMonto(p.monto ?? ""), fecha: p.fecha || null, medioId: p.medio || null, textoExtraido: p.texto ?? null }
+        ? { monto: parseMonto(p.monto ?? ""), fecha: p.fecha || null, medioSugeridoTicket, textoExtraido: p.texto ?? null }
         : null;
     return pc ? { pc, ...borradorDesdePorConfirmar(pc, ticket, hoy) } : null;
   });
-  // El canal con el que se recomendó (#43): la promo propuesta y la guardada son las mismas.
-  const canal: Canal = (desde ? desde.borrador.canal : p.canal) === "online" ? "online" : "presencial";
+  // El canal con el que se recomendó (#43) o, con ticket y a mano, en el local; el usuario lo
+  // cambia con «¿Dónde pagaste?» (spec 015, FR-015). La promo propuesta y la guardada son las mismas.
+  const [canal, setCanal] = useState<Canal>(() =>
+    (desde ? desde.borrador.canal : p.canal) === "online" ? "online" : "presencial",
+  );
   const modo: OrigenCompra = desde
     ? desde.borrador.modo
     : p.modo === "ticket" || p.modo === "excepcion"
@@ -73,17 +92,28 @@ export default function Revisa() {
       : "manual";
   const comercioInicial = desde?.borrador.comercio ?? p.comercio ?? "";
   const [comercio, setComercio] = useState(comercioInicial);
+  // El rubro de la sugerencia que tocó el usuario (spec 015, FR-005): vale hasta que cambie el
+  // texto del campo.
+  const [categoriaElegida, setCategoriaElegida] = useState<number | null>(null);
+  /** Tocó «No está en la lista» (FR-008): no se vuelve a sugerir hasta que cambie el texto. */
+  const [noEsta, setNoEsta] = useState(false);
+  /**
+   * El texto en el que se buscó por última vez: con ticket, al abrir; a mano, al terminar de
+   * escribir (FR-009). Mientras escribe, no coincide con el campo y no se muestra nada.
+   */
+  const [buscadoEn, setBuscadoEn] = useState<string | null>(() => (p.modo === "ticket" && !desde ? comercioInicial : null));
+  // El comercio vino de la compra por confirmar o de la recomendación: no se sugiere otro (FR-010).
+  const vinoElComercio = (desde !== null || p.modo === "excepcion") && comercio.trim() === comercioInicial.trim();
   // El rubro con el que se recomendó vale mientras el comercio siga siendo ese: si lo cambia a
-  // mano, se busca por nombre como siempre.
-  const categoriaElegida = desde ? (desde.borrador.categoriaId ?? NaN) : Number(p.categoriaId);
-  const categoriaId =
-    Number.isInteger(categoriaElegida) && comercio.trim() === comercioInicial.trim() ? categoriaElegida : undefined;
+  // mano, se busca por nombre como siempre, salvo que haya elegido una sugerencia.
+  const categoriaDeOrigen = desde ? (desde.borrador.categoriaId ?? NaN) : Number(p.categoriaId);
+  const categoriaQueVino =
+    Number.isInteger(categoriaDeOrigen) && comercio.trim() === comercioInicial.trim() ? categoriaDeOrigen : undefined;
+  const categoriaId = categoriaElegida ?? categoriaQueVino;
   const [monto, setMonto] = useState<number | null>(desde ? desde.borrador.monto : parseMonto(p.monto ?? ""));
-  // Excepción: el usuario eligió el medio al tocar "Usar…". Ticket: solo si el ticket lo dice.
-  // Manual: nunca preseleccionado.
-  const medioDelTicket = modo === "ticket" ? (desde ? desde.borrador.medioId : p.medio || null) : null;
+  // Excepción: el usuario eligió el medio al tocar "Usar…". Ticket y manual: nunca preseleccionado.
   const [medioId, setMedioId] = useState<string | null>(
-    desde ? desde.borrador.medioId : modo === "excepcion" ? p.medio || null : medioDelTicket,
+    desde ? desde.borrador.medioId : modo === "excepcion" ? p.medio || null : null,
   );
   const [guardando, setGuardando] = useState(false);
   /** El usuario quitó la promo propuesta (spec 010, FR-023). Cambiar de medio la vuelve a proponer. */
@@ -94,29 +124,69 @@ export default function Revisa() {
   const dispatch = useAppDispatch();
   const [fechaElegida, setFechaElegida] = useState<string | null>(desde?.borrador.fecha ?? null);
   const fecha = fechaElegida ?? (p.fecha || hoy);
+  // Con compra por confirmar, del día de la simulación a hoy; sin ella, cualquier día hasta hoy (FR-010).
+  const rangoDeDias = desde ? desde.diasPosibles : { desde: null, hoy };
 
   const perfil = useAppSelector(selectPerfilVista);
-  const comercioConocido = comercio.trim() ? comercioDelCatalogo(comercio, perfil.comercios, categoriaId) : undefined;
   // Comercios y rubros: «Usar…» desde un rubro llega con su nombre («Supermercados»).
   const catalogo = useAppSelector(selectCatalogoParaCompras);
-  const conocido = comercioConocido ?? (comercio.trim() ? comercioDelCatalogo(comercio, catalogo, categoriaId) : undefined);
-  // Qué dice el motor de cada medio para este comercio (solo para orientar; no preselecciona).
-  const rec = useRecomendacionPara(conocido?.id ?? null, monto, canal);
-  // La promo que se propone y se guarda es la misma función, evaluada en la fecha de la compra
-  // (FR-022): no la del día de hoy, que con un ticket de otro día mostraría otra cosa.
+  // La ayuda para elegir el comercio (spec 015): nunca cambia el comercio sola (FR-004).
+  // El texto del ticket solo mientras el comercio sea el leído: si lo editó, manda lo que escribió (FR-002.1).
+  const textoDelTicket = textoParaSugerir({
+    textoTicket: modo === "ticket" ? (desde?.borrador.textoExtraido ?? p.texto ?? null) : null,
+    nombre: comercio,
+    nombreLeido: comercioInicial,
+  });
+  const sugerenciaDeComercio = useMemo(
+    () =>
+      sugerenciaEnPantalla({
+        comercio,
+        buscadoEn,
+        noEsta,
+        vinoElComercio,
+        categoriaElegida,
+        categoriaQueVino: categoriaQueVino ?? null,
+        textoTicket: textoDelTicket,
+        catalogo,
+      }),
+    [comercio, buscadoEn, noEsta, vinoElComercio, categoriaElegida, categoriaQueVino, textoDelTicket, catalogo],
+  );
+  const cambiarComercio = (texto: string) => {
+    setComercio(texto);
+    setCategoriaElegida(null);
+    setNoEsta(false);
+  };
+  const elegirComercio = (c: Comercio) => {
+    hapticoSeleccion();
+    setComercio(c.nombre);
+    setBuscadoEn(c.nombre);
+    setNoEsta(false);
+    setCategoriaElegida(c.categoriaId);
+  };
+  // La promo que se propone y se guarda y el texto de cada tarjeta salen de la misma cuenta,
+  // evaluada en la fecha de la compra (FR-022, issue #144): no la del día de hoy, que con un
+  // ticket de otro día mostraría otra cosa.
   const entradas = useAppSelector(selectEntradasMotor);
+  const comercioDeLaCompra = useMemo(
+    () => (comercio.trim() ? comercioPorNombre(comercio.trim(), catalogo, categoriaId) : null),
+    [comercio, catalogo, categoriaId],
+  );
   const propuesta = useMemo(
-    () => (medioId && comercio.trim() ? promoPropuesta(entradas, comercioPorNombre(comercio.trim(), catalogo, categoriaId), medioId, fecha, monto, canal) : null),
-    [entradas, catalogo, medioId, comercio, categoriaId, fecha, monto, canal],
+    () => (medioId && comercioDeLaCompra ? promoPropuesta(entradas, comercioDeLaCompra, medioId, fecha, monto, canal) : null),
+    [entradas, comercioDeLaCompra, medioId, fecha, monto, canal],
+  );
+  // Solo lo que le pasó a esta compra con cada tarjeta, sin promos de otros comercios (issue #144).
+  const detalles = useMemo(
+    () => (comercioDeLaCompra ? detallesDeLaCompra(entradas, comercioDeLaCompra, fecha, monto, canal) : null),
+    [entradas, comercioDeLaCompra, fecha, monto, canal],
   );
   const hayPromo = propuesta !== null && propuesta.promociones.length > 0;
 
-  const detalleDe = (id: string): string | null => {
-    const r = rec;
-    if (!r) return null;
-    if (r.medio?.id === id) return r.razon;
-    const a = r.alternativas.find((x) => x.medioId === id);
-    return a ? a.motivo : null;
+  /** La sugerencia, nunca marcada: la del ticket (spec 014 FR-008) o, sin ella, la de la simulación (spec 012 FR-008). */
+  const notaDelMedio = (id: string): string | null => {
+    if (medioId !== null) return null;
+    if (medioSugeridoTicket === id) return "El que dice el ticket";
+    return desde?.medioSugerido === id ? "El que elegiste al simular" : null;
   };
 
   const listo = medioId !== null && monto !== null && comercio.trim() !== "";
@@ -190,7 +260,19 @@ export default function Revisa() {
       ) : null}
 
       <View style={{ gap: space.md }}>
-        <Field label="Comercio" value={comercio} onChangeText={setComercio} placeholder="¿Dónde compraste?" />
+        <Field
+          label="Comercio"
+          value={comercio}
+          onChangeText={cambiarComercio}
+          onBlur={() => setBuscadoEn(comercio)}
+          placeholder="¿Dónde compraste?"
+        />
+        <SugerenciaComercio
+          resultado={sugerenciaDeComercio}
+          catalogo={catalogo}
+          onElegir={elegirComercio}
+          onNoEsta={() => setNoEsta(true)}
+        />
         <Field
           label="Total"
           value={montoEditable(monto)}
@@ -200,61 +282,61 @@ export default function Revisa() {
           keyboardType="number-pad"
           tabular
         />
-        {desde && desde.fechasPosibles.length > 1 ? (
-          // Cambió el día desde la simulación: se elige entre ese día y hoy (FR-017).
-          <View style={{ gap: space.sm }}>
-            <Text variant="label" tone="inkSecondary">
-              ¿Cuándo pagaste?
-            </Text>
-            <View style={{ gap: space.sm }}>
-              {desde.fechasPosibles.map((f) => (
-                <OptionRow
-                  key={f}
-                  title={f === hoy ? "Hoy" : "El día que simulaste"}
-                  detail={fechaLarga(f).replace(/^./, (c) => c.toUpperCase())}
-                  selected={fecha === f}
-                  onPress={() => {
-                    hapticoSeleccion();
-                    setFechaElegida(f);
-                  }}
-                />
-              ))}
-            </View>
-          </View>
-        ) : (
+        <SelectorFecha
+          valor={fecha}
+          rango={rangoDeDias}
+          onChange={(f) => {
+            hapticoSeleccion();
+            setFechaElegida(f);
+          }}
+        />
+        <View style={{ gap: space.sm }}>
           <Text variant="label" tone="inkSecondary">
-            {fechaLarga(fecha).replace(/^./, (c) => c.toUpperCase())}
+            ¿Dónde pagaste?
           </Text>
-        )}
+          <Segmentado
+            accessibilityLabel="Dónde pagaste"
+            opciones={[
+              { valor: "presencial", label: "En el local" },
+              { valor: "online", label: "Online" },
+            ]}
+            valor={canal}
+            onChange={(c) => {
+              hapticoSeleccion();
+              setCanal(c);
+            }}
+          />
+        </View>
       </View>
 
       <View style={{ gap: space.md }}>
         <SectionHeader title="¿Con qué pagaste?" />
-        {modo === "ticket" && !medioDelTicket ? (
+        {sugerencia && sugerencia.tipo !== "sugerida" ? (
           <Card tone="warning" padding={space.md}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
               <Icon name="info" size={18} color={colors.warning} />
               <Text variant="bodyMd" tone="warning" style={{ flex: 1 }}>
-                El ticket no dice el medio de pago.
+                {sugerencia.tipo === "sin_medio"
+                  ? "El ticket no dice el medio de pago."
+                  : `El ticket dice ${sugerencia.leido}, pero no sabemos cuál de tus tarjetas es.`}
               </Text>
             </View>
           </Card>
         ) : null}
-        {desde && desde.avisos.length > 0 ? (
-          <Text variant="bodyMd" tone="warning">
-            {desde.avisos
-              .map((a) => (a === "monto-distinto" ? "El monto del ticket es distinto al que simulaste." : "El ticket dice otro medio de pago."))
-              .join(" ")}{" "}
-            Usamos lo del ticket.
+        {desde?.avisos.map((a) => (
+          <Text key={a} variant="bodyMd" tone="warning">
+            {a === "monto-distinto"
+              ? "El monto del ticket es distinto al que simulaste: usamos el del ticket."
+              : "El ticket dice otro medio de pago que el que elegiste al simular."}
           </Text>
-        ) : null}
+        ))}
         <View accessibilityRole="radiogroup" style={{ gap: space.md }}>
           {perfil.medios.map((m) => (
             <OptionRow
               key={m.id}
               title={m.nombre}
-              detail={detalleDe(m.id)}
-              note={desde?.medioSugerido === m.id && medioId === null ? "El que elegiste al simular" : null}
+              detail={detalles?.[m.id] ?? null}
+              note={notaDelMedio(m.id)}
               selected={medioId === m.id}
               onPress={() => {
                 hapticoSeleccion();
@@ -308,4 +390,14 @@ export default function Revisa() {
       ) : null}
     </Screen>
   );
+}
+
+/** El medio leído llega como texto en los parámetros de la ruta; lo que no es del contrato es `null`. */
+function medioDeLosParametros(p: { medioRed?: string; medioTipo?: string; medioBanco?: string }): MedioLeido {
+  return {
+    red: esRed(p.medioRed) ? p.medioRed : null,
+    tipo: esTipoTarjeta(p.medioTipo) ? p.medioTipo : null,
+    banco: p.medioBanco || null,
+    ultimos4: null,
+  };
 }

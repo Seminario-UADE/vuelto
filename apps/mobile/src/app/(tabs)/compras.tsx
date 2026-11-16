@@ -11,7 +11,7 @@ import { divisor } from "@/components/lista";
 import { Screen } from "@/components/screen";
 import { Text } from "@/components/text";
 import type { Compra } from "@/data/contracts";
-import { aprox, diaDelMes, pesos } from "@/lib/format";
+import { aprox, conMayuscula, diaDelMes, pesos } from "@/lib/format";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectMarcasDeSubida, selectResumenCompras } from "@/store/selectores";
 import { reintentarRechazadas } from "@/store/thunks";
@@ -26,7 +26,7 @@ export default function Compras() {
   const datos = useAppSelector(selectResumenCompras);
   const subida = useAppSelector(selectMarcasDeSubida);
   const dispatch = useAppDispatch();
-  const mes = datos.mes.replace(/^./, (c) => c.toUpperCase());
+  const mes = conMayuscula(datos.mes);
 
   const porDia = new Map<string, Compra[]>();
   for (const c of [...datos.compras].sort((a, b) => b.fecha.localeCompare(a.fecha))) porDia.set(c.fecha, [...(porDia.get(c.fecha) ?? []), c]);
@@ -68,7 +68,7 @@ export default function Compras() {
             <FilaAccion
               leading="devolvieron"
               titulo={`Te devolvieron ${aprox(datos.devolvieron.monto)}`}
-              detalle={datos.devolvieron.base.texto.replace(/^./, (c) => c.toUpperCase())}
+              detalle={conMayuscula(datos.devolvieron.base.texto)}
               valor="Topes"
               onPress={() => router.push("/topes")}
             />

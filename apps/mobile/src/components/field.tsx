@@ -13,13 +13,15 @@ type Props = {
   error?: string | null;
   tabular?: boolean;
   prefix?: string;
+  /** Al salir del campo o cerrar el teclado: el usuario terminó de escribir (spec 015). */
+  onBlur?: () => void;
 };
 
 /**
  * Campo editable del ticket: etiqueta arriba en Musgo, valor en body-lg y lápiz a la
  * derecha; el error va debajo en Óxido con qué pasó y cómo seguir (DESIGN.md §5).
  */
-export function Field({ label, value, onChangeText, placeholder, keyboardType, error, tabular, prefix }: Props) {
+export function Field({ label, value, onChangeText, placeholder, keyboardType, error, tabular, prefix, onBlur }: Props) {
   const ref = useRef<ComponentRef<typeof TextInput>>(null);
   return (
     <View style={{ gap: space.xs }}>
@@ -53,6 +55,7 @@ export function Field({ label, value, onChangeText, placeholder, keyboardType, e
               ref={ref}
               value={value}
               onChangeText={onChangeText}
+              onBlur={onBlur}
               placeholder={placeholder}
               placeholderTextColor={colors.inkSecondary}
               keyboardType={keyboardType}

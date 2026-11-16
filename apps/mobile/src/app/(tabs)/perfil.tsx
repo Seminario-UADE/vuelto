@@ -23,6 +23,8 @@ const ESCENARIOS: { id: Escenario; label: string }[] = [
   { id: "normal", label: "Normal" },
   { id: "mes-vacio", label: "Sin compras" },
   { id: "ticket-ilegible", label: "Ticket ilegible" },
+  { id: "sin-red", label: "Sin red" },
+  { id: "ticket-de-ejemplo", label: "Ticket de ejemplo" },
 ];
 
 /**

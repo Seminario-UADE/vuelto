@@ -2526,6 +2526,583 @@ proveedor que cuide la privacidad sin costo.
 
 ---
 
+## 2026-11-10 — Spec de la lectura del ticket con Groq (issue #48)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit, `spec-critic` y `gh` CLI.
+
+**Objetivo:** escribir la spec del servicio que lee la foto de un ticket y
+devuelve sus datos, ya con Groq (ADR-012), para que después la issue #49
+lo conecte a la pantalla de confirmar la compra.
+
+**Prompts principales:**
+1. "Arrancá la issue #48 sobre el PR #126." Se acordó el alcance: solo el
+   servicio y su contrato; la cámara y la pantalla son de la issue #49.
+2. "¿Cómo serían las reglas de código para tapar datos personales, si no
+   todos los tickets los tienen en el mismo lugar?" Las reglas buscan por la
+   forma del dato (tarjeta, CUIT con dígito verificador, DNI anunciado), no
+   por su lugar. Los nombres no tienen forma fija: se le pide a Groq que los
+   tape, y las reglas quedan como red de seguridad. "Con las dos capas,
+   arrancá."
+3. "No entendí: ¿quién definió el formato que espera la app? ¿El descuento se
+   puede sacar del ticket o se calcula después?" El formato lo armó Joaquín
+   para un lector de mentira. Se decidió que el servicio devuelva el medio de
+   pago tal como lo dice el ticket (la app lo cruza con las tarjetas del
+   perfil) y no leer el descuento: casi ninguna promo bancaria aparece en el
+   ticket, y el reintegro ya lo calcula el motor al confirmar.
+4. "El ticket va a ser de un solo pago" y "que haga falta tener cuenta".
+5. "Pasala por spec-critic y corregí el ADR-012."
+6. "Commiteá ambos y seguí con el plan." El plan define cómo se arma el
+   servicio (igual que el de recomendar), que Groq devuelve los datos tal
+   como están impresos y nuestro código los convierte, el contrato para la
+   app (issue #49) con un mensaje sugerido para cada error, y una prueba con 3
+   fotos reales que corre el usuario fuera de la sesión de IA antes de
+   escribir el servicio.
+7. "Commiteá y seguí con las tasks." 28 tareas en 3 etapas. La primera
+   termina con la prueba de Groq con fotos reales, que corre el usuario: si
+   no pasa, no se sigue. Los tests van antes que el código, sin red ni key.
+8. "Arrancá con la etapa 1, hasta la tarea 9 en pausa." Se armó lo mínimo
+   para hablarle a Groq: el esquema, su validación en el servidor y la
+   conexión, con tests que simulan a Groq. Más un script para que el usuario
+   pruebe con fotos reales en otra terminal, sin que la key pase por la IA.
+9. "Me devolvió ExtractorNoDisponibleError." El script no decía por qué. Se
+   le sumó el código de Groq o el motivo de la falla de conexión, sin datos
+   del ticket. En el segundo intento, Groq leyó bien el primer ticket: monto,
+   fecha y red correctos, y el tipo de tarjeta vacío porque el ticket no lo
+   dice. Eligió la razón social en vez del nombre del local.
+10. "Ajustá lo del comercio." La instrucción a Groq y el esquema ahora piden
+    el nombre del local (el que reconoce el usuario y el que se cruza con la
+    compra por confirmar) y, si no hay, la razón social. Error de la IA: el
+    commit anterior dejó un import sin usar porque no se corrió el lint antes
+    de commitear; se corrigió en este.
+11. "Algunas fotos dan 429. ¿Puede ser que Groq esté dormido y haya que
+    darle tiempo, o mandarle una señal antes?" El 429 era el límite de uso
+    por minuto, no un arranque en frío. "No venía de probar antes, fueron
+    días distintos": la primera explicación de la IA no cerraba, así que se
+    pasó a mostrar el mensaje de Groq, que dice qué límite se superó.
+12. "¿Las tres fotos se mandan juntas o de a una?" De a una; el script
+    muestra los resultados al final. En la app es siempre una foto por
+    pedido.
+13. Con los mensajes de Groq y los límites que el usuario vio en la consola
+    se ajustó: apagar el "pensamiento" interno del modelo (cada ticket pasó
+    de unos 3.500 a unos 1.350 tokens), sacar el tope de respuesta (con tope,
+    Groq cortaba el texto antes de tiempo; se comprobó con una prueba con y
+    sin tope) y reintentar una vez si Groq pide esperar 12 segundos o menos.
+    "¿Cuánto esperaría?": lo que diga Groq, solo si entra en los 20 segundos.
+14. "Commiteá y seguí con la etapa 2." El servicio convierte lo que lee Groq
+    (importes con formato argentino, fechas, red, débito o crédito, últimos 4)
+    con reglas probadas que nunca deducen, y tapa en el texto tarjetas, CUIT
+    de personas y DNI. Los casos de prueba incluyen formatos reales de los
+    tickets del usuario. Para no tapar códigos que no son tarjetas (números
+    de factura, códigos de barras), se usa la cuenta de control de las
+    tarjetas. Error de la IA: un test del servicio se escribió y se hizo
+    pasar sin verlo fallar antes; en el resto de la etapa se volvió al orden.
+15. "Commiteá y seguí con la etapa 3." La validación de la foto (formato,
+    tamaño y archivo dañado, antes de gastar cupo de Groq), la puerta de
+    entrada con un código por cada error y registros de una sola línea sin
+    datos del ticket, la entrada de la función y la documentación del
+    endpoint para la issue #49.
+16. "Revisá los resultados y mostrame todo junto" y "avanzá con los arreglos
+    1 a 8". Las revisiones (reglas, estándares y spec) no encontraron
+    incumplimientos de reglas, pero sí un caso real: si Groq o la
+    verificación de la cuenta se colgaban a mitad de camino, nada cortaba y
+    el usuario podía esperar más de 25 segundos. Ahora el corte de Groq cubre
+    la respuesta completa y hay un límite de 24 segundos para todo el pedido.
+    También: cualquier caída de Groq es "no disponible"; una tarjeta agrupada
+    de a 4 se tapa siempre, aunque Groq haya leído mal un dígito (antes
+    quedaba visible); el servicio se llama como los demás; y se sacó código
+    repetido. Error de la IA: las pruebas de estos arreglos se escribieron
+    junto con el código, sin verlas fallar antes.
+17. "Pasame el comando del despliegue." El usuario desplegó la función desde
+    Git Bash (`supabase login` y `supabase functions deploy` con `--use-api`)
+    y la probó con la key pública: respondió `no_autenticado`. O sea, la
+    función arranca con la key de Groq de los secrets y rechaza a quien no
+    tiene cuenta. "Igual la #49 es mi ticket": las notas para conectar la app
+    quedan para esa issue y no como aviso a otro integrante.
+
+**Resultado:**
+- Spec 013: qué recibe y qué devuelve el servicio, qué datos personales
+  tapa en el texto del ticket, un código distinto para cada error y una
+  prueba manual con fotos reales antes de escribir el código.
+- Groq devuelve los datos tal como están impresos y nuestro código los
+  convierte, así se puede probar que nunca se deduce nada (por ejemplo, la
+  red por los dígitos de la tarjeta).
+- Dos pasadas de spec-critic: la primera encontró que el contrato no
+  coincidía con lo que espera la app y que no estaba claro qué era el
+  descuento; la segunda, detalles técnicos que se resolvieron.
+- El ADR-012 se corrigió en el PR #126: ya no promete el formato del lector
+  simulado de la app.
+- Etapa 1: el esquema que recibe Groq y el que valida el servidor no se
+  pueden desalinear (un test lo controla), los errores de Groq se traducen a
+  los códigos de la spec y ningún error copia valores del ticket. 20 tests
+  nuevos, sin red ni key.
+- La prueba con fotos reales pasó: 3 tickets leídos bien (montos, fechas,
+  red y débito con sus últimos 4). Se escapó un dato personal, el nombre de
+  un mozo, y se sumó a la instrucción; se mide en la issue #10.
+- Límites reales del plan gratis: unos 2 a 3 tickets por minuto y unos 145
+  por día para toda la app. Alcanza para el MVP y quedó escrito en el
+  ADR-012.
+- La función está completa: 241 tests del servidor sin red ni key, y las
+  revisiones de reglas, estándares y spec sin incumplimientos.
+- La función quedó desplegada en Supabase y responde.
+- Queda pendiente: la issue #49 (ahora del usuario) conecta la app: adaptar
+  el formato que espera, sin descuento, y mandar la foto en JPG (el iPhone
+  saca HEIC) de 2,5 MB como máximo.
+
+---
+
+## 2026-11-14 — Spec de registrar una compra con la foto del ticket (issue #49)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit, `spec-critic` y `gh` CLI.
+
+**Objetivo:** conectar la app al servicio que lee el ticket (issue #48): sacar
+la foto, mandarla y llevar lo leído a «Revisá tu compra», sin que la foto
+quede en el celular.
+
+**Prompts principales:**
+1. "Arrancá con la issue #49." Antes de escribir la spec se acordó cómo sacar
+   la foto, qué hacer con el medio de pago, qué pasa sin cuenta y sin
+   descuento.
+2. "Había una opción que dentro de la app me dejaba sacar una foto, volver a
+   sacarla si no me gustaba, y no se guardaba en la memoria del celular." Es
+   la cámara del sistema: muestra «Repetir» y «Usar foto», y no la agrega a
+   la galería. Deja una copia temporal en la carpeta privada de la app, que
+   se borra enseguida.
+3. "Vamos con la cámara del sistema, borrar los temporales, el medio del
+   ticket solo como sugerencia, sin cuenta ofrecer iniciar sesión, sin
+   descuento y con un ticket de ejemplo para la demo."
+4. spec-critic marcó que la constitución decía que la foto nunca va a disco,
+   y en el celular eso es imposible. "1a y 2a": se aclara la constitución
+   (3.0.2: un temporal que se borra al terminar no cuenta como guardar la
+   foto) y la fecha pasa a poder cambiarse en «Revisá tu compra».
+5. "Commiteá y seguí con el plan." Tres librerías oficiales de Expo (cámara y
+   galería, achicar la foto, borrar archivos), la lógica en una carpeta
+   aparte que se prueba sin celular, y un calendario propio para la fecha
+   porque el de la comunidad no anda en la versión web de la app.
+6. "Commiteá y seguí con las tareas." 21 tareas en 3 etapas: la lógica
+   probada sin celular, la cámara y las pantallas (termina con la prueba del
+   usuario en su celular) y el cierre.
+7. "Commiteá y arrancá con la etapa 1." Toda la lógica, con las pruebas
+   escritas primero y vistas fallar antes del código: los mensajes de cada
+   error, la sugerencia del medio de pago, los días que se pueden elegir,
+   la llamada al servicio y el borrado de la foto en todos los casos.
+8. "Commiteá y seguí con la etapa 2." La cámara, «Escanear ticket», el
+   calendario y «Revisá tu compra». Antes de escribir el código que borra
+   las copias, se revisó en el código de las librerías de Expo en qué
+   carpetas las dejan, en vez de suponerlo.
+9. "Commiteá y hago la prueba en el celular." Para abrir la app en Expo Go
+   hubo vueltas: el login de Expo falla en Windows al abrir el navegador, así
+   que se arrancó sin cuenta de Expo (`--offline`). Además, faltaba el
+   archivo con la dirección de Supabase de la app, que cargó el usuario.
+10. "¿Cómo puedo probar alguno con reintegro? ¿No hay una librería que busque
+    por parecido?" La lectura anduvo, pero la compra quedó sin reintegro: el
+    ticket dice «COTO C.I.C.S.A.» y el catálogo dice «Coto». Idea del
+    usuario: sugerir el comercio más parecido. Quedó como la issue #134,
+    siempre como sugerencia que el usuario confirma.
+11. "Salió el mensaje de sin conexión, seguí con la etapa 3." Tres revisiones
+    en paralelo: las reglas del proyecto, el estilo del código y lo que pide
+    la spec.
+12. "El E1 no tiene mucho sentido: si la sacás de nuevo va a pesar similar."
+    Se aclaró que E1 no era la foto pesada, sino la que no se puede abrir
+    (dañada o en un formato raro), que con otra foto sí anda. "Dale, hacé el
+    E1."
+13. "Mergealo, está bien así." Se mergearon el PR #133 y el PR #135, después
+    de resolver los choques con lo que otros PRs habían sumado a `main`.
+14. "¿Podemos probar la versión web a ver si las fotos funcionan?" En el
+    celular, la web dijo «No pudimos abrir la foto». "¿Cambiamos algo desde
+    que funcionó con el QR?" No en la foto: el problema era de Safari, que
+    se queda sin memoria al cargar la foto entera de 12 megapíxeles. Se
+    cambió para cargarla ya achicada.
+15. Probada desde la compu, la web pasó a decir «Sin conexión». El servicio
+    no le contestaba al navegador la consulta previa que hace antes de
+    mandar un pedido a otro sitio (CORS), y el navegador lo bloqueaba. En la
+    app del celular no pasa porque no hay navegador de por medio.
+
+**Resultado:**
+- Spec 014: dos botones (cámara y galería del sistema), la foto achicada a
+  JPEG de 2,5 MB como máximo, las copias temporales borradas en todos los
+  casos, el medio del ticket como sugerencia solo si coincide con una sola
+  tarjeta, un mensaje y unas salidas para cada error, y la fecha editable.
+- La constitución (3.0.2), la política de privacidad, CLAUDE.md y el revisor
+  de reglas dicen qué pasa con la foto en el celular.
+- Dos pasadas de spec-critic: la primera encontró el choque con la
+  constitución y que el banco de la tarjeta nunca iba a coincidir con el del
+  ticket («Banco Galicia» contra «BCO GALICIA»); la segunda, contradicciones
+  con la spec 012 que se resolvieron.
+- Etapa 1 (lógica, 12 tareas): 80 pruebas nuevas, todas sin celular, más
+  las que se ajustaron de la compra por confirmar y los escenarios. Cubren
+  el mensaje y las salidas de cada error, cuándo una tarjeta lleva «El que
+  dice el ticket», qué días se pueden elegir, qué responde la app a cada
+  respuesta del servicio (incluidos los 30 segundos sin respuesta) y que la
+  foto y su copia achicada se borren en cada camino, aunque algo falle.
+- El medio del ticket ya no se marca solo en «Revisá tu compra»: queda como
+  sugerencia. En Perfil se suman los escenarios «Sin red» y «Ticket de
+  ejemplo» (este último con «VISA DEBITO», para la demo sin gastar el cupo
+  de Groq).
+- Etapa 2 (cámara y pantallas): «Escanear ticket» tiene «Sacar foto» y
+  «Elegir de la galería», y pide iniciar sesión si no hay cuenta. Muestra
+  «Leyendo el ticket…» mientras lee, y un mensaje con sus botones para cada
+  error. Al abrirse, borra las copias que hubieran quedado de una lectura
+  cortada. En «Revisá tu compra», la tarjeta que coincide con el ticket
+  lleva «El que dice el ticket» sin quedar marcada, y la fecha se cambia
+  tocándola, con un calendario que no deja elegir días fuera de lo
+  permitido.
+- Si el ticket dice una fecha anterior a la simulación, se propone el día de
+  la simulación, porque la compra no puede ser anterior.
+- La versión web de la app se sigue armando bien con las librerías nuevas, y
+  la key de Groq no aparece en ningún lado de la app.
+- Prueba en el celular (iPhone, con el servicio real): la cámara, la galería
+  y una foto HEIC leyeron bien y rápido; la foto no quedó en la galería; sin
+  permiso de cámara y sin conexión mostraron sus mensajes. «Sin sesión» no
+  se puede probar a mano porque la app no deja entrar sin cuenta.
+- Revisiones: no se rompe ninguna regla del proyecto. Se arreglaron dos
+  cosas de lo que pide la spec: si la sesión vence durante la lectura,
+  ahora siempre se ofrece iniciar sesión, en vez de «Algo falló»; y una foto
+  que no se puede abrir ya no dice «La foto es muy pesada», sino que ofrece
+  sacarla de nuevo. También se juntó en un solo lugar código que estaba
+  repetido y se corrigieron dos textos de la spec para que digan lo mismo
+  que lo decidido.
+- Los documentos de arquitectura ya dicen que la lectura del ticket es real
+  y qué pasa con la foto en el celular.
+- Error de la IA: en la primera explicación de E1 no quedó claro que se
+  trataba de la foto que no se abre, no de la pesada.
+- Se mergearon el PR #133 (issue #48) y el PR #135 (issue #49, con la
+  constitución 3.0.2).
+- Arreglos para la versión web: la foto se carga ya achicada, que también
+  le baja la memoria a la app del celular, y el servicio contesta la
+  consulta del navegador. Hay que volver a desplegar el servicio.
+- Error de la IA: la prueba en el celular se hizo solo con la app y no con
+  la web, y la web era una de las plataformas del plan. Los dos problemas
+  aparecieron recién después del merge.
+
+---
+
+## 2026-11-15 — Presentación de la entrega del MVP (issue #131)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con la skill `presentaciones-visuales`.
+
+**Objetivo:** armar el guion con reparto y tiempos de los 4 integrantes y el
+deck de la entrega del MVP. El material anterior era de las entregas parciales
+y presentaba como futuro lo que ya existe.
+
+**Prompts principales:**
+1. Leer `CLAUDE.md`, la issue #131, el guion y el deck anteriores, el alcance, los
+   requisitos, `uso-de-ia.md` y `docs/design/`. Antes de redactar: preguntar fecha,
+   duración y formato, y armar una tabla de «qué funciona de punta a punta / qué
+   está simulado / qué falta» verificada contra el repo, sin asumir.
+2. Respuestas al formulario: entrega esta semana (sin día exacto), 10 minutos,
+   presencial con proyector.
+3. «Sí, seguí» a la tabla, para pasar a redactar el guion y el deck en HTML, en modo
+   claro y oscuro.
+
+**Resultado:**
+- La tabla se verificó contra `gh issue list --state all`, el código, el CI y el log
+  de la última ingesta. Confirmó lo que el usuario ya sabía: la lectura del ticket en
+  la app (#49) y el gasto en grupo (#54, #130) están simulados, y la ingesta de MODO
+  corre sola todos los días. Encontró lo que faltaba: la Edge Function del ticket
+  (#48) está hecha pero en un PR abierto (#133) y sin conectar a la app; el extractor
+  de letra chica (#51) no existe; no hay informes de precisión (#10, #53); el APK de
+  respaldo (#56) y la auditoría de secretos (#55) no se hicieron; la base alojada
+  estuvo con migraciones atrasadas (#127); y 3 de las últimas 10 corridas de la
+  ingesta fallaron.
+- `docs/presentacion/guion.md` se reescribió para 10 minutos, con reparto por
+  integrante, tiempos por slide, qué decir y qué decir «en voz alta» como simulado,
+  preguntas probables y lista de control.
+- `docs/presentacion/vuelto-mvp.html`: deck de 13 slides con la paleta de la app v9.1,
+  modo claro y oscuro (`D`), cronómetro (`T`) y pantalla completa (`F`). Las capturas
+  del rediseño quedaron como `[PENDIENTE]`: las de `docs/design/` son de la v8 y no
+  había una sesión de Supabase local libre para sacar nuevas.
+- `docs/uso-de-ia.md` se actualizó: dice Groq para tickets y Gemini para letra chica,
+  y que esta última todavía no está implementada.
+- Las cifras del deck salen de las fuentes del repo: la encuesta
+  (`encuesta-resultados.md`), `alcance-mvp.md`, el log de la ingesta del 14/11 y el
+  conteo de tests (motor 216, app 709, supabase 40, ingesta 295). No se citan
+  resultados de #10 ni #53 porque no existen.
+- Pendientes marcados `[PENDIENTE: …]`: día y hora de la entrega, capturas v9.1,
+  build de respaldo y su link, comercio y monto de la demo, prueba en modo avión en
+  un celular real, estado del PR #133 y de las migraciones, y el ensayo completo.
+- Error de proceso: las primeras capturas candidatas parecían del rediseño actual y
+  eran de la v8 (crema, con datos de ejemplo); se vio al abrirlas y se descartaron.
+## 2026-11-14 — Migraciones al día: chequeo en el CI y error claro en la app (issue #127, ADR-013)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con `gh` CLI y el subagente `test-runner`.
+
+**Objetivo:** que no vuelva a pasar que la base alojada quede atrás de las
+migraciones del repo sin que nadie se entere (la app falló en el celular con
+«No pudimos cargar los bancos» porque faltaban cuatro migraciones).
+
+**Prompts principales:**
+1. "Leé CLAUDE.md, la infraestructura y el issue #127 [...] Mi recomendación
+   (cuestionala si ves algo mejor): NO aplicar migraciones automáticamente a
+   producción en cada merge. Un job de CI con `migration list --linked`, una
+   casilla en la plantilla de PR y que la app distinga «servidor no al día» de
+   «sin conexión». No ejecutes `db push` ni pidas credenciales. Proponeme el
+   plan y esperá mi OK antes de editar."
+2. "Aprobado" (el plan con dos desviaciones de la recomendación, ver abajo).
+
+**Resultado:**
+- Se leyó antes de proponer y se esperó el OK. Dos cambios sobre lo pedido,
+  aprobados por el usuario: el chequeo **no corre en `pull_request`** (un PR con
+  una migración nueva fallaría siempre, y un workflow editable por el PR no debe
+  leer el secret) y usa **un solo secret, `SUPABASE_DB_URL`**, con
+  `migration list --db-url`, en vez del token de acceso de toda la cuenta más la
+  contraseña.
+- `.github/workflows/migraciones.yml` (push a `main` con cambios de migraciones,
+  diario y a mano) lista las migraciones y `supabase/scripts/` las compara. Una
+  salida que no se pudo leer falla: no se toma por «al día». No aplica nada.
+- Casilla en `.github/pull_request_template.md`, comando en `CLAUDE.md`, pasos
+  para cargar el secret en `docs/architecture/04-infrastructure.md` y la decisión
+  en el ADR-013 (por qué no aplicar en el merge y cuándo revisarlo).
+- En la app, `clasificarError` devuelve `servidor_desactualizado` para columna,
+  tabla o función inexistentes y para un 403 con `42501`; el perfil y los bancos
+  lo muestran en vez de «sin conexión» o «No pudimos guardar el cambio».
+- Lo que **no** se pudo probar: la conexión real a la base alojada, el formato
+  de `--db-url` contra el pooler y la ejecución en GitHub Actions (no hay
+  secret ni se tocó la base alojada; Docker estaba apagado, así que tampoco se
+  comparó contra la salida real de `migration list --local`). El analizador se
+  probó con tablas de ejemplo con los dos estilos de separador.
+- Quedó fuera a propósito: la subida de compras (`data/compras/errores.ts`)
+  sigue tratando los errores desconocidos como transitorios, para no perder
+  compras del usuario; hay que decidirlo aparte porque cambia la spec 010.
+- Errores de la IA en el proceso: se creó primero `supabase/scripts/` sin los
+  tipos de Node en el workspace (falló el `typecheck`; se sumó `@types/node`);
+  una fila de la tabla de secrets quedó separada del resto por una línea en
+  blanco y se corrigió; un archivo temporal de prueba fue a la carpeta temporal
+  del sistema en vez de la del scratchpad y se borró.
+
+---
+
+## 2026-11-15 — Selector de medio: todos los bancos y redes en grilla (issue #128)
+
+**Herramienta:** Claude Code (Sonnet 5.5) en la app de escritorio, con el emulador de Android y Expo Go
+para probar en pantalla, y los agentes `test-runner` y `/code-review` antes del PR.
+
+**Objetivo:** arreglar dos problemas del selector de medio de pago (onboarding y «Agregar tarjeta» en
+Perfil): la lista de bancos aparecía vacía hasta escribir, y las 9 redes salían encimadas y cortadas
+en un control segmentado pensado para 2 o 3 opciones.
+
+**Prompts principales:**
+1. Pedido del issue #128 con reglas: verificar los dos problemas en el código y mostrar la opción de
+   diseño en una línea antes de editar; bancos completos con el buscador vacío; redes legibles con
+   44 pt de área táctil, sin volver a las píldoras; tests primero para `buscar-bancos`; actualizar a
+   mano la spec 001; sin tocar ingesta ni base; capturas antes y después; no dar por hecho lo no
+   probado. «Mostrame el plan con los archivos que vas a tocar y esperá mi OK.»
+2. «Sí, adelante», sobre el plan con la rama cortada desde `origin/main`.
+
+**Resultado:**
+- La rama de trabajo estaba 138 commits atrás de `origin/main` y no tenía `apps/mobile/src/perfil`;
+  se cortó `claude/128-bancos-y-redes` desde `origin/main`.
+- `buscarBancos` devuelve el catálogo completo, ordenado, con el texto vacío; los tests se reescribieron
+  primero y se vieron fallar. El issue decía «8 redes» pero lista 9: son 9 (spec y enum).
+- `GrillaRedes` (cuadrados de opción de 16 pt, borde de 2 pt y check al elegir) reemplaza al
+  `Segmentado` de las redes. `columnasRedes` (función pura, con tests) elige 3, 2 o 1 columnas según
+  el ancho del contenedor y la letra del sistema; así «Mastercard» nunca se parte.
+- `Screen` deja libre el alto del teclado al final en Android (`useAlturaTeclado`): en el emulador
+  con teclado abierto el último banco quedaba tapado. Es un cambio global, lo usan unas 18 pantallas.
+- Spec 001 (US1-1, US3-2, FR-001, FR-002, FR-005), `plan.md`, `tasks.md` y `DESIGN.md` (v9.2).
+- Capturas antes y después en `docs/capturas/bancos-redes-128/`, en claro y oscuro, con teclado,
+  con letra 1.3 y 1.8 y la variante de Perfil.
+- Revisión (`/code-review`): sin violaciones duras. Se aplicaron los tokens del tema en la grilla, un
+  comentario que contradecía a su constante, `plan.md:80` (decía que con texto vacío no se muestra
+  nada) y un aviso para el catálogo vacío. Quedó sin cambiar: el hook del teclado repite el patrón de
+  `tab-bar.tsx` y la lista de 82 no está virtualizada.
+- Verificado: lint, typecheck y los tests de los 4 workspaces. En pantalla, solo en el emulador de
+  Android (API 36) y con un arnés temporal que no se commiteó, porque en esta máquina no hay
+  credenciales de Supabase: muestra el `SelectorMedio` real con los 82 bancos del relevamiento de MODO,
+  no la pantalla real con la base. No se probó en iOS ni en un celular real; los componentes no tienen
+  tests de pantalla.
+- Errores de la IA en el proceso: una expectativa mal escrita en un test (Santander es `on_hub_list` y
+  va antes que Banco del Sol), un alias `@/` que Vitest no resuelve y que rompió un import, y dos veces
+  borró o pisó capturas con un comando demasiado amplio; se restauraron o se volvieron a sacar.
+
+---
+
+## 2026-11-15 — Gasto compartido con los datos de la cuenta (issue #130)
+
+**Herramienta:** Claude Code (Opus 5.5), con `gh` CLI, el navegador del panel
+de Claude y Supabase local (Docker). Subagentes: `test-runner`,
+`rules-guardian` y las dos revisiones de `/code-review`.
+
+**Objetivo:** corregir G-01, G-02 y G-04 de la revisión del gasto compartido
+(`docs/product/revision-gasto-grupo.md`). Con una cuenta real, «Vos» se
+evaluaba con los datos de Martín, todas las cuentas tenían a Lucía y Mateo de
+contactos y un comercio que no se podía resolver dejaba el resultado
+cargando para siempre.
+
+**Prompts principales:**
+1. "Leé CLAUDE.md, los ADR 008 a 010, la revisión y el issue #130. Corregí
+   G-01, G-02 y G-04; antes de editar, verificá que cada hallazgo siga igual.
+   Proponeme un plan y esperá mi OK." Se decidió implementar directo, sin
+   spec-kit: es un issue S de bugs y la revisión ya dice cómo corregirlos
+   (ADR-007). G-01 y G-02 seguían igual. G-04 había cambiado en parte:
+   armar y resultado ya buscaban el comercio en el store, pero si no lo
+   encontraban el pedido seguía cayendo en `comercioPorId`, y el resultado no
+   mostraba el error.
+2. "OK, avanzá." Primero los tests en rojo (10 fallaban por la razón
+   esperada), después el código.
+3. Al vaciar la lista de contactos se rompía la última línea del test
+   «contactos no se guardan» (`persistencia.test.ts`), que el usuario había
+   pedido no tocar. Se le preguntó y eligió cambiar solo esa línea: los
+   contactos siguen sin guardarse, y G-03 queda afuera.
+
+**Resultado:**
+- G-01: «Vos» se evalúa con los medios, las compras, el corpus y el reloj del
+  store (`selectEntradasMotor`). «Hoy» sale de ese reloj, no del reloj de
+  ejemplo, así que también se corrige G-12 en este camino. Los contactos
+  siguen simulados y se evalúan con el mismo corpus.
+- G-02: la lista de contactos arranca vacía y aparece el estado vacío que ya
+  estaba diseñado. Lucía y Mateo vienen solo al elegir un escenario de demo.
+- G-04: el pedido lleva el `Comercio` ya resuelto y se borró `comercioPorId`.
+  El resultado muestra el error con «Reintentar» y armar avisa si no hay
+  comercio. «¿Pagan entre varios?» ya no se ofrecía para un comercio sin
+  rubro (la recomendación es `null`), así que esa pantalla no se tocó.
+- Se verificó en la app web con Supabase local y una cuenta nueva, en claro
+  y oscuro, antes y después (`docs/design/capturas-130/`). Con el código
+  anterior, la cuenta nueva veía a Lucía y Mateo, el grupo decía «Tu Galicia
+  Visa crédito… según 3 compras de octubre» (la cuenta solo tenía una
+  Santander y ninguna compra) y un comercio desconocido dejaba el resultado
+  en el esqueleto.
+- Quedó sin verificar en pantalla el error con «Reintentar» del resultado:
+  con el comercio ya resuelto, el simulador no falla. Se va a ver con el
+  backend real (#56).
+- Lo que marcaron las revisiones y se ajustó: el resultado se recalcula si
+  cambian los datos de «Vos»; el error se muestra inline, en `error`
+  (DESIGN.md); armar no arma el grupo con otro comercio que el que pide la
+  ruta; los tests no repiten el pedido.
+- Errores de la IA en el proceso: el plan decía que «¿Pagan entre varios?»
+  se seguía ofreciendo sin rubro. Recién al leer la pantalla con más detalle
+  se vio que no. Además, la base de Supabase local estaba vieja (le faltaban
+  migraciones) y se aplicaron las que faltaban con `supabase migration up`,
+  sin borrar datos.
+
+---
+
+## 2026-11-15 — «Revisá tu compra»: la promo de cada tarjeta, con la fecha de la compra (issue #144)
+
+**Herramienta:** Claude Code (Opus 5.5), sin spec-kit (issue chica).
+
+**Objetivo:** que el texto debajo de cada tarjeta, al registrar una compra,
+hable solo de esa compra y use su fecha, no la de hoy.
+
+**Prompts principales:**
+1. "Cuando pongo «Perfumería Raffe» a mano me dice «La promo es solo en
+   FarmaPlus»." La pantalla mostraba el «¿por qué no?» de la recomendación (issue #46),
+   que explica también las promos de otros comercios del mismo rubro.
+2. "Para el ticket no me sirve saber eso. Y si alguien carga tarde una
+   compra de una promo que estaba vigente ese día, ¿no debería contar?" El
+   reintegro ya se calculaba con la fecha de la compra, pero el texto de
+   cada tarjeta usaba la de hoy: la misma pantalla podía decir «Promo
+   aplicada» y «La promo venció». Quedó como la issue #144.
+3. "Si es del mismo negocio, como Coto, está bien decir «Hoy no aplica, la
+   promo es los miércoles»." Se ajustó la regla: el motivo se muestra si la
+   promo es de ese comercio; si es de otro comercio o de otro rubro, «No hay
+   ninguna promo».
+
+**Resultado:**
+- Cada tarjeta dice cuánto devuelve esa compra (estimado, con su base), por
+  qué no aplicó una promo de ese comercio (el día, la vigencia, el canal, el
+  monto mínimo o el tope agotado) o «No hay ninguna promo». Nunca promos de
+  otros comercios.
+- El texto y el reintegro salen de la misma cuenta, con la fecha de la
+  compra: una compra cargada tarde cuenta con la promo vigente ese día.
+- La recomendación antes de comprar no cambió (es de otro equipo).
+- Queda anotado en la issue: la app solo conserva las promos vencidas del
+  mes en curso, no las de meses anteriores.
+
+---
+
+## 2026-11-15 — Sugerir el comercio del catálogo (issue #134)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit y `spec-critic`.
+
+**Objetivo:** que al registrar una compra, si el nombre del ticket o el
+escrito a mano no coincide con un comercio con promos («COTO C.I.C.S.A.»
+contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
+
+**Prompts principales:**
+1. "Arrancá con la issue #134, pero antes evaluemos cómo se vería: una opción
+   con el negocio sugerido para que el usuario elija, el top 3 o un buscador
+   si no lo encuentra, así si se leyó el nombre de la sociedad dueña de las
+   franquicias se encuentra el nombre comercial del local." Se mostraron
+   tres formas de presentarlo y el usuario eligió «top 3 + buscar». Para la
+   razón social se propuso buscar los nombres del catálogo dentro del texto
+   completo del ticket, en vez de una búsqueda con un modelo de lenguaje.
+2. "No hace falta la otra issue para recordar." Se aclaró que la app no
+   recuerda la elección del usuario para la próxima vez.
+3. "Aplicá las correcciones como las proponés." spec-critic encontró 13
+   puntos. Entre ellos: el rubro elegido se perdía al cambiar el nombre,
+   «coincide exacto» tenía dos definiciones, y la medición se ajustaba con la
+   misma lista que la medía.
+4. "Commiteá y seguí con el plan." Para el parecido entre nombres se eligió
+   una comparación propia que cuenta letras de diferencia, en vez de la
+   librería Fuse.js: es corta, sin dependencias y su umbral se entiende
+   fácil («Carrefur» está a una letra de «Carrefour»).
+5. "Commiteá y seguí con las tareas." 16 tareas en 3 etapas: la lógica con
+   su medición, la pantalla (termina con la prueba del usuario) y el cierre.
+6. "Commiteá y arrancá con la etapa 1." La lógica de la sugerencia, con las
+   pruebas escritas primero y vistas fallar antes del código. La prueba de
+   tiempo falló al correr junto con todas las demás; en vez de aflojarla, se
+   hizo más rápida la búsqueda en el texto del ticket.
+7. "Commiteá y seguí con la etapa 2." El recuadro de sugerencias, el
+   buscador y los cambios en «Revisá tu compra».
+8. "Si la promo es solo online, debería dejarme marcar si hice la compra
+   online: con FarmaPlus no me tomaba ningún reintegro." Con ticket o a
+   mano, la compra se tomaba siempre como hecha en el local, sin forma de
+   cambiarlo. "No hagas otra issue, sumalo a esta rama."
+9. "Cuando edité el nombre a «FarmaPlu», me seguía sugiriendo primero
+   Kansas, el negocio del ticket." Era un error de la spec: el texto del
+   ticket seguía mandando aunque el usuario hubiera cambiado el nombre.
+10. "Funciona bien, seguí con la etapa 3." Tres revisiones en paralelo: las
+    reglas del proyecto, el estilo del código y lo que pide la spec.
+11. "Avanzá así y mostrame la bitácora." Se aplicaron los arreglos
+    propuestos de las revisiones.
+
+**Resultado:**
+- Spec 015: si el comercio no coincide, un recuadro con hasta 3 sugerencias
+  (nombre y rubro), «Buscar otro comercio» y «No está en la lista». Si
+  coincide, una línea chica de confirmación. Nunca se elige solo y no hace
+  falta elegir para guardar.
+- Las sugerencias salen del texto del ticket, del nombre sin «S.A.» ni
+  sucursal, y de la búsqueda por parecido. Todo en el celular, sin red.
+- La medición queda fija en dos listas dentro de la spec: 20 nombres como
+  los de tickets reales y 10 comercios que no están en el catálogo.
+- Plan: la lógica en un archivo nuevo que se prueba sin celular, el umbral
+  ajustado con una lista distinta de la de medición, y el campo «Comercio»
+  avisa cuando el usuario termina de escribir.
+- Etapa 1 (lógica): con las dos listas de la spec, el comercio correcto
+  sale primero en los 20 nombres de tickets y no se sugiere nada en los 10
+  comercios que no están en el catálogo. Con 1.000 comercios, una búsqueda
+  tarda unos 12 milisegundos.
+- Errores de la IA: dos veces, al generar los archivos con un script, los
+  saltos de línea de los textos de prueba quedaron mal escritos y hubo que
+  corregirlos a mano.
+- Etapa 2 (pantalla): debajo del campo «Comercio» aparece la línea de
+  confirmación o el recuadro con las sugerencias, «Buscar otro comercio» y
+  «No está en la lista». A mano, el recuadro aparece al terminar de
+  escribir; con ticket, al abrir. El rubro elegido se guarda con la compra
+  y se borra si se cambia el nombre. Con compra por confirmar o desde una
+  recomendación no aparece.
+- Después de la prueba del usuario: «Revisá tu compra» pregunta «¿Dónde
+  pagaste?» («En el local» u «Online») y recalcula la promo; y el texto del
+  ticket solo se usa mientras el comercio sea el que leyó el ticket.
+- Error de la IA: la spec ponía el texto del ticket por delante de lo que
+  escribía el usuario, y no lo vio ninguna revisión hasta la prueba real.
+- La segunda prueba del usuario anduvo: «Online» con FarmaPlus y la
+  sugerencia después de editar el nombre.
+- Revisiones: no se rompe ninguna regla del proyecto. Se arreglaron:
+  - el anuncio del recuadro para el lector de pantalla del iPhone;
+  - la línea de confirmación también cuando el comercio viene de la
+    simulación;
+  - el título sin «¿Cuál es?» cuando no hay sugerencias;
+  - que tocar una sugerencia con el teclado abierto no dependa del orden
+    en que el celular avisa los toques;
+  - el orden entre rubros de un mismo comercio, fijo por categoría.
+  Además, la regla de cuándo mostrar la ayuda pasó a una función con sus
+  pruebas, y el buscador tomó el estilo de los demás buscadores de la app.
+- Los documentos de arquitectura explican la sugerencia y que «Revisá tu
+  compra» calcula todo con la fecha y el lugar de la compra.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

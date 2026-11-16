@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  SIN_PROMO_EN_LA_COMPRA,
   compraParaGuardar,
   comprasVista,
+  detallesDeLaCompra,
   gastoPorSemana,
   perfilDelMotor,
   promoPropuesta,
@@ -337,5 +339,103 @@ describe("promoPropuesta (spec 010, FR-022)", () => {
       ],
     };
     expect(promoPropuesta(agotada, comercio("coto"), "galicia-visa-credito", "2026-10-14", 24500).promociones).toEqual([]);
+  });
+});
+
+describe("detallesDeLaCompra: el texto de cada tarjeta en «Revisá tu compra» (issue #144)", () => {
+  it("la tarjeta con promo ese día dice cuánto devuelve, con su base; las demás, que no hay ninguna promo", () => {
+    const d = detallesDeLaCompra(entradas, comercio("coto"), "2026-10-14", 24500);
+    expect(d["galicia-visa-credito"]).toBe("Te devuelven ≈$4.900, según 3 compras de octubre");
+    const otras = Object.entries(d).filter(([id]) => id !== "galicia-visa-credito");
+    expect(otras.length).toBeGreaterThan(0);
+    expect(otras.every(([, texto]) => texto === SIN_PROMO_EN_LA_COMPRA)).toBe(true);
+    expect(SIN_PROMO_EN_LA_COMPRA).toBe("No hay ninguna promo");
+  });
+
+  it("usa la fecha de la compra: el jueves, la promo de Coto de los miércoles dice por qué no aplicó", () => {
+    expect(detallesDeLaCompra(entradas, comercio("coto"), "2026-10-15", 24500)["galicia-visa-credito"]).toBe(
+      "Hoy no aplica, la promo es los miércoles",
+    );
+  });
+
+  it("una compra cargada tarde cuenta con la promo que estaba vigente ese día, aunque hoy esté vencida", () => {
+    const vencida = promociones.map((p) =>
+      p.id === "promo-galicia-super-mie" ? { ...p, vigencia: { ...p.vigencia, hasta: "2026-10-14" } } : p,
+    );
+    const despues = { ...entradas, promociones: vencida, ahora: new Date("2026-10-20T15:00:00Z") };
+    expect(detallesDeLaCompra(despues, comercio("coto"), "2026-10-14", 24500)["galicia-visa-credito"]).toMatch(
+      /^Te devuelven ≈\$4\.900/,
+    );
+    expect(detallesDeLaCompra(despues, comercio("coto"), "2026-10-21", 24500)["galicia-visa-credito"]).toBe(
+      "La promo venció el 14/10",
+    );
+  });
+
+  it("nunca una promo de otro comercio: «No hay ninguna promo», no «La promo es solo en FarmaPlus»", () => {
+    const deFarmaPlus = {
+      ...promociones[0]!,
+      id: "promo-galicia-farmaplus",
+      titulo: "Galicia: 20% en FarmaPlus",
+      categoriaId: comercio("farmacity").categoriaId!,
+      comercio: "FarmaPlus",
+      vigencia: { desde: "2026-10-01", hasta: "2026-12-31", dias: null },
+    };
+    const conFarmaPlus = { ...entradas, promociones: [...promociones, deFarmaPlus] };
+    const d = detallesDeLaCompra(conFarmaPlus, comercio("farmacity"), "2026-10-14", 10000);
+    expect(d["galicia-visa-credito"]).toBe(SIN_PROMO_EN_LA_COMPRA);
+    expect(Object.values(d).some((t) => t.includes("FarmaPlus"))).toBe(false);
+  });
+
+  it("una promo de otro rubro tampoco se explica: «No hay ninguna promo»", () => {
+    // Santander tiene promo en combustibles: no dice nada de una compra en Coto.
+    expect(detallesDeLaCompra(entradas, comercio("coto"), "2026-10-14", 24500)["santander-mastercard-credito"]).toBe(
+      SIN_PROMO_EN_LA_COMPRA,
+    );
+  });
+
+  it("con el tope agotado lo dice, con su base: es de esta compra", () => {
+    expect(detallesDeLaCompra(entradas, comercio("farmacity"), "2026-10-14", 10000)["macro-visa-debito"]).toBe(
+      "Tope agotado este mes, según 2 compras",
+    );
+  });
+
+  it("sin monto no inventa un reintegro", () => {
+    expect(detallesDeLaCompra(entradas, comercio("coto"), "2026-10-14", null)["galicia-visa-credito"]).toBe(
+      "Tiene promo: cargá el monto para estimar cuánto te devuelven",
+    );
+  });
+
+  it("un comercio fuera del catálogo: ninguna tarjeta tiene promo", () => {
+    const libre: Comercio = { id: "libre-raffe", nombre: "Perfumería Raffe", inicial: "P", rubro: "otro", categoriaId: null, frecuente: false };
+    const d = detallesDeLaCompra(entradas, libre, "2026-10-14", 5000);
+    expect(Object.keys(d).length).toBe(mediosDeMartin.length);
+    expect(Object.values(d).every((t) => t === SIN_PROMO_EN_LA_COMPRA)).toBe(true);
+  });
+});
+
+describe("el canal de la compra en «Revisá tu compra» (spec 015, FR-015)", () => {
+  const soloOnline = {
+    ...promociones[0]!,
+    id: "promo-galicia-farmacias-online",
+    titulo: "Galicia: 20% en farmacias online",
+    categoriaId: comercio("farmacity").categoriaId!,
+    canal: "online" as const,
+    vigencia: { desde: "2026-10-01", hasta: "2026-12-31", dias: null },
+  };
+  const conOnline = { ...entradas, promociones: [...promociones, soloOnline] };
+
+  it("en el local, la promo solo online no aplica y lo dice", () => {
+    expect(promoPropuesta(conOnline, comercio("farmacity"), "galicia-visa-credito", "2026-10-14", 10000, "presencial").promociones).toEqual([]);
+    expect(detallesDeLaCompra(conOnline, comercio("farmacity"), "2026-10-14", 10000, "presencial")["galicia-visa-credito"]).toBe(
+      "La promo es solo online",
+    );
+  });
+
+  it("online, la misma promo aplica y se estima el reintegro", () => {
+    const p = promoPropuesta(conOnline, comercio("farmacity"), "galicia-visa-credito", "2026-10-14", 10000, "online");
+    expect(p.promociones.map((x) => x.promocionId)).toEqual(["promo-galicia-farmacias-online"]);
+    expect(detallesDeLaCompra(conOnline, comercio("farmacity"), "2026-10-14", 10000, "online")["galicia-visa-credito"]).toMatch(
+      /^Te devuelven ≈\$/,
+    );
   });
 });

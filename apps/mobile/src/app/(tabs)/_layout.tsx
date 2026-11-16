@@ -4,6 +4,7 @@ import { View } from "react-native";
 import { EmptyState } from "@/components/empty-state";
 import { RUTA_COMPRAR, TabBar } from "@/components/tab-bar";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { MENSAJES_ERROR } from "@/perfil/modelo";
 import { leerMedios } from "@/store/perfil-remoto";
 import { useTema } from "@/components/tema-provider";
 import { colors } from "@/theme";
@@ -29,12 +30,16 @@ export default function TabsLayout() {
   }
   // No se pudo leer y no hay nada guardado: no se sabe si tiene medios en Supabase, así que no se lo
   // manda a repetir el onboarding (FR-010: ni carga infinita ni redirección a ciegas).
-  if (sinMedios && (perfil.carga === "sin-conexion" || perfil.carga === "error")) {
+  if (sinMedios && (perfil.carga === "sin-conexion" || perfil.carga === "servidor-desactualizado" || perfil.carga === "error")) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.canvas, justifyContent: "center" }}>
         <EmptyState
           title="No pudimos cargar tu perfil"
-          body="Necesitamos conexión para leer tus medios de pago."
+          body={
+            perfil.carga === "servidor-desactualizado"
+              ? MENSAJES_ERROR.servidor_desactualizado
+              : "Necesitamos conexión para leer tus medios de pago."
+          }
           action={{ label: "Reintentar", onPress: () => void dispatch(leerMedios()) }}
         />
       </View>

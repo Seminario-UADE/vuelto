@@ -295,6 +295,8 @@ export function ticketDeEjemplo(hoy: string) {
     comercio: "Coto",
     fecha: hoy,
     monto: 24500,
-    textoExtraido: `COTO C.I.C.S.A. · SUC. 112 ALMAGRO\n${d}/${m}/${a} 18:42\nVARIOS SUPERMERCADO\nTOTAL $ 24.500,00\nGRACIAS POR SU COMPRA`,
+    // El medio tal cual lo dice el ticket (spec 014, FR-012): la app lo cruza con el perfil.
+    medio: { banco: null, tipo: "debito" as const, red: "visa" as const, ultimos4: null },
+    textoExtraido: `COTO C.I.C.S.A. · SUC. 112 ALMAGRO\n${d}/${m}/${a} 18:42\nVARIOS SUPERMERCADO\nTOTAL $ 24.500,00\nVISA DEBITO\nGRACIAS POR SU COMPRA`,
   };
 }

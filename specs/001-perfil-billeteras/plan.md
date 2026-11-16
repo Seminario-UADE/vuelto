@@ -77,8 +77,9 @@ ADR-010, RNF-02, ADR-009, contrato de tipos #33). La spec no cambia.
    - **Orden**: primero los `onHubList === true`, después por nombre normalizado y, si dos
      empatan, por `id`. Se comparan códigos de carácter (`<` y `>`), no `localeCompare`, para que
      el orden no dependa del idioma del dispositivo.
-   - **Sin resultados**: con texto vacío no se muestra nada. Con texto pero sin coincidencias,
-     aparece el aviso de US1-7.
+   - **Texto vacío**: se muestra todo el catálogo, con el mismo orden (FR-001; cambia por la
+     issue #128, antes no se mostraba nada). Si el catálogo mismo está vacío, un aviso lo dice.
+   - **Sin resultados**: con texto pero sin coincidencias, aparece el aviso de US1-7.
 8. **Los bancos no se borran del catálogo.** El sembrado hace upsert por `id`, y `banco_id` es FK
    sin `on delete` (no deja borrar un banco con medios). Así un medio ya declarado siempre tiene
    un banco que mostrar (Edge Cases de la spec).

@@ -21,8 +21,11 @@ narrowly focused on these seven rules, each with its failure mode:
    `GROQ`, or similar. The Gemini key may only appear in the ingestion script;
    the Groq key only in a Supabase Edge Function (ADR-012).
 4. **Las imágenes de ticket no se persisten.** Check ticket-handling code
-   for any write of the raw image to storage/DB — only the extracted text
-   may be persisted alongside the purchase record.
+   for any write of the raw image to storage/DB/logs or the device gallery —
+   only the extracted text may be persisted alongside the purchase record. On
+   the phone, the temporary cache files of the camera, the picker and the
+   resized copy are allowed only if every path deletes them (constitución
+   3.0.2 §IV); a path that leaves one behind is a violation.
 5. **La publicación de promociones es automática y pasa siempre por la
    validación del esquema** (ADR-005). No hay revisión humana ni cola de
    aprobación: un borrador se publica solo si `esPromocionPublicable`
