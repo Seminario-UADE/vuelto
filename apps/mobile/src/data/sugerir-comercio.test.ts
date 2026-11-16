@@ -6,6 +6,7 @@ import {
   nombreLimpio,
   parecido,
   sugerirComercio,
+  textoParaSugerir,
   type ResultadoSugerencia,
 } from "./sugerir-comercio";
 
@@ -219,5 +220,36 @@ describe("tiempo (spec 015, SC-005)", () => {
     const inicio = performance.now();
     sugerirComercio({ nombre: "COMERCIO NUMERIO S.A.", textoTicket: texto, catalogo: grande, categoriaConocida: null });
     expect(performance.now() - inicio).toBeLessThan(100);
+  });
+});
+
+describe("textoParaSugerir: el texto del ticket solo mientras el comercio sea el leído (spec 015, FR-002.1)", () => {
+  const texto = "KANSAS\nTOTAL 10.000";
+
+  it("con el nombre leído (o el mismo con otra escritura) se usa el texto", () => {
+    expect(textoParaSugerir({ textoTicket: texto, nombre: "Kansas", nombreLeido: "KANSAS" })).toBe(texto);
+  });
+
+  it("con el comercio vacío se usa el texto", () => {
+    expect(textoParaSugerir({ textoTicket: texto, nombre: "  ", nombreLeido: "KANSAS" })).toBe(texto);
+  });
+
+  it("si el usuario lo editó, manda lo que escribió: el texto ya no se usa", () => {
+    expect(textoParaSugerir({ textoTicket: texto, nombre: "FarmaPlu", nombreLeido: "KANSAS" })).toBeNull();
+  });
+
+  it("sin ticket no hay texto", () => {
+    expect(textoParaSugerir({ textoTicket: null, nombre: "Kansas", nombreLeido: "Kansas" })).toBeNull();
+  });
+
+  it("con «FarmaPlu» editado sobre un ticket de Kansas, la primera sugerencia es FarmaPlus", () => {
+    const catalogo = [comercio("FarmaPlus", 4), comercio("Kansas", 2)];
+    const r = sugerirComercio({
+      nombre: "FarmaPlu",
+      textoTicket: textoParaSugerir({ textoTicket: texto, nombre: "FarmaPlu", nombreLeido: "KANSAS" }),
+      catalogo,
+      categoriaConocida: null,
+    });
+    expect(nombres(r)).toEqual(["FarmaPlus/4"]);
   });
 });

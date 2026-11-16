@@ -412,3 +412,30 @@ describe("detallesDeLaCompra: el texto de cada tarjeta en «Revisá tu compra» 
     expect(Object.values(d).every((t) => t === SIN_PROMO_EN_LA_COMPRA)).toBe(true);
   });
 });
+
+describe("el canal de la compra en «Revisá tu compra» (spec 015, FR-015)", () => {
+  const soloOnline = {
+    ...promociones[0]!,
+    id: "promo-galicia-farmacias-online",
+    titulo: "Galicia: 20% en farmacias online",
+    categoriaId: comercio("farmacity").categoriaId!,
+    canal: "online" as const,
+    vigencia: { desde: "2026-10-01", hasta: "2026-12-31", dias: null },
+  };
+  const conOnline = { ...entradas, promociones: [...promociones, soloOnline] };
+
+  it("en el local, la promo solo online no aplica y lo dice", () => {
+    expect(promoPropuesta(conOnline, comercio("farmacity"), "galicia-visa-credito", "2026-10-14", 10000, "presencial").promociones).toEqual([]);
+    expect(detallesDeLaCompra(conOnline, comercio("farmacity"), "2026-10-14", 10000, "presencial")["galicia-visa-credito"]).toBe(
+      "La promo es solo online",
+    );
+  });
+
+  it("online, la misma promo aplica y se estima el reintegro", () => {
+    const p = promoPropuesta(conOnline, comercio("farmacity"), "galicia-visa-credito", "2026-10-14", 10000, "online");
+    expect(p.promociones.map((x) => x.promocionId)).toEqual(["promo-galicia-farmacias-online"]);
+    expect(detallesDeLaCompra(conOnline, comercio("farmacity"), "2026-10-14", 10000, "online")["galicia-visa-credito"]).toMatch(
+      /^Te devuelven ≈\$/,
+    );
+  });
+});

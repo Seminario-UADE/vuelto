@@ -238,3 +238,21 @@ export function buscarEnCatalogo(catalogo: readonly Comercio[], texto: string, l
   }
   return resultados.slice(0, limite);
 }
+
+/**
+ * El texto del ticket solo vale mientras el comercio sea el que leyó el ticket o esté vacío
+ * (spec 015, FR-002.1): si el usuario lo editó, manda lo que escribió.
+ */
+export function textoParaSugerir({
+  textoTicket,
+  nombre,
+  nombreLeido,
+}: {
+  textoTicket: string | null;
+  nombre: string;
+  nombreLeido: string;
+}): string | null {
+  if (textoTicket === null) return null;
+  const clave = claveDeComercio(nombre);
+  return clave === "" || clave === claveDeComercio(nombreLeido) ? textoTicket : null;
+}

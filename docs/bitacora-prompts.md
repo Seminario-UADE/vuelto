@@ -3044,6 +3044,13 @@ contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
    hizo más rápida la búsqueda en el texto del ticket.
 7. "Commiteá y seguí con la etapa 2." El recuadro de sugerencias, el
    buscador y los cambios en «Revisá tu compra».
+8. "Si la promo es solo online, debería dejarme marcar si hice la compra
+   online: con FarmaPlus no me tomaba ningún reintegro." Con ticket o a
+   mano, la compra se tomaba siempre como hecha en el local, sin forma de
+   cambiarlo. "No hagas otra issue, sumalo a esta rama."
+9. "Cuando edité el nombre a «FarmaPlu», me seguía sugiriendo primero
+   Kansas, el negocio del ticket." Era un error de la spec: el texto del
+   ticket seguía mandando aunque el usuario hubiera cambiado el nombre.
 
 **Resultado:**
 - Spec 015: si el comercio no coincide, un recuadro con hasta 3 sugerencias
@@ -3070,8 +3077,13 @@ contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
   escribir; con ticket, al abrir. El rubro elegido se guarda con la compra
   y se borra si se cambia el nombre. Con compra por confirmar o desde una
   recomendación no aparece.
-- Queda pendiente: la prueba del usuario y el cierre (revisiones,
-  documentación y PR).
+- Después de la prueba del usuario: «Revisá tu compra» pregunta «¿Dónde
+  pagaste?» («En el local» u «Online») y recalcula la promo; y el texto del
+  ticket solo se usa mientras el comercio sea el que leyó el ticket.
+- Error de la IA: la spec ponía el texto del ticket por delante de lo que
+  escribía el usuario, y no lo vio ninguna revisión hasta la prueba real.
+- Queda pendiente: volver a probar y el cierre (revisiones, documentación y
+  PR).
 
 ---
 

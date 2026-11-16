@@ -9,6 +9,7 @@ import { Icon } from "@/components/icon";
 import { OptionRow } from "@/components/option-row";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
+import { Segmentado } from "@/components/segmentado";
 import { SelectorFecha } from "@/components/selector-fecha";
 import { SugerenciaComercio } from "@/components/sugerencia-comercio";
 import { SheetHeader } from "@/components/sheet-header";
@@ -16,7 +17,7 @@ import { Text } from "@/components/text";
 import { comercioPorNombre, detallesDeLaCompra, promoPropuesta } from "@/data/calculo";
 import type { Canal, Comercio, OrigenCompra } from "@/data/contracts";
 import { borradorDesdePorConfirmar } from "@/data/por-confirmar";
-import { sugerirComercio } from "@/data/sugerir-comercio";
+import { sugerirComercio, textoParaSugerir } from "@/data/sugerir-comercio";
 import { aprox, montoEditable, parseMonto } from "@/lib/format";
 import { esRed, esTipoTarjeta } from "@/perfil/modelo";
 import { hapticoExito, hapticoSeleccion } from "@/lib/haptics";
@@ -79,8 +80,11 @@ export default function Revisa() {
         : null;
     return pc ? { pc, ...borradorDesdePorConfirmar(pc, ticket, hoy) } : null;
   });
-  // El canal con el que se recomendó (#43): la promo propuesta y la guardada son las mismas.
-  const canal: Canal = (desde ? desde.borrador.canal : p.canal) === "online" ? "online" : "presencial";
+  // El canal con el que se recomendó (#43) o, con ticket y a mano, en el local; el usuario lo
+  // cambia con «¿Dónde pagaste?» (spec 015, FR-015). La promo propuesta y la guardada son las mismas.
+  const [canal, setCanal] = useState<Canal>(() =>
+    (desde ? desde.borrador.canal : p.canal) === "online" ? "online" : "presencial",
+  );
   const modo: OrigenCompra = desde
     ? desde.borrador.modo
     : p.modo === "ticket" || p.modo === "excepcion"
@@ -127,7 +131,12 @@ export default function Revisa() {
   // Comercios y rubros: «Usar…» desde un rubro llega con su nombre («Supermercados»).
   const catalogo = useAppSelector(selectCatalogoParaCompras);
   // La ayuda para elegir el comercio (spec 015): nunca cambia el comercio sola (FR-004).
-  const textoDelTicket = modo === "ticket" ? (desde?.borrador.textoExtraido ?? p.texto ?? null) : null;
+  // El texto del ticket solo mientras el comercio sea el leído: si lo editó, manda lo que escribió (FR-002.1).
+  const textoDelTicket = textoParaSugerir({
+    textoTicket: modo === "ticket" ? (desde?.borrador.textoExtraido ?? p.texto ?? null) : null,
+    nombre: comercio,
+    nombreLeido: comercioInicial,
+  });
   const sugerenciaDeComercio = useMemo(
     () =>
       noEsta || vinoElComercio || buscadoEn === null || buscadoEn !== comercio
@@ -274,6 +283,23 @@ export default function Revisa() {
             setFechaElegida(f);
           }}
         />
+        <View style={{ gap: space.sm }}>
+          <Text variant="label" tone="inkSecondary">
+            ¿Dónde pagaste?
+          </Text>
+          <Segmentado
+            accessibilityLabel="Dónde pagaste"
+            opciones={[
+              { valor: "presencial", label: "En el local" },
+              { valor: "online", label: "Online" },
+            ]}
+            valor={canal}
+            onChange={(c) => {
+              hapticoSeleccion();
+              setCanal(c);
+            }}
+          />
+        </View>
       </View>
 
       <View style={{ gap: space.md }}>

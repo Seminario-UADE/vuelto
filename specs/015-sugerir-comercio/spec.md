@@ -42,6 +42,8 @@ Martín escanea un ticket de Coto. El lector trae «COTO C.I.C.S.A.». En «Revi
 4. **Given** un comercio que coincide exacto con uno del catálogo en un solo rubro, o uno ya elegido de una sugerencia, **Then** no aparece el recuadro: solo una línea chica debajo del campo con el nombre y el rubro («Coto · Supermercados»).
 5. **Given** el ticket dice «INC S.A.» en el campo comercio y «CARREFOUR» en otra línea del texto, **Then** la primera sugerencia es «Carrefour».
 6. **Given** el usuario eligió una sugerencia, **When** cambia el texto del campo, **Then** la elección se borra (nombre y rubro) y, al terminar de escribir, se vuelve a buscar.
+7. **Given** un ticket de «Kansas» y el usuario edita el comercio a «FarmaPlu», **When** termina de escribir, **Then** la primera sugerencia es «FarmaPlus»: el texto del ticket ya no se usa (FR-002).
+8. **Given** una promo de FarmaPlus solo online, **When** el usuario elige «Online» en «¿Dónde pagaste?», **Then** aparece la promo y el reintegro se recalcula (FR-015).
 
 ---
 
@@ -94,7 +96,7 @@ Martín carga a mano «coto sucursal 5». Al terminar de escribir aparece el mis
 
 - **FR-001**: En «Revisá tu compra», cuando el comercio no coincide exacto con uno del catálogo, la app MUST mostrar debajo del campo un recuadro con hasta 3 sugerencias del catálogo, cada una con su nombre y su rubro, ninguna marcada, con el título «No lo encontramos entre los comercios con promo. ¿Cuál es?». Si el comercio está vacío pero el texto del ticket nombra uno o más comercios del catálogo, MUST mostrar el recuadro con el título «¿Es alguno de estos?». Si el comercio está vacío y el texto no nombra ninguno, no hay recuadro.
 - **FR-002**: Las sugerencias MUST salir, en este orden y sin repetir, de:
-  1. los comercios del catálogo cuyo nombre aparece como palabras enteras **dentro del texto completo del ticket** (solo con ticket; con la regla de *Edge Cases* para los nombres cortos), en el orden en que aparecen;
+  1. los comercios del catálogo cuyo nombre aparece como palabras enteras **dentro del texto completo del ticket** (solo con ticket y **solo mientras el comercio sea el que leyó el ticket o esté vacío**: si el usuario lo edita, manda lo que escribió y el texto ya no se usa; con la regla de *Edge Cases* para los nombres cortos), en el orden en que aparecen;
   2. los comercios cuyo nombre aparece como palabras enteras **dentro del nombre limpio** del comercio leído o escrito;
   3. los más **parecidos** por escritura al nombre limpio, que superen un umbral de parecido.
 - **FR-003**: La sugerencia MUST ser determinística (el mismo nombre, texto y catálogo dan siempre las mismas sugerencias, en el mismo orden) y calcularse en el celular, sin red y sin modelos de lenguaje.
@@ -108,6 +110,7 @@ Martín carga a mano «coto sucursal 5». Al terminar de escribir aparece el mis
 - **FR-011**: Un comercio en dos rubros MUST tratarse como en *Edge Cases*.
 - **FR-012**: La app MUST NOT recordar las elecciones del usuario entre compras.
 - **FR-013**: Los rubros sin comercio del catálogo MUST NOT sugerirse ni aparecer en el buscador.
+- **FR-015** *(agregado el 15/11 después de la prueba del usuario)*: «Revisá tu compra» MUST preguntar «¿Dónde pagaste?» con «En el local» y «Online». Con ticket o carga a mano arranca en «En el local»; desde una recomendación o una compra por confirmar, con el que se eligió al simular. Al cambiarlo, la promo propuesta y el texto de cada tarjeta MUST recalcularse, y la compra MUST guardarse con ese canal.
 - **FR-014**: Accesibilidad: el lector de pantalla MUST anunciar la aparición del recuadro, y cada sugerencia y cada resultado MUST ser un botón cuya etiqueta lleva el nombre y el rubro.
 
 ### Key Entities
