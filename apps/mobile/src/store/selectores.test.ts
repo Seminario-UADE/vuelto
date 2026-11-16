@@ -89,7 +89,7 @@ describe("selectUsoDeTopes (torta de Inicio, v9)", () => {
       disponible: 0,
       queda: 0,
       topes: 0,
-      base: "todavía no usaste ningún tope este mes",
+      base: "Todavía no usaste ningún tope este mes",
     });
   });
 

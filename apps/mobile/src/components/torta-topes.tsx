@@ -25,7 +25,7 @@ const MINIMO = 0.03;
  */
 export function TortaTopes({ uso }: { uso: UsoDeTopes }) {
   const t = useTema();
-  if (uso.topes === 0) return <SinTopesUsados />;
+  if (uso.topes === 0) return <SinTopesUsados texto={uso.base} />;
   const arco = uso.queda === 0 ? 0 : Math.max(MINIMO, uso.queda);
   const porcentaje = Math.round(uso.queda * 100);
   return (
@@ -84,12 +84,12 @@ export function TortaTopes({ uso }: { uso: UsoDeTopes }) {
 }
 
 /** Todavía sin compras este mes: ninguna suma que mostrar, solo el camino a Topes (issue #149). */
-function SinTopesUsados() {
+function SinTopesUsados({ texto }: { texto: string }) {
   return (
     <PressableScale
       onPress={() => router.push("/topes")}
       accessibilityRole="button"
-      accessibilityLabel="Todavía no usaste ningún tope este mes. Ver tus topes."
+      accessibilityLabel={`${texto}. Ver tus topes.`}
     >
       <Card padding={space.lg}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: space.lg }}>
@@ -97,7 +97,7 @@ function SinTopesUsados() {
             <Text variant="label" tone="inkSecondary">
               Tope que te queda
             </Text>
-            <Text>Todavía no usaste ningún tope este mes.</Text>
+            <Text>{texto}.</Text>
             <Text variant="caption" tone="inkSecondary">
               Cuando registres una compra con promo, acá ves cuánto te queda.
             </Text>

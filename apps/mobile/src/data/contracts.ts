@@ -153,7 +153,7 @@ export type UsoDeTopes = {
   /** De 0 a 1: la parte del tope total que todavía queda. */
   queda: number;
   topes: number;
-  /** "según 4 compras de octubre" o, sin compras, "todavía no usaste ningún tope este mes". */
+  /** "según 4 compras de octubre" o, sin compras, "Todavía no usaste ningún tope este mes". */
   base: string;
 };
 

@@ -555,6 +555,9 @@ export function compraParaGuardar(
   };
 }
 
+/** La torta de Inicio sin compras en el período: no hay suma para mostrar (issue #149). */
+export const SIN_TOPES_USADOS = "Todavía no usaste ningún tope este mes";
+
 /**
  * Inicio (v9): los topes que estás usando este mes, sumados, para el gráfico de torta. Solo
  * cuentan los que ya tienen compras: sumar el tope de cada promo del corpus daba una cifra que
@@ -575,7 +578,7 @@ export function usoDeTopes(topes: ResumenTopes): UsoDeTopes | null {
     topes: usados.length,
     base:
       compras === 0
-        ? "todavía no usaste ningún tope este mes"
+        ? SIN_TOPES_USADOS
         : `según ${compras} ${compras === 1 ? "compra" : "compras"} de ${topes.mes}`,
   };
 }
