@@ -47,6 +47,9 @@ export default function TabsLayout() {
   }
   // Sin medios en el perfil: al onboarding, sin salida hasta confirmar (issue #41, T009).
   if (sinMedios) return <Redirect href="/medios" />;
+  // Una invitación abierta antes de tener cuenta o perfil se abre apenas el perfil está listo, venga
+  // de la primera respuesta, de «Guardá tu perfil» o del primer ingreso (ADR-008 §1, spec 012 US5).
+  if (perfil.invitacionPendiente) return <Redirect href={`/i/${perfil.invitacionPendiente}`} />;
   return (
     <Tabs
       tabBar={(props) => <TabBar {...props} />}

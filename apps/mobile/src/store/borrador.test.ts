@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { MedioDelBorrador } from "../perfil/borrador";
 import { borradorComercios, borradorMedios, borradorNombre } from "./perfil";
-import { guardarBorradorEnCuenta, leerMedios } from "./perfil-remoto";
+import { elegirMediosSinCuenta, guardarBorradorEnCuenta, leerMedios, TEXTO_FALLA_BORRADOR } from "./perfil-remoto";
 import { memoria, storeDePrueba } from "./prueba";
 import { GALICIA, guardado, ok, remoto } from "./prueba-perfil-remoto";
 import { emailPorConfirmarCambio, usuarioCambio } from "./sesion";
@@ -14,9 +14,9 @@ const elegido: MedioDelBorrador = { bancoId: GALICIA, nombreBanco: "Banco Galici
 /** Un store con lo elegido sin cuenta y, después, una sesión abierta. */
 function conBorrador(r = remoto(), { comercios = ["Coto", "Farmacity"], nombre = "Ana" as string | null } = {}) {
   const s = storeDePrueba(null, memoria(), { perfilRemoto: r.datos });
-  s.dispatch(borradorMedios({ medios: [elegido], ahora: AHORA }));
-  s.dispatch(borradorComercios({ comercios, ahora: AHORA }));
-  if (nombre !== null) s.dispatch(borradorNombre({ nombre, ahora: AHORA }));
+  s.dispatch(borradorMedios({ medios: [elegido], creadoEn: AHORA }));
+  s.dispatch(borradorComercios({ comercios, creadoEn: AHORA }));
+  if (nombre !== null) s.dispatch(borradorNombre({ nombre, creadoEn: AHORA }));
   s.dispatch(usuarioCambio({ id: "u1", email: "ana@mail.com" }));
   return s;
 }
@@ -82,8 +82,8 @@ describe("guardarBorradorEnCuenta (spec 012, US5, FR-031 y FR-034)", () => {
   it("una falla a mitad conserva el borrador de lo que falta, y la próxima lectura lo reintenta", async () => {
     const falla = remoto({ confirmarComercios: { ok: false, error: "sin_conexion" } });
     const s = storeDePrueba(null, memoria(), { perfilRemoto: falla.datos });
-    s.dispatch(borradorMedios({ medios: [elegido], ahora: AHORA }));
-    s.dispatch(borradorComercios({ comercios: ["Coto"], ahora: AHORA }));
+    s.dispatch(borradorMedios({ medios: [elegido], creadoEn: AHORA }));
+    s.dispatch(borradorComercios({ comercios: ["Coto"], creadoEn: AHORA }));
     s.dispatch(usuarioCambio({ id: "u1", email: "ana@mail.com" }));
 
     const res = await s.dispatch(guardarBorradorEnCuenta());
@@ -125,7 +125,7 @@ describe("guardarBorradorEnCuenta (spec 012, US5, FR-031 y FR-034)", () => {
   it("sin sesión no hace nada: el borrador espera a la cuenta", async () => {
     const r = remoto();
     const s = storeDePrueba(null, memoria(), { perfilRemoto: r.datos });
-    s.dispatch(borradorMedios({ medios: [elegido], ahora: AHORA }));
+    s.dispatch(borradorMedios({ medios: [elegido], creadoEn: AHORA }));
     expect(await s.dispatch(guardarBorradorEnCuenta())).toEqual({ ok: true, datos: [] });
     expect(r.llamadas).toEqual([]);
     expect(s.getState().perfil.borrador?.medios).toEqual([elegido]);
@@ -134,8 +134,8 @@ describe("guardarBorradorEnCuenta (spec 012, US5, FR-031 y FR-034)", () => {
   it("con confirmación de email: el borrador espera sin sesión y se guarda en el primer ingreso (FR-033, SC-009)", async () => {
     const r = remoto({ confirmarOnboarding: ok([guardado("m1")]) });
     const s = storeDePrueba(null, memoria(), { perfilRemoto: r.datos });
-    s.dispatch(borradorMedios({ medios: [elegido], ahora: AHORA }));
-    s.dispatch(borradorNombre({ nombre: "Ana", ahora: AHORA }));
+    s.dispatch(borradorMedios({ medios: [elegido], creadoEn: AHORA }));
+    s.dispatch(borradorNombre({ nombre: "Ana", creadoEn: AHORA }));
     // El registro no devolvió sesión: «Revisá tu email» muestra la dirección.
     s.dispatch(emailPorConfirmarCambio("ana@mail.com"));
     await s.dispatch(leerMedios());
@@ -149,5 +149,29 @@ describe("guardarBorradorEnCuenta (spec 012, US5, FR-031 y FR-034)", () => {
     expect(r.llamadas).toContain("confirmar:1");
     expect(r.llamadas).toContain("guardarNombre:u1:Ana");
     expect(s.getState().perfil.borrador).toBeNull();
+  });
+
+  it("el comienzo del borrador es el reloj real, no el de ejemplo: no se vence por error (FR-031)", () => {
+    const s = storeDePrueba(null, memoria(), { reloj: () => new Date("2026-11-16T15:00:00.000Z") });
+    // Sin corpus sincronizado, `sesion.ahora` sigue en el reloj de ejemplo (octubre).
+    expect(s.getState().sesion.ahora.startsWith("2026-10")).toBe(true);
+    s.dispatch(elegirMediosSinCuenta([elegido]));
+    expect(s.getState().perfil.borrador?.creadoEn).toBe("2026-11-16T15:00:00.000Z");
+  });
+
+  it("si fallan los comercios, se avisa en vez de quedar trabado en silencio (escenario 8)", async () => {
+    const r = remoto({ confirmarComercios: { ok: false, error: "sin_conexion" } });
+    const s = conBorrador(r);
+    await s.dispatch(guardarBorradorEnCuenta());
+    expect(s.getState().sesion.aviso).toBe(TEXTO_FALLA_BORRADOR.comercios);
+    expect(s.getState().perfil.borrador?.comercios).toEqual(["Coto", "Farmacity"]);
+  });
+
+  it("si falla el nombre, se avisa y el nombre queda en el borrador para reintentar", async () => {
+    const r = remoto({ guardarNombre: { ok: false, error: "sin_conexion" } });
+    const s = conBorrador(r);
+    await s.dispatch(guardarBorradorEnCuenta());
+    expect(s.getState().sesion.aviso).toBe(TEXTO_FALLA_BORRADOR.nombre);
+    expect(s.getState().perfil.borrador).toEqual({ medios: [], comercios: [], nombre: "Ana", creadoEn: AHORA });
   });
 });

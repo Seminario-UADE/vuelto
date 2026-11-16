@@ -133,7 +133,7 @@ Sofía toca «Empezar» en Bienvenida sin crear cuenta. Elige sus medios, ve su 
 2. **Given** «Empezar», **Then** el usuario elige medios (con la lista de bancos) y ve la primera respuesta (US4), calculada con las promociones reales, sin haber creado nada en el servidor.
 3. **Given** la primera respuesta, **When** toca «Seguir», **Then** se abre «Guardá tu perfil», con nombre, email y contraseña.
 4. **When** crea la cuenta, **Then** los medios, los habituales y el nombre elegidos se guardan en ella y el usuario llega a Inicio sin repetir pasos.
-5. **Given** un proyecto que exige confirmar el email, **When** crea la cuenta, **Then** ve una pantalla que dice a qué email se mandó la confirmación y qué hacer, con «Ya confirmé, entrar». Lo elegido sigue en el teléfono y se guarda en la cuenta al primer ingreso.
+5. **Given** un proyecto que exige confirmar el email, **When** crea la cuenta, **Then** ve una pantalla que dice a qué email se mandó la confirmación y qué hacer, con «Ya confirmé, entrar» (y «Usé otro email», que vuelve al registro). Lo elegido sigue en el teléfono y se guarda en la cuenta al primer ingreso.
 6. **Given** que en «Guardá tu perfil» elige «Ya tengo cuenta», **Then** la regla se aplica por separado a medios y a habituales: si la cuenta ya los tiene, prevalecen los de la cuenta y se avisa que la selección de este teléfono no se aplicó; si no los tiene, se guardan los elegidos.
 7. **Given** que cierra la app en medio del onboarding sin cuenta, **When** la vuelve a abrir, **Then** retoma donde estaba, con lo elegido.
 8. **Given** que falla el guardado de lo elegido después de crear la cuenta, **Then** el usuario no pierde la selección y puede reintentar, sin quedar en un estado a medias que lo haga repetir el alta.
@@ -154,7 +154,7 @@ Sofía toca «Empezar» en Bienvenida sin crear cuenta. Elige sus medios, ve su 
 - **Medio borrado del perfil** después de crear la compra por confirmar: «Revisá» no lo preselecciona y pide elegir otro, así que la compra queda `manual`.
 - **Texto grande o lector de pantalla**: la tarjeta de la compra por confirmar y sus tres acciones se leen en orden, y cada acción tiene un área táctil de al menos 44 pt.
 - **Invitación abierta antes de tener cuenta** (`i/[token]`): se conserva durante el onboarding y se abre al terminar, como hoy.
-- **Borrador del onboarding sin terminar** (US5): si nunca se crea la cuenta, se borra a los 30 días o al tocar «Ya tengo cuenta» y entrar.
+- **Borrador del onboarding sin terminar** (US5): si nunca se crea la cuenta, se borra a los 30 días. Al tocar «Ya tengo cuenta» y entrar, se aplica FR-034 y el borrador se borra después de guardar lo que corresponda. El nombre sigue la misma regla: si la cuenta ya tiene uno, queda el de la cuenta.
 
 ## Requirements *(mandatory)*
 

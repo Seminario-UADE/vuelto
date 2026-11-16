@@ -15,8 +15,8 @@ import { hapticoSeleccion } from "@/lib/haptics";
 import { MENSAJES_ERROR, puedeConfirmar, type MedioNuevo } from "@/perfil/modelo";
 import { medioVista } from "@/perfil/vista";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { borradorMedios } from "@/store/perfil";
-import { confirmarMedios, leerBancos, leerMedios } from "@/store/perfil-remoto";
+import { aMedioNuevo } from "@/perfil/borrador";
+import { confirmarMedios, elegirMediosSinCuenta, leerBancos, leerMedios } from "@/store/perfil-remoto";
 import { space } from "@/theme";
 
 /**
@@ -30,12 +30,11 @@ export default function Medios() {
   const dispatch = useAppDispatch();
   const guardados = useAppSelector((s) => s.perfil.medios);
   const sinCuenta = useAppSelector((s) => s.sesion.usuario === null);
-  const ahora = useAppSelector((s) => s.sesion.ahora);
   const delBorrador = useAppSelector((s) => s.perfil.borrador?.medios);
   const bancos = useAsync(() => dispatch(leerBancos()));
   // Sin cuenta, vuelve con lo que ya había elegido (FR-031: sobrevive a cerrar la app).
   const [nuevos, setNuevos] = useState<MedioNuevo[]>(() =>
-    sinCuenta ? (delBorrador ?? []).map(({ bancoId, tipo, red }) => ({ bancoId, tipo, red })) : [],
+    sinCuenta ? (delBorrador ?? []).map(aMedioNuevo) : [],
   );
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +59,7 @@ export default function Medios() {
 
   const continuar = async () => {
     if (sinCuenta) {
-      dispatch(borradorMedios({ medios: nuevos.map((n) => ({ ...n, nombreBanco: nombreBanco(n.bancoId) })), ahora }));
+      dispatch(elegirMediosSinCuenta(nuevos.map((n) => ({ ...n, nombreBanco: nombreBanco(n.bancoId) }))));
       router.push("/primera-respuesta");
       return;
     }

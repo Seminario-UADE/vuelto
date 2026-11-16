@@ -17,8 +17,10 @@ import { RUBROS } from "@/lib/rubros";
 import { quitarComercio, SELECCION_VACIA, tocarComercio } from "@/lib/seleccion-comercios";
 import { MENSAJES_ERROR } from "@/perfil/modelo";
 import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
-import { borradorComercios, invitacionGuardada, onboardingTerminado } from "@/store/perfil";
-import { confirmarComercios } from "@/store/perfil-remoto";
+import { comerciosConNombre } from "@/data/comercios";
+import { invitacionGuardada, onboardingTerminado } from "@/store/perfil";
+import { confirmarComercios, elegirComerciosSinCuenta } from "@/store/perfil-remoto";
+import { selectCatalogoComercios } from "@/store/selectores";
 import { rubroColors, space } from "@/theme";
 
 /**
@@ -33,10 +35,20 @@ export default function PrimeraRespuesta() {
   const dispatch = useAppDispatch();
   const pendiente = useAppSelector((s) => s.perfil.invitacionPendiente);
   const sinCuenta = useAppSelector((s) => s.sesion.usuario === null);
-  const ahora = useAppSelector((s) => s.sesion.ahora);
-  const [seleccion, setSeleccion] = useState(SELECCION_VACIA);
+  const catalogo = useAppSelector(selectCatalogoComercios);
+  const delBorrador = useAppSelector((s) => s.perfil.borrador?.comercios);
   // Los nombres de los marcados, como los guarda `comercios_habituales`.
   const nombres = useRef(new Map<string, string>());
+  // Sin cuenta, vuelve con los que ya había marcado (US5, escenario 7).
+  const [seleccion, setSeleccion] = useState(() => {
+    if (!sinCuenta || !delBorrador) return SELECCION_VACIA;
+    const marcados = delBorrador.flatMap((n) => {
+      const c = comerciosConNombre(n, catalogo)[0];
+      if (c) nombres.current.set(c.id, n);
+      return c ? [c.id] : [];
+    });
+    return { marcados, activo: null };
+  });
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const r = useRecomendacionPara(seleccion.activo, null);
@@ -51,7 +63,7 @@ export default function PrimeraRespuesta() {
   const seguir = async () => {
     if (sinCuenta) {
       const comercios = seleccion.marcados.map((id) => nombres.current.get(id) ?? id);
-      dispatch(borradorComercios({ comercios, ahora }));
+      dispatch(elegirComerciosSinCuenta(comercios));
       router.push("/registro");
       return;
     }

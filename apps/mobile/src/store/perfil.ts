@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { usuario } from "../data/fixtures";
-import { borradorVacio, type MedioDelBorrador } from "../perfil/borrador";
+import { borradorNuevo, borradorVacio, type MedioDelBorrador } from "../perfil/borrador";
 import { escenarioElegido, rehidratado, sesionCerrada, type ComercioHabitual, type EstadoPerfil, type MedioGuardado } from "./acciones";
 
 /**
@@ -75,20 +75,20 @@ export const perfil = createSlice({
       s.invitacionPendiente = a.payload;
     },
     /**
-     * Los medios elegidos sin cuenta (US5): reemplazan los del borrador. `ahora` es el reloj del
-     * store; marca el comienzo del borrador si recién empieza (FR-031).
+     * Los medios elegidos sin cuenta (US5): reemplazan los del borrador. `creadoEn` lo pone el thunk
+     * con el reloj real, el mismo que decide el vencimiento a los 30 días (FR-031).
      */
-    borradorMedios(s, a: PayloadAction<{ medios: MedioDelBorrador[]; ahora: string }>) {
-      s.borrador ??= { medios: [], comercios: [], nombre: null, creadoEn: a.payload.ahora };
+    borradorMedios(s, a: PayloadAction<{ medios: MedioDelBorrador[]; creadoEn: string }>) {
+      s.borrador ??= borradorNuevo(a.payload.creadoEn);
       s.borrador.medios = a.payload.medios;
     },
-    borradorComercios(s, a: PayloadAction<{ comercios: string[]; ahora: string }>) {
-      s.borrador ??= { medios: [], comercios: [], nombre: null, creadoEn: a.payload.ahora };
+    borradorComercios(s, a: PayloadAction<{ comercios: string[]; creadoEn: string }>) {
+      s.borrador ??= borradorNuevo(a.payload.creadoEn);
       s.borrador.comercios = a.payload.comercios;
     },
     /** El nombre del registro, cuando la cuenta todavía no tiene sesión (confirmar el email, FR-033). */
-    borradorNombre(s, a: PayloadAction<{ nombre: string; ahora: string }>) {
-      s.borrador ??= { medios: [], comercios: [], nombre: null, creadoEn: a.payload.ahora };
+    borradorNombre(s, a: PayloadAction<{ nombre: string; creadoEn: string }>) {
+      s.borrador ??= borradorNuevo(a.payload.creadoEn);
       s.borrador.nombre = a.payload.nombre;
     },
     /** Esa parte ya está en la cuenta: sale del borrador, y sin nada más el borrador se borra. */

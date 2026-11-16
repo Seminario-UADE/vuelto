@@ -4,6 +4,7 @@
  * Lo que devuelve la base entra al slice `perfil`, que se persiste en el dispositivo; si un pedido
  * falla, el slice no cambia y la pantalla muestra el error clasificado.
  */
+import { aMedioNuevo, type MedioDelBorrador } from "../perfil/borrador";
 import type { Resultado } from "../perfil/datos";
 import {
   comercioRepetido,
@@ -21,6 +22,9 @@ import {
 } from "../perfil/modelo";
 import type { AppDispatch, AppThunk, RootState } from "./index";
 import {
+  borradorComercios,
+  borradorMedios,
+  borradorNombre,
   borradorParteGuardada,
   cargaCambio,
   type CargaPerfil,
@@ -243,6 +247,25 @@ export function sacarComercio(id: string): AppThunk<Promise<Resultado<null>>> {
 
 // ─── Borrador del onboarding (spec 012, US5) ───
 
+/**
+ * Lo elegido sin cuenta va al borrador (FR-031). El comienzo del borrador lo marca el reloj real
+ * (`reloj` del store), el mismo con el que se vence al abrir la app: `sesion.ahora` puede seguir en
+ * el reloj de ejemplo si todavía no se sincronizó el corpus.
+ */
+export function elegirMediosSinCuenta(medios: MedioDelBorrador[]): AppThunk {
+  return (dispatch, _getState, { reloj }) => dispatch(borradorMedios({ medios, creadoEn: reloj().toISOString() }));
+}
+
+export function elegirComerciosSinCuenta(comercios: string[]): AppThunk {
+  return (dispatch, _getState, { reloj }) =>
+    dispatch(borradorComercios({ comercios, creadoEn: reloj().toISOString() }));
+}
+
+/** El nombre de «Guardá tu perfil», una vez creada la cuenta: lo guarda la misma pasada del borrador. */
+export function nombreAlBorrador(nombre: string): AppThunk {
+  return (dispatch, _getState, { reloj }) => dispatch(borradorNombre({ nombre, creadoEn: reloj().toISOString() }));
+}
+
 /** La cuenta ya tenía esa parte: prevalece la de la cuenta y se avisa (FR-034). */
 export type AvisoBorrador = "medios-de-la-cuenta" | "comercios-de-la-cuenta";
 
@@ -252,6 +275,22 @@ export const TEXTO_AVISO_BORRADOR: Record<AvisoBorrador, string> = {
 };
 
 /**
+ * Las tarjetas ya están en la cuenta pero otra parte no se pudo guardar: sigue en el borrador y se
+ * reintenta en la próxima lectura del perfil (al abrir la app o con «Reintentar»). Se avisa para que
+ * no parezca perdida (escenario 8).
+ */
+export const TEXTO_FALLA_BORRADOR = {
+  comercios: "No pudimos guardar tus comercios. Lo volvemos a intentar la próxima vez que abras la app",
+  nombre: "No pudimos guardar tu nombre. Lo volvemos a intentar la próxima vez que abras la app",
+} as const;
+
+/**
+ * La pasada en curso, si hay una. Como `escrituras`, es estado del módulo: el registro y la lectura
+ * que dispara la sesión nueva llaman casi a la vez y tienen que compartir la misma pasada.
+ */
+let guardandoBorrador: Promise<Resultado<AvisoBorrador[]>> | null = null;
+
+/**
  * Guarda en la cuenta lo elegido antes de tenerla (FR-031): al crearla o al primer ingreso. Lee la
  * cuenta y, por separado para medios y habituales, si ya los tiene prevalecen y se avisa; si no, se
  * guardan los del borrador (FR-034). El nombre, solo si la cuenta no tiene uno. Cada parte sale del
@@ -259,8 +298,6 @@ export const TEXTO_AVISO_BORRADOR: Record<AvisoBorrador, string> = {
  * lectura lo vuelve a intentar. Dos llamadas a la vez (el registro y la lectura que dispara la
  * sesión nueva) comparten la misma pasada: el borrador nunca se guarda dos veces.
  */
-let guardandoBorrador: Promise<Resultado<AvisoBorrador[]>> | null = null;
-
 export function guardarBorradorEnCuenta(): AppThunk<Promise<Resultado<AvisoBorrador[]>>> {
   return (dispatch) => {
     guardandoBorrador ??= dispatch(pasarBorradorALaCuenta()).finally(() => {
@@ -297,8 +334,7 @@ function pasarBorradorALaCuenta(): AppThunk<Promise<Resultado<AvisoBorrador[]>>>
       dispatch(mediosLeidos(medios.datos));
       if (medios.datos.length > 0 && elegidos.length > 0) avisos.push("medios-de-la-cuenta");
     } else {
-      const sinNombreDeBanco = elegidos.map(({ bancoId, tipo, red }) => ({ bancoId, tipo, red }));
-      const r = await escribir("medios", dispatch, getState, () => perfilRemoto.confirmarOnboarding(sinNombreDeBanco), (d) =>
+      const r = await escribir("medios", dispatch, getState, () => perfilRemoto.confirmarOnboarding(elegidos.map(aMedioNuevo)), (d) =>
         dispatch(mediosLeidos(d)),
       );
       if (!r.ok) {
@@ -308,7 +344,11 @@ function pasarBorradorALaCuenta(): AppThunk<Promise<Resultado<AvisoBorrador[]>>>
     }
     dispatch(borradorParteGuardada("medios"));
 
-    if (!comercios.ok) return comercios;
+    if (!comercios.ok) {
+      dispatch(avisoMostrado(TEXTO_FALLA_BORRADOR.comercios));
+      return comercios;
+    }
+    // Sin repetidos entre sí: la cuenta no tiene ninguno (si tuviera, prevalecen los de la cuenta).
     const nombres = comerciosNuevos(borrador()?.comercios ?? [], []);
     if (comercios.datos.length > 0 || nombres.length === 0) {
       dispatch(comerciosLeidos(comercios.datos));
@@ -317,17 +357,26 @@ function pasarBorradorALaCuenta(): AppThunk<Promise<Resultado<AvisoBorrador[]>>>
       const r = await escribir("comercios", dispatch, getState, () => perfilRemoto.confirmarComercios(nombres), (d) =>
         dispatch(comerciosLeidos(d)),
       );
-      if (!r.ok) return r;
+      if (!r.ok) {
+        dispatch(avisoMostrado(TEXTO_FALLA_BORRADOR.comercios));
+        return r;
+      }
     }
     dispatch(borradorParteGuardada("comercios"));
 
-    if (!nombre.ok) return nombre;
+    if (!nombre.ok) {
+      dispatch(avisoMostrado(TEXTO_FALLA_BORRADOR.nombre));
+      return nombre;
+    }
     const v = validarNombre(borrador()?.nombre ?? "");
     if (nombre.datos === null && v.ok) {
       const r = await escribir("nombre", dispatch, getState, () => perfilRemoto.guardarNombre(usuarioId, v.nombre), (d) =>
         dispatch(nombreCambiado(d)),
       );
-      if (!r.ok) return r;
+      if (!r.ok) {
+        dispatch(avisoMostrado(TEXTO_FALLA_BORRADOR.nombre));
+        return r;
+      }
     } else if (nombre.datos !== null) {
       dispatch(nombreCambiado(nombre.datos));
     }

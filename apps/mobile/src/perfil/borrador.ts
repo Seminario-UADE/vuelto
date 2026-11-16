@@ -18,6 +18,16 @@ export type BorradorPerfil = {
 
 export const BORRADOR_DIAS = 30;
 
+/** Un borrador recién empezado, sin nada elegido todavía. */
+export function borradorNuevo(creadoEn: string): BorradorPerfil {
+  return { medios: [], comercios: [], nombre: null, creadoEn };
+}
+
+/** Lo que se manda a `medios_de_pago`: el nombre del banco es solo para mostrar, no es una columna. */
+export function aMedioNuevo({ bancoId, tipo, red }: MedioDelBorrador): MedioNuevo {
+  return { bancoId, tipo, red };
+}
+
 const MS_POR_DIA = 24 * 60 * 60 * 1000;
 
 /** Más de 30 días desde que se empezó, o una fecha que no se puede leer. */

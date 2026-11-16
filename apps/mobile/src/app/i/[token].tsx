@@ -51,6 +51,9 @@ export default function AceptarInvitacion() {
     if (!usuario || !onboardingCompleto) {
       dispatch(invitacionGuardada(token));
       router.replace("/bienvenida");
+    } else {
+      // Ya se abrió: Inicio no vuelve a mandar acá.
+      dispatch(invitacionGuardada(null));
     }
   }, [dispatch, usuario, onboardingCompleto, token]);
 

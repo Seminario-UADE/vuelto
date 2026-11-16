@@ -21,7 +21,7 @@ export default function ConfirmarEmail() {
       kind="sheet"
       footer={
         <>
-          <Button label="Ya lo confirmé, entrar" onPress={() => router.replace("/login")} />
+          <Button label="Ya confirmé, entrar" onPress={() => router.replace("/login")} />
           <Button label="Usé otro email" variant="text" onPress={() => router.replace("/registro")} />
         </>
       }

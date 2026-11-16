@@ -4,8 +4,7 @@ import { TextInput, View } from "react-native";
 import { entrarCuenta, registrarCuenta } from "@/data/auth";
 import { NOMBRE_MAXIMO, validarNombre } from "@/perfil/modelo";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { borradorNombre, invitacionGuardada } from "@/store/perfil";
-import { cambiarNombre, guardarBorradorEnCuenta } from "@/store/perfil-remoto";
+import { cambiarNombre, guardarBorradorEnCuenta, nombreAlBorrador } from "@/store/perfil-remoto";
 import { avisoMostrado, emailPorConfirmarCambio } from "@/store/sesion";
 import { hapticoExito } from "@/lib/haptics";
 import type { ErrorAuth } from "@/lib/auth";
@@ -56,9 +55,8 @@ const TEXTOS = {
  */
 export function FormularioCuenta({ modo }: { modo: Modo }) {
   const conBorrador = useAppSelector((s) => s.perfil.borrador !== null);
-  const ahora = useAppSelector((s) => s.sesion.ahora);
-  const pendiente = useAppSelector((s) => s.perfil.invitacionPendiente);
-  const guardar = modo === "registro" && conBorrador;
+  // Se decide al abrir: si el borrador se vacía al guardarse, el título no cambia antes de salir.
+  const [guardar] = useState(modo === "registro" && conBorrador);
   const t = TEXTOS[guardar ? "guardar" : modo];
   const dispatch = useAppDispatch();
   const emailRef = useRef<ComponentRef<typeof TextInput>>(null);
@@ -79,14 +77,15 @@ export function FormularioCuenta({ modo }: { modo: Modo }) {
     }
     setEnviando(true);
     setError(null);
-    // Antes de crear la cuenta: apenas haya sesión, el borrador se guarda entero (FR-031).
-    if (guardar && n.ok) dispatch(borradorNombre({ nombre: n.nombre, ahora }));
     const r = await dispatch((modo === "registro" ? registrarCuenta : entrarCuenta)(email, clave));
     if (!r.ok) {
       setEnviando(false);
       setError(r);
       return;
     }
+    // Recién con la cuenta creada: un intento fallido (email ya usado) no deja su nombre en el
+    // borrador. Lo guarda la misma pasada que lo demás, ahora o en el primer ingreso (FR-031, FR-033).
+    if (guardar && n.ok) dispatch(nombreAlBorrador(n.nombre));
     // Con la cuenta ya creada (hay sesión), el nombre va a `perfiles`. Si falla no se frena el alta:
     // queda sin nombre, Perfil pide cargarlo y nunca se muestra uno inventado (FR-029).
     if (modo === "registro" && !guardar && n.ok && r.cuenta !== null) {
@@ -95,7 +94,7 @@ export function FormularioCuenta({ modo }: { modo: Modo }) {
     }
     // Lo elegido sin cuenta pasa a la cuenta antes de seguir. Si falla, queda en el teléfono y la
     // próxima lectura del perfil lo reintenta: Inicio espera y no repite el onboarding.
-    const guardoBorrador = guardar && r.cuenta !== null ? await dispatch(guardarBorradorEnCuenta()) : null;
+    if (guardar && r.cuenta !== null) await dispatch(guardarBorradorEnCuenta());
     setEnviando(false);
     if (r.cuenta === null) {
       // El proyecto pide confirmar el email: todavía no hay sesión. Lo elegido sigue en el borrador
@@ -106,12 +105,7 @@ export function FormularioCuenta({ modo }: { modo: Modo }) {
     }
     hapticoExito();
     if (router.canDismiss()) router.dismissAll();
-    // Una invitación abierta antes de tener cuenta sigue después del onboarding (ADR-008 §1).
-    if (guardoBorrador?.ok && pendiente) {
-      dispatch(invitacionGuardada(null));
-      router.replace(`/i/${pendiente}`);
-      return;
-    }
+    // Una invitación abierta antes de tener cuenta la abre Inicio apenas el perfil está listo.
     router.replace("/");
   };
 

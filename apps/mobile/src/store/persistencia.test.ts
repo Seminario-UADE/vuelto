@@ -241,9 +241,9 @@ describe("persistencia del borrador del onboarding (spec 012, US5, T043)", () =>
   it("hace ida y vuelta: sobrevive a cerrar la app (FR-031)", async () => {
     const disco = memoria();
     const a = await abrirEl(disco, "2026-11-16T12:00:00Z");
-    a.dispatch(borradorMedios({ medios: [medio], ahora: "2026-11-16T12:00:00.000Z" }));
-    a.dispatch(borradorComercios({ comercios: ["Coto"], ahora: "2026-11-16T12:00:00.000Z" }));
-    a.dispatch(borradorNombre({ nombre: "Ana", ahora: "2026-11-16T12:00:00.000Z" }));
+    a.dispatch(borradorMedios({ medios: [medio], creadoEn: "2026-11-16T12:00:00.000Z" }));
+    a.dispatch(borradorComercios({ comercios: ["Coto"], creadoEn: "2026-11-16T12:00:00.000Z" }));
+    a.dispatch(borradorNombre({ nombre: "Ana", creadoEn: "2026-11-16T12:00:00.000Z" }));
     await esperar();
 
     const b = await abrirEl(disco, "2026-11-20T12:00:00Z");
@@ -258,7 +258,7 @@ describe("persistencia del borrador del onboarding (spec 012, US5, T043)", () =>
   it("uno de más de 30 días se descarta al abrir, sin llevarse el resto del perfil", async () => {
     const disco = memoria();
     const a = await abrirEl(disco, "2026-10-01T12:00:00Z");
-    a.dispatch(borradorMedios({ medios: [medio], ahora: "2026-10-01T12:00:00.000Z" }));
+    a.dispatch(borradorMedios({ medios: [medio], creadoEn: "2026-10-01T12:00:00.000Z" }));
     a.dispatch(onboardingTerminado());
     await esperar();
 
