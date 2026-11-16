@@ -3010,6 +3010,99 @@ hable solo de esa compra y use su fecha, no la de hoy.
 
 ---
 
+## 2026-11-15 — Sugerir el comercio del catálogo (issue #134)
+
+**Herramienta:** Claude Code (Opus 5.5), con spec-kit y `spec-critic`.
+
+**Objetivo:** que al registrar una compra, si el nombre del ticket o el
+escrito a mano no coincide con un comercio con promos («COTO C.I.C.S.A.»
+contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
+
+**Prompts principales:**
+1. "Arrancá con la issue #134, pero antes evaluemos cómo se vería: una opción
+   con el negocio sugerido para que el usuario elija, el top 3 o un buscador
+   si no lo encuentra, así si se leyó el nombre de la sociedad dueña de las
+   franquicias se encuentra el nombre comercial del local." Se mostraron
+   tres formas de presentarlo y el usuario eligió «top 3 + buscar». Para la
+   razón social se propuso buscar los nombres del catálogo dentro del texto
+   completo del ticket, en vez de una búsqueda con un modelo de lenguaje.
+2. "No hace falta la otra issue para recordar." Se aclaró que la app no
+   recuerda la elección del usuario para la próxima vez.
+3. "Aplicá las correcciones como las proponés." spec-critic encontró 13
+   puntos. Entre ellos: el rubro elegido se perdía al cambiar el nombre,
+   «coincide exacto» tenía dos definiciones, y la medición se ajustaba con la
+   misma lista que la medía.
+4. "Commiteá y seguí con el plan." Para el parecido entre nombres se eligió
+   una comparación propia que cuenta letras de diferencia, en vez de la
+   librería Fuse.js: es corta, sin dependencias y su umbral se entiende
+   fácil («Carrefur» está a una letra de «Carrefour»).
+5. "Commiteá y seguí con las tareas." 16 tareas en 3 etapas: la lógica con
+   su medición, la pantalla (termina con la prueba del usuario) y el cierre.
+6. "Commiteá y arrancá con la etapa 1." La lógica de la sugerencia, con las
+   pruebas escritas primero y vistas fallar antes del código. La prueba de
+   tiempo falló al correr junto con todas las demás; en vez de aflojarla, se
+   hizo más rápida la búsqueda en el texto del ticket.
+7. "Commiteá y seguí con la etapa 2." El recuadro de sugerencias, el
+   buscador y los cambios en «Revisá tu compra».
+8. "Si la promo es solo online, debería dejarme marcar si hice la compra
+   online: con FarmaPlus no me tomaba ningún reintegro." Con ticket o a
+   mano, la compra se tomaba siempre como hecha en el local, sin forma de
+   cambiarlo. "No hagas otra issue, sumalo a esta rama."
+9. "Cuando edité el nombre a «FarmaPlu», me seguía sugiriendo primero
+   Kansas, el negocio del ticket." Era un error de la spec: el texto del
+   ticket seguía mandando aunque el usuario hubiera cambiado el nombre.
+10. "Funciona bien, seguí con la etapa 3." Tres revisiones en paralelo: las
+    reglas del proyecto, el estilo del código y lo que pide la spec.
+11. "Avanzá así y mostrame la bitácora." Se aplicaron los arreglos
+    propuestos de las revisiones.
+
+**Resultado:**
+- Spec 015: si el comercio no coincide, un recuadro con hasta 3 sugerencias
+  (nombre y rubro), «Buscar otro comercio» y «No está en la lista». Si
+  coincide, una línea chica de confirmación. Nunca se elige solo y no hace
+  falta elegir para guardar.
+- Las sugerencias salen del texto del ticket, del nombre sin «S.A.» ni
+  sucursal, y de la búsqueda por parecido. Todo en el celular, sin red.
+- La medición queda fija en dos listas dentro de la spec: 20 nombres como
+  los de tickets reales y 10 comercios que no están en el catálogo.
+- Plan: la lógica en un archivo nuevo que se prueba sin celular, el umbral
+  ajustado con una lista distinta de la de medición, y el campo «Comercio»
+  avisa cuando el usuario termina de escribir.
+- Etapa 1 (lógica): con las dos listas de la spec, el comercio correcto
+  sale primero en los 20 nombres de tickets y no se sugiere nada en los 10
+  comercios que no están en el catálogo. Con 1.000 comercios, una búsqueda
+  tarda unos 12 milisegundos.
+- Errores de la IA: dos veces, al generar los archivos con un script, los
+  saltos de línea de los textos de prueba quedaron mal escritos y hubo que
+  corregirlos a mano.
+- Etapa 2 (pantalla): debajo del campo «Comercio» aparece la línea de
+  confirmación o el recuadro con las sugerencias, «Buscar otro comercio» y
+  «No está en la lista». A mano, el recuadro aparece al terminar de
+  escribir; con ticket, al abrir. El rubro elegido se guarda con la compra
+  y se borra si se cambia el nombre. Con compra por confirmar o desde una
+  recomendación no aparece.
+- Después de la prueba del usuario: «Revisá tu compra» pregunta «¿Dónde
+  pagaste?» («En el local» u «Online») y recalcula la promo; y el texto del
+  ticket solo se usa mientras el comercio sea el que leyó el ticket.
+- Error de la IA: la spec ponía el texto del ticket por delante de lo que
+  escribía el usuario, y no lo vio ninguna revisión hasta la prueba real.
+- La segunda prueba del usuario anduvo: «Online» con FarmaPlus y la
+  sugerencia después de editar el nombre.
+- Revisiones: no se rompe ninguna regla del proyecto. Se arreglaron:
+  - el anuncio del recuadro para el lector de pantalla del iPhone;
+  - la línea de confirmación también cuando el comercio viene de la
+    simulación;
+  - el título sin «¿Cuál es?» cuando no hay sugerencias;
+  - que tocar una sugerencia con el teclado abierto no dependa del orden
+    en que el celular avisa los toques;
+  - el orden entre rubros de un mismo comercio, fijo por categoría.
+  Además, la regla de cuándo mostrar la ayuda pasó a una función con sus
+  pruebas, y el buscador tomó el estilo de los demás buscadores de la app.
+- Los documentos de arquitectura explican la sugerencia y que «Revisá tu
+  compra» calcula todo con la fecha y el lugar de la compra.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
