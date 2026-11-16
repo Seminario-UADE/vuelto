@@ -82,6 +82,11 @@ describe("identidad del comercio", () => {
     expect(r.map((c) => c.nombre)).toEqual(["Café Martínez"]);
   });
 
+  it("fuera del catálogo, un nombre sin letras ni números no comparte id con otro (#147)", () => {
+    expect(comercioPorNombre("Mc Donald's", []).id).toBe(comercioPorNombre("McDonald's", []).id);
+    expect(comercioPorNombre("★★", []).id).not.toBe(comercioPorNombre("!!!", []).id);
+  });
+
   it("«McDonald's» y «Mc Donald's» son uno solo; «Coto» y «Cotto», dos (#147)", () => {
     const r = comerciosDelCorpus(
       [

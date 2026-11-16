@@ -333,7 +333,9 @@ export function comprasDeTopeVista(
 export function comercioPorNombre(nombre: string, catalogo: readonly Comercio[], categoriaId?: number): Comercio {
   return (
     comercioDelCatalogo(nombre, catalogo, categoriaId) ?? {
-      id: `libre-${claveDeComercio(nombre)}`,
+      // Un nombre sin letras ni números («★★») no tiene clave: va el nombre tal cual, así no
+      // comparte id con otro.
+      id: `libre-${claveDeComercio(nombre) || nombre.trim()}`,
       nombre,
       inicial: nombre.charAt(0).toUpperCase(),
       rubro: "otro",
