@@ -3042,6 +3042,8 @@ contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
    pruebas escritas primero y vistas fallar antes del código. La prueba de
    tiempo falló al correr junto con todas las demás; en vez de aflojarla, se
    hizo más rápida la búsqueda en el texto del ticket.
+7. "Commiteá y seguí con la etapa 2." El recuadro de sugerencias, el
+   buscador y los cambios en «Revisá tu compra».
 
 **Resultado:**
 - Spec 015: si el comercio no coincide, un recuadro con hasta 3 sugerencias
@@ -3062,6 +3064,14 @@ contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
 - Errores de la IA: dos veces, al generar los archivos con un script, los
   saltos de línea de los textos de prueba quedaron mal escritos y hubo que
   corregirlos a mano.
+- Etapa 2 (pantalla): debajo del campo «Comercio» aparece la línea de
+  confirmación o el recuadro con las sugerencias, «Buscar otro comercio» y
+  «No está en la lista». A mano, el recuadro aparece al terminar de
+  escribir; con ticket, al abrir. El rubro elegido se guarda con la compra
+  y se borra si se cambia el nombre. Con compra por confirmar o desde una
+  recomendación no aparece.
+- Queda pendiente: la prueba del usuario y el cierre (revisiones,
+  documentación y PR).
 
 ---
 

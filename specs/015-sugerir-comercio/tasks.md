@@ -39,9 +39,9 @@ description: "Tareas para sugerir el comercio del catálogo (issue #134)"
 
 **Independent Test**: quickstart §2, pasos 1, 2 y 5.
 
-- [ ] T008 [P] [US1] Sumar `onBlur` (opcional) a `src/components/field.tsx`, que lo pasa al `TextInput` (research R6).
-- [ ] T009 [P] [US1] Escribir `src/components/sugerencia-comercio.tsx`: la línea de confirmación («Coto · Supermercados»), el recuadro con su título (`no_encontrado`, `es_alguno` o «¿En qué rubro?»), hasta 3 filas tocables con nombre y rubro (`nombreDeRubro`), «Buscar otro comercio» y «No está en la lista»; anunciado al lector de pantalla y cada fila con nombre y rubro en su etiqueta (FR-014). Sin lógica: recibe el `ResultadoSugerencia` y las acciones.
-- [ ] T010 [US1] Ajustar `src/app/revisa.tsx` (research R7): estados `elegido`, `noEstaEnLaLista` y `buscadoEn`; el `categoriaId` de la promo y de los textos de las tarjetas sale de `elegido` si lo hay; cambiar el texto borra `elegido` y `noEstaEnLaLista`; con ticket se busca al abrir; tocar una sugerencia pone el nombre del catálogo y su rubro (FR-005); nunca elige solo (FR-004).
+- [X] T008 [P] [US1] Sumar `onBlur` (opcional) a `src/components/field.tsx`, que lo pasa al `TextInput` (research R6).
+- [X] T009 [P] [US1] Escribir `src/components/sugerencia-comercio.tsx`: la línea de confirmación («Coto · Supermercados»), el recuadro con su título (`no_encontrado`, `es_alguno` o «¿En qué rubro?»), hasta 3 filas tocables con nombre y rubro (`nombreDeRubro`), «Buscar otro comercio» y «No está en la lista»; anunciado al lector de pantalla y cada fila con nombre y rubro en su etiqueta (FR-014). Sin lógica: recibe el `ResultadoSugerencia` y las acciones.
+- [X] T010 [US1] Ajustar `src/app/revisa.tsx` (research R7): estados `elegido`, `noEstaEnLaLista` y `buscadoEn`; el `categoriaId` de la promo y de los textos de las tarjetas sale de `elegido` si lo hay; cambiar el texto borra `elegido` y `noEstaEnLaLista`; con ticket se busca al abrir; tocar una sugerencia pone el nombre del catálogo y su rubro (FR-005); nunca elige solo (FR-004).
 
 **Checkpoint**: con un ticket que dice «COTO C.I.C.S.A.», un toque deja la compra en Coto con su promo.
 
@@ -53,7 +53,7 @@ description: "Tareas para sugerir el comercio del catálogo (issue #134)"
 
 **Independent Test**: quickstart §2, pasos 3 y 4.
 
-- [ ] T011 [US2] Sumar a `src/components/sugerencia-comercio.tsx` el buscador en el mismo lugar (campo con el teclado abierto, resultados de `buscarEnCatalogo` mientras se escribe, «No encontramos comercios con promo con ese nombre» si no hay) y conectar en `src/app/revisa.tsx` «No está en la lista» (cierra y deja el campo como está, FR-008).
+- [X] T011 [US2] Sumar a `src/components/sugerencia-comercio.tsx` el buscador en el mismo lugar (campo con el teclado abierto, resultados de `buscarEnCatalogo` mientras se escribe, «No encontramos comercios con promo con ese nombre» si no hay) y conectar en `src/app/revisa.tsx` «No está en la lista» (cierra y deja el campo como está, FR-008).
 
 ---
 
@@ -63,7 +63,7 @@ description: "Tareas para sugerir el comercio del catálogo (issue #134)"
 
 **Independent Test**: quickstart §2, pasos 2 y 6.
 
-- [ ] T012 [US3] En `src/app/revisa.tsx`, buscar en `onBlur` del campo «Comercio» y no mostrar el recuadro mientras se escribe (FR-009); con compra por confirmar (con o sin ticket) o desde una recomendación, pasar el rubro que vino como `categoriaConocida` y no mostrar el recuadro mientras el comercio sea el que vino (FR-010).
+- [X] T012 [US3] En `src/app/revisa.tsx`, buscar en `onBlur` del campo «Comercio» y no mostrar el recuadro mientras se escribe (FR-009); con compra por confirmar (con o sin ticket) o desde una recomendación, pasar el rubro que vino como `categoriaConocida` y no mostrar el recuadro mientras el comercio sea el que vino (FR-010).
 - [ ] T013 [US3] Prueba a mano (quickstart §2, todos los pasos), la corre el usuario en el celular o en la web.
 
 **Checkpoint**: las tres historias andando.

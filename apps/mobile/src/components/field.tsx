@@ -13,13 +13,17 @@ type Props = {
   error?: string | null;
   tabular?: boolean;
   prefix?: string;
+  /** Al salir del campo o cerrar el teclado: el usuario terminó de escribir (spec 015). */
+  onBlur?: () => void;
+  /** Abre con el teclado listo (el buscador de comercios, spec 015 US2-1). */
+  autoFocus?: boolean;
 };
 
 /**
  * Campo editable del ticket: etiqueta arriba en Musgo, valor en body-lg y lápiz a la
  * derecha; el error va debajo en Óxido con qué pasó y cómo seguir (DESIGN.md §5).
  */
-export function Field({ label, value, onChangeText, placeholder, keyboardType, error, tabular, prefix }: Props) {
+export function Field({ label, value, onChangeText, placeholder, keyboardType, error, tabular, prefix, onBlur, autoFocus }: Props) {
   const ref = useRef<ComponentRef<typeof TextInput>>(null);
   return (
     <View style={{ gap: space.xs }}>
@@ -53,6 +57,8 @@ export function Field({ label, value, onChangeText, placeholder, keyboardType, e
               ref={ref}
               value={value}
               onChangeText={onChangeText}
+              onBlur={onBlur}
+              autoFocus={autoFocus}
               placeholder={placeholder}
               placeholderTextColor={colors.inkSecondary}
               keyboardType={keyboardType}
