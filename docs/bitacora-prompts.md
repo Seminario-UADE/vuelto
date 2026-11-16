@@ -3263,6 +3263,55 @@ que se encontró al probar la app en un celular real.
 
 ---
 
+## 2026-11-16 — Probar la app antes de crear la cuenta (issue #112, spec 012 US5)
+
+**Herramienta:** Claude Code (Opus 5.5), con los agentes `rules-guardian` y
+`test-runner` y la skill `/code-review`.
+
+**Objetivo:** que una persona nueva pueda elegir sus tarjetas y sus
+comercios y ver una primera recomendación sin crear una cuenta, y que todo
+lo elegido pase a la cuenta cuando la crea al final.
+
+**Prompts principales:**
+1. "Mira mis asignaciones y ve que podemos hacer hoy." Se revisaron los
+   issues asignados y se eligió el #112, que ya tenía spec y tareas.
+2. "Sí, arrancá #112" y "Sí, seguí", una vez por etapa: guardar lo elegido
+   en el celular, las pantallas sin cuenta, «Revisá tu email» y la parte de
+   privacidad.
+3. "La pruebo en mi celular, dame el paso a paso." Supabase local no
+   arrancó en la compu (el CLI se rompe en Windows), así que se armaron
+   cinco escenarios para probar en Expo Go contra el Supabase del equipo,
+   con cuentas de prueba.
+4. "Pude con Coto pero no Carrefour, ve por qué pasa esto." La IA consultó
+   la base: no hay ninguna promo de Carrefour, y el buscador solo muestra
+   comercios con promos.
+
+**Resultado:**
+- La bienvenida tiene «Empezar» sin cuenta. Lo elegido (tarjetas,
+  comercios y nombre) queda en el celular como borrador por 30 días, y si
+  la app se cierra a mitad de camino, la bienvenida ofrece «Seguir donde
+  quedé».
+- La recomendación de la primera pantalla sale del motor con las tarjetas
+  del borrador, sin red ni cuenta (ADR-010).
+- Al final, «Guardá tu perfil» crea la cuenta y pasa el borrador. Si la
+  cuenta ya tenía tarjetas o comercios, se quedan esos y la app lo avisa
+  («Tu cuenta ya tenía tarjetas: quedaron esas»). Si falla una parte, se
+  reintenta la próxima vez que se abre la app.
+- Si el proyecto pide confirmar el email, aparece «Revisá tu email» y el
+  borrador se pasa al entrar. `docs/product/privacidad.md` dice qué guarda
+  el borrador y cuándo se borra.
+- Revisiones: `/code-review` encontró que el vencimiento usaba otro reloj,
+  que una invitación pendiente se perdía, que una falla parcial dejaba el
+  borrador trabado y que el nombre se guardaba antes de crear la cuenta.
+  Se arregló todo. `rules-guardian` no encontró nada contra las reglas.
+- Prueba en el celular: pasaron la cuenta nueva, cerrar la app a mitad de
+  camino y entrar a una cuenta que ya tenía datos. «Revisá tu email» no se
+  pudo probar porque el proyecto no pide confirmar el email.
+- Queda fuera: el buscador no deja marcar un comercio sin promos (como
+  Carrefour hoy). Pasa igual sin el #112.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

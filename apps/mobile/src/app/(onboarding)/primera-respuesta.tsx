@@ -17,8 +17,10 @@ import { RUBROS } from "@/lib/rubros";
 import { quitarComercio, SELECCION_VACIA, tocarComercio } from "@/lib/seleccion-comercios";
 import { MENSAJES_ERROR } from "@/perfil/modelo";
 import { useAppDispatch, useAppSelector, useRecomendacionPara } from "@/store/hooks";
+import { comerciosConNombre } from "@/data/comercios";
 import { invitacionGuardada, onboardingTerminado } from "@/store/perfil";
-import { confirmarComercios } from "@/store/perfil-remoto";
+import { confirmarComercios, elegirComerciosSinCuenta } from "@/store/perfil-remoto";
+import { selectCatalogoComercios } from "@/store/selectores";
 import { rubroColors, space } from "@/theme";
 
 /**
@@ -27,13 +29,28 @@ import { rubroColors, space } from "@/theme";
  * Inicio, ADR-010); los marcados se guardan como habituales al seguir. Se puede seguir sin elegir.
  * Cierra el onboarding: va a Inicio, o a la invitación que abrió antes de tener cuenta. Un usuario
  * nuevo no tiene compras, así que no se muestra ninguna cifra de tope (Principio V).
+ * Sin cuenta (spec 012, US5), los marcados van al borrador y se sigue a «Guardá tu perfil».
  */
 export default function PrimeraRespuesta() {
   const dispatch = useAppDispatch();
   const pendiente = useAppSelector((s) => s.perfil.invitacionPendiente);
-  const [seleccion, setSeleccion] = useState(SELECCION_VACIA);
+  const sinCuenta = useAppSelector((s) => s.sesion.usuario === null);
+  const catalogo = useAppSelector(selectCatalogoComercios);
+  const delBorrador = useAppSelector((s) => s.perfil.borrador?.comercios);
+  // Sin cuenta, vuelve con los que ya había marcado (US5, escenario 7): id del catálogo y nombre.
+  const [inicial] = useState(() =>
+    sinCuenta && delBorrador
+      ? delBorrador.flatMap((n): [string, string][] => {
+          const c = comerciosConNombre(n, catalogo)[0];
+          return c ? [[c.id, n]] : [];
+        })
+      : [],
+  );
   // Los nombres de los marcados, como los guarda `comercios_habituales`.
-  const nombres = useRef(new Map<string, string>());
+  const nombres = useRef(new Map<string, string>(inicial));
+  const [seleccion, setSeleccion] = useState(
+    inicial.length > 0 ? { marcados: inicial.map(([id]) => id), activo: null } : SELECCION_VACIA,
+  );
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const r = useRecomendacionPara(seleccion.activo, null);
@@ -46,6 +63,12 @@ export default function PrimeraRespuesta() {
   };
 
   const seguir = async () => {
+    if (sinCuenta) {
+      const comercios = seleccion.marcados.map((id) => nombres.current.get(id) ?? id);
+      dispatch(elegirComerciosSinCuenta(comercios));
+      router.push("/registro");
+      return;
+    }
     if (seleccion.marcados.length === 0) return terminar();
     setEnviando(true);
     setError(null);

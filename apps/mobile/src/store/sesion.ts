@@ -26,6 +26,11 @@ export type EstadoSesion = {
    * al empezar y descarta su resultado si cambió (spec 009 R3). No se persiste.
    */
   epoca: number;
+  /**
+   * A dónde se mandó el email para confirmar la cuenta (spec 012, FR-033): lo muestra «Revisá tu
+   * email». No va en la ruta (en la web quedaría en la barra y el historial) ni se persiste.
+   */
+  emailPorConfirmar: string | null;
 };
 
 export const sesionInicial: EstadoSesion = {
@@ -36,6 +41,7 @@ export const sesionInicial: EstadoSesion = {
   escenario: "normal",
   hidratado: false,
   epoca: 0,
+  emailPorConfirmar: null,
 };
 
 export const sesion = createSlice({
@@ -48,9 +54,14 @@ export const sesion = createSlice({
     usuarioCambio(s, a: PayloadAction<Cuenta | null>) {
       s.usuario = a.payload;
       s.authLista = true;
+      // Entró: ya no hay nada por confirmar.
+      if (a.payload !== null) s.emailPorConfirmar = null;
     },
     avisoMostrado(s, a: PayloadAction<string | null>) {
       s.aviso = a.payload;
+    },
+    emailPorConfirmarCambio(s, a: PayloadAction<string | null>) {
+      s.emailPorConfirmar = a.payload;
     },
   },
   extraReducers: (b) => {
@@ -76,4 +87,4 @@ export const sesion = createSlice({
   },
 });
 
-export const { ahoraCambio, usuarioCambio, avisoMostrado } = sesion.actions;
+export const { ahoraCambio, usuarioCambio, avisoMostrado, emailPorConfirmarCambio } = sesion.actions;

@@ -5,6 +5,7 @@ import { Button } from "@/components/button";
 import { Icon, type IconName } from "@/components/icon";
 import { Screen } from "@/components/screen";
 import { Text } from "@/components/text";
+import { useAppSelector } from "@/store/hooks";
 import { colors, radius, space } from "@/theme";
 
 const PUNTOS: { icon: IconName; texto: string }[] = [
@@ -13,17 +14,25 @@ const PUNTOS: { icon: IconName; texto: string }[] = [
   { icon: "candado", texto: "Sin conectar tu banco ni pedir tus claves" },
 ];
 
-/** Bienvenida (onboarding 1/5): la propuesta y la puerta a crear cuenta o entrar. */
+/**
+ * Bienvenida: la propuesta y «Empezar», sin cuenta (spec 012, US5, FR-031). La cuenta se pide al
+ * final, después de ver la primera recomendación; quien ya tiene una entra por «Ya tengo cuenta».
+ */
 export default function Bienvenida() {
+  // Volvió sin terminar: retoma donde estaba, con lo elegido (US5, escenario 7).
+  const yaEligio = useAppSelector((s) => (s.perfil.borrador?.medios.length ?? 0) > 0);
   return (
     <Screen
       kind="tab"
       footer={
         <>
-          <Button label="Crear cuenta" onPress={() => router.push("/registro")} />
+          <Button
+            label={yaEligio ? "Seguir donde quedé" : "Empezar"}
+            onPress={() => router.push(yaEligio ? "/primera-respuesta" : "/medios")}
+          />
           <Button label="Ya tengo cuenta" variant="text" onPress={() => router.push("/login")} />
           <Text variant="label" tone="inkSecondary" align="center">
-            Después te lleva un minuto: tus medios y, si querés, tus comercios.
+            Te lleva un minuto y no hace falta cuenta para probar: tus tarjetas y, si querés, tus comercios.
           </Text>
         </>
       }
