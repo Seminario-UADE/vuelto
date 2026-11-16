@@ -3036,6 +3036,8 @@ contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
    una comparación propia que cuenta letras de diferencia, en vez de la
    librería Fuse.js: es corta, sin dependencias y su umbral se entiende
    fácil («Carrefur» está a una letra de «Carrefour»).
+5. "Commiteá y seguí con las tareas." 16 tareas en 3 etapas: la lógica con
+   su medición, la pantalla (termina con la prueba del usuario) y el cierre.
 
 **Resultado:**
 - Spec 015: si el comercio no coincide, un recuadro con hasta 3 sugerencias
