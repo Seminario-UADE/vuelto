@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { codigoDeSalida, cosechar, informe, leerCatalogo, opcionesDeArgumentos } from "./ingestar.ts";
+import { codigoDeSalida, cosechar, informe, leerCatalogo, motivosDeFalla, opcionesDeArgumentos, resumenParaActions } from "./ingestar.ts";
 import type { ResumenCosecha } from "./ingestar.ts";
 import { clienteCon, detalleDe, fixture, tarjeta } from "./test/modo-falso.ts";
 import type { Libre } from "./test/modo-falso.ts";
@@ -150,11 +150,14 @@ describe("codigoDeSalida", () => {
   const base: ResumenCosecha = {
     listado: {
       candidatas: 0,
+      porEmpezar: 0,
       porCategoria: {},
       porBanco: {},
       secciones: [],
       soloEnElListadoAnterior: [],
       descartadas: { noVigente: 0, noEsReintegro: 0, otraCategoria: 0 },
+      desglose: { porEstado: {}, porTipo: {}, porCategoria: {} },
+      cadenas: {},
     },
     publicables: 0,
     descartes: { nivel_de_cliente: 3 },
@@ -172,6 +175,54 @@ describe("codigoDeSalida", () => {
     expect(codigoDeSalida({ ...base, detalleConError: [{ slug: "a", error: "x" }] }, { ok: true })).toBe(1);
     expect(codigoDeSalida({ ...base, formatoDesconocido: [{ slug: "a", ruta: "x" }] }, { ok: true })).toBe(1);
     expect(codigoDeSalida(base, { ok: false })).toBe(1);
+  });
+
+  const PUBLICADO = {
+    ok: true,
+    motivo: null,
+    resumen: {
+      categorias: { insertar: 0, actualizar: 0 },
+      bancos: { insertar: 0, actualizar: 0 },
+      capturas: { nuevas: 5, sinCambios: 10 },
+      promociones: { insertar: 51, actualizar: 2, reactivar: 0, darDeBaja: 1, sinCambios: 3100 },
+    },
+  };
+
+  it("sin fallas no hay motivos; con fallas, uno por cada cosa que quedó sin leer o sin escribir", () => {
+    expect(motivosDeFalla(base, { ok: true, motivo: null })).toEqual([]);
+    const motivos = motivosDeFalla(
+      { ...base, detalleConError: [{ slug: "a", error: "MODO respondió 503" }], formatoDesconocido: [{ slug: "b", ruta: "offers[0].limits" }] },
+      { ok: false, motivo: "menos de la mitad" },
+    );
+    expect(motivos).toHaveLength(3);
+    expect(motivos[0]).toBe("menos de la mitad");
+    expect(motivos[1]).toContain("a: MODO respondió 503");
+    expect(motivos[2]).toContain("b: offers[0].limits");
+    // Hay un motivo exactamente cuando el código de salida es 1.
+    expect(motivosDeFalla(base, { ok: false, motivo: null })).toHaveLength(1);
+  });
+
+  it("el resumen para Actions dice si salió bien y trae el desglose y las cadenas", () => {
+    const conDatos: ResumenCosecha = {
+      ...base,
+      listado: {
+        ...base.listado,
+        candidatas: 1777,
+        porEmpezar: 10,
+        desglose: { porEstado: { FINISHED: 9000, FINISHED_FOR_PRODUCT: 1028 }, porTipo: { financing: 893 }, porCategoria: {} },
+        cadenas: { Carrefour: { candidatas: 0, noVigentes: 2, otrasDescartadas: 0 } },
+      },
+    };
+    const bien = resumenParaActions(conDatos, PUBLICADO);
+    expect(bien).toContain("salió bien");
+    expect(bien).toContain("1777 (10 todavía no empezaron)");
+    expect(bien).toContain("51 nuevas, 2 cambiadas, 0 reactivadas, 1 bajas, 3100 sin cambios");
+    expect(bien).toContain("por estado: FINISHED: 9000, FINISHED_FOR_PRODUCT: 1028");
+    expect(bien).toContain("por categoría: ninguna");
+    expect(bien).toContain("| Carrefour | 0 | 2 | 0 |");
+    const mal = resumenParaActions({ ...conDatos, detalleConError: [{ slug: "a", error: "x" }] }, PUBLICADO);
+    expect(mal).toContain("FALLÓ");
+    expect(mal).toContain("- Falló el detalle de a: x");
   });
 
   it("el informe no repite la lista de descartes uno por uno", () => {

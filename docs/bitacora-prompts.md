@@ -3179,6 +3179,44 @@ Hasta ahora las pantallas corrían sobre datos de ejemplo.
 
 ---
 
+## 2026-11-16 — Por qué no llega Carrefour y mejoras a la ingesta
+
+**Herramienta:** Claude Code.
+
+**Objetivo:** entender por qué no llegan promos de algunas cadenas, como
+Carrefour, revisar la ingesta de MODO y mejorar lo que haga falta.
+
+**Prompts principales:**
+1. "Fijate qué está pasando con el scraping de las promociones y por qué no
+   llegan algunas como Carrefour. Verificá y hacé un review de lo que está
+   construido." Se leyó el registro de la última corrida y se consultó la
+   API pública de MODO: Carrefour tuvo dos promos en octubre de 2026 y las
+   dos terminaron. No tiene ninguna vigente; la ingesta las excluye bien.
+2. "Creo que el scraping actual está mal: en la página de Coto hay muchos
+   bancos adheridos, no solo Macro." Se abrió la página de
+   `coto-noviembre26` en un navegador y se comparó con lo que genera el
+   mapeo del repo: 20 bancos en la web y 20 filas en la ingesta, sin
+   diferencias. La portada de promos pide los datos a las mismas rutas que
+   usa la ingesta.
+3. "¿Hay algo para mejorar?" y "Ok, dale." Se hicieron los cambios chicos.
+
+**Resultado:**
+- La ingesta trae lo mismo que muestra MODO. Carrefour solo va a aparecer
+  cuando vuelva a publicar en MODO o si se suma otra fuente.
+- Error de la IA: el primer resumen decía que dos de cada tres promos eran
+  de Macro. Contaba el rótulo del listado, donde una promo de muchos bancos
+  figura como «Bancos adheridos». Por filas publicadas, Macro ronda el 18%.
+  Lo corrigió la objeción del usuario.
+- El workflow pasa de las 09:00 UTC a las 07:17 UTC: con la hora en punto,
+  las corridas de noviembre arrancaron entre 6 y 10 horas tarde.
+- Entran también las promos publicadas que todavía no empezaron
+  (`NEXT_FOR_PRODUCT`), con su fecha de inicio.
+- El resumen de la corrida desglosa lo que el listado deja afuera (por
+  estado, tipo y categoría) y controla ocho cadenas grandes.
+- El motivo de una falla se imprime al final del registro y en el resumen
+  del job de GitHub Actions.
+- Queda pendiente, para una issue aparte: bajar el detalle solo de las
+  promos nuevas o cambiadas (hoy son 42 minutos para detectar 5 cambios).
 ## 2026-11-15 — Prueba en Android y tres arreglos que salieron de ella (issues #43, #147, #148, #149)
 
 **Herramienta:** Claude Code (Opus 5.5), con los agentes `rules-guardian` y

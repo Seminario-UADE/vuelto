@@ -194,6 +194,19 @@ describe("mapearDetalle — descartes", () => {
     expect(r.descartes[0]!.motivo).toBe("vencida_en_la_fuente");
   });
 
+  it("una promo publicada que todavía no empezó se mapea igual, con su fecha de inicio", () => {
+    const r = mapearDetalle(
+      conDetalle("petrelli", (d) => {
+        d.real_status = "NEXT_FOR_PRODUCT";
+        d.conditions.schedule.start_date = "2026-12-01";
+      }),
+      OPCIONES,
+    );
+    expect(r.descartes).toEqual([]);
+    expect(r.promociones).toHaveLength(1);
+    expect(r.promociones[0]!.vigencia.desde).toBe("2026-12-01");
+  });
+
   it("una promo que ya terminó aunque MODO la siga listando: vencida_en_la_fuente", () => {
     const r = mapearDetalle(cargar("petrelli"), { ...OPCIONES, hoy: "2027-01-01" });
     expect(r.descartes[0]).toMatchObject({ motivo: "vencida_en_la_fuente", detalle: expect.stringContaining("2026-12-31") });
