@@ -44,6 +44,13 @@ describe("elegibilidad: caso feliz", () => {
     expect(primeraReglaQueFalla(p, contexto(compra({ comercio: "McDonald's" })))).toBeNull();
   });
 
+  it("dos nombres sin letras ni números no son el mismo comercio, salvo que estén escritos igual (#147)", () => {
+    const p = promo({ comercio: "★★" });
+    expect(primeraReglaQueFalla(p, contexto(compra({ comercio: "!!!" })))).toBe("comercio");
+    expect(primeraReglaQueFalla(p, contexto(compra({ comercio: "" })))).toBe("comercio");
+    expect(primeraReglaQueFalla(p, contexto(compra({ comercio: " ★★ " })))).toBeNull();
+  });
+
   it("las jurisdicciones válidas del MVP son nacional, CABA y PBA", () => {
     expect(JURISDICCIONES_VALIDAS).toEqual(["nacional", "caba", "pba"]);
   });

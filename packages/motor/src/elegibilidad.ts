@@ -55,14 +55,22 @@ export function claveComercio(texto: string): string {
   return normalizar(texto).replace(/[^\p{L}\p{N}]/gu, "");
 }
 
+/**
+ * Un nombre sin letras ni números («★★») no tiene clave: se compara como está escrito, así no
+ * pasa por el mismo comercio que cualquier otro nombre sin clave.
+ */
+function mismoComercio(a: string, b: string): boolean {
+  const clave = claveComercio(a);
+  return clave === "" ? normalizar(a) === normalizar(b) : clave === claveComercio(b);
+}
+
 export const REGLAS_DE_PROMOCION: readonly Regla[] = [
   { causa: "categoria", cumple: (p, { compra }) => p.categoriaId === compra.categoriaId },
   {
     causa: "comercio",
     // Sin comercio en la compra no se puede confirmar una promo de un comercio.
     cumple: (p, { compra }) =>
-      p.comercio === null ||
-      (compra.comercio !== null && claveComercio(p.comercio) === claveComercio(compra.comercio)),
+      p.comercio === null || (compra.comercio !== null && mismoComercio(p.comercio, compra.comercio)),
   },
   {
     causa: "vigencia",
