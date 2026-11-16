@@ -12,8 +12,8 @@ endpoints**: los calcula la app con el motor (ADR-010, constitución §II).
 | Endpoint | Issue | Qué hace | Contrato |
 |---|---|---|---|
 | `POST /functions/v1/extraer-ticket` | #48 | Groq lee la foto del ticket (ADR-012) y devuelve monto, comercio, fecha, medio de pago tal como lo dice el ticket y el texto con los datos personales tapados. La imagen no se guarda. Exige una cuenta real | `specs/013-extraer-ticket/contracts/extraer-ticket.md` |
-| `POST /functions/v1/recomendar-grupo` | #54 | Gasto en grupo: lee datos de contactos vinculados (ADR-008 §4) y llama al motor (pendiente) | — |
-| Invitaciones | — | Edge Function y RPC `security definer` (ADR-008 §4) | — |
+| `POST /functions/v1/recomendar-grupo` | #54 | Gasto en grupo: con la sesión de quien pide, lee sus datos (RLS) y los de sus contactos vinculados (`datos_de_contactos`, con la clave de servidor) y llama a `recomendarGrupo` del motor. Responde solo lo de FR-021 | `specs/016-gasto-grupo/contracts/recomendar-grupo.md` |
+| Invitaciones y contactos | #54 | RPC: `crear_invitacion`, `ver_invitacion`, `aceptar_invitacion`, `mis_contactos` (funciones `security definer` en `contactos_privado` con envoltorios en `public`) y `quitar_contacto`. Sin Edge Function (ADR-010 §Actualización) | `specs/016-gasto-grupo/contracts/rpc-contactos.md` |
 | `POST /functions/v1/recomendar` | #43 | **Fuera del camino de la app (ADR-010 §5).** Implementada y testeada con repositorios en memoria (PR #71); no se sigue invirtiendo en ella y se borra o se reutiliza para el grupo | `specs/004-recomendar-pantalla/contracts/recomendar.md` |
 | `GET /functions/v1/topes` | #45 | **Descartado:** los topes los estima la app con el motor (`estimar…`) | — |
 
@@ -69,14 +69,13 @@ cambiar el cuerpo de esa función.
 | Función | Endpoint | Estado |
 |---|---|---|
 | Leer el ticket | `POST /functions/v1/extraer-ticket` (#48) | **Conectado** (issue #49, spec 014). No pasa por `api.ts`: `ticket/leer.ts` achica la foto a JPEG de 2,5 MB como máximo, la manda con `ticket/servicio.ts` (`functions.invoke`, con la sesión del usuario, 30 s de espera) y borra las copias temporales en todos los caminos. La respuesta llega como `LecturaApp`: el medio tal como lo dice el ticket, que «Revisá» solo sugiere. `api.leerTicket({ hoy, escenario })` queda para los escenarios de desarrollo («Ticket de ejemplo», «Ticket ilegible», «Sin red»), sin cámara ni servicio |
-| `recomendarGrupo(pedido, comercio?)` | `POST /functions/v1/recomendar-grupo` (#56) | Reemplazo local (`grupo-simulado.ts`) que evalúa a cada integrante con el motor; de los contactos solo viaja lo de ADR-008 §3 |
-| `verInvitacion`, `aceptarInvitacion`, `quitarContacto`, `crearInvitacion` | Edge Function y RPC `security definer` (ADR-008 §4) | Mock |
+| Gasto en grupo | `POST /functions/v1/recomendar-grupo` (#54) | **Conectado** (spec 016). No pasa por `api.ts`: `grupo/repositorio.ts` (`functions.invoke`, con la sesión del usuario, 15 s de espera), a través del thunk `pedirRecomendacionGrupo` |
+| Contactos e invitaciones | RPC de `contracts/rpc-contactos.md` (#54) | **Conectado** (spec 016), en `grupo/repositorio.ts` y los thunks de `store/contactos.ts` |
 | Escribir y borrar compras (`public.compras`) | Supabase directo con RLS (ADR-009), desde la cola de subida (spec 010) | Repositorio escrito y probado contra Supabase local; **sin conectar** hasta #40, #41 y #42 |
 | Comercios del buscador | — | **Salieron de `api.ts`** (issue #43, spec 004 FR-030): `selectCatalogoComercios` los deriva del corpus sincronizado (pares comercio + rubro de las promos vigentes, `data/comercios.ts`), sin red. Antes de la primera sincronización, el catálogo de ejemplo |
 | Medios de pago y bancos (`perfil/datos.ts`, thunks de `store/perfil-remoto.ts`) | Supabase directo con RLS (ADR-009) | Implementado (issue #41) |
 | Comercios habituales (`comercios_habituales`, mismos archivos) | Supabase directo con RLS (ADR-009) | Implementado (issue #47) |
 | `recomendar`, `getTopes`, `getCompras`, `guardarCompra`, `getPerfil` | — | **Salieron de `api.ts`**: selectores y el thunk `guardarCompra` del store. La Edge Function `recomendar` queda fuera del camino de la app (ADR-010 §5); la sincronización de compras y corpus es #42 |
-| `crearInvitacion`, `verInvitacion`, `aceptarInvitacion` | Edge Function y RPC `security definer` (ADR-008 §4) | Mock |
 
 Tipos: `apps/mobile/src/data/contracts.ts` (la respuesta de `recomendar()` se
 importa de `@vuelto/motor`; el resto son tipos de vista).

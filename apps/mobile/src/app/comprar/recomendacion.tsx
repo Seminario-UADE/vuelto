@@ -78,7 +78,7 @@ export default function PasoRecomendacion() {
         onChange={(c) => dispatch(canalCambiado(c))}
       />
 
-      {r ? (
+      {r && (r.alternativas.length > 0 || r.comercio.categoriaId !== null) ? (
         <Card padding={space.lg} gap={0} style={{ paddingVertical: space.xs }}>
           {opciones.length > 0 ? (
             <FilaAccion
@@ -118,13 +118,16 @@ export default function PasoRecomendacion() {
               ))}
             </View>
           ) : null}
-          <View style={r.alternativas.length > 0 ? divisor(1) : undefined}>
-            <FilaAccion
-              icon="chevron"
-              titulo="¿Pagan entre varios?"
-              onPress={() => router.push({ pathname: "/grupo/armar", params: { comercio: r.comercio.id, monto: monto ?? "" } })}
-            />
-          </View>
+          {/* Un comercio sin rubro (escrito a mano) no se puede evaluar en grupo (spec 016 FR-029, G-04). */}
+          {r.comercio.categoriaId !== null ? (
+            <View style={r.alternativas.length > 0 ? divisor(1) : undefined}>
+              <FilaAccion
+                icon="chevron"
+                titulo="¿Pagan entre varios?"
+                onPress={() => router.push({ pathname: "/grupo/armar", params: { comercio: r.comercio.id, monto: monto ?? "" } })}
+              />
+            </View>
+          ) : null}
         </Card>
       ) : null}
 

@@ -249,57 +249,69 @@ export type Contacto = {
 };
 
 export type Invitacion = {
+  /** `vuelto://i/<token>` (en Expo Go, el link que da Expo). El QR codifica este mismo link. */
   link: string;
+  /** ISO: cuándo vence (24 h desde que se creó). */
   venceEn: string;
   usoUnico: true;
 };
 
-export type EstadoInvitacion = "valida" | "vencida" | "usada" | "propia" | "ya-contacto";
+export type EstadoInvitacion = "valida" | "vencida" | "usada" | "propia" | "ya-contacto" | "inexistente" | "sin-nombre";
 
 export type VistaInvitacion = {
   estado: EstadoInvitacion;
+  /** `null` si la invitación no existe. */
   quienInvita: string | null;
+  /** ISO, solo si es válida. */
+  venceEn: string | null;
   comparte: string[];
   noComparte: string[];
   sePuedeDeducir: string;
 };
 
-export type IntegranteGrupo =
-  { tipo: "vos" } | { tipo: "contacto"; contactoId: string } | { tipo: "sin-cuenta"; nombre: string };
+/** Alguien sin cuenta en el grupo: su nombre vive solo en el teléfono (D5); al servidor va la cantidad. */
+export type SinCuentaEnGrupo = { posicion: number; nombre: string };
+
+/** El grupo que arma Armar (spec 016). Sin fecha: la compra es de hoy, según el servidor (FR-025). */
+export type PedidoGrupo = {
+  /** Resuelto en el paso de compra, siempre con rubro (FR-029). */
+  comercio: Comercio & { categoriaId: number };
+  canal: Canal;
+  monto: number;
+  /** Ids de los contactos vinculados marcados. */
+  contactos: string[];
+  sinCuenta: SinCuentaEnGrupo[];
+};
 
 export type FilaIntegrante = {
+  /** `vos`, el id del contacto o `sin-<posición>`: las filas no se identifican por el nombre (US3-7). */
+  clave: string;
   nombre: string;
   /** `null` para "Vos" (avatar sin inicial, auditoría P2 #11). */
   iniciales: string | null;
   esVos: boolean;
-  /** Texto armado por el servidor. Nunca nombra medios no recomendados de un contacto. */
+  /** Nunca nombra medios no recomendados de un contacto ni dice nada de su tope (FR-021). */
   detalle: string;
+  /** Cuánto pone, en pesos enteros (FR-006). */
+  pone: number;
 };
 
-export type PedidoGrupo = {
-  nombre: string | null;
-  /** Ya resuelto por la pantalla (`selectComercioSimulado`), también uno fuera del catálogo (G-04). */
-  comercio: Comercio;
-  monto: number;
-  /** Día de la compra (ISO). La cena del ejemplo es el sábado 17/10. */
-  fecha: string;
-  integrantes: IntegranteGrupo[];
-};
-
+/** Lo que muestra Gasto en grupo, armado en el teléfono con la respuesta del servidor (`grupo/vista.ts`). */
 export type RecomendacionGrupo = {
-  nombre: string | null;
+  titulo: string;
   comercio: Comercio;
-  /** "sábado 17/10" u "hoy miércoles" */
+  /** "hoy sábado" o, si el servidor evaluó otro día, "domingo 16/11" (US3-8). */
   cuando: string;
   monto: number;
-  /** `null` si nadie del grupo tiene promo para esta compra. */
-  quienPaga: { nombre: string; esVos: boolean } | null;
-  /** Solo el medio de quien paga: "su Provincia Visa débito". */
+  /** `null` si nadie del grupo tiene reintegro en esta compra. */
+  quienPaga: { clave: string; nombre: string; esVos: boolean; iniciales: string | null } | null;
+  /** Solo el medio de quien paga: "su Galicia Visa crédito" o "tu Provincia Visa débito". */
   medio: string | null;
+  /** Qué da la promo, sin nada del tope: "20% en gastronomía". */
   razon: string | null;
   reintegro: number | null;
-  base: Base | null;
-  partePorPersona: number;
+  /** La base en palabras (constitución §V). */
+  base: string | null;
   integrantes: FilaIntegrante[];
 };
 

@@ -4,8 +4,9 @@ Modelo relacional (Postgres vía Supabase). El esquema base (perfiles, bancos,
 categorías, medios de pago, comercios habituales, capturas crudas,
 promociones y compras, cada una con su RLS) está en `supabase/migrations/`
 (issue #34); el detalle de columnas, constraints y quién lee/escribe cada tabla
-está en `specs/007-esquema-supabase-rls/data-model.md`. Contactos, invitaciones
-y grupo (ADR-008) todavía no tienen migración.
+está en `specs/007-esquema-supabase-rls/data-model.md`. Contactos e invitaciones
+(ADR-008) están en `supabase/migrations/20261115000001_contactos.sql`, con su
+detalle en `specs/016-gasto-grupo/data-model.md`.
 
 ## Promoción
 
@@ -100,34 +101,40 @@ Declarado manualmente, en tres capas de prioridad:
 2. **Comercios recurridos** (alta) — dónde compra habitualmente
 3. **Gustos y preferencias** (diferible, no entra al MVP)
 
-## Grupo (contexto §4.5 — nivel 1 del alcance, ADR-008)
+## Grupo (contexto §4.5 — nivel 1 del alcance, ADR-008, spec 016)
 
-Integrantes: contactos vinculados y, opcionalmente, personas sin cuenta
-declaradas a mano (nombre y medios de pago). El motor evalúa la unión de
-medios del grupo, cada uno con el tope de su dueño; un integrante sin cuenta
-no tiene tope conocido.
+Integrantes: quien pide, contactos vinculados y, opcionalmente, personas sin
+cuenta, solo con un nombre que no sale del teléfono ni se guarda. El motor
+(`recomendarGrupo`) evalúa a cada integrante con cuenta con su propio tope y
+decide sobre las cifras que se muestran. Un integrante sin cuenta no paga, pero
+cuenta para la división. El grupo no es una tabla: existe solo durante el
+cálculo.
 
-## Invitación (`invitacion`)
+## Invitación (`invitaciones`)
 
 | Campo | Nota |
 |---|---|
 | Emisor | Usuario que generó el link/QR |
-| Hash del token | Nunca el token en claro |
+| Hash del token | `sha256` en hexadecimal (texto: la regla de estructura prohíbe columnas binarias). Nunca el token en claro |
 | Vence | 24 h desde la creación |
 | Usada | Fecha de aceptación, `null` si no se usó. Un solo uso |
 
-## Contacto (`contacto`)
+Como mucho una invitación sin usar por cuenta: crear otra borra la anterior.
 
-Vínculo simétrico entre dos cuentas (un par, sin duplicados ni
-auto-vínculo), con fecha de creación. Se borra si cualquiera de los dos lo
-quita o borra su cuenta. Las dos tablas llevan RLS en la misma migración
-que las crea: `contacto`, visible para sus dos integrantes; `invitacion`,
-solo para su emisor. Aceptar una invitación pasa por la función
-`security definer` `aceptar_invitacion(token)` (ADR-008 §4).
+## Contacto (`contactos`)
 
-Los datos de un contacto no se leen por RLS: la Edge Function del motor
-llama a una función `security definer` que verifica el vínculo con
-`auth.uid()` y devuelve solo nombre para mostrar, medios de pago, tope
-consumido agregado por promo y cantidad de compras (ver
-`../product/privacidad.md`). El perfil suma el campo **nombre para
-mostrar**, que elige el usuario.
+Vínculo simétrico entre dos cuentas (un par ordenado `usuario_a < usuario_b`,
+sin duplicados ni auto-vínculo), con fecha de creación. Se borra si
+cualquiera de los dos lo quita o borra su cuenta. Las dos tablas llevan RLS
+en la misma migración que las crea: `contactos`, visible y borrable por sus
+dos integrantes; `invitaciones`, visible solo para su emisor. Crear, ver y
+aceptar invitaciones, y listar los contactos con su nombre, pasa por funciones
+`security definer` en el schema `contactos_privado`, con envoltorios
+`security invoker` en `public` (ADR-008 §Actualización).
+
+Los datos de un contacto no se leen por RLS: la Edge Function
+`recomendar-grupo` llama a `datos_de_contactos`, que verifica el vínculo con
+`auth.uid()`, exige la clave de servidor y devuelve solo el nombre para
+mostrar, los medios de pago y las compras del período reducidas a promoción,
+fecha, monto y descuento (ver `../product/privacidad.md`). El perfil suma el
+campo **nombre para mostrar**, que elige el usuario.

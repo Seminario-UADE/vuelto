@@ -1,83 +1,86 @@
-import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useState } from "react";
 import { Pressable, TextInput, View } from "react-native";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
-import { EmptyState } from "@/components/empty-state";
 import { Icon, iconoDeRubro } from "@/components/icon";
 import { MontoInput } from "@/components/monto-input";
 import { OptionRow } from "@/components/option-row";
 import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { Text } from "@/components/text";
-import * as api from "@/data/api";
-import type { IntegranteGrupo } from "@/data/contracts";
-import { fechaCorta, iniciales, parseMonto } from "@/lib/format";
-import { grupoArmado } from "@/store/contactos";
+import type { SinCuentaEnGrupo } from "@/data/contracts";
+import { cantidadDeIntegrantes } from "@/grupo/pedido";
+import { MAXIMO_INTEGRANTES } from "@/grupo/vista";
+import { iniciales, parseMonto } from "@/lib/format";
+import { cargarContactos } from "@/store/contactos";
+import { grupoArmado } from "@/store/grupo";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectComercioSimulado, selectHoy } from "@/store/selectores";
+import { selectBuscarComercioPorId } from "@/store/selectores";
 import { colors, fonts, radius, rubroColors, size, space, type as escala } from "@/theme";
 
 /**
- * Armar grupo (ADR-008): vos, tus contactos vinculados y gente sin cuenta (solo el nombre,
- * vive mientras dura el grupo). El primario va en un pie fijo que no tapa la lista (P2 #7).
+ * Armar grupo (ADR-008, spec 016 US3): vos, tus contactos vinculados y gente sin cuenta (solo el
+ * nombre, que no sale del teléfono). La compra es la del paso de compra, de hoy, con su rubro y su
+ * canal. Hasta 12 personas (FR-026). El primario va en un pie fijo que no tapa la lista (P2 #7).
  */
 export default function ArmarGrupo() {
   const p = useLocalSearchParams<{ comercio?: string; monto?: string }>();
   const dispatch = useAppDispatch();
-  const hoy = useAppSelector(selectHoy);
   const contactos = useAppSelector((s) => s.contactos.lista);
-  const ejemplo = api.getGrupoDeEjemplo();
-  const desdeComercio = Boolean(p.comercio);
-  const fecha = desdeComercio ? hoy : ejemplo.fecha;
-  const nombre = desdeComercio ? null : ejemplo.nombre;
+  const canal = useAppSelector((s) => s.simulacion.canal);
+  // Del corpus guardado, sin red (#43). Sin rubro no se puede evaluar en grupo (G-04).
+  const comercio = useAppSelector(selectBuscarComercioPorId)(p.comercio ?? "");
 
-  // El mismo comercio que resolvió el «+» (G-04), sin red (#43); sin él, el del grupo de ejemplo.
-  // Si la ruta pide otro que el de la simulación, no se arma el grupo con uno que no se eligió.
-  const simulado = useAppSelector(selectComercioSimulado);
-  const comercio = desdeComercio ? (simulado?.id === p.comercio ? simulado : null) : ejemplo.comercio;
-
-  const [monto, setMonto] = useState<number | null>(desdeComercio ? parseMonto(p.monto ?? "") : ejemplo.monto);
+  const [monto, setMonto] = useState<number | null>(parseMonto(p.monto ?? ""));
   const [excluidos, setExcluidos] = useState<string[]>([]);
-  const [sinCuenta, setSinCuenta] = useState<string[]>(desdeComercio ? [] : ["Sofía"]);
+  const [sinCuenta, setSinCuenta] = useState<SinCuentaEnGrupo[]>([]);
+  // La posición de carga de cada uno: no se reusa al sacar a alguien (spec 016 FR-002).
+  const [proxima, setProxima] = useState(0);
   const [nuevo, setNuevo] = useState("");
+  // La lista al día al armar (FR-019): un vínculo quitado desde el otro teléfono no aparece.
+  useFocusEffect(
+    useCallback(() => {
+      void dispatch(cargarContactos());
+    }, [dispatch]),
+  );
+
+  if (!comercio || comercio.categoriaId === null) {
+    return (
+      <Screen footer={<Button label="Volver al paso de compra" onPress={() => router.back()} />}>
+        <Card padding={space.xl}>
+          <Text variant="titleMd" accessibilityRole="header">
+            No podemos armar un grupo para este comercio
+          </Text>
+          <Text variant="bodyMd" tone="inkSecondary">
+            Para decidir quién conviene que pague necesitamos saber el rubro del comercio. Elegilo de la lista en el paso
+            de compra.
+          </Text>
+        </Card>
+      </Screen>
+    );
+  }
+  const conRubro = { ...comercio, categoriaId: comercio.categoriaId };
 
   const elegidos = contactos.filter((c) => !excluidos.includes(c.id));
-  const cantidad = 1 + elegidos.length + sinCuenta.length;
-  const listo = monto !== null && cantidad >= 2;
+  const cantidad = cantidadDeIntegrantes({ contactos: elegidos.map((c) => c.id), sinCuenta });
+  const lleno = cantidad >= MAXIMO_INTEGRANTES;
+  const listo = monto !== null && cantidad >= 2 && cantidad <= MAXIMO_INTEGRANTES;
 
   const agregar = () => {
     const n = nuevo.trim();
-    if (!n) return;
-    setSinCuenta((xs) => [...xs, n]);
+    if (!n || lleno) return;
+    setSinCuenta((xs) => [...xs, { posicion: proxima, nombre: n }]);
+    setProxima((x) => x + 1);
     setNuevo("");
   };
 
   const ver = () => {
-    if (!listo || comercio === null || monto === null) return;
-    const integrantes: IntegranteGrupo[] = [
-      { tipo: "vos" },
-      ...elegidos.map((c) => ({ tipo: "contacto" as const, contactoId: c.id })),
-      ...sinCuenta.map((n) => ({ tipo: "sin-cuenta" as const, nombre: n })),
-    ];
-    dispatch(grupoArmado({ nombre, comercio, monto, fecha, integrantes }));
+    if (!listo || monto === null) return;
+    dispatch(grupoArmado({ comercio: conRubro, canal, monto, contactos: elegidos.map((c) => c.id), sinCuenta }));
     router.push("/grupo/resultado");
   };
-
-  if (comercio === null) {
-    // El comercio ya no se puede resolver (por ejemplo, salió del corpus al sincronizar): se avisa
-    // en vez de esconder el encabezado sin decir nada (G-04).
-    return (
-      <Screen>
-        <EmptyState
-          title="No encontramos ese comercio"
-          body="Volvé a elegirlo en «¿Con qué pago?» para armar el grupo."
-          action={{ label: "Volver", onPress: () => router.back() }}
-        />
-      </Screen>
-    );
-  }
 
   return (
     <Screen
@@ -85,7 +88,13 @@ export default function ArmarGrupo() {
         <>
           <Text variant="label" tone="inkSecondary" align="center">
             {cantidad} {cantidad === 1 ? "persona" : "personas"}
-            {monto === null ? " · falta el monto" : cantidad < 2 ? " · sumá a alguien más" : ""}
+            {monto === null
+              ? " · falta el monto"
+              : cantidad < 2
+                ? " · sumá a alguien más"
+                : cantidad > MAXIMO_INTEGRANTES
+                  ? ` · son más de ${MAXIMO_INTEGRANTES}`
+                  : ""}
           </Text>
           <Button label="Ver quién conviene que pague" onPress={ver} disabled={!listo} />
         </>
@@ -95,11 +104,10 @@ export default function ArmarGrupo() {
         <Avatar icon={iconoDeRubro[comercio.rubro]} rubro={rubroColors[comercio.rubro]} />
         <View style={{ flex: 1 }}>
           <Text variant="bodyLg" weight="semibold">
-            {nombre ?? comercio.nombre}
+            {comercio.nombre}
           </Text>
           <Text variant="label" tone="inkSecondary">
-            {nombre ? `${comercio.nombre} · ` : ""}
-            {fecha === hoy ? "hoy" : `sábado ${fechaCorta(fecha)}`}
+            hoy · {canal === "online" ? "online" : "en el local"}
           </Text>
         </View>
       </View>
@@ -149,9 +157,9 @@ export default function ArmarGrupo() {
 
       <View style={{ gap: space.md }}>
         <SectionHeader title="Sin cuenta en Vuelto" />
-        {sinCuenta.map((n, i) => (
+        {sinCuenta.map(({ posicion, nombre: n }) => (
           <View
-            key={`${n}-${i}`}
+            key={posicion}
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -172,7 +180,7 @@ export default function ArmarGrupo() {
               </Text>
             </View>
             <Pressable
-              onPress={() => setSinCuenta((xs) => xs.filter((_, j) => j !== i))}
+              onPress={() => setSinCuenta((xs) => xs.filter((x) => x.posicion !== posicion))}
               accessibilityRole="button"
               accessibilityLabel={`Sacar a ${n} del grupo`}
               style={{ width: size.hit + 8, height: size.hit, alignItems: "center", justifyContent: "center" }}
@@ -205,7 +213,7 @@ export default function ArmarGrupo() {
           />
           <Pressable
             onPress={agregar}
-            disabled={!nuevo.trim()}
+            disabled={!nuevo.trim() || lleno}
             accessibilityRole="button"
             accessibilityLabel="Agregar al grupo"
             style={{
@@ -216,7 +224,7 @@ export default function ArmarGrupo() {
               backgroundColor: colors.surfaceStrong,
               alignItems: "center",
               justifyContent: "center",
-              opacity: nuevo.trim() ? 1 : 0.5,
+              opacity: nuevo.trim() && !lleno ? 1 : 0.5,
             }}
           >
             <Icon name="agregar" size={22} />

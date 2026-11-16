@@ -8,7 +8,7 @@ import { aCentavos, aCentesimosDePunto, aplicarPorcentaje } from "./dinero.ts";
 import { vigenteEn } from "./elegibilidad.ts";
 import { inicioDelPeriodo } from "./fecha.ts";
 import { compararIds } from "./orden.ts";
-import type { BaseEstimacion, Compra, FechaISO, PeriodoAcumulable, Promocion } from "./tipos.ts";
+import type { BaseEstimacion, ConsumoDeTope, FechaISO, PeriodoAcumulable, Promocion } from "./tipos.ts";
 
 /**
  * Qué tope tiene una promo (FR-012 de la issue #38): la única lectura de
@@ -45,8 +45,8 @@ export interface Saldo {
 }
 
 /** Agrupa una sola vez las compras por promo, para no recorrerlas por cada promo. */
-function comprasPorPromocion(compras: Compra[]): Map<string, Compra[]> {
-  const porPromo = new Map<string, Compra[]>();
+function comprasPorPromocion(compras: readonly ConsumoDeTope[]): Map<string, ConsumoDeTope[]> {
+  const porPromo = new Map<string, ConsumoDeTope[]>();
   for (const c of compras) {
     if (c.promocionId === null) continue;
     const lista = porPromo.get(c.promocionId);
@@ -65,7 +65,7 @@ function armarSaldo(
   tope: number,
   periodo: Saldo["periodo"],
   miembros: Promocion[],
-  comprasDe: Map<string, Compra[]>,
+  comprasDe: Map<string, ConsumoDeTope[]>,
   hoy: FechaISO,
 ): Saldo {
   const inicio = inicioDelPeriodo(periodo, hoy);
@@ -112,7 +112,7 @@ function grupoDe(promo: Promocion): string | null {
 function saldoDeGrupo(
   grupoTopeId: string,
   miembros: Promocion[],
-  comprasDe: Map<string, Compra[]>,
+  comprasDe: Map<string, ConsumoDeTope[]>,
   hoy: FechaISO,
 ): Saldo | null {
   const conTope = miembros.flatMap((m) => {
@@ -133,7 +133,7 @@ function saldoDeGrupo(
  */
 export function calcularSaldos(
   promociones: Promocion[],
-  compras: Compra[],
+  compras: readonly ConsumoDeTope[],
   hoy: FechaISO,
 ): Map<string, Saldo> {
   const comprasDe = comprasPorPromocion(compras);

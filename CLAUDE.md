@@ -31,7 +31,7 @@ directo, sin compilar.
 |---|---|
 | `packages/motor` (`@vuelto/motor`) | Motor de reglas: TS puro, sin `dependencies`, tests Vitest |
 | `apps/mobile` | App Expo (issue #39). Importa `@vuelto/motor` y guarda su estado en Redux; la recomendación y los topes son selectores (ADR-010, issue #81). Sincroniza el corpus y las compras del período desde Supabase (`src/sync/`, issue #42). Tests Vitest de cálculo, store, persistencia y sincronización; `npm run test:integracion -w @vuelto/mobile` prueba las consultas contra un Supabase local (Docker) |
-| `supabase` (`@vuelto/supabase`) | Edge Functions (`functions/`: `extraer-ticket`, que lee la foto del ticket con Groq sin guardarla (issue #48, ADR-012); `recomendar`, hoy fuera del camino de la app por ADR-010; y `_shared/`, tests Vitest); `migrations/` (esquema con RLS), `seed.sql` y `tests/database/` (pgTAP, `supabase test db`); `scripts/` (comparación de las migraciones del repo con las de la base alojada, ADR-013). Los `functions/*/index.ts` corren en Deno: los chequea `deno check` en el CI, no `tsc` |
+| `supabase` (`@vuelto/supabase`) | Edge Functions (`functions/`: `extraer-ticket`, que lee la foto del ticket con Groq sin guardarla (issue #48, ADR-012); `recomendar-grupo`, el gasto en grupo (issue #54, spec 016); `recomendar`, hoy fuera del camino de la app por ADR-010; y `_shared/`, tests Vitest); `migrations/` (esquema con RLS), `seed.sql` y `tests/database/` (pgTAP, `supabase test db`); `scripts/` (comparación de las migraciones del repo con las de la base alojada, ADR-013). Los `functions/*/index.ts` corren en Deno: los chequea `deno check` en el CI, no `tsc` |
 | `ingesta` (`@vuelto/ingesta`) | Ingesta automática de promociones de MODO (issue #35, ADR-011): `src/corpus/` con el listado de la API pública, el mapeo del detalle, la validación y la publicación en Supabase (capturas crudas, promos y bajas). La corre todos los días `.github/workflows/ingesta.yml`. Tests Vitest sin red. El extractor con Gemini de la letra chica (#50, #51) se suma acá |
 
 Comandos (desde la raíz; recorren todos los workspaces, los mismos que corre el CI):
@@ -88,7 +88,7 @@ Si cambia `packages/motor/src`, recompilarlo (`npm run build -w @vuelto/motor`) 
 |---|---|
 | Motor de reglas | Paquete TypeScript propio, sin dependencias, con su suite de tests. Corre **en la app** (recomendación y topes en vivo, sin red) y, para el gasto en grupo, en una Edge Function (ADR-010) |
 | Cliente mobile | Expo (React Native) con Redux Toolkit como estado: perfil, corpus de promociones y compras del período; la recomendación y los topes se derivan con selectores, no se guardan |
-| Backend / DB | Supabase (Postgres + Auth + RLS). Edge Functions solo donde hay un secreto o datos de otros usuarios (ticket, grupo, invitaciones) |
+| Backend / DB | Supabase (Postgres + Auth + RLS). Edge Functions solo donde hay un secreto o datos de otros usuarios (ticket, grupo). Las invitaciones van por RPC (ADR-010 §Actualización) |
 | Extractor | **Siempre del lado del servidor**, nunca en el cliente. Ticket: Groq (Edge Function). Letra chica: Gemini (ingesta). Ver ADR-012 |
 | Ingesta / scraping | Playwright (dónde corre el cron: pendiente) |
 | Testing | Vitest sobre el motor + Expo Go para ejecución manual |

@@ -59,7 +59,11 @@
       mencionada en el pitch como camino de crecimiento).
 - [ ] Probar el extractor contra 15-20 tickets reales
 - [x] Política de retención de imágenes de ticket — ver `privacidad.md`
-- [ ] Gasto en grupo: promoción de débito, redondeo de la división
+- [x] Gasto en grupo: promoción de débito, redondeo de la división —
+      resuelto por el PO el 15/11/2026 (issue #54, spec 016): la división
+      descuenta el reintegro igual para débito y crédito, y el reintegro le
+      llega a quien paga; se divide en pesos enteros y el resto va de a $1 en
+      el orden del desempate. Ver ADR-008 §Actualización.
 - [ ] Formato exacto de requisitos de la cátedra (numeración, si distingue
       funcionales de no funcionales, formato de historia de usuario) — hace
       falta para terminar el override de spec-kit en
