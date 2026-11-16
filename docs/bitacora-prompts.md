@@ -3032,6 +3032,10 @@ contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
    puntos. Entre ellos: el rubro elegido se perdía al cambiar el nombre,
    «coincide exacto» tenía dos definiciones, y la medición se ajustaba con la
    misma lista que la medía.
+4. "Commiteá y seguí con el plan." Para el parecido entre nombres se eligió
+   una comparación propia que cuenta letras de diferencia, en vez de la
+   librería Fuse.js: es corta, sin dependencias y su umbral se entiende
+   fácil («Carrefur» está a una letra de «Carrefour»).
 
 **Resultado:**
 - Spec 015: si el comercio no coincide, un recuadro con hasta 3 sugerencias
@@ -3042,6 +3046,9 @@ contra «Coto»), la app sugiera cuál es y el usuario lo confirme.
   sucursal, y de la búsqueda por parecido. Todo en el celular, sin red.
 - La medición queda fija en dos listas dentro de la spec: 20 nombres como
   los de tickets reales y 10 comercios que no están en el catálogo.
+- Plan: la lógica en un archivo nuevo que se prueba sin celular, el umbral
+  ajustado con una lista distinta de la de medición, y el campo «Comercio»
+  avisa cuando el usuario termina de escribir.
 
 ---
 
