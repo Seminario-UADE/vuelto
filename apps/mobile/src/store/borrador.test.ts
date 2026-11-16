@@ -4,7 +4,7 @@ import { borradorComercios, borradorMedios, borradorNombre } from "./perfil";
 import { guardarBorradorEnCuenta, leerMedios } from "./perfil-remoto";
 import { memoria, storeDePrueba } from "./prueba";
 import { GALICIA, guardado, ok, remoto } from "./prueba-perfil-remoto";
-import { usuarioCambio } from "./sesion";
+import { emailPorConfirmarCambio, usuarioCambio } from "./sesion";
 
 // Spec 012, US5 (T044): lo elegido antes de tener cuenta se guarda en ella al crearla o al entrar.
 
@@ -129,5 +129,25 @@ describe("guardarBorradorEnCuenta (spec 012, US5, FR-031 y FR-034)", () => {
     expect(await s.dispatch(guardarBorradorEnCuenta())).toEqual({ ok: true, datos: [] });
     expect(r.llamadas).toEqual([]);
     expect(s.getState().perfil.borrador?.medios).toEqual([elegido]);
+  });
+
+  it("con confirmación de email: el borrador espera sin sesión y se guarda en el primer ingreso (FR-033, SC-009)", async () => {
+    const r = remoto({ confirmarOnboarding: ok([guardado("m1")]) });
+    const s = storeDePrueba(null, memoria(), { perfilRemoto: r.datos });
+    s.dispatch(borradorMedios({ medios: [elegido], ahora: AHORA }));
+    s.dispatch(borradorNombre({ nombre: "Ana", ahora: AHORA }));
+    // El registro no devolvió sesión: «Revisá tu email» muestra la dirección.
+    s.dispatch(emailPorConfirmarCambio("ana@mail.com"));
+    await s.dispatch(leerMedios());
+    expect(r.llamadas).toEqual([]);
+    expect(s.getState().sesion.emailPorConfirmar).toBe("ana@mail.com");
+
+    // Confirmó y entró: la dirección ya no hace falta y el borrador pasa entero a la cuenta.
+    s.dispatch(usuarioCambio({ id: "u1", email: "ana@mail.com" }));
+    expect(s.getState().sesion.emailPorConfirmar).toBeNull();
+    await s.dispatch(leerMedios());
+    expect(r.llamadas).toContain("confirmar:1");
+    expect(r.llamadas).toContain("guardarNombre:u1:Ana");
+    expect(s.getState().perfil.borrador).toBeNull();
   });
 });

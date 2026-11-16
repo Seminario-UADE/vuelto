@@ -6,7 +6,7 @@ import { NOMBRE_MAXIMO, validarNombre } from "@/perfil/modelo";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { borradorNombre, invitacionGuardada } from "@/store/perfil";
 import { cambiarNombre, guardarBorradorEnCuenta } from "@/store/perfil-remoto";
-import { avisoMostrado } from "@/store/sesion";
+import { avisoMostrado, emailPorConfirmarCambio } from "@/store/sesion";
 import { hapticoExito } from "@/lib/haptics";
 import type { ErrorAuth } from "@/lib/auth";
 import { CLAVE_MINIMA } from "@/lib/auth";
@@ -98,9 +98,10 @@ export function FormularioCuenta({ modo }: { modo: Modo }) {
     const guardoBorrador = guardar && r.cuenta !== null ? await dispatch(guardarBorradorEnCuenta()) : null;
     setEnviando(false);
     if (r.cuenta === null) {
-      // El proyecto pide confirmar el email: todavía no hay sesión.
-      dispatch(avisoMostrado("Te mandamos un email para confirmar tu cuenta"));
-      router.replace("/login");
+      // El proyecto pide confirmar el email: todavía no hay sesión. Lo elegido sigue en el borrador
+      // y se guarda en el primer ingreso (FR-033).
+      dispatch(emailPorConfirmarCambio(email.trim()));
+      router.replace("/confirmar-email");
       return;
     }
     hapticoExito();
