@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Keyboard, Pressable, View } from "react-native";
 import { hapticoLeve } from "@/lib/haptics";
+import { margenBajoLaCapsula } from "@/lib/margen-tab-bar";
 import { colors, floatingShadow, radius, size, space } from "@/theme";
 import { Icon, type IconName } from "./icon";
 import { Text } from "./text";
@@ -36,7 +37,7 @@ export function TabBar({ state, descriptors, emitter, navigateToTab, insets }: B
         backgroundColor: colors.canvas,
         paddingHorizontal: space.gutter,
         paddingTop: space.sm,
-        paddingBottom: Math.max(insets.bottom, space.md),
+        paddingBottom: margenBajoLaCapsula(insets.bottom),
       }}
     >
       <View
