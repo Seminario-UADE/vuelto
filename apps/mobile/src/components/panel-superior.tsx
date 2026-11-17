@@ -2,6 +2,8 @@ import { StatusBar } from "expo-status-bar";
 import type { ReactNode } from "react";
 import { View, type ColorValue } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useFondoDePagina } from "@/lib/fondo-de-pagina";
+import { extraArribaWebApp } from "@/lib/web-app-instalada";
 import { radius, space } from "@/theme";
 
 /** Lo que sobra arriba del panel: al tirar hacia abajo (rebote de iOS) se sigue viendo el panel, no el fondo. */
@@ -30,13 +32,16 @@ type Props = {
  */
 export function PanelSuperior({ color, fondo, barra, accessibilityLabel, redondeado = true, children }: Props) {
   const insets = useSafeAreaInsets();
+  // Mismo alto que suma `Screen` arriba: el panel se come ese relleno y lo repone como propio.
+  const arriba = insets.top + extraArribaWebApp();
+  useFondoDePagina(color);
   return (
     <View
       accessibilityLabel={accessibilityLabel}
       style={{
         marginHorizontal: -space.gutter,
-        marginTop: -(insets.top + space.lg + SOBRANTE_REBOTE),
-        paddingTop: insets.top + space.sm + SOBRANTE_REBOTE,
+        marginTop: -(arriba + space.lg + SOBRANTE_REBOTE),
+        paddingTop: arriba + space.sm + SOBRANTE_REBOTE,
         paddingHorizontal: space.gutter,
         backgroundColor: color,
         borderBottomLeftRadius: redondeado ? radius.sheet : 0,

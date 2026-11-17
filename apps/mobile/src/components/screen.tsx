@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { ScrollView, View, type ScrollViewProps } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAlturaTeclado } from "@/hooks/use-altura-teclado";
+import { extraArribaWebApp } from "@/lib/web-app-instalada";
 import { colors, floatingShadow, space } from "@/theme";
 
 type Props = {
@@ -41,7 +42,7 @@ export function Screen({ children, footer, kind = "stack", aboveTabBar, gap = sp
         {...scrollProps}
         contentContainerStyle={{
           paddingHorizontal: space.gutter,
-          paddingTop: kind === "tab" ? insets.top + space.lg : space.lg,
+          paddingTop: kind === "tab" ? insets.top + extraArribaWebApp() + space.lg : space.lg,
           paddingBottom: (footer ? altoFooter : inferior) + space.xxl + altoTeclado,
           gap,
         }}
