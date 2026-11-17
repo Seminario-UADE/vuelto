@@ -1,16 +1,14 @@
-# Capturas del deck (pendientes)
+# Capturas del deck
 
-El deck `../../vuelto-mvp.html` (slide 10) busca estas cuatro capturas de la
-app **v9.1** (paleta de seis verdes, `docs/design/DESIGN.md`). Hasta que estén,
-muestra cuadros marcados como `[PENDIENTE: captura v9.1]`.
+Capturas de la app web (v9.1, modo oscuro, 390×844) del 16/11/2026, con Supabase local, 3180
+promos bajadas por la ingesta real de MODO y una cuenta de prueba (Galicia Visa crédito,
+compra de $90.000 en ChangoMás un lunes).
 
-| Archivo | Pantalla | Modo |
+| Archivo | Pantalla | Slide |
 |---|---|---|
-| `inicio-claro.png` | Inicio | claro |
-| `inicio-oscuro.png` | Inicio | oscuro |
-| `recomendacion-claro.png` | «Con qué te conviene pagar» | claro |
-| `recomendacion-oscuro.png` | «Con qué te conviene pagar» | oscuro |
+| `inicio.jpg`, `comprar.jpg`, `recomendacion.jpg`, `pagar.jpg` | Decidir | 5 |
+| `escanear.jpg`, `revisa.jpg` (carga a mano), `topes.jpg`, `compras.jpg` | Registrar y controlar | 6 |
+| `grupo-invitar.jpg`, `grupo-armar.jpg`, `grupo-resultado.jpg` | Gasto en grupo (de `docs/design/capturas-grupo-016/`, 15/11) | 7 |
 
-Formato: PNG de teléfono, proporción ~9:19 (390×844 pt o más). Con la cuenta de
-demo y con datos reales, no con los fixtures (las de `docs/design/capturas-v8/`
-son de la v8, crema, y muestran «Hola, Martín» de ejemplo).
+La pantalla de «Revisá tu compra» se sacó cargando a mano: la función del ticket (Groq) no
+corre en local. Para mostrar una lectura real hay que sacarla desde el celular.
