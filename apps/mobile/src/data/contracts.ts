@@ -155,6 +155,20 @@ export type UsoDeTopes = {
   topes: number;
   /** "según 4 compras de octubre" o, sin compras, "Todavía no usaste ningún tope este mes". */
   base: string;
+  /**
+   * Un tramo por tope usado, en el orden de `medios` (Inicio v10): el anillo segmentado dibuja lo
+   * que queda de cada uno, así se ve cuál se está agotando.
+   */
+  tramos: TramoDeUso[];
+};
+
+export type TramoDeUso = {
+  clave: ClaveTope;
+  /** Nombre del medio, para la leyenda. */
+  nombre: string;
+  disponible: number;
+  nominal: number;
+  estado: EstadoTope;
 };
 
 export type ResumenTopes = {

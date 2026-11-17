@@ -128,3 +128,45 @@ export const RUBROS_DE_MODO: readonly Comercio[] = CATEGORIAS_MODO.map((x) => co
 export function esComercioDeRubro(c: Comercio): boolean {
   return c.id.startsWith(PREFIJO_RUBRO);
 }
+
+/** Nombres de MODO que no entran en un chip: el corto para los chips de rubro (elegir comercio, v10). */
+const NOMBRE_CORTO_DE_CATEGORIA: ReadonlyMap<number, string> = new Map([
+  [4, "Farmacias"],
+  [10, "Electro"],
+  [11, "Ferretería"],
+  [13, "Jugueterías"],
+]);
+
+/** El nombre de un rubro de MODO para un chip («Farmacias» en vez de «Farmacias, Perfumerías y Peluquerías»). */
+export function nombreCortoDeRubro(categoriaId: number): string {
+  return NOMBRE_CORTO_DE_CATEGORIA.get(categoriaId) ?? CATEGORIAS_MODO.find((x) => x.id === categoriaId)?.nombre ?? RUBROS.otro.titulo;
+}
+
+/**
+ * Lo que lista «¿Dónde estás comprando?» (v10): los comercios del catálogo, con los del usuario
+ * primero y después por nombre; con `categoriaId`, solo los de ese rubro; con `q`, los que
+ * coinciden, primero los que empiezan con lo escrito. Sin repetir un mismo comercio del mismo rubro.
+ */
+export function comerciosParaElegir(
+  catalogo: readonly Comercio[],
+  propios: readonly Comercio[],
+  { q = "", categoriaId = null }: { q?: string; categoriaId?: number | null } = {},
+): Comercio[] {
+  const t = claveDeComercio(q);
+  const pasa = (c: Comercio) =>
+    (categoriaId === null || c.categoriaId === categoriaId) && (t === "" || claveDeComercio(c.nombre).includes(t));
+  // Buscando, primero lo que empieza con lo escrito, después lo que tiene una palabra que empieza así.
+  const cercania = (c: Comercio) => {
+    if (t === "") return 0;
+    const n = claveDeComercio(c.nombre);
+    return n.startsWith(t) ? 0 : n.split(/\s+/).some((w) => w.startsWith(t)) ? 1 : 2;
+  };
+  const primeros = propios.filter(pasa).sort((a, b) => cercania(a) - cercania(b));
+  const resto = catalogo
+    .filter((c) => pasa(c) && !primeros.some((p) => p.id === c.id))
+    .sort(
+      (a, b) =>
+        cercania(a) - cercania(b) || Number(b.frecuente) - Number(a.frecuente) || a.nombre.localeCompare(b.nombre, "es"),
+    );
+  return [...primeros, ...resto];
+}

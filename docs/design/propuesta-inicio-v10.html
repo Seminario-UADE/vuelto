@@ -1,0 +1,267 @@
+<title>Vuelto Inicio v10</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: una columna de lectura; arriba los tres celulares lado a lado (actual / propuesta oscuro / propuesta claro), abajo auditoría, paleta y cambios. */
+:root{
+  --bg:#F2F6F3; --fg:#0B1A14; --muted:#4A6157; --line:#D5E0D9; --card:#FFFFFF; --accent:#1C6B4E; --warn:#985A00; --bad:#B42A22;
+  --f-body:"Hanken Grotesk",ui-sans-serif,system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B100E;--fg:#E6F1EA;--muted:#9AADA3;--line:#27322D;--card:#141B18;--accent:#7DD3A0;--warn:#E8BC66;--bad:#F09488;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B100E;--fg:#E6F1EA;--muted:#9AADA3;--line:#27322D;--card:#141B18;--accent:#7DD3A0;--warn:#E8BC66;--bad:#F09488;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.55;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 80px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+h1{font-size:clamp(28px,4vw,40px);line-height:1.1;letter-spacing:-.02em;margin:0;text-wrap:balance}
+h2{font-size:22px;letter-spacing:-.01em;margin:0 0 16px;text-wrap:balance}
+h3{font-size:16px;margin:0 0 6px}
+p{margin:0;max-width:68ch}
+.lede{color:var(--muted);font-size:18px;margin-top:12px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.phones{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:28px;justify-items:center}
+.ph-col{display:flex;flex-direction:column;gap:12px;align-items:center;min-width:0}
+.ph-cap{text-align:center;font-size:14px;color:var(--muted);max-width:300px}
+.ph-cap b{color:var(--fg);display:block;font-size:15px}
+
+/* ---------- celular ---------- */
+.phone{width:300px;height:640px;border-radius:44px;padding:8px;background:#000;box-shadow:0 0 0 1px #2a2f2d,0 24px 60px rgba(0,0,0,.28);flex:none}
+.scr{position:relative;height:100%;border-radius:36px;overflow:hidden;background:var(--canvas);color:var(--ink);font-family:var(--f-body);font-size:12px;line-height:1.35}
+.island{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:84px;height:24px;border-radius:14px;background:#000;z-index:5}
+.sb{display:flex;justify-content:space-between;padding:12px 22px 0;font-weight:600;font-size:12px;color:var(--onHero);position:relative;z-index:2}
+.row{display:flex;align-items:center;gap:10px}
+.av{width:34px;height:34px;border-radius:50%;background:var(--heroChip);display:grid;place-items:center;font-weight:700;color:var(--onHero);flex:none}
+.hdr{padding:14px 16px 0;position:relative;z-index:2}
+.hdr .who{flex:1;min-width:0}
+.hdr .hi{color:var(--onHero);font-weight:600;font-size:14px}
+.hdr .dt{color:var(--onHeroMuted);font-size:11px}
+.ic{width:34px;height:34px;border-radius:50%;background:var(--heroChip);display:grid;place-items:center;flex:none}
+.ic svg,.tile svg,.tab svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ic{color:var(--onHero)}
+.amt-lbl{color:var(--onHeroMuted);font-size:12px;text-align:center}
+.amt{color:var(--onHero);font-weight:700;font-size:40px;letter-spacing:-.03em;text-align:center;line-height:1.05;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--heroChip);color:var(--onHero);font-size:11px;font-weight:500}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tile{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--onHero);font-size:10.5px;font-weight:600}
+.tile i{width:48px;height:48px;border-radius:14px;background:var(--heroChip);display:grid;place-items:center}
+.tile svg{width:20px;height:20px}
+.card{background:var(--surface);border-radius:16px;box-shadow:var(--shadow)}
+.sh{display:flex;justify-content:space-between;align-items:baseline;font-weight:600;font-size:13px;color:var(--ink)}
+.sh a{color:var(--accent);font-size:11px;font-weight:600}
+.lr{display:flex;align-items:center;gap:10px;padding:9px 12px}
+.lr+.lr{border-top:1px solid var(--divider)}
+.sq{width:30px;height:30px;border-radius:9px;background:var(--strong);display:grid;place-items:center;font-weight:700;font-size:11px;color:var(--ink);flex:none}
+.lr .t{flex:1;min-width:0}
+.lr .n{font-weight:600;font-size:12px}
+.lr .s{color:var(--ink2);font-size:10.5px}
+.lr .v{text-align:right;font-weight:600;font-variant-numeric:tabular-nums;font-size:12px}
+.bar{height:4px;border-radius:4px;background:var(--strong);margin-top:5px;overflow:hidden}
+.bar b{display:block;height:100%;border-radius:4px;background:var(--accent)}
+.tabbar{position:absolute;left:10px;right:10px;bottom:10px;height:54px;border-radius:18px;background:var(--tabbar);display:flex;align-items:center;justify-content:space-around;box-shadow:var(--shadow);z-index:4}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:var(--ink2)}
+.tab.on{color:var(--accent)}
+.plus{width:42px;height:42px;border-radius:14px;background:var(--accent);color:var(--onAccent);display:grid;place-items:center}
+.plus svg{width:20px;height:20px;stroke-width:2.2}
+
+/* actual (v9.1, oscuro) */
+.cur{--canvas:#051F20;--surface:#0B2B26;--strong:#163832;--divider:#235347;--ink:#DAF1DE;--ink2:#8EB69B;--accent:#8EB69B;--onAccent:#051F20;--onHero:#DAF1DE;--onHeroMuted:#B9D6C2;--heroChip:rgba(218,241,222,.10);--tabbar:#0B2B26;--shadow:none}
+.cur .panel{position:absolute;inset:0 0 auto;height:352px;border-radius:0 0 26px 26px;background:radial-gradient(120% 100% at 50% 0%,#235347 0%,#0B2B26 100%)}
+.cur .body{position:relative;z-index:2;display:flex;flex-direction:column;gap:14px;padding:0 16px}
+
+/* propuesta */
+.nv{--onHero:#E6F1EA;--onHeroMuted:#B9D6C2;--heroChip:rgba(230,241,234,.12);--heroGlow:#1F5A45;--heroBase:#0B100E}
+.nv-d{--canvas:#0B100E;--surface:#141B18;--strong:#1D2622;--divider:#27322D;--ink:#E6F1EA;--ink2:#9AADA3;--accent:#7DD3A0;--onAccent:#06130D;--tabbar:rgba(29,38,34,.92);--shadow:none;--sheet:#0B100E;--grab:#3A4741}
+.nv-l{--canvas:#F2F6F3;--surface:#FFFFFF;--strong:#E4ECE7;--divider:#E1E9E4;--ink:#0B1A14;--ink2:#4A6157;--accent:#1C6B4E;--onAccent:#FFFFFF;--tabbar:#FFFFFF;--shadow:0 1px 2px rgba(11,26,20,.05),0 6px 16px rgba(11,26,20,.07);--sheet:#F2F6F3;--grab:#C3D0C8;--heroBase:#0E2A21}
+.nv .glow{position:absolute;inset:0 0 auto;height:420px;background:radial-gradient(90% 70% at 50% 8%,var(--heroGlow) 0%,var(--heroBase) 78%)}
+.nv .hero{position:relative;z-index:2;padding:18px 16px 0;display:flex;flex-direction:column;gap:6px;align-items:center}
+.nv .amt .aprox{color:var(--onHeroMuted);font-weight:500;font-size:26px;margin-right:2px;vertical-align:4px}
+.nv .tiles{padding:20px 16px 0;position:relative;z-index:2}
+.nv .tile.pri i{background:#7DD3A0;color:#06130D}
+.nv .sheet{position:absolute;left:0;right:0;top:360px;bottom:0;background:var(--sheet);border-radius:26px 26px 0 0;z-index:3;padding:10px 14px 0;display:flex;flex-direction:column;gap:12px}
+.nv .grab{width:36px;height:4px;border-radius:4px;background:var(--grab);margin:0 auto}
+.ring-card{display:flex;gap:12px;align-items:center;padding:12px}
+.ring-card .k{color:var(--ink2);font-size:10.5px}
+.ring-card .big{font-weight:700;font-size:20px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.legend{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:4px;font-size:9.5px;color:var(--ink2)}
+.legend i{width:7px;height:7px;border-radius:2px;display:block}
+
+/* ---------- secciones ---------- */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;min-width:0}
+.find{display:flex;flex-direction:column;gap:12px}
+.find li{list-style:none;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
+.find ul{margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.sev{font-size:11px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:6px;border:1px solid currentColor;margin-top:2px;white-space:nowrap}
+.p1{color:var(--bad)} .p2{color:var(--warn)} .p3{color:var(--muted)}
+.find p{font-size:15px}
+.find small{color:var(--muted);font-size:13px;display:block;margin-top:2px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+tr:last-child td{border-bottom:0}
+.sw{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:12.5px;white-space:nowrap}
+.sw i{width:18px;height:18px;border-radius:5px;display:inline-block;box-shadow:inset 0 0 0 1px rgba(127,127,127,.35)}
+.old{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.num{font-family:var(--f-mono);font-size:12.5px;font-variant-numeric:tabular-nums}
+ol.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px;max-width:72ch}
+ol.steps li::marker{color:var(--muted);font-weight:600}
+.note{font-size:14px;color:var(--muted)}
+code{font-family:var(--f-mono);font-size:.88em}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Propuesta · Inicio v10 · Paleta oscura refinada</div>
+    <h1>Inicio: la cifra del mes sobre un brillo verde, y un oscuro que deja de ser pantano</h1>
+    <p class="lede">A la izquierda, cómo se ve hoy el Inicio en oscuro (reconstruido desde <code>theme.ts</code> y <code>panel-inicio.tsx</code>). Al centro y a la derecha, la propuesta en los dos temas. Los datos son de ejemplo.</p>
+  </header>
+
+  <section class="phones" aria-label="Comparación de pantallas">
+    <!-- ACTUAL -->
+    <div class="ph-col">
+      <div class="phone"><div class="scr cur">
+        <div class="panel"></div><div class="island"></div>
+        <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="body">
+          <div class="row hdr" style="padding:14px 0 0"><div class="av">S</div><div class="who"><div class="hi">Hola, Sofía</div><div class="dt">Lunes 16 de noviembre</div></div><div class="ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:4px"><div class="amt-lbl">Este mes te devolvieron aproximadamente</div><div class="amt">$18.400</div><span class="pill">según 4 compras registradas</span></div>
+          <div class="tiles">
+            <div class="tile"><i><svg viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg></i>Comprar</div>
+            <div class="tile"><i><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/></svg></i>Escanear</div>
+            <div class="tile"><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9h9"/></svg></i>Topes</div>
+            <div class="tile"><i><svg viewBox="0 0 24 24"><path d="M4 10h16l-1-5H5zM5 10v10h14V10"/></svg></i>Comercios</div>
+          </div>
+          <div class="card" style="padding:12px;display:flex;gap:12px;align-items:center;margin-top:18px">
+            <svg width="74" height="74" viewBox="0 0 74 74"><circle cx="37" cy="37" r="31" stroke="#163832" stroke-width="10" fill="none"/><circle cx="37" cy="37" r="31" stroke="#8EB69B" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="122 195" transform="rotate(-90 37 37)"/><text x="37" y="41" text-anchor="middle" fill="#DAF1DE" font-size="13" font-weight="700" font-family="Hanken Grotesk">≈63%</text></svg>
+            <div><div style="color:#8EB69B;font-size:10.5px">Tope que te queda</div><div style="font-weight:700;font-size:20px">≈$31.600</div><div style="color:#8EB69B;font-size:10.5px">de $50.000 en 3 topes</div></div>
+          </div>
+          <div class="sh">Hoy podés usar <a>Ver todos</a></div>
+          <div class="card"><div class="lr"><div class="sq">VG</div><div class="t"><div class="n">Visa Galicia</div><div class="s">según 2 compras</div></div><div class="v">≈$12.000</div></div></div>
+          <div class="card"><div class="lr"><div class="sq">MB</div><div class="t"><div class="n">MODO BBVA</div><div class="s">según 1 compra</div></div><div class="v">≈$9.600</div></div></div>
+        </div>
+        <div class="tabbar"><div class="tab on"><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9H4z"/></svg>Inicio</div><div class="tab"><svg viewBox="0 0 24 24"><path d="M4 10h16l-1-5H5zM5 10v10h14V10"/></svg>Comercios</div><div class="plus"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/></svg>Compras</div><div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Perfil</div></div>
+      </div></div>
+      <div class="ph-cap"><b>Hoy · oscuro v9.1</b>Todo verde saturado: fondo, tarjetas, divisores y panel son el mismo tono. El panel apenas se despega.</div>
+    </div>
+
+    <!-- PROPUESTA OSCURO -->
+    <div class="ph-col">
+      <div class="phone"><div class="scr nv nv-d">
+        <div class="glow"></div><div class="island"></div>
+        <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="row hdr"><div class="av">S</div><div class="who"><div class="hi">Hola, Sofía</div><div class="dt">Lunes 16 de noviembre</div></div><div class="ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div>
+        <div class="hero"><div class="amt-lbl">Te devolvieron en noviembre</div><div class="amt"><span class="aprox">≈</span>$18.400</div><span class="pill">según 4 compras registradas</span></div>
+        <div class="tiles">
+          <div class="tile pri"><i><svg viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg></i>Con qué pago</div>
+          <div class="tile"><i><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/></svg></i>Escanear</div>
+          <div class="tile"><i><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.6-3.5 3-5.5 6-5.5s5.4 2 6 5.5M15 14.5c2.8 0 5 1.8 5.6 5"/></svg></i>En grupo</div>
+          <div class="tile"><i><svg viewBox="0 0 24 24"><path d="M4 10h16l-1-5H5zM5 10v10h14V10"/></svg></i>Comercios</div>
+        </div>
+        <div class="sheet">
+          <div class="grab"></div>
+          <div class="card ring-card">
+            <svg width="70" height="70" viewBox="0 0 70 70" aria-hidden="true"><g fill="none" stroke-width="9" stroke-linecap="butt" transform="rotate(-90 35 35)"><circle cx="35" cy="35" r="29" stroke="#1D2622"/><circle cx="35" cy="35" r="29" stroke="#7DD3A0" stroke-dasharray="44 182.2"/><circle cx="35" cy="35" r="29" stroke="#86C8D0" stroke-dasharray="36 182.2" stroke-dashoffset="-48"/><circle cx="35" cy="35" r="29" stroke="#E8BC66" stroke-dasharray="21 182.2" stroke-dashoffset="-88"/></g><text x="35" y="39" text-anchor="middle" fill="#E6F1EA" font-size="12.5" font-weight="700" font-family="Hanken Grotesk">63%</text></svg>
+            <div style="flex:1;min-width:0"><div class="k">Tope que te queda</div><div class="big">≈$31.600</div><div class="k">de $50.000 · según 4 compras</div>
+              <div class="legend"><span><i style="background:#7DD3A0"></i>Galicia</span><span><i style="background:#86C8D0"></i>BBVA</span><span><i style="background:#E8BC66"></i>MP · queda poco</span></div></div>
+          </div>
+          <div class="sh">Hoy podés usar <a>Ver todos</a></div>
+          <div class="card">
+            <div class="lr"><div class="sq">VG</div><div class="t"><div class="n">Visa Galicia</div><div class="bar"><b style="width:60%"></b></div></div><div class="v">≈$12.000<div class="s" style="font-weight:400">de $20.000</div></div></div>
+            <div class="lr"><div class="sq">MB</div><div class="t"><div class="n">MODO BBVA</div><div class="bar"><b style="width:64%;background:#86C8D0"></b></div></div><div class="v">≈$9.600<div class="s" style="font-weight:400">de $15.000</div></div></div>
+          </div>
+        </div>
+        <div class="tabbar"><div class="tab on"><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9H4z"/></svg>Inicio</div><div class="tab"><svg viewBox="0 0 24 24"><path d="M4 10h16l-1-5H5zM5 10v10h14V10"/></svg>Comercios</div><div class="plus"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/></svg>Compras</div><div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Perfil</div></div>
+      </div></div>
+      <div class="ph-cap"><b>Propuesta · oscuro</b>Neutros casi negros con un dejo verde. El verde vive en el brillo del panel y en la acción, que ahora tiene luz.</div>
+    </div>
+
+    <!-- PROPUESTA CLARO -->
+    <div class="ph-col">
+      <div class="phone"><div class="scr nv nv-l">
+        <div class="glow"></div><div class="island"></div>
+        <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="row hdr"><div class="av">S</div><div class="who"><div class="hi">Hola, Sofía</div><div class="dt">Lunes 16 de noviembre</div></div><div class="ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div></div>
+        <div class="hero"><div class="amt-lbl">Te devolvieron en noviembre</div><div class="amt"><span class="aprox">≈</span>$18.400</div><span class="pill">según 4 compras registradas</span></div>
+        <div class="tiles">
+          <div class="tile pri"><i><svg viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-12z"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg></i>Con qué pago</div>
+          <div class="tile"><i><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/></svg></i>Escanear</div>
+          <div class="tile"><i><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.6-3.5 3-5.5 6-5.5s5.4 2 6 5.5M15 14.5c2.8 0 5 1.8 5.6 5"/></svg></i>En grupo</div>
+          <div class="tile"><i><svg viewBox="0 0 24 24"><path d="M4 10h16l-1-5H5zM5 10v10h14V10"/></svg></i>Comercios</div>
+        </div>
+        <div class="sheet">
+          <div class="grab"></div>
+          <div class="card ring-card">
+            <svg width="70" height="70" viewBox="0 0 70 70" aria-hidden="true"><g fill="none" stroke-width="9" transform="rotate(-90 35 35)"><circle cx="35" cy="35" r="29" stroke="#E4ECE7"/><circle cx="35" cy="35" r="29" stroke="#1C6B4E" stroke-dasharray="44 182.2"/><circle cx="35" cy="35" r="29" stroke="#1E62A6" stroke-dasharray="36 182.2" stroke-dashoffset="-48"/><circle cx="35" cy="35" r="29" stroke="#C07A12" stroke-dasharray="21 182.2" stroke-dashoffset="-88"/></g><text x="35" y="39" text-anchor="middle" fill="#0B1A14" font-size="12.5" font-weight="700" font-family="Hanken Grotesk">63%</text></svg>
+            <div style="flex:1;min-width:0"><div class="k">Tope que te queda</div><div class="big">≈$31.600</div><div class="k">de $50.000 · según 4 compras</div>
+              <div class="legend"><span><i style="background:#1C6B4E"></i>Galicia</span><span><i style="background:#1E62A6"></i>BBVA</span><span><i style="background:#C07A12"></i>MP · queda poco</span></div></div>
+          </div>
+          <div class="sh">Hoy podés usar <a>Ver todos</a></div>
+          <div class="card">
+            <div class="lr"><div class="sq">VG</div><div class="t"><div class="n">Visa Galicia</div><div class="bar"><b style="width:60%"></b></div></div><div class="v">≈$12.000<div class="s" style="font-weight:400">de $20.000</div></div></div>
+            <div class="lr"><div class="sq">MB</div><div class="t"><div class="n">MODO BBVA</div><div class="bar"><b style="width:64%;background:#1E62A6"></b></div></div><div class="v">≈$9.600<div class="s" style="font-weight:400">de $15.000</div></div></div>
+          </div>
+        </div>
+        <div class="tabbar"><div class="tab on"><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9H4z"/></svg>Inicio</div><div class="tab"><svg viewBox="0 0 24 24"><path d="M4 10h16l-1-5H5zM5 10v10h14V10"/></svg>Comercios</div><div class="plus"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><div class="tab"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/></svg>Compras</div><div class="tab"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Perfil</div></div>
+      </div></div>
+      <div class="ph-cap"><b>Propuesta · claro</b>El panel queda oscuro en los dos temas: es la marca. Debajo, la hoja clara sube con su agarradera, como en la referencia azul.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Auditoría del Inicio actual</h2>
+    <div class="grid2">
+      <div class="box find"><h3>Color y modo oscuro</h3><ul>
+        <li><span class="sev p1">P1</span><p>Fondo, tarjetas, hundido y divisor son cuatro verdes saturados que además cambian de matiz (noche tira a cian, pino a verde). Resultado: superficies barrosas y poca jerarquía.<small>Contraste fondo/tarjeta 1,13:1, pero con matices distintos que “ensucian” en lugar de elevar.</small></p></li>
+        <li><span class="sev p1">P1</span><p>El panel del Inicio (pino → helecho) es del mismo tono que el fondo noche: en oscuro no hay foco, la cifra del mes no protagoniza.</p></li>
+        <li><span class="sev p2">P2</span><p>La acción en salvia <code>#8EB69B</code> está desaturada: el «+», las tabs activas y los links se leen como deshabilitados.</p></li>
+        <li><span class="sev p2">P2</span><p>El divisor helecho <code>#235347</code> es tan visible que las listas parecen rayadas. Un divisor debería casi desaparecer.</p></li>
+        <li><span class="sev p2">P2</span><p>Ámbar, coral, lago y los fondos de rubro (marrón, bordó) se ensucian sobre un fondo verde. Sobre un neutro quedan limpios.</p></li>
+        <li><span class="sev p3">P3</span><p>La tarjeta de decisión pasa a menta clara en oscuro: un rectángulo encandilante en una pantalla oscura. Fuera del Inicio, pero sale del mismo tema.</p></li>
+      </ul></div>
+      <div class="box find"><h3>Layout y jerarquía</h3><ul>
+        <li><span class="sev p2">P2</span><p>«Comprar» es la razón de ser de Vuelto y tiene el mismo peso que «Comercios». En la propuesta es el único atajo relleno y dice lo que hace: «Con qué pago».</p></li>
+        <li><span class="sev p2">P2</span><p>Cada tope de «Hoy podés usar» va en su propia tarjeta: tres tarjetas apiladas para tres filas. Pasa a una lista agrupada, con barra y «de $X» para leer el estado sin entrar.</p></li>
+        <li><span class="sev p2">P2</span><p>La torta suma todo en un solo arco: no dice <em>cuál</em> medio se está agotando. El anillo segmentado (referencia violeta) muestra un tramo por medio y marca el que queda poco.</p></li>
+        <li><span class="sev p3">P3</span><p>«Este mes te devolvieron aproximadamente» ocupa dos líneas. «Te devolvieron en noviembre» + «≈» atenuado delante de la cifra dice lo mismo, y el estimado se ve sin leer.</p></li>
+        <li><span class="sev p3">P3</span><p>El atajo «Topes» repite la torta, que ya es tocable y lleva a Topes. Lo reemplaza «En grupo» (spec 016), que hoy no tiene entrada visible desde Inicio.</p></li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Paleta refinada</h2>
+    <p class="note" style="margin-bottom:16px">Mismos roles de <code>theme.ts</code>: ninguna pantalla cambia de código por la paleta, solo de valores. Contraste WCAG medido contra el fondo; todo texto pasa AA y la mayoría AAA.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Rol</th><th>Oscuro hoy</th><th>Oscuro propuesto</th><th>Contraste</th><th>Claro propuesto</th><th>Contraste</th></tr></thead>
+      <tbody>
+        <tr><td>canvas</td><td><span class="sw old"><i style="background:#051F20"></i>#051F20</span></td><td><span class="sw"><i style="background:#0B100E"></i>#0B100E</span></td><td class="num">—</td><td><span class="sw"><i style="background:#F2F6F3"></i>#F2F6F3</span></td><td class="num">—</td></tr>
+        <tr><td>surface</td><td><span class="sw old"><i style="background:#0B2B26"></i>#0B2B26</span></td><td><span class="sw"><i style="background:#141B18"></i>#141B18</span></td><td class="num">—</td><td><span class="sw"><i style="background:#FCFEFD"></i>#FCFEFD</span></td><td class="num">—</td></tr>
+        <tr><td>surfaceStrong</td><td><span class="sw old"><i style="background:#163832"></i>#163832</span></td><td><span class="sw"><i style="background:#1D2622"></i>#1D2622</span></td><td class="num">—</td><td><span class="sw"><i style="background:#E4ECE7"></i>#E4ECE7</span></td><td class="num">—</td></tr>
+        <tr><td>divider</td><td><span class="sw old"><i style="background:#235347"></i>#235347</span></td><td><span class="sw"><i style="background:#27322D"></i>#27322D</span></td><td class="num">decorativo</td><td><span class="sw"><i style="background:#D5E0D9"></i>#D5E0D9</span></td><td class="num">decorativo</td></tr>
+        <tr><td>ink</td><td><span class="sw old"><i style="background:#DAF1DE"></i>#DAF1DE</span></td><td><span class="sw"><i style="background:#E6F1EA"></i>#E6F1EA</span></td><td class="num">16,6</td><td><span class="sw"><i style="background:#0B1A14"></i>#0B1A14</span></td><td class="num">16,4</td></tr>
+        <tr><td>inkSecondary</td><td><span class="sw old"><i style="background:#8EB69B"></i>#8EB69B</span></td><td><span class="sw"><i style="background:#9AADA3"></i>#9AADA3</span></td><td class="num">8,1</td><td><span class="sw"><i style="background:#4A6157"></i>#4A6157</span></td><td class="num">6,1</td></tr>
+        <tr><td>controlBorder</td><td><span class="sw old"><i style="background:#5E8A70"></i>#5E8A70</span></td><td><span class="sw"><i style="background:#64766D"></i>#64766D</span></td><td class="num">4,0</td><td><span class="sw"><i style="background:#6F857B"></i>#6F857B</span></td><td class="num">3,6</td></tr>
+        <tr><td>accent</td><td><span class="sw old"><i style="background:#8EB69B"></i>#8EB69B</span></td><td><span class="sw"><i style="background:#7DD3A0"></i>#7DD3A0</span></td><td class="num">10,7</td><td><span class="sw"><i style="background:#1C6B4E"></i>#1C6B4E</span></td><td class="num">5,9</td></tr>
+        <tr><td>onAccent</td><td><span class="sw old"><i style="background:#051F20"></i>#051F20</span></td><td><span class="sw"><i style="background:#06130D"></i>#06130D</span></td><td class="num">10,6 s/accent</td><td><span class="sw"><i style="background:#F4FAF6"></i>#F4FAF6</span></td><td class="num">6,1 s/accent</td></tr>
+        <tr><td>heroBg → heroBgHi</td><td><span class="sw old"><i style="background:#0B2B26"></i>#0B2B26 → #235347</span></td><td><span class="sw"><i style="background:#1F5A45"></i>#1F5A45 → fondo</span></td><td class="num">texto 7,0</td><td><span class="sw"><i style="background:#0E2A21"></i>#1F5A45 → #0E2A21</span></td><td class="num">texto 7,0</td></tr>
+        <tr><td>warning / error</td><td><span class="sw old"><i style="background:#E2B65E"></i>#E2B65E / #EE8F84</span></td><td><span class="sw"><i style="background:#E8BC66"></i>#E8BC66 / #F09488</span></td><td class="num">10,8 / 8,5</td><td><span class="sw"><i style="background:#985A00"></i>sin cambio</span></td><td class="num">5,0 / 5,8</td></tr>
+        <tr><td>decisionBg (oscuro)</td><td><span class="sw old"><i style="background:#DAF1DE"></i>#DAF1DE</span></td><td><span class="sw"><i style="background:#0F2019"></i>#0F2019</span></td><td class="num">texto 14,6</td><td><span class="sw"><i style="background:#0B1A14"></i>#0B1A14</span></td><td class="num">sin cambio</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note" style="margin-top:12px">Los seis verdes de la v9.1 no desaparecen: helecho y salvia quedan como origen del brillo del panel y de la acción. Lo que cambia es que el verde deja de pintar las superficies del oscuro. El contraste fondo/tarjeta pasa de 1,13 a 1,10 pero sin cambio de matiz, así que la elevación se lee limpia; en claro, las tarjetas blancas siguen despegadas con sombra.</p>
+  </section>
+
+  <section>
+    <h2>Qué cambia en el código</h2>
+    <ol class="steps">
+      <li><b>Paleta</b> (<code>theme.ts</code>): nuevos valores del oscuro y ajuste fino del claro, mismos roles; <code>theme.test.ts</code> sigue midiendo los contrastes. DESIGN.md pasa a v10.</li>
+      <li><b>Panel de Inicio</b> (<code>panel-inicio.tsx</code>, <code>panel-superior.tsx</code>): el degradé se funde con el fondo en vez de cortar con esquinas redondeadas; rótulo corto con «≈» atenuado; «Con qué pago» como único atajo relleno; «En grupo» reemplaza a «Topes».</li>
+      <li><b>Hoja</b>: el contenido sube sobre el panel con radio 26 y agarradera (solo visual, no se arrastra).</li>
+      <li><b>Anillo de topes</b> (<code>torta-topes.tsx</code>): un tramo por medio, con el color de su estado cuando queda poco o se agotó y una leyenda corta. Sigue siendo estimado y con base.</li>
+      <li><b>Hoy podés usar</b> (<code>index.tsx</code>): una lista agrupada con barra y «de $X» en lugar de una tarjeta por tope.</li>
+      <li>Verificación en la web en los dos temas y con texto grande antes de dar por cerrado.</li>
+    </ol>
+  </section>
+</div>

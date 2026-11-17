@@ -24,7 +24,10 @@ import {
   idDeComercio,
   nombreDeRubro,
   RUBROS_DE_MODO,
+  comerciosParaElegir,
+  nombreCortoDeRubro,
 } from "./comercios";
+import type { Comercio } from "./contracts";
 import { catalogoComercios, mediosDeclarados, mediosDeEjemplo, promociones } from "./fixtures";
 
 // Issue #43, spec 004 FR-030: el buscador sale de las promos del corpus, no de una lista a mano.
@@ -292,3 +295,35 @@ function conCorpus(promos: Promocion[]) {
   );
   return s;
 }
+
+describe("comerciosParaElegir (¿Dónde estás comprando?, v10)", () => {
+  const c = (id: string, nombre: string, categoriaId: number, frecuente = false): Comercio => ({
+    id,
+    nombre,
+    inicial: nombre.charAt(0),
+    rubro: categoriaId === 1 ? "supermercado" : "farmacia",
+    categoriaId,
+    frecuente,
+  });
+  const catalogo = [c("a", "Vea", 1), c("b", "Coto", 1, true), c("c", "Farmacity", 4), c("d", "Día", 1)];
+
+  it("los del usuario primero; después los frecuentes y por nombre", () => {
+    expect(comerciosParaElegir(catalogo, [catalogo[3]!]).map((x) => x.nombre)).toEqual(["Día", "Coto", "Farmacity", "Vea"]);
+  });
+
+  it("filtra por rubro y por texto, sin repetir", () => {
+    expect(comerciosParaElegir(catalogo, [catalogo[0]!], { categoriaId: 1 }).map((x) => x.id)).toEqual(["a", "b", "d"]);
+    expect(comerciosParaElegir(catalogo, [], { q: "far" }).map((x) => x.id)).toEqual(["c"]);
+    expect(comerciosParaElegir(catalogo, [], { q: "far", categoriaId: 1 })).toEqual([]);
+  });
+
+  it("buscando, primero lo que empieza con lo escrito", () => {
+    const conDiamante = [...catalogo, c("e", "Cereales El Diamante", 1)];
+    expect(comerciosParaElegir(conDiamante, [], { q: "dia" }).map((x) => x.nombre)).toEqual(["Día", "Cereales El Diamante"]);
+  });
+
+  it("nombre corto para los chips", () => {
+    expect(nombreCortoDeRubro(4)).toBe("Farmacias");
+    expect(nombreCortoDeRubro(1)).toBe("Supermercados");
+  });
+});
