@@ -3312,6 +3312,38 @@ lo elegido pase a la cuenta cuando la crea al final.
 
 ---
 
+## 2026-11-17 — Presentación del MVP: video, un teléfono por slide y nuevo reparto
+
+**Herramienta:** Claude Code (Sonnet 5.5).
+
+**Objetivo:** ajustar el deck de la entrega del MVP (`docs/presentacion/`): sumar el
+video de presentación, mostrar la app con un solo teléfono por slide, reducir el texto
+y repartir mejor las secciones entre los cuatro integrantes.
+
+**Prompts principales:**
+1. "tiene que ser algo similar a lo anterior, pero tampoco repitiendo tanta
+   información que ya hemos dado, sino más mostrando los avances de la
+   aplicación y tal vez más las pantallas" (sesión anterior, mismo trabajo).
+2. "habría que poner este video al principio" y "seguís sin poner las capturas
+   reales en la presentación, hacelo": se rehicieron las capturas de grupo con
+   dos cuentas locales.
+3. "todas las slides tienen demasiada información de más… tener solo un
+   'teléfono' en la slide, e ir mostrando el proceso como si fuese en vivo":
+   se rediseñó el deck con animaciones (skill `emil-design-eng`).
+4. "deberíamos repartirlo mejor": Joaquín pidió redistribuir las secciones; la
+   IA propuso un reparto, Joaquín lo ajustó (agenda después del problema y la
+   solución, sin demo en vivo) y se aplicó en el guion y en el orden de las
+   slides.
+
+**Resultado:** deck de 14 slides con el video primero, capturas animadas y
+agenda; guion con el reparto y los tiempos (9:41 con el video). PRs #157, #160
+y #162.
+
+**Quedó sin verificar:** ensayo completo con cronómetro y audio del video en el
+proyector.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
