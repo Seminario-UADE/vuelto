@@ -68,7 +68,13 @@ function base(b: BaseDeVosRemota | BaseDeContactoRemota, quien: { nombre: string
 const AVISO_SOLO_VOS =
   "Solo pudimos evaluar tus medios: nadie más del grupo tiene cuenta con Vuelto. Invitá a alguien para que Vuelto decida con sus topes.";
 
-type Pagador = { quienPaga: NonNullable<RecomendacionGrupo["quienPaga"]>; medio: string; razon: string; base: string };
+type Pagador = {
+  quienPaga: NonNullable<RecomendacionGrupo["quienPaga"]>;
+  medio: string;
+  medioPropioId: string | null;
+  razon: string;
+  base: string;
+};
 
 export function vistaDeGrupo(
   r: RespuestaGrupo,
@@ -84,7 +90,7 @@ export function vistaDeGrupo(
     const medio = nombreDeMedioPropio(vos.medio, opciones.mediosPropios);
     const baseVos = base(vos.base, { fecha: r.fecha });
     const paga = r.quienPaga?.tipo === "vos";
-    if (paga) pagador = { quienPaga: { clave: "vos", nombre: "Vos", esVos: true, iniciales: null }, medio: `tu ${medio}`, razon: vos.queDa, base: baseVos };
+    if (paga) pagador = { quienPaga: { clave: "vos", nombre: "Vos", esVos: true, iniciales: null }, medio: `tu ${medio}`, medioPropioId: vos.medio.id, razon: vos.queDa, base: baseVos };
     filas.push({
       clave: "vos",
       nombre: "Vos",
@@ -115,7 +121,7 @@ export function vistaDeGrupo(
       const baseContacto = base(o.base, { nombre });
       if (paga && o.medio) {
         const medio = nombreDeMedioDeContacto(o.medio);
-        pagador = { quienPaga: { clave: c.id, nombre, esVos: false, iniciales: inicialesDe(nombre) }, medio: `su ${medio}`, razon: o.queDa ?? "", base: baseContacto };
+        pagador = { quienPaga: { clave: c.id, nombre, esVos: false, iniciales: inicialesDe(nombre) }, medio: `su ${medio}`, medioPropioId: null, razon: o.queDa ?? "", base: baseContacto };
         detalle = `Paga con su ${medio}`;
       } else {
         detalle = `${aprox(o.reintegro)} si paga ${nombre} · ${baseContacto}`;
@@ -145,6 +151,7 @@ export function vistaDeGrupo(
     monto: pedido.monto,
     quienPaga: p?.quienPaga ?? null,
     medio: p?.medio ?? null,
+    medioPropioId: p?.medioPropioId ?? null,
     razon: p?.razon || null,
     reintegro: p ? r.reintegro : null,
     base: p?.base ?? null,

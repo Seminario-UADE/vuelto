@@ -5,8 +5,9 @@ import { esDeEjemplo, esUuid } from "../data/compras/ejemplo";
 import { compraAFila } from "../data/compras/fila";
 import { descartarViejas, reconciliar, siguienteLote, type Operacion } from "../data/compras/operaciones";
 import { PLAZO_DE_ENVIO_MS, type ResultadoEnvio, type Subida } from "../data/compras/repositorio";
-import type { BorradorCompra } from "../data/contracts";
+import type { BorradorCompra, RecomendacionGrupo } from "../data/contracts";
 import { origenAlConfirmar, type CompraPorConfirmar } from "../data/por-confirmar";
+import { porConfirmarDeGrupo } from "../grupo/confirmar";
 import {
   CLAVE_COLA,
   borradoEncolado,
@@ -96,6 +97,28 @@ export function usarRecomendacion(): AppThunk<{ porConfirmar: CompraPorConfirmar
     dispatch(porConfirmarCreada(porConfirmar));
     dispatch(comercioElegido(null));
     return { porConfirmar, medioNombre: r.medio.nombre, reemplazo };
+  };
+}
+
+/**
+ * «Voy a pagar yo» en el resultado del grupo (issue #138, ADR-008 §6): si quien paga sos vos, deja
+ * una compra por confirmar con el medio recomendado y el monto de la compra, como `usarRecomendacion`.
+ * No crea ninguna compra, así que no toca topes (FR-003). Si paga otro, o no hay usuario o grupo,
+ * no hace nada y devuelve `null`: cada uno registra lo suyo. No toca la simulación individual.
+ */
+export function usarRecomendacionDeGrupo(
+  g: RecomendacionGrupo,
+): AppThunk<{ porConfirmar: CompraPorConfirmar; reemplazo: boolean } | null> {
+  return (dispatch, getState, { generarId }) => {
+    const estado = getState();
+    const pedido = estado.grupo.pedido;
+    const usuarioId = estado.sesion.usuario?.id ?? null;
+    if (pedido === null || usuarioId === null) return null;
+    const porConfirmar = porConfirmarDeGrupo(g, pedido, { id: generarId(), usuarioId, ahora: estado.sesion.ahora });
+    if (porConfirmar === null) return null;
+    const reemplazo = selectPorConfirmarVigentes(estado).some((c) => c.comercioId === porConfirmar.comercioId);
+    dispatch(porConfirmarCreada(porConfirmar));
+    return { porConfirmar, reemplazo };
   };
 }
 

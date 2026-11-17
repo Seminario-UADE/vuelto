@@ -5,6 +5,9 @@
 > más «Tengo una invitación» para pegarlo. Quedan en issues aparte: G-07 (#137),
 > G-09 (#138) y G-11 (#139). La referencia a "#56" de este documento era un error:
 > #56 es el build de EAS. El backend de contactos era #54.
+>
+> **Actualización (17/11/2026):** G-09 (#138) la decidió el PO y está implementada: ver
+> la resolución en el propio hallazgo y la actualización de ADR-008 §6.
 
 Fecha: 10/11/2026. Alcance: contactos vinculados y gasto en grupo (RF-19 a RF-22,
 ADR-008). Es una revisión, no un cambio: no toca código de la app ni del backend.
@@ -194,6 +197,12 @@ Observado (ver `armar-comercio-libre-oscuro.jpg` y `resultado-comercio-libre-osc
 - Corrección propuesta: si `quienPaga.esVos`, crear la compra por confirmar con el
   medio recomendado; si paga otro, dejar el aviso y que el texto diga que cada uno
   registra lo suyo. Decisión de producto antes de implementar.
+- **Resuelto (17/11/2026, issue #138).** Decisión del PO, tomada el 17/11/2026: se
+  hace lo propuesto. Si paga «Vos», el botón («Voy a pagar yo») crea la compra por
+  confirmar con el medio recomendado y el monto de la compra entera, sin descontar
+  tope hasta que se confirme. Si paga otro, no se crea nada y el aviso dice que cada
+  uno registra lo suyo. Detalle en ADR-008 §6 (actualización del 17/11/2026); código en
+  `grupo/confirmar.ts` y `usarRecomendacionDeGrupo` (`store/thunks.ts`).
 
 **G-10 · La división no cierra.** Código.
 - `grupo-simulado.ts:184`: `Math.round((monto - reintegro) / n)`. Con $10.000 entre 3
