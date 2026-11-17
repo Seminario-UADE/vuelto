@@ -3,9 +3,9 @@
 - **Fecha:** `[PENDIENTE: día y hora exactos de la entrega]`.
 - **Duración:** 10 minutos de exposición, sin contar preguntas.
 - **Formato:** presencial, con proyector. **Demo en vivo desde el celular, con el deck como
-  respaldo**: las slides 6 a 8 son capturas del mismo recorrido, y si la demo falla se
+  respaldo**: las slides 6 a 9 son capturas del mismo recorrido, y si la demo falla se
   sigue con ellas.
-- **Deck:** [`vuelto-mvp.html`](vuelto-mvp.html), 13 slides. Abrirlo en el navegador y
+- **Deck:** [`vuelto-mvp.html`](vuelto-mvp.html), 14 slides. Abrirlo en el navegador y
   apretar `F` para pantalla completa. `D` cambia entre claro y oscuro, `T` prende un
   cronómetro, `←` `→` pasan de slide.
 - **La slide 1 es el video de presentación** (`videos/Vuelto_profesional_final_v2.mp4`,
@@ -22,14 +22,15 @@
 
 | Persona | Slides | Tiempo |
 |---|---|---|
-| Joaquín | 1, 2, 3, 11, 13 | 3:26 |
-| Santiago | 4, 12 | 1:20 |
-| Jesús | 5, 6, 7, 8 | 3:45 |
-| Agustín | 9, 10 | 1:40 |
-| | **Total** | **10:11** |
+| Joaquín | 1, 2, 3, 12, 14 | 3:26 |
+| Santiago | 4, 13 | 1:20 |
+| Jesús | 5 (y 6 a 9 si la demo falla) | 3:00 (4:00) |
+| Agustín | 10, 11 | 1:40 |
+| | **Total con la demo andando** | **9:26** |
+| | **Total mostrando las pantallas (6 a 9)** | **10:26** |
 
-**Con el video no queda margen:** son 10:11 sobre 10:00, sin contar pases ni el cambio de
-Jesús al celular. Hay que recortar al menos 1:00; ver «Si nos pasamos».
+Con la demo andando quedan 0:34 de margen para pases y para que Jesús cambie al celular.
+Si hay que mostrar las pantallas, **se pasa de 10:00**: recortar como se indica abajo.
 
 ## Orden y tiempos
 
@@ -40,19 +41,30 @@ Jesús al celular. Hay que recortar al menos 1:00; ver «Si nos pasamos».
 | 3 | El problema en una slide | Joaquín | 0:30 |
 | 4 | Avances desde la entrega anterior | Santiago | 0:50 |
 | 5 | Demo en vivo | Jesús | 3:00 |
-| 6 | Pantallas: empezar y decidir | Jesús | 0:15 |
-| 7 | Pantallas: registrar y controlar | Jesús | 0:15 |
-| 8 | Pantallas: gasto en grupo | Jesús | 0:15 |
-| 9 | Cómo funciona por dentro | Agustín | 0:50 |
-| 10 | Ingesta y privacidad | Agustín | 0:50 |
-| 11 | Estado real | Joaquín | 1:00 |
-| 12 | Uso de IA | Santiago | 0:30 |
-| 13 | Cierre | Joaquín | 0:20 |
+| 6 | Pantallas: empezar sin cuenta (2 pasos) | Jesús | 0:10 |
+| 7 | Pantallas: decidir (5 pasos) | Jesús | 0:20 |
+| 8 | Pantallas: registrar y controlar (4 pasos) | Jesús | 0:15 |
+| 9 | Pantallas: gasto en grupo (4 pasos) | Jesús | 0:15 |
+| 10 | Cómo funciona por dentro | Agustín | 0:50 |
+| 11 | Ingesta y privacidad | Agustín | 0:50 |
+| 12 | Estado real | Joaquín | 1:00 |
+| 13 | Uso de IA | Santiago | 0:30 |
+| 14 | Cierre | Joaquín | 0:20 |
 
-Si nos pasamos: se acorta la 12 (solo el primer bloque), la 10, la 3 (el video ya abre con
+Si nos pasamos: se acorta la 13 (solo el primer bloque), la 11, la 3 (el video ya abre con
 el problema: **revisar contra el audio antes de decidir**, no lo transcribí) y la portada se
-pasa en 5 segundos. **La 11 no se acorta**: es la que dice qué es real y qué falta. Si la
-demo anda, las slides 6 a 8 se pasan sin comentarlas.
+pasa en 5 segundos. **La 12 no se acorta**: es la que dice qué es real y qué falta. Si la
+demo anda, las slides 6 a 9 se pasan sin comentarlas.
+
+### Cómo se maneja el deck
+
+- `→` / `←` (o el clicker) pasan de slide. En las slides 6 a 9 **cada `→` avanza un paso
+  dentro del teléfono**: primero aparece el «toque» sobre el botón y después cambia la
+  pantalla, como en vivo. `←` retrocede un paso. Se puede tocar el teléfono para avanzar.
+- Un paso a la vez: la lista de la izquierda marca en qué pantalla se está y explica solo
+  esa. No hay que leer las slides; alcanzan los títulos.
+- `Espacio` o `K` reproducen el video en la slide 1.
+- Para saltar a una slide o paso: `vuelto-mvp.html#7.3` (slide 7, paso 3).
 
 ---
 
@@ -104,20 +116,21 @@ Recorrer la tabla *antes → ahora*:
 7. Si hay tiempo: modo avión y repetir la recomendación. `[PENDIENTE: probarlo en un
    celular real; hoy no hay evidencia.]`
 
-**Slides 6, 7 y 8** (0:15 c/u): solo si la demo falló, o para dejar a la vista el
+**Slides 6 a 9** (0:10 a 0:20 c/u): solo si la demo falló, o para dejar a la vista el
 recorrido. Capturas de la app web del 17/11 (detalle en `assets/capturas/LEEME.md`). La 6
-suma las dos pantallas de empezar sin cuenta.
+son las dos pantallas de empezar sin cuenta; la 7 repite el caso del tope compartido
+(al 25% le queda poco tope, conviene el 20%).
 
-## Agustín — Por dentro (slides 9 y 10, 1:40)
+## Agustín — Por dentro (slides 10 y 11, 1:40)
 
-**Slide 9 · Arquitectura**
+**Slide 10 · Arquitectura**
 - API de MODO → ingesta diaria → Supabase → app Expo. **El motor corre en el celular**,
   sin red.
 - **Ningún modelo de lenguaje entra al motor.** Groq lee tickets y ya se usa desde la app;
   la lectura de letra chica con Gemini **no está hecha**.
 - El gasto en grupo es otra Edge Function que usa el mismo motor, sin LLM.
 
-**Slide 10 · Ingesta y privacidad**
+**Slide 11 · Ingesta y privacidad**
 - Corrida del 15/11: **3151 promos publicables**, 696 descartadas por nivel de cliente y
   18 por topes que el motor no modela. Unos 43 minutos.
 - De las últimas 10 corridas **fallaron 2** (7 y 10/11); las últimas 5 pasaron.
@@ -125,7 +138,7 @@ suma las dos pantallas de empezar sin cuenta.
   descarta. Se guarda el texto extraído, y solo cuando el usuario confirma.
 - Acumulabilidad y jurisdicción quedan en `null` hasta el extractor de letra chica.
 
-## Joaquín — Estado real y cierre (slides 11 y 13, 1:20)
+## Joaquín — Estado real y cierre (slides 12 y 14, 1:20)
 
 - **Funciona de punta a punta:** ingesta y sincronización, motor en la app, probar sin
   cuenta y crearla al final (#112), perfil y compras con RLS, registrar la compra con la
@@ -138,7 +151,7 @@ suma las dos pantallas de empezar sin cuenta.
   es una política, no un proceso corriendo.
 - Cierre: «Vuelto decide con código, mide con datos y dice lo que todavía no hace.»
 
-## Santiago — Uso de IA (slide 12, 0:30)
+## Santiago — Uso de IA (slide 13, 0:30)
 
 - En el producto el LLM extrae datos y no decide: Groq lee tickets; Gemini leerá la letra
   chica (pendiente); el motor no tiene LLM.
