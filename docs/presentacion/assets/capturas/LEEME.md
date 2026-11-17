@@ -6,10 +6,10 @@ promos bajadas por la ingesta real de MODO y una cuenta de prueba con Galicia Vi
 
 | Archivo | Pantalla | Slide (paso) |
 |---|---|---|
-| `bienvenida.jpg`, `primera-respuesta.jpg` | Empezar sin cuenta | 6 (1 y 2) |
-| `inicio.jpg`, `comprar.jpg`, `monto.jpg`, `recomendacion.jpg`, `pagar.jpg` | Decidir | 7 (1 a 5) |
-| `escanear.jpg`, `revisa.jpg` (carga a mano), `compras.jpg`, `topes.jpg` | Registrar y controlar | 8 (1 a 4) |
-| `grupo-contactos.jpg`, `grupo-invitar.jpg`, `grupo-armar.jpg`, `grupo-resultado.jpg` | Gasto en grupo | 9 (1 a 4) |
+| `bienvenida.jpg`, `primera-respuesta.jpg` | Empezar sin cuenta | 5 (1 y 2) |
+| `inicio.jpg`, `comprar.jpg`, `monto.jpg`, `recomendacion.jpg`, `pagar.jpg` | Decidir | 6 (1 a 5) |
+| `escanear.jpg`, `revisa.jpg` (carga a mano), `compras.jpg`, `topes.jpg` | Registrar y controlar | 7 (1 a 4) |
+| `grupo-contactos.jpg`, `grupo-invitar.jpg`, `grupo-armar.jpg`, `grupo-resultado.jpg` | Gasto en grupo | 8 (1 a 4) |
 | `medios.jpg` | Elegir tarjetas en el onboarding (sin usar en el deck) | — |
 
 Todas son de 618×1336 px. Cada slide de pantallas muestra **un teléfono** y cambia de imagen
