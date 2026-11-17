@@ -79,6 +79,15 @@
 > queda poco, en advertencia y con texto). «Hoy podés usar» pasa a **una lista
 > agrupada**. El aire entre los atajos y el anillo se acota a la agarradera.
 > Propuesta y auditoría: `propuesta-inicio-v10.html`.
+> **Elegir comercio** (paso 1 de comprar): el buscador (con botón para borrar),
+> los rubros en **chips** con scroll que filtran (como los filtros de la
+> referencia), tus comercios en una fila horizontal y una **lista agrupada**
+> con el rubro de cada uno; los de la fila no se repiten abajo. Con un rubro
+> elegido, la primera fila es «No sé en qué comercio» (solo las promos de todo
+> el rubro): el camino por rubro queda a la vista en vez de detrás de un link.
+> Buscando, primero lo que empieza con lo escrito. Sin resultados, una fila
+> por rubro. La grilla de cuadrados sigue en la pestaña Comercios y en el
+> selector de comercios del perfil.
 >
 > **Estado de implementación**: la app implementa la paleta, los dos temas y
 > los radios de la v6 (issue #115). La fila de comercios y la lista agrupada

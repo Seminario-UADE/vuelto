@@ -120,7 +120,10 @@ export function PanelInicio({ nombre, fecha, mes, devolvieron, etiqueta }: Props
                 numberOfLines={1}
                 style={{ color: colors.onHero, fontSize: 52, lineHeight: 58, letterSpacing: -1.2, alignSelf: "stretch" }}
               >
-                <Text style={{ color: colors.onHeroMuted, fontSize: 34, letterSpacing: 0 }}>≈</Text>
+                {/* Mismo alto de línea que la cifra: si no, en iOS el anidado achica la línea y la recorta. */}
+                <Text variant="display" style={{ color: colors.onHeroMuted, fontSize: 34, lineHeight: 58, letterSpacing: 0 }}>
+                  ≈
+                </Text>
                 {pesos(devolvieron.monto)}
               </Text>
               <View
