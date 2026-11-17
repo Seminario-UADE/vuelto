@@ -3465,6 +3465,34 @@ el perfil y vuelven a la invitación.
 
 ---
 
+## 2026-11-17 — Qué hace «Confirmar» en el resultado del grupo (issue #138, hallazgo G-09)
+
+**Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde otra sesión de Claude Code.
+
+**Objetivo:** que «Confirmar» en el resultado del gasto en grupo haga algo coherente con
+ADR-008 §6, según la decisión que tomó el PO (17/11/2026).
+
+**Prompts principales:**
+1. "Implementá el issue #138 y abrí un PR que lo cierre": si paga «Vos», crear la compra
+   por confirmar con el medio recomendado (como «Usar» en la compra individual); si paga
+   otro, dejar el aviso con un texto que diga que cada uno registra lo suyo. Registrar la
+   decisión en la documentación.
+
+**Resultado:** `grupo/confirmar.ts` (puro: la compra por confirmar de «Vos», la etiqueta y el
+aviso) y el thunk `usarRecomendacionDeGrupo`, con tests. `vistaDeGrupo` suma `medioPropioId`
+(el id del medio propio de quien paga, que el resultado no traía). El botón dice «Voy a pagar
+yo» si pagás vos y «Listo» si paga otro. Decisión registrada en ADR-008 §6 (actualización),
+spec 016 y G-09 de `revision-gasto-grupo.md`.
+
+**Decisiones que tomó la IA, a revisar:** el monto de la compra por confirmar es el de la
+compra entera (la pagás vos); el botón cambió de «Confirmar que…» a «Voy a pagar yo» / «Listo»
+(DESIGN.md §8 no usa «Confirmar» para esto); no navega al paso «Pagá con…»: avisa y vuelve,
+como antes.
+
+**Quedó sin verificar:** el resultado en el celular o el simulador; solo lint, typecheck y tests.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

@@ -14,7 +14,9 @@ import { storeDePrueba } from "./prueba";
 import { selectRecomendacion, selectResumenCompras, selectTopes } from "./selectores";
 import { ahoraCambio, usuarioCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
-import { descartarPorConfirmar, usarRecomendacion } from "./thunks";
+import type { PedidoGrupo, RecomendacionGrupo } from "../data/contracts";
+import { grupoArmado } from "./grupo";
+import { descartarPorConfirmar, usarRecomendacion, usarRecomendacionDeGrupo } from "./thunks";
 
 // Spec 012, US1: el slice `porConfirmar` y su efecto (nulo) sobre topes y recomendaciones.
 
@@ -162,6 +164,89 @@ describe("usarRecomendacion (FR-002, FR-004, FR-012)", () => {
     s.dispatch(mediosConfirmados(mediosDeEjemplo(mediosDeclarados.map((m) => m.id))));
     s.dispatch(comercioElegido("coto"));
     expect(s.dispatch(usarRecomendacion())).toBeNull();
+    expect(s.getState().porConfirmar.lista).toEqual([]);
+  });
+});
+
+describe("usarRecomendacionDeGrupo (#138, ADR-008 §6)", () => {
+  const pedido: PedidoGrupo = {
+    comercio: { id: "coto", nombre: "Coto", inicial: "C", rubro: "supermercado", categoriaId: 1, frecuente: true },
+    canal: "presencial",
+    monto: 30000,
+    contactos: ["u-lucia"],
+    sinCuenta: [],
+  };
+  const vos = {
+    quienPaga: { clave: "vos", nombre: "Vos", esVos: true, iniciales: null },
+    medioPropioId: "galicia-visa-credito",
+    medio: "tu Galicia Visa crédito",
+    comercio: pedido.comercio,
+  } as RecomendacionGrupo;
+  const lucia = {
+    quienPaga: { clave: "u-lucia", nombre: "Lucía", esVos: false, iniciales: "L" },
+    medioPropioId: null,
+    medio: "su Galicia Visa crédito",
+    comercio: pedido.comercio,
+  } as RecomendacionGrupo;
+
+  function conGrupo() {
+    const s = conMartin();
+    s.dispatch(grupoArmado(pedido));
+    return s;
+  }
+
+  it("si pagás vos, deja la compra por confirmar con tu medio y el monto de la compra entera", () => {
+    const s = conGrupo();
+    const r = s.dispatch(usarRecomendacionDeGrupo(vos));
+    expect(r?.reemplazo).toBe(false);
+    expect(r?.porConfirmar).toMatchObject({
+      usuarioId: "u1",
+      comercioId: "coto",
+      comercioNombre: "Coto",
+      medioId: "galicia-visa-credito",
+      monto: 30000,
+      creadaEn: AHORA,
+      canal: "presencial",
+      categoriaId: 1,
+    });
+    expect(selectPorConfirmarVigentes(s.getState())).toHaveLength(1);
+  });
+
+  it("no toca topes ni compras hasta que se confirme (FR-003)", () => {
+    const s = conGrupo();
+    const antes = { topes: selectTopes(s.getState()), resumen: selectResumenCompras(s.getState()) };
+    s.dispatch(usarRecomendacionDeGrupo(vos));
+    expect(s.getState().compras.lista).toEqual(conMartin().getState().compras.lista);
+    expect({ topes: selectTopes(s.getState()), resumen: selectResumenCompras(s.getState()) }).toEqual(antes);
+  });
+
+  it("no limpia la simulación individual ni el grupo armado", () => {
+    const s = conGrupo();
+    s.dispatch(comercioElegido("jumbo"));
+    s.dispatch(usarRecomendacionDeGrupo(vos));
+    expect(s.getState().simulacion.comercioId).toBe("jumbo");
+    expect(s.getState().grupo.pedido).toEqual(pedido);
+  });
+
+  it("otra vez en el mismo comercio la reemplaza y lo avisa (FR-012)", () => {
+    const s = conGrupo();
+    s.dispatch(usarRecomendacionDeGrupo(vos));
+    const r = s.dispatch(usarRecomendacionDeGrupo(vos));
+    expect(r?.reemplazo).toBe(true);
+    expect(s.getState().porConfirmar.lista).toHaveLength(1);
+  });
+
+  it("si paga otro no crea nada", () => {
+    const s = conGrupo();
+    expect(s.dispatch(usarRecomendacionDeGrupo(lucia))).toBeNull();
+    expect(s.getState().porConfirmar.lista).toEqual([]);
+  });
+
+  it("sin grupo armado o sin usuario no hace nada", () => {
+    expect(conMartin().dispatch(usarRecomendacionDeGrupo(vos))).toBeNull();
+    const s = storeDePrueba();
+    s.dispatch(grupoArmado(pedido));
+    expect(s.dispatch(usarRecomendacionDeGrupo(vos))).toBeNull();
     expect(s.getState().porConfirmar.lista).toEqual([]);
   });
 });

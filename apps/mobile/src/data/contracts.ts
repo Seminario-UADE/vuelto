@@ -321,6 +321,12 @@ export type RecomendacionGrupo = {
   quienPaga: { clave: string; nombre: string; esVos: boolean; iniciales: string | null } | null;
   /** Solo el medio de quien paga: "su Galicia Visa crédito" o "tu Provincia Visa débito". */
   medio: string | null;
+  /**
+   * El id del medio **propio** con el que pagás, solo si quien paga sos vos: es lo que necesita la
+   * compra por confirmar (#138). `null` si paga un contacto (su medio no tiene id para la app) o si
+   * nadie paga.
+   */
+  medioPropioId: string | null;
   /** Qué da la promo, sin nada del tope: "20% en gastronomía". */
   razon: string | null;
   reintegro: number | null;

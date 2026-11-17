@@ -43,6 +43,7 @@ describe("vistaDeGrupo (spec 016 US3)", () => {
     const v = vistaDeGrupo(base(), pedido, opciones);
     expect(v.titulo).toBe("Te conviene que pague Lucía");
     expect(v.medio).toBe("su Galicia Visa crédito");
+    expect(v.medioPropioId).toBeNull();
     expect(v.razon).toBe("20% en gastronomía");
     expect(v.reintegro).toBe(5000);
     expect(v.base).toBe("según las compras que registró Lucía");
@@ -94,6 +95,8 @@ describe("vistaDeGrupo (spec 016 US3)", () => {
     );
     expect(v.titulo).toBe("Te conviene pagar vos");
     expect(v.medio).toBe("tu Provincia Visa débito");
+    // El id del medio propio, para la compra por confirmar (#138).
+    expect(v.medioPropioId).toBe("m-prov");
     expect(v.base).toBe("según 3 compras de noviembre");
     expect(v.integrantes[0]?.detalle).toBe("Paga con tu Provincia Visa débito · según 3 compras de noviembre");
     expect(v.integrantes[1]?.detalle).toBe("≈$5.000 si paga Lucía · según las compras que registró Lucía");
@@ -103,6 +106,7 @@ describe("vistaDeGrupo (spec 016 US3)", () => {
     const v = vistaDeGrupo(base({ quienPaga: null, reintegro: null }), pedido, opciones);
     expect(v.titulo).toBe("Nadie del grupo tiene reintegro en esta compra");
     expect(v.medio).toBeNull();
+    expect(v.medioPropioId).toBeNull();
     expect(v.reintegro).toBeNull();
   });
 
