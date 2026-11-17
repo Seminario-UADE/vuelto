@@ -191,6 +191,7 @@ function Navegacion() {
           />
           <Stack.Screen name="(auth)/login" options={pageSheet} />
           <Stack.Screen name="(auth)/registro" options={pageSheet} />
+          <Stack.Screen name="(auth)/confirmar-email" options={pageSheet} />
           <Stack.Screen
             name="i/[token]"
             options={{ ...header, title: "Invitación" }}

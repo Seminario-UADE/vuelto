@@ -4,7 +4,7 @@ import { colorPorTema } from "./theme-color";
 /**
  * Tema de Vuelto: el ÚNICO archivo de la app con colores escritos a mano.
  *
- * Valores de docs/design/DESIGN.md v9 §2–§4. Los nombres son roles (semánticos), no colores:
+ * Valores de docs/design/DESIGN.md v10 §2–§4. Los nombres son roles (semánticos), no colores:
  * cada rol tiene un valor en el tema claro y otro en el oscuro, compuestos por separado (el oscuro
  * no es la inversión del claro). La app sigue la apariencia del sistema
  * (`userInterfaceStyle: "automatic"`).
@@ -23,15 +23,39 @@ const paleta = {
   helecho: "#235347",
   salvia: "#8EB69B",
   menta: "#DAF1DE",
-  // Derivados del claro: la menta aclarada para fondo y tarjetas, y grises verdes para texto y bordes.
-  mentaFondo: "#EEF6F0",
-  mentaTarjeta: "#F8FCF9",
-  divisorClaro: "#C9DDD0",
-  textoSecundarioClaro: "#456A5E",
-  bordeControlClaro: "#6E8C80",
+  // v10: neutros con un dejo verde. El verde de la marca vive en el panel y en la acción, no en las
+  // superficies. Claro: niebla verdosa y tarjetas casi blancas.
+  nieblaFondo: "#F2F6F3",
+  nieblaTarjeta: "#FCFEFD",
+  nieblaHundida: "#E4ECE7",
+  divisorClaro: "#D5E0D9",
+  tintaClara: "#0B1A14",
+  textoSecundarioClaro: "#4A6157",
+  bordeControlClaro: "#6F857B",
+  /** Acción del claro: helecho con más vida, sigue en AA sobre todas las superficies. */
+  bosque: "#1C6B4E",
+  sobreBosque: "#F4FAF6",
+  // Oscuro: casi negro con un dejo verde, sin cambio de matiz entre niveles.
+  carbon: "#0B100E",
+  carbonTarjeta: "#141B18",
+  carbonHundido: "#1D2622",
+  divisorOscuro: "#27322D",
+  nube: "#E6F1EA",
+  textoSecundarioOscuro: "#9AADA3",
+  /** Acción del oscuro: la salvia con luz (la v9.1 se leía como deshabilitada). */
+  brote: "#7DD3A0",
+  sobreBrote: "#06130D",
+  /** Brillo del panel de Inicio, en los dos temas. */
+  brillo: "#1F5A45",
+  /** Borde del panel en el claro: el panel queda oscuro en los dos temas. */
+  panelClaro: "#0E2A21",
+  /** Decisión en el oscuro: verde hondo en vez de la menta encandilante de la v9.1. */
+  decisionOscura: "#0F2019",
+  decisionOscuraMuted: "#A3C2B0",
+  exitoFondoOscuro: "#1C3A2E",
   /** Texto atenuado sobre el panel (helecho): la salvia no llega a AA ahí. */
   salviaClara: "#B9D6C2",
-  bordeControlOscuro: "#5E8A70",
+  bordeControlOscuro: "#64766D",
   // Semánticos. Claro
   ambarClaro: "#985A00",
   ambarFondoClaro: "#FCEFD8",
@@ -48,11 +72,11 @@ const paleta = {
   rubroHogarClaro: "#4A53A6",
   rubroHogarFondoClaro: "#E2E5F8",
   // Semánticos. Oscuro
-  ambar: "#E2B65E",
+  ambar: "#E8BC66",
   ambarOscuro: "#2B2410",
-  coral: "#EE8F84",
+  coral: "#F09488",
   hojaOscura: "#9BD8AE",
-  lagoClaro: "#7CC4CB",
+  lagoClaro: "#86C8D0",
   lagoOscuro: "#17484C",
   rubroSuperOscuro: "#9CCB9F",
   rubroSuperFondoOscuro: "#1F4A36",
@@ -86,6 +110,8 @@ type Rol =
   | "heroSurface"
   | "onHero"
   | "onHeroMuted"
+  | "heroAccent"
+  | "onHeroAccent"
   | "rubroSuper"
   | "rubroSuperBg"
   | "rubroFarmacia"
@@ -100,6 +126,7 @@ type Rol =
   | "onDecision"
   | "onDecisionMuted"
   | "onDecisionAccent"
+  | "onDecisionAccentInk"
   | "decisionSurface"
   | "scrim"
   | "scrimOverlay"
@@ -111,26 +138,26 @@ type Rol =
 
 export type Tema = Readonly<Record<Rol, string>>;
 
-/** Tema claro (v9.1): menta y tinta noche; la acción en helecho. El panel y la decisión, en noche. */
+/** Tema claro (v10): niebla verdosa y tinta casi negra; la acción en bosque. El panel y la decisión, oscuros. */
 const claro: Tema = {
   /** Fondo de todas las pantallas. */
-  canvas: paleta.mentaFondo,
+  canvas: paleta.nieblaFondo,
   /** Tarjetas y listas agrupadas: lo más claro, con sombra suave. */
-  surface: paleta.mentaTarjeta,
+  surface: paleta.nieblaTarjeta,
   /** Campos, segmentos, círculos de comercio, fila seleccionada: hundidos respecto del fondo. */
-  surfaceStrong: paleta.menta,
+  surfaceStrong: paleta.nieblaHundida,
   /** Líneas divisorias. Nunca como único borde de un control. */
   divider: paleta.divisorClaro,
   /** Texto principal e íconos. */
-  ink: paleta.noche,
+  ink: paleta.tintaClara,
   /** Texto secundario y metadatos. */
   inkSecondary: paleta.textoSecundarioClaro,
   /** Borde de radios, checkboxes e inputs no seleccionados. */
   controlBorder: paleta.bordeControlClaro,
   /** Único acento de acción: primario, selección, tab activa, progreso, links. */
-  accent: paleta.helecho,
+  accent: paleta.bosque,
   /** Texto e íconos sobre `accent`. */
-  onAccent: paleta.menta,
+  onAccent: paleta.sobreBosque,
   /** Advertencia (queda poco, otro día). Siempre con texto o ícono. */
   warning: paleta.ambarClaro,
   warningBg: paleta.ambarFondoClaro,
@@ -143,12 +170,15 @@ const claro: Tema = {
   /** Segundo acento: información y estimaciones; nunca reemplaza a `accent` en acciones. */
   accent2: paleta.azulClaro,
   accent2Bg: paleta.azulFondoClaro,
-  /** Panel de Inicio: degradé noche → helecho, como la referencia. */
-  heroBg: paleta.noche,
-  heroBgHi: paleta.helecho,
-  heroSurface: "rgba(218,241,222,0.12)",
-  onHero: paleta.menta,
+  /** Panel de Inicio (v10): brillo verde arriba al centro que se funde hacia el borde; oscuro en los dos temas. */
+  heroBg: paleta.panelClaro,
+  heroBgHi: paleta.brillo,
+  heroSurface: "rgba(230,241,234,0.12)",
+  onHero: paleta.nube,
   onHeroMuted: paleta.salviaClara,
+  /** Atajo principal del panel («Con qué pago»): brote en los dos temas, porque el panel es oscuro en los dos. */
+  heroAccent: paleta.brote,
+  onHeroAccent: paleta.sobreBrote,
   /** Color por rubro: ícono y fondo del cuadrado de comercio. */
   rubroSuper: paleta.rubroSuperClaro,
   rubroSuperBg: paleta.rubroSuperFondoClaro,
@@ -165,8 +195,10 @@ const claro: Tema = {
   onDecision: paleta.menta,
   /** Razón y base sobre la decisión. */
   onDecisionMuted: paleta.salvia,
-  /** Botón «Usar [medio]», inicial del medio y detalles sobre la decisión (texto encima: `ink`). */
+  /** Botón «Usar [medio]», inicial del medio y detalles sobre la decisión (texto encima: `onDecisionAccentInk`). */
   onDecisionAccent: paleta.salvia,
+  /** Texto e íconos sobre `onDecisionAccent` (botón «Usar [medio]», inicial del medio). */
+  onDecisionAccentInk: paleta.tintaClara,
   /** Superficie secundaria dentro de la decisión (campo de monto, pista de la barra). */
   decisionSurface: "rgba(218,241,222,0.10)",
   /** Visor de cámara (Escanear ticket): oscuro en los dos temas. */
@@ -180,29 +212,31 @@ const claro: Tema = {
   transparent: "transparent",
 };
 
-/** Tema oscuro (v9.1): noche, pino y musgo; texto menta y acción salvia. La decisión va en menta. */
+/** Tema oscuro (v10): carbón con un dejo verde, texto nube y acción brote. La decisión, en verde hondo. */
 const oscuro: Tema = {
-  canvas: paleta.noche,
-  surface: paleta.pino,
-  surfaceStrong: paleta.musgo,
-  divider: paleta.helecho,
-  ink: paleta.menta,
-  inkSecondary: paleta.salvia,
+  canvas: paleta.carbon,
+  surface: paleta.carbonTarjeta,
+  surfaceStrong: paleta.carbonHundido,
+  divider: paleta.divisorOscuro,
+  ink: paleta.nube,
+  inkSecondary: paleta.textoSecundarioOscuro,
   controlBorder: paleta.bordeControlOscuro,
-  accent: paleta.salvia,
-  onAccent: paleta.noche,
+  accent: paleta.brote,
+  onAccent: paleta.sobreBrote,
   warning: paleta.ambar,
   warningBg: paleta.ambarOscuro,
   error: paleta.coral,
-  successBg: paleta.helecho,
+  successBg: paleta.exitoFondoOscuro,
   success: paleta.hojaOscura,
   accent2: paleta.lagoClaro,
   accent2Bg: paleta.lagoOscuro,
-  heroBg: paleta.pino,
-  heroBgHi: paleta.helecho,
-  heroSurface: "rgba(218,241,222,0.10)",
-  onHero: paleta.menta,
+  heroBg: paleta.carbon,
+  heroBgHi: paleta.brillo,
+  heroSurface: "rgba(230,241,234,0.12)",
+  onHero: paleta.nube,
   onHeroMuted: paleta.salviaClara,
+  heroAccent: paleta.brote,
+  onHeroAccent: paleta.sobreBrote,
   rubroSuper: paleta.rubroSuperOscuro,
   rubroSuperBg: paleta.rubroSuperFondoOscuro,
   rubroFarmacia: paleta.lagoClaro,
@@ -213,17 +247,18 @@ const oscuro: Tema = {
   rubroGastroBg: paleta.rubroGastroFondoOscuro,
   rubroHogar: paleta.rubroHogarOscuro,
   rubroHogarBg: paleta.rubroHogarFondoOscuro,
-  decisionBg: paleta.menta,
-  onDecision: paleta.noche,
-  onDecisionMuted: paleta.helecho,
-  onDecisionAccent: paleta.helecho,
+  decisionBg: paleta.decisionOscura,
+  onDecision: paleta.nube,
+  onDecisionMuted: paleta.decisionOscuraMuted,
+  onDecisionAccent: paleta.brote,
+  onDecisionAccentInk: paleta.sobreBrote,
   decisionSurface: "rgba(5,31,32,0.07)",
   scrim: paleta.noche,
   scrimOverlay: "rgba(5,31,32,0.55)",
   scrimSurface: "rgba(218,241,222,0.12)",
   onScrim: paleta.menta,
   onScrimMuted: paleta.salvia,
-  backdrop: "rgba(2,17,12,0.6)",
+  backdrop: "rgba(4,8,6,0.6)",
   transparent: "transparent",
 };
 

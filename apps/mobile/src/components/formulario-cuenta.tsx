@@ -3,9 +3,9 @@ import { useRef, useState, type ComponentRef } from "react";
 import { TextInput, View } from "react-native";
 import { entrarCuenta, registrarCuenta } from "@/data/auth";
 import { NOMBRE_MAXIMO, validarNombre } from "@/perfil/modelo";
-import { useAppDispatch } from "@/store/hooks";
-import { cambiarNombre } from "@/store/perfil-remoto";
-import { avisoMostrado } from "@/store/sesion";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { cambiarNombre, guardarBorradorEnCuenta, nombreAlBorrador } from "@/store/perfil-remoto";
+import { avisoMostrado, emailPorConfirmarCambio } from "@/store/sesion";
 import { hapticoExito } from "@/lib/haptics";
 import type { ErrorAuth } from "@/lib/auth";
 import { CLAVE_MINIMA } from "@/lib/auth";
@@ -27,6 +27,14 @@ const TEXTOS = {
     cambio: "Ya tengo cuenta",
     rutaCambio: "/login",
   },
+  /** Registro al final del onboarding sin cuenta (spec 012, US5): lo elegido queda en la cuenta. */
+  guardar: {
+    titulo: "Guardá tu perfil",
+    subtitulo: "Así tus tarjetas, tus comercios y tus compras quedan guardados y solo vos los ves.",
+    boton: "Guardar mi perfil",
+    cambio: "Ya tengo cuenta",
+    rutaCambio: "/login",
+  },
   entrar: {
     titulo: "Entrá a tu cuenta",
     subtitulo: "Con el email y la contraseña que usaste al registrarte.",
@@ -41,10 +49,15 @@ const TEXTOS = {
  * distinto texto y distinta llamada a Supabase Auth. Al entrar, la navegación la deciden los
  * layouts según `sesion.usuario` y el perfil del dispositivo (sin medios ⇒ onboarding).
  * El registro pide además el nombre que ven sus contactos (spec 012, FR-027), que se guarda en la
- * cuenta apenas existe.
+ * cuenta apenas existe. Con un borrador del onboarding (US5) el registro se titula «Guardá tu
+ * perfil» y el nombre va al borrador: lo guarda `guardarBorradorEnCuenta` junto con lo demás, apenas
+ * hay sesión (al crearla, o al primer ingreso si hay que confirmar el email).
  */
 export function FormularioCuenta({ modo }: { modo: Modo }) {
-  const t = TEXTOS[modo];
+  const conBorrador = useAppSelector((s) => s.perfil.borrador !== null);
+  // Se decide al abrir: si el borrador se vacía al guardarse, el título no cambia antes de salir.
+  const [guardar] = useState(modo === "registro" && conBorrador);
+  const t = TEXTOS[guardar ? "guardar" : modo];
   const dispatch = useAppDispatch();
   const emailRef = useRef<ComponentRef<typeof TextInput>>(null);
   const claveRef = useRef<ComponentRef<typeof TextInput>>(null);
@@ -70,21 +83,29 @@ export function FormularioCuenta({ modo }: { modo: Modo }) {
       setError(r);
       return;
     }
+    // Recién con la cuenta creada: un intento fallido (email ya usado) no deja su nombre en el
+    // borrador. Lo guarda la misma pasada que lo demás, ahora o en el primer ingreso (FR-031, FR-033).
+    if (guardar && n.ok) dispatch(nombreAlBorrador(n.nombre));
     // Con la cuenta ya creada (hay sesión), el nombre va a `perfiles`. Si falla no se frena el alta:
     // queda sin nombre, Perfil pide cargarlo y nunca se muestra uno inventado (FR-029).
-    if (modo === "registro" && n.ok && r.cuenta !== null) {
+    if (modo === "registro" && !guardar && n.ok && r.cuenta !== null) {
       const guardado = await dispatch(cambiarNombre(n.nombre));
       if (!guardado.ok) dispatch(avisoMostrado("No pudimos guardar tu nombre. Cargalo desde Perfil"));
     }
+    // Lo elegido sin cuenta pasa a la cuenta antes de seguir. Si falla, queda en el teléfono y la
+    // próxima lectura del perfil lo reintenta: Inicio espera y no repite el onboarding.
+    if (guardar && r.cuenta !== null) await dispatch(guardarBorradorEnCuenta());
     setEnviando(false);
     if (r.cuenta === null) {
-      // El proyecto pide confirmar el email: todavía no hay sesión.
-      dispatch(avisoMostrado("Te mandamos un email para confirmar tu cuenta"));
-      router.replace("/login");
+      // El proyecto pide confirmar el email: todavía no hay sesión. Lo elegido sigue en el borrador
+      // y se guarda en el primer ingreso (FR-033).
+      dispatch(emailPorConfirmarCambio(email.trim()));
+      router.replace("/confirmar-email");
       return;
     }
     hapticoExito();
     if (router.canDismiss()) router.dismissAll();
+    // Una invitación abierta antes de tener cuenta la abre Inicio apenas el perfil está listo.
     router.replace("/");
   };
 

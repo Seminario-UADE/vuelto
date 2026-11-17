@@ -3,9 +3,8 @@
  * no de una lista armada a mano. Funciones puras: el selector `selectCatalogoComercios` las
  * llama con el corpus del store y `hoy` (ADR-010), así el buscador anda sin red.
  */
-import { CATEGORIAS_MODO, type FechaISO, type Promocion } from "@vuelto/motor";
+import { CATEGORIAS_MODO, claveComercio, type FechaISO, type Promocion } from "@vuelto/motor";
 import { RUBROS } from "../lib/rubros";
-import { normalizarComercio } from "../perfil/modelo";
 import type { Comercio, Rubro } from "./contracts";
 
 /** Las categorías de MODO que la app ya conoce como rubro (ícono y textos propios). */
@@ -16,16 +15,17 @@ const RUBRO_DE_CATEGORIA = new Map<number, Rubro>(
 );
 
 /**
- * Clave para comparar nombres en el buscador (spec 004 FR-002): sin mayúsculas, acentos ni
- * espacios de más. «Café  Martínez» y «cafe martinez» son el mismo comercio.
+ * Clave para comparar nombres en el buscador (spec 004 FR-002): la misma que usa el motor para
+ * saber si una promo es de este comercio, sin mayúsculas, acentos, espacios ni puntuación.
+ * «Café  Martínez» = «cafe martinez», y «McDonald's» = «Mc Donald's» (issue #147).
  */
 export function claveDeComercio(nombre: string): string {
-  return normalizarComercio(nombre).normalize("NFD").replace(/\p{Diacritic}/gu, "");
+  return claveComercio(nombre);
 }
 
 /** El mismo comercio en el mismo rubro tiene siempre el mismo id, venga de la promo que venga. */
 export function idDeComercio(nombre: string, categoriaId: number): string {
-  return `${categoriaId}-${claveDeComercio(nombre).replace(/ /g, "-")}`;
+  return `${categoriaId}-${claveDeComercio(nombre)}`;
 }
 
 /**
@@ -39,8 +39,9 @@ export function comerciosDelCorpus(promociones: readonly Promocion[], hoy: Fecha
   for (const p of promociones) {
     if (p.comercio === null || p.vigencia.hasta < hoy) continue;
     const nombre = p.comercio.trim().replace(/\s+/g, " ");
-    if (nombre === "") continue;
-    // El mismo par con otra escritura («Café» / «Cafe») queda con el primer nombre que llegó.
+    if (claveDeComercio(nombre) === "") continue;
+    // El mismo par con otra escritura («Café» / «Cafe», «McDonald's» / «Mc Donald's») es una sola
+    // entrada, con el primer nombre que llegó.
     const id = idDeComercio(nombre, p.categoriaId);
     if (por.has(id)) continue;
     por.set(id, {
@@ -126,4 +127,46 @@ export const RUBROS_DE_MODO: readonly Comercio[] = CATEGORIAS_MODO.map((x) => co
 /** Se eligió un rubro, no un comercio. */
 export function esComercioDeRubro(c: Comercio): boolean {
   return c.id.startsWith(PREFIJO_RUBRO);
+}
+
+/** Nombres de MODO que no entran en un chip: el corto para los chips de rubro (elegir comercio, v10). */
+const NOMBRE_CORTO_DE_CATEGORIA: ReadonlyMap<number, string> = new Map([
+  [4, "Farmacias"],
+  [10, "Electro"],
+  [11, "Ferretería"],
+  [13, "Jugueterías"],
+]);
+
+/** El nombre de un rubro de MODO para un chip («Farmacias» en vez de «Farmacias, Perfumerías y Peluquerías»). */
+export function nombreCortoDeRubro(categoriaId: number): string {
+  return NOMBRE_CORTO_DE_CATEGORIA.get(categoriaId) ?? CATEGORIAS_MODO.find((x) => x.id === categoriaId)?.nombre ?? RUBROS.otro.titulo;
+}
+
+/**
+ * Lo que lista «¿Dónde estás comprando?» (v10): los comercios del catálogo, con los del usuario
+ * primero y después por nombre; con `categoriaId`, solo los de ese rubro; con `q`, los que
+ * coinciden, primero los que empiezan con lo escrito. Sin repetir un mismo comercio del mismo rubro.
+ */
+export function comerciosParaElegir(
+  catalogo: readonly Comercio[],
+  propios: readonly Comercio[],
+  { q = "", categoriaId = null }: { q?: string; categoriaId?: number | null } = {},
+): Comercio[] {
+  const t = claveDeComercio(q);
+  const pasa = (c: Comercio) =>
+    (categoriaId === null || c.categoriaId === categoriaId) && (t === "" || claveDeComercio(c.nombre).includes(t));
+  // Buscando, primero lo que empieza con lo escrito, después lo que tiene una palabra que empieza así.
+  const cercania = (c: Comercio) => {
+    if (t === "") return 0;
+    const n = claveDeComercio(c.nombre);
+    return n.startsWith(t) ? 0 : n.split(/\s+/).some((w) => w.startsWith(t)) ? 1 : 2;
+  };
+  const primeros = propios.filter(pasa).sort((a, b) => cercania(a) - cercania(b));
+  const resto = catalogo
+    .filter((c) => pasa(c) && !primeros.some((p) => p.id === c.id))
+    .sort(
+      (a, b) =>
+        cercania(a) - cercania(b) || Number(b.frecuente) - Number(a.frecuente) || a.nombre.localeCompare(b.nombre, "es"),
+    );
+  return [...primeros, ...resto];
 }

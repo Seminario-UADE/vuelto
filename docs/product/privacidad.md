@@ -19,6 +19,8 @@ comercial.
 | Nombre para mostrar | Perfil (RF-21) | Sí, mientras la cuenta exista. Lo ven los contactos vinculados y quien recibe una invitación |
 | Invitación de contacto (hash del token, emisor, vencimiento, fecha de uso) | Perfil (RF-21) | Sí, mientras exista la cuenta del emisor. Como mucho una sin usar por cuenta: generar otra borra la anterior. Deja de servir al usarse o a las 24 h; el borrado automático de las vencidas queda fuera de alcance del MVP, igual que el de compras |
 | Lista de contactos en el teléfono (id, nombre para mostrar y fecha del vínculo) | Servidor (spec 016, FR-019) | Sí, en el teléfono (`vuelto.contactos.v1`), asociada a la cuenta; se borra al cerrar sesión o al entrar otra cuenta |
+| Borrador del onboarding: medios, comercios habituales y nombre elegidos antes de crear la cuenta | Onboarding sin cuenta (spec 012, US5, FR-031) | Sí, solo en el teléfono, hasta que pasa a la cuenta; como mucho 30 días |
+| Email al que se mandó la confirmación de la cuenta | Registro (spec 012, FR-033) | **No.** Vive en la memoria de la app mientras se muestra «Revisá tu email»; no va en la ruta ni se guarda en el teléfono |
 | Integrantes sin cuenta de un grupo (solo el nombre) | Quien arma el grupo (RF-19, spec 016 D5) | **No.** El nombre vive en la memoria del teléfono mientras se arma el grupo; no se guarda en el teléfono ni sale de él (al servidor va solo la cantidad) |
 
 ## Imágenes de ticket: retención durante el procesamiento
@@ -83,6 +85,18 @@ usuario vuelve a fotografiar el ticket.
     48 h** de creada: deja de mostrarse y se borra al abrir la app. También se
     borran al cerrar sesión (la app avisa antes cuántas se pierden) y cuando
     entra otra cuenta en el mismo teléfono.
+  - **El borrador del onboarding** (spec 012, US5, issue #112) va dentro de
+    `vuelto.store.v1`, con el perfil: los medios (banco, tipo, red y nombre del
+    banco), los nombres de los comercios habituales y el nombre para mostrar que
+    se eligieron antes de tener cuenta, y la fecha en que se empezó. Sirve para
+    ver la primera recomendación sin crear la cuenta. **No sale del teléfono**
+    hasta que se crea la cuenta o se entra por primera vez: ahí se guarda en
+    ella y se borra del teléfono (si la cuenta ya tenía medios o habituales,
+    quedan los de la cuenta y el borrador de esa parte se descarta). Si nunca se
+    crea la cuenta, **se borra a los 30 días**, al abrir la app. Para leer los
+    bancos y las promociones sin cuenta, la app usa la lectura pública de esas
+    tres tablas (bancos, categorías y promociones), que no tienen datos de
+    usuarios.
   - **La lista de contactos** (spec 016) usa otra clave, `vuelto.contactos.v1`:
     el id, el nombre para mostrar y la fecha del vínculo de cada contacto, con
     el id de la cuenta a la que pertenece. Sirve para mostrar la lista sin red;

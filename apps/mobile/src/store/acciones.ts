@@ -3,9 +3,10 @@
  */
 import { createAction } from "@reduxjs/toolkit";
 import type { Compra, Promocion } from "@vuelto/motor";
+import type { BorradorPerfil } from "../perfil/borrador";
 import type { ComercioHabitual, MedioDePago as MedioGuardado } from "../perfil/modelo";
 
-export type { ComercioHabitual, MedioGuardado };
+export type { BorradorPerfil, ComercioHabitual, MedioGuardado };
 
 /** Escenarios para probar estados vacíos y de error (solo desarrollo, en Perfil). */
 export type Escenario = "normal" | "mes-vacio" | "ticket-ilegible" | "sin-red" | "ticket-de-ejemplo";
@@ -23,6 +24,11 @@ export type EstadoPerfil = {
   comercios: ComercioHabitual[];
   /** Invitación abierta antes de terminar el onboarding (ADR-008 §1). */
   invitacionPendiente: string | null;
+  /**
+   * Lo elegido en el onboarding antes de tener cuenta (spec 012, US5): vive en el teléfono hasta
+   * guardarse en la cuenta, como máximo 30 días. `null` = no hay nada sin guardar.
+   */
+  borrador: BorradorPerfil | null;
 };
 
 export type EstadoCorpus = {

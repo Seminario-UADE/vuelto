@@ -334,7 +334,9 @@ export function comprasDeTopeVista(
 export function comercioPorNombre(nombre: string, catalogo: readonly Comercio[], categoriaId?: number): Comercio {
   return (
     comercioDelCatalogo(nombre, catalogo, categoriaId) ?? {
-      id: `libre-${claveDeComercio(nombre).replace(/ /g, "-")}`,
+      // Un nombre sin letras ni números («★★») no tiene clave: va el nombre tal cual, así no
+      // comparte id con otro.
+      id: `libre-${claveDeComercio(nombre) || nombre.trim()}`,
       nombre,
       inicial: nombre.charAt(0).toUpperCase(),
       rubro: "otro",
@@ -581,5 +583,12 @@ export function usoDeTopes(topes: ResumenTopes): UsoDeTopes | null {
       compras === 0
         ? SIN_TOPES_USADOS
         : `según ${compras} ${compras === 1 ? "compra" : "compras"} de ${topes.mes}`,
+    tramos: usados.map((t) => ({
+      clave: t.clave,
+      nombre: t.medio.nombre,
+      disponible: t.disponible ?? t.nominal,
+      nominal: t.nominal,
+      estado: t.estado,
+    })),
   };
 }

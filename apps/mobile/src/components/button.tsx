@@ -38,7 +38,7 @@ export function Button({ label, onPress, variant = "primary", disabled, loading,
   const tinta = {
     primary: colors.onAccent,
     destructive: colors.onAccent,
-    decision: colors.ink,
+    decision: colors.onDecisionAccentInk,
     secondary: colors.ink,
     text: colors.accent,
   }[variant];

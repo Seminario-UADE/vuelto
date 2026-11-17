@@ -3,9 +3,17 @@ import { mediosDeEjemplo } from "../data/fixtures";
 import * as motor from "@vuelto/motor";
 import { catalogoComercios, mediosDeclarados, mediosDelMotor } from "../data/fixtures";
 import { recomendacionVista } from "../data/calculo";
-import { mediosConfirmados } from "./perfil";
+import { borradorMedios, mediosConfirmados } from "./perfil";
 import { sincronizado } from "./acciones";
-import { selectConvieneHoy, selectEntradasMotor, selectFrescura, selectRecomendacion, selectTopes, selectUsoDeTopes } from "./selectores";
+import {
+  selectConvieneHoy,
+  selectEntradasMotor,
+  selectFrescura,
+  selectMediosParaMotor,
+  selectRecomendacion,
+  selectTopes,
+  selectUsoDeTopes,
+} from "./selectores";
 import { ahoraCambio } from "./sesion";
 import { comercioElegido, montoCambiado } from "./simulacion";
 import { guardarCompra } from "./thunks";
@@ -77,6 +85,9 @@ describe("selectUsoDeTopes (torta de Inicio, v9)", () => {
     expect(uso.queda).toBeCloseTo(uso.disponible / uso.nominal);
     const compras = new Set(usados.flatMap((t) => t.compraIds)).size;
     expect(uso.base).toBe(`según ${compras} compras de octubre`);
+    // Un tramo por tope usado, con lo que le queda a cada uno (anillo segmentado, v10).
+    expect(uso.tramos.map((t) => t.clave)).toEqual(usados.map((t) => t.clave));
+    expect(uso.tramos.reduce((n, t) => n + t.disponible, 0)).toBe(uso.disponible);
   });
 
   it("sin compras en el período no suma nada: todavía no usaste ningún tope (#149)", () => {
@@ -90,11 +101,24 @@ describe("selectUsoDeTopes (torta de Inicio, v9)", () => {
       queda: 0,
       topes: 0,
       base: "Todavía no usaste ningún tope este mes",
+      tramos: [],
     });
   });
 
   it("sin medios no hay torta", () => {
     expect(selectUsoDeTopes(storeDePrueba().getState())).toBeNull();
+  });
+});
+
+describe("selectMediosParaMotor (spec 012, US5)", () => {
+  it("sin medios guardados, el motor responde con los del borrador; con medios de la cuenta, con esos", () => {
+    const s = storeDePrueba();
+    const medio = { bancoId: "galicia", nombreBanco: "Banco Galicia", tipo: "credito" as const, red: "visa" as const };
+    s.dispatch(borradorMedios({ medios: [medio], creadoEn: "2026-10-14T12:00:00.000Z" }));
+    expect(selectMediosParaMotor(s.getState())).toEqual([{ ...medio, id: "borrador-0" }]);
+    expect(selectEntradasMotor(s.getState()).medios).toEqual([{ ...medio, id: "borrador-0" }]);
+    s.dispatch(mediosConfirmados(mediosDeEjemplo(["macro-visa-debito"])));
+    expect(selectMediosParaMotor(s.getState()).map((m) => m.id)).toEqual(["macro-visa-debito"]);
   });
 });
 
