@@ -214,3 +214,20 @@ de nadie.
   para débito y crédito, y el reintegro le llega a quien paga (D2). Se divide
   en pesos enteros y el resto se reparte de a $1 en el orden del desempate
   (D3).
+
+## Actualización (17/11/2026, issue #138, hallazgo G-09)
+
+El Product Owner decidió qué hace «Confirmar» en el resultado del grupo. Precisa
+§6, no lo cambia: cada uno sigue registrando **sus propias** compras.
+
+- **§6 Si paga «Vos».** El botón del resultado («Voy a pagar yo») deja una
+  **compra por confirmar** con el medio recomendado, como «Voy a pagar con…» en la
+  compra individual (spec 012). Lleva el comercio, el rubro, el canal y el monto
+  de la compra entera (la pagás vos y el reintegro es sobre ese total). No es una
+  compra: no descuenta tope hasta que se confirme con «Ya pagué» (FR-003 de la
+  spec 012), y vive solo en el teléfono.
+- **§6 Si paga otro.** No se crea nada para el usuario: Vuelto no escribe en la
+  cuenta de nadie ni anota nada por quien paga. El botón queda en «Listo» y el
+  aviso lo dice: «Paga Lucía con su Galicia Visa crédito. Cada uno registra lo
+  suyo: Vuelto no anota nada por vos.»
+- Decisión tomada por el PO el 17/11/2026.

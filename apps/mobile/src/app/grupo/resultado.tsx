@@ -9,6 +9,7 @@ import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { Skeleton, SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
+import { avisoDeConfirmar, etiquetaDeConfirmar } from "@/grupo/confirmar";
 import { cantidadDeIntegrantes } from "@/grupo/pedido";
 import type { FallaGrupo } from "@/grupo/repositorio";
 import { vistaDeGrupo } from "@/grupo/vista";
@@ -19,6 +20,7 @@ import { pedirRecomendacionGrupo } from "@/store/grupo";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectHoy } from "@/store/selectores";
 import { avisoMostrado } from "@/store/sesion";
+import { usarRecomendacionDeGrupo } from "@/store/thunks";
 import { radius, space } from "@/theme";
 
 /** Qué dice cada falla (spec 016 FR-027). La acción la elige la pantalla. */
@@ -79,13 +81,14 @@ export default function GastoEnGrupo() {
   // La lista ya se recargó al recibir el 409 (US3-12): volver a armar la muestra al día.
   const volverAArmar = () => router.back();
 
-  // «Confirmar» sigue como antes: el aviso y volver (qué más hace es la issue #138).
+  // «Confirmar» (#138, ADR-008 §6): si pagás vos, deja la compra por confirmar; si paga otro, solo avisa
+  // que cada uno registra lo suyo. En los dos casos vuelve al comienzo del flujo.
   const confirmar = () => {
     if (!g?.quienPaga) return router.dismissAll();
+    const r = g.quienPaga.esVos ? dispatch(usarRecomendacionDeGrupo(g)) : null;
     hapticoExito();
-    dispatch(
-      avisoMostrado(g.quienPaga.esVos ? `Listo: pagás vos con ${g.medio}` : `Listo: paga ${g.quienPaga.nombre} con ${g.medio}`),
-    );
+    const aviso = avisoDeConfirmar(g, { creada: r !== null, reemplazo: r?.reemplazo ?? false });
+    if (aviso) dispatch(avisoMostrado(aviso));
     router.dismissAll();
   };
 
@@ -132,7 +135,7 @@ export default function GastoEnGrupo() {
       footer={
         g ? (
           <Button
-            label={g.quienPaga ? (g.quienPaga.esVos ? "Confirmar que pago yo" : `Confirmar que paga ${g.quienPaga.nombre}`) : "Listo"}
+            label={etiquetaDeConfirmar(g)}
             onPress={confirmar}
           />
         ) : null
@@ -155,6 +158,15 @@ export default function GastoEnGrupo() {
       ) : (
         <Skeleton height={240} r={radius.card} />
       )}
+
+      {g?.aviso ? (
+        <Card padding={space.lg}>
+          <Text variant="bodyMd" tone="inkSecondary" accessibilityLiveRegion="polite">
+            {g.aviso}
+          </Text>
+          <Button label="Invitar a alguien" variant="text" icon="invitar" onPress={() => router.push("/contactos/invitar")} />
+        </Card>
+      ) : null}
 
       <View style={{ gap: space.md }}>
         <SectionHeader title="Cómo queda cada uno" />

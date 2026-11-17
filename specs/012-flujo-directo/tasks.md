@@ -95,7 +95,7 @@
 
 ### Implementation
 
-- [X] T022 [US2] Completar `normalizarComercio`, `ticketCoincide` y la rama con ticket de `borradorDesdePorConfirmar` en `src/data/por-confirmar.ts`. Tiene que pasar T021. *(Issue #110: el cruce quedó como `cruceDelTicket` y `porConfirmarDelTicket`, con la sugerencia de comercio de la spec 015; FR-013 revisado.)*
+- [X] T022 [US2] Completar `normalizarComercio`, `ticketCoincide` y la rama con ticket de `borradorDesdePorConfirmar` en `src/data/por-confirmar.ts`. Tiene que pasar T021. *(Issue #110: el cruce quedó como `cruceDelTicket` y `porConfirmarDelTicket`, con la sugerencia de comercio de la spec 015; FR-013 revisado. El PR #165 hizo lo mismo en paralelo con `ticketCoincide` y `cruzarConTicket`; al mezclar quedó una sola versión, con sus detalles de la tarjeta vencida, la fecha mal leída y la compra más reciente.)*
 - [X] T023 [US2] En `src/app/escanear.tsx`:
   - aceptar el parámetro `porConfirmar`. Si coincide, ir a `revisa` con `modo: "ticket"`; si no, preguntar «¿Este ticket es de tu compra en X?».
   - sin el parámetro, buscar con `ticketCoincide` y preguntar «¿Es tu compra por confirmar en X?».

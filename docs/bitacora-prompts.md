@@ -3312,6 +3312,187 @@ lo elegido pase a la cuenta cuando la crea al final.
 
 ---
 
+## 2026-11-17 — Presentación del MVP: video, un teléfono por slide y nuevo reparto
+
+**Herramienta:** Claude Code (Sonnet 5.5).
+
+**Objetivo:** ajustar el deck de la entrega del MVP (`docs/presentacion/`): sumar el
+video de presentación, mostrar la app con un solo teléfono por slide, reducir el texto
+y repartir mejor las secciones entre los cuatro integrantes.
+
+**Prompts principales:**
+1. "tiene que ser algo similar a lo anterior, pero tampoco repitiendo tanta
+   información que ya hemos dado, sino más mostrando los avances de la
+   aplicación y tal vez más las pantallas" (sesión anterior, mismo trabajo).
+2. "habría que poner este video al principio" y "seguís sin poner las capturas
+   reales en la presentación, hacelo": se rehicieron las capturas de grupo con
+   dos cuentas locales.
+3. "todas las slides tienen demasiada información de más… tener solo un
+   'teléfono' en la slide, e ir mostrando el proceso como si fuese en vivo":
+   se rediseñó el deck con animaciones (skill `emil-design-eng`).
+4. "deberíamos repartirlo mejor": Joaquín pidió redistribuir las secciones; la
+   IA propuso un reparto, Joaquín lo ajustó (agenda después del problema y la
+   solución, sin demo en vivo) y se aplicó en el guion y en el orden de las
+   slides.
+
+**Resultado:** deck de 14 slides con el video primero, capturas animadas y
+agenda; guion con el reparto y los tiempos (9:41 con el video). PRs #157, #160
+y #162.
+
+**Quedó sin verificar:** ensayo completo con cronómetro y audio del video en el
+proyector.
+
+---
+
+## 2026-11-17 — Auditoría de secretos y privacidad antes del pitch (issue #55)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con el agente `rules-guardian`.
+
+**Objetivo:** reunir evidencia de RNF-04 a RNF-07: sin keys de Gemini, Groq ni
+service role en la app, sin imágenes de ticket en Storage ni en la base, y toda tabla
+con RLS. Con un script para el CI y un informe corto.
+
+**Prompts principales:**
+1. "Implementá el issue #55 (`gh issue view 55`) y abrí un PR que lo cierre" (la
+   sesión de coordinación lo repartió junto con otros issues en paralelo).
+
+**Decisiones de la IA que conviene revisar:**
+- El script prueba primero que el detector detecta (plantó 5 keys falsas): un "0 resultados"
+  de un detector que no detecta no prueba nada. Nunca imprime una coincidencia.
+- La service role key se detecta decodificando el payload de cada JWT (`role=service_role`),
+  no por el prefijo, para no marcar la anon key, que es pública y sí va en el bundle.
+- La base local de la prueba se levantó con otro `project_id` y otros puertos (cambio no
+  commiteado) porque el stack del proyecto ya estaba corriendo desde otro checkout.
+
+**Resultado:** `scripts/auditar-secretos.sh` + job `auditar-secretos` en el CI, test pgTAP
+`privacidad_storage.test.sql` e informe en `docs/product/auditoria-privacidad.md`.
+
+**Quedó sin verificar:** el extractor de Gemini (#51) todavía no existe; hay que repetir la
+pasada cuando llegue. La prueba con el valor literal de las keys reales es solo local.
+## 2026-11-17 — Estado real del MVP y revisión de issues (issue #132)
+
+**Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde otra sesión de
+Claude Code.
+
+**Objetivo:** poner al día `docs/product/estado.md` (decía «Sprint 1, el motor
+tiene solo el esqueleto») y `docs/product/pendientes.md`, y revisar contra el
+código y el historial los issues abiertos que parecen resueltos (#43, #35, #31,
+#50, #82, #79 y #103), sin cerrar ninguno.
+
+**Prompts principales:**
+1. "Implementá el issue #132 y abrí un PR que lo cierre": reescribir el estado
+   real (hecho, falta, simulado), revisar `pendientes.md` ítem por ítem y dar
+   un veredicto con evidencia por issue.
+2. Reglas dadas: solo documentación, no cerrar ni comentar issues en GitHub
+   (la persona decide a partir de la tabla del PR), no marcar como hechos los
+   issues que están implementando otras sesiones (#137, #139, #110, #55) y
+   escribir «sin verificar» lo que no se pueda comprobar.
+
+**Resultado:** `estado.md` y `pendientes.md` reescritos con fecha de
+relevamiento; tabla de veredictos en la descripción del PR. En el camino
+aparecieron dos cosas que el repo no mostraba: el workflow `migraciones.yml`
+falla en cada corrida por un secret sin cargar (`SUPABASE_DB_URL`) y la ingesta
+programada no tiene corridas el 16 y 17/11. Ninguna se tocó, quedaron anotadas
+en `pendientes.md`.
+
+**Quedó sin verificar:** si la base alojada tiene las 12 migraciones, si hay un
+APK de respaldo generado, el conteo actual de promos publicadas y todo lo que
+depende de la cátedra (equipo, exclusiones, formato de requisitos).
+## 2026-11-17 — Confirmar la compra por confirmar escaneando el ticket (issue #110, spec 012 US2)
+
+**Herramienta:** Claude Code (Sonnet 5.5), en una sesión lanzada desde otra sesión de Claude Code.
+
+**Objetivo:** que «Escanear ticket» cruce el ticket con la compra por confirmar (spec 012
+US2, tareas T021–T025) sin rehacer lo que ya estaba en `main`.
+
+**Prompts principales:**
+1. "Implementá el issue #110 y abrí un PR que lo cierre. Primero verificá el estado
+   real: revisá qué de la spec ya existe en el código para no rehacer nada."
+   La IA encontró hecho `borradorDesdePorConfirmar` con ticket, la sugerencia sin
+   marcar en `revisa.tsx`, el ticket de ejemplo con la fecha de hoy y el escenario
+   «sin red». Faltaban `normalizarComercio`, `ticketCoincide` y las preguntas de
+   `escanear.tsx`.
+
+**Resultado:** `ticketCoincide` (palabra entera, sin tildes ni puntuación, fecha no
+anterior a la simulación) y `coincidenteConTicket` (la más reciente) con tests;
+`escanear.tsx` pregunta «¿Este ticket es de tu compra en X?» desde la tarjeta cuando no
+coincide y «¿Es tu compra por confirmar en X?» desde otro escaneo cuando sí; «No» sigue
+como ticket suelto; un ticket del comercio pero anterior a la simulación se avisa y sigue
+como suelto (US2-6); si la lectura falla, «Confirmar a mano». La decisión es la función pura
+`cruzarConTicket`. `rules-guardian` y `/code-review` (estándares y spec) corrieron antes del PR;
+el de spec encontró el aviso de US2-6 que faltaba.
+
+**Quedó sin verificar:** el recorrido completo en el teléfono (quickstart 3 y 4); las
+pantallas de Expo no tienen tests automáticos.
+## 2026-11-17 — Armar grupo sin contactos y aviso de «solo evaluamos a Vos» (issue #139, G-11)
+
+**Herramienta:** Claude Code (Sonnet 5.5), en una sesión lanzada desde otra sesión
+que repartía issues del gasto en grupo.
+
+**Objetivo:** que Armar grupo no sea un callejón sin contactos (estado vacío que lleva
+a Invitar) y que el resultado diga cuando nadie más que «Vos» tiene datos.
+
+**Prompts principales:**
+1. "Implementá el issue #139 y abrí un PR que lo cierre": con el contexto del
+   hallazgo G-11 de `docs/product/revision-gasto-grupo.md`, sin spec-kit (issue S).
+
+**Resultado:** `grupo/armar.ts` decide el estado vacío y el texto del pie (con
+tests); `vistaDeGrupo` suma `aviso` cuando el grupo no tiene contactos vinculados
+(con tests); Armar muestra el estado vacío con «Invitar a alguien» y el resultado
+muestra el aviso.
+
+**Quedó sin verificar:** las dos pantallas no se probaron en un dispositivo ni en
+el simulador; solo lint, typecheck y tests.
+## 2026-11-17 — La invitación no se pierde con «Ya tengo cuenta» (issue #137, hallazgo G-07)
+
+**Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde otra sesión de Claude Code.
+
+**Objetivo:** que quien abre un link de invitación y entra con una cuenta existente llegue
+a la pantalla de aceptación, y que `invitacionPendiente` se consuma una sola vez.
+
+**Prompts principales:**
+1. "Implementá el issue #137 y abrí un PR que lo cierre" (con el contexto de ADR-008 §1 y
+   el hallazgo G-07).
+
+**Resultado:** al leer el código, `(tabs)/_layout.tsx` ya redirigía a la invitación
+pendiente (sumado en el PR de la revisión del #112), así que el flujo funcionaba pero sin
+test. Se sacó esa decisión a una función pura (`perfil/destino.ts`, `destinoDeTabs`) y se
+cubrió con tests del flujo (sesión, perfil listo, onboarding, consumo único). Además, `/i/[token]`
+con sesión pero sin perfil listo ya no manda a Bienvenida: va a la raíz y las tabs esperan
+el perfil y vuelven a la invitación.
+
+**Quedó sin verificar:** el recorrido completo en el celular (Expo Go) con un link real.
+
+---
+
+## 2026-11-17 — Qué hace «Confirmar» en el resultado del grupo (issue #138, hallazgo G-09)
+
+**Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde otra sesión de Claude Code.
+
+**Objetivo:** que «Confirmar» en el resultado del gasto en grupo haga algo coherente con
+ADR-008 §6, según la decisión que tomó el PO (17/11/2026).
+
+**Prompts principales:**
+1. "Implementá el issue #138 y abrí un PR que lo cierre": si paga «Vos», crear la compra
+   por confirmar con el medio recomendado (como «Usar» en la compra individual); si paga
+   otro, dejar el aviso con un texto que diga que cada uno registra lo suyo. Registrar la
+   decisión en la documentación.
+
+**Resultado:** `grupo/confirmar.ts` (puro: la compra por confirmar de «Vos», la etiqueta y el
+aviso) y el thunk `usarRecomendacionDeGrupo`, con tests. `vistaDeGrupo` suma `medioPropioId`
+(el id del medio propio de quien paga, que el resultado no traía). El botón dice «Voy a pagar
+yo» si pagás vos y «Listo» si paga otro. Decisión registrada en ADR-008 §6 (actualización),
+spec 016 y G-09 de `revision-gasto-grupo.md`.
+
+**Decisiones que tomó la IA, a revisar:** el monto de la compra por confirmar es el de la
+compra entera (la pagás vos); el botón cambió de «Confirmar que…» a «Voy a pagar yo» / «Listo»
+(DESIGN.md §8 no usa «Confirmar» para esto); no navega al paso «Pagá con…»: avisa y vuelve,
+como antes.
+
+**Quedó sin verificar:** el resultado en el celular o el simulador; solo lint, typecheck y tests.
+
+---
+
 ## 2026-11-17 — Cruzar el ticket con la compra por confirmar (issue #110)
 
 **Herramienta:** Claude Code (Opus 5.5), sin spec-kit (las tareas ya estaban en la spec 012).
@@ -3341,6 +3522,10 @@ confirmarla en el comercio equivocado ni dejarla duplicada.
    seguir el mismo camino?" Se unificó.
 7. "Diferenciemos: medio de pago para Visa o Master, y tarjeta solo para el recuadro «Por
    confirmar»."
+8. Al abrir el PR apareció que otro integrante había hecho la misma issue en paralelo (PR #165,
+   ya en `main`). "La 1 y avisale en el PR": se dejó un solo cruce, el acordado con el usuario,
+   sumando tres detalles de esa versión (la tarjeta vencida durante el escaneo, la fecha mal
+   leída y la compra más reciente cuando coinciden varias), y se le avisó con un comentario.
 
 **Resultado:**
 - Desde la compra por confirmar: si el primer comercio sugerido es el simulado (o el ticket no

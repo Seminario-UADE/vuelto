@@ -227,6 +227,10 @@ describe("cruceDelTicket (spec 012 FR-013, revisado en la issue #110)", () => {
     expect(cruceDelTicket(enCoto, ticket("Coto", "2026-10-13"), catalogoComercios)).toBe("anterior");
   });
 
+  it("una fecha mal leída (no AAAA-MM-DD) no contradice nada: se cruza (idea del PR #165)", () => {
+    expect(cruceDelTicket(enCoto, ticket("Coto", "13/10/2026"), catalogoComercios)).toBe("coincide");
+  });
+
   it("el mismo día o después, y sin fecha, se cruza", () => {
     expect(cruceDelTicket(enCoto, ticket("Coto", "2026-10-16"), catalogoComercios)).toBe("coincide");
     expect(cruceDelTicket(enCoto, ticket("Coto", null), catalogoComercios)).toBe("coincide");
@@ -239,6 +243,12 @@ describe("porConfirmarDelTicket: escanear suelto (spec 012 US2-9)", () => {
 
   it("devuelve la compra por confirmar con la que coincide", () => {
     expect(porConfirmarDelTicket([enJumbo, enCoto], lectura, catalogoComercios)?.id).toBe(enCoto.id);
+  });
+
+  it("si coinciden varias, la más reciente (idea del PR #165)", () => {
+    const vieja = { ...enCoto, id: "vieja", creadaEn: "2026-10-14T13:00:00.000Z" };
+    const nueva = { ...enCoto, id: "nueva", creadaEn: "2026-10-15T02:45:00.000Z" };
+    expect(porConfirmarDelTicket([vieja, nueva], lectura, catalogoComercios)?.id).toBe("nueva");
   });
 
   it("ninguna coincide, el ticket no trae comercio o es anterior: null", () => {

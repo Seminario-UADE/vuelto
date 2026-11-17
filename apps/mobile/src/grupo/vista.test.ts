@@ -43,6 +43,7 @@ describe("vistaDeGrupo (spec 016 US3)", () => {
     const v = vistaDeGrupo(base(), pedido, opciones);
     expect(v.titulo).toBe("Te conviene que pague Lucía");
     expect(v.medio).toBe("su Galicia Visa crédito");
+    expect(v.medioPropioId).toBeNull();
     expect(v.razon).toBe("20% en gastronomía");
     expect(v.reintegro).toBe(5000);
     expect(v.base).toBe("según las compras que registró Lucía");
@@ -94,6 +95,8 @@ describe("vistaDeGrupo (spec 016 US3)", () => {
     );
     expect(v.titulo).toBe("Te conviene pagar vos");
     expect(v.medio).toBe("tu Provincia Visa débito");
+    // El id del medio propio, para la compra por confirmar (#138).
+    expect(v.medioPropioId).toBe("m-prov");
     expect(v.base).toBe("según 3 compras de noviembre");
     expect(v.integrantes[0]?.detalle).toBe("Paga con tu Provincia Visa débito · según 3 compras de noviembre");
     expect(v.integrantes[1]?.detalle).toBe("≈$5.000 si paga Lucía · según las compras que registró Lucía");
@@ -103,7 +106,35 @@ describe("vistaDeGrupo (spec 016 US3)", () => {
     const v = vistaDeGrupo(base({ quienPaga: null, reintegro: null }), pedido, opciones);
     expect(v.titulo).toBe("Nadie del grupo tiene reintegro en esta compra");
     expect(v.medio).toBeNull();
+    expect(v.medioPropioId).toBeNull();
     expect(v.reintegro).toBeNull();
+  });
+
+  it("#139: con un contacto vinculado no hay aviso, aunque no tenga reintegro", () => {
+    expect(vistaDeGrupo(base(), pedido, opciones).aviso).toBeNull();
+    const sinPromo = base({ quienPaga: null, reintegro: null, contactos: [{ id: LUCIA, nombre: "Lucía", opcion: null, parte: 12000 }] });
+    expect(vistaDeGrupo(sinPromo, pedido, opciones).aviso).toBeNull();
+  });
+
+  it("#139: si solo hay gente sin cuenta, el resultado avisa que solo se evaluó a Vos, pague quien pague", () => {
+    const soloSinCuenta = (datos: Partial<RespuestaGrupo> = {}) =>
+      base({ contactos: [], sinCuenta: [{ posicion: 0, parte: 20500 }, { posicion: 1, parte: 20500 }], ...datos });
+    const pedidoSin: PedidoGrupo = { ...pedido, contactos: [], sinCuenta: [{ posicion: 0, nombre: "Sofía" }, { posicion: 1, nombre: "Juan" }] };
+
+    const nadie = vistaDeGrupo(soloSinCuenta({ quienPaga: null, reintegro: null }), pedidoSin, opciones);
+    expect(nadie.aviso).toContain("Solo pudimos evaluar tus medios");
+    expect(nadie.aviso).toContain("Invitá a alguien");
+
+    const pagasVos = vistaDeGrupo(
+      soloSinCuenta({
+        quienPaga: { tipo: "vos" },
+        reintegro: 4000,
+        vos: { opcion: { medio: { id: "m-prov", bancoNombre: null, tipo: "debito", red: "visa" }, queDa: "10% en gastronomía", reintegro: 4000, base: { tipo: "sin_tope_informado" } }, sinOpcion: null, parte: 20500 },
+      }),
+      pedidoSin,
+      opciones,
+    );
+    expect(pagasVos.aviso).toContain("Solo pudimos evaluar tus medios");
   });
 
   it("US3-7: dos contactos con el mismo nombre quedan en su fila, identificados por id", () => {

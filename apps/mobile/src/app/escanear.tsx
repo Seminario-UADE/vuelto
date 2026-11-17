@@ -84,6 +84,10 @@ export default function Escanear() {
   }, []);
 
   const porConfirmar = useAppSelector(selectPorConfirmarVigentes);
+  // Las del usuario aunque ya no estén vigentes: si la de la tarjeta venció con el escaneo abierto,
+  // igual se confirma (idea del PR #165).
+  const todasLasPorConfirmar = useAppSelector((s) => s.porConfirmar.lista);
+  const usuarioId = usuario?.id ?? null;
   const catalogo = useAppSelector(selectCatalogoParaCompras);
 
   /** Abre «Revisá tu compra» con lo leído: confirmando esa compra por confirmar, o como compra suelta (`null`). */
@@ -113,7 +117,9 @@ export default function Escanear() {
     }
     const ticket = { comercio: t.comercio, fecha: t.fecha, textoExtraido: t.textoExtraido };
     // Desde «Ya pagué» o la tarjeta: se cruza con esa compra (spec 012 US2-5 y US2-6).
-    const pc = desde.porConfirmar ? porConfirmar.find((c) => c.id === desde.porConfirmar) : undefined;
+    const pc = desde.porConfirmar
+      ? todasLasPorConfirmar.find((c) => c.id === desde.porConfirmar && c.usuarioId === usuarioId)
+      : undefined;
     if (pc) {
       const cruce = cruceDelTicket(pc, ticket, catalogo);
       if (cruce === "otro_comercio") setEstado({ tipo: "de_otro_comercio", leido: t, pc });

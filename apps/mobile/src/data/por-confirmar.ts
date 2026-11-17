@@ -163,8 +163,11 @@ export type TicketParaCruzar = { comercio: string | null; fecha: string | null; 
  */
 export type CruceTicket = "coincide" | "otro_comercio" | "sin_comercio" | "anterior";
 
+/** Una fecha `AAAA-MM-DD`: una que no se pudo leer bien no contradice nada (idea del PR #165). */
+const FECHA_ISO = /^\d{4}-\d{2}-\d{2}$/;
+
 export function cruceDelTicket(c: CompraPorConfirmar, ticket: TicketParaCruzar, catalogo: readonly Comercio[]): CruceTicket {
-  if (ticket.fecha !== null && ticket.fecha < diaDeLaSimulacion(c)) return "anterior";
+  if (ticket.fecha !== null && FECHA_ISO.test(ticket.fecha) && ticket.fecha < diaDeLaSimulacion(c)) return "anterior";
   // Sin comercio en el ticket no se cruza: desde la compra por confirmar se sigue sin preguntar y,
   // suelto, no se busca una (FR-013), aunque el texto nombre a algún comercio.
   if (claveDeComercio(ticket.comercio ?? "") === "") return "sin_comercio";
@@ -182,12 +185,14 @@ export function cruceDelTicket(c: CompraPorConfirmar, ticket: TicketParaCruzar, 
 
 /**
  * Escaneando suelto (spec 012 US2-9): la compra por confirmar con la que coincide el ticket, para
- * preguntar «¿Es tu compra por confirmar en X?»; `null` si ninguna. Un ticket sin comercio no se cruza.
+ * preguntar «¿Es tu compra por confirmar en X?»; si coinciden varias, la más reciente (como en el
+ * PR #165); `null` si ninguna. Un ticket sin comercio no se cruza.
  */
 export function porConfirmarDelTicket(
   lista: readonly CompraPorConfirmar[],
   ticket: TicketParaCruzar,
   catalogo: readonly Comercio[],
 ): CompraPorConfirmar | null {
-  return lista.find((c) => cruceDelTicket(c, ticket, catalogo) === "coincide") ?? null;
+  const coinciden = lista.filter((c) => cruceDelTicket(c, ticket, catalogo) === "coincide");
+  return coinciden.sort((a, b) => Date.parse(b.creadaEn) - Date.parse(a.creadaEn))[0] ?? null;
 }

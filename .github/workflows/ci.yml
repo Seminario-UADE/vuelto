@@ -76,6 +76,23 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+  # Auditoría de secretos (issue #55, RNF-04 y RNF-05): exporta el bundle web
+  # y busca las keys de Gemini, Groq y la service role de Supabase, ahí y en los
+  # archivos versionados. Tiene que dar 0 resultados; nunca imprime un valor.
+  # Sin secrets del repo: la prueba contra el valor literal de tus keys es local
+  # (ver el encabezado del script).
+  auditar-secretos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Buscar keys en el bundle y en el repo
+        run: scripts/auditar-secretos.sh
+
   # Migraciones y RLS de Supabase (issue #34): levanta la base local, la
   # reinicia dos veces para comprobar que el esquema sale limpio y corre las
   # pruebas pgTAP de supabase/tests/database. Sin servicios que no usamos
