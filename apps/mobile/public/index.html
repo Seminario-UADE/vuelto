@@ -13,12 +13,16 @@
 
     <!--
       Agregada a la pantalla de inicio del iPhone: se abre sin la interfaz de Safari y la barra de
-      estado queda transparente, con texto claro, encima del panel (que es oscuro en los dos temas).
+      estado queda transparente, encima del panel de Inicio. iOS elige solo el color de la hora y la
+      batería según lo que hay detrás (oscuro sobre el fondo claro, claro sobre el panel).
     -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Vuelto" />
+    <!-- display: standalone vive en el manifest: sin él, iOS 26 deja los botones de Safari (atrás, compartir, recargar). -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <!-- En Safari común, la barra toma el color del panel de arriba (heroBg de theme.ts). -->
     <meta name="theme-color" content="#0E2A21" media="(prefers-color-scheme: light)" />
