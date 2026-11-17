@@ -9,10 +9,12 @@ import { Icon } from "@/components/icon";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import type { LecturaApp } from "@/data/contracts";
+import { cruzarConTicket, type CompraPorConfirmar } from "@/data/por-confirmar";
 import { hapticoLeve } from "@/lib/haptics";
 import { supabase } from "@/lib/supabase";
 import type { Escenario } from "@/store/acciones";
 import { useAppSelector } from "@/store/hooks";
+import { selectPorConfirmarVigentes } from "@/store/por-confirmar";
 import { selectHoy } from "@/store/selectores";
 import { borrar, elegirDeGaleria, limpiarTemporales, preparar, sacarFoto, type FotoElegida } from "@/ticket/camara";
 import { leerFoto } from "@/ticket/leer";
@@ -24,7 +26,11 @@ type Estado =
   | { tipo: "listo" }
   | { tipo: "sin_permiso" }
   | { tipo: "leyendo" }
-  | { tipo: "resultado"; resultado: ResultadoLectura };
+  | { tipo: "resultado"; resultado: ResultadoLectura }
+  /** El ticket se leyó y hay una compra por confirmar que puede ser la suya (spec 012 US2-5, US2-9). */
+  | { tipo: "pregunta"; pc: CompraPorConfirmar; ticket: Record<string, string>; desdeTarjeta: boolean }
+  /** El ticket es del comercio pero de antes de la simulación: no se cruza, se avisa (spec 012 US2-6). */
+  | { tipo: "anterior"; pc: CompraPorConfirmar; ticket: Record<string, string> };
 
 /** Los escenarios de desarrollo de Perfil que simulan la lectura (FR-012); el resto usa la cámara. */
 const ESCENARIO_TICKET: Record<Escenario, api.EscenarioTicket | null> = {
@@ -40,6 +46,8 @@ const ETIQUETA_SALIDA: Record<SalidaLectura, string> = {
   iniciar_sesion: "Iniciar sesión",
   cargar_a_mano: "Cargar a mano",
 };
+// Con una compra por confirmar, lo que se carga a mano es su confirmación (spec 012 T023).
+const ETIQUETA_CONFIRMAR_A_MANO = "Confirmar a mano";
 
 /**
  * Escanear ticket (modal a pantalla completa, spec 014). «Sacar foto» abre la cámara del sistema
@@ -47,6 +55,12 @@ const ETIQUETA_SALIDA: Record<SalidaLectura, string> = {
  * copias se borran antes de seguir (FR-007, `ticket/leer.ts`); nunca se guarda.
  *
  * Los escenarios de desarrollo de Perfil (FR-012) simulan la lectura sin cámara ni servicio.
+ *
+ * Con la lectura hecha se cruza el ticket con las compras por confirmar (spec 012 FR-013):
+ * desde la tarjeta, si coincide sigue directo a «Revisá» y si no, pregunta «¿Este ticket es de tu
+ * compra en X?»; desde cualquier otro lado, si coincide alguna pregunta «¿Es tu compra por
+ * confirmar en X?». Si dice que no (o ninguna coincide), el ticket sigue como suelto. Un ticket del
+ * mismo comercio pero de antes de la simulación no se cruza: se avisa y sigue como suelto (US2-6).
  */
 export default function Escanear() {
   // Desde el paso 4 del flujo: la lectura confirma esa compra por confirmar (spec 012 FR-007).
@@ -62,6 +76,8 @@ export default function Escanear() {
   const usuario = useAppSelector((s) => s.sesion.usuario);
   const conSesion = usuario !== null && supabase !== null;
   const hoy = useAppSelector(selectHoy);
+  const vigentes = useAppSelector(selectPorConfirmarVigentes);
+  const listaPorConfirmar = useAppSelector((s) => s.porConfirmar.lista);
   // Si el usuario cierra la pantalla mientras lee, la lectura termina (y borra) pero no navega.
   const abierta = useRef(true);
 
@@ -80,20 +96,36 @@ export default function Escanear() {
       setEstado({ tipo: "resultado", resultado: t.resultado });
       return;
     }
+    const ticket: Record<string, string> = {
+      modo: "ticket",
+      comercio: t.comercio ?? "",
+      monto: t.monto === null ? "" : String(t.monto),
+      fecha: t.fecha ?? "",
+      // Lo que dice el ticket, no una tarjeta: «Revisá» lo sugiere, nunca lo marca (FR-008).
+      medioRed: t.medio.red ?? "",
+      medioTipo: t.medio.tipo ?? "",
+      medioBanco: t.medio.banco ?? "",
+      texto: t.textoExtraido,
+    };
+    const cruce = cruzarConTicket({ comercio: t.comercio, fecha: t.fecha }, desde.porConfirmar, listaPorConfirmar, vigentes);
+    if (cruce.tipo === "pregunta") {
+      setEstado({ tipo: "pregunta", pc: cruce.pc, ticket, desdeTarjeta: cruce.desdeTarjeta });
+      return;
+    }
+    if (cruce.tipo === "anterior") {
+      setEstado({ tipo: "anterior", pc: cruce.pc, ticket });
+      return;
+    }
+    // Desde la tarjeta sigue con sus parámetros aunque la compra ya no esté (como antes del cruce).
+    router.replace({ pathname: "/revisa", params: cruce.tipo === "directo" ? { ...ticket, ...extra } : ticket });
+  };
+
+  /** «Sí»: la compra por confirmar con el ticket (US2-1). «No»: el ticket sigue como suelto, y la compra queda igual. */
+  const responder = (e: Extract<Estado, { tipo: "pregunta" }>, esSuya: boolean) => {
+    hapticoLeve();
     router.replace({
       pathname: "/revisa",
-      params: {
-        modo: "ticket",
-        comercio: t.comercio ?? "",
-        monto: t.monto ?? "",
-        fecha: t.fecha ?? "",
-        // Lo que dice el ticket, no una tarjeta: «Revisá» lo sugiere, nunca lo marca (FR-008).
-        medioRed: t.medio.red ?? "",
-        medioTipo: t.medio.tipo ?? "",
-        medioBanco: t.medio.banco ?? "",
-        texto: t.textoExtraido,
-        ...extra,
-      },
+      params: esSuya ? { ...e.ticket, porConfirmar: e.pc.id, ...(desde.flujo ? { flujo: desde.flujo } : {}) } : e.ticket,
     });
   };
 
@@ -140,6 +172,7 @@ export default function Escanear() {
   };
 
   const leyendo = estado.tipo === "leyendo";
+  const etiquetaAMano = desde.porConfirmar ? ETIQUETA_CONFIRMAR_A_MANO : ETIQUETA_SALIDA.cargar_a_mano;
   // Sin sesión no se abre la cámara ni se llama al servicio (FR-002). Los escenarios no usan ninguno.
   const pideSesion = !conSesion && escenarioTicket === null;
 
@@ -176,7 +209,11 @@ export default function Escanear() {
         <View style={{ alignItems: "center", gap: space.md }}>
           <Icon name={leyendo ? "ticket" : "camara"} size={56} color={colors.onScrim} />
           <Text variant="bodyLg" align="center" accessibilityLiveRegion="polite" style={{ color: colors.onScrim }}>
-            {leyendo ? "Leyendo el ticket…" : "Sacale una foto al ticket entero, con buena luz."}
+            {leyendo
+              ? "Leyendo el ticket…"
+              : estado.tipo === "pregunta" || estado.tipo === "anterior"
+                ? "Leímos tu ticket."
+                : "Sacale una foto al ticket entero, con buena luz."}
           </Text>
         </View>
 
@@ -186,7 +223,7 @@ export default function Escanear() {
               Iniciá sesión para leer tickets
             </Text>
             <Button label="Iniciar sesión" onPress={iniciarSesion} />
-            <Button label="Cargar a mano" variant="secondary" onPress={aMano} />
+            <Button label={etiquetaAMano} variant="secondary" onPress={aMano} />
           </Card>
         ) : estado.tipo === "resultado" ? (
           <Card>
@@ -197,8 +234,28 @@ export default function Escanear() {
               </Text>
             </View>
             {salidaDe(estado.resultado).salidas.map((s, i) => (
-              <Button key={s} label={ETIQUETA_SALIDA[s]} variant={i === 0 ? "primary" : "secondary"} onPress={accion[s]} />
+              <Button key={s} label={s === "cargar_a_mano" ? etiquetaAMano : ETIQUETA_SALIDA[s]} variant={i === 0 ? "primary" : "secondary"} onPress={accion[s]} />
             ))}
+          </Card>
+        ) : estado.tipo === "pregunta" ? (
+          <Card>
+            <Text variant="bodyMd" accessibilityLiveRegion="polite">
+              {estado.desdeTarjeta
+                ? `¿Este ticket es de tu compra en ${estado.pc.comercioNombre}?`
+                : `¿Es tu compra por confirmar en ${estado.pc.comercioNombre}?`}
+            </Text>
+            <Button label="Sí, es esa" onPress={() => responder(estado, true)} />
+            <Button label="No, es otra" variant="secondary" onPress={() => responder(estado, false)} />
+          </Card>
+        ) : estado.tipo === "anterior" ? (
+          <Card>
+            <View style={{ flexDirection: "row", gap: space.sm }}>
+              <Icon name="info" size={20} />
+              <Text variant="bodyMd" style={{ flex: 1 }} accessibilityLiveRegion="polite">
+                {`Este ticket es de antes de que simularas tu compra en ${estado.pc.comercioNombre}, así que no la confirma. Lo cargamos como una compra aparte.`}
+              </Text>
+            </View>
+            <Button label="Seguir con el ticket" onPress={() => router.replace({ pathname: "/revisa", params: estado.ticket })} />
           </Card>
         ) : estado.tipo === "sin_permiso" ? (
           <Card>
@@ -206,7 +263,7 @@ export default function Escanear() {
               Para sacar la foto necesitamos permiso para usar la cámara
             </Text>
             <Button label="Elegir de la galería" icon="galeria" onPress={() => void leer(elegirDeGaleria)} />
-            <Button label="Cargar a mano" variant="secondary" onPress={aMano} />
+            <Button label={etiquetaAMano} variant="secondary" onPress={aMano} />
           </Card>
         ) : (
           <Card>
@@ -233,7 +290,7 @@ export default function Escanear() {
         )}
       </ScrollView>
 
-      {pideSesion || estado.tipo === "resultado" || estado.tipo === "sin_permiso" ? null : (
+      {pideSesion || estado.tipo === "resultado" || estado.tipo === "sin_permiso" || estado.tipo === "pregunta" || estado.tipo === "anterior" ? null : (
         <View style={{ alignItems: "center", paddingVertical: space.lg }}>
           <Pressable
             onPress={aMano}
@@ -243,7 +300,7 @@ export default function Escanear() {
           >
             <Icon name="teclado" size={24} color={colors.onScrim} />
             <Text variant="label" style={{ color: colors.onScrim }}>
-              Cargar a mano
+              {etiquetaAMano}
             </Text>
           </Pressable>
         </View>
