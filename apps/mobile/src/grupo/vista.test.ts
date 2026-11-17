@@ -106,6 +106,33 @@ describe("vistaDeGrupo (spec 016 US3)", () => {
     expect(v.reintegro).toBeNull();
   });
 
+  it("#139: con un contacto vinculado no hay aviso, aunque no tenga reintegro", () => {
+    expect(vistaDeGrupo(base(), pedido, opciones).aviso).toBeNull();
+    const sinPromo = base({ quienPaga: null, reintegro: null, contactos: [{ id: LUCIA, nombre: "Lucía", opcion: null, parte: 12000 }] });
+    expect(vistaDeGrupo(sinPromo, pedido, opciones).aviso).toBeNull();
+  });
+
+  it("#139: si solo hay gente sin cuenta, el resultado avisa que solo se evaluó a Vos, pague quien pague", () => {
+    const soloSinCuenta = (datos: Partial<RespuestaGrupo> = {}) =>
+      base({ contactos: [], sinCuenta: [{ posicion: 0, parte: 20500 }, { posicion: 1, parte: 20500 }], ...datos });
+    const pedidoSin: PedidoGrupo = { ...pedido, contactos: [], sinCuenta: [{ posicion: 0, nombre: "Sofía" }, { posicion: 1, nombre: "Juan" }] };
+
+    const nadie = vistaDeGrupo(soloSinCuenta({ quienPaga: null, reintegro: null }), pedidoSin, opciones);
+    expect(nadie.aviso).toContain("Solo pudimos evaluar tus medios");
+    expect(nadie.aviso).toContain("Invitá a alguien");
+
+    const pagasVos = vistaDeGrupo(
+      soloSinCuenta({
+        quienPaga: { tipo: "vos" },
+        reintegro: 4000,
+        vos: { opcion: { medio: { id: "m-prov", bancoNombre: null, tipo: "debito", red: "visa" }, queDa: "10% en gastronomía", reintegro: 4000, base: { tipo: "sin_tope_informado" } }, sinOpcion: null, parte: 20500 },
+      }),
+      pedidoSin,
+      opciones,
+    );
+    expect(pagasVos.aviso).toContain("Solo pudimos evaluar tus medios");
+  });
+
   it("US3-7: dos contactos con el mismo nombre quedan en su fila, identificados por id", () => {
     const r = base({
       quienPaga: { tipo: "contacto", id: OTRA_ANA },

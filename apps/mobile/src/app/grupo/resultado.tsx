@@ -156,6 +156,15 @@ export default function GastoEnGrupo() {
         <Skeleton height={240} r={radius.card} />
       )}
 
+      {g?.aviso ? (
+        <Card padding={space.lg}>
+          <Text variant="bodyMd" tone="inkSecondary" accessibilityLiveRegion="polite">
+            {g.aviso}
+          </Text>
+          <Button label="Invitar a alguien" variant="text" icon="invitar" onPress={() => router.push("/contactos/invitar")} />
+        </Card>
+      ) : null}
+
       <View style={{ gap: space.md }}>
         <SectionHeader title="Cómo queda cada uno" />
         {g ? (

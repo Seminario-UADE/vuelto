@@ -3344,6 +3344,25 @@ proyector.
 
 ---
 
+## 2026-11-17 — Armar grupo sin contactos y aviso de «solo evaluamos a Vos» (issue #139, G-11)
+
+**Herramienta:** Claude Code (Sonnet 5.5), en una sesión lanzada desde otra sesión
+que repartía issues del gasto en grupo.
+
+**Objetivo:** que Armar grupo no sea un callejón sin contactos (estado vacío que lleva
+a Invitar) y que el resultado diga cuando nadie más que «Vos» tiene datos.
+
+**Prompts principales:**
+1. "Implementá el issue #139 y abrí un PR que lo cierre": con el contexto del
+   hallazgo G-11 de `docs/product/revision-gasto-grupo.md`, sin spec-kit (issue S).
+
+**Resultado:** `grupo/armar.ts` decide el estado vacío y el texto del pie (con
+tests); `vistaDeGrupo` suma `aviso` cuando el grupo no tiene contactos vinculados
+(con tests); Armar muestra el estado vacío con «Invitar a alguien» y el resultado
+muestra el aviso.
+
+**Quedó sin verificar:** las dos pantallas no se probaron en un dispositivo ni en
+el simulador; solo lint, typecheck y tests.
 ## 2026-11-17 — La invitación no se pierde con «Ya tengo cuenta» (issue #137, hallazgo G-07)
 
 **Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde otra sesión de Claude Code.
