@@ -3344,6 +3344,35 @@ proyector.
 
 ---
 
+## 2026-11-17 — Estado real del MVP y revisión de issues (issue #132)
+
+**Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde otra sesión de
+Claude Code.
+
+**Objetivo:** poner al día `docs/product/estado.md` (decía «Sprint 1, el motor
+tiene solo el esqueleto») y `docs/product/pendientes.md`, y revisar contra el
+código y el historial los issues abiertos que parecen resueltos (#43, #35, #31,
+#50, #82, #79 y #103), sin cerrar ninguno.
+
+**Prompts principales:**
+1. "Implementá el issue #132 y abrí un PR que lo cierre": reescribir el estado
+   real (hecho, falta, simulado), revisar `pendientes.md` ítem por ítem y dar
+   un veredicto con evidencia por issue.
+2. Reglas dadas: solo documentación, no cerrar ni comentar issues en GitHub
+   (la persona decide a partir de la tabla del PR), no marcar como hechos los
+   issues que están implementando otras sesiones (#137, #139, #110, #55) y
+   escribir «sin verificar» lo que no se pueda comprobar.
+
+**Resultado:** `estado.md` y `pendientes.md` reescritos con fecha de
+relevamiento; tabla de veredictos en la descripción del PR. En el camino
+aparecieron dos cosas que el repo no mostraba: el workflow `migraciones.yml`
+falla en cada corrida por un secret sin cargar (`SUPABASE_DB_URL`) y la ingesta
+programada no tiene corridas el 16 y 17/11. Ninguna se tocó, quedaron anotadas
+en `pendientes.md`.
+
+**Quedó sin verificar:** si la base alojada tiene las 12 migraciones, si hay un
+APK de respaldo generado, el conteo actual de promos publicadas y todo lo que
+depende de la cátedra (equipo, exclusiones, formato de requisitos).
 ## 2026-11-17 — Confirmar la compra por confirmar escaneando el ticket (issue #110, spec 012 US2)
 
 **Herramienta:** Claude Code (Sonnet 5.5), en una sesión lanzada desde otra sesión de Claude Code.
