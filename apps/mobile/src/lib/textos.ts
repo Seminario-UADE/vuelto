@@ -1,5 +1,6 @@
 import type { PeriodoAcumulable } from "@vuelto/motor";
 import type { Base, Periodo } from "../data/contracts";
+import { aprox } from "./format";
 
 /** El período del motor en la vista; sin período, mensual como en el motor. */
 export function periodoDeVista(periodo: PeriodoAcumulable | null): Periodo {
@@ -26,4 +27,18 @@ export function textoBase(cantidad: number, periodo: Periodo, mes: string): Base
     periodo,
     texto: periodo === "mes" ? `según ${compras} de ${mes}` : `según ${compras} esta semana`,
   };
+}
+
+/**
+ * «Te devuelven ≈$X» con su base, sin punto final (cada pantalla cierra a su manera). La base
+ * (Principio V) llega de dos formas: una cola corta en minúscula, «según 1 compra de noviembre»,
+ * que se une con coma, o una oración entera, «Sin compras registradas este mes: …», que va aparte
+ * y sin su punto, para no repetirlo ni dejar una mayúscula después de la coma. Sin base, solo la cifra.
+ */
+export function textoReintegro(reintegro: number, base: string | null): string {
+  const cifra = `Te devuelven ${aprox(reintegro)}`;
+  const limpia = base?.trim().replace(/\.+$/, "") ?? "";
+  if (limpia === "") return cifra;
+  const esOracion = limpia[0] !== limpia[0]?.toLowerCase();
+  return `${cifra}${esOracion ? ". " : ", "}${limpia}`;
 }

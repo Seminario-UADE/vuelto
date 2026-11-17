@@ -376,6 +376,12 @@ describe("detallesDeLaCompra: el texto de cada tarjeta en «Revisá tu compra» 
     expect(SIN_PROMO_EN_LA_COMPRA).toBe("No hay ninguna promo");
   });
 
+  it("sin compras registradas en el mes, la base es una oración entera y se separa con punto (sin «, S» ni «..»)", () => {
+    const sinCompras = { ...entradas, compras: [] };
+    const d = detallesDeLaCompra(sinCompras, comercio("coto"), "2026-10-14", 24500)["galicia-visa-credito"];
+    expect(d).toMatch(/^Te devuelven ≈\$[\d.]+\. Sin compras registradas este mes: todavía no podemos estimar cuánto te queda$/);
+  });
+
   it("usa la fecha de la compra: el jueves, la promo de Coto de los miércoles dice por qué no aplicó", () => {
     expect(detallesDeLaCompra(entradas, comercio("coto"), "2026-10-15", 24500)["galicia-visa-credito"]).toBe(
       "Hoy no aplica, la promo es los miércoles",
