@@ -4,13 +4,23 @@ Capturas de la app web (Inicio v10, modo oscuro, 390×844) del martes 17/11/2026
 con la rama del #112 (onboarding sin cuenta) y el #147 ya mergeados. Supabase local, 3180
 promos bajadas por la ingesta real de MODO y una cuenta de prueba con Galicia Visa crédito.
 
-| Archivo | Pantalla | Slide |
+| Archivo | Pantalla | Slide (paso) |
 |---|---|---|
-| `bienvenida.jpg`, `primera-respuesta.jpg` | Empezar sin cuenta | 5 |
-| `inicio.jpg`, `comprar.jpg`, `recomendacion.jpg`, `pagar.jpg` | Decidir | 5 |
-| `escanear.jpg`, `revisa.jpg` (carga a mano), `topes.jpg`, `compras.jpg` | Registrar y controlar | 6 |
-| `grupo-invitar.jpg`, `grupo-armar.jpg`, `grupo-resultado.jpg` | Gasto en grupo (de `docs/design/capturas-grupo-016/`, 15/11) | 7 |
+| `bienvenida.jpg`, `primera-respuesta.jpg` | Empezar sin cuenta | 6 (1 y 2) |
+| `inicio.jpg`, `comprar.jpg`, `monto.jpg`, `recomendacion.jpg`, `pagar.jpg` | Decidir | 7 (1 a 5) |
+| `escanear.jpg`, `revisa.jpg` (carga a mano), `compras.jpg`, `topes.jpg` | Registrar y controlar | 8 (1 a 4) |
+| `grupo-contactos.jpg`, `grupo-invitar.jpg`, `grupo-armar.jpg`, `grupo-resultado.jpg` | Gasto en grupo | 9 (1 a 4) |
 | `medios.jpg` | Elegir tarjetas en el onboarding (sin usar en el deck) | — |
+
+Todas son de 618×1336 px. Cada slide de pantallas muestra **un teléfono** y cambia de imagen
+a cada `→`; el «toque» que se ve antes del cambio sale del atributo `data-tap` (x,y en % de
+la pantalla) de la imagen de destino, en `vuelto-mvp.html`. Si se reemplaza una captura por
+otra con otro layout, hay que ajustar ese `data-tap`.
+
+Las capturas de grupo se sacaron el 17/11 con dos cuentas locales: «Martín» (Galicia Visa
+crédito, con la compra de Natural Life de $40.000) y «Lucía» (Comafi Visa crédito), vinculadas
+como contactos. El resultado es una cuenta real del servidor: 20% en Natural Life para los
+dos, ≈$8.000, «te conviene pagar vos» por empate.
 
 ## Qué compras hay detrás de las capturas
 
