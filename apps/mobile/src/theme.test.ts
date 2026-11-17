@@ -50,8 +50,8 @@ const textosComunes: Par[] = [
   ["onDecision / decisionBg", "onDecision", "decisionBg"],
   ["onDecisionMuted / decisionBg", "onDecisionMuted", "decisionBg"],
   ["onDecisionAccent / decisionBg", "onDecisionAccent", "decisionBg"],
-  // El botón «Usar [medio]» y la inicial del medio: texto `ink` sobre `onDecisionAccent`.
-  ["ink / onDecisionAccent", "ink", "onDecisionAccent"],
+  // El botón «Usar [medio]» y la inicial del medio: texto `onDecisionAccentInk` sobre `onDecisionAccent`.
+  ["onDecisionAccentInk / onDecisionAccent", "onDecisionAccentInk", "onDecisionAccent"],
   // v8: segundo acento, éxito, cabecera de Inicio y color por rubro.
   ["accent2 / canvas", "accent2", "canvas"],
   ["accent2 / surface", "accent2", "surface"],
@@ -62,6 +62,7 @@ const textosComunes: Par[] = [
   ["onHeroMuted / heroBg", "onHeroMuted", "heroBg"],
   ["onHero / heroBgHi", "onHero", "heroBgHi"],
   ["onHeroMuted / heroBgHi", "onHeroMuted", "heroBgHi"],
+  ["onHeroAccent / heroAccent", "onHeroAccent", "heroAccent"],
   ["rubroSuper / rubroSuperBg", "rubroSuper", "rubroSuperBg"],
   ["rubroFarmacia / rubroFarmaciaBg", "rubroFarmacia", "rubroFarmaciaBg"],
   ["rubroCombustible / rubroCombustibleBg", "rubroCombustible", "rubroCombustibleBg"],

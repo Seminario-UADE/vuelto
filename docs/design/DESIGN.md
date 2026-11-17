@@ -1,4 +1,4 @@
-# Design System: Vuelto (v9.2)
+# Design System: Vuelto (v10)
 
 > Fuente de verdad para diseñar y generar pantallas de Vuelto (Stitch y la
 > app). La v6 (07/11/2026) reemplaza a `DESIGN-v5.md`, y su razonamiento está
@@ -59,6 +59,27 @@
 > Crédito) sigue segmentado. El selector de banco muestra **todos los bancos**
 > con el buscador vacío.
 >
+> **v10 (17/11/2026)**: cambia la **paleta del oscuro** y el **Inicio**. El
+> oscuro de la v9.1 pintaba todas las superficies con verdes saturados que
+> además cambiaban de matiz: se veía barroso, el panel no se despegaba del
+> fondo y la acción en salvia parecía deshabilitada. Ahora los dos temas usan
+> **neutros con un dejo verde** (oscuro: carbón `#0B100E`, tarjetas `#141B18`,
+> hundido `#1D2622`; claro: niebla `#F2F6F3`, tarjetas `#FCFEFD`) y el verde
+> de la marca vive en el **brillo del panel** (`#1F5A45`) y en la **acción**
+> (claro `#1C6B4E` bosque, oscuro `#7DD3A0` brote). La decisión en el oscuro
+> deja la menta encandilante y pasa a verde hondo (`#0F2019`) con detalles en
+> brote; nuevo rol `onDecisionAccentInk` para el texto sobre el botón. Nuevos
+> roles `heroAccent`/`onHeroAccent` para el atajo principal del panel.
+> **Inicio**: el panel pierde las esquinas de abajo y el brillo se funde con el
+> borde; el resto sube encima como una **hoja** con agarradera (`hoja.tsx`,
+> solo visual). Rótulo «Te devolvieron en noviembre» con el «≈» atenuado
+> delante de la cifra. Cuatro atajos: **Con qué pago** (el único relleno, en
+> brote), Escanear, Contactos y Comercios (Topes sale: se abre desde el
+> anillo). El anillo de topes pasa a **un tramo por medio** con leyenda (el que
+> queda poco, en advertencia y con texto). «Hoy podés usar» pasa a **una lista
+> agrupada**. El aire entre los atajos y el anillo se acota a la agarradera.
+> Propuesta y auditoría: `propuesta-inicio-v10.html`.
+>
 > **Estado de implementación**: la app implementa la paleta, los dos temas y
 > los radios de la v6 (issue #115). La fila de comercios y la lista agrupada
 > existen como componentes base (`fila-comercios.tsx`, `lista-agrupada.tsx`)
@@ -103,31 +124,32 @@ tema. Ratios WCAG 2.1 medidos.
 
 | Rol | Claro | Oscuro | Uso | Contraste (claro / oscuro) |
 |---|---|---|---|---|
-| `canvas` | `#EEF6F0` Menta aclarada | `#051F20` Noche | Fondo de las pantallas | — |
-| `surface` | `#F8FCF9` | `#0B2B26` Pino | Tarjetas y listas agrupadas. En el claro es lo más claro y lleva sombra | — |
-| `surfaceStrong` | `#DAF1DE` Menta | `#163832` Musgo | Segmentos, campos, fila seleccionada, pista de la torta. En el claro es lo hundido | — |
-| `divider` | `#C9DDD0` | `#235347` Helecho | Divisores. Nunca el único borde de un control | decorativo |
-| `ink` | `#051F20` Noche | `#DAF1DE` Menta | Texto principal e íconos | 15.6 / 14.4 sobre canvas |
-| `inkSecondary` | `#456A5E` | `#8EB69B` Salvia | Texto secundario, bases, metadatos | 5.5 / 7.6 sobre canvas (5.1 / 5.7 sobre `surfaceStrong`) |
-| `controlBorder` | `#6E8C80` | `#5E8A70` | Radios, checkboxes, inputs sin seleccionar | 3.3 / 4.4 |
-| `accent` | `#235347` Helecho | `#8EB69B` Salvia | **Acento de acción**: primario, selección, tab activa, progreso, links, arco de la torta | 7.9 / 7.6 |
-| `onAccent` | `#DAF1DE` | `#051F20` | Texto e íconos sobre el acento | 7.3 / 7.6 |
-| `warning` | `#985A00` | `#E2B65E` | Queda poco, promo de otro día | 5.0 / 9.1 |
+| `canvas` | `#F2F6F3` Niebla | `#0B100E` Carbón | Fondo de las pantallas | — |
+| `surface` | `#FCFEFD` | `#141B18` | Tarjetas y listas agrupadas. En el claro es lo más claro y lleva sombra | — |
+| `surfaceStrong` | `#E4ECE7` | `#1D2622` | Segmentos, campos, fila seleccionada, pista del anillo. En el claro es lo hundido | — |
+| `divider` | `#D5E0D9` | `#27322D` | Divisores y agarradera de la hoja. Nunca el único borde de un control | decorativo |
+| `ink` | `#0B1A14` | `#E6F1EA` Nube | Texto principal e íconos | 16.4 / 16.6 sobre canvas |
+| `inkSecondary` | `#4A6157` | `#9AADA3` | Texto secundario, bases, metadatos | 6.1 / 8.1 sobre canvas (5.6 / 6.6 sobre `surfaceStrong`) |
+| `controlBorder` | `#6F857B` | `#64766D` | Radios, checkboxes, inputs sin seleccionar | 3.6 / 4.0 |
+| `accent` | `#1C6B4E` Bosque | `#7DD3A0` Brote | **Acento de acción**: primario, selección, tab activa, progreso, links, primer tramo del anillo | 5.9 / 10.7 |
+| `onAccent` | `#F4FAF6` | `#06130D` | Texto e íconos sobre el acento | 6.1 / 10.6 |
+| `warning` | `#985A00` | `#E8BC66` | Queda poco, promo de otro día | 5.0 / 10.8 |
 | `warningBg` | `#FCEFD8` | `#2B2410` | Fondo de aviso, siempre con `warning` | — |
-| `error` | `#B42A22` | `#EE8F84` | Tope agotado, error de lectura | 5.8 / 7.3 |
-| `successBg` | `#DAF1DE` | `#235347` | Confirmación y fondo del ahorro (con `ink`) | — |
+| `error` | `#B42A22` | `#F09488` | Tope agotado, error de lectura | 5.8 / 8.5 |
+| `successBg` | `#DAF1DE` | `#1C3A2E` | Confirmación y fondo del ahorro (con `ink`) | — |
 | `success` | `#1D6B44` | `#9BD8AE` | Texto de lo que se ganó o se devolvió | 5.9 / 10.5 |
-| `accent2` | `#1E62A6` | `#7CC4CB` | Segundo acento: información y estimaciones; nunca en acciones | 5.7 / 8.7 |
+| `accent2` | `#1E62A6` | `#86C8D0` | Segundo acento: información, estimaciones y segundo tramo del anillo; nunca en acciones | 5.7 / 10.2 |
 | `accent2Bg` | `#DFEBF7` | `#17484C` | Fondo del segundo acento, siempre con `accent2` | — |
-| `heroBg` | `#051F20` Noche | `#0B2B26` Pino | Panel de Inicio: borde del degradé | — |
-| `heroBgHi` | `#235347` Helecho | `#235347` Helecho | Panel de Inicio: arriba al centro del degradé | — |
-| `heroSurface` | `rgba(218,241,222,0.12)` | `…0.10` | Avatar, píldora de la base y atajos dentro del panel | — |
-| `onHero` | `#DAF1DE` | `#DAF1DE` | Texto sobre el panel | 14.4 / 12.7 (7.3 sobre `heroBgHi`) |
+| `heroBg` | `#0E2A21` | `#0B100E` (el fondo) | Panel de Inicio: borde del brillo. En el oscuro se funde con la pantalla | — |
+| `heroBgHi` | `#1F5A45` Brillo | `#1F5A45` Brillo | Panel de Inicio: centro del brillo, arriba | — |
+| `heroSurface` | `rgba(230,241,234,0.12)` | igual | Avatar, píldora de la base y atajos dentro del panel | — |
+| `onHero` | `#E6F1EA` | `#E6F1EA` | Texto sobre el panel | 7.0 sobre `heroBgHi` |
 | `onHeroMuted` | `#B9D6C2` | `#B9D6C2` | Fecha y rótulos sobre el panel (la salvia no llega a AA sobre helecho) | 11.0 / 9.7 (5.6 sobre `heroBgHi`) |
-| `decisionBg` | `#051F20` Noche | `#DAF1DE` Menta | Panel de decisión (superficie invertida) | — |
-| `onDecision` | `#DAF1DE` | `#051F20` | Texto sobre la decisión | 14.4 / 14.4 |
-| `onDecisionMuted` | `#8EB69B` | `#235347` | Razón y base sobre la decisión | 7.6 / 7.3 |
-| `onDecisionAccent` | `#8EB69B` (texto `#051F20`) | `#235347` (texto `#DAF1DE`) | Inicial del medio y botón dentro de la decisión | 7.6 / 7.3 |
+| `decisionBg` | `#051F20` Noche | `#0F2019` | Panel de decisión | — |
+| `onDecision` | `#DAF1DE` | `#E6F1EA` | Texto sobre la decisión | 14.4 / 14.6 |
+| `onDecisionMuted` | `#8EB69B` | `#A3C2B0` | Razón y base sobre la decisión | 7.6 / 8.8 |
+| `onDecisionAccent` | `#8EB69B` (texto `onDecisionAccentInk` `#0B1A14`) | `#7DD3A0` (texto `#06130D`) | Inicial del medio y botón dentro de la decisión | 7.6 / 9.4 |
+| `heroAccent` | `#7DD3A0` (texto `onHeroAccent` `#06130D`) | igual | Atajo principal del panel («Con qué pago») | 10.6 |
 
 **Color por rubro (v8; claro de la v9, oscuro de la v8).** Cinco pares ícono/fondo para el cuadrado de cada
 comercio (`rubroColors` en `theme.ts`). El rubro es una ayuda para reconocer el
@@ -370,10 +392,11 @@ primera, vas a ver cuánto tope te queda.», sin botón a otra pestaña.
   resúmenes cortos, y una sola columna con `fontScale > 1.2`.
 - Las pantallas de nivel superior llevan large title nativo (colapsa al
   scrollear). Las hijas, título inline y back del sistema.
-- **Inicio** (de arriba abajo): el panel con saludo, fecha, «Este mes te
-  devolvieron ≈X» con su base y tres atajos; «Por confirmar» si hay; «Tus
-  topes» (los primeros tres, cada uno en su tarjeta con barra y base; «Ver
-  todos» abre Topes) y «Últimas compras» (tres; «Ver todas» va a Compras).
+- **Inicio** (de arriba abajo, v10): el panel con saludo, fecha, «Te
+  devolvieron en {mes} ≈X» con su base y cuatro atajos; encima, la hoja con
+  el anillo de topes por medio, «Por confirmar» si hay, «Hoy podés usar» (los
+  primeros tres en una lista agrupada con barra y base; «Ver todos» abre
+  Topes) y «Últimas compras» (tres; «Ver todas» va a Compras).
 - **Compras** (pestaña): «Gastaste este mes» con un gráfico de barras por
   tramo de 7 días (el de hoy en el acento), una fila «Te devolvieron ≈X» que
   abre Topes y las compras agrupadas por día. Sin filtros ni badges.

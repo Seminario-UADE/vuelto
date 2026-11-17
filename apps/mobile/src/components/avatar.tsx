@@ -23,7 +23,7 @@ type Props = {
  */
 export function Avatar({ letras, icon, tone = "neutral", size = tamanos.avatar, forma = "circulo", rubro }: Props) {
   const fondo = rubro?.bg ?? { neutral: colors.surfaceStrong, activo: colors.accent, decision: colors.onDecisionAccent }[tone];
-  const tinta = rubro?.fg ?? (tone === "activo" ? colors.onAccent : colors.ink);
+  const tinta = rubro?.fg ?? (tone === "activo" ? colors.onAccent : tone === "decision" ? colors.onDecisionAccentInk : colors.ink);
   return (
     <View
       accessible={false}

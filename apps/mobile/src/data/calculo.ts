@@ -581,5 +581,12 @@ export function usoDeTopes(topes: ResumenTopes): UsoDeTopes | null {
       compras === 0
         ? SIN_TOPES_USADOS
         : `según ${compras} ${compras === 1 ? "compra" : "compras"} de ${topes.mes}`,
+    tramos: usados.map((t) => ({
+      clave: t.clave,
+      nombre: t.medio.nombre,
+      disponible: t.disponible ?? t.nominal,
+      nominal: t.nominal,
+      estado: t.estado,
+    })),
   };
 }

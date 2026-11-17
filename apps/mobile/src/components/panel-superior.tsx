@@ -15,6 +15,11 @@ type Props = {
   /** Cómo va la barra de estado sobre el panel. */
   barra: "light" | "dark";
   accessibilityLabel?: string;
+  /**
+   * `false`: sin esquinas abajo, porque lo que sigue sube encima como una hoja (Inicio v10, `Hoja`).
+   * Por defecto, las esquinas de abajo redondeadas.
+   */
+  redondeado?: boolean;
   children: ReactNode;
 };
 
@@ -23,7 +28,7 @@ type Props = {
  * esquinas de abajo redondeadas. Va como primer hijo de un `Screen kind="tab"`: se come el
  * margen lateral y el área segura de arriba, y suma esa área como relleno propio.
  */
-export function PanelSuperior({ color, fondo, barra, accessibilityLabel, children }: Props) {
+export function PanelSuperior({ color, fondo, barra, accessibilityLabel, redondeado = true, children }: Props) {
   const insets = useSafeAreaInsets();
   return (
     <View
@@ -34,8 +39,8 @@ export function PanelSuperior({ color, fondo, barra, accessibilityLabel, childre
         paddingTop: insets.top + space.sm + SOBRANTE_REBOTE,
         paddingHorizontal: space.gutter,
         backgroundColor: color,
-        borderBottomLeftRadius: radius.sheet,
-        borderBottomRightRadius: radius.sheet,
+        borderBottomLeftRadius: redondeado ? radius.sheet : 0,
+        borderBottomRightRadius: redondeado ? radius.sheet : 0,
         borderCurve: "continuous",
         overflow: "hidden",
       }}

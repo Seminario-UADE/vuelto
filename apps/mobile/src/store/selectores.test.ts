@@ -77,6 +77,9 @@ describe("selectUsoDeTopes (torta de Inicio, v9)", () => {
     expect(uso.queda).toBeCloseTo(uso.disponible / uso.nominal);
     const compras = new Set(usados.flatMap((t) => t.compraIds)).size;
     expect(uso.base).toBe(`según ${compras} compras de octubre`);
+    // Un tramo por tope usado, con lo que le queda a cada uno (anillo segmentado, v10).
+    expect(uso.tramos.map((t) => t.clave)).toEqual(usados.map((t) => t.clave));
+    expect(uso.tramos.reduce((n, t) => n + t.disponible, 0)).toBe(uso.disponible);
   });
 
   it("sin compras en el período no suma nada: todavía no usaste ningún tope (#149)", () => {
@@ -90,6 +93,7 @@ describe("selectUsoDeTopes (torta de Inicio, v9)", () => {
       queda: 0,
       topes: 0,
       base: "Todavía no usaste ningún tope este mes",
+      tramos: [],
     });
   });
 
