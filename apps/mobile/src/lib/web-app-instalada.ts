@@ -21,7 +21,7 @@ export function esWebAppInstalada(): boolean {
  * esto el primer renglón de cada pantalla queda por debajo de esa franja y se lee nítido. En la
  * app nativa y en el navegador común no se suma nada.
  */
-export const EXTRA_ARRIBA_WEB_APP = 10;
+export const EXTRA_ARRIBA_WEB_APP = 8;
 
 export function extraArribaWebApp(): number {
   return esWebAppInstalada() ? EXTRA_ARRIBA_WEB_APP : 0;
