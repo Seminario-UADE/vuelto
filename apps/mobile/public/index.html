@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <!--
+      viewport-fit=cover: la página llega hasta debajo de la barra de estado y de la isla, y
+      env(safe-area-inset-*) da los márgenes reales (react-native-safe-area-context los lee en web).
+      Así el panel de Inicio se dibuja detrás de la hora, como en la app nativa.
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+    <title>%WEB_TITLE%</title>
+
+    <!--
+      Agregada a la pantalla de inicio del iPhone: se abre sin la interfaz de Safari y la barra de
+      estado queda transparente, con texto claro, encima del panel (que es oscuro en los dos temas).
+    -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Vuelto" />
+
+    <!-- En Safari común, la barra toma el color del panel de arriba (heroBg de theme.ts). -->
+    <meta name="theme-color" content="#0E2A21" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0B100E" media="(prefers-color-scheme: dark)" />
+
+    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <style id="expo-reset">
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        overflow: hidden;
+      }
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+      /* Fondo mientras carga y en el rebote: el canvas de cada tema (theme.ts), no blanco. */
+      html,
+      body {
+        background-color: #f2f6f3;
+      }
+      @media (prefers-color-scheme: dark) {
+        html,
+        body {
+          background-color: #0b100e;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript>Necesitás activar JavaScript para usar Vuelto.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
