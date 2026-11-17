@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vuelto — Entrega del MVP</title>
+<style>
+  /* Paleta de la app (v9.1, apps/mobile/src/theme.ts): seis verdes + semánticos.
+     Claro y oscuro se componen por separado; D alterna, y arranca con el modo del sistema. */
+  :root {
+    --bg: #EEF6F0;
+    --card: #F8FCF9;
+    --card-2: #DAF1DE;
+    --ink: #051F20;
+    --ink-2: #456A5E;
+    --line: #C9DDD0;
+    --accent: #235347;
+    --on-accent: #DAF1DE;
+    --hero: #0B2B26;
+    --hero-2: #163832;
+    --on-hero: #EEF6F0;
+    --on-hero-2: #B9D6C2;
+    --ok: #1D6B44;   --ok-bg: #DDF2E4;
+    --warn: #985A00; --warn-bg: #FCEFD8;
+    --bad: #B42A22;  --bad-bg: #FBE4E1;
+    --shadow: 0 1px 2px rgba(5,31,32,.06), 0 8px 24px rgba(5,31,32,.07);
+    --sans: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    /* Movimiento: salida fuerte para lo que entra, sin ease-in */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  }
+  :root[data-theme="dark"] {
+    --bg: #051F20;
+    --card: #0B2B26;
+    --card-2: #163832;
+    --ink: #DAF1DE;
+    --ink-2: #8EB69B;
+    --line: #1E4A3F;
+    --accent: #8EB69B;
+    --on-accent: #051F20;
+    --hero: #0B2B26;
+    --hero-2: #163832;
+    --on-hero: #DAF1DE;
+    --on-hero-2: #8EB69B;
+    --ok: #9BD8AE;   --ok-bg: #1F4A36;
+    --warn: #E2B65E; --warn-bg: #2B2410;
+    --bad: #EE8F84;  --bad-bg: #3A1E1B;
+    --shadow: none;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--ink); font-family: var(--sans); transition: background .3s ease, color .3s ease; }
+
+  /* Escenario 16:9 escalado a la ventana */
+  .stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px; transform-origin: center center; background: var(--bg); overflow: hidden; transition: background .3s ease; }
+  .slide { position: absolute; inset: 0; padding: 72px 80px 60px; display: flex; flex-direction: column; opacity: 0; visibility: hidden; transition: opacity .2s ease-out, visibility 0s linear .2s; }
+  .slide.active { opacity: 1; visibility: visible; transition: opacity .25s ease-out; }
+  .slide.hero { background: var(--hero); color: var(--on-hero); }
+  .slide.video { padding: 0; background: #051F20; }
+  .slide.video video { width: 100%; height: 100%; object-fit: contain; display: block; background: #051F20; }
+
+  /* Entrada escalonada: sube 12 px y aparece; ~60 ms entre elementos */
+  .rise { opacity: 0; transform: translateY(12px); }
+  .slide.active .rise { animation: rise .5s var(--ease-out) both; animation-delay: var(--d, 0s); }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .rise, .slide.active .rise { animation: none; opacity: 1; transform: none; }
+    .slide { transition: none; }
+  }
+
+  .who { position: absolute; top: 26px; left: 80px; right: 80px; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+  .who::before { content: ""; width: 24px; height: 2px; background: var(--accent); }
+  .who .t { margin-left: auto; font-family: var(--mono); letter-spacing: 0; font-weight: 600; }
+  .hero .who { color: var(--on-hero-2); }
+  .hero .who::before { background: var(--on-hero-2); }
+
+  .kicker { font-size: 16px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .hero .kicker { color: var(--on-hero-2); }
+  h1, h2 { font-weight: 800; letter-spacing: -.02em; line-height: 1.06; }
+  h1 { font-size: 120px; }
+  h2 { font-size: 56px; max-width: 1080px; }
+  h3 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+  .lead { font-size: 28px; line-height: 1.35; color: var(--ink-2); max-width: 880px; }
+  .hero .lead { color: var(--on-hero-2); }
+  .foot { margin-top: auto; font-size: 18px; line-height: 1.45; color: var(--ink-2); }
+  .hero .foot { color: var(--on-hero-2); }
+  b, strong { font-weight: 700; }
+  .center { margin-top: auto; margin-bottom: auto; }
+
+  .badge { display: inline-block; font-size: 14px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; padding: 5px 12px; border-radius: 8px; }
+  .b-ok { background: var(--ok-bg); color: var(--ok); }
+  .b-sim { background: var(--warn-bg); color: var(--warn); }
+  .b-falta { background: var(--bad-bg); color: var(--bad); }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 28px 30px; box-shadow: var(--shadow); }
+  .card li { list-style: none; font-size: 26px; line-height: 1.3; color: var(--ink-2); margin-bottom: 14px; }
+  .card li:last-child { margin-bottom: 0; }
+  .card li::before { content: "·"; margin-right: 12px; font-weight: 800; color: var(--accent); }
+  .grid { display: grid; gap: 22px; }
+  .g2 { grid-template-columns: 1fr 1fr; } .g3 { grid-template-columns: repeat(3, 1fr); } .g4 { grid-template-columns: repeat(4, 1fr); }
+
+  .big { font-weight: 800; letter-spacing: -.03em; line-height: 1; font-size: 108px; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip { font-size: 17px; font-weight: 600; background: var(--card-2); color: var(--accent); border-radius: 999px; padding: 7px 16px; }
+
+  /* Slide 4: avances */
+  .tile { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 28px 30px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 12px; }
+  .tile .was { font-size: 18px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+  .tile .now { font-size: 31px; font-weight: 800; letter-spacing: -.015em; line-height: 1.15; color: var(--ink); }
+
+  /* Slide 5: demo */
+  .demo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .demo .s { display: flex; align-items: center; gap: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 26px 28px; box-shadow: var(--shadow); font-size: 30px; font-weight: 700; }
+  .demo .n { width: 48px; height: 48px; flex: none; border-radius: 14px; background: var(--accent); color: var(--on-accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 24px; }
+
+  /* Flujos: un teléfono, el recorrido paso a paso */
+  .slide.flow { padding-top: 0; padding-bottom: 0; }
+  .ftxt { position: absolute; left: 80px; top: 78px; width: 600px; display: flex; flex-direction: column; }
+  .fsteps { list-style: none; margin-top: 34px; display: flex; flex-direction: column; gap: 6px; }
+  .fsteps li { display: flex; gap: 18px; align-items: flex-start; padding: 12px 0; opacity: .34; transition: opacity .22s ease-out; }
+  .fsteps li.on { opacity: 1; }
+  .fsteps .n { flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--card-2); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; transition: background .22s ease-out, color .22s ease-out; }
+  .fsteps li.on .n { background: var(--accent); color: var(--on-accent); }
+  .fsteps b { display: block; font-size: 30px; line-height: 1.15; letter-spacing: -.01em; padding-top: 3px; }
+  .fsteps .d { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .24s var(--ease-out); }
+  .fsteps li.on .d { grid-template-rows: 1fr; }
+  .fsteps .d > p { overflow: hidden; min-height: 0; font-size: 22px; line-height: 1.35; color: var(--ink-2); opacity: 0; transition: opacity .2s ease-out; }
+  .fsteps li.on .d > p { opacity: 1; padding-top: 6px; }
+
+  .phone3 { position: absolute; right: 120px; top: 40px; width: 306px; height: 640px; padding: 9px; border-radius: 46px; background: #0A1412; box-shadow: 0 0 0 1px rgba(142,182,155,.28), 0 24px 60px rgba(5,31,32,.28); cursor: pointer; }
+  .phone3 .screen { position: relative; width: 288px; height: 622px; border-radius: 38px; overflow: hidden; background: #0C1210; }
+  .phone3 .scr { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; opacity: 0; transform: translateX(7%); filter: blur(3px); transition: opacity .22s ease-out, transform .3s var(--ease-out), filter .22s ease-out; will-change: transform, opacity; }
+  .phone3 .scr.on { opacity: 1; transform: none; filter: none; }
+  .phone3 .scr.before { transform: translateX(-4%); }
+  .phone3 .tap { position: absolute; width: 58px; height: 58px; margin: -29px 0 0 -29px; border-radius: 50%; border: 3px solid #DAF1DE; background: rgba(218,241,222,.28); opacity: 0; pointer-events: none; z-index: 2; }
+  .phone3 .vacia { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; font-family: var(--mono); font-size: 14px; color: var(--warn); background: var(--warn-bg); }
+  @media (prefers-reduced-motion: reduce) { .phone3 .scr { transform: none; filter: none; transition: opacity .2s ease; } }
+
+  /* Diagrama */
+  svg.dia { width: 100%; height: auto; }
+  svg.dia text { font-family: var(--sans); fill: var(--ink); }
+  svg.dia .box { fill: var(--card); stroke: var(--line); stroke-width: 2; }
+  svg.dia .core { fill: var(--hero); stroke: var(--hero); }
+  svg.dia .llm { fill: none; stroke: var(--warn); stroke-width: 2; stroke-dasharray: 7 6; }
+  svg.dia .sub { font-size: 20px; fill: var(--ink-2); }
+  svg.dia .ttl { font-size: 27px; font-weight: 700; }
+  svg.dia .arrow { stroke: var(--accent); stroke-width: 3; fill: none; }
+  svg.dia .arrow.d { stroke: var(--warn); stroke-dasharray: 7 6; }
+  svg.dia .tagt { font-size: 16px; font-weight: 800; letter-spacing: .06em; }
+  svg.dia .band { fill: var(--card-2); }
+  svg.dia text.oh { fill: var(--on-hero); }
+  svg.dia text.oh2 { fill: var(--on-hero-2); }
+
+  /* Estado y IA */
+  .col { display: flex; flex-direction: column; gap: 14px; }
+  .col .badge { align-self: flex-start; }
+  .col .card { flex: none; }
+  .hero .row { display: flex; gap: 22px; }
+  .hero .pane { flex: 1; background: var(--hero-2); border-radius: 22px; padding: 26px 30px; }
+  .hero .pane h3 { color: var(--on-hero); }
+  .hero .pane li { list-style: none; font-size: 26px; line-height: 1.35; color: var(--on-hero-2); margin-bottom: 8px; }
+  .hero .pane li::before { content: "·"; margin-right: 12px; font-weight: 800; color: var(--on-hero); }
+  .mark { width: 64px; height: 64px; color: var(--on-hero); }
+  .quote { font-size: 46px; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+
+  /* Controles */
+  .ctrl { position: fixed; bottom: 14px; right: 16px; display: flex; align-items: center; gap: 8px; z-index: 10; transition: opacity .3s; }
+  .ctrl button { font: 600 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 10px; padding: 8px 12px; cursor: pointer; transition: transform .16s ease-out; }
+  .ctrl button:active { transform: scale(.97); }
+  .ctrl button:hover { border-color: var(--accent); }
+  .ctrl button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #counter { font-family: var(--mono); font-size: 14px; color: var(--ink-2); padding: 0 6px; }
+  #timer { display: none; font-family: var(--mono); font-size: 14px; color: var(--ink-2); }
+  body.show-timer #timer { display: inline; }
+  #progress { position: fixed; left: 0; bottom: 0; height: 4px; width: 0; background: var(--accent); transition: width .3s ease; z-index: 10; }
+  body.fs.idle .ctrl { opacity: 0; } body.fs.idle { cursor: none; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <!-- 1 · Video de presentación (1:26). Espacio o K: reproducir y pausar. -->
+  <section class="slide video" id="slide-video">
+    <video id="intro" controls playsinline preload="metadata" poster="assets/poster-video.jpg" src="videos/Vuelto_profesional_final_v2.mp4"></video>
+  </section>
+
+  <!-- 2 · Portada -->
+  <section class="slide hero">
+    <div class="who">Joaquín<span class="t">0:10</span></div>
+    <div class="center">
+      <svg class="mark rise" viewBox="0 0 1024 1024" aria-hidden="true" style="margin-bottom:30px"><path fill="currentColor" d="M 330 270 L 405 270 L 590 560 C 612 594 646 615 686 615 C 652 647 606 660 565 642 C 542 632 523 613 508 590 Z M 710 285 C 665 308 623 330 592 359 C 555 393 548 437 570 477 C 583 501 599 518 618 535 C 611 501 622 471 648 448 C 675 424 713 408 747 389 C 780 371 795 341 795 285 C 767 300 739 315 710 285 Z"/></svg>
+      <h1 class="rise" style="--d:.06s">Vuelto</h1>
+      <p class="lead rise" style="--d:.12s; margin-top:18px">Entrega del MVP · de la recomendación al tope</p>
+    </div>
+    <p class="foot rise" style="--d:.18s">Joaquín Nuñez · Jesús Quijada · Agustín Herrero · Santiago Pazos · Seminario de Integración Profesional · UADE</p>
+  </section>
+
+  <!-- 3 · Problema -->
+  <section class="slide">
+    <div class="who">Joaquín<span class="t">0:40</span></div>
+    <div class="center">
+      <h2 class="rise" style="font-size:76px">No falta información.<br><span style="color:var(--accent)">Falta la decisión.</span></h2>
+      <div class="grid g2" style="margin-top:44px">
+        <div class="card rise" style="--d:.1s"><h3>Hoy, en la caja</h3><p style="font-size:26px; line-height:1.3; color:var(--ink-2)">La promo cambia por día y por tarjeta. El tope se comparte y no se ve.</p></div>
+        <div class="card rise" style="--d:.16s; background:var(--hero); border-color:var(--hero)"><h3 style="color:var(--on-hero)">Con Vuelto</h3><p style="font-size:26px; line-height:1.3; color:var(--on-hero-2)">Te dice con qué pagar y cuánto tope te queda.</p></div>
+      </div>
+    </div>
+    <p class="foot rise" style="--d:.22s">Encuesta propia, 51 respuestas: 98% se enteró de una promo mejor después de pagar.</p>
+  </section>
+
+  <!-- 4 · Agenda -->
+  <section class="slide">
+    <div class="who">Joaquín<span class="t">0:15</span></div>
+    <div class="kicker rise" style="margin-top:18px">Qué vamos a ver</div>
+    <h2 class="rise" style="--d:.05s">Tres cosas, en diez minutos</h2>
+    <div class="grid center" style="gap:20px">
+      <div class="tile rise" style="--d:.1s"><span class="was">1 · Cómo se usa</span><span class="now">Empezar, decidir, registrar y gasto en grupo</span></div>
+      <div class="tile rise" style="--d:.16s"><span class="was">2 · Por dentro</span><span class="now">El motor en la app y la ingesta de promos</span></div>
+      <div class="tile rise" style="--d:.22s"><span class="was">3 · Dónde estamos</span><span class="now">Estado real, avances y uso de IA</span></div>
+    </div>
+  </section>
+
+  <!-- 5 · Flujo: empezar sin cuenta -->
+  <section class="slide flow" data-steps="2">
+    <div class="who">Joaquín<span class="t">0:30</span></div>
+    <div class="ftxt">
+      <div class="kicker rise">Empezar sin cuenta</div>
+      <h2 class="rise" style="--d:.05s">Se prueba antes de crear la cuenta</h2>
+      <ol class="fsteps rise" style="--d:.12s">
+        <li><span class="n">1</span><div><b>Bienvenida</b><div class="d"><p>Sin cuenta, sin conectar el banco.</p></div></div></li>
+        <li><span class="n">2</span><div><b>Primera respuesta</b><div class="d"><p>Elegís un comercio y ves con qué pagar hoy. La cuenta viene al final.</p></div></div></li>
+      </ol>
+    </div>
+    <div class="phone3 rise" style="--d:.1s"><div class="screen">
+      <img class="scr" src="assets/capturas/bienvenida.jpg" alt="Bienvenida, sin cuenta">
+      <img class="scr" src="assets/capturas/primera-respuesta.jpg" data-tap="50,83.5" alt="Primera respuesta: te conviene Galicia Visa crédito en COTO">
+      <span class="tap"></span>
+    </div></div>
+  </section>
+
+  <!-- 6 · Flujo: decidir -->
+  <section class="slide flow" data-steps="5">
+    <div class="who">Joaquín<span class="t">0:50</span></div>
+    <div class="ftxt">
+      <div class="kicker rise">Decidir</div>
+      <h2 class="rise" style="--d:.05s">Una compra, una recomendación</h2>
+      <ol class="fsteps rise" style="--d:.12s">
+        <li><span class="n">1</span><div><b>Inicio</b><div class="d"><p>Lo devuelto este mes y el tope que queda.</p></div></div></li>
+        <li><span class="n">2</span><div><b>Comprar</b><div class="d"><p>Elegís dónde estás comprando.</p></div></div></li>
+        <li><span class="n">3</span><div><b>Monto</b><div class="d"><p>Cuánto vas a pagar.</p></div></div></li>
+        <li><span class="n">4</span><div><b>Recomendación</b><div class="d"><p>Al 25% le queda poco tope: conviene el 20%. Se calcula en el celular, sin red.</p></div></div></li>
+        <li><span class="n">5</span><div><b>Voy a pagar</b><div class="d"><p>Queda por confirmar; no cuenta en tus topes hasta entonces.</p></div></div></li>
+      </ol>
+    </div>
+    <div class="phone3 rise" style="--d:.1s"><div class="screen">
+      <img class="scr" src="assets/capturas/inicio.jpg" alt="Inicio">
+      <img class="scr" src="assets/capturas/comprar.jpg" data-tap="50,93.6" alt="Comprar: elegir el comercio">
+      <img class="scr" src="assets/capturas/monto.jpg" data-tap="48,18.7" alt="Monto: $40.000 en Natural Life">
+      <img class="scr" src="assets/capturas/recomendacion.jpg" data-tap="50,95.3" alt="Recomendación: Galicia Visa crédito, 20%">
+      <img class="scr" src="assets/capturas/pagar.jpg" data-tap="50,95.3" alt="Pagá con Galicia">
+      <span class="tap"></span>
+    </div></div>
+  </section>
+
+  <!-- 7 · Flujo: registrar y controlar -->
+  <section class="slide flow" data-steps="4">
+    <div class="who">Joaquín<span class="t">0:40</span></div>
+    <div class="ftxt">
+      <div class="kicker rise">Registrar y controlar</div>
+      <h2 class="rise" style="--d:.05s">La foto del ticket mantiene el tope al día</h2>
+      <ol class="fsteps rise" style="--d:.12s">
+        <li><span class="n">1</span><div><b>Escanear el ticket</b><div class="d"><p>La foto no se guarda: se lee y se descarta.</p></div></div></li>
+        <li><span class="n">2</span><div><b>Revisá tu compra</b><div class="d"><p>Comercio, monto y medio. Lo confirma el usuario.</p></div></div></li>
+        <li><span class="n">3</span><div><b>Tus compras</b><div class="d"><p>Lo registrado en el mes.</p></div></div></li>
+        <li><span class="n">4</span><div><b>Tus topes</b><div class="d"><p>Estimado, con las compras en que se basa.</p></div></div></li>
+      </ol>
+    </div>
+    <div class="phone3 rise" style="--d:.1s"><div class="screen">
+      <img class="scr" src="assets/capturas/escanear.jpg" alt="Escaneá el ticket">
+      <img class="scr" src="assets/capturas/revisa.jpg" data-tap="50,49.6" alt="Revisá tu compra">
+      <img class="scr" src="assets/capturas/compras.jpg" data-tap="50,95.3" alt="Tus compras">
+      <img class="scr" src="assets/capturas/topes.jpg" data-tap="87,49" alt="Tus topes">
+      <span class="tap"></span>
+    </div></div>
+  </section>
+
+  <!-- 8 · Flujo: gasto en grupo -->
+  <section class="slide flow" data-steps="4">
+    <div class="who">Jesús<span class="t">0:50</span></div>
+    <div class="ftxt">
+      <div class="kicker rise">Gasto en grupo</div>
+      <h2 class="rise" style="--d:.05s">Entre varios: quién conviene que pague</h2>
+      <ol class="fsteps rise" style="--d:.12s">
+        <li><span class="n">1</span><div><b>Contactos</b><div class="d"><p>Solo se ve el nombre y qué medio conviene.</p></div></div></li>
+        <li><span class="n">2</span><div><b>Invitar</b><div class="d"><p>QR o link, una sola vez. No se comparten compras ni tarjetas.</p></div></div></li>
+        <li><span class="n">3</span><div><b>Armar el grupo</b><div class="d"><p>Contactos vinculados y gente sin cuenta.</p></div></div></li>
+        <li><span class="n">4</span><div><b>Resultado</b><div class="d"><p>Quién paga y cuánto pone cada uno. Lo calcula una función del servidor con el mismo motor.</p></div></div></li>
+      </ol>
+    </div>
+    <div class="phone3 rise" style="--d:.1s"><div class="screen">
+      <img class="scr" src="assets/capturas/grupo-contactos.jpg" alt="Contactos: Lucía vinculada">
+      <img class="scr" src="assets/capturas/grupo-invitar.jpg" data-tap="50,35.5" alt="Invitar a alguien con un QR o un link">
+      <img class="scr" src="assets/capturas/grupo-armar.jpg" alt="Pagan entre varios: armar el grupo con Lucía">
+      <img class="scr" src="assets/capturas/grupo-resultado.jpg" data-tap="50,95.3" alt="Quién conviene que pague">
+      <span class="tap"></span>
+    </div></div>
+  </section>
+
+  <!-- 9 · Estado real -->
+  <section class="slide">
+    <div class="who">Jesús<span class="t">1:00</span></div>
+    <div class="kicker rise" style="margin-top:18px">Estado real del MVP</div>
+    <h2 class="rise" style="--d:.05s">Qué funciona y qué falta</h2>
+    <div class="grid g3" style="margin-top:40px; align-items:start">
+      <div class="col rise" style="--d:.1s"><span class="badge b-ok">Funciona</span>
+        <div class="card"><ul>
+          <li>Ingesta y motor en la app</li>
+          <li>Probar sin cuenta</li>
+          <li>Registrar con la foto, con su lectura medida</li>
+          <li>Gasto en grupo</li>
+          <li>Auditoría de secretos en el CI</li>
+        </ul></div></div>
+      <div class="col rise" style="--d:.16s"><span class="badge b-sim">En curso</span>
+        <div class="card"><ul>
+          <li>Chequeo de la ingesta (#52)</li>
+          <li>APK de respaldo (#56)</li>
+        </ul></div></div>
+      <div class="col rise" style="--d:.22s"><span class="badge b-falta">Mejoras</span>
+        <div class="card"><ul>
+          <li>Detalles de la promo con Gemini</li>
+          <li>Medir la lectura con más tickets</li>
+        </ul></div></div>
+    </div>
+  </section>
+
+  <!-- 10 · Arquitectura -->
+  <section class="slide">
+    <div class="who">Agustín<span class="t">0:50</span></div>
+    <div class="kicker rise" style="margin-top:18px">Por dentro</div>
+    <h2 class="rise" style="--d:.05s">El motor corre en la app, sin red</h2>
+    <div class="center">
+      <svg class="dia rise" style="--d:.12s" viewBox="0 0 1120 380" role="img" aria-label="Diagrama: API pública de promociones, ingesta diaria, Supabase y app con motor de reglas. Fuera del camino crítico: Groq para tickets, en uso, y una función para el gasto en grupo, sin modelo de lenguaje.">
+        <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker><marker id="ahd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--warn)"/></marker></defs>
+        <rect class="band" x="0" y="0" width="1120" height="170" rx="20"/>
+        <text x="22" y="32" class="tagt" style="fill:var(--accent)">CAMINO CRÍTICO · SIN MODELO DE LENGUAJE</text>
+
+        <rect class="box" x="22" y="56" width="230" height="90" rx="16"/>
+        <text x="40" y="94" class="ttl">API pública</text><text x="40" y="125" class="sub">de promociones</text>
+
+        <rect class="box" x="322" y="56" width="250" height="90" rx="16"/>
+        <text x="340" y="94" class="ttl">Ingesta diaria</text><text x="340" y="125" class="sub">mapeo por código</text>
+
+        <rect class="box" x="642" y="56" width="220" height="90" rx="16"/>
+        <text x="660" y="94" class="ttl">Supabase</text><text x="660" y="125" class="sub">promos y compras</text>
+
+        <rect class="box core" x="932" y="56" width="166" height="90" rx="16"/>
+        <text x="950" y="94" class="ttl oh">App Expo</text><text x="950" y="125" class="sub oh2">motor, sin red</text>
+
+        <path class="arrow" d="M252 101 H318" marker-end="url(#ah)"/>
+        <path class="arrow" d="M572 101 H638" marker-end="url(#ah)"/>
+        <path class="arrow" d="M862 101 H928" marker-end="url(#ah)"/>
+
+        <text x="22" y="222" class="tagt" style="fill:var(--warn)">FUERA DEL CAMINO CRÍTICO</text>
+        <text x="22" y="252" class="sub">El LLM extrae datos,</text><text x="22" y="278" class="sub">nunca decide.</text>
+
+        <rect class="llm" x="642" y="214" width="220" height="150" rx="16"/>
+        <text x="660" y="254" class="ttl">Ticket</text><text x="660" y="284" class="sub">Groq · Edge Function</text>
+        <text x="660" y="326" class="tagt" style="fill:var(--ok)">EN USO</text>
+
+        <rect class="box" x="912" y="214" width="186" height="150" rx="16"/>
+        <text x="930" y="254" class="ttl">En grupo</text><text x="930" y="284" class="sub">Edge Function</text>
+        <text x="930" y="326" class="tagt" style="fill:var(--ok)">SIN LLM</text>
+
+        <path class="arrow d" d="M752 214 V150" marker-end="url(#ahd)"/>
+        <path class="arrow" d="M1005 214 V150" marker-end="url(#ah)"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 11 · Ingesta y privacidad -->
+  <section class="slide">
+    <div class="who">Agustín<span class="t">0:50</span></div>
+    <div class="kicker rise" style="margin-top:18px">Ingesta y privacidad</div>
+    <h2 class="rise" style="--d:.05s">Promos al día, y ninguna foto guardada</h2>
+    <div class="grid g3 center" style="gap:22px">
+      <div class="card rise" style="--d:.1s"><div class="big">3244</div><p style="font-size:24px; color:var(--ink-2); margin-top:14px; line-height:1.3">promos publicables en la corrida del 17/11</p></div>
+      <div class="card rise" style="--d:.16s"><div class="big">1<span style="font-size:56px; color:var(--ink-2)"> de 10</span></div><p style="font-size:24px; color:var(--ink-2); margin-top:14px; line-height:1.3">corridas falló; desde el 11/11 pasaron todas</p></div>
+      <div class="card rise" style="--d:.22s"><div class="big">0</div><p style="font-size:24px; color:var(--ink-2); margin-top:14px; line-height:1.3">fotos de ticket guardadas: se leen y se descartan</p></div>
+    </div>
+    <p class="foot rise" style="--d:.3s">Sin modelo de lenguaje y sin revisión humana en la ingesta. Se guarda el texto extraído, solo si el usuario confirma.</p>
+  </section>
+
+  <!-- 12 · Avances -->
+  <section class="slide">
+    <div class="who">Santiago<span class="t">0:50</span></div>
+    <div class="kicker rise" style="margin-top:18px">Desde la entrega anterior</div>
+    <h2 class="rise" style="--d:.05s">Lo que era de ejemplo, ahora funciona</h2>
+    <div class="grid g2" style="margin-top:34px; gap:20px">
+      <div class="tile rise" style="--d:.1s"><span class="was">Ticket</span><span class="now">Foto con la cámara, leída con Groq</span></div>
+      <div class="tile rise" style="--d:.16s"><span class="was">Gasto en grupo</span><span class="now">Invitación por QR o link</span></div>
+      <div class="tile rise" style="--d:.22s"><span class="was">Empezar</span><span class="now">Se prueba sin crear la cuenta</span></div>
+      <div class="tile rise" style="--d:.28s"><span class="was">Comercio</span><span class="now">Un local, un solo nombre</span></div>
+    </div>
+    <div class="chips rise" style="--d:.34s; margin-top:auto"><span class="chip">1804 tests en verde</span><span class="chip">CI con 7 chequeos</span><span class="chip">83 PRs mergeados</span></div>
+  </section>
+
+  <!-- 13 · IA -->
+  <section class="slide">
+    <div class="who">Santiago<span class="t">0:30</span></div>
+    <div class="kicker rise" style="margin-top:18px">Uso de IA</div>
+    <h2 class="rise" style="--d:.05s">Extrae datos; nunca decide</h2>
+    <div class="grid g2 center" style="gap:22px">
+      <div class="card rise" style="--d:.1s">
+        <h3>En el producto</h3>
+        <ul><li>Groq lee tickets</li><li>Mejora: Gemini para los detalles de la letra chica</li><li>El motor no tiene LLM</li></ul>
+      </div>
+      <div class="card rise" style="--d:.16s">
+        <h3>Para construir</h3>
+        <ul><li>Claude Code con spec-kit</li><li>Una persona decide</li><li>Bitácora con los errores de la IA</li></ul>
+      </div>
+    </div>
+    <p class="foot rise" style="--d:.24s">Todo está declarado en <span style="font-family:var(--mono)">docs/uso-de-ia.md</span>.</p>
+  </section>
+
+  <!-- 14 · Cierre -->
+  <section class="slide hero">
+    <div class="who">Santiago<span class="t">0:20</span></div>
+    <div style="margin-top:18px">
+      <div class="kicker rise">Cierre</div>
+      <div class="row rise" style="--d:.08s; margin-top:10px">
+        <div class="pane"><h3>Hecho</h3><ul><li>Decide con qué pagar</li><li>Registra con la foto</li><li>Muestra el tope que queda</li><li>Decide quién paga</li></ul></div>
+        <div class="pane"><h3>Sigue</h3><ul><li>Detalles de la promo con Gemini</li><li>Medir la lectura con más tickets</li><li>APK de respaldo</li></ul></div>
+      </div>
+    </div>
+    <div style="margin-top:auto">
+      <p class="quote rise" style="--d:.2s">Vuelto decide con código, mide con datos y dice lo que todavía no hace.</p>
+      <p class="lead rise" style="--d:.28s; margin-top:14px">Gracias. ¿Preguntas?</p>
+    </div>
+  </section>
+
+</div>
+
+<div class="ctrl">
+  <span id="timer">00:00</span>
+  <span id="counter">1 / 14</span>
+  <button id="theme" type="button" title="Modo claro u oscuro (D)">Claro / oscuro</button>
+  <button id="prev" type="button" aria-label="Anterior">←</button>
+  <button id="next" type="button" aria-label="Siguiente">→</button>
+  <button id="present" type="button" title="Pantalla completa (F)">Pantalla completa</button>
+</div>
+<div id="progress"></div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var stage = document.getElementById('stage');
+  var counter = document.getElementById('counter');
+  var progress = document.getElementById('progress');
+  var root = document.documentElement;
+  var intro = document.getElementById('intro');
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cur = 0, step = 0, pending = null;
+
+  function stepsOf(i) { return parseInt(slides[i].getAttribute('data-steps') || '1', 10); }
+  function toggleIntro() { if (intro.paused) { var p = intro.play(); if (p && p.catch) p.catch(function () {}); } else intro.pause(); }
+
+  /* Tema: el guardado, o el del sistema */
+  function setTheme(t) { root.setAttribute('data-theme', t); try { localStorage.setItem('vuelto-deck-tema', t); } catch (e) {} }
+  var saved = null;
+  try { saved = localStorage.getItem('vuelto-deck-tema'); } catch (e) {}
+  setTheme(saved || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+  function toggleTheme() { setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
+  document.getElementById('theme').addEventListener('click', toggleTheme);
+
+  /* Capturas que faltan: se marcan como pendientes en vez de mostrar una imagen rota */
+  Array.prototype.forEach.call(document.querySelectorAll('.phone3 .scr'), function (img) {
+    function vacia() {
+      if (img.getAttribute('data-vacia')) return;
+      img.setAttribute('data-vacia', '1');
+      img.style.visibility = 'hidden';
+      var s = document.createElement('div'); s.className = 'vacia';
+      s.textContent = '[PENDIENTE: captura ' + (img.getAttribute('src') || '').replace('assets/capturas/', '') + ']';
+      img.parentNode.appendChild(s);
+    }
+    img.addEventListener('error', vacia);
+    if (img.complete && img.naturalWidth === 0) vacia();
+  });
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+
+  /* Un paso dentro de un flujo: pantalla del teléfono y lista de la izquierda */
+  function paint() {
+    var el = slides[cur];
+    var scr = el.querySelectorAll('.scr');
+    for (var i = 0; i < scr.length; i++) {
+      scr[i].classList.toggle('on', i === step);
+      scr[i].classList.toggle('before', i < step);
+    }
+    var li = el.querySelectorAll('.fsteps li');
+    for (var j = 0; j < li.length; j++) li[j].classList.toggle('on', j === step);
+  }
+  function render() {
+    slides.forEach(function (el, i) { el.classList.toggle('active', i === cur); });
+    if (cur !== 0 && !intro.paused) intro.pause();
+    paint();
+    counter.textContent = (cur + 1) + ' / ' + slides.length;
+    progress.style.width = ((cur + 1) / slides.length * 100) + '%';
+    try { history.replaceState(null, '', '#' + (cur + 1) + (stepsOf(cur) > 1 ? '.' + (step + 1) : '')); } catch (e) {}
+  }
+  function go(n, s) {
+    if (pending) { clearTimeout(pending); pending = null; }
+    cur = Math.max(0, Math.min(slides.length - 1, n));
+    step = Math.max(0, Math.min(stepsOf(cur) - 1, s || 0));
+    render();
+  }
+
+  /* Avanzar: dentro de un flujo, primero el «toque» en la pantalla y después el cambio.
+     Si se aprieta de nuevo mientras tanto, el cambio pendiente se aplica ya (interrumpible). */
+  function tapAt(scr) {
+    var ring = slides[cur].querySelector('.tap');
+    var xy = (scr.getAttribute('data-tap') || '').split(',');
+    if (!ring || xy.length < 2 || reduce) return false;
+    ring.style.left = xy[0] + '%'; ring.style.top = xy[1] + '%';
+    ring.animate(
+      [{ opacity: 0, transform: 'scale(.7)' }, { opacity: 1, transform: 'scale(1)', offset: .3 }, { opacity: 0, transform: 'scale(1.2)' }],
+      { duration: 380, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' }
+    );
+    return true;
+  }
+  function next() {
+    if (pending) { clearTimeout(pending); pending = null; step++; render(); return; }
+    if (step < stepsOf(cur) - 1) {
+      var dest = slides[cur].querySelectorAll('.scr')[step + 1];
+      if (dest && tapAt(dest)) {
+        pending = setTimeout(function () { pending = null; step++; render(); }, 260);
+      } else { step++; render(); }
+    } else if (cur < slides.length - 1) { go(cur + 1, 0); }
+  }
+  function prev() {
+    if (pending) { clearTimeout(pending); pending = null; }
+    if (step > 0) { step--; render(); }
+    else if (cur > 0) { go(cur - 1, stepsOf(cur - 1) - 1); }
+  }
+  document.getElementById('next').addEventListener('click', next);
+  document.getElementById('prev').addEventListener('click', prev);
+  Array.prototype.forEach.call(document.querySelectorAll('.phone3'), function (p) { p.addEventListener('click', next); });
+  window.addEventListener('resize', fit);
+
+  document.addEventListener('keydown', function (e) {
+    var k = e.key;
+    if (cur === 0 && (k === ' ' || k === 'k' || k === 'K')) { e.preventDefault(); toggleIntro(); }
+    else if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); next(); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); prev(); }
+    else if (k === 'Home') go(0, 0);
+    else if (k === 'End') go(slides.length - 1, 0);
+    else if (k === 'f' || k === 'F') toggleFs();
+    else if (k === 'd' || k === 'D') toggleTheme();
+    else if (k === 't' || k === 'T') toggleTimer();
+  });
+
+  function toggleFs() {
+    var el = document.documentElement;
+    if (!document.fullscreenElement) { if (el.requestFullscreen) el.requestFullscreen().catch(function () {}); }
+    else if (document.exitFullscreen) document.exitFullscreen();
+  }
+  document.addEventListener('fullscreenchange', function () {
+    document.body.classList.toggle('fs', !!document.fullscreenElement);
+    document.body.classList.remove('idle');
+    fit();
+  });
+  document.getElementById('present').addEventListener('click', toggleFs);
+
+  var idleT;
+  function wake() { document.body.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(function () { document.body.classList.add('idle'); }, 2500); }
+  document.addEventListener('mousemove', wake);
+  document.addEventListener('mousedown', wake);
+
+  var timerEl = document.getElementById('timer'), t0 = null, tick = null;
+  function fmt(n) { return (n < 10 ? '0' : '') + n; }
+  function toggleTimer() {
+    var on = document.body.classList.toggle('show-timer');
+    if (on) {
+      t0 = t0 || Date.now();
+      tick = setInterval(function () { var s = Math.floor((Date.now() - t0) / 1000); timerEl.textContent = fmt(Math.floor(s / 60)) + ':' + fmt(s % 60); }, 500);
+    } else { clearInterval(tick); t0 = null; timerEl.textContent = '00:00'; }
+  }
+
+  var sx = null;
+  document.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (sx === null) return;
+    var dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+    sx = null;
+  }, { passive: true });
+
+  fit();
+  function fromHash() {
+    var m = (location.hash || '').replace('#', '').split('.');
+    var start = parseInt(m[0], 10), st = parseInt(m[1], 10);
+    var n = isNaN(start) ? 0 : start - 1, s = isNaN(st) ? 0 : st - 1;
+    if (n !== cur || s !== step) go(n, s);
+  }
+  window.addEventListener('hashchange', fromHash);
+  cur = -1; fromHash();
+})();
+</script>
+</body>
+</html>

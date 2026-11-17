@@ -5,7 +5,9 @@
 - **Formato:** presencial, con proyector. **Sin demo en vivo**: el recorrido de la app se
   muestra con capturas animadas (un teléfono por slide, paso a paso) de la app del 17/11.
   Ver «Qué son las capturas» en las preguntas probables.
-- **Deck:** [`vuelto-mvp.html`](vuelto-mvp.html), 14 slides. Abrirlo en el navegador y
+- **Deck:** [`vuelto-mvp-v2.html`](vuelto-mvp-v2.html), 14 slides (la v2 del 17/11, con el
+  estado al día y la letra chica como mejora, ADR-014; `vuelto-mvp.html` queda como la
+  versión anterior). Abrirlo en el navegador y
   apretar `F` para pantalla completa. `D` cambia entre claro y oscuro, `T` prende un
   cronómetro, `←` `→` pasan de slide.
 - **La slide 1 es el video de presentación** (`videos/Vuelto_profesional_final_v2.mp4`,
@@ -115,30 +117,36 @@ $15.000.
 **Slide 9 · Estado real** (1:00)
 - **Funciona de punta a punta:** ingesta y sincronización, motor en la app, probar sin
   cuenta y crearla al final (#112), perfil y compras con RLS, registrar la compra con la
-  foto y gasto en grupo con contactos vinculados.
-- **En curso:** detalles del gasto en grupo (#138, #139), chequeo de salud de la ingesta
-  (#52).
-- **Falta:** extractor de letra chica (#51); medir la precisión del lector de tickets y
-  del extractor (#10, #53): **no tenemos una cifra**, y probar la función con 3 tickets no
-  mide nada; auditoría de secretos (#55); APK de respaldo (#56). El borrado a los 90 días
-  es una política, no un proceso corriendo.
+  foto, gasto en grupo con contactos vinculados y la auditoría de secretos en el CI (#55).
+- **La lectura del ticket está medida** (#10): en 5 tickets reales acertó monto, fecha y
+  comercio en los 5, y el medio de pago en los 3 que lo traían. Es una muestra chica: lo
+  decimos así, como un indicio.
+- **En curso:** chequeo de salud de la ingesta (#52) y APK de respaldo (#56).
+- **Mejoras:** leer los detalles de la letra chica con Gemini (#51, ADR-014) y medir la
+  lectura con más tickets. El borrado a los 90 días es una política, no un proceso
+  corriendo.
 
 ## Agustín — Por dentro (slides 10 y 11, 1:40)
 
 **Slide 10 · Arquitectura**
-- API de MODO → ingesta diaria → Supabase → app Expo. **El motor corre en el celular**,
-  sin red.
-- **Ningún modelo de lenguaje entra al motor.** Groq lee tickets y ya se usa desde la app;
-  la lectura de letra chica con Gemini **no está hecha**.
+- API pública de promociones → ingesta diaria → Supabase → app Expo. **El motor corre en
+  el celular**, sin red y siempre con la misma respuesta para los mismos datos.
+- **Ningún modelo de lenguaje entra al motor ni decide.** Groq lee la foto del ticket y lo
+  leído aparece como sugerencia: el usuario confirma.
 - El gasto en grupo es otra Edge Function que usa el mismo motor, sin LLM.
+- Se puede mencionar, sin que esté en la slide: casi todos los datos de la promo llegan
+  ordenados por la API; leer los detalles de la letra chica con Gemini es una mejora.
 
 **Slide 11 · Ingesta y privacidad**
-- Corrida del 15/11: **3151 promos publicables**, 696 descartadas por nivel de cliente y
-  18 por topes que el motor no modela. Unos 43 minutos.
-- De las últimas 10 corridas **fallaron 2** (7 y 10/11); las últimas 5 pasaron.
+- Corrida del 17/11: **3244 promos publicables**, 710 descartadas por nivel de cliente y
+  22 por topes que el motor no modela. Unos 45 minutos.
+- De las últimas 10 corridas **falló 1** (10/11); desde el 11/11 pasaron todas. El 16/11
+  GitHub no disparó la corrida programada: lo va a vigilar el chequeo de salud (#52).
 - La foto del ticket va celular → Edge Function → Groq (Zero Data Retention) y se
   descarta. Se guarda el texto extraído, y solo cuando el usuario confirma.
-- Acumulabilidad y jurisdicción quedan en `null` hasta el extractor de letra chica.
+- Si preguntan por la letra chica: en una muestra de 100 promos del 17/11, ninguna promo
+  general estaba limitada a una provincia y 4 se podían sumar con otras. Leerla con
+  Gemini es una mejora (ADR-014).
 
 ## Santiago — Avances, IA y cierre (slides 12 a 14, 1:40)
 
@@ -150,12 +158,12 @@ $15.000.
 - **Empezar:** antes había que crear la cuenta para probar; ahora se prueba sin cuenta (#112).
 - **Comercio:** el mismo local escrito distinto ya es uno solo (#147), y se sugiere el del
   catálogo que más se parece al del ticket.
-- Números del pie: 1804 tests en verde (corrida local del 17/11), CI con 6 chequeos,
+- Números del pie: 1804 tests en verde (corrida local del 17/11), CI con 7 chequeos,
   83 PRs mergeados.
 
 **Slide 13 · Uso de IA** (0:30)
-- En el producto el LLM extrae datos y no decide: Groq lee tickets; Gemini leerá la letra
-  chica (pendiente); el motor no tiene LLM.
+- En el producto el LLM extrae datos y no decide: Groq lee tickets; leer los detalles de
+  la letra chica con Gemini es una mejora (ADR-014); el motor no tiene LLM.
 - Para construir: Claude Code con spec-kit y agentes de revisión, una persona decide
   alcance y arquitectura, 64 sesiones en la bitácora con los errores de la IA.
 - Todo está en `docs/uso-de-ia.md`.
@@ -168,17 +176,19 @@ con datos y dice lo que todavía no hace.» Gracias, ¿preguntas?
 ## Preguntas probables
 
 - **¿El ticket se lee de verdad?** Sí: la app manda la foto a una Edge Function que la lee
-  con Groq. No medimos la precisión (#10); no decimos un número.
+  con Groq. En 5 tickets reales acertó monto, fecha y comercio en los 5 (#10,
+  `docs/product/precision-extractor.md`); es una muestra chica.
 - **¿Hay que crear una cuenta para probarla?** No: se eligen las tarjetas y se ve con qué
   pagar hoy; la cuenta se pide al guardar el perfil (#112).
-- **¿El gasto en grupo anda?** Sí, con contactos vinculados por invitación. Quedan dos
-  detalles abiertos (#138, #139).
-- **¿Y el extractor de promos?** No existe (#51, #53). Las promos entran por el mapeo por
-  código de los datos de MODO.
+- **¿El gasto en grupo anda?** Sí, con contactos vinculados por invitación.
+- **¿Y la letra chica?** Casi todos los datos de la promo llegan ordenados por una API
+  pública y se mapean por código. Leer la letra chica con Gemini quedó como mejora
+  (ADR-014): en una muestra de 100 promos, ninguna promo general estaba limitada a una
+  provincia y 4 se podían sumar con otras.
 - **¿Por qué el LLM no recomienda?** Rompe el determinismo y los tests.
 - **¿Publicar promos sin revisión humana no es arriesgado?** Decisión aceptada (ADR-011):
-  si falta un campo obligatorio, la promo no se publica. El riesgo se mide con el informe
-  de precisión, que no está.
+  si falta un campo obligatorio, la promo no se publica. Lo que no viene como dato queda
+  vacío, no inventado.
 - **¿Qué pasa con las fotos?** No se guardan: se mandan a Groq y se descartan.
 - **¿Son 4 y la materia pide 6 a 8?** Pendiente de confirmar con la cátedra.
 - **¿Qué son las capturas? ¿No hay demo en vivo?** Son capturas de la app (versión web,
@@ -200,4 +210,4 @@ con datos y dice lo que todavía no hace.» Gracias, ¿preguntas?
 
 1. Día y hora de la entrega.
 2. Prueba en modo avión en un celular real (no se muestra en el deck; solo se dice si preguntan).
-3. Informes de precisión (#10, #53), si llegan.
+3. Ampliar la medición del lector de tickets con más tickets, si da el tiempo.

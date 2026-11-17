@@ -9,8 +9,8 @@
 - **Etapa:** MVP funcionando de punta a punta, en la recta final antes del
   pitch. El motor, la app, el esquema de Supabase con RLS, la ingesta diaria de
   MODO y la lectura del ticket están implementados y con tests. Lo que queda
-  son terminaciones de UX, la letra chica con Gemini, la auditoría de
-  secretos y la preparación de la entrega (ver «Qué falta»).
+  son terminaciones de UX, la auditoría de secretos y la preparación de la
+  entrega; leer la letra chica con Gemini quedó como mejora (ADR-014) (ver «Qué falta»).
 - **Nombre:** Vuelto es tentativo; falta verificar dominio y marca (INPI).
   Ver `marca.md`.
 - **Equipo:** 4 integrantes (la materia pide 6-8, sin resolver con la
@@ -37,12 +37,12 @@
 ## Qué falta
 
 **Código, con issue abierta**
-- **Letra chica con Gemini (#51)**: no está empezada. Sin eso, `acumulable` y
-  `jurisdiccion` salen `null` en la mayoría de las promos publicadas (el motor
-  lo tolera: `acumulable = null` se trata como no acumulable). Dependen de #51:
-  el chequeo de salud de la ingesta (#52) y el informe de precisión por campo
-  (#53, que además hay que redefinir porque ya no hay corpus revisado a mano
-  contra el cual medir, ADR-011).
+- **Letra chica con Gemini (#51)**: pasó a ser una **mejora posterior al MVP**
+  (ADR-014). La API trae casi todo estructurado; `acumulable` y `jurisdiccion`
+  quedan `null`. En un muestreo de 100 promos del 17/11, ninguna promo general
+  estaba limitada a una provincia y 4 decían que se acumulan. El informe de
+  precisión del extractor (#53) sigue a la #51. El chequeo de salud de la
+  ingesta (#52) no depende de Gemini.
 - **Precisión del lector de tickets (#10)**: cerrada con 5 tickets medidos campo por campo
   (monto, fecha y comercio 5 de 5; medio de pago 3 de 3), por debajo de los 15-20 de RNF-09.
   Informe en `docs/product/precision-extractor.md`.
@@ -86,8 +86,9 @@
   `apps/mobile/src/data/fixtures.ts`); con una sincronización hecha pasa al
   corpus real y al reloj real. Los escenarios de prueba del ticket (ejemplo,
   ilegible, sin red) solo se ven en desarrollo (`__DEV__`, en Perfil).
-- **Letra chica.** Hasta que exista #51, lo que MODO no declara como dato
-  estructurado queda `null`, no inventado.
+- **Letra chica.** Lo que MODO no declara como dato estructurado
+  (acumulabilidad y jurisdicción) queda `null`, no inventado. Leerlo con Gemini
+  es una mejora (ADR-014).
 - **Retención de 90 días.** Es una política declarada (`privacidad.md`); no hay
   un job que borre compras vencidas ni invitaciones vencidas.
 - **Aplicar migraciones.** Mergear una migración no la aplica a la base
