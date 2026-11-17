@@ -3593,6 +3593,41 @@ confirmarla en el comercio equivocado ni dejarla duplicada.
 
 ---
 
+## 2026-11-17 — La letra chica con Gemini pasa a ser una mejora (ADR-014)
+
+**Herramienta:** Claude Code (Opus 5.5).
+
+**Objetivo:** decidir si hace falta Gemini para el MVP y dejar la presentación al día.
+
+**Prompts principales:**
+1. "¿Se está corriendo la ingesta todos los días con la API pública?" Sí: el historial de GitHub
+   Actions muestra corridas diarias, con una falla el 10/11 y un día sin corrida (16/11).
+2. "Entonces lo de Gemini no haría falta: no scrapeamos la letra chica." La API trae casi todo
+   ordenado; solo dos datos quedan en la letra chica (si la promo se suma con otras y en qué
+   provincia vale).
+3. "Pongámoslo como una mejora, no como algo necesario." Para no afirmar sin datos se hizo un
+   muestreo: 100 de las 1.830 promos del día. Ninguna promo general estaba limitada a una
+   provincia (las que nombran un lugar son de locales puntuales) y solo 4 decían que se suman.
+4. "Armá la ADR y los comentarios. En la presentación, sin decir 'API de MODO', Gemini como
+   mejora, y la precisión del lector ya no como algo que falta, en un HTML nuevo."
+
+**Resultado:**
+- ADR-014: leer la letra chica con Gemini pasa a ser una mejora posterior al MVP, con el
+  muestreo como evidencia y los riesgos aceptados escritos.
+- `vuelto-mvp-v2.html`: la ingesta toma una API pública; Gemini aparece como mejora para los
+  detalles de la promo; la lectura del ticket figura como medida; también se corrigieron las
+  issues ya cerradas (#138, #139, #55) y el CI con 7 chequeos. A pedido del usuario, la slide
+  10 no muestra el bloque de Gemini (se menciona de palabra), y la slide 11 usa la corrida del
+  17/11 (3244 promos publicables; 1 de las últimas 10 corridas falló).
+- El guion usa la v2: la lectura del ticket como medida, la letra chica como mejora y los
+  números de la corrida del 17/11.
+- `CLAUDE.md`, `estado.md` y `pendientes.md` al día; `CLAUDE.md` ya no dice que la ingesta usa
+  Playwright.
+- Error de la IA: la primera búsqueda de provincias confundió «Cabal» (la red de tarjetas) con
+  «CABA»; leyendo los fragmentos a mano se vio que casi todas las menciones eran texto legal.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

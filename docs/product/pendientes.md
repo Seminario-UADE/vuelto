@@ -50,8 +50,8 @@
       (`.github/workflows/ingesta.yml`, ADR-011, 03/11/2026)
 - [x] Proveedor/modelo del extractor, con salida estructurada: ticket → Groq
       (`qwen/qwen3.8-27b`, `strict`), letra chica → Gemini (ADR-012,
-      PR #126). ADR-012 sigue figurando «propuesto»: falta pasarlo a
-      «aceptado».
+      PR #126), que pasó a ser una mejora posterior al MVP (ADR-014).
+      ADR-012 sigue figurando «propuesto»: falta pasarlo a «aceptado».
 - [x] Reconciliar la lista de cadenas de supermercado del alcance contra las
       que tienen promoción vigente en MODO: hecho con el relevamiento del
       03/11/2026 (issue #35), ver `alcance-mvp.md` §Cadenas y
@@ -65,9 +65,10 @@
       igual (porcentaje sin techo, avisado en el motivo). Si hace falta
       distinguirlos, se suma un campo aparte (ej. `tope.sinTope: boolean | null`);
       `Tope` en `packages/motor/src/tipos.ts` no lo tiene. Depende de #51.
-- [ ] Experimento de precisión del extractor (entregable de research): #53,
-      que hay que redefinir porque ya no hay corpus revisado a mano contra el
-      cual medir (ADR-011).
+- [ ] *(Mejora, ADR-014)* Experimento de precisión del extractor de letra
+      chica: #53, que sigue a la #51 (Gemini como mejora posterior al MVP) y
+      hay que redefinir porque ya no hay corpus revisado a mano contra el cual
+      medir (ADR-011).
 - [x] Probar el extractor de tickets contra tickets reales (#10): 5 tickets medidos, por debajo de
       los 15-20 de RNF-09; informe en `docs/product/precision-extractor.md`, con una tabla para
       seguir sumando.
