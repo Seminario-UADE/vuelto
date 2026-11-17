@@ -3493,6 +3493,61 @@ como antes.
 
 ---
 
+## 2026-11-17 — Cruzar el ticket con la compra por confirmar (issue #110)
+
+**Herramienta:** Claude Code (Opus 5.5), sin spec-kit (las tareas ya estaban en la spec 012).
+
+**Objetivo:** que al escanear un ticket la app sepa si es de la compra que se simuló, sin
+confirmarla en el comercio equivocado ni dejarla duplicada.
+
+**Prompts principales:**
+1. "¿Quedan issues por tomar? No solo mías." Se listaron las abiertas y se marcaron las que
+   parecían ya resueltas.
+2. "Revisá la #110 y la #105." La issue #105 depende de la #110. A la #110 le faltaba el cruce
+   del ticket: desde una compra por confirmar, un ticket de otro comercio se confirmaba igual en
+   el comercio simulado, y escaneando suelto la compra quedaba colgada (y podía registrarse dos
+   veces).
+3. "Un ticket de antes de simular no puede ser de esa compra." Se trata como compra aparte, con
+   un aviso.
+4. "Si la búsqueda devuelve primero el comercio de la compra simulada, no debería preguntar,
+   pero tiene que poder cambiarse." El cruce usa la sugerencia de comercio de la issue #134 en
+   vez de la regla más simple de la spec 012; el comercio se puede cambiar en «Revisá tu compra».
+5. "Desde la tarjeta me dijo que el ticket era de otra fecha y solo me dejó cargarlo aparte:
+   debería preguntarme si es un error y es de esa compra." El aviso ahora ofrece las dos
+   opciones.
+6. "Simulé en Coto, escaneé un ticket de Bonafide desde el recorrido y no me preguntó nada."
+   Probando con el ticket de ejemplo se vio que, cuando el comercio no tenía promo, el recorrido
+   saltaba directo a cargar la compra a mano: no quedaba compra por confirmar ni se podía
+   escanear. "¿Qué tiene que ver la compra por confirmar con que haya o no promo? ¿No deberían
+   seguir el mismo camino?" Se unificó.
+7. "Diferenciemos: medio de pago para Visa o Master, y tarjeta solo para el recuadro «Por
+   confirmar»."
+8. Al abrir el PR apareció que otro integrante había hecho la misma issue en paralelo (PR #165,
+   ya en `main`). "La 1 y avisale en el PR": se dejó un solo cruce, el acordado con el usuario,
+   sumando tres detalles de esa versión (la tarjeta vencida durante el escaneo, la fecha mal
+   leída y la compra más reciente cuando coinciden varias), y se le avisó con un comentario.
+
+**Resultado:**
+- Desde la compra por confirmar: si el primer comercio sugerido es el simulado (o el ticket no
+  trae comercio), sigue sin preguntar; si es otro, pregunta «¿Este ticket es de tu compra en
+  X?»; si el ticket es de antes de la simulación, avisa y lo carga como compra aparte.
+- Escaneando suelto: si el ticket coincide con una compra por confirmar, pregunta «¿Es tu
+  compra por confirmar en X?». Así no queda la compra colgada ni registrada dos veces.
+- La app nunca decide sola: pregunta, y el comercio siempre se puede cambiar después.
+- El aviso de ticket anterior a la simulación ofrece «Cargar como compra aparte» y «Es de mi
+  compra en X», por si la fecha se leyó mal; con esa opción la fecha arranca en el día de la
+  simulación y se puede cambiar.
+- Con o sin promo, el recorrido es el mismo: queda la compra por confirmar y se puede escanear o
+  cargar a mano. Sin promo, la compra por confirmar queda sin medio de pago, que se elige al
+  confirmarla.
+- Error de la IA: hizo varias pruebas antes de encontrar el problema, cuando con revisar el
+  camino sin promo alcanzaba; el usuario lo marcó.
+- Contratiempos: al traer los cambios de `main`, los tests fallaron porque el motor compilado
+  estaba viejo (hay que recompilarlo cuando cambia, como dice CLAUDE.md), y el chequeo de tipos
+  falló por un archivo de rutas generado viejo; ninguno de los dos era un error del código.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

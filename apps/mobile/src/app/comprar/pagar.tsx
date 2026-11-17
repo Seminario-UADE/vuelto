@@ -42,10 +42,12 @@ export default function PasoPagar() {
   }
 
   const params = { porConfirmar: pc.id, flujo: "1" };
+  // Sin promo, la compra por confirmar no tiene medio de pago: se elige al confirmar (issue #110).
+  const nombreDelMedio = medio?.nombre ?? (pc.medioId === null ? "Con el medio de pago que quieras" : "El medio que elegiste");
   return (
     <Paso
       paso={4}
-      titulo={`Pagá con ${medio?.nombreCorto ?? "el medio que elegiste"}`}
+      titulo={pc.medioId === null ? `Pagá en ${pc.comercioNombre}` : `Pagá con ${medio?.nombreCorto ?? "el medio que elegiste"}`}
       atras={false}
       footer={
         <>
@@ -57,7 +59,7 @@ export default function PasoPagar() {
     >
       <View
         accessible
-        accessibilityLabel={`Pagá con ${medio?.nombre ?? "el medio que elegiste"} en ${pc.comercioNombre}${pc.monto !== null ? `, ${pesos(pc.monto)}` : ""}`}
+        accessibilityLabel={`${nombreDelMedio} en ${pc.comercioNombre}${pc.monto !== null ? `, ${pesos(pc.monto)}` : ""}`}
         style={{
           backgroundColor: colors.decisionBg,
           borderRadius: radius.card,
@@ -67,9 +69,9 @@ export default function PasoPagar() {
           alignItems: "flex-start",
         }}
       >
-        <Avatar letras={medio?.inicial ?? "?"} tone="decision" size={56} />
+        <Avatar letras={medio?.inicial ?? pc.comercioNombre.charAt(0)} tone="decision" size={56} />
         <Text variant="titleLg" style={{ color: colors.onDecision }}>
-          {medio?.nombre ?? "El medio que elegiste"}
+          {nombreDelMedio}
         </Text>
         <Text variant="bodyLg" tabular style={{ color: colors.onDecisionMuted }}>
           {pc.comercioNombre}

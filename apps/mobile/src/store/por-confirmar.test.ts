@@ -5,6 +5,7 @@ import { sesionCerrada } from "./acciones";
 import { compraAgregada } from "./compras";
 import { mediosConfirmados } from "./perfil";
 import {
+  leerPorConfirmar,
   porConfirmarCreada,
   porConfirmarDescartada,
   porConfirmarPurgadas,
@@ -156,6 +157,16 @@ describe("usarRecomendacion (FR-002, FR-004, FR-012)", () => {
     const r = s.dispatch(usarRecomendacion());
     expect(r?.reemplazo).toBe(true);
     expect(s.getState().porConfirmar.lista).toHaveLength(1);
+  });
+
+  it("sin promo también crea la compra por confirmar, sin medio de pago (issue #110)", () => {
+    const s = conMartin();
+    s.dispatch(comercioElegido("farmacity"));
+    expect(selectRecomendacion(s.getState())?.medio).toBeNull();
+    const r = s.dispatch(usarRecomendacion());
+    expect(r?.porConfirmar).toMatchObject({ comercioId: "farmacity", comercioNombre: "Farmacity", medioId: null });
+    expect(r?.medioNombre).toBeNull();
+    expect(selectPorConfirmarVigentes(s.getState())).toHaveLength(1);
   });
 
   it("sin comercio simulado o sin usuario no hace nada", () => {
@@ -324,5 +335,16 @@ describe("SC-003: una compra por confirmar no cambia topes, bases, totales ni re
       // Revisá precarga con el borrador, pero cerrar la hoja no despacha nada: la compra sigue.
       expect(selectPorConfirmarVigentes(s.getState())).toHaveLength(1);
     });
+  });
+});
+
+describe("leerPorConfirmar: lo guardado en el teléfono (spec 012 FR-014)", () => {
+  it("lee una compra por confirmar sin medio de pago (sin promo, issue #110)", () => {
+    expect(leerPorConfirmar(JSON.stringify({ version: 1, lista: [pc({ medioId: null })] }))).toEqual([pc({ medioId: null })]);
+  });
+
+  it("descarta una entrada con un medio de pago inválido, sin tirar abajo las otras", () => {
+    const raw = JSON.stringify({ version: 1, lista: [pc({ id: "ok" }), { ...pc({ id: "mal" }), medioId: 3 }] });
+    expect(leerPorConfirmar(raw).map((c) => c.id)).toEqual(["ok"]);
   });
 });

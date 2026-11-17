@@ -88,23 +88,23 @@
 
 ### Tests
 
-- [x] T021 [P] [US2] Sumar a `src/data/por-confirmar.test.ts`:
+- [X] T021 [P] [US2] Sumar a `src/data/por-confirmar.test.ts`:
   - `normalizarComercio`;
   - `ticketCoincide`: «COTO C.I.C.S.A.» coincide con Coto, «Cotolengo» no, y una fecha anterior al día de la simulación no coincide;
   - `borradorDesdePorConfirmar` con ticket: `medioId: null` y `medioSugerido` cuando el ticket no trae medio, el medio del ticket cuando sí lo trae, el aviso de monto solo si se simuló con monto y el aviso de medio distinto.
 
 ### Implementation
 
-- [x] T022 [US2] Completar `normalizarComercio`, `ticketCoincide` y la rama con ticket de `borradorDesdePorConfirmar` en `src/data/por-confirmar.ts`. Tiene que pasar T021.
-- [x] T023 [US2] En `src/app/escanear.tsx`:
+- [X] T022 [US2] Completar `normalizarComercio`, `ticketCoincide` y la rama con ticket de `borradorDesdePorConfirmar` en `src/data/por-confirmar.ts`. Tiene que pasar T021. *(Issue #110: el cruce quedó como `cruceDelTicket` y `porConfirmarDelTicket`, con la sugerencia de comercio de la spec 015; FR-013 revisado. El PR #165 hizo lo mismo en paralelo con `ticketCoincide` y `cruzarConTicket`; al mezclar quedó una sola versión, con sus detalles de la tarjeta vencida, la fecha mal leída y la compra más reciente.)*
+- [X] T023 [US2] En `src/app/escanear.tsx`:
   - aceptar el parámetro `porConfirmar`. Si coincide, ir a `revisa` con `modo: "ticket"`; si no, preguntar «¿Este ticket es de tu compra en X?».
   - sin el parámetro, buscar con `ticketCoincide` y preguntar «¿Es tu compra por confirmar en X?».
   - si la lectura falla, ofrecer «Probar de nuevo» y «Confirmar a mano».
-- [x] T024 [US2] En `src/app/revisa.tsx`:
+- [X] T024 [US2] En `src/app/revisa.tsx`:
   - con ticket y sin medio, mostrar la sugerencia «El que elegiste al simular» **sin seleccionarla**;
   - «Guardar» se habilita con un toque en un medio (FR-008);
   - mostrar los avisos de diferencia.
-- [x] T025 [US2] Pasar `rules-guardian` sobre los cambios de `revisa.tsx` y `escanear.tsx` (ticket: RF-10, la imagen no se persiste).
+- [X] T025 [US2] Pasar `rules-guardian` sobre los cambios de `revisa.tsx` y `escanear.tsx` (ticket: RF-10, la imagen no se persiste).
 
 **Checkpoint**: US1 + US2 cumplen el flujo de #105.
 
