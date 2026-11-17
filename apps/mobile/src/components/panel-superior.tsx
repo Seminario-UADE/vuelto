@@ -2,6 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import type { ReactNode } from "react";
 import { View, type ColorValue } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useFondoDePagina } from "@/lib/fondo-de-pagina";
 import { radius, space } from "@/theme";
 
 /** Lo que sobra arriba del panel: al tirar hacia abajo (rebote de iOS) se sigue viendo el panel, no el fondo. */
@@ -30,6 +31,7 @@ type Props = {
  */
 export function PanelSuperior({ color, fondo, barra, accessibilityLabel, redondeado = true, children }: Props) {
   const insets = useSafeAreaInsets();
+  useFondoDePagina(color);
   return (
     <View
       accessibilityLabel={accessibilityLabel}
