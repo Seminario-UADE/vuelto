@@ -18,7 +18,8 @@ import { comercioPorNombre, detallesDeLaCompra, promoPropuesta } from "@/data/ca
 import type { Canal, Comercio, OrigenCompra } from "@/data/contracts";
 import { borradorDesdePorConfirmar } from "@/data/por-confirmar";
 import { sugerenciaEnPantalla, textoParaSugerir } from "@/data/sugerir-comercio";
-import { aprox, montoEditable, parseMonto } from "@/lib/format";
+import { montoEditable, parseMonto } from "@/lib/format";
+import { textoReintegro } from "@/lib/textos";
 import { esRed, esTipoTarjeta } from "@/perfil/modelo";
 import { hapticoExito, hapticoSeleccion } from "@/lib/haptics";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -197,7 +198,7 @@ export default function Revisa() {
       : medioId === null
         ? "Elegí con qué pagaste para continuar"
         : hayPromo && !quitoLaPromo && propuesta.reintegro !== null
-          ? `Te devuelven ${aprox(propuesta.reintegro)}${propuesta.base ? `, ${propuesta.base}` : ""}. Hasta que guardes, tus topes no cambian.`
+          ? `${textoReintegro(propuesta.reintegro, propuesta.base)}. Hasta que guardes, tus topes no cambian.`
           : "Hasta que guardes, tus topes no cambian.";
 
   const guardar = () => {
@@ -375,7 +376,7 @@ export default function Revisa() {
                 ))}
                 <Text variant="bodyMd" tone="inkSecondary">
                   {propuesta.reintegro !== null
-                    ? `Te devuelven ${aprox(propuesta.reintegro)}${propuesta.base ? `, ${propuesta.base}` : ""}.`
+                    ? `${textoReintegro(propuesta.reintegro, propuesta.base)}.`
                     : "Cargá el monto para estimar cuánto te devuelven."}
                 </Text>
               </>

@@ -47,10 +47,9 @@ import type { MedioDePago as MedioGuardado } from "../perfil/modelo";
 import { claveDeComercio, comercioDelCatalogo, comerciosConNombre, esComercioDeRubro } from "./comercios";
 import { medioDelMotor, medioVista } from "../perfil/vista";
 import { aVista } from "./vista-recomendacion";
-import { aprox } from "../lib/format";
 import { mediodia } from "../lib/reloj";
 import { RUBROS } from "../lib/rubros";
-import { periodoDeVista, textoBase } from "../lib/textos";
+import { periodoDeVista, textoBase, textoReintegro } from "../lib/textos";
 
 /** Lo que el motor necesita para una persona, ya con su forma. */
 export type EntradasMotor = {
@@ -513,7 +512,7 @@ export function detallesDeLaCompra(
         const texto =
           p.reintegro === null
             ? "Tiene promo: cargá el monto para estimar cuánto te devuelven"
-            : `Te devuelven ${aprox(p.reintegro)}${p.base ? `, ${p.base}` : ""}`;
+            : textoReintegro(p.reintegro, p.base);
         return [id, texto];
       }
       const porQueNo = r?.descartadas.find(
