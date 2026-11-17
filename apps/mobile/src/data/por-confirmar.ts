@@ -74,6 +74,56 @@ export function origenAlConfirmar(
   return mismoComercio && b.medioId === c.medioId ? "excepcion" : "manual";
 }
 
+/**
+ * El nombre de un comercio para compararlo (spec 012 FR-013, R3): minúsculas, sin tildes, sin
+ * puntuación y con los espacios colapsados. Los puntos y apóstrofes se sacan (así «C.I.C.S.A.» es
+ * «cicsa» y «McDonald's», «mcdonalds»); el resto de la puntuación separa palabras.
+ */
+export function normalizarComercio(nombre: string): string {
+  return nombre
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .replace(/[.'’`´]/g, "")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+}
+
+/** Lo que el cruce necesita del ticket: el comercio y la fecha que leyó, `null` si no los trae. */
+export type TicketParaCruzar = { comercio: string | null; fecha: string | null };
+
+const FECHA_ISO = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * ¿El ticket es de esta compra por confirmar? (spec 012 FR-013, R3). Sí si el nombre normalizado
+ * del comercio del ticket contiene, como palabra entera, el de la compra («coto cicsa» contiene
+ * «coto»; «cotolengo» no), y la fecha del ticket no es anterior al día de la simulación. Un ticket
+ * sin fecha legible no se descarta por la fecha: sin dato no hay nada que contradiga.
+ */
+export function ticketCoincide(c: CompraPorConfirmar, ticket: TicketParaCruzar): boolean {
+  if (ticket.comercio === null) return false;
+  const buscado = normalizarComercio(c.comercioNombre);
+  if (buscado === "") return false;
+  if (!` ${normalizarComercio(ticket.comercio)} `.includes(` ${buscado} `)) return false;
+  return ticket.fecha === null || !FECHA_ISO.test(ticket.fecha) || ticket.fecha >= diaDeLaSimulacion(c);
+}
+
+/**
+ * La compra por confirmar con la que coincide el ticket; si coinciden varias (un nombre contenido
+ * en otro), la más reciente (R3). `null` si ninguna. Se asume que `lista` son las vigentes del usuario.
+ */
+export function coincidenteConTicket(
+  lista: readonly CompraPorConfirmar[],
+  ticket: TicketParaCruzar,
+): CompraPorConfirmar | null {
+  let mejor: CompraPorConfirmar | null = null;
+  for (const c of lista) {
+    if (!ticketCoincide(c, ticket)) continue;
+    if (mejor === null || Date.parse(c.creadaEn) > Date.parse(mejor.creadaEn)) mejor = c;
+  }
+  return mejor;
+}
+
 export type AvisoPorConfirmar = "monto-distinto" | "medio-distinto";
 
 export type BorradorPorConfirmar = {
