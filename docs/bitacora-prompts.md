@@ -3548,6 +3548,28 @@ confirmarla en el comercio equivocado ni dejarla duplicada.
 
 ---
 
+## 2026-11-17 — Revisión de issues abiertas: #139, #82 y #35
+
+**Herramienta:** Claude Code (Opus 5.5).
+
+**Objetivo:** cerrar las issues que ya estaban resueltas o reemplazadas.
+
+**Prompts principales:**
+1. "¿Quedan issues por tomar? ¿Cerraste las que estábamos mirando?" Se listaron las abiertas y
+   se marcaron tres que parecían resueltas.
+2. "Revisá la #139, la #82 y la #35." Se compararon con el código y las decisiones.
+3. "Hacé las tres."
+
+**Resultado:**
+- Issue #139 (estado vacío en «Armar grupo»): cerrada, ya la había hecho el PR #164.
+- Issue #35 (sembrar promos a mano): cerrada como reemplazada por la ADR-011, que decidió que
+  las promos nunca se cargan a mano.
+- Issue #82 (publicar la web en cada merge): el workflow ya andaba; faltaba que la
+  documentación dijera que la web se publica sola. Se actualizó y se cerró. La versión de prueba
+  por PR queda como mejora.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

@@ -272,7 +272,7 @@ estar logueado (`npx eas-cli@latest login`) con una cuenta del equipo.
 
 | Qué | Para quién | Cómo se publica |
 |---|---|---|
-| **Web** en https://vuelto.expo.app (EAS Hosting) | Cualquier teléfono desde el navegador, incluido el jurado | `npx expo export --platform web` y después `npx eas-cli@latest deploy --prod` (desde `apps/mobile`) |
+| **Web** en https://vuelto.expo.app (EAS Hosting) | Cualquier teléfono desde el navegador, incluido el jurado | **Sola, en cada merge a `main`** (issue #82): `.github/workflows/deploy-web.yml` corre cuando el CI de `main` termina bien, con el secreto `EXPO_TOKEN` del repo. A mano, si hace falta: la pestaña Actions («Deploy web» → *Run workflow*), o `npx expo export --platform web` y `npx eas-cli@latest deploy --prod` desde `apps/mobile` |
 | **APK de Android** (perfil `preview` de `eas.json`, distribución interna) | Android, app nativa | `npx eas-cli@latest build --platform android --profile preview`; el link de descarga queda en expo.dev |
 | Expo Go con el servidor local | Desarrollo, iPhone nativo | `npm run start -w @vuelto/mobile` (con `-- --tunnel` si no están en la misma red) |
 
@@ -280,7 +280,10 @@ estar logueado (`npx eas-cli@latest login`) con una cuenta del equipo.
   pantallas.
 - iPhone nativo sin computadora requiere una cuenta de Apple Developer (US$ 99/año), fuera del
   costo $0 del proyecto.
-- Cada publicación sale de lo que haya en el directorio en ese momento: publicar desde `main`.
+- La publicación automática usa el commit que validó el CI y nunca publica si algún chequeo
+  falló. Publicando a mano, cada publicación sale de lo que haya en el directorio en ese momento:
+  publicar desde `main`.
+- Todavía no hay una versión de prueba por PR (`eas deploy` sin `--prod`): queda como mejora.
 
 ## Dónde se guarda el corpus (decisión de la issue #42)
 
