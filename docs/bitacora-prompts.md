@@ -3344,6 +3344,31 @@ proyector.
 
 ---
 
+## 2026-11-17 — Auditoría de secretos y privacidad antes del pitch (issue #55)
+
+**Herramienta:** Claude Code (Sonnet 5.5), con el agente `rules-guardian`.
+
+**Objetivo:** reunir evidencia de RNF-04 a RNF-07: sin keys de Gemini, Groq ni
+service role en la app, sin imágenes de ticket en Storage ni en la base, y toda tabla
+con RLS. Con un script para el CI y un informe corto.
+
+**Prompts principales:**
+1. "Implementá el issue #55 (`gh issue view 55`) y abrí un PR que lo cierre" (la
+   sesión de coordinación lo repartió junto con otros issues en paralelo).
+
+**Decisiones de la IA que conviene revisar:**
+- El script prueba primero que el detector detecta (plantó 5 keys falsas): un "0 resultados"
+  de un detector que no detecta no prueba nada. Nunca imprime una coincidencia.
+- La service role key se detecta decodificando el payload de cada JWT (`role=service_role`),
+  no por el prefijo, para no marcar la anon key, que es pública y sí va en el bundle.
+- La base local de la prueba se levantó con otro `project_id` y otros puertos (cambio no
+  commiteado) porque el stack del proyecto ya estaba corriendo desde otro checkout.
+
+**Resultado:** `scripts/auditar-secretos.sh` + job `auditar-secretos` en el CI, test pgTAP
+`privacidad_storage.test.sql` e informe en `docs/product/auditoria-privacidad.md`.
+
+**Quedó sin verificar:** el extractor de Gemini (#51) todavía no existe; hay que repetir la
+pasada cuando llegue. La prueba con el valor literal de las keys reales es solo local.
 ## 2026-11-17 — Estado real del MVP y revisión de issues (issue #132)
 
 **Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde otra sesión de
