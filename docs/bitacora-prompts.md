@@ -3344,6 +3344,28 @@ proyector.
 
 ---
 
+## 2026-11-17 — La invitación no se pierde con «Ya tengo cuenta» (issue #137, hallazgo G-07)
+
+**Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde otra sesión de Claude Code.
+
+**Objetivo:** que quien abre un link de invitación y entra con una cuenta existente llegue
+a la pantalla de aceptación, y que `invitacionPendiente` se consuma una sola vez.
+
+**Prompts principales:**
+1. "Implementá el issue #137 y abrí un PR que lo cierre" (con el contexto de ADR-008 §1 y
+   el hallazgo G-07).
+
+**Resultado:** al leer el código, `(tabs)/_layout.tsx` ya redirigía a la invitación
+pendiente (sumado en el PR de la revisión del #112), así que el flujo funcionaba pero sin
+test. Se sacó esa decisión a una función pura (`perfil/destino.ts`, `destinoDeTabs`) y se
+cubrió con tests del flujo (sesión, perfil listo, onboarding, consumo único). Además, `/i/[token]`
+con sesión pero sin perfil listo ya no manda a Bienvenida: va a la raíz y las tabs esperan
+el perfil y vuelven a la invitación.
+
+**Quedó sin verificar:** el recorrido completo en el celular (Expo Go) con un link real.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**
