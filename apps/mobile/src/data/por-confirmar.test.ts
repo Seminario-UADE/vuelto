@@ -6,6 +6,7 @@ import {
   antiguedad,
   borradorDesdePorConfirmar,
   coincidenteConTicket,
+  cruzarConTicket,
   estaVigente,
   normalizarComercio,
   origenAlConfirmar,
@@ -217,13 +218,11 @@ describe("ticketCoincide (spec 012 FR-013, research R3)", () => {
   it("otro comercio no coincide", () => {
     expect(ticketCoincide(enCoto, { ...ticket, comercio: "Jumbo" })).toBe(false);
   });
-  it("una fecha anterior al día de la simulación no coincide; el mismo día o después, sí", () => {
+  // enCoto se creó el 14 a las 23:30 en Argentina (el 15 en UTC): el día de la simulación es el 14.
+  it("una fecha anterior al día de la simulación (argentino) no coincide; el mismo día o después, sí", () => {
     expect(ticketCoincide(enCoto, { ...ticket, fecha: "2026-10-13" })).toBe(false);
     expect(ticketCoincide(enCoto, { ...ticket, fecha: "2026-10-14" })).toBe(true);
     expect(ticketCoincide(enCoto, { ...ticket, fecha: "2026-10-15" })).toBe(true);
-  });
-  it("el día de la simulación es el argentino: creada el 14 a las 23:30, un ticket del 14 coincide", () => {
-    expect(ticketCoincide(enCoto, { ...ticket, fecha: "2026-10-14" })).toBe(true);
   });
   it("sin fecha legible no se descarta por la fecha", () => {
     expect(ticketCoincide(enCoto, { ...ticket, fecha: null })).toBe(true);
@@ -258,5 +257,47 @@ describe("coincidenteConTicket (spec 012 US2-9, research R3)", () => {
     };
     expect(coincidenteConTicket([enCoto, enCotoDigital], ticket)).toBe(enCotoDigital);
     expect(coincidenteConTicket([enCotoDigital, enCoto], ticket)).toBe(enCotoDigital);
+  });
+});
+
+describe("cruzarConTicket (spec 012 US2-1, US2-5, US2-6, US2-9)", () => {
+  const ticket = { comercio: "COTO C.I.C.S.A.", fecha: "2026-10-14" };
+  const enJumbo: CompraPorConfirmar = { ...enCoto, id: "j", comercioId: "jumbo", comercioNombre: "Jumbo" };
+
+  it("desde la tarjeta, si coincide: directo con esa compra", () => {
+    expect(cruzarConTicket(ticket, enCoto.id, [enCoto], [enCoto])).toEqual({ tipo: "directo", pc: enCoto });
+  });
+  it("desde la tarjeta, si el comercio no coincide: pregunta «¿Este ticket es de tu compra en X?»", () => {
+    expect(cruzarConTicket({ ...ticket, comercio: "Jumbo" }, enCoto.id, [enCoto], [enCoto])).toEqual({
+      tipo: "pregunta",
+      pc: enCoto,
+      desdeTarjeta: true,
+    });
+  });
+  it("desde la tarjeta, un ticket del comercio pero anterior a la simulación no se cruza: aviso (US2-6)", () => {
+    expect(cruzarConTicket({ ...ticket, fecha: "2026-10-13" }, enCoto.id, [enCoto], [enCoto])).toEqual({ tipo: "anterior", pc: enCoto });
+  });
+  it("sin tarjeta, un ticket del comercio pero anterior a la simulación: aviso, no pregunta (US2-6)", () => {
+    expect(cruzarConTicket({ ...ticket, fecha: "2026-10-13" }, undefined, [enCoto], [enCoto])).toEqual({ tipo: "anterior", pc: enCoto });
+  });
+  it("desde la tarjeta, si la compra ya no está, sigue directo sin ella", () => {
+    expect(cruzarConTicket(ticket, enCoto.id, [], [])).toEqual({ tipo: "directo", pc: null });
+  });
+  it("desde la tarjeta, una vencida con el escaneo abierto se sigue encontrando", () => {
+    expect(cruzarConTicket(ticket, enCoto.id, [enCoto], [])).toEqual({ tipo: "directo", pc: enCoto });
+  });
+  it("sin tarjeta, si coincide una vigente: pregunta «¿Es tu compra por confirmar en X?»", () => {
+    expect(cruzarConTicket(ticket, undefined, [enJumbo, enCoto], [enJumbo, enCoto])).toEqual({
+      tipo: "pregunta",
+      pc: enCoto,
+      desdeTarjeta: false,
+    });
+  });
+  it("sin tarjeta y sin coincidencia: suelto", () => {
+    expect(cruzarConTicket(ticket, undefined, [enJumbo], [enJumbo])).toEqual({ tipo: "suelto" });
+    expect(cruzarConTicket(ticket, undefined, [], [])).toEqual({ tipo: "suelto" });
+  });
+  it("sin tarjeta, una vencida no se ofrece", () => {
+    expect(cruzarConTicket(ticket, undefined, [enCoto], [])).toEqual({ tipo: "suelto" });
   });
 });

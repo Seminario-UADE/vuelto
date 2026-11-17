@@ -94,6 +94,17 @@ export type TicketParaCruzar = { comercio: string | null; fecha: string | null }
 
 const FECHA_ISO = /^\d{4}-\d{2}-\d{2}$/;
 
+function comercioCoincide(c: CompraPorConfirmar, ticket: TicketParaCruzar): boolean {
+  if (ticket.comercio === null) return false;
+  const buscado = normalizarComercio(c.comercioNombre);
+  return buscado !== "" && ` ${normalizarComercio(ticket.comercio)} `.includes(` ${buscado} `);
+}
+
+/** La fecha del ticket es anterior al día de la simulación. Sin fecha legible no hay nada que contradiga. */
+function esAnteriorALaSimulacion(c: CompraPorConfirmar, ticket: TicketParaCruzar): boolean {
+  return ticket.fecha !== null && FECHA_ISO.test(ticket.fecha) && ticket.fecha < diaDeLaSimulacion(c);
+}
+
 /**
  * ¿El ticket es de esta compra por confirmar? (spec 012 FR-013, R3). Sí si el nombre normalizado
  * del comercio del ticket contiene, como palabra entera, el de la compra («coto cicsa» contiene
@@ -101,11 +112,7 @@ const FECHA_ISO = /^\d{4}-\d{2}-\d{2}$/;
  * sin fecha legible no se descarta por la fecha: sin dato no hay nada que contradiga.
  */
 export function ticketCoincide(c: CompraPorConfirmar, ticket: TicketParaCruzar): boolean {
-  if (ticket.comercio === null) return false;
-  const buscado = normalizarComercio(c.comercioNombre);
-  if (buscado === "") return false;
-  if (!` ${normalizarComercio(ticket.comercio)} `.includes(` ${buscado} `)) return false;
-  return ticket.fecha === null || !FECHA_ISO.test(ticket.fecha) || ticket.fecha >= diaDeLaSimulacion(c);
+  return comercioCoincide(c, ticket) && !esAnteriorALaSimulacion(c, ticket);
 }
 
 /**
@@ -122,6 +129,43 @@ export function coincidenteConTicket(
     if (mejor === null || Date.parse(c.creadaEn) > Date.parse(mejor.creadaEn)) mejor = c;
   }
   return mejor;
+}
+
+/**
+ * Qué hace «Escanear ticket» con la lectura (spec 012 FR-013, US2-1, US2-5, US2-9):
+ * - `directo`: sigue a «Revisá» con esa compra por confirmar (`pc`), o sin ella si la de la tarjeta ya no está;
+ * - `pregunta`: hay una compra que puede ser la del ticket y se le pregunta al usuario;
+ * - `anterior`: es del mismo comercio pero de antes de la simulación: no se cruza, se avisa y sigue
+ *   como suelto (US2-6);
+ * - `suelto`: el ticket sigue sin compra por confirmar.
+ */
+export type CruceConTicket =
+  | { tipo: "directo"; pc: CompraPorConfirmar | null }
+  | { tipo: "pregunta"; pc: CompraPorConfirmar; desdeTarjeta: boolean }
+  | { tipo: "anterior"; pc: CompraPorConfirmar }
+  | { tipo: "suelto" };
+
+/**
+ * Decide el cruce. Desde la tarjeta (`idDeLaTarjeta`): si coincide, directo; si es del comercio pero anterior a la simulación, anterior; si no, pregunta. Desde
+ * cualquier otro lado: si coincide alguna de `vigentes`, pregunta; si no, suelto. La de la tarjeta
+ * se busca en `todas` (si venció con el escaneo abierto, igual se confirma).
+ */
+export function cruzarConTicket(
+  ticket: TicketParaCruzar,
+  idDeLaTarjeta: string | undefined,
+  todas: readonly CompraPorConfirmar[],
+  vigentes: readonly CompraPorConfirmar[],
+): CruceConTicket {
+  if (idDeLaTarjeta !== undefined) {
+    const pc = todas.find((c) => c.id === idDeLaTarjeta) ?? null;
+    if (pc === null || ticketCoincide(pc, ticket)) return { tipo: "directo", pc };
+    if (comercioCoincide(pc, ticket)) return { tipo: "anterior", pc };
+    return { tipo: "pregunta", pc, desdeTarjeta: true };
+  }
+  const candidata = coincidenteConTicket(vigentes, ticket);
+  if (candidata) return { tipo: "pregunta", pc: candidata, desdeTarjeta: false };
+  const anterior = vigentes.find((c) => comercioCoincide(c, ticket));
+  return anterior ? { tipo: "anterior", pc: anterior } : { tipo: "suelto" };
 }
 
 export type AvisoPorConfirmar = "monto-distinto" | "medio-distinto";

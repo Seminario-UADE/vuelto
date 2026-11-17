@@ -3344,6 +3344,35 @@ proyector.
 
 ---
 
+## 2026-11-17 — Confirmar la compra por confirmar escaneando el ticket (issue #110, spec 012 US2)
+
+**Herramienta:** Claude Code (Sonnet 5.5), en una sesión lanzada desde otra sesión de Claude Code.
+
+**Objetivo:** que «Escanear ticket» cruce el ticket con la compra por confirmar (spec 012
+US2, tareas T021–T025) sin rehacer lo que ya estaba en `main`.
+
+**Prompts principales:**
+1. "Implementá el issue #110 y abrí un PR que lo cierre. Primero verificá el estado
+   real: revisá qué de la spec ya existe en el código para no rehacer nada."
+   La IA encontró hecho `borradorDesdePorConfirmar` con ticket, la sugerencia sin
+   marcar en `revisa.tsx`, el ticket de ejemplo con la fecha de hoy y el escenario
+   «sin red». Faltaban `normalizarComercio`, `ticketCoincide` y las preguntas de
+   `escanear.tsx`.
+
+**Resultado:** `ticketCoincide` (palabra entera, sin tildes ni puntuación, fecha no
+anterior a la simulación) y `coincidenteConTicket` (la más reciente) con tests;
+`escanear.tsx` pregunta «¿Este ticket es de tu compra en X?» desde la tarjeta cuando no
+coincide y «¿Es tu compra por confirmar en X?» desde otro escaneo cuando sí; «No» sigue
+como ticket suelto; un ticket del comercio pero anterior a la simulación se avisa y sigue
+como suelto (US2-6); si la lectura falla, «Confirmar a mano». La decisión es la función pura
+`cruzarConTicket`. `rules-guardian` y `/code-review` (estándares y spec) corrieron antes del PR;
+el de spec encontró el aviso de US2-6 que faltaba.
+
+**Quedó sin verificar:** el recorrido completo en el teléfono (quickstart 3 y 4); las
+pantallas de Expo no tienen tests automáticos.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

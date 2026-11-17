@@ -9,7 +9,7 @@ import { Icon } from "@/components/icon";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import type { LecturaApp } from "@/data/contracts";
-import { coincidenteConTicket, ticketCoincide, type CompraPorConfirmar } from "@/data/por-confirmar";
+import { cruzarConTicket, type CompraPorConfirmar } from "@/data/por-confirmar";
 import { hapticoLeve } from "@/lib/haptics";
 import { supabase } from "@/lib/supabase";
 import type { Escenario } from "@/store/acciones";
@@ -28,7 +28,9 @@ type Estado =
   | { tipo: "leyendo" }
   | { tipo: "resultado"; resultado: ResultadoLectura }
   /** El ticket se leyó y hay una compra por confirmar que puede ser la suya (spec 012 US2-5, US2-9). */
-  | { tipo: "pregunta"; pc: CompraPorConfirmar; ticket: Record<string, string>; desdeTarjeta: boolean };
+  | { tipo: "pregunta"; pc: CompraPorConfirmar; ticket: Record<string, string>; desdeTarjeta: boolean }
+  /** El ticket es del comercio pero de antes de la simulación: no se cruza, se avisa (spec 012 US2-6). */
+  | { tipo: "anterior"; pc: CompraPorConfirmar; ticket: Record<string, string> };
 
 /** Los escenarios de desarrollo de Perfil que simulan la lectura (FR-012); el resto usa la cámara. */
 const ESCENARIO_TICKET: Record<Escenario, api.EscenarioTicket | null> = {
@@ -57,7 +59,8 @@ const ETIQUETA_CONFIRMAR_A_MANO = "Confirmar a mano";
  * Con la lectura hecha se cruza el ticket con las compras por confirmar (spec 012 FR-013):
  * desde la tarjeta, si coincide sigue directo a «Revisá» y si no, pregunta «¿Este ticket es de tu
  * compra en X?»; desde cualquier otro lado, si coincide alguna pregunta «¿Es tu compra por
- * confirmar en X?». Si dice que no (o ninguna coincide), el ticket sigue como suelto.
+ * confirmar en X?». Si dice que no (o ninguna coincide), el ticket sigue como suelto. Un ticket del
+ * mismo comercio pero de antes de la simulación no se cruza: se avisa y sigue como suelto (US2-6).
  */
 export default function Escanear() {
   // Desde el paso 4 del flujo: la lectura confirma esa compra por confirmar (spec 012 FR-007).
@@ -74,7 +77,6 @@ export default function Escanear() {
   const conSesion = usuario !== null && supabase !== null;
   const hoy = useAppSelector(selectHoy);
   const vigentes = useAppSelector(selectPorConfirmarVigentes);
-  // La de la tarjeta se busca entre todas: si venció con el escaneo abierto, igual se confirma (como en «Revisá»).
   const listaPorConfirmar = useAppSelector((s) => s.porConfirmar.lista);
   // Si el usuario cierra la pantalla mientras lee, la lectura termina (y borra) pero no navega.
   const abierta = useRef(true);
@@ -105,23 +107,17 @@ export default function Escanear() {
       medioBanco: t.medio.banco ?? "",
       texto: t.textoExtraido,
     };
-    const lectura = { comercio: t.comercio, fecha: t.fecha };
-    const abrir = (params: Record<string, string>) => router.replace({ pathname: "/revisa", params });
-    if (desde.porConfirmar) {
-      const pc = listaPorConfirmar.find((c) => c.id === desde.porConfirmar);
-      if (!pc || ticketCoincide(pc, lectura)) {
-        abrir({ ...ticket, ...extra });
-        return;
-      }
-      setEstado({ tipo: "pregunta", pc, ticket, desdeTarjeta: true });
+    const cruce = cruzarConTicket({ comercio: t.comercio, fecha: t.fecha }, desde.porConfirmar, listaPorConfirmar, vigentes);
+    if (cruce.tipo === "pregunta") {
+      setEstado({ tipo: "pregunta", pc: cruce.pc, ticket, desdeTarjeta: cruce.desdeTarjeta });
       return;
     }
-    const candidata = coincidenteConTicket(vigentes, lectura);
-    if (candidata) {
-      setEstado({ tipo: "pregunta", pc: candidata, ticket, desdeTarjeta: false });
+    if (cruce.tipo === "anterior") {
+      setEstado({ tipo: "anterior", pc: cruce.pc, ticket });
       return;
     }
-    abrir(ticket);
+    // Desde la tarjeta sigue con sus parámetros aunque la compra ya no esté (como antes del cruce).
+    router.replace({ pathname: "/revisa", params: cruce.tipo === "directo" ? { ...ticket, ...extra } : ticket });
   };
 
   /** «Sí»: la compra por confirmar con el ticket (US2-1). «No»: el ticket sigue como suelto, y la compra queda igual. */
@@ -215,7 +211,7 @@ export default function Escanear() {
           <Text variant="bodyLg" align="center" accessibilityLiveRegion="polite" style={{ color: colors.onScrim }}>
             {leyendo
               ? "Leyendo el ticket…"
-              : estado.tipo === "pregunta"
+              : estado.tipo === "pregunta" || estado.tipo === "anterior"
                 ? "Leímos tu ticket."
                 : "Sacale una foto al ticket entero, con buena luz."}
           </Text>
@@ -251,6 +247,16 @@ export default function Escanear() {
             <Button label="Sí, es esa" onPress={() => responder(estado, true)} />
             <Button label="No, es otra" variant="secondary" onPress={() => responder(estado, false)} />
           </Card>
+        ) : estado.tipo === "anterior" ? (
+          <Card>
+            <View style={{ flexDirection: "row", gap: space.sm }}>
+              <Icon name="info" size={20} />
+              <Text variant="bodyMd" style={{ flex: 1 }} accessibilityLiveRegion="polite">
+                {`Este ticket es de antes de que simularas tu compra en ${estado.pc.comercioNombre}, así que no la confirma. Lo cargamos como una compra aparte.`}
+              </Text>
+            </View>
+            <Button label="Seguir con el ticket" onPress={() => router.replace({ pathname: "/revisa", params: estado.ticket })} />
+          </Card>
         ) : estado.tipo === "sin_permiso" ? (
           <Card>
             <Text variant="bodyMd" accessibilityLiveRegion="polite">
@@ -284,7 +290,7 @@ export default function Escanear() {
         )}
       </ScrollView>
 
-      {pideSesion || estado.tipo === "resultado" || estado.tipo === "sin_permiso" || estado.tipo === "pregunta" ? null : (
+      {pideSesion || estado.tipo === "resultado" || estado.tipo === "sin_permiso" || estado.tipo === "pregunta" || estado.tipo === "anterior" ? null : (
         <View style={{ alignItems: "center", paddingVertical: space.lg }}>
           <Pressable
             onPress={aMano}
