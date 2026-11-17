@@ -4,6 +4,7 @@ import { View } from "react-native";
 import { EmptyState } from "@/components/empty-state";
 import { RUTA_COMPRAR, TabBar } from "@/components/tab-bar";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { destinoDeTabs } from "@/perfil/destino";
 import { MENSAJES_ERROR } from "@/perfil/modelo";
 import { leerMedios } from "@/store/perfil-remoto";
 import { useTema } from "@/components/tema-provider";
@@ -21,16 +22,10 @@ export default function TabsLayout() {
   const perfil = useAppSelector((s) => s.perfil);
   const dispatch = useAppDispatch();
   // Toda la app está detrás de la sesión: sin usuario, a Bienvenida (crear cuenta o entrar).
-  if (!usuario) return <Redirect href="/bienvenida" />;
-  const sinMedios = !perfil.onboardingCompleto || perfil.medios.length === 0;
-  // Entra en un celular sin nada guardado: hasta saber si ya tiene medios en Supabase no se decide
-  // (si los tiene, no repite el onboarding).
-  if (sinMedios && (perfil.carga === "sin-leer" || perfil.carga === "leyendo")) {
-    return <View style={{ flex: 1, backgroundColor: colors.canvas }} />;
-  }
-  // No se pudo leer y no hay nada guardado: no se sabe si tiene medios en Supabase, así que no se lo
-  // manda a repetir el onboarding (FR-010: ni carga infinita ni redirección a ciegas).
-  if (sinMedios && (perfil.carga === "sin-conexion" || perfil.carga === "servidor-desactualizado" || perfil.carga === "error")) {
+  const destino = destinoDeTabs(usuario !== null, perfil);
+  if (destino.tipo === "bienvenida") return <Redirect href="/bienvenida" />;
+  if (destino.tipo === "esperar") return <View style={{ flex: 1, backgroundColor: colors.canvas }} />;
+  if (destino.tipo === "error-de-carga") {
     return (
       <View style={{ flex: 1, backgroundColor: colors.canvas, justifyContent: "center" }}>
         <EmptyState
@@ -46,10 +41,11 @@ export default function TabsLayout() {
     );
   }
   // Sin medios en el perfil: al onboarding, sin salida hasta confirmar (issue #41, T009).
-  if (sinMedios) return <Redirect href="/medios" />;
+  if (destino.tipo === "onboarding") return <Redirect href="/medios" />;
   // Una invitación abierta antes de tener cuenta o perfil se abre apenas el perfil está listo, venga
-  // de la primera respuesta, de «Guardá tu perfil» o del primer ingreso (ADR-008 §1, spec 012 US5).
-  if (perfil.invitacionPendiente) return <Redirect href={`/i/${perfil.invitacionPendiente}`} />;
+  // de la primera respuesta, de «Guardá tu perfil», de «Ya tengo cuenta» o del primer ingreso
+  // (ADR-008 §1, spec 012 US5, issue #137). La pantalla de aceptación la limpia al abrirse.
+  if (destino.tipo === "invitacion") return <Redirect href={`/i/${destino.token}`} />;
   return (
     <Tabs
       tabBar={(props) => <TabBar {...props} />}
