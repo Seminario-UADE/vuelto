@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ScrollView, View, type ScrollViewProps } from "react-native";
+import { Platform, ScrollView, View, type ScrollViewProps } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAlturaTeclado } from "@/hooks/use-altura-teclado";
 import { extraArribaWebApp } from "@/lib/web-app-instalada";
@@ -12,7 +12,8 @@ type Props = {
   /**
    * `stack`: pantalla con header nativo; el sistema maneja el inset superior.
    * `tab`: raíz de una pestaña sin header; se suma el área segura superior.
-   * `sheet`: dentro de un sheet o modal.
+   * `sheet`: dentro de un sheet o modal. En la app nativa el sistema ya lo deja debajo de la barra
+   * de estado; en la web ocupa toda la pantalla, así que se suma el área segura de arriba y de abajo.
    */
   kind?: "stack" | "tab" | "sheet";
   /** El pie está encima de la tab bar (que ya reserva el área segura inferior). */
@@ -30,7 +31,11 @@ export function Screen({ children, footer, kind = "stack", aboveTabBar, gap = sp
   const insets = useSafeAreaInsets();
   const [altoFooter, setAltoFooter] = useState(0);
   const altoTeclado = useAlturaTeclado();
-  const inferior = aboveTabBar || kind === "sheet" ? space.md : Math.max(insets.bottom, space.md);
+  // En la web un sheet es una pantalla completa (sin el marco que le pone iOS): sin el área segura,
+  // la X queda debajo de la hora y el botón de abajo, sobre la barra de inicio (en la web app instalada).
+  const sheetNativo = kind === "sheet" && Platform.OS !== "web";
+  const inferior = aboveTabBar || sheetNativo ? space.md : Math.max(insets.bottom, space.md);
+  const superior = kind === "tab" || kind === "sheet" ? (sheetNativo ? 0 : insets.top + extraArribaWebApp()) : 0;
   return (
     <View style={{ flex: 1, backgroundColor: colors.canvas }}>
       <ScrollView
@@ -42,7 +47,7 @@ export function Screen({ children, footer, kind = "stack", aboveTabBar, gap = sp
         {...scrollProps}
         contentContainerStyle={{
           paddingHorizontal: space.gutter,
-          paddingTop: kind === "tab" ? insets.top + extraArribaWebApp() + space.lg : space.lg,
+          paddingTop: superior + space.lg,
           paddingBottom: (footer ? altoFooter : inferior) + space.xxl + altoTeclado,
           gap,
         }}
