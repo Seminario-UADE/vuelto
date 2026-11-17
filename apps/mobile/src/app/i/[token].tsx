@@ -10,6 +10,7 @@ import { SkeletonList } from "@/components/skeleton";
 import { Text } from "@/components/text";
 import type { EstadoInvitacion } from "@/data/contracts";
 import { textoVencimiento } from "@/grupo/invitacion";
+import { rutaPreviaALaInvitacion } from "@/perfil/destino";
 import { useAsync } from "@/hooks/use-async";
 import { hapticoExito } from "@/lib/haptics";
 import { iniciales } from "@/lib/format";
@@ -50,7 +51,7 @@ export default function AceptarInvitacion() {
   useEffect(() => {
     if (!usuario || !onboardingCompleto) {
       dispatch(invitacionGuardada(token));
-      router.replace("/bienvenida");
+      router.replace(rutaPreviaALaInvitacion(usuario !== null));
     } else {
       // Ya se abrió: Inicio no vuelve a mandar acá.
       dispatch(invitacionGuardada(null));
