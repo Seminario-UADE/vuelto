@@ -8,6 +8,7 @@
 - **Deck:** [`vuelto-mvp.html`](vuelto-mvp.html), 12 slides. Abrirlo en el navegador y
   apretar `F` para pantalla completa. `D` cambia entre claro y oscuro, `T` prende un
   cronómetro, `←` `→` pasan de slide.
+- En `videos/` hay tres videos de presentación del producto (redes y versión profesional).
 - `vuelto-avance.html` y `vuelto-avance-completa.html` son de las entregas parciales. El
   research (encuesta, fuentes) ya se presentó ahí: acá va en una frase.
 
@@ -65,17 +66,26 @@ Recorrer la tabla *antes → ahora*:
   confirma en «Revisá tu compra». La foto no se guarda.
 - **Gasto en grupo:** antes eran contactos de ejemplo; ahora se invita por QR o link,
   los contactos quedan vinculados y el cálculo lo hace una función del servidor.
-- **Comercio:** sugiere el del catálogo que más se parece al del ticket.
-- **Topes en Inicio:** la torta suma solo lo que ya usaste este mes.
-- **El porqué:** «Por qué no los otros» explica cada uno de tus medios.
-- Números del pie: 1766 tests en verde, CI con 6 chequeos, 13 ADRs, 16 specs, 78 PRs.
+- **Empezar:** antes había que crear la cuenta para probar; ahora se eligen las tarjetas,
+  se toca un comercio y la app dice con qué pagar hoy. La cuenta se crea al final (#112).
+- **Comercio:** el mismo local escrito distinto ya es uno solo (#147), y se sugiere el del
+  catálogo que más se parece al del ticket.
+- **Topes y el porqué:** la torta de Inicio suma solo lo que ya usaste este mes, y cada
+  medio explica por qué sí o por qué no.
+- Números del pie: 1804 tests en verde (corrida local del 17/11), CI con 6 chequeos,
+  13 ADRs, 16 specs, 83 PRs mergeados.
 
 ## Jesús — Demo y pantallas (slides 4 a 7, 3:45)
 
 **Slide 4 · Demo** (3:00)
 1. Tocar **«+»**: elegir un comercio **con promo vigente ese día** y poner el monto.
-   `[PENDIENTE: comercio y monto de la demo. Coto tiene sus promos los lunes y martes.]`
-2. Mostrar la recomendación: medio, reintegro y tope que queda. Con **dos o más medios** en la cuenta de demo, abrir también **«Por qué no los otros»**.
+   `[PENDIENTE: comercio y monto de la demo, con promo vigente ese día.]`
+   Para mostrar el tope compartido: elegir un comercio con tope (el 17/11 fue Natural Life,
+   25% los martes, tope de $15.000) y **hacer dos compras seguidas**. En la segunda, la
+   recomendación pasa al 20% porque al 25% le queda poco tope.
+2. Mostrar la recomendación: medio, reintegro y tope que queda. Abrir **«Otras opciones»**
+   para ver por qué la otra promo conviene menos. Con **dos o más medios** en la cuenta de
+   demo, se explica también cada medio.
 3. «Voy a pagar con…»: la compra queda por confirmar en Inicio.
 4. **Foto del ticket:** sacar la foto de un ticket real, revisar y guardar. Decir que la
    foto se descarta.
@@ -86,7 +96,8 @@ Recorrer la tabla *antes → ahora*:
    celular real; hoy no hay evidencia.]`
 
 **Slides 5, 6 y 7** (0:15 c/u): solo si la demo falló, o para dejar a la vista el
-recorrido. Capturas de la app web del 16/11 (detalle en `assets/capturas/LEEME.md`).
+recorrido. Capturas de la app web del 17/11 (detalle en `assets/capturas/LEEME.md`). La 5
+suma las dos pantallas de empezar sin cuenta.
 
 ## Agustín — Por dentro (slides 8 y 9, 1:40)
 
@@ -107,10 +118,11 @@ recorrido. Capturas de la app web del 16/11 (detalle en `assets/capturas/LEEME.m
 
 ## Joaquín — Estado real y cierre (slides 10 y 12, 1:20)
 
-- **Funciona de punta a punta:** ingesta y sincronización, motor en la app, cuenta con
-  RLS, registrar la compra con la foto y gasto en grupo con contactos vinculados.
-- **En curso:** mismo comercio escrito distinto (#147, PR abierto), detalles del gasto en
-  grupo (#138, #139), chequeo de salud de la ingesta (#52).
+- **Funciona de punta a punta:** ingesta y sincronización, motor en la app, probar sin
+  cuenta y crearla al final (#112), perfil y compras con RLS, registrar la compra con la
+  foto y gasto en grupo con contactos vinculados.
+- **En curso:** detalles del gasto en grupo (#138, #139), chequeo de salud de la ingesta
+  (#52).
 - **Falta:** extractor de letra chica (#51); medir la precisión del lector de tickets y
   del extractor (#10, #53): **no tenemos una cifra**, y probar la función con 3 tickets no
   mide nada; auditoría de secretos (#55); APK de respaldo (#56). El borrado a los 90 días
@@ -131,6 +143,8 @@ recorrido. Capturas de la app web del 16/11 (detalle en `assets/capturas/LEEME.m
 
 - **¿El ticket se lee de verdad?** Sí: la app manda la foto a una Edge Function que la lee
   con Groq. No medimos la precisión (#10); no decimos un número.
+- **¿Hay que crear una cuenta para probarla?** No: se eligen las tarjetas y se ve con qué
+  pagar hoy; la cuenta se pide al guardar el perfil (#112).
 - **¿El gasto en grupo anda?** Sí, con contactos vinculados por invitación. Quedan dos
   detalles abiertos (#138, #139).
 - **¿Y el extractor de promos?** No existe (#51, #53). Las promos entran por el mapeo por
@@ -144,7 +158,8 @@ recorrido. Capturas de la app web del 16/11 (detalle en `assets/capturas/LEEME.m
 
 ## Antes de entrar
 
-- [ ] Pestaña **Actions**: la última *Ingesta de promociones* en verde.
+- [ ] Pestaña **Actions**: la última *Ingesta de promociones* en verde. Al 17/11 (00:30) la
+      última corrida registrada era la del 15/11: no figura la del 16/11, revisar por qué.
 - [ ] Migraciones de la base alojada al día (`supabase migration list --linked`).
       **El chequeo `migraciones.yml` falló el 15 y el 16/11: cargar el secret
       `SUPABASE_DB_URL` en el repo o revisar a mano.** Además, la migración de contactos

@@ -253,11 +253,11 @@
         <div class="dh"></div><div class="dh">Antes</div><div class="dh">Ahora</div>
         <b>Ticket</b><span>Un ticket de ejemplo, sin cámara</span><span class="now">Foto con la cámara, la lee Groq y se confirma en «Revisá tu compra»</span>
         <b>Gasto en grupo</b><span>Contactos e invitaciones de ejemplo</span><span class="now">Invitación por QR o link, contactos vinculados y cálculo en el servidor</span>
-        <b>Comercio</b><span>El nombre del ticket tenía que coincidir exacto</span><span class="now">Sugiere el comercio del catálogo que más se parece</span>
-        <b>Topes en Inicio</b><span>Sumaba los topes de todas las promos</span><span class="now">Torta con los topes que ya usaste este mes</span>
-        <b>El porqué</b><span>«Por qué no los otros» listaba promos de otros comercios</span><span class="now">Explica cada uno de tus medios en esa compra</span>
+        <b>Empezar</b><span>Había que crear la cuenta para probar la app</span><span class="now">Se prueba sin cuenta: elegís tus tarjetas y ves con qué pagar hoy; la cuenta viene al final</span>
+        <b>Comercio</b><span>El mismo local escrito distinto contaba como otro</span><span class="now">Es un solo comercio, y se sugiere el del catálogo que más se parece</span>
+        <b>Topes y el porqué</b><span>Inicio sumaba los topes de todas las promos</span><span class="now">Torta con lo que ya usaste este mes, y cada medio explica por qué sí o no</span>
       </div>
-      <div class="chips rise" style="--d:.22s; margin-top:auto"><span class="chip">1766 tests en verde</span><span class="chip">CI con 6 chequeos</span><span class="chip">13 ADRs · 16 specs</span><span class="chip">78 PRs mergeados</span></div>
+      <div class="chips rise" style="--d:.22s; margin-top:auto"><span class="chip">1804 tests en verde</span><span class="chip">CI con 6 chequeos</span><span class="chip">13 ADRs · 16 specs</span><span class="chip">83 PRs mergeados</span></div>
     </div>
   </section>
 
@@ -285,15 +285,17 @@
   <!-- 5 · Pantallas: decidir -->
   <section class="slide">
     <div class="who">Jesús<span class="t">0:15</span></div>
-    <div class="kicker rise" style="margin-top:14px">Pantallas · decidir</div>
-    <h2 class="rise" style="--d:.05s">Con qué pagar, y por qué</h2>
-    <div class="phones">
-      <div class="phone rise" style="--d:.1s"><div class="frame"><img src="assets/capturas/inicio.jpg" alt="Inicio"></div><div class="cap">Inicio<small>lo devuelto y el tope que queda</small></div></div>
-      <div class="phone rise" style="--d:.15s"><div class="frame"><img src="assets/capturas/comprar.jpg" alt="Comprar: elegir el comercio"></div><div class="cap">Comprar<small>comercio y monto</small></div></div>
-      <div class="phone rise" style="--d:.2s"><div class="frame"><img src="assets/capturas/recomendacion.jpg" alt="Recomendación"></div><div class="cap">Recomendación<small>medio, reintegro y tope</small></div></div>
-      <div class="phone rise" style="--d:.25s"><div class="frame"><img src="assets/capturas/pagar.jpg" alt="Voy a pagar con Galicia"></div><div class="cap">Voy a pagar con…<small>queda por confirmar</small></div></div>
+    <div class="kicker rise" style="margin-top:14px">Pantallas · empezar y decidir</div>
+    <h2 class="rise" style="--d:.05s">Se prueba sin cuenta y se decide en cada compra</h2>
+    <div class="phones" style="gap:14px; margin-top:30px">
+      <div class="phone rise" style="--d:.1s"><div class="frame"><img src="assets/capturas/bienvenida.jpg" alt="Bienvenida, sin cuenta"></div><div class="cap">Empezar<small>sin cuenta</small></div></div>
+      <div class="phone rise" style="--d:.14s"><div class="frame"><img src="assets/capturas/primera-respuesta.jpg" alt="Primera respuesta: te conviene Galicia Visa crédito"></div><div class="cap">Primera respuesta<small>con tus tarjetas, antes de la cuenta</small></div></div>
+      <div class="phone rise" style="--d:.18s"><div class="frame"><img src="assets/capturas/inicio.jpg" alt="Inicio"></div><div class="cap">Inicio<small>lo devuelto y el tope que queda</small></div></div>
+      <div class="phone rise" style="--d:.22s"><div class="frame"><img src="assets/capturas/comprar.jpg" alt="Comprar: elegir el comercio"></div><div class="cap">Comprar<small>comercio y monto</small></div></div>
+      <div class="phone rise" style="--d:.26s"><div class="frame"><img src="assets/capturas/recomendacion.jpg" alt="Recomendación"></div><div class="cap">Recomendación<small>medio, reintegro y por qué</small></div></div>
+      <div class="phone rise" style="--d:.3s"><div class="frame"><img src="assets/capturas/pagar.jpg" alt="Voy a pagar con Galicia"></div><div class="cap">Voy a pagar con…<small>queda por confirmar</small></div></div>
     </div>
-    <p class="foot">La recomendación se calcula en el celular, con código determinístico y sin red.</p>
+    <p class="foot">La recomendación se calcula en el celular, con código determinístico y sin red. Con la compra anterior, el 20% pasa a convenir más que el 25%: al 25% le queda poco tope.</p>
   </section>
 
   <!-- 6 · Pantallas: registrar y controlar -->
@@ -423,13 +425,12 @@
           <div class="card"><ul>
             <li>Ingesta diaria de MODO y sincronización al celular</li>
             <li>Motor en la app: recomendación y topes</li>
-            <li>Cuenta, perfil y compras con RLS</li>
+            <li>Probar sin cuenta; la cuenta se crea al final (#112). Perfil y compras con RLS</li>
             <li>Registrar la compra con la foto del ticket</li>
             <li>Gasto en grupo con contactos vinculados</li>
           </ul></div></div>
         <div class="col rise" style="--d:.16s"><span class="badge b-sim">En curso</span>
           <div class="card"><ul>
-            <li>El mismo comercio escrito distinto cuenta como uno (#147, PR abierto)</li>
             <li>Detalles del gasto en grupo: estado vacío y qué hace «Confirmar» (#138, #139)</li>
             <li>Chequeo de salud de la ingesta (#52)</li>
           </ul></div></div>
