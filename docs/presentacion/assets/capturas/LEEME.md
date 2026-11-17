@@ -6,10 +6,10 @@ promos bajadas por la ingesta real de MODO y una cuenta de prueba con Galicia Vi
 
 | Archivo | Pantalla | Slide |
 |---|---|---|
-| `bienvenida.jpg`, `primera-respuesta.jpg` | Empezar sin cuenta | 5 |
-| `inicio.jpg`, `comprar.jpg`, `recomendacion.jpg`, `pagar.jpg` | Decidir | 5 |
-| `escanear.jpg`, `revisa.jpg` (carga a mano), `topes.jpg`, `compras.jpg` | Registrar y controlar | 6 |
-| `grupo-invitar.jpg`, `grupo-armar.jpg`, `grupo-resultado.jpg` | Gasto en grupo (de `docs/design/capturas-grupo-016/`, 15/11) | 7 |
+| `bienvenida.jpg`, `primera-respuesta.jpg` | Empezar sin cuenta | 6 |
+| `inicio.jpg`, `comprar.jpg`, `recomendacion.jpg`, `pagar.jpg` | Decidir | 6 |
+| `escanear.jpg`, `revisa.jpg` (carga a mano), `topes.jpg`, `compras.jpg` | Registrar y controlar | 7 |
+| `grupo-invitar.jpg`, `grupo-armar.jpg`, `grupo-resultado.jpg` | Gasto en grupo (de `docs/design/capturas-grupo-016/`, 15/11) | 8 |
 | `medios.jpg` | Elegir tarjetas en el onboarding (sin usar en el deck) | — |
 
 ## Qué compras hay detrás de las capturas

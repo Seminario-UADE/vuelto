@@ -3,12 +3,15 @@
 - **Fecha:** `[PENDIENTE: día y hora exactos de la entrega]`.
 - **Duración:** 10 minutos de exposición, sin contar preguntas.
 - **Formato:** presencial, con proyector. **Demo en vivo desde el celular, con el deck como
-  respaldo**: las slides 5 a 7 son capturas del mismo recorrido, y si la demo falla se
+  respaldo**: las slides 6 a 8 son capturas del mismo recorrido, y si la demo falla se
   sigue con ellas.
-- **Deck:** [`vuelto-mvp.html`](vuelto-mvp.html), 12 slides. Abrirlo en el navegador y
+- **Deck:** [`vuelto-mvp.html`](vuelto-mvp.html), 13 slides. Abrirlo en el navegador y
   apretar `F` para pantalla completa. `D` cambia entre claro y oscuro, `T` prende un
   cronómetro, `←` `→` pasan de slide.
-- En `videos/` hay tres videos de presentación del producto (redes y versión profesional).
+- **La slide 1 es el video de presentación** (`videos/Vuelto_profesional_final_v2.mp4`,
+  1:26, con audio). En esa slide **`Espacio` o `K` reproducen y pausan**; al pasar de slide
+  se pausa solo. Probar el audio del proyector antes de entrar.
+- En `videos/` quedan además los videos de redes y las dos versiones de voz del profesional.
 - `vuelto-avance.html` y `vuelto-avance-completa.html` son de las entregas parciales. El
   research (encuesta, fuentes) ya se presentó ahí: acá va en una frase.
 
@@ -19,38 +22,44 @@
 
 | Persona | Slides | Tiempo |
 |---|---|---|
-| Joaquín | 1, 2, 10, 12 | 2:00 |
-| Santiago | 3, 11 | 1:20 |
-| Jesús | 4, 5, 6, 7 | 3:45 |
-| Agustín | 8, 9 | 1:40 |
-| | **Total** | **8:45** |
+| Joaquín | 1, 2, 3, 11, 13 | 3:26 |
+| Santiago | 4, 12 | 1:20 |
+| Jesús | 5, 6, 7, 8 | 3:45 |
+| Agustín | 9, 10 | 1:40 |
+| | **Total** | **10:11** |
 
-Quedan 1:15 de margen para pases y para que Jesús cambie de la presentación al celular.
+**Con el video no queda margen:** son 10:11 sobre 10:00, sin contar pases ni el cambio de
+Jesús al celular. Hay que recortar al menos 1:00; ver «Si nos pasamos».
 
 ## Orden y tiempos
 
 | # | Slide | Quién | Tiempo |
 |---|---|---|---|
-| 1 | Portada | Joaquín | 0:10 |
-| 2 | El problema en una slide | Joaquín | 0:30 |
-| 3 | Avances desde la entrega anterior | Santiago | 0:50 |
-| 4 | Demo en vivo | Jesús | 3:00 |
-| 5 | Pantallas: decidir | Jesús | 0:15 |
-| 6 | Pantallas: registrar y controlar | Jesús | 0:15 |
-| 7 | Pantallas: gasto en grupo | Jesús | 0:15 |
-| 8 | Cómo funciona por dentro | Agustín | 0:50 |
-| 9 | Ingesta y privacidad | Agustín | 0:50 |
-| 10 | Estado real | Joaquín | 1:00 |
-| 11 | Uso de IA | Santiago | 0:30 |
-| 12 | Cierre | Joaquín | 0:20 |
+| 1 | Video de presentación | Joaquín (da play) | 1:26 |
+| 2 | Portada | Joaquín | 0:10 |
+| 3 | El problema en una slide | Joaquín | 0:30 |
+| 4 | Avances desde la entrega anterior | Santiago | 0:50 |
+| 5 | Demo en vivo | Jesús | 3:00 |
+| 6 | Pantallas: empezar y decidir | Jesús | 0:15 |
+| 7 | Pantallas: registrar y controlar | Jesús | 0:15 |
+| 8 | Pantallas: gasto en grupo | Jesús | 0:15 |
+| 9 | Cómo funciona por dentro | Agustín | 0:50 |
+| 10 | Ingesta y privacidad | Agustín | 0:50 |
+| 11 | Estado real | Joaquín | 1:00 |
+| 12 | Uso de IA | Santiago | 0:30 |
+| 13 | Cierre | Joaquín | 0:20 |
 
-Si nos pasamos: se acorta la 11 (solo el primer bloque), la 9 y la 2. **La 10 no se
-acorta**: es la que dice qué es real y qué falta. Si la demo anda, las slides 5 a 7 se
-pasan sin comentarlas.
+Si nos pasamos: se acorta la 12 (solo el primer bloque), la 10, la 3 (el video ya abre con
+el problema: **revisar contra el audio antes de decidir**, no lo transcribí) y la portada se
+pasa en 5 segundos. **La 11 no se acorta**: es la que dice qué es real y qué falta. Si la
+demo anda, las slides 6 a 8 se pasan sin comentarlas.
 
 ---
 
-## Joaquín — Apertura (slides 1 y 2, 0:40)
+## Joaquín — Apertura (slides 1 a 3, 2:06)
+
+- Slide 1: dar play al video (1:26) y esperar a que termine antes de hablar.
+- Slides 2 y 3, 0:40:
 
 - Hoy no repetimos el research: mostramos la app funcionando.
 - Las promos cambian por día, billetera, banco y tarjeta, y el tope de reintegro es
@@ -59,7 +68,7 @@ pasan sin comentarlas.
   queda**, como estimado y con su base. Los datos de la encuesta (51 respuestas) ya se
   presentaron; un dato alcanza: 98% se enteró después de una promo mejor.
 
-## Santiago — Avances (slide 3, 0:50)
+## Santiago — Avances (slide 4, 0:50)
 
 Recorrer la tabla *antes → ahora*:
 - **Ticket:** antes devolvía uno de ejemplo; ahora se saca la foto, la lee Groq y se
@@ -75,9 +84,9 @@ Recorrer la tabla *antes → ahora*:
 - Números del pie: 1804 tests en verde (corrida local del 17/11), CI con 6 chequeos,
   13 ADRs, 16 specs, 83 PRs mergeados.
 
-## Jesús — Demo y pantallas (slides 4 a 7, 3:45)
+## Jesús — Demo y pantallas (slides 5 a 8, 3:45)
 
-**Slide 4 · Demo** (3:00)
+**Slide 5 · Demo** (3:00)
 1. Tocar **«+»**: elegir un comercio **con promo vigente ese día** y poner el monto.
    `[PENDIENTE: comercio y monto de la demo, con promo vigente ese día.]`
    Para mostrar el tope compartido: elegir un comercio con tope (el 17/11 fue Natural Life,
@@ -95,20 +104,20 @@ Recorrer la tabla *antes → ahora*:
 7. Si hay tiempo: modo avión y repetir la recomendación. `[PENDIENTE: probarlo en un
    celular real; hoy no hay evidencia.]`
 
-**Slides 5, 6 y 7** (0:15 c/u): solo si la demo falló, o para dejar a la vista el
-recorrido. Capturas de la app web del 17/11 (detalle en `assets/capturas/LEEME.md`). La 5
+**Slides 6, 7 y 8** (0:15 c/u): solo si la demo falló, o para dejar a la vista el
+recorrido. Capturas de la app web del 17/11 (detalle en `assets/capturas/LEEME.md`). La 6
 suma las dos pantallas de empezar sin cuenta.
 
-## Agustín — Por dentro (slides 8 y 9, 1:40)
+## Agustín — Por dentro (slides 9 y 10, 1:40)
 
-**Slide 8 · Arquitectura**
+**Slide 9 · Arquitectura**
 - API de MODO → ingesta diaria → Supabase → app Expo. **El motor corre en el celular**,
   sin red.
 - **Ningún modelo de lenguaje entra al motor.** Groq lee tickets y ya se usa desde la app;
   la lectura de letra chica con Gemini **no está hecha**.
 - El gasto en grupo es otra Edge Function que usa el mismo motor, sin LLM.
 
-**Slide 9 · Ingesta y privacidad**
+**Slide 10 · Ingesta y privacidad**
 - Corrida del 15/11: **3151 promos publicables**, 696 descartadas por nivel de cliente y
   18 por topes que el motor no modela. Unos 43 minutos.
 - De las últimas 10 corridas **fallaron 2** (7 y 10/11); las últimas 5 pasaron.
@@ -116,7 +125,7 @@ suma las dos pantallas de empezar sin cuenta.
   descarta. Se guarda el texto extraído, y solo cuando el usuario confirma.
 - Acumulabilidad y jurisdicción quedan en `null` hasta el extractor de letra chica.
 
-## Joaquín — Estado real y cierre (slides 10 y 12, 1:20)
+## Joaquín — Estado real y cierre (slides 11 y 13, 1:20)
 
 - **Funciona de punta a punta:** ingesta y sincronización, motor en la app, probar sin
   cuenta y crearla al final (#112), perfil y compras con RLS, registrar la compra con la
@@ -129,7 +138,7 @@ suma las dos pantallas de empezar sin cuenta.
   es una política, no un proceso corriendo.
 - Cierre: «Vuelto decide con código, mide con datos y dice lo que todavía no hace.»
 
-## Santiago — Uso de IA (slide 11, 0:30)
+## Santiago — Uso de IA (slide 12, 0:30)
 
 - En el producto el LLM extrae datos y no decide: Groq lee tickets; Gemini leerá la letra
   chica (pendiente); el motor no tiene LLM.

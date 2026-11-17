@@ -53,6 +53,8 @@
   .slide { position: absolute; inset: 0; padding: 64px 72px 60px; display: flex; flex-direction: column; opacity: 0; visibility: hidden; transition: opacity .35s ease, visibility 0s linear .35s; }
   .slide.active { opacity: 1; visibility: visible; transition: opacity .35s ease; }
   .slide.hero { background: var(--hero); color: var(--on-hero); }
+  .slide.video { padding: 0; background: #051F20; }
+  .slide.video video { width: 100%; height: 100%; object-fit: contain; display: block; background: #051F20; }
   .rise { opacity: 0; transform: translateY(12px); }
   .slide.active .rise { animation: rise .55s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--d, 0s); }
   @keyframes rise { to { opacity: 1; transform: none; } }
@@ -205,7 +207,12 @@
 <body>
 <div class="stage" id="stage">
 
-  <!-- 1 · Portada -->
+  <!-- 1 · Video de presentación (1:26). Espacio o K: reproducir/pausar. -->
+  <section class="slide video" id="slide-video">
+    <video id="intro" controls playsinline preload="metadata" poster="assets/poster-video.jpg" src="videos/Vuelto_profesional_final_v2.mp4"></video>
+  </section>
+
+  <!-- 2 · Portada -->
   <section class="slide hero">
     <div class="who">Joaquín<span class="t">0:10</span></div>
     <div style="margin-top:auto; margin-bottom:auto;">
@@ -498,7 +505,7 @@
 
 <div class="ctrl">
   <span id="timer">00:00</span>
-  <span id="counter">1 / 12</span>
+  <span id="counter">1 / 13</span>
   <button id="theme" type="button" title="Modo claro u oscuro (D)">Claro / oscuro</button>
   <button id="prev" type="button" aria-label="Anterior">←</button>
   <button id="next" type="button" aria-label="Siguiente">→</button>
@@ -514,6 +521,8 @@
   var progress = document.getElementById('progress');
   var root = document.documentElement;
   var cur = 0;
+  var intro = document.getElementById('intro');
+  function toggleIntro() { if (intro.paused) { var p = intro.play(); if (p && p.catch) p.catch(function () {}); } else intro.pause(); }
 
   /* Tema: el guardado, o el del sistema */
   function setTheme(t) { root.setAttribute('data-theme', t); try { localStorage.setItem('vuelto-deck-tema', t); } catch (e) {} }
@@ -540,6 +549,7 @@
   function go(n) {
     cur = Math.max(0, Math.min(slides.length - 1, n));
     slides.forEach(function (el, i) { el.classList.toggle('active', i === cur); });
+    if (cur !== 0 && !intro.paused) intro.pause();
     counter.textContent = (cur + 1) + ' / ' + slides.length;
     progress.style.width = ((cur + 1) / slides.length * 100) + '%';
     try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
@@ -552,7 +562,8 @@
 
   document.addEventListener('keydown', function (e) {
     var k = e.key;
-    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); next(); }
+    if (cur === 0 && (k === ' ' || k === 'k' || k === 'K')) { e.preventDefault(); toggleIntro(); }
+    else if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); next(); }
     else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); prev(); }
     else if (k === 'Home') go(0);
     else if (k === 'End') go(slides.length - 1);
