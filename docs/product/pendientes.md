@@ -68,7 +68,9 @@
 - [ ] Experimento de precisión del extractor (entregable de research): #53,
       que hay que redefinir porque ya no hay corpus revisado a mano contra el
       cual medir (ADR-011).
-- [ ] Probar el extractor de tickets contra 15-20 tickets reales (#10)
+- [x] Probar el extractor de tickets contra tickets reales (#10): 5 tickets medidos, por debajo de
+      los 15-20 de RNF-09; informe en `docs/product/precision-extractor.md`, con una tabla para
+      seguir sumando.
 - [x] Contrato con la ingesta (#35, #50, #51): cada lote de escrituras de
       `promociones` se confirma en menos de 5 minutos (la app relee con 10 de
       margen, `04-infrastructure.md`). La ingesta escribe en lotes de 50 filas

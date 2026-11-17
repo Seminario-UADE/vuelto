@@ -3570,6 +3570,29 @@ confirmarla en el comercio equivocado ni dejarla duplicada.
 
 ---
 
+## 2026-11-17 — Informe de precisión del lector de tickets (issue #10)
+
+**Herramienta:** Claude Code (Opus 5.5).
+
+**Objetivo:** dejar escrito el informe de acierto por campo que pedía la issue #10 (RNF-09).
+
+**Prompts principales:**
+1. "La precisión del lector ya la cerré, ya la probé varias veces." La issue estaba cerrada, pero
+   faltaba el informe que pedía su criterio. "Armá el informe." Se avisó que lo registrado no
+   alcanzaba para 15-20 tickets, para no inventar números.
+2. "Dejame probar con algunos tickets más." El usuario probó en el celular y pasó los resultados
+   ticket por ticket (Pastasole y Cardano, uno muy arrugado), sin fotos ni datos personales.
+3. "Ya con esos está bien, cerrá el ticket con eso."
+
+**Resultado:**
+- `docs/product/precision-extractor.md`: 5 tickets medidos (3 de la issue #48 y 2 nuevos).
+  Monto, fecha y comercio, 5 de 5; medio de pago, 3 de 3 (en 2 tickets no figuraba).
+- Quedan escritos los límites (muestra chica y pocos rubros), el dato personal que se escapó en
+  la issue #48 y cómo se corrigió, y una tabla para seguir sumando tickets.
+- `estado.md` y `pendientes.md` dicen que el lector ya se midió.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

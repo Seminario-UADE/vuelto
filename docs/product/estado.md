@@ -43,8 +43,9 @@
   el chequeo de salud de la ingesta (#52) y el informe de precisión por campo
   (#53, que además hay que redefinir porque ya no hay corpus revisado a mano
   contra el cual medir, ADR-011).
-- **Precisión del lector de tickets (#10)**: sin probar contra 15-20 tickets
-  reales.
+- **Precisión del lector de tickets (#10)**: cerrada con 5 tickets medidos campo por campo
+  (monto, fecha y comercio 5 de 5; medio de pago 3 de 3), por debajo de los 15-20 de RNF-09.
+  Informe en `docs/product/precision-extractor.md`.
 - **Auditoría de secretos y privacidad (#55)** y **cargar las keys (#85)**:
   en curso / abiertas.
 - **Compra por confirmar con el ticket (#110)**, **estado vacío de «Armar
