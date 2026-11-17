@@ -64,6 +64,10 @@ function base(b: BaseDeVosRemota | BaseDeContactoRemota, quien: { nombre: string
     : `sin base ${periodo === "semana" ? "esta semana" : "este mes"}`;
 }
 
+/** Sin contactos vinculados, la gente sin cuenta no aporta tope: solo se pudo evaluar a «Vos» (#139, G-11). */
+const AVISO_SOLO_VOS =
+  "Solo pudimos evaluar tus medios: nadie más del grupo tiene cuenta con Vuelto. Invitá a alguien para que Vuelto decida con sus topes.";
+
 type Pagador = { quienPaga: NonNullable<RecomendacionGrupo["quienPaga"]>; medio: string; razon: string; base: string };
 
 export function vistaDeGrupo(
@@ -144,6 +148,7 @@ export function vistaDeGrupo(
     razon: p?.razon || null,
     reintegro: p ? r.reintegro : null,
     base: p?.base ?? null,
+    aviso: r.contactos.length === 0 ? AVISO_SOLO_VOS : null,
     integrantes: filas,
   };
 }
