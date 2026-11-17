@@ -18,8 +18,8 @@ export type CompraPorConfirmar = {
   /** Del catálogo; hay una por comercio (FR-012). */
   comercioId: string;
   comercioNombre: string;
-  /** El medio recomendado que eligió con «Usar». */
-  medioId: string;
+  /** El medio recomendado que eligió con «Usar»; `null` si el comercio no tenía promo (issue #110). */
+  medioId: string | null;
   /** El de la simulación, si lo cargó: `null` o un número finito mayor a 0. */
   monto: number | null;
   /** ISO, de `sesion.ahora` (nunca `new Date()`, ADR-010). */

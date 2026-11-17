@@ -105,7 +105,7 @@ describe("confirmarPorConfirmar (spec 012, FR-006, FR-016, SC-008)", () => {
     return { s, pc: r.porConfirmar };
   }
 
-  const delBorrador = (pc: { comercioNombre: string; medioId: string; monto: number | null }) => ({
+  const delBorrador = (pc: { comercioNombre: string; medioId: string | null; monto: number | null }) => ({
     modo: "excepcion" as const,
     comercio: pc.comercioNombre,
     fecha: "2026-10-14",

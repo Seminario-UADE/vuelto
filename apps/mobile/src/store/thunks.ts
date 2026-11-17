@@ -72,21 +72,22 @@ export function guardarCompra(b: BorradorCompra, intento: string | null = null, 
 /**
  * «Usar [medio]» desde Inicio o desde el detalle del comercio (spec 012, FR-002): deja una
  * compra por confirmar con lo que se está simulando y limpia la simulación. No crea ninguna
- * compra, así que no toca topes (FR-003). Devuelve si reemplazó la del mismo comercio
- * (FR-012), o `null` si no hay un medio recomendado o no hay usuario.
+ * compra, así que no toca topes (FR-003). Sin promo también se crea, sin medio de pago: el
+ * recorrido es el mismo y el medio se elige al confirmar (issue #110). Devuelve si reemplazó la
+ * del mismo comercio (FR-012), o `null` si no hay comercio simulado o no hay usuario.
  */
-export function usarRecomendacion(): AppThunk<{ porConfirmar: CompraPorConfirmar; medioNombre: string; reemplazo: boolean } | null> {
+export function usarRecomendacion(): AppThunk<{ porConfirmar: CompraPorConfirmar; medioNombre: string | null; reemplazo: boolean } | null> {
   return (dispatch, getState, { generarId }) => {
     const estado = getState();
     const r = selectRecomendacion(estado);
     const usuarioId = estado.sesion.usuario?.id ?? null;
-    if (r === null || r.medio === null || usuarioId === null) return null;
+    if (r === null || usuarioId === null) return null;
     const porConfirmar: CompraPorConfirmar = {
       id: generarId(),
       usuarioId,
       comercioId: r.comercio.id,
       comercioNombre: r.comercio.nombre,
-      medioId: r.medio.id,
+      medioId: r.medio?.id ?? null,
       monto: estado.simulacion.monto,
       creadaEn: estado.sesion.ahora,
       canal: estado.simulacion.canal,
@@ -95,7 +96,7 @@ export function usarRecomendacion(): AppThunk<{ porConfirmar: CompraPorConfirmar
     const reemplazo = selectPorConfirmarVigentes(estado).some((c) => c.comercioId === porConfirmar.comercioId);
     dispatch(porConfirmarCreada(porConfirmar));
     dispatch(comercioElegido(null));
-    return { porConfirmar, medioNombre: r.medio.nombre, reemplazo };
+    return { porConfirmar, medioNombre: r.medio?.nombre ?? null, reemplazo };
   };
 }
 

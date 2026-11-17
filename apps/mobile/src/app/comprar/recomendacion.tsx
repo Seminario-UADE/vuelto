@@ -38,27 +38,10 @@ export default function PasoRecomendacion() {
     if (id) router.replace({ pathname: "/comprar/pagar", params: { id } });
   };
 
-  const footer = !r ? null : r.medio ? (
-    <Button label={`Voy a pagar con ${r.medio.nombreCorto}`} onPress={voyAPagar} />
-  ) : (
-    // Sin promo no hay medio que recomendar: igual se puede registrar la compra al pagar.
-    <Button
-      label="Registrar la compra"
-      onPress={() =>
-        router.push({
-          pathname: "/revisa",
-          params: {
-            modo: "manual",
-            comercio: r.comercio.nombre,
-            // El rubro exacto y el canal: la compra se guarda como se recomendó (FR-022).
-            ...(r.comercio.categoriaId !== null ? { categoriaId: String(r.comercio.categoriaId) } : {}),
-            monto: monto ?? "",
-            canal,
-            flujo: "1",
-          },
-        })
-      }
-    />
+  // Con o sin promo, el mismo recorrido: queda la compra por confirmar y sigue a «Pagá con…»; sin
+  // promo, sin medio de pago, que se elige al confirmar (issue #110).
+  const footer = !r ? null : (
+    <Button label={r.medio ? `Voy a pagar con ${r.medio.nombreCorto}` : "Voy a pagar"} onPress={voyAPagar} />
   );
 
   return (

@@ -96,7 +96,7 @@ function entradaValida(x: unknown): x is CompraPorConfirmar {
     esTexto(x.usuarioId) &&
     esTexto(x.comercioId) &&
     esTexto(x.comercioNombre) &&
-    esTexto(x.medioId) &&
+    (x.medioId === null || esTexto(x.medioId)) &&
     (x.monto === null || (typeof x.monto === "number" && Number.isFinite(x.monto) && x.monto > 0)) &&
     esTexto(x.creadaEn) &&
     !Number.isNaN(Date.parse(x.creadaEn)) &&

@@ -243,9 +243,15 @@ export default function Escanear() {
         ) : estado.tipo === "anterior" ? (
           <Card>
             <Text variant="bodyMd" accessibilityLiveRegion="polite">
-              {`Este ticket es de antes de que simularas la compra en ${estado.pc.comercioNombre}: lo cargamos como una compra aparte.`}
+              {`Este ticket es de antes de que simularas la compra en ${estado.pc.comercioNombre}.`}
             </Text>
-            <Button label="Seguir" onPress={() => irARevisa(estado.leido, null)} />
+            <Button label="Cargar como compra aparte" onPress={() => irARevisa(estado.leido, null)} />
+            {/* Por si la fecha se leyó mal: la fecha arranca en el día de la simulación y se puede cambiar. */}
+            <Button
+              label={`Es de mi compra en ${estado.pc.comercioNombre}`}
+              variant="secondary"
+              onPress={() => irARevisa(estado.leido, estado.pc.id)}
+            />
           </Card>
         ) : estado.tipo === "sin_permiso" ? (
           <Card>
