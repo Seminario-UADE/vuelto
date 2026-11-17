@@ -3373,6 +3373,70 @@ en `pendientes.md`.
 **Quedó sin verificar:** si la base alojada tiene las 12 migraciones, si hay un
 APK de respaldo generado, el conteo actual de promos publicadas y todo lo que
 depende de la cátedra (equipo, exclusiones, formato de requisitos).
+## 2026-11-17 — Confirmar la compra por confirmar escaneando el ticket (issue #110, spec 012 US2)
+
+**Herramienta:** Claude Code (Sonnet 5.5), en una sesión lanzada desde otra sesión de Claude Code.
+
+**Objetivo:** que «Escanear ticket» cruce el ticket con la compra por confirmar (spec 012
+US2, tareas T021–T025) sin rehacer lo que ya estaba en `main`.
+
+**Prompts principales:**
+1. "Implementá el issue #110 y abrí un PR que lo cierre. Primero verificá el estado
+   real: revisá qué de la spec ya existe en el código para no rehacer nada."
+   La IA encontró hecho `borradorDesdePorConfirmar` con ticket, la sugerencia sin
+   marcar en `revisa.tsx`, el ticket de ejemplo con la fecha de hoy y el escenario
+   «sin red». Faltaban `normalizarComercio`, `ticketCoincide` y las preguntas de
+   `escanear.tsx`.
+
+**Resultado:** `ticketCoincide` (palabra entera, sin tildes ni puntuación, fecha no
+anterior a la simulación) y `coincidenteConTicket` (la más reciente) con tests;
+`escanear.tsx` pregunta «¿Este ticket es de tu compra en X?» desde la tarjeta cuando no
+coincide y «¿Es tu compra por confirmar en X?» desde otro escaneo cuando sí; «No» sigue
+como ticket suelto; un ticket del comercio pero anterior a la simulación se avisa y sigue
+como suelto (US2-6); si la lectura falla, «Confirmar a mano». La decisión es la función pura
+`cruzarConTicket`. `rules-guardian` y `/code-review` (estándares y spec) corrieron antes del PR;
+el de spec encontró el aviso de US2-6 que faltaba.
+
+**Quedó sin verificar:** el recorrido completo en el teléfono (quickstart 3 y 4); las
+pantallas de Expo no tienen tests automáticos.
+## 2026-11-17 — Armar grupo sin contactos y aviso de «solo evaluamos a Vos» (issue #139, G-11)
+
+**Herramienta:** Claude Code (Sonnet 5.5), en una sesión lanzada desde otra sesión
+que repartía issues del gasto en grupo.
+
+**Objetivo:** que Armar grupo no sea un callejón sin contactos (estado vacío que lleva
+a Invitar) y que el resultado diga cuando nadie más que «Vos» tiene datos.
+
+**Prompts principales:**
+1. "Implementá el issue #139 y abrí un PR que lo cierre": con el contexto del
+   hallazgo G-11 de `docs/product/revision-gasto-grupo.md`, sin spec-kit (issue S).
+
+**Resultado:** `grupo/armar.ts` decide el estado vacío y el texto del pie (con
+tests); `vistaDeGrupo` suma `aviso` cuando el grupo no tiene contactos vinculados
+(con tests); Armar muestra el estado vacío con «Invitar a alguien» y el resultado
+muestra el aviso.
+
+**Quedó sin verificar:** las dos pantallas no se probaron en un dispositivo ni en
+el simulador; solo lint, typecheck y tests.
+## 2026-11-17 — La invitación no se pierde con «Ya tengo cuenta» (issue #137, hallazgo G-07)
+
+**Herramienta:** Claude Code (Sonnet 5.5), sesión lanzada desde otra sesión de Claude Code.
+
+**Objetivo:** que quien abre un link de invitación y entra con una cuenta existente llegue
+a la pantalla de aceptación, y que `invitacionPendiente` se consuma una sola vez.
+
+**Prompts principales:**
+1. "Implementá el issue #137 y abrí un PR que lo cierre" (con el contexto de ADR-008 §1 y
+   el hallazgo G-07).
+
+**Resultado:** al leer el código, `(tabs)/_layout.tsx` ya redirigía a la invitación
+pendiente (sumado en el PR de la revisión del #112), así que el flujo funcionaba pero sin
+test. Se sacó esa decisión a una función pura (`perfil/destino.ts`, `destinoDeTabs`) y se
+cubrió con tests del flujo (sesión, perfil listo, onboarding, consumo único). Además, `/i/[token]`
+con sesión pero sin perfil listo ya no manda a Bienvenida: va a la raíz y las tabs esperan
+el perfil y vuelven a la invitación.
+
+**Quedó sin verificar:** el recorrido completo en el celular (Expo Go) con un link real.
 
 ---
 

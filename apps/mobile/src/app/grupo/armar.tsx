@@ -4,6 +4,7 @@ import { Pressable, TextInput, View } from "react-native";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/button";
 import { Card } from "@/components/card";
+import { EmptyState } from "@/components/empty-state";
 import { Icon, iconoDeRubro } from "@/components/icon";
 import { MontoInput } from "@/components/monto-input";
 import { OptionRow } from "@/components/option-row";
@@ -11,6 +12,7 @@ import { Screen } from "@/components/screen";
 import { SectionHeader } from "@/components/section-header";
 import { Text } from "@/components/text";
 import type { SinCuentaEnGrupo } from "@/data/contracts";
+import { armarSinContactos, textoDelPie } from "@/grupo/armar";
 import { cantidadDeIntegrantes } from "@/grupo/pedido";
 import { MAXIMO_INTEGRANTES } from "@/grupo/vista";
 import { iniciales, parseMonto } from "@/lib/format";
@@ -66,6 +68,7 @@ export default function ArmarGrupo() {
   const elegidos = contactos.filter((c) => !excluidos.includes(c.id));
   const cantidad = cantidadDeIntegrantes({ contactos: elegidos.map((c) => c.id), sinCuenta });
   const lleno = cantidad >= MAXIMO_INTEGRANTES;
+  const sinContactos = armarSinContactos(contactos.length);
   const listo = monto !== null && cantidad >= 2 && cantidad <= MAXIMO_INTEGRANTES;
 
   const agregar = () => {
@@ -87,14 +90,7 @@ export default function ArmarGrupo() {
       footer={
         <>
           <Text variant="label" tone="inkSecondary" align="center">
-            {cantidad} {cantidad === 1 ? "persona" : "personas"}
-            {monto === null
-              ? " · falta el monto"
-              : cantidad < 2
-                ? " · sumá a alguien más"
-                : cantidad > MAXIMO_INTEGRANTES
-                  ? ` · son más de ${MAXIMO_INTEGRANTES}`
-                  : ""}
+            {textoDelPie({ cantidad, monto, vinculados: contactos.length, maximo: MAXIMO_INTEGRANTES })}
           </Text>
           <Button label="Ver quién conviene que pague" onPress={ver} disabled={!listo} />
         </>
@@ -139,6 +135,13 @@ export default function ArmarGrupo() {
             </Text>
           </View>
         </View>
+        {sinContactos ? (
+          <EmptyState
+            title="Todavía no tenés contactos en Vuelto"
+            body="Invitá a alguien para que Vuelto decida con sus topes. Sin contactos solo podemos evaluar tus medios."
+            action={{ label: "Invitar a alguien", onPress: () => router.push("/contactos/invitar") }}
+          />
+        ) : null}
         {contactos.map((c) => {
           const sel = !excluidos.includes(c.id);
           return (
@@ -232,7 +235,9 @@ export default function ArmarGrupo() {
         </View>
       </View>
 
-      <Button label="¿Falta alguien con Vuelto? Invitalo" variant="text" icon="invitar" onPress={() => router.push("/contactos/invitar")} />
+      {sinContactos ? null : (
+        <Button label="¿Falta alguien con Vuelto? Invitalo" variant="text" icon="invitar" onPress={() => router.push("/contactos/invitar")} />
+      )}
     </Screen>
   );
 }

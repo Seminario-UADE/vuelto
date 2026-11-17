@@ -326,6 +326,11 @@ export type RecomendacionGrupo = {
   reintegro: number | null;
   /** La base en palabras (constitución §V). */
   base: string | null;
+  /**
+   * Un aviso cuando nadie más que «Vos» tiene datos (solo gente sin cuenta): la decisión salió
+   * únicamente de tus medios y la pantalla lo dice. `null` si hay algún contacto vinculado (#139).
+   */
+  aviso: string | null;
   integrantes: FilaIntegrante[];
 };
 
