@@ -17,11 +17,11 @@ export function esWebAppInstalada(): boolean {
  * Alto extra que se suma arriba, en pt, solo en la web app instalada del iPhone.
  *
  * iOS 26 difumina el contenido que queda bajo la barra de estado (un efecto de borde del sistema
- * que no se puede apagar desde la web) y el difuminado llega ~40 pt más abajo del área segura. Con
+ * que no se puede apagar desde la web) y el difuminado llega unos 25 pt más abajo del área segura. Con
  * esto el primer renglón de cada pantalla queda por debajo de esa franja y se lee nítido. En la
  * app nativa y en el navegador común no se suma nada.
  */
-export const EXTRA_ARRIBA_WEB_APP = 24;
+export const EXTRA_ARRIBA_WEB_APP = 10;
 
 export function extraArribaWebApp(): number {
   return esWebAppInstalada() ? EXTRA_ARRIBA_WEB_APP : 0;
