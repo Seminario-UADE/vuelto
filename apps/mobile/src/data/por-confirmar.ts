@@ -6,6 +6,8 @@
 import { fechaArgentina } from "@vuelto/motor";
 import { diaPermitido, type RangoDeDias } from "../ticket/fechas";
 import { comercioPorNombre } from "./calculo";
+import { claveDeComercio } from "./comercios";
+import { sugerirComercio } from "./sugerir-comercio";
 import type { BorradorCompra, Canal, Comercio, OrigenCompra } from "./contracts";
 
 export type CompraPorConfirmar = {
@@ -148,4 +150,44 @@ export function borradorDesdePorConfirmar(
     diasPosibles,
     avisos,
   };
+}
+
+/** Lo que el cruce necesita de la lectura del ticket. `null` en lo que no trae. */
+export type TicketParaCruzar = { comercio: string | null; fecha: string | null; textoExtraido: string | null };
+
+/**
+ * Cómo se relaciona un ticket con una compra por confirmar (spec 012 FR-013, revisado en la
+ * issue #110): `coincide` si la sugerencia de comercio de la spec 015 da primero el comercio
+ * simulado; `otro_comercio` si da otro o ninguno (se pregunta); `sin_comercio` si el ticket no lo
+ * trae; `anterior` si la fecha es de antes de la simulación (va como suelto, US2-6).
+ */
+export type CruceTicket = "coincide" | "otro_comercio" | "sin_comercio" | "anterior";
+
+export function cruceDelTicket(c: CompraPorConfirmar, ticket: TicketParaCruzar, catalogo: readonly Comercio[]): CruceTicket {
+  if (ticket.fecha !== null && ticket.fecha < diaDeLaSimulacion(c)) return "anterior";
+  // Sin comercio en el ticket no se cruza: desde la compra por confirmar se sigue sin preguntar y,
+  // suelto, no se busca una (FR-013), aunque el texto nombre a algún comercio.
+  if (claveDeComercio(ticket.comercio ?? "") === "") return "sin_comercio";
+  const r = sugerirComercio({
+    nombre: ticket.comercio ?? "",
+    textoTicket: ticket.textoExtraido,
+    catalogo,
+    categoriaConocida: c.categoriaId ?? null,
+  });
+  const primero =
+    r.tipo === "coincide" ? r.comercio : r.tipo === "elegir_rubro" ? r.opciones[0] : r.tipo === "sugerencias" ? r.sugerencias[0]?.comercio : undefined;
+  if (primero === undefined) return "otro_comercio";
+  return claveDeComercio(primero.nombre) === claveDeComercio(c.comercioNombre) ? "coincide" : "otro_comercio";
+}
+
+/**
+ * Escaneando suelto (spec 012 US2-9): la compra por confirmar con la que coincide el ticket, para
+ * preguntar «¿Es tu compra por confirmar en X?»; `null` si ninguna. Un ticket sin comercio no se cruza.
+ */
+export function porConfirmarDelTicket(
+  lista: readonly CompraPorConfirmar[],
+  ticket: TicketParaCruzar,
+  catalogo: readonly Comercio[],
+): CompraPorConfirmar | null {
+  return lista.find((c) => cruceDelTicket(c, ticket, catalogo) === "coincide") ?? null;
 }

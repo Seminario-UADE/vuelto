@@ -3312,6 +3312,39 @@ lo elegido pase a la cuenta cuando la crea al final.
 
 ---
 
+## 2026-11-17 — Cruzar el ticket con la compra por confirmar (issue #110)
+
+**Herramienta:** Claude Code (Opus 5.5), sin spec-kit (las tareas ya estaban en la spec 012).
+
+**Objetivo:** que al escanear un ticket la app sepa si es de la compra que se simuló, sin
+confirmarla en el comercio equivocado ni dejarla duplicada.
+
+**Prompts principales:**
+1. "¿Quedan issues por tomar? No solo mías." Se listaron las abiertas y se marcaron las que
+   parecían ya resueltas.
+2. "Revisá la #110 y la #105." La issue #105 depende de la #110. A la #110 le faltaba el cruce
+   del ticket: desde una compra por confirmar, un ticket de otro comercio se confirmaba igual en
+   el comercio simulado, y escaneando suelto la compra quedaba colgada (y podía registrarse dos
+   veces).
+3. "Un ticket de antes de simular no puede ser de esa compra." Se trata como compra aparte, con
+   un aviso.
+4. "Si la búsqueda devuelve primero el comercio de la compra simulada, no debería preguntar,
+   pero tiene que poder cambiarse." El cruce usa la sugerencia de comercio de la issue #134 en
+   vez de la regla más simple de la spec 012; el comercio se puede cambiar en «Revisá tu compra».
+
+**Resultado:**
+- Desde la compra por confirmar: si el primer comercio sugerido es el simulado (o el ticket no
+  trae comercio), sigue sin preguntar; si es otro, pregunta «¿Este ticket es de tu compra en
+  X?»; si el ticket es de antes de la simulación, avisa y lo carga como compra aparte.
+- Escaneando suelto: si el ticket coincide con una compra por confirmar, pregunta «¿Es tu
+  compra por confirmar en X?». Así no queda la compra colgada ni registrada dos veces.
+- La app nunca decide sola: pregunta, y el comercio siempre se puede cambiar después.
+- Contratiempos: al traer los cambios de `main`, los tests fallaron porque el motor compilado
+  estaba viejo (hay que recompilarlo cuando cambia, como dice CLAUDE.md), y el chequeo de tipos
+  falló por un archivo de rutas generado viejo; ninguno de los dos era un error del código.
+
+---
+
 ## YYYY-MM-DD — Título de la sesión
 
 **Herramienta:**

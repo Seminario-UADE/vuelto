@@ -5,6 +5,8 @@ import {
   VENCIMIENTO_POR_CONFIRMAR_MS,
   antiguedad,
   borradorDesdePorConfirmar,
+  cruceDelTicket,
+  porConfirmarDelTicket,
   estaVigente,
   origenAlConfirmar,
   type CompraPorConfirmar,
@@ -188,5 +190,62 @@ describe("borradorDesdePorConfirmar con ticket (spec 012 FR-007, spec 014 FR-008
   it("una fecha del ticket anterior a la simulación no se propone: va el día de la simulación (spec 012 FR-013)", () => {
     expect(borradorDesdePorConfirmar(enCoto, { ...ticket, fecha: "2026-10-10" }, "2026-10-16").borrador.fecha).toBe("2026-10-14");
     expect(borradorDesdePorConfirmar(enCoto, { ...ticket, fecha: "2026-10-15" }, "2026-10-16").borrador.fecha).toBe("2026-10-15");
+  });
+});
+
+describe("cruceDelTicket (spec 012 FR-013, revisado en la issue #110)", () => {
+  const ticket = (comercio: string | null, fecha: string | null = "2026-10-14", textoExtraido: string | null = null) => ({
+    comercio,
+    fecha,
+    textoExtraido,
+  });
+
+  it("el primer resultado de la sugerencia es el comercio simulado: coincide, sin preguntar", () => {
+    expect(cruceDelTicket(enCoto, ticket("COTO C.I.C.S.A."), catalogoComercios)).toBe("coincide");
+    expect(cruceDelTicket(enCoto, ticket("Coto"), catalogoComercios)).toBe("coincide");
+  });
+
+  it("la razón social con la marca en el texto: coincide", () => {
+    expect(cruceDelTicket(enCoto, ticket("C.I.C.S.A.", "2026-10-14", "C.I.C.S.A.\nCOTO\nTOTAL"), catalogoComercios)).toBe(
+      "coincide",
+    );
+  });
+
+  it("el primer resultado es otro comercio, o ninguno: otro_comercio (se pregunta)", () => {
+    expect(cruceDelTicket(enCoto, ticket("JUMBO RETAIL S.A."), catalogoComercios)).toBe("otro_comercio");
+    expect(cruceDelTicket(enCoto, ticket("Cotolengo"), catalogoComercios)).toBe("otro_comercio");
+    expect(cruceDelTicket(enCoto, ticket("Kiosco El Sol"), catalogoComercios)).toBe("otro_comercio");
+  });
+
+  it("el ticket no trae comercio: sin_comercio, aunque el texto nombre a otro del catálogo", () => {
+    expect(cruceDelTicket(enCoto, ticket(null), catalogoComercios)).toBe("sin_comercio");
+    expect(cruceDelTicket(enCoto, ticket("  "), catalogoComercios)).toBe("sin_comercio");
+    expect(cruceDelTicket(enCoto, ticket(null, "2026-10-14", "JUMBO\nTOTAL"), catalogoComercios)).toBe("sin_comercio");
+  });
+
+  it("una fecha anterior al día de la simulación: anterior, aunque el comercio coincida", () => {
+    expect(cruceDelTicket(enCoto, ticket("Coto", "2026-10-13"), catalogoComercios)).toBe("anterior");
+  });
+
+  it("el mismo día o después, y sin fecha, se cruza", () => {
+    expect(cruceDelTicket(enCoto, ticket("Coto", "2026-10-16"), catalogoComercios)).toBe("coincide");
+    expect(cruceDelTicket(enCoto, ticket("Coto", null), catalogoComercios)).toBe("coincide");
+  });
+});
+
+describe("porConfirmarDelTicket: escanear suelto (spec 012 US2-9)", () => {
+  const enJumbo: CompraPorConfirmar = { ...enCoto, id: "pc-jumbo", comercioId: "jumbo", comercioNombre: "Jumbo" };
+  const lectura = { comercio: "COTO C.I.C.S.A.", fecha: "2026-10-14", textoExtraido: null };
+
+  it("devuelve la compra por confirmar con la que coincide", () => {
+    expect(porConfirmarDelTicket([enJumbo, enCoto], lectura, catalogoComercios)?.id).toBe(enCoto.id);
+  });
+
+  it("ninguna coincide, el ticket no trae comercio o es anterior: null", () => {
+    expect(porConfirmarDelTicket([enJumbo], lectura, catalogoComercios)).toBeNull();
+    expect(porConfirmarDelTicket([enCoto], { ...lectura, comercio: null }, catalogoComercios)).toBeNull();
+    expect(porConfirmarDelTicket([enCoto], { ...lectura, comercio: null, textoExtraido: "COTO\nTOTAL" }, catalogoComercios)).toBeNull();
+    expect(porConfirmarDelTicket([enCoto], { ...lectura, fecha: "2026-10-01" }, catalogoComercios)).toBeNull();
+    expect(porConfirmarDelTicket([], lectura, catalogoComercios)).toBeNull();
   });
 });

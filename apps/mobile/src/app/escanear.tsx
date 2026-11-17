@@ -9,22 +9,31 @@ import { Icon } from "@/components/icon";
 import { Text } from "@/components/text";
 import * as api from "@/data/api";
 import type { LecturaApp } from "@/data/contracts";
+import { cruceDelTicket, porConfirmarDelTicket, type CompraPorConfirmar } from "@/data/por-confirmar";
 import { hapticoLeve } from "@/lib/haptics";
 import { supabase } from "@/lib/supabase";
 import type { Escenario } from "@/store/acciones";
 import { useAppSelector } from "@/store/hooks";
-import { selectHoy } from "@/store/selectores";
+import { selectPorConfirmarVigentes } from "@/store/por-confirmar";
+import { selectCatalogoParaCompras, selectHoy } from "@/store/selectores";
 import { borrar, elegirDeGaleria, limpiarTemporales, preparar, sacarFoto, type FotoElegida } from "@/ticket/camara";
 import { leerFoto } from "@/ticket/leer";
 import { salidaDe, type ResultadoLectura, type SalidaLectura } from "@/ticket/resultados";
 import { LIMITE_LECTURA_MS, pedirLectura } from "@/ticket/servicio";
 import { colors, radius, size, space } from "@/theme";
 
+/** La lectura que salió bien, para seguir a «Revisá tu compra». */
+type Leido = Extract<LecturaApp, { ok: true }>;
+
 type Estado =
   | { tipo: "listo" }
   | { tipo: "sin_permiso" }
   | { tipo: "leyendo" }
-  | { tipo: "resultado"; resultado: ResultadoLectura };
+  | { tipo: "resultado"; resultado: ResultadoLectura }
+  // El cruce con la compra por confirmar (spec 012 FR-013, issue #110): se pregunta, nunca se decide solo.
+  | { tipo: "de_otro_comercio"; leido: Leido; pc: CompraPorConfirmar }
+  | { tipo: "es_por_confirmar"; leido: Leido; pc: CompraPorConfirmar }
+  | { tipo: "anterior"; leido: Leido; pc: CompraPorConfirmar };
 
 /** Los escenarios de desarrollo de Perfil que simulan la lectura (FR-012); el resto usa la cámara. */
 const ESCENARIO_TICKET: Record<Escenario, api.EscenarioTicket | null> = {
@@ -74,12 +83,11 @@ export default function Escanear() {
     };
   }, []);
 
-  const terminar = (t: LecturaApp) => {
-    if (!abierta.current) return;
-    if (!t.ok) {
-      setEstado({ tipo: "resultado", resultado: t.resultado });
-      return;
-    }
+  const porConfirmar = useAppSelector(selectPorConfirmarVigentes);
+  const catalogo = useAppSelector(selectCatalogoParaCompras);
+
+  /** Abre «Revisá tu compra» con lo leído: confirmando esa compra por confirmar, o como compra suelta (`null`). */
+  const irARevisa = (t: Leido, porConfirmarId: string | null) =>
     router.replace({
       pathname: "/revisa",
       params: {
@@ -92,9 +100,31 @@ export default function Escanear() {
         medioTipo: t.medio.tipo ?? "",
         medioBanco: t.medio.banco ?? "",
         texto: t.textoExtraido,
-        ...extra,
+        ...(porConfirmarId ? { porConfirmar: porConfirmarId } : {}),
+        ...(desde.flujo ? { flujo: desde.flujo } : {}),
       },
     });
+
+  const terminar = (t: LecturaApp) => {
+    if (!abierta.current) return;
+    if (!t.ok) {
+      setEstado({ tipo: "resultado", resultado: t.resultado });
+      return;
+    }
+    const ticket = { comercio: t.comercio, fecha: t.fecha, textoExtraido: t.textoExtraido };
+    // Desde «Ya pagué» o la tarjeta: se cruza con esa compra (spec 012 US2-5 y US2-6).
+    const pc = desde.porConfirmar ? porConfirmar.find((c) => c.id === desde.porConfirmar) : undefined;
+    if (pc) {
+      const cruce = cruceDelTicket(pc, ticket, catalogo);
+      if (cruce === "otro_comercio") setEstado({ tipo: "de_otro_comercio", leido: t, pc });
+      else if (cruce === "anterior") setEstado({ tipo: "anterior", leido: t, pc });
+      else irARevisa(t, pc.id);
+      return;
+    }
+    // Escaneando suelto: si coincide con una compra por confirmar, se pregunta (US2-9).
+    const coincide = desde.porConfirmar ? null : porConfirmarDelTicket(porConfirmar, ticket, catalogo);
+    if (coincide) setEstado({ tipo: "es_por_confirmar", leido: t, pc: coincide });
+    else irARevisa(t, desde.porConfirmar ?? null);
   };
 
   const leer = async (elegir: () => Promise<FotoElegida>) => {
@@ -200,6 +230,23 @@ export default function Escanear() {
               <Button key={s} label={ETIQUETA_SALIDA[s]} variant={i === 0 ? "primary" : "secondary"} onPress={accion[s]} />
             ))}
           </Card>
+        ) : estado.tipo === "de_otro_comercio" || estado.tipo === "es_por_confirmar" ? (
+          <Card>
+            <Text variant="bodyMd" weight="semibold" accessibilityLiveRegion="polite">
+              {estado.tipo === "de_otro_comercio"
+                ? `¿Este ticket es de tu compra en ${estado.pc.comercioNombre}?`
+                : `¿Es tu compra por confirmar en ${estado.pc.comercioNombre}?`}
+            </Text>
+            <Button label="Sí, es esa compra" onPress={() => irARevisa(estado.leido, estado.pc.id)} />
+            <Button label="No, es otra compra" variant="secondary" onPress={() => irARevisa(estado.leido, null)} />
+          </Card>
+        ) : estado.tipo === "anterior" ? (
+          <Card>
+            <Text variant="bodyMd" accessibilityLiveRegion="polite">
+              {`Este ticket es de antes de que simularas la compra en ${estado.pc.comercioNombre}: lo cargamos como una compra aparte.`}
+            </Text>
+            <Button label="Seguir" onPress={() => irARevisa(estado.leido, null)} />
+          </Card>
         ) : estado.tipo === "sin_permiso" ? (
           <Card>
             <Text variant="bodyMd" accessibilityLiveRegion="polite">
@@ -233,7 +280,7 @@ export default function Escanear() {
         )}
       </ScrollView>
 
-      {pideSesion || estado.tipo === "resultado" || estado.tipo === "sin_permiso" ? null : (
+      {pideSesion || (estado.tipo !== "listo" && estado.tipo !== "leyendo") ? null : (
         <View style={{ alignItems: "center", paddingVertical: space.lg }}>
           <Pressable
             onPress={aMano}
