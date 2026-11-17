@@ -48,6 +48,26 @@
         height: 100lvh;
         flex: 1;
       }
+      /*
+        Que se sienta como una app y no como una página: sin selección de texto al mantener apretado
+        (aparecía el menú Copiar / Consultar / Traducir sobre la barra de pestañas), sin el menú de
+        mantener apretado en links e imágenes, sin el destello gris al tocar y sin rebote de la página.
+        Los campos de texto siguen siendo seleccionables.
+      */
+      html,
+      body {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+        overscroll-behavior: none;
+      }
+      input,
+      textarea,
+      [contenteditable="true"] {
+        -webkit-user-select: text;
+        user-select: text;
+      }
       /* Fondo mientras carga y en el rebote: el canvas de cada tema (theme.ts), no blanco. */
       html,
       body {
