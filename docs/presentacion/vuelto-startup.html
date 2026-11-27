@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vuelto — UADE Startup 2026</title>
+<style>
+  /* Tipografía de la marca (Hanken Grotesk, OFL), servida desde assets/fonts: funciona sin red */
+  @font-face { font-family: "Hanken Grotesk"; src: url(assets/fonts/HankenGrotesk_400Regular.ttf) format("truetype"); font-weight: 400; font-display: block; }
+  @font-face { font-family: "Hanken Grotesk"; src: url(assets/fonts/HankenGrotesk_500Medium.ttf) format("truetype"); font-weight: 500; font-display: block; }
+  @font-face { font-family: "Hanken Grotesk"; src: url(assets/fonts/HankenGrotesk_600SemiBold.ttf) format("truetype"); font-weight: 600; font-display: block; }
+  @font-face { font-family: "Hanken Grotesk"; src: url(assets/fonts/HankenGrotesk_700Bold.ttf) format("truetype"); font-weight: 700; font-display: block; }
+  @font-face { font-family: "Hanken Grotesk"; src: url(assets/fonts/HankenGrotesk_800ExtraBold.ttf) format("truetype"); font-weight: 800; font-display: block; }
+
+  /* Paleta de la app (v9.1, apps/mobile/src/theme.ts), la misma de vuelto-mvp-v2.html.
+     Claro y oscuro se componen por separado; D alterna, y arranca con el modo del sistema. */
+  :root {
+    --bg: #EEF6F0;
+    --card: #F8FCF9;
+    --card-2: #DAF1DE;
+    --ink: #051F20;
+    --ink-2: #456A5E;
+    --line: #C9DDD0;
+    --accent: #235347;
+    --on-accent: #DAF1DE;
+    --hero: #0B2B26;
+    --hero-2: #163832;
+    --on-hero: #EEF6F0;
+    --on-hero-2: #B9D6C2;
+    --ok: #1D6B44;   --ok-bg: #DDF2E4;
+    --warn: #985A00; --warn-bg: #FCEFD8;
+    --bad: #B42A22;  --bad-bg: #FBE4E1;
+    --shadow: 0 1px 2px rgba(5,31,32,.06), 0 8px 24px rgba(5,31,32,.07);
+    --sans: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  :root[data-theme="dark"] {
+    --bg: #051F20;
+    --card: #0B2B26;
+    --card-2: #163832;
+    --ink: #DAF1DE;
+    --ink-2: #8EB69B;
+    --line: #1E4A3F;
+    --accent: #8EB69B;
+    --on-accent: #051F20;
+    --hero: #0B2B26;
+    --hero-2: #163832;
+    --on-hero: #DAF1DE;
+    --on-hero-2: #8EB69B;
+    --ok: #9BD8AE;   --ok-bg: #1F4A36;
+    --warn: #E2B65E; --warn-bg: #2B2410;
+    --bad: #EE8F84;  --bad-bg: #3A1E1B;
+    --shadow: none;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--ink); font-family: var(--sans); transition: background .3s ease, color .3s ease; }
+
+  /* Escenario 16:9 escalado a la ventana */
+  .stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px; transform-origin: center center; background: var(--bg); overflow: hidden; transition: background .3s ease; }
+  .slide { position: absolute; inset: 0; padding: 72px 80px 60px; display: flex; flex-direction: column; opacity: 0; visibility: hidden; transition: opacity .2s ease-out, visibility 0s linear .2s; }
+  .slide.active { opacity: 1; visibility: visible; transition: opacity .25s ease-out; }
+  /* Las slides oscuras llevan una grilla tenue, como papel milimetrado: textura sin decorar */
+  .slide.hero { color: var(--on-hero); background-color: var(--hero);
+    background-image: linear-gradient(rgba(142,182,155,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(142,182,155,.06) 1px, transparent 1px);
+    background-size: 40px 40px; background-position: -1px -1px; }
+  .slide.video { padding: 0; background: #051F20; }
+  .slide.video video { width: 100%; height: 100%; object-fit: contain; display: block; background: #051F20; }
+
+  .rise { opacity: 0; transform: translateY(12px); }
+  .slide.active .rise { animation: rise .5s var(--ease-out) both; animation-delay: var(--d, 0s); }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .rise, .slide.active .rise { animation: none; opacity: 1; transform: none; }
+    .slide { transition: none; }
+  }
+
+  /* Cabecera: parte de la guía, quién habla y su tiempo (con T, cuenta regresiva) */
+  .who { position: absolute; top: 26px; left: 80px; right: 80px; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); z-index: 3; }
+  .who::before { content: ""; width: 24px; height: 2px; background: var(--accent); }
+  /* El tiempo de cada parte es para quien presenta: solo se ve con el cronómetro (T) */
+  .who .t { margin-left: auto; font-family: var(--mono); letter-spacing: 0; font-weight: 600; padding: 2px 8px; border-radius: 6px; transition: background .2s, color .2s; visibility: hidden; }
+  body.show-timer .who .t { visibility: visible; }
+  .who .t.low { background: var(--warn-bg); color: var(--warn); }
+  .who .t.over { background: var(--bad-bg); color: var(--bad); }
+  .hero .who { color: var(--on-hero-2); }
+  .hero .who::before { background: var(--on-hero-2); }
+  .slide.video .who { color: #8EB69B; }
+  .slide.video .who::before { background: #8EB69B; }
+
+  .kicker { font-size: 16px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .hero .kicker { color: var(--on-hero-2); }
+  h1, h2 { font-weight: 800; letter-spacing: -.02em; line-height: 1.06; }
+  h1 { font-size: 104px; }
+  h2 { font-size: 54px; max-width: 1100px; }
+  h3 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+  .lead { font-size: 28px; line-height: 1.35; color: var(--ink-2); max-width: 900px; }
+  .hero .lead { color: var(--on-hero-2); }
+  .foot { margin-top: auto; font-size: 18px; line-height: 1.45; color: var(--ink-2); }
+  .hero .foot { color: var(--on-hero-2); }
+  b, strong { font-weight: 700; }
+  .center { margin-top: auto; margin-bottom: auto; }
+  .acc { color: var(--accent); }
+  .hero .acc { color: #8EB69B; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 26px 28px; box-shadow: var(--shadow); }
+  .card p { font-size: 23px; line-height: 1.32; color: var(--ink-2); }
+  .card li { list-style: none; font-size: 23px; line-height: 1.3; color: var(--ink-2); margin-bottom: 12px; }
+  .card li:last-child { margin-bottom: 0; }
+  .card li::before { content: "·"; margin-right: 12px; font-weight: 800; color: var(--accent); }
+  .card.dark { background: var(--hero); border-color: var(--hero); }
+  .card.dark h3 { color: var(--on-hero); }
+  .card.dark p, .card.dark li { color: var(--on-hero-2); }
+  .card.dark li::before { color: var(--on-hero); }
+  .grid { display: grid; gap: 22px; }
+  .g2 { grid-template-columns: 1fr 1fr; } .g3 { grid-template-columns: repeat(3, 1fr); }
+
+  .big { font-weight: 800; letter-spacing: -.03em; line-height: 1; font-size: 96px; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip { font-size: 17px; font-weight: 600; background: var(--card-2); color: var(--accent); border-radius: 999px; padding: 7px 16px; }
+  .badge { display: inline-block; font-size: 14px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; padding: 5px 12px; border-radius: 8px; }
+  .b-ok { background: var(--ok-bg); color: var(--ok); }
+  .b-sim { background: var(--warn-bg); color: var(--warn); }
+
+  /* Storytelling: la escena en la caja */
+  .scene { display: grid; grid-template-columns: 1.25fr 1fr; gap: 48px; align-items: center; }
+  .ticket { background: var(--hero-2); border-radius: 22px; padding: 28px 30px; font-family: var(--mono); font-size: 21px; line-height: 1.7; color: var(--on-hero-2); }
+  .ticket .row { display: flex; justify-content: space-between; }
+  .ticket .row b { color: var(--on-hero); font-weight: 600; }
+  .ticket hr { border: 0; border-top: 1px dashed #2E5A4E; margin: 12px 0; }
+  .ticket .late { color: #E2B65E; }
+
+  /* El 98%, dibujado: un punto por persona encuestada (51); el vacío es quien no lo vivió */
+  .waffle-row { margin-top: auto; display: flex; align-items: center; gap: 28px; }
+  .waffle { display: grid; grid-template-columns: repeat(17, 14px); gap: 5px; flex: none; }
+  .waffle i { width: 14px; height: 14px; border-radius: 4px; background: #8EB69B; }
+  .waffle i.no { background: transparent; box-shadow: inset 0 0 0 2px #8EB69B; }
+  .waffle-row p { font-size: 24px; line-height: 1.3; color: var(--on-hero-2); }
+  .waffle-row p b { color: var(--on-hero); }
+  .src { display: block; font-size: 15px; letter-spacing: .04em; color: var(--ink-2); margin-top: 6px; font-weight: 500; }
+  .hero .src { color: #8EB69B; }
+
+  /* Diferenciación: lista de promos vs Vuelto */
+  .vs { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 22px; }
+  .vs th { text-align: left; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); font-weight: 800; padding: 0 22px 12px; }
+  .vs td { padding: 15px 22px; border-top: 1px solid var(--line); color: var(--ink-2); line-height: 1.25; }
+  .vs td:first-child { font-weight: 700; color: var(--ink); width: 26%; }
+  .vs td.v { color: var(--ink); font-weight: 600; background: var(--card-2); }
+  .vs th.v { color: var(--accent); background: var(--card-2); border-radius: 14px 14px 0 0; padding-top: 12px; }
+  .vs tr:last-child td.v { border-radius: 0 0 14px 14px; }
+
+  /* UX/UI: un teléfono, una decisión por paso */
+  .slide.flow { padding-top: 0; padding-bottom: 0; }
+  .ftxt { position: absolute; left: 80px; top: 78px; width: 620px; display: flex; flex-direction: column; }
+  .fsteps { list-style: none; margin-top: 30px; display: flex; flex-direction: column; gap: 6px; }
+  .fsteps li { display: flex; gap: 18px; align-items: flex-start; padding: 12px 0; opacity: .34; transition: opacity .22s ease-out; }
+  .fsteps li.on { opacity: 1; }
+  .fsteps .n { flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--card-2); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; transition: background .22s ease-out, color .22s ease-out; }
+  .fsteps li.on .n { background: var(--accent); color: var(--on-accent); }
+  .fsteps b { display: block; font-size: 30px; line-height: 1.15; letter-spacing: -.01em; padding-top: 3px; }
+  .fsteps .d { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .24s var(--ease-out); }
+  .fsteps li.on .d { grid-template-rows: 1fr; }
+  .fsteps .d > p { overflow: hidden; min-height: 0; font-size: 22px; line-height: 1.35; color: var(--ink-2); opacity: 0; transition: opacity .2s ease-out; }
+  .fsteps li.on .d > p { opacity: 1; padding-top: 6px; }
+
+  .phone3 { position: absolute; right: 120px; top: 40px; width: 306px; height: 640px; padding: 9px; border-radius: 46px; background: #0A1412; box-shadow: 0 0 0 1px rgba(142,182,155,.28), 0 24px 60px rgba(5,31,32,.28); cursor: pointer; }
+  .phone3 .screen { position: relative; width: 288px; height: 622px; border-radius: 38px; overflow: hidden; background: #0C1210; }
+  .phone3 .scr { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; opacity: 0; transform: translateX(7%); filter: blur(3px); transition: opacity .22s ease-out, transform .3s var(--ease-out), filter .22s ease-out; will-change: transform, opacity; }
+  .phone3 .scr.on { opacity: 1; transform: none; filter: none; }
+  .phone3 .scr.before { transform: translateX(-4%); }
+  .phone3 .vacia { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; font-family: var(--mono); font-size: 14px; color: var(--warn); background: var(--warn-bg); }
+  @media (prefers-reduced-motion: reduce) { .phone3 .scr { transform: none; filter: none; transition: opacity .2s ease; } }
+
+  /* Demo: video real, sin audio, con la cuenta de los 100 s */
+  .demo-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .demo-wrap video { max-width: 100%; max-height: 100%; }
+  .demo-clock { position: absolute; left: 28px; bottom: 26px; font-family: var(--mono); font-size: 22px; font-weight: 600; color: #DAF1DE; background: rgba(5,31,32,.72); border: 1px solid #1E4A3F; border-radius: 12px; padding: 8px 14px; z-index: 3; }
+  .demo-clock.over { color: #EE8F84; border-color: #EE8F84; }
+  .demo-falta { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center; color: #DAF1DE; padding: 80px; }
+  .demo-falta .badge { background: #2B2410; color: #E2B65E; }
+  .demo-falta h2 { font-size: 46px; }
+  .demo-falta p { font-size: 22px; line-height: 1.45; color: #8EB69B; max-width: 820px; }
+  .demo-falta code { font-family: var(--mono); color: #DAF1DE; }
+  .slide.sin-demo .demo-falta { display: flex; }
+  .slide.sin-demo .demo-wrap, .slide.sin-demo .demo-clock { display: none; }
+
+  /* Diagrama */
+  svg.dia { width: 100%; height: auto; }
+  svg.dia text { font-family: var(--sans); fill: var(--ink); }
+  svg.dia .box { fill: var(--card); stroke: var(--line); stroke-width: 2; }
+  svg.dia .core { fill: var(--hero); stroke: var(--hero); }
+  svg.dia .llm { fill: none; stroke: var(--warn); stroke-width: 2; stroke-dasharray: 7 6; }
+  svg.dia .sub { font-size: 19px; fill: var(--ink-2); }
+  svg.dia .ttl { font-size: 26px; font-weight: 700; }
+  svg.dia .arrow { stroke: var(--accent); stroke-width: 3; fill: none; }
+  svg.dia .arrow.d { stroke: var(--warn); stroke-dasharray: 7 6; }
+  svg.dia .tagt { font-size: 15px; font-weight: 800; letter-spacing: .06em; }
+  svg.dia .band { fill: var(--card-2); }
+  svg.dia text.oh { fill: var(--on-hero); }
+  svg.dia text.oh2 { fill: var(--on-hero-2); }
+  /* Cada flecha dice qué hace (un verbo), no solo que hay una conexión */
+  svg.dia .verb { font-size: 16px; font-weight: 600; fill: var(--ink-2); text-anchor: middle; }
+  svg.dia .flow circle { fill: var(--accent); }
+  /* Paso a paso: lo que todavía no se contó queda apagado */
+  .steps [data-s] { transition: opacity .3s var(--ease-out); }
+  .steps [data-s].off { opacity: .12; }
+  .steps .flow.off { opacity: 0; }
+  @media (prefers-reduced-motion: reduce) { svg.dia .flow { display: none; } }
+  .deci { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .deci div { border-left: 3px solid var(--accent); padding: 2px 0 2px 14px; font-size: 19px; line-height: 1.32; color: var(--ink-2); }
+  .deci b { display: block; color: var(--ink); font-size: 20px; }
+
+  /* IA: las cinco preguntas de la guía, en el producto y en el desarrollo */
+  .ia { width: 100%; border-collapse: separate; border-spacing: 0; }
+  .ia th { text-align: left; padding: 0 18px 10px; font-size: 15px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .ia th small { display: block; font-size: 13px; color: var(--ink-2); letter-spacing: .04em; margin-top: 2px; }
+  .ia td { padding: 11px 18px; border-top: 1px solid var(--line); font-size: 19px; line-height: 1.3; color: var(--ink-2); vertical-align: top; }
+  .ia td:first-child { width: 19%; font-weight: 700; color: var(--ink); font-size: 18px; }
+  .ia td b { color: var(--ink); }
+  .pips { display: inline-flex; gap: 4px; margin-right: 10px; vertical-align: 1px; }
+  .pips i { width: 12px; height: 12px; border-radius: 3px; background: var(--ok); }
+
+  /* Cierre */
+  .hero .row { display: flex; gap: 22px; }
+  .hero .pane { flex: 1; background: var(--hero-2); border-radius: 22px; padding: 24px 28px; }
+  .hero .pane .kicker { margin-bottom: 10px; }
+  .hero .pane li { list-style: none; font-size: 23px; line-height: 1.35; color: var(--on-hero-2); margin-bottom: 8px; }
+  .hero .pane li::before { content: "·"; margin-right: 12px; font-weight: 800; color: var(--on-hero); }
+  .hero .pane li b { color: var(--on-hero); }
+  .mark { width: 64px; height: 64px; color: var(--on-hero); }
+  .quote { font-size: 50px; font-weight: 800; letter-spacing: -.02em; line-height: 1.12; }
+  .lang { display: inline-block; font-size: 14px; font-weight: 800; letter-spacing: .1em; padding: 5px 12px; border-radius: 8px; background: var(--hero-2); color: var(--on-hero-2); }
+
+  /* Controles */
+  .ctrl { position: fixed; bottom: 14px; right: 16px; display: flex; align-items: center; gap: 8px; z-index: 10; transition: opacity .3s; }
+  .ctrl button { font: 600 14px var(--sans); border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 10px; padding: 8px 12px; cursor: pointer; transition: transform .16s ease-out; }
+  .ctrl button:active { transform: scale(.97); }
+  .ctrl button:hover { border-color: var(--accent); }
+  .ctrl button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #counter { font-family: var(--mono); font-size: 14px; color: var(--ink-2); padding: 0 6px; }
+  #timer { display: none; font-family: var(--mono); font-size: 14px; color: var(--ink-2); }
+  body.show-timer #timer { display: inline; }
+  #progress { position: fixed; left: 0; bottom: 0; height: 4px; width: 0; background: var(--accent); transition: width .3s ease; z-index: 10; }
+  body.fs.idle .ctrl { opacity: 0; } body.fs.idle { cursor: none; }
+
+  /* Modo edición (E): se corrige el texto en el navegador y Ctrl/Cmd+S descarga el HTML */
+  body.editing [contenteditable] { outline: 1px dashed var(--warn); outline-offset: 3px; border-radius: 4px; cursor: text; }
+  body.editing [contenteditable]:focus { outline: 2px solid var(--warn); }
+  #edit-bar { display: none; position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 20; font: 600 14px var(--sans); background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn); border-radius: 10px; padding: 8px 14px; }
+  body.editing #edit-bar { display: block; }
+  /* Revisión de desbordes (?revisar): marca en rojo la slide con algo que se sale */
+  .slide.desborda { outline: 4px solid var(--bad); outline-offset: -4px; }
+
+  /* PDF (Startup_Pitch.pdf): una slide por página, todas visibles */
+  @page { size: 1280px 720px; margin: 0; }
+  @media print {
+    html, body { overflow: visible; height: auto; }
+    .ctrl, #progress, .demo-clock, .who .t { display: none !important; }
+    .stage { position: static; transform: none !important; width: 1280px; height: auto; overflow: visible; }
+    .slide { position: relative; width: 1280px; height: 720px; opacity: 1; visibility: visible; break-after: page; page-break-after: always; }
+    .rise { opacity: 1 !important; transform: none !important; animation: none !important; }
+    .fsteps li { opacity: 1; } .fsteps .d { grid-template-rows: 1fr; } .fsteps .d > p { opacity: 1; padding-top: 6px; }
+    .phone3 .scr { transition: none; }
+    .steps [data-s].off { opacity: 1; }
+    svg.dia .flow { display: none; }
+    .phone3 .scr:nth-child(2) { opacity: 1; transform: none; filter: none; }
+    .slide.video video, .demo-wrap { display: none; }
+    .slide.video .print-only { display: flex; }
+  }
+  .print-only { display: none; position: absolute; inset: 0; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: #051F20 center/cover no-repeat; color: #DAF1DE; text-align: center; }
+  .print-only h1, .print-only h2 { color: #DAF1DE; }
+  .print-only h2 { font-size: 48px; }
+  .print-only p { font-size: 22px; color: #B9D6C2; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <!-- 0 · Comercial: se proyecta antes del pitch y no cuenta en los 8 minutos.
+       Espacio o K: reproducir y pausar. Provisorio hasta tener el comercial de 40 s. -->
+  <section class="slide video" data-media="comercial">
+    <video id="comercial" controls playsinline preload="metadata" poster="assets/poster-video.jpg" src="videos/Vuelto_profesional_final_v2.mp4"></video>
+    <div class="print-only portada">
+      <svg class="mark" viewBox="0 0 1024 1024" aria-hidden="true" style="width:96px; height:96px; color:#DAF1DE"><path fill="currentColor" d="M 330 270 L 405 270 L 590 560 C 612 594 646 615 686 615 C 652 647 606 660 565 642 C 542 632 523 613 508 590 Z M 710 285 C 665 308 623 330 592 359 C 555 393 548 437 570 477 C 583 501 599 518 618 535 C 611 501 622 471 648 448 C 675 424 713 408 747 389 C 780 371 795 341 795 285 C 767 300 739 315 710 285 Z"/></svg>
+      <h1 style="font-size:110px">Vuelto</h1>
+      <p style="font-size:28px">Con qué pagar, y cuánto tope te queda</p>
+      <p style="font-size:18px; margin-top:40px; color:#8EB69B">Joaquín Nuñez · Jesús Quijada · Agustín Herrero · Santiago Pazos · UADE Startup 2026</p>
+    </div>
+  </section>
+
+  <!-- 1 · Storytelling (integrante 1, 50 s) -->
+  <section class="slide hero" data-time="50">
+    <div class="who">1 · Storytelling · Joaquín<span class="t">0:50</span></div>
+    <div class="scene center">
+      <div>
+        <div class="kicker rise">Un martes cualquiera, en la caja</div>
+        <h2 class="rise" style="--d:.05s; font-size:62px">Pagaste con la tarjeta de siempre.<br><span class="acc">La promo era con otra.</span></h2>
+        <p class="lead rise" style="--d:.12s; margin-top:26px">Las promos cambian por día, banco, billetera y tarjeta. Y el tope de reintegro se comparte entre promos y nadie te dice cuánto queda.</p>
+      </div>
+      <div class="ticket rise" style="--d:.18s" aria-label="Ejemplo de una compra: 40.000 pesos pagados con la tarjeta de siempre, cuando otra daba 20% de reintegro">
+        <div class="row"><span>Natural Life</span><b>martes</b></div>
+        <hr>
+        <div class="row"><span>Total</span><b>$40.000</b></div>
+        <div class="row"><span>Pagado con</span><b>la de siempre</b></div>
+        <div class="row"><span>Reintegro</span><b>$0</b></div>
+        <hr>
+        <div class="late">Después: «había 20% con otra tarjeta»</div>
+      </div>
+    </div>
+    <div class="waffle-row rise" style="--d:.26s">
+      <div class="waffle" id="waffle" role="img" aria-label="50 de 51 personas encuestadas se enteraron de una promo mejor después de pagar"></div>
+      <p><b>98%</b> se enteró de una promo mejor <b>después</b> de pagar<span class="src">Encuesta propia · 50 de 51 respuestas</span></p>
+    </div>
+  </section>
+
+  <!-- 2 · Producto y valor (integrante 2, 60 s) -->
+  <section class="slide" data-time="60">
+    <div class="who">2 · Producto y valor · Joaquín<span class="t">1:00</span></div>
+    <div class="kicker rise" style="margin-top:18px">Vuelto</div>
+    <h2 class="rise" style="--d:.05s">Te dice con qué pagar <span class="acc">y cuánto tope te queda</span></h2>
+    <div class="center">
+      <table class="vs rise" style="--d:.12s">
+        <thead><tr><th></th><th>Apps y listas de promos</th><th class="v">Vuelto</th></tr></thead>
+        <tbody>
+          <tr><td>Qué te da</td><td>Todas las promos del día</td><td class="v">Una respuesta: con qué medio pagar esta compra</td></tr>
+          <tr><td>El tope</td><td>No lo ves</td><td class="v">Cuánto queda, estimado y con sus compras de base</td></tr>
+          <tr><td>Tus medios</td><td>Filtrás a mano</td><td class="v">Cruza solo las tarjetas y billeteras que tenés</td></tr>
+          <tr><td>Entre varios</td><td>—</td><td class="v">Quién conviene que pague la cuenta</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="foot rise" style="--d:.2s">Para quien paga con varias tarjetas y billeteras en el súper, la farmacia o la dietética. Sin conectar el banco.</p>
+  </section>
+
+  <!-- 3 · Experiencia UX/UI (integrante 3, 60 s): tres decisiones de interfaz -->
+  <section class="slide flow" data-time="60" data-steps="3">
+    <div class="who">3 · Experiencia UX/UI · Jesús<span class="t">1:00</span></div>
+    <div class="ftxt">
+      <div class="kicker rise">Tres decisiones de interfaz</div>
+      <h2 class="rise" style="--d:.05s">Una pregunta, una respuesta</h2>
+      <ol class="fsteps rise" style="--d:.12s">
+        <li><span class="n">1</span><div><b>Se prueba sin cuenta</b><div class="d"><p>Elegís tus tarjetas y ya ves con qué pagar. La cuenta se pide al final, para guardar.</p></div></div></li>
+        <li><span class="n">2</span><div><b>Una respuesta, no una lista</b><div class="d"><p>Comercio y monto: la pantalla dice qué medio usar y cuánto vuelve. El resto, abajo y opcional.</p></div></div></li>
+        <li><span class="n">3</span><div><b>El tope, con su base</b><div class="d"><p>Nunca una cifra falsamente precisa: «≈», y en cuántas compras se basa.</p></div></div></li>
+      </ol>
+    </div>
+    <div class="phone3 rise" style="--d:.1s"><div class="screen">
+      <img class="scr" src="assets/capturas/primera-respuesta.jpg" alt="Primera respuesta sin cuenta: te conviene Galicia Visa crédito en COTO">
+      <img class="scr" src="assets/capturas/recomendacion.jpg" alt="Recomendación: Galicia Visa crédito, 20%">
+      <img class="scr" src="assets/capturas/topes.jpg" alt="Tus topes: estimado, con las compras en que se basa">
+    </div></div>
+  </section>
+
+  <!-- 4 · Demo del MVP (integrante 4, 100 s): grabación real, sin audio, narrada en vivo.
+       El archivo va en entrega/Startup_DemoMVP.mp4. Espacio o K: reproducir y pausar. -->
+  <section class="slide video" data-time="100" data-media="demo">
+    <div class="who">4 · Demo del MVP · Jesús · en vivo<span class="t">1:40</span></div>
+    <div class="demo-wrap"><video id="demo" muted playsinline preload="auto" src="entrega/Startup_DemoMVP.mp4"></video></div>
+    <div class="demo-clock" id="demo-clock">1:40</div>
+    <div class="demo-falta">
+      <span class="badge">Pendiente</span>
+      <h2>Falta la grabación real del MVP</h2>
+      <p>Guardarla como <code>docs/presentacion/entrega/Startup_DemoMVP.mp4</code>: captura de pantalla de la app funcionando, sin voz, de 100 s como máximo. La guía no acepta animaciones, prototipos ni video generado con IA.</p>
+    </div>
+    <div class="print-only"><h2>Demo del MVP · 100 s</h2><p>Grabación real de la app, narrada en vivo · Startup_DemoMVP.mp4</p></div>
+  </section>
+
+  <!-- 5 · Arquitectura (integrante 5, 80 s). Cuatro pasos: cada → enciende una parte del diagrama. -->
+  <section class="slide steps" data-time="80" data-steps="4">
+    <div class="who">5 · Arquitectura · Agustín<span class="t">1:20</span></div>
+    <div class="kicker rise" style="margin-top:18px">Por dentro</div>
+    <h2 class="rise" style="--d:.05s">El motor corre en el celular, sin red</h2>
+    <div class="center">
+      <svg class="dia rise" style="--d:.12s" viewBox="0 0 1120 380" role="img" aria-label="Diagrama: la ingesta lee cada día la API pública de MODO y publica las promos en Supabase; la app Expo las sincroniza y corre el motor de reglas en el celular. Fuera del camino crítico, la app manda la foto del ticket a una Edge Function que la lee con Groq, y pide el cálculo del gasto en grupo a otra Edge Function con el mismo motor.">
+        <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker><marker id="ahd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--warn)"/></marker></defs>
+        <rect class="band" x="0" y="0" width="1120" height="170" rx="20"/>
+        <text x="22" y="32" class="tagt" style="fill:var(--accent)">CAMINO CRÍTICO · SIN MODELO DE LENGUAJE</text>
+
+        <!-- Flujo: las promos viajan de MODO a la app (los puntos pasan por debajo de las cajas) -->
+        <g class="flow" data-s="2" aria-hidden="true">
+          <circle r="6"><animateMotion dur="3.2s" repeatCount="indefinite" path="M122 101 H1005"/></circle>
+          <circle r="6"><animateMotion dur="3.2s" begin="1.07s" repeatCount="indefinite" path="M122 101 H1005"/></circle>
+          <circle r="6"><animateMotion dur="3.2s" begin="2.13s" repeatCount="indefinite" path="M122 101 H1005"/></circle>
+        </g>
+
+        <g data-s="1">
+          <rect class="box" x="22" y="56" width="200" height="90" rx="16"/>
+          <text x="40" y="94" class="ttl">API de MODO</text><text x="40" y="125" class="sub">promos públicas</text>
+          <rect class="box" x="312" y="56" width="220" height="90" rx="16"/>
+          <text x="330" y="94" class="ttl">Ingesta</text><text x="330" y="125" class="sub">GitHub Actions</text>
+          <rect class="box" x="622" y="56" width="200" height="90" rx="16"/>
+          <text x="640" y="94" class="ttl">Supabase</text><text x="640" y="125" class="sub">Postgres + RLS</text>
+          <path class="arrow" d="M222 101 H308" marker-end="url(#ah)"/><text class="verb" x="267" y="88">lee a diario</text>
+          <path class="arrow" d="M532 101 H618" marker-end="url(#ah)"/><text class="verb" x="577" y="88">publica</text>
+        </g>
+
+        <g data-s="2">
+          <rect class="box core" x="912" y="56" width="186" height="90" rx="16"/>
+          <text x="930" y="94" class="ttl oh">App Expo</text><text x="930" y="125" class="sub oh2">motor + Redux</text>
+          <path class="arrow" d="M822 101 H908" marker-end="url(#ah)"/><text class="verb" x="867" y="88">sincroniza</text>
+        </g>
+
+        <g data-s="3">
+          <text x="22" y="222" class="tagt" style="fill:var(--warn)">FUERA DEL CAMINO CRÍTICO</text>
+          <text x="22" y="252" class="sub">Solo donde hay un secreto</text><text x="22" y="278" class="sub">o datos de otros usuarios.</text>
+          <rect class="llm" x="622" y="214" width="230" height="150" rx="16"/>
+          <text x="640" y="254" class="ttl">Ticket</text><text x="640" y="284" class="sub">Edge Function</text>
+          <text x="640" y="326" class="tagt" style="fill:var(--warn)">GROQ · LEE, NO DECIDE</text>
+          <path class="arrow d" d="M950 150 V186 H737 V210" marker-end="url(#ahd)"/><text class="verb" x="843" y="204">manda la foto</text>
+        </g>
+
+        <g data-s="4">
+          <rect class="box" x="912" y="234" width="186" height="130" rx="16"/>
+          <text x="930" y="274" class="ttl">En grupo</text><text x="930" y="304" class="sub">Edge Function</text>
+          <text x="930" y="342" class="tagt" style="fill:var(--ok)">MISMO MOTOR</text>
+          <path class="arrow" d="M1060 150 V230" marker-end="url(#ah)"/><text class="verb" x="1050" y="214" style="text-anchor:end">pide el cálculo</text>
+        </g>
+      </svg>
+    </div>
+    <div class="deci" data-s="4">
+      <div><b>Motor en TypeScript puro</b>Sin dependencias: misma respuesta para los mismos datos, con tests.</div>
+      <div><b>Se deriva, no se guarda</b>Recomendación y topes salen de selectores sobre el estado.</div>
+      <div><b>Seguridad desde la tabla</b>RLS al crear cada tabla; las keys nunca viajan al celular.</div>
+    </div>
+  </section>
+
+  <!-- 6 · Inteligencia Artificial (integrante 6, 70 s): escenarios A y B -->
+  <section class="slide" data-time="70">
+    <div class="who">6 · Inteligencia artificial · Santiago<span class="t">1:10</span></div>
+    <div class="kicker rise" style="margin-top:18px">Uso de IA, con evidencia</div>
+    <h2 class="rise" style="--d:.05s; font-size:48px">La IA lee y construye. <span class="acc">Nunca decide con qué pagar.</span></h2>
+    <div class="center">
+      <table class="ia rise" style="--d:.12s">
+        <thead><tr><th></th><th>En el producto<small>Escenario A</small></th><th>Para desarrollarlo<small>Escenario B</small></th></tr></thead>
+        <tbody>
+          <tr><td>Qué tarea</td><td>Leer la foto del ticket: monto, fecha, comercio y medio</td><td>Specs, código, tests, revisión y documentación</td></tr>
+          <tr><td>Con qué</td><td>Groq (<b>qwen3.8-27b</b>) en una Edge Function, con salida contra un esquema estricto</td><td><b>Claude Code</b> con spec-kit y agentes que revisan specs y corren tests</td></tr>
+          <tr><td>Cómo se midió</td><td><span class="pips" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><b>5 de 5</b> tickets reales en monto, fecha y comercio; <b>3 de 3</b> en el medio</td><td>CI con 7 chequeos y <b>1804 tests</b>; cada PR lo revisa una persona</td></tr>
+          <tr><td>Límites</td><td>Muestra chica. Leía la razón social y una vez dejó ver el nombre de un mozo: se ajustó</td><td>Errores de la IA registrados en la bitácora: <b>78 sesiones</b></td></tr>
+          <tr><td>Qué decidimos</td><td>El usuario confirma lo leído; la foto no se guarda; el motor no tiene LLM</td><td>Alcance y arquitectura los decide el equipo, con cada decisión escrita</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src rise" style="--d:.2s">Fuentes en el repo: docs/product/precision-extractor.md · docs/uso-de-ia.md · docs/bitacora-prompts.md</p>
+  </section>
+
+  <!-- 7a · Cierre en español (integrante 7, 30 s) -->
+  <section class="slide hero" data-time="30">
+    <div class="who">7 · Cierre · Santiago<span class="t">0:30</span></div>
+    <div style="margin-top:18px">
+      <span class="lang rise">ESPAÑOL</span>
+      <h2 class="rise" style="--d:.05s; margin-top:18px; font-size:50px">Funciona hoy. <span class="acc">Falta probarlo con más gente.</span></h2>
+    </div>
+    <div class="row rise center" style="--d:.12s">
+      <div class="pane"><div class="kicker">Validamos</div><ul><li>El problema: <b>98%</b> lo vivió</li><li><b>3244</b> promos reales, al día solas</li><li>La lectura del ticket</li></ul></div>
+      <div class="pane"><div class="kicker">Aprendimos</div><ul><li>No falta información: <b>falta la decisión</b></li><li>El tope es lo que nadie ve</li></ul></div>
+      <div class="pane"><div class="kicker">Próximos pasos</div><ul><li>Probarlo con más usuarios</li><li>Leer la letra chica con IA</li><li>Más bancos y billeteras</li></ul></div>
+    </div>
+    <p class="src rise" style="--d:.2s">Encuesta propia, 51 respuestas · ingesta del 17/11 · lectura de 5 tickets reales (docs/product/precision-extractor.md)</p>
+  </section>
+
+  <!-- 7b · Closing in English (integrante 7, 30 s) -->
+  <section class="slide hero" data-time="30">
+    <div class="who">7 · Closing · Santiago<span class="t">0:30</span></div>
+    <div class="center">
+      <span class="lang rise">ENGLISH</span>
+      <p class="quote rise" style="--d:.06s; margin-top:22px">Every purchase has a right way to pay.<br><span class="acc">Vuelto finds it before you pay.</span></p>
+      <p class="lead rise" style="--d:.14s; margin-top:26px">Today, a working MVP for Argentina's shoppers. Tomorrow, every bank, every wallet, every refund cap, in one decision.</p>
+    </div>
+    <div class="rise" style="--d:.22s; display:flex; align-items:center; gap:22px">
+      <svg class="mark" viewBox="0 0 1024 1024" aria-hidden="true"><path fill="currentColor" d="M 330 270 L 405 270 L 590 560 C 612 594 646 615 686 615 C 652 647 606 660 565 642 C 542 632 523 613 508 590 Z M 710 285 C 665 308 623 330 592 359 C 555 393 548 437 570 477 C 583 501 599 518 618 535 C 611 501 622 471 648 448 C 675 424 713 408 747 389 C 780 371 795 341 795 285 C 767 300 739 315 710 285 Z"/></svg>
+      <div><p style="font-size:34px; font-weight:800">Thank you.</p><p class="foot" style="margin-top:4px">Joaquín Nuñez · Jesús Quijada · Agustín Herrero · Santiago Pazos · UADE Startup 2026</p></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="ctrl">
+  <span id="timer">00:00</span>
+  <span id="counter">1 / 9</span>
+  <button id="theme" type="button" title="Modo claro u oscuro (D)">Claro / oscuro</button>
+  <button id="prev" type="button" aria-label="Anterior">←</button>
+  <button id="next" type="button" aria-label="Siguiente">→</button>
+  <button id="edit" type="button" title="Editar el texto (E)">Editar</button>
+  <button id="present" type="button" title="Pantalla completa (F)">Pantalla completa</button>
+</div>
+<div id="progress"></div>
+<div id="edit-bar">Modo edición · Ctrl/Cmd+S descarga el HTML corregido · Esc para salir</div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var stage = document.getElementById('stage');
+  var counter = document.getElementById('counter');
+  var progress = document.getElementById('progress');
+  var root = document.documentElement;
+  var cur = 0, step = 0;
+
+  function stepsOf(i) { return parseInt(slides[i].getAttribute('data-steps') || '1', 10); }
+  function videoOf(i) { return slides[i] && slides[i].querySelector('video'); }
+  function fmtT(s) { var neg = s < 0; s = Math.abs(s); return (neg ? '+' : '') + Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60); }
+
+  /* Tema: el guardado, o el del sistema */
+  function setTheme(t) { root.setAttribute('data-theme', t); try { localStorage.setItem('vuelto-deck-tema', t); } catch (e) {} }
+  var saved = null;
+  try { saved = localStorage.getItem('vuelto-deck-tema'); } catch (e) {}
+  setTheme(saved || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+  function toggleTheme() { setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
+  document.getElementById('theme').addEventListener('click', toggleTheme);
+
+  /* Capturas que faltan: se marcan como pendientes */
+  Array.prototype.forEach.call(document.querySelectorAll('.phone3 .scr'), function (img) {
+    function vacia() {
+      if (img.getAttribute('data-vacia')) return;
+      img.setAttribute('data-vacia', '1'); img.style.visibility = 'hidden';
+      var s = document.createElement('div'); s.className = 'vacia';
+      s.textContent = '[PENDIENTE: captura ' + (img.getAttribute('src') || '').replace('assets/capturas/', '') + ']';
+      img.parentNode.appendChild(s);
+    }
+    img.addEventListener('error', vacia);
+    if (img.complete && img.naturalWidth === 0) vacia();
+  });
+
+  /* Waffle del 98%: 51 respuestas, 50 lo vivieron */
+  (function () {
+    var w = document.getElementById('waffle'), html = '';
+    for (var i = 0; i < 51; i++) html += i < 50 ? '<i></i>' : '<i class="no"></i>';
+    w.innerHTML = html;
+  })();
+
+  /* Demo: si el MP4 no está, se muestra el aviso; mientras corre, la cuenta de los 100 s */
+  var demo = document.getElementById('demo'), demoSlide = demo.closest('.slide'), clock = document.getElementById('demo-clock');
+  demo.addEventListener('error', function () { demoSlide.classList.add('sin-demo'); });
+  demo.addEventListener('loadeddata', function () { demoSlide.classList.remove('sin-demo'); });
+  demo.addEventListener('timeupdate', function () {
+    var left = 100 - Math.floor(demo.currentTime);
+    clock.textContent = fmtT(left); clock.classList.toggle('over', left < 0);
+  });
+  demo.addEventListener('click', function () { toggleVideo(demo); });
+
+  function toggleVideo(v) { if (!v) return; if (v.paused) { var p = v.play(); if (p && p.catch) p.catch(function () {}); } else v.pause(); }
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+
+  function paint() {
+    var el = slides[cur];
+    var scr = el.querySelectorAll('.scr');
+    for (var i = 0; i < scr.length; i++) { scr[i].classList.toggle('on', i === step); scr[i].classList.toggle('before', i < step); }
+    var li = el.querySelectorAll('.fsteps li');
+    for (var j = 0; j < li.length; j++) li[j].classList.toggle('on', j === step);
+    /* Diagramas por pasos: data-s="N" se enciende en el paso N y queda encendido */
+    var parts = el.querySelectorAll('[data-s]');
+    for (var k = 0; k < parts.length; k++) parts[k].classList.toggle('off', parseInt(parts[k].getAttribute('data-s'), 10) > step + 1);
+  }
+  var slideStart = Date.now();
+  function render() {
+    slides.forEach(function (el, i) {
+      el.classList.toggle('active', i === cur);
+      var v = el.querySelector('video'); if (i !== cur && v && !v.paused) v.pause();
+    });
+    paint();
+    counter.textContent = (cur + 1) + ' / ' + slides.length;
+    progress.style.width = ((cur + 1) / slides.length * 100) + '%';
+    try { history.replaceState(null, '', '#' + (cur + 1) + (stepsOf(cur) > 1 ? '.' + (step + 1) : '')); } catch (e) {}
+  }
+  function go(n, s) {
+    var prevCur = cur;
+    cur = Math.max(0, Math.min(slides.length - 1, n));
+    step = Math.max(0, Math.min(stepsOf(cur) - 1, s || 0));
+    if (cur !== prevCur) { slideStart = Date.now(); resetSlideClock(); }
+    render();
+  }
+  function next() {
+    if (step < stepsOf(cur) - 1) { step++; render(); }
+    else if (cur < slides.length - 1) go(cur + 1, 0);
+  }
+  function prev() {
+    if (step > 0) { step--; render(); }
+    else if (cur > 0) go(cur - 1, stepsOf(cur - 1) - 1);
+  }
+  document.getElementById('next').addEventListener('click', next);
+  document.getElementById('prev').addEventListener('click', prev);
+  Array.prototype.forEach.call(document.querySelectorAll('.phone3'), function (p) { p.addEventListener('click', next); });
+  window.addEventListener('resize', fit);
+
+  /* Modo edición: el texto de las slides se vuelve editable; al guardar se descarga una copia
+     limpia (sin el estado de la presentación) para reemplazar este archivo. */
+  var EDITABLE = '.stage h1, .stage h2, .stage h3, .stage p, .stage li, .stage td, .stage th, .stage .kicker, .stage .lang';
+  var editing = false;
+  function toggleEdit() {
+    editing = !editing;
+    document.body.classList.toggle('editing', editing);
+    Array.prototype.forEach.call(document.querySelectorAll(EDITABLE), function (el) {
+      if (editing) el.setAttribute('contenteditable', 'true'); else el.removeAttribute('contenteditable');
+    });
+    if (!editing && document.activeElement) document.activeElement.blur();
+  }
+  function saveEdited() {
+    var c = root.cloneNode(true);
+    c.removeAttribute('data-theme');
+    Array.prototype.forEach.call(c.querySelectorAll('[contenteditable]'), function (el) { el.removeAttribute('contenteditable'); });
+    Array.prototype.forEach.call(c.querySelectorAll('.vacia'), function (el) { el.parentNode.removeChild(el); });
+    Array.prototype.forEach.call(c.querySelectorAll('[data-vacia]'), function (el) { el.removeAttribute('data-vacia'); el.removeAttribute('style'); });
+    ['active', 'on', 'before', 'off', 'sin-demo', 'low', 'over', 'desborda'].forEach(function (cls) {
+      Array.prototype.forEach.call(c.querySelectorAll('.' + cls), function (el) { el.classList.remove(cls); });
+    });
+    Array.prototype.forEach.call(c.querySelectorAll('.who .t'), function (t) { t.textContent = fmtT(parseInt(t.closest('.slide').getAttribute('data-time'), 10)); });
+    c.querySelector('body').removeAttribute('class');
+    c.querySelector('#stage').removeAttribute('style');
+    c.querySelector('#progress').removeAttribute('style');
+    c.querySelector('#waffle').innerHTML = '';
+    c.querySelector('#timer').textContent = '00:00';
+    c.querySelector('#demo-clock').textContent = '1:40';
+    c.querySelector('#counter').textContent = '1 / ' + slides.length;
+    var blob = new Blob(['<!DOCTYPE html>\n' + c.outerHTML + '\n'], { type: 'text/html' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'vuelto-startup.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+  document.getElementById('edit').addEventListener('click', toggleEdit);
+
+  document.addEventListener('keydown', function (e) {
+    var k = e.key, v = videoOf(cur);
+    if ((e.metaKey || e.ctrlKey) && (k === 's' || k === 'S')) { if (editing) { e.preventDefault(); saveEdited(); } return; }
+    if (e.target && e.target.isContentEditable) { if (k === 'Escape') toggleEdit(); return; }
+    if (k === 'e' || k === 'E') { toggleEdit(); return; }
+    if (editing && k === 'Escape') { toggleEdit(); return; }
+    if (v && (k === ' ' || k === 'k' || k === 'K')) { e.preventDefault(); toggleVideo(v); }
+    else if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); next(); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); prev(); }
+    else if (k === 'Home') go(0, 0);
+    else if (k === 'End') go(slides.length - 1, 0);
+    else if (k === 'f' || k === 'F') toggleFs();
+    else if (k === 'd' || k === 'D') toggleTheme();
+    else if (k === 't' || k === 'T') toggleTimer();
+  });
+
+  function toggleFs() {
+    if (!document.fullscreenElement) { if (root.requestFullscreen) root.requestFullscreen().catch(function () {}); }
+    else if (document.exitFullscreen) document.exitFullscreen();
+  }
+  document.addEventListener('fullscreenchange', function () {
+    document.body.classList.toggle('fs', !!document.fullscreenElement);
+    document.body.classList.remove('idle'); fit();
+  });
+  document.getElementById('present').addEventListener('click', toggleFs);
+
+  var idleT;
+  function wake() { document.body.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(function () { document.body.classList.add('idle'); }, 2500); }
+  document.addEventListener('mousemove', wake);
+  document.addEventListener('mousedown', wake);
+
+  /* T: cronómetro total (abajo) y, en cada parte, la cuenta regresiva de su tiempo.
+     Se pone ámbar en los últimos 10 s y rojo cuando se pasa. */
+  var timerEl = document.getElementById('timer'), t0 = null, tick = null;
+  function fmt(n) { return (n < 10 ? '0' : '') + n; }
+  function resetSlideClock() {
+    Array.prototype.forEach.call(document.querySelectorAll('.who .t'), function (t) {
+      var sl = t.closest('.slide'); t.textContent = fmtT(parseInt(sl.getAttribute('data-time'), 10)); t.classList.remove('low', 'over');
+    });
+  }
+  function tickAll() {
+    var s = Math.floor((Date.now() - t0) / 1000);
+    timerEl.textContent = fmt(Math.floor(s / 60)) + ':' + fmt(s % 60);
+    var sl = slides[cur], budget = parseInt(sl.getAttribute('data-time') || '0', 10), t = sl.querySelector('.who .t');
+    if (!t || !budget || sl === demoSlide) return;  /* la demo se cuenta con su propio reloj */
+    var left = budget - Math.floor((Date.now() - slideStart) / 1000);
+    t.textContent = fmtT(left); t.classList.toggle('low', left <= 10 && left >= 0); t.classList.toggle('over', left < 0);
+  }
+  function toggleTimer() {
+    var on = document.body.classList.toggle('show-timer');
+    if (on) { t0 = t0 || Date.now(); slideStart = Date.now(); tick = setInterval(tickAll, 500); }
+    else { clearInterval(tick); t0 = null; timerEl.textContent = '00:00'; resetSlideClock(); }
+  }
+
+  var sx = null;
+  document.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (sx === null) return;
+    var dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+    sx = null;
+  }, { passive: true });
+
+  /* Revisión de desbordes: después de cargar la fuente, busca en cada slide algo que se salga
+     del escenario 16:9. Siempre deja el resultado en la consola; con ?revisar en la URL además
+     marca en rojo las slides con problemas. */
+  function revisar() {
+    var malas = [];
+    slides.forEach(function (el, i) {
+      var sr = el.getBoundingClientRect(), tol = 2;
+      var fuera = Array.prototype.filter.call(el.querySelectorAll('*'), function (n) {
+        if (n.closest('svg') && n.tagName.toLowerCase() !== 'svg') return false;
+        var r = n.getBoundingClientRect();
+        if (!r.width || !r.height) return false;
+        return r.right > sr.right + tol || r.bottom > sr.bottom + tol || r.left < sr.left - tol || r.top < sr.top - tol;
+      });
+      if (fuera.length) { malas.push(i + 1); if (/[?&]revisar/.test(location.search)) el.classList.add('desborda'); }
+    });
+    if (malas.length) console.warn('Revisión de slides: se sale algo en ' + malas.join(', '));
+    else console.info('Revisión de slides: todo entra en el 16:9');
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { setTimeout(revisar, 300); });
+  else window.addEventListener('load', revisar);
+
+  fit();
+  function fromHash() {
+    var m = (location.hash || '').replace('#', '').split('.');
+    var start = parseInt(m[0], 10), st = parseInt(m[1], 10);
+    var n = isNaN(start) ? 0 : start - 1, s = isNaN(st) ? 0 : st - 1;
+    if (n !== cur || s !== step) go(n, s);
+  }
+  window.addEventListener('hashchange', fromHash);
+  cur = -1; fromHash();
+})();
+</script>
+</body>
+</html>
